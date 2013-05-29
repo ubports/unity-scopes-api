@@ -1,0 +1,39 @@
+Source: unity-scopes
+Priority: extra
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Build-Depends: debhelper (>= 9),
+               cmake,
+               doxygen,
+               graphviz,
+               libgtest-dev,
+               pkg-config,
+               python3,
+               libunity-api-dev,
+Standards-Version: 3.9.4
+Section: libs
+Homepage: https://launchpad.net/unity-api
+Vcs-Bzr: lp:unity-scopes
+Vcs-Browser: https://code.launchpad.net/unity-scopes
+
+Package: libunity-scopes0
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends},
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Description: API for Unity scopes integration
+ Library to integrate scopes with the Unity shell
+
+Package: libunity-scopes-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libunity-api0 (= ${binary:Version}),
+Description: Header files for Unity scopes API
+ Library to integrate scopes with the Unity shell (dev files)
+
+Package: libunity-scopes-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends},
+Description: Documentation for Unity scopes API
+ Library to integrate scopes with the Unity shell (documentation)

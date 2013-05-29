@@ -1,0 +1,7 @@
+add_subdirectory(internal)
+add_subdirectory(scopes)
+
+set(SRC
+)
+
+set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

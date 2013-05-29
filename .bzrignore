@@ -1,0 +1,8 @@
+# default build dir
+/build*
+
+# Eclipse project files
+/.project
+/.cproject
+/.settings
+/.pydevproject

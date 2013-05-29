@@ -1,0 +1,4 @@
+set(HDR_INSTALL_DIR include)
+add_subdirectory(unity)
+
+set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} PARENT_SCOPE)
