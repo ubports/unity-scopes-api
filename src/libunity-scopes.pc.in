@@ -17,7 +17,8 @@
 #
 
 Name: lib@UNITY_SCOPES_LIB@
-Description: Unity Scopes library
+Description: Unity Scopes API library
 Version: @UNITY_SCOPES_MAJOR@.@UNITY_SCOPES_MINOR@
-Libs: -L@CMAKE_INSTALL_PREFIX@/lib -lunity-scopes
+libdir=@libdir@
+Libs: -L${libdir} -l@UNITY_SCOPES_LIB@
 Cflags: -I@CMAKE_INSTALL_PREFIX@/include
