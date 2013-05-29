@@ -19,7 +19,7 @@
 #include <unity/api/scopes/internal/ScopeBaseImpl.h>
 #include <unity/api/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
-
+#include <scope-api-testconfig.h>
 #include <gtest/gtest.h>
 
 using namespace unity::api::scopes;
@@ -27,7 +27,7 @@ using namespace unity::api::scopes::internal;
 
 namespace
 {
-    char const* scopelib = TESTLIBDIR "/libscopelib.so";
+    char const* scopelib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/ScopeBase/libscopelib.so";
 }
 
 bool create_called = false;
