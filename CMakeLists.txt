@@ -112,7 +112,7 @@ set(OTHER_LIBS
 set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 
 # Library install prefix
-set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
+set(LIB_INSTALL_PREFIX "lib" CACHE PATH "Destination install dir for the library")
 
 # Tests
 include(CTest)
