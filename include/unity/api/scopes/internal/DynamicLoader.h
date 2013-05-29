@@ -46,7 +46,7 @@ namespace internal
 // requiring an unresolved symbol is looked for (lazy binding) or whether all functions are bound
 // immediately on loading. (References to variables are always bound immediately, regardless of the flag.)
 //
-// By default, the destructor calls dlclose(). If you don't the destructor to call dlclose(), pass
+// By default, the destructor calls dlclose(). If you don't want the destructor to call dlclose(), pass
 // Unload::noclose to create(). This will leave the library loaded in memory, even after this instance is destroyed.
 // Note that, if a thread is still executing inside the library when it is unloaded, or if the code elsewhere
 // still holds a reference to something in the library and uses the reference once the library is unloaded,
