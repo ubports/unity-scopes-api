@@ -20,15 +20,16 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-#include <boost/regex.hpp>  // BUGFIX: We don't use std::regex because, as of gcc 4.7.2, it is still broken
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity::api::scopes::internal;
 
 namespace
 {
-    char const* goodlib = TESTLIBDIR "/libtestlib.so";
-    char const* badlib = TESTLIBDIR "/libbadtestlib.so";
+    char const* goodlib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/DynamicLoader/libtestlib.so";
+    char const* badlib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/DynamicLoader/libbadtestlib.so";
 }
 
 // Basic test.

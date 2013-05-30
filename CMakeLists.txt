@@ -63,8 +63,7 @@ include(FindPkgConfig)
 find_package(Boost 1.49.0 COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
-set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LIBRARIES})
-link_directories(${UNITY_API_LIBRARY_DIRS})
+set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS})
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -113,7 +112,7 @@ set(OTHER_LIBS
 set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 
 # Library install prefix
-set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
+set(LIB_INSTALL_PREFIX "lib" CACHE PATH "Destination install dir for the library")
 
 set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_PREFIX} CACHE PATH "Destination install dir for the library")
 set(libdir ${LIBDIR})
