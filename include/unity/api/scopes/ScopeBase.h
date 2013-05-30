@@ -59,10 +59,10 @@ public:
 ~~~
 
 The derived class must provide implementations of the pure virtual methods initialize(), finalize(), and start();
-In addition, the librarya must provide two functions with "C" linkage. The create function must return a pointer to
+In addition, the library must provide two functions with "C" linkage. The create function must return a pointer to
 the derived instance, which the Unity run time passes back to the destroy function before the scope library is
 unloaded. Typically, the create and destroy functions will simply call new and delete, respectively. (However,
-there is no requirement that the derived class instance must be heap allocated.
+there is no requirement that the derived class instance must be heap allocated.)
 
 Rather than hard-coding the names of the functions, use the #UNITY_API_SCOPE_CREATE_FUNCTION and
 #UNITY_API_SCOPE_DESTROY_FUNCTION macros, for example:
