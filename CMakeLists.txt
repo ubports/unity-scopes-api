@@ -29,6 +29,10 @@ if(cmake_build_type_lower MATCHES coverage)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+
+  # We add -g when building with coverage so valgrind reports line numbers.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
 endif()
 
 # Static C++ checks
@@ -134,7 +138,6 @@ endif()
 # Documentation
 #
 
-message("lib: ${UNITY_SCOPES_LIB}")
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
