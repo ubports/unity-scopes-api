@@ -33,14 +33,18 @@ endif()
 
 # Static C++ checks
 
-set(cppcheck_flags --inline-suppr --enable=all -q --error-exitcode=2)
-set(cppcheck_flags ${cppcheck_flags} --template '{file}({line}): {severity} ({id}): {message}')
-
-add_custom_target(cppcheck COMMAND cppcheck ${cppcheck_flags}
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/test
-    ${CMAKE_BINARY_DIR}/test
-)
+find_program(CPPCHECK_COMMAND NAMES cppcheck)
+if (CPPCHECK_COMMAND)
+    set(CPPCHECK_COMMAND_OPTIONS --check-config --inline-suppr --enable=all -q --error-exitcode=2)
+    set(CPPCHECK_COMMAND_OPTIONS ${CPPCHECK_COMMAND_OPTIONS} --template '{file}({line}): {severity} ({id}): {message}')
+    add_custom_target(cppcheck COMMAND ${CPPCHECK_COMMAND} ${CPPCHECK_COMMAND_OPTIONS}
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/test
+        ${CMAKE_BINARY_DIR}/test
+    )
+else()
+    message(WARNING "Cannot find cppcheck: cppcheck target will not be available")
+endif()
 
 #
 # Definitions for testing with valgrind.
@@ -134,7 +138,6 @@ endif()
 # Documentation
 #
 
-message("lib: ${UNITY_SCOPES_LIB}")
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
