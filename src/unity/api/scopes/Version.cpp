@@ -30,28 +30,24 @@ namespace scopes
 {
 
 int
-Version::
 major_version()
 {
     return UNITY_SCOPES_VERSION_MAJOR;
 }
 
 int
-Version::
 minor_version()
 {
     return UNITY_SCOPES_VERSION_MINOR;
 }
 
 int
-Version::
 micro_version()
 {
     return UNITY_SCOPES_VERSION_MICRO;
 }
 
 char const*
-Version::
 str()
 {
     return UNITY_SCOPES_VERSION_STRING;
