@@ -16,9 +16,12 @@
 # Authored by: Michi Henning <michi.henning@canonical.com>
 #
 
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/include
+libdir=@LIBDIR@
+
 Name: lib@UNITY_SCOPES_LIB@
 Description: Unity Scopes API library
 Version: @UNITY_SCOPES_MAJOR@.@UNITY_SCOPES_MINOR@
-libdir=@libdir@
 Libs: -L${libdir} -l@UNITY_SCOPES_LIB@
-Cflags: -I@CMAKE_INSTALL_PREFIX@/include
+Cflags: -I${includedir}
