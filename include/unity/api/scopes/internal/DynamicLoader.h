@@ -84,11 +84,14 @@ public:
 
     void* find_variable(std::string const& symbol);
 
+    std::string path() const;
+
     ~DynamicLoader() noexcept;
 
 private:
     DynamicLoader(std::string const& path, Binding b, Unload ul);
 
+    std::string path_;
     void* handle_;
     Unload unload_;
 };

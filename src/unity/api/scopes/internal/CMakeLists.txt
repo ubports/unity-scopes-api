@@ -1,6 +1,7 @@
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
 )
 
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

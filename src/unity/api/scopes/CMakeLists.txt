@@ -2,6 +2,7 @@ add_subdirectory(internal)
 
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeExceptions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Version.cpp
 )
 
