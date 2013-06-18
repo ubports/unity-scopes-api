@@ -30,36 +30,28 @@ namespace scopes
 
 /// @cond
 
-ScopeBase::
-ScopeBase()
+ScopeBase::ScopeBase()
     : p_(new internal::ScopeBaseImpl)
 {
 }
 
-ScopeBase::
-~ScopeBase()
+ScopeBase::~ScopeBase()
 {
 }
 
 /// @endcond
 
-void
-ScopeBase::
-stop()
+void ScopeBase::stop()
 {
     p_->stop();
 }
 
-void
-ScopeBase::
-run() noexcept
+void ScopeBase::run() noexcept
 {
     p_->run();
 }
 
-void
-ScopeBase::
-runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
+void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     p_->runtime_version(v_major, v_minor, v_micro);
 }

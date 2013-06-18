@@ -35,8 +35,7 @@ namespace scopes
 namespace internal
 {
 
-DynamicLoader::
-DynamicLoader(string const& path, Binding b, Unload ul)
+DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
     : unload_(ul)
 {
     if ((handle_ = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
@@ -45,8 +44,7 @@ DynamicLoader(string const& path, Binding b, Unload ul)
     }
 }
 
-DynamicLoader::
-~DynamicLoader() noexcept
+DynamicLoader::~DynamicLoader() noexcept
 {
     if (unload_ == Unload::automatic)
     {
@@ -54,16 +52,12 @@ DynamicLoader::
     }
 }
 
-DynamicLoader::UPtr
-DynamicLoader::
-create(string const& path, Binding b, Unload ul)
+DynamicLoader::UPtr DynamicLoader::create(string const& path, Binding b, Unload ul)
 {
     return UPtr(new DynamicLoader(path, b, ul));
 }
 
-DynamicLoader::VoidFunc
-DynamicLoader::
-find_function(string const& symbol)
+DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 {
     // The ugly cast is needed because a void* (returned by dlsym()) is not compatible with a function pointer.
     VoidFunc func;
@@ -71,9 +65,7 @@ find_function(string const& symbol)
     return func;
 }
 
-void*
-DynamicLoader::
-find_variable(string const& symbol)
+void* DynamicLoader::find_variable(string const& symbol)
 {
     dlerror();  // Clear any existing error
     void* p = dlsym(handle_, symbol.c_str());

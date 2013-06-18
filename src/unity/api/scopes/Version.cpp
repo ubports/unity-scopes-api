@@ -29,26 +29,22 @@ namespace api
 namespace scopes
 {
 
-int
-major_version()
+int major_version()
 {
     return UNITY_SCOPES_VERSION_MAJOR;
 }
 
-int
-minor_version()
+int minor_version()
 {
     return UNITY_SCOPES_VERSION_MINOR;
 }
 
-int
-micro_version()
+int micro_version()
 {
     return UNITY_SCOPES_VERSION_MICRO;
 }
 
-char const*
-str()
+char const* str()
 {
     return UNITY_SCOPES_VERSION_STRING;
 }

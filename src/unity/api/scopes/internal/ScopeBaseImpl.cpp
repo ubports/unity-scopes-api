@@ -30,31 +30,23 @@ namespace scopes
 namespace internal
 {
 
-ScopeBaseImpl::
-ScopeBaseImpl()
+ScopeBaseImpl::ScopeBaseImpl()
 {
 }
 
-ScopeBaseImpl::
-~ScopeBaseImpl()
+ScopeBaseImpl::~ScopeBaseImpl()
 {
 }
 
-void
-ScopeBaseImpl::
-stop()
+void ScopeBaseImpl::stop()
 {
 }
 
-void
-ScopeBaseImpl::
-run()
+void ScopeBaseImpl::run()
 {
 }
 
-void
-ScopeBaseImpl::
-runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
+void ScopeBaseImpl::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = unity::api::scopes::major_version();
     v_minor = unity::api::scopes::minor_version();
