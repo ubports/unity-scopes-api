@@ -19,12 +19,11 @@
 #ifndef SCOPELOADERTEST_MYSCOPE
 #define SCOPELOADERTEST_MYSCOPE
 
-#include <unity/SymbolExport.h>
 #include "Counters.h"
 
 // Test scope class that allows us to count the number of calls to start() and stop().
 
-class UNITY_API MyScope : public unity::api::scopes::ScopeBase
+class EXPORT MyScope : public unity::api::scopes::ScopeBase
 {
 public:
     MyScope() {}
@@ -32,7 +31,7 @@ public:
 
     virtual void start() { inc_start(); }
     virtual void stop() { inc_stop(); }
-    virtual void query(std::string const& /* q */) {}
+    virtual void query(std::string const& /* q */, std::function<void(std::string const&)> /* callback */) {}
 };
 
 #endif

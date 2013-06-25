@@ -39,37 +39,37 @@ namespace internal
 {
 
 ScopeLoader::ScopeLoader(string const& name, string const& path, MiddlewareBase::SPtr& middleware)
-    : scope_name_(name)
-    , dyn_loader_(DynamicLoader::create(path))
-    , middleware_(middleware)
-    , scope_state_(ScopeState::Created)
-    , scope_cmd_(ScopeCmd::None)
+    : m_scope_name(name)
+    , m_dyn_loader(DynamicLoader::create(path))
+    , m_middleware(middleware)
+    , m_scope_state(ScopeState::Created)
+    , m_scope_cmd(ScopeCmd::None)
 {
     // Look for the scope create and destroy functions.
     unity::api::scopes::CreateFunction create_func
         = reinterpret_cast<unity::api::scopes::CreateFunction>(
-            dyn_loader_->find_function(UNITY_API_SCOPE_CREATE_SYMSTR)
+            m_dyn_loader->find_function(UNITY_API_SCOPE_CREATE_SYMSTR)
           );
     unity::api::scopes::DestroyFunction destroy_func
         = reinterpret_cast<unity::api::scopes::DestroyFunction>(
-            dyn_loader_->find_function(UNITY_API_SCOPE_DESTROY_SYMSTR)
+            m_dyn_loader->find_function(UNITY_API_SCOPE_DESTROY_SYMSTR)
           );
 
     // Make a new thread. The thread initializes the scope and then waits for signals to transition
     // between the Stopped and Started state, or to the Finished state.
-    scope_thread_ = std::thread(&ScopeLoader::run_scope, this, create_func, destroy_func);
+    m_scope_thread = std::thread(&ScopeLoader::run_scope, this, create_func, destroy_func);
 
     // Wait until the thread has finished initializing.
-    std::unique_lock<std::mutex> lock(lock_);
-    while (scope_state_ == ScopeState::Created)
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while (m_scope_state == ScopeState::Created)
     {
-        state_changed_.wait(lock);
+        m_state_changed.wait(lock);
     }
 
     // Check that we initialized successfully.
-    if (scope_state_ == ScopeState::Failed)
+    if (m_scope_state == ScopeState::Failed)
     {
-        scope_thread_.join();
+        m_scope_thread.join();
         throw unity::ResourceException("Failed to initialize thread for scope \"" + name + "\"");
     }
 }
@@ -86,33 +86,33 @@ ScopeLoader::UPtr ScopeLoader::load(string const& name, string const& path, Midd
 
 void ScopeLoader::unload() noexcept
 {
-    std::unique_lock<std::mutex> lock(lock_);
-    switch (scope_state_)
+    std::unique_lock<std::mutex> lock(m_mutex);
+    switch (m_scope_state)
     {
         case ScopeState::Started:
         {
             lock.unlock();
             stop();
             lock.lock();
-            while (scope_state_ == ScopeState::Started)
+            while (m_scope_state == ScopeState::Started)
             {
-                state_changed_.wait(lock);
+                m_state_changed.wait(lock);
             }
             // FALLTHROUGH
         }
         case ScopeState::Stopped:
         {
-            scope_cmd_ = ScopeCmd::Finish;
+            m_scope_cmd = ScopeCmd::Finish;
             // FALLTHROUGH
         }
         case ScopeState::Failed:
         case ScopeState::Finished:
         {
             lock.unlock();
-            cmd_changed_.notify_all();
-            if (scope_thread_.joinable())   // If unload is called more than once, don't join a second time.
+            m_cmd_changed.notify_all();
+            if (m_scope_thread.joinable())   // If unload is called more than once, don't join a second time.
             {
-                scope_thread_.join();
+                m_scope_thread.join();
             }
             break;
         }
@@ -126,13 +126,13 @@ void ScopeLoader::unload() noexcept
 void ScopeLoader::start()
 {
     // cppcheck-suppress unreadVariable
-    std::unique_lock<std::mutex> lock(lock_);
-    switch (scope_state_)
+    std::unique_lock<std::mutex> lock(m_mutex);
+    switch (m_scope_state)
     {
         case ScopeState::Stopped:
         {
-            scope_cmd_ = ScopeCmd::Start;
-            cmd_changed_.notify_all();
+            m_scope_cmd = ScopeCmd::Start;
+            m_cmd_changed.notify_all();
             break;
         }
         case ScopeState::Started:
@@ -141,11 +141,11 @@ void ScopeLoader::start()
         }
         case ScopeState::Failed:
         {
-            throw LogicException("Cannot start scope \"" + scope_name_ + "\" in Failed state"); // LCOV_EXCL_LINE
+            throw LogicException("Cannot start scope \"" + m_scope_name + "\" in Failed state"); // LCOV_EXCL_LINE
         }
         case ScopeState::Finished:
         {
-            throw LogicException("Cannot start scope \"" + scope_name_ + "\" in Finished state"); // LCOV_EXCL_LINE
+            throw LogicException("Cannot start scope \"" + m_scope_name + "\" in Finished state"); // LCOV_EXCL_LINE
         }
         default:
         {
@@ -157,13 +157,13 @@ void ScopeLoader::start()
 void ScopeLoader::stop()
 {
     // cppcheck-suppress unreadVariable
-    std::unique_lock<std::mutex> lock(lock_);
-    switch (scope_state_)
+    std::unique_lock<std::mutex> lock(m_mutex);
+    switch (m_scope_state)
     {
         case ScopeState::Started:
         {
-            scope_cmd_ = ScopeCmd::Stop;
-            cmd_changed_.notify_all();
+            m_scope_cmd = ScopeCmd::Stop;
+            m_cmd_changed.notify_all();
         }
         case ScopeState::Stopped:
         case ScopeState::Finished:
@@ -172,7 +172,7 @@ void ScopeLoader::stop()
         }
         case ScopeState::Failed:
         {
-            throw LogicException("Cannot stop scope \"" + scope_name_ + "\" in Failed state"); // LCOV_EXCL_LINE
+            throw LogicException("Cannot stop scope \"" + m_scope_name + "\" in Failed state"); // LCOV_EXCL_LINE
         }
         default:
         {
@@ -183,12 +183,12 @@ void ScopeLoader::stop()
 
 string ScopeLoader::name() const noexcept
 {
-    return scope_name_;
+    return m_scope_name;
 }
 
 string ScopeLoader::libpath() const noexcept
 {
-    return dyn_loader_->path();
+    return m_dyn_loader->path();
 }
 
 void ScopeLoader::run_scope(unity::api::scopes::CreateFunction create_func,
@@ -201,9 +201,9 @@ void ScopeLoader::run_scope(unity::api::scopes::CreateFunction create_func,
         if (scope_base.get() == nullptr)
         {
             // cppcheck-suppress unreadVariable
-            std::unique_lock<std::mutex> lock(lock_);
-            scope_state_ = ScopeState::Failed;
-            state_changed_.notify_all();
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_scope_state = ScopeState::Failed;
+            m_state_changed.notify_all();
             // TODO: Log error
             return;
         }
@@ -211,43 +211,43 @@ void ScopeLoader::run_scope(unity::api::scopes::CreateFunction create_func,
         // Notify the parent thread that we are ready to go.
         {
             // cppcheck-suppress unreadVariable
-            std::unique_lock<std::mutex> lock(lock_);
-            scope_state_ = ScopeState::Stopped;
-            state_changed_.notify_all();
+            std::unique_lock<std::mutex> lock(m_mutex);
+            m_scope_state = ScopeState::Stopped;
+            m_state_changed.notify_all();
         }
 
         // Wait until we are told to do something. We can transition between the Stopped and Started state any
         // number of times. Once we are told to finish, the thread exits, calling the destroy function first.
         bool done = false;
-        std::unique_lock<std::mutex> lock(lock_);
+        std::unique_lock<std::mutex> lock(m_mutex);
         while (!done)
         {
-            while (scope_cmd_ == ScopeCmd::None)
+            while (m_scope_cmd == ScopeCmd::None)
             {
-                cmd_changed_.wait(lock);
+                m_cmd_changed.wait(lock);
             }
-            switch (scope_cmd_)
+            switch (m_scope_cmd)
             {
                 case ScopeCmd::Start:
                 {
                     scope_base.get()->start();
-                    middleware_->start(scope_name_);
-                    scope_state_ = ScopeState::Started;
-                    state_changed_.notify_all();
+                    m_middleware->start(m_scope_name);
+                    m_scope_state = ScopeState::Started;
+                    m_state_changed.notify_all();
                     break;
                 }
                 case ScopeCmd::Stop:
                 {
-                    middleware_->stop();
+                    m_middleware->stop();
                     scope_base.get()->stop();
-                    scope_state_ = ScopeState::Stopped;
-                    state_changed_.notify_all();
+                    m_scope_state = ScopeState::Stopped;
+                    m_state_changed.notify_all();
                     break;
                 }
                 case ScopeCmd::Finish:
                 {
-                    scope_state_ = ScopeState::Finished;
-                    state_changed_.notify_all();
+                    m_scope_state = ScopeState::Finished;
+                    m_state_changed.notify_all();
                     done = true;
                     break;
                 }
@@ -256,7 +256,7 @@ void ScopeLoader::run_scope(unity::api::scopes::CreateFunction create_func,
                     assert(false); // LCOV_EXCL_LINE
                 }
             }
-            scope_cmd_ = ScopeCmd::None;    // We've dealt with this command
+            m_scope_cmd = ScopeCmd::None;    // We've dealt with this command
         }
     }
     catch (unity::Exception const& e)
@@ -281,9 +281,9 @@ void ScopeLoader::run_scope(unity::api::scopes::CreateFunction create_func,
 void ScopeLoader::handle_thread_exception()
 {
     // cppcheck-suppress unreadVariable
-    std::unique_lock<std::mutex> lock(lock_);
-    scope_state_ = ScopeState::Failed;
-    state_changed_.notify_all();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_scope_state = ScopeState::Failed;
+    m_state_changed.notify_all();
 }
 
 } // namespace internal

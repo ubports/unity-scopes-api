@@ -1,12 +1,15 @@
 add_subdirectory(unity)
 
 # Pseudo-library of object files. We need a dynamic version of the library for normal clients,
-# and a static version for the whitebox tests. Everyting is compile with -fPIC, so the same object files
-# are suitable for either. Here, we create an object library that then is used to link the static and dynamic
+# and a static version for the whitebox tests, so we can write unit tests for classes in the internal namespaces
+# (because, for the .so, non-public APIs are compiled with -fvisibility=hidden).
+# Everything is compiled with -fPIC, so the same object files are suitable for either library.
+# Here, we create an object library that then is used to link the static and dynamic
 # libraries, without having to compile each source file twice with different compile flags.
 
 set(UNITY_SCOPES_LIB_OBJ ${UNITY_SCOPES_LIB}-obj)
 add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC})
+set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 # Use the object files to make the shared library.
 set(UNITY_SCOPES_SOVERSION 0)

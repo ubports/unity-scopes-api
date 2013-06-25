@@ -19,7 +19,7 @@
 #ifndef SCOPELOADERTEST_COUNTERS
 #define SCOPELOADERTEST_COUNTERS
 
-#define EXPORT __attribute__ ((visibility("default")))
+#include "TestExports.h"
 
 int EXPORT num_create();
 void EXPORT inc_create();

@@ -24,8 +24,6 @@
 
 #include <cassert>
 
-#define EXPORT __attribute__ ((visibility("default")))
-
 extern "C"
 {
 

@@ -22,8 +22,6 @@
 #include "MyScope.h"
 #include "Counters.h"
 
-#define EXPORT __attribute__ ((visibility("default")))
-
 // Library that doesn't have the expected destroy method
 
 extern "C"

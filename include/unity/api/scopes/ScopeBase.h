@@ -151,7 +151,7 @@ public:
     The passed functor can be used to push the results, either synchronously, while query() is still running,
     or asynchronously, after query() has returned.
     */
-    virtual void query(std::string const& q) = 0;
+    virtual void query(std::string const& q, std::function<void(std::string const&)> callback) = 0;
 
     /**
     \brief This method returns the version information for the scopes API that the scope was compiled with.

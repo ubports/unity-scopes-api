@@ -57,18 +57,18 @@ private:
     void run_scope(unity::api::scopes::CreateFunction create_func, unity::api::scopes::DestroyFunction destroy_func);
     void handle_thread_exception();
 
-    std::string scope_name_;
-    unity::api::scopes::internal::DynamicLoader::UPtr dyn_loader_;
-    unity::api::scopes::internal::MiddlewareBase::SPtr middleware_;
-    std::thread scope_thread_;
+    std::string m_scope_name;
+    unity::api::scopes::internal::DynamicLoader::UPtr m_dyn_loader;
+    unity::api::scopes::internal::MiddlewareBase::SPtr m_middleware;
+    std::thread m_scope_thread;
 
     enum class ScopeState { Created, Stopped, Started, Finished, Failed };
-    ScopeState scope_state_;
-    std::condition_variable state_changed_;
+    ScopeState m_scope_state;
+    std::condition_variable m_state_changed;
     enum class ScopeCmd { None, Start, Stop, Finish };
-    ScopeCmd scope_cmd_;
-    std::condition_variable cmd_changed_;
-    std::mutex lock_;
+    ScopeCmd m_scope_cmd;
+    std::condition_variable m_cmd_changed;
+    std::mutex m_mutex;
 };
 
 } // namespace internal

@@ -28,7 +28,7 @@ public:
     virtual void start() override {}
     virtual void stop() override {}
 
-    virtual void query(std::string const&) override {}
+    virtual void query(std::string const&, std::function<void(std::string const&)>) override {}
 
 protected:
     virtual ~MyScope() {}

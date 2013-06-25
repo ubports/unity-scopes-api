@@ -26,8 +26,6 @@
 
 #include <gtest/gtest.h>
 
-#define EXPORT __attribute__ ((visibility("default")))
-
 using namespace std;
 
 class ScopeA : public MyScope
