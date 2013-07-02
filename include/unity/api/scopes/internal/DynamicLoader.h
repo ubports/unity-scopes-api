@@ -91,9 +91,9 @@ public:
 private:
     DynamicLoader(std::string const& path, Binding b, Unload ul);
 
-    std::string m_path;
-    void* m_handle;
-    Unload m_unload;
+    std::string path_;
+    void* handle_;
+    Unload unload_;
 };
 
 } // namespace internal

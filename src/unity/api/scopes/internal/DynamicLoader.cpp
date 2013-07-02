@@ -36,10 +36,10 @@ namespace internal
 {
 
 DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
-    : m_path(path)
-    , m_unload(ul)
+    : path_(path)
+    , unload_(ul)
 {
-    if ((m_handle = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
+    if ((handle_ = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
     {
         throw ResourceException(dlerror());
     }
@@ -47,9 +47,9 @@ DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
 
 DynamicLoader::~DynamicLoader() noexcept
 {
-    if (m_unload == Unload::automatic)
+    if (unload_ == Unload::automatic)
     {
-        dlclose(m_handle);
+        dlclose(handle_);
     }
 }
 
@@ -69,7 +69,7 @@ DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 void* DynamicLoader::find_variable(string const& symbol)
 {
     dlerror();  // Clear any existing error
-    void* p = dlsym(m_handle, symbol.c_str());
+    void* p = dlsym(handle_, symbol.c_str());
     char const* error = dlerror();
     if (error)
     {
@@ -80,7 +80,7 @@ void* DynamicLoader::find_variable(string const& symbol)
 
 string DynamicLoader::path() const
 {
-    return m_path;
+    return path_;
 }
 
 } // namespace internal
