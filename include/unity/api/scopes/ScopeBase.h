@@ -159,9 +159,7 @@ private:
 // class was compiled with.
 
 inline
-void
-ScopeBase::
-compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept
+void ScopeBase::compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = UNITY_SCOPES_VERSION_MAJOR;
     v_minor = UNITY_SCOPES_VERSION_MINOR;
