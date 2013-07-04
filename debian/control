@@ -17,6 +17,7 @@ Vcs-Browser: https://code.launchpad.net/unity-scopes
 
 Package: libunity-scopes0
 Architecture: any
+Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
@@ -26,6 +27,7 @@ Description: API for Unity scopes integration
 Package: libunity-scopes-dev
 Section: libdevel
 Architecture: any
+Multi-Arch: same
 Depends: ${misc:Depends},
          libunity-api0 (= ${binary:Version}),
 Description: Header files for Unity scopes API
@@ -34,6 +36,7 @@ Description: Header files for Unity scopes API
 Package: libunity-scopes-doc
 Section: doc
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends},
 Description: Documentation for Unity scopes API
  Library to integrate scopes with the Unity shell (documentation)

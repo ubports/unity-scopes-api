@@ -2,15 +2,15 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Lesser GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
@@ -119,11 +119,6 @@ When the scope should complete its activities, the run time calls stop(). The ca
 stop() are made by the same thread.
 */
 
-namespace internal
-{
-class ScopeBaseImpl;
-}
-
 class UNITY_API ScopeBase : private util::NonCopyable
 {
 public:
@@ -173,9 +168,7 @@ protected:
 // class was compiled with.
 
 inline
-void
-ScopeBase::
-compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept
+void ScopeBase::compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = UNITY_SCOPES_VERSION_MAJOR;
     v_minor = UNITY_SCOPES_VERSION_MINOR;
