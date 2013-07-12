@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#define EXPORT __attribute__ ((visibility("default")))
+#include "TestExports.h"
 
 extern "C"
 {

@@ -17,7 +17,6 @@
  */
 
 #include <unity/api/scopes/ScopeBase.h>
-#include <unity/api/scopes/internal/ScopeBaseImpl.h>
 
 namespace unity
 {
@@ -28,32 +27,13 @@ namespace api
 namespace scopes
 {
 
-/// @cond
-
-ScopeBase::ScopeBase()
-    : p_(new internal::ScopeBaseImpl)
+void
+ScopeBase::
+runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
-}
-
-ScopeBase::~ScopeBase()
-{
-}
-
-/// @endcond
-
-void ScopeBase::stop()
-{
-    p_->stop();
-}
-
-void ScopeBase::run() noexcept
-{
-    p_->run();
-}
-
-void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
-{
-    p_->runtime_version(v_major, v_minor, v_micro);
+    v_major = unity::api::scopes::major_version();
+    v_minor = unity::api::scopes::minor_version();
+    v_micro = unity::api::scopes::micro_version();
 }
 
 } // namespace scopes

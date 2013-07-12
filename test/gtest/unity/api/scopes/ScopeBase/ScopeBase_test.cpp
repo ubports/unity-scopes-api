@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeBaseImpl.h>
+#include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 #include <scope-api-testconfig.h>
@@ -34,7 +34,7 @@ bool create_called = false;
 
 // This test loads the scope library via the DynamicLoader and calls the library's create entry point
 // (unity_api_scope_create(), which returns a pointer to a ScopeBase). It then calls the derived instance's
-// initialize(), start(), and finalize() member functions before calling the library's destroy entry point
+// start(), and stop() member functions before calling the library's destroy entry point
 // (unity_api_scope_destroy(), which deallocates the dervied instance again.
 //
 // If all this works without any exceptions or crashes, we know that the basic mechanism of loading and unloading
@@ -70,9 +70,7 @@ TEST(ScopeBase, basic)
     EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
 
-    b->initialize();
     b->start();
     b->stop();
-    b->finalize();
     destroy(b);
 }

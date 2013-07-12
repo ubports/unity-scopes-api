@@ -110,14 +110,22 @@ set(UNITY_SCOPES_VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SC
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
 
+# Static version for testing
+set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    unity-api
     dl
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
+
+# All the libraries we need to link a gtest executable. (We link the tests against a static version
+# so we can do whitebox testing on internal classes.
+set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB} ${OTHER_LIBS})
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})

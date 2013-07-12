@@ -1,1 +1,2 @@
 add_subdirectory(DynamicLoader)
+add_subdirectory(ScopeLoader)

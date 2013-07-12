@@ -19,10 +19,41 @@
 #ifndef UNITY_API_SCOPES_SCOPEBASE_H
 #define UNITY_API_SCOPES_SCOPEBASE_H
 
+#include <unity/SymbolExport.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/api/scopes/Version.h>
 
 #include <memory>
+
+/**
+\brief Expands to the identifier of the scope create function. @hideinitializer
+*/
+#define UNITY_API_SCOPE_CREATE_FUNCTION unity_api_scope_create
+
+/**
+\brief Expands to the identifier of the scope destroy function. @hideinitializer
+*/
+#define UNITY_API_SCOPE_DESTROY_FUNCTION unity_api_scope_destroy
+
+// Convenience definitions for looking up the create and destroy functions in the symbol table
+// of a dynamically loaded scope.
+// UNITY_API_SCOPE_CREATE_SYMSTR and UNITY_API_SCOPE_DESTROY_SYMSTR expand to a string literal containing the name
+// of the create and destroy function, respectively.
+
+#ifndef DOXYGEN_SKIP
+#    define UNITY_API_SCOPE_STR(sym) #sym
+#    define UNITY_API_SCOPE_XSTR(sym) UNITY_API_SCOPE_STR(sym)
+#endif
+
+/**
+\brief Expands to the identifier of the scope create function as a string literal. @hideinitializer
+*/
+#define UNITY_API_SCOPE_CREATE_SYMSTR UNITY_API_SCOPE_XSTR(UNITY_API_SCOPE_CREATE_FUNCTION)
+
+/**
+\brief Expands to the identifier of the scope destroy function as a string literal. @hideinitializer
+*/
+#define UNITY_API_SCOPE_DESTROY_SYMSTR UNITY_API_SCOPE_XSTR(UNITY_API_SCOPE_DESTROY_FUNCTION)
 
 namespace unity
 {
@@ -38,7 +69,7 @@ namespace scopes
 \class ScopeBase
 \brief Base class for a scope implementation.
 
-Scopes are provided to the Unity run time by providing them in a shared library (one library per scope).
+Scopes are accessed by the Unity run time as a shared library (one library per scope).
 Each scope must implement a class that derives from ScopeBase, for example:
 
 ~~~
@@ -50,19 +81,20 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual void initialize();
-    virtual void finalize();
-
     virtual void start();
-    virtual void stop();    // Optional
+    virtual void stop();
 };
 ~~~
 
-The derived class must provide implementations of the pure virtual methods initialize(), finalize(), and start();
-In addition, the library must provide two functions with "C" linkage. The create function must return a pointer to
-the derived instance, which the Unity run time passes back to the destroy function before the scope library is
-unloaded. Typically, the create and destroy functions will simply call new and delete, respectively. (However,
+The derived class must provide implementations of the pure virtual methods start()
+and stop(). In addition, the library must provide two functions with "C" linkage:
+ - a create function that must return a pointer to the derived instance
+ - a destroy function that is passed the pointer returned by the create function
+
+Typically, the create and destroy functions will simply call new and delete, respectively. (However,
 there is no requirement that the derived class instance must be heap allocated.)
+If the create function throws an exception, the destroy function will not be called. If the create function returns
+NULL, the destroy function will be called with NULL as its argument.
 
 Rather than hard-coding the names of the functions, use the #UNITY_API_SCOPE_CREATE_FUNCTION and
 #UNITY_API_SCOPE_DESTROY_FUNCTION macros, for example:
@@ -81,78 +113,55 @@ UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
 }
 ~~~
 
-After the Unity run time has obtained a pointer to the class instance from the create function, it calls initialize(),
-followed by start(), which passes the thread of control to the scope implementation. When the scope should complete
-its activities, the run time calls stop(). Once stop() (which may be overridden by the derived class) returns,
-the run time calls finalize(). The calls to initialize(), start(), and finalize() are made by the same thread.
-(However, stop() is called by a different thread.)
-Once finalize() completes, the run time calls the destroy function and then unloads the library from memory.
-
-The implementation of the scope is free to use the thread that calls start() in any way it deems fit, such as
-to run an event loop. If the implementation of start() does not need to use the thread calling start(),
-the implementation can call run(). run() blocks the calling thread until the run time has called stop()
-and stop() has completed, at which point run() unblocks the calling thread and returns.
-The derived class can override stop() to, for example, arrange for its event loop to terminate and join with
-any threads it has created.
+After the Unity run time has obtained a pointer to the class instance from the create function, it calls start(),
+which allows the scope to intialize itself. Once start() returns, incoming query requests are dispatched to the scope.
+When the scope should complete its activities, the run time calls stop(). The calls to start() and
+stop() are made by the same thread.
 */
-
-namespace internal
-{
-class ScopeBaseImpl;
-}
 
 class UNITY_API ScopeBase : private util::NonCopyable
 {
 public:
     /// @cond
-    virtual ~ScopeBase();
+    virtual ~ScopeBase() {}
     /// @endcond
 
     /**
-    Called by the Unity run time after loading the scope's library. If initialize() throws an exception,
-    start() and finalize() will _not_ be called.
-    */
-    virtual void initialize() = 0;
-
-    /**
-    Called by the Unity run time after stop() completes. Exceptions from finalize() are ignored.
-    */
-    virtual void finalize() = 0;
-
-    /**
-    Called by the Unity run time after initialize() completes. If start() throws an exception, stop()
-    will _not_ be called (but finalize() _will_ be called).
+    \brief Called by the Unity run time after initialize() completes.
+    If start() throws an exception, stop() will _not_ be called (but finalize() _will_ be called).
     */
     virtual void start() = 0;
 
     /**
-    Called by the Unity run time when the scope should shut down. Exceptions from stop() are ignored.
+    \brief Called by the Unity run time when the scope should shut down.
+    A scope should deallocate as many resources as possible when stop() is called, for example,
+    deallocate any caches and close network connections.
+
+    Exceptions from stop() are ignored.
     */
-    virtual void stop();
+    virtual void stop() = 0;
 
     /**
-    This method suspends the calling thread, so run() blocks the caller. The call completes after the Unity
-    run time has called stop() and stop() has returned.
+    \brief Called by the Unity run time when scope should process a query.
+    The passed functor can be used to push the results, either synchronously, while query() is still running,
+    or asynchronously, after query() has returned.
     */
-    void run() noexcept;
+    virtual void query(std::string const& q, std::function<void(std::string const&)> callback) = 0;
 
     /**
-    This method returns the version information for the scopes API that the scope was compiled with.
+    \brief This method returns the version information for the scopes API that the scope was compiled with.
     */
     void compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
     /**
-    This method returns the version information for the scopes API that the scope was linked with.
+    \brief This method returns the version information for the scopes API that the scope was linked with.
     */
     void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
 protected:
     /// @cond
-    ScopeBase();
+    ScopeBase() = default;
     /// @endcond
-
-private:
-    std::unique_ptr<internal::ScopeBaseImpl> p_;
 };
 
 // We inline this function so we are guaranteed to be returned the version of the scopes library that the derived
@@ -173,18 +182,45 @@ void ScopeBase::compiled_version(int& v_major, int& v_minor, int& v_micro) noexc
 } // namespace unity
 
 /**
-Expands to the identifier of the scope creation function. @hideinitializer
+\brief The function called by the Unity run time to initialize the scope.
+It must return a pointer to a ScopeBase instance. The returned instance need not be heap-allocated.
+
+If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
+the destroy function _will_be called with NULL as its argument.
 */
-#define UNITY_API_SCOPE_CREATE_FUNCTION unity_api_scope_create
+extern "C" unity::api::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION();
 
 /**
-Expands to the identifier of the scope destroy function. @hideinitializer
-*/
-#define UNITY_API_SCOPE_DESTROY_FUNCTION unity_api_scope_destroy
+\brief The function called by the Unity run time to finalize the scope.
+The passed pointer is the pointer that was returned by the create function.
 
-/// @cond
-extern "C" unity::api::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION();
+Exceptions thrown by the destroy function are ignored.
+*/
 extern "C" void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase*);
-/// @endcond
+
+namespace unity
+{
+
+namespace api
+{
+
+namespace scopes
+{
+
+/**
+\brief Convenience typedef for the create function pointer.
+*/
+typedef decltype(&UNITY_API_SCOPE_CREATE_FUNCTION) CreateFunction;
+
+/**
+\brief Convenience typedef for the destroy function pointer.
+*/
+typedef decltype(&UNITY_API_SCOPE_DESTROY_FUNCTION) DestroyFunction;
+
+} // namespace scopes
+
+} // namespace api
+
+} // namespace unity
 
 #endif

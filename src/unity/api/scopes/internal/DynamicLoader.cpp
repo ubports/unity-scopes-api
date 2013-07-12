@@ -36,7 +36,8 @@ namespace internal
 {
 
 DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
-    : unload_(ul)
+    : path_(path)
+    , unload_(ul)
 {
     if ((handle_ = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
     {
@@ -75,6 +76,11 @@ void* DynamicLoader::find_variable(string const& symbol)
         throw ResourceException(error);
     }
     return p;
+}
+
+string DynamicLoader::path() const
+{
+    return path_;
 }
 
 } // namespace internal
