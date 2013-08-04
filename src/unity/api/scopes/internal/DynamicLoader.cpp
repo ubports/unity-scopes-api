@@ -19,6 +19,7 @@
 #include <unity/api/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
 #include <dlfcn.h>
 
 using namespace std;
@@ -35,13 +36,41 @@ namespace scopes
 namespace internal
 {
 
-DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
-    : m_path(path)
-    , m_unload(ul)
+DynamicLoader::LibraryHandles DynamicLoader::m_handles;
+mutex DynamicLoader::m_mutex;
+
+DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
+    m_path(path),
+    m_handle(nullptr),
+    m_unload(ul)
 {
+    // Prevent concurrent access to m_handles and guard against concurrent
+    // calls to dlopen()/dlclose(), which are not thread-safe.
+    lock_guard<decltype(m_mutex)> lock(m_mutex);
+
+    // If the caller doesn't want dlclose() to be called, we look whether we've loaded
+    // this library previously and, if so, re-use its handle.
+    if (ul == Unload::noclose)
+    {
+        auto it = m_handles.find(path);
+        if (it != m_handles.end())
+        {
+            m_handle = it->second;
+            assert(m_handle);
+            return;
+        }
+    }
+
+    assert(ul == Unload::automatic || m_handle == nullptr);
+
     if ((m_handle = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
     {
         throw ResourceException(dlerror());
+    }
+
+    if (ul == Unload::noclose)
+    {
+        m_handles[path] = m_handle; // Remember the library for re-use.
     }
 }
 
@@ -49,6 +78,8 @@ DynamicLoader::~DynamicLoader() noexcept
 {
     if (m_unload == Unload::automatic)
     {
+        assert(m_handle);
+        lock_guard<decltype(m_mutex)> lock(m_mutex);
         dlclose(m_handle);
     }
 }

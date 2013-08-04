@@ -1,0 +1,8 @@
+Ice.Plugin.IceUDS.cpp.IceUDS=@IceUDS_LIBDIR@/IceUDS,1.0:create_Ice_UDS
+testscope.Endpoints=uds -f @CMAKE_CURRENT_BINARY_DIR@/testscope
+#testscope.Endpoints=tcp -h localhost -p 10000
+#testscope.ThreadPool.Size=2
+
+#Ice.Trace.Network=3
+#Ice.Trace.Protocol=1
+Ice.Warn.UnusedProperties=1

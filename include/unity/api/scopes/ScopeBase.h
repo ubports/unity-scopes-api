@@ -21,9 +21,12 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/util/NonCopyable.h>
+#include <unity/api/scopes/RegistryProxy.h>
+#include <unity/api/scopes/ReplyProxy.h>
 #include <unity/api/scopes/Version.h>
 
 #include <memory>
+#include <iostream> // TODO:REMOVE THIS
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -81,8 +84,9 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual void start();
+    virtual int start();
     virtual void stop();
+    virtual void run();
 };
 ~~~
 
@@ -115,27 +119,33 @@ UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
 
 After the Unity run time has obtained a pointer to the class instance from the create function, it calls start(),
 which allows the scope to intialize itself. Once start() returns, incoming query requests are dispatched to the scope.
-When the scope should complete its activities, the run time calls stop(). The calls to start() and
-stop() are made by the same thread.
+When the scope should complete its activities, the run time calls stop(). The calls to the create function, start(),
+stop(), and the destroy function) are made by the same thread. The call to run() is made by a _different_ thread.
 */
-
-namespace internal
-{
-class ScopeBaseImpl;
-}
 
 class UNITY_API ScopeBase : private util::NonCopyable
 {
 public:
     /// @cond
-    virtual ~ScopeBase() {}
+    virtual ~ScopeBase();
     /// @endcond
 
     /**
-    \brief Called by the Unity run time after initialize() completes.
-    If start() throws an exception, stop() will _not_ be called (but finalize() _will_ be called).
+    \brief This value must be returned from the start() method.
     */
-    virtual void start() = 0;
+    static constexpr int VERSION = UNITY_SCOPES_VERSION_MAJOR;
+
+    /**
+    \brief Called by the Unity run time after initialize() completes.
+    If start() throws an exception, stop() will _not_ be called.
+
+    The call to start() is made by the same thread that calls the create function.
+
+    \return Any return value other than SCOPES_MAJOR_VERSION will cause the Unity run time
+    to refuse to load the scope. The return value is used to ensure that the shared library
+    containing the scope is ABI compatible with the Unity scopes run time.
+    */
+    virtual int start(RegistryProxy::SPtr const& registry) = 0;
 
     /**
     \brief Called by the Unity run time when the scope should shut down.
@@ -143,20 +153,30 @@ public:
     deallocate any caches and close network connections.
 
     Exceptions from stop() are ignored.
+
+    The call to stop() is made by the same thread that calls the create function and start().
     */
     virtual void stop() = 0;
 
     /**
-    \brief Called by the Unity run time when scope should process a query.
-    The passed functor can be used to push the results, either synchronously, while query() is still running,
-    or asynchronously, after query() has returned.
+    \brief Called by the Unity run time to hand a thread of control to the scope.
+    run() passes a thread of control to the scope to do with as it sees fit, for example, to run an event loop.
+
+    If run() throws an exception, stop() _will_ be called.
+
+    The call to run() is made by a separate thread (not the thread that calls the create function and start()).
     */
-    virtual void query(std::string const& q, std::function<void(std::string const&)> callback) = 0;
+    virtual void run() = 0;
 
     /**
-    \brief This method returns the version information for the scopes API that the scope was compiled with.
+    \brief Called by the Unity run time when scope should process a query.
+    TODO: complete documentation.
+
+    Calls to query() are made by an arbitrary thread. If the scope is configured to run single-threaded, all calls
+    to query() are made by the same thread. If the scope is configured to run multi-threaded, each call to query()
+    is made by an arbitrary thread, and several calls to query() may be made concurrently.
     */
-    void compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept;
+    virtual void query(std::string const& q, ReplyProxy::SPtr const& reply) = 0;
 
     /**
     \brief This method returns the version information for the scopes API that the scope was linked with.
@@ -165,22 +185,9 @@ public:
 
 protected:
     /// @cond
-    ScopeBase() = default;
+    ScopeBase();
     /// @endcond
 };
-
-// We inline this function so we are guaranteed to be returned the version of the scopes library that the derived
-// class was compiled with.
-
-inline
-void
-ScopeBase::
-compiled_version(int& v_major, int& v_minor, int& v_micro) noexcept
-{
-    v_major = UNITY_SCOPES_VERSION_MAJOR;
-    v_minor = UNITY_SCOPES_VERSION_MINOR;
-    v_micro = UNITY_SCOPES_VERSION_MICRO;
-}
 
 } // namespace scopes
 

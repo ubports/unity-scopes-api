@@ -16,13 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/UnityExceptions.h>
-
 #include "MyScope.h"
 #include "Counters.h"
 #include "PerScopeVariables.h"
+
+#include <unity/api/scopes/internal/ScopeLoader.h>
+#include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
@@ -31,8 +30,8 @@ using namespace std;
 class ScopeA : public MyScope
 {
 public:
-    virtual void start() { inc_start(); }
-    virtual void stop() { inc_stop(); }
+    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override { inc_start(); return VERSION; }
+    virtual void stop() override { inc_stop(); }
 };
 
 extern "C"

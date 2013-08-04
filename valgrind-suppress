@@ -1,0 +1,22 @@
+{
+    Ice::initialize
+    Memcheck:Leak
+    ...
+    fun:_ZN3Ice10initializeERKNS_18InitializationDataEi
+}
+
+{
+    Ice::Properties::load
+    Memcheck:Leak
+    ...
+    fun:_ZN3Ice11PropertiesI4loadERKSs
+}
+
+{
+    Thread create leak
+    Memcheck:Leak
+    fun:calloc
+    fun:_dl_allocate_tls
+    fun:pthread_create@@GLIBC_2.2.5
+    fun:_ZNSt6thread15_M_start_threadESt10shared_ptrINS_10_Impl_baseEE
+}

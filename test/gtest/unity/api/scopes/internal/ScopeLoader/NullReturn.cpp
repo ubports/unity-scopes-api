@@ -16,11 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/ScopeBase.h>
-
 #include "MyScope.h"
 #include "Counters.h"
+
+#include <unity/api/scopes/internal/ScopeLoader.h>
 
 #include <cassert>
 
@@ -42,9 +41,12 @@ void
 UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
 {
     inc_destroy();
-    // We use an assert instead of EXPECT_EQ because we can't see the symbols
+    // We use an abort instead of EXPECT_EQ because we can't see the symbols
     // in gtest.a here.
-    assert(scope_base == nullptr);
+    if (scope_base != nullptr)
+    {
+        abort();
+    }
 }
 
 }

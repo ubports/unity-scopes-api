@@ -48,7 +48,7 @@ micro_version()
 }
 
 char const*
-str()
+version_string()
 {
     return UNITY_SCOPES_VERSION_STRING;
 }

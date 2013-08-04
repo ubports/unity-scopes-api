@@ -21,7 +21,6 @@
 
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/internal/DynamicLoader.h>
-#include <unity/api/scopes/internal/MiddlewareBase.h>
 
 #include <thread>
 #include <condition_variable>
@@ -38,37 +37,69 @@ namespace scopes
 namespace internal
 {
 
-class ScopeLoader final : public unity::util::DefinesPtrs<ScopeLoader>
+// ScopeLoader loads the .so for a scope and TODO: complete this and updated comments below.
+
+class UNITY_API ScopeLoader final : public util::NonCopyable
 {
 public:
-    static UPtr load(std::string const& scope_name, std::string const& path, MiddlewareBase::SPtr& middleware);
-    void unload() noexcept;
+    UNITY_DEFINES_PTRS(ScopeLoader);
 
+    // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy
+    // so we can pass it to the scope's start method.
+    static UPtr load(std::string const& scope_name, std::string const& libpath, RegistryProxy::SPtr const& registry);
+
+    // unload() explicitly finalizes the scope. This is called by the destructor too, but calling it explicity
+    // allows the caller to receive any exceptions that may have been produced by the scope thread.
+    void unload();
+
+    // These methods start or stop a scope. They are asynchronous, that is, they don't wait until the scope is
+    // started or stopped; instead they just instruct the scope to do what it is told without waiting.
     void start();
     void stop();
 
+    // Returns the scope name
     std::string name() const noexcept;
+
+    // Returns the library path for the scope
     std::string libpath() const noexcept;
+
+    // Returns the actual implementation provided by the scope.
+    unity::api::scopes::ScopeBase* scope_base() const;
 
     ~ScopeLoader() noexcept;
 
 private:
-    ScopeLoader(std::string const& name, std::string const& path, MiddlewareBase::SPtr& middleware);
+    ScopeLoader(std::string const& name, std::string const& path, RegistryProxy::SPtr const& registry);
     void run_scope(unity::api::scopes::CreateFunction create_func, unity::api::scopes::DestroyFunction destroy_func);
     void handle_thread_exception();
 
+    void run_application(unity::api::scopes::ScopeBase* scope);
+    void notify_app_thread_started();
+
     std::string m_scope_name;
+    unity::api::scopes::ScopeBase* m_scope_base;
     unity::api::scopes::internal::DynamicLoader::UPtr m_dyn_loader;
-    unity::api::scopes::internal::MiddlewareBase::SPtr m_middleware;
+    unity::api::scopes::RegistryProxy::SPtr m_registry_;
+    std::exception_ptr m_exception;
+
     std::thread m_scope_thread;
 
     enum class ScopeState { Created, Stopped, Started, Finished, Failed };
     ScopeState m_scope_state;
     std::condition_variable m_state_changed;
+    mutable std::mutex m_state_mutex;
+
     enum class ScopeCmd { None, Start, Stop, Finish };
-    ScopeCmd m_scope_cmd;
+    ScopeCmd m_cmd;
     std::condition_variable m_cmd_changed;
-    std::mutex m_mutex;
+    std::mutex m_cmd_mutex;
+
+    std::thread m_run_thread;
+
+    enum class AppState { Created, Started, Stopped };
+    AppState m_run_thread_state;
+    std::condition_variable m_run_thread_changed;
+    std::mutex m_run_thread_mutex;
 };
 
 } // namespace internal

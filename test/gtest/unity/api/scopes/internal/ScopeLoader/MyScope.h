@@ -21,7 +21,9 @@
 
 #include "Counters.h"
 
-// Test scope class that allows us to count the number of calls to start() and stop().
+#include <unity/api/scopes/ScopeBase.h>
+
+// Test scope class that allows us to count the number of calls to start(), run(), and stop().
 
 class EXPORT MyScope : public unity::api::scopes::ScopeBase
 {
@@ -29,9 +31,14 @@ public:
     MyScope() {}
     virtual ~MyScope() {}
 
-    virtual void start() { inc_start(); }
-    virtual void stop() { inc_stop(); }
-    virtual void query(std::string const& /* q */, std::function<void(std::string const&)> /* callback */) {}
+    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override
+    {
+        inc_start();
+        return VERSION;
+    }
+    virtual void stop() override { inc_stop(); }
+    virtual void run() override { inc_run(); }
+    virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) override {}
 };
 
 #endif

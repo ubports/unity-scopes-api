@@ -60,17 +60,12 @@ TEST(ScopeBase, basic)
     int vminor;
     int vmicro;
 
-    b->compiled_version(vmajor, vminor, vmicro);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR, vmajor);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
-
     b->runtime_version(vmajor, vminor, vmicro);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR, vmajor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
 
-    b->start();
+    b->start(nullptr);
     b->stop();
     destroy(b);
 }
