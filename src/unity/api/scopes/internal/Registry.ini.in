@@ -1,0 +1,4 @@
+[Registry]
+Middleware = Ice
+Ice.Endpoint = uds -f /tmp/Registry
+Ice.Configfile = Ice.Registry.Config

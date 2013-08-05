@@ -14,7 +14,7 @@ foreach(dir ${OTHER_INCLUDE_DIRS})
     set(other_inc_dirs "${other_inc_dirs} -I${dir}")
 endforeach()
 
-set(other_inc_dirs "${other_inc_dirs} -I${CMAKE_BINARY_DIR}/include")
+set(other_inc_dirs "${other_inc_dirs} -I${CMAKE_BINARY_DIR}/include -I${CMAKE_BINARY_DIR}")
 
 foreach(dir ${subdirs})
 

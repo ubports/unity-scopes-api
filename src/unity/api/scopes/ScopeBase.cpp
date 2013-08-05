@@ -27,9 +27,19 @@ namespace api
 namespace scopes
 {
 
-void
-ScopeBase::
-runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
+//! @cond
+
+ScopeBase::ScopeBase()
+{
+}
+
+ScopeBase::~ScopeBase()
+{
+}
+
+//! @endcond
+
+void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = unity::api::scopes::major_version();
     v_minor = unity::api::scopes::minor_version();

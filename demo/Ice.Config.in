@@ -1,0 +1,9 @@
+Ice.Plugin.IceUDS.cpp.IceUDS=@IceUDS_LIBDIR@/IceUDS,1.0:create_Ice_UDS
+scope-A.Endpoints=uds -f /tmp/scope-A
+scope-B.Endpoints=uds -f /tmp/scope-B
+scope-C.Endpoints=uds -f /tmp/scope-C
+scope-D.Endpoints=uds -f /tmp/scope-D
+
+Ice.Trace.Network=3
+#Ice.Trace.Protocol=1
+Ice.Warn.UnusedProperties=1

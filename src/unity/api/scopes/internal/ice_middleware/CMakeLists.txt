@@ -1,0 +1,13 @@
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceMiddleware.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceObjectProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceRegistryProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceReplyProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceScopeProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RegistryI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ReplyI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
+)
+
+set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

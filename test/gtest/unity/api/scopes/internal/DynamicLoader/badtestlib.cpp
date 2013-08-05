@@ -21,20 +21,20 @@
 extern "C"
 {
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-test_function()
-{
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    test_function()
+    {
+    }
 
-EXPORT
-int
-// cppcheck-suppress unusedFunction
-unresolved()
-{
-    extern int foo();
-    return foo();
-}
+    EXPORT
+    int
+    // cppcheck-suppress unusedFunction
+    unresolved()
+    {
+        extern int foo();
+        return foo();
+    }
 
 }

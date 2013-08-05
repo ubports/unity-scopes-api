@@ -25,11 +25,24 @@
 #ifndef UNITY_API_SCOPES_VERSION_H
 #define UNITY_API_SCOPES_VERSION_H
 
-#define UNITY_SCOPES_VERSION_MAJOR @UNITY_SCOPES_MAJOR@
-#define UNITY_SCOPES_VERSION_MINOR @UNITY_SCOPES_MINOR@
-#define UNITY_SCOPES_VERSION_MICRO @UNITY_SCOPES_MICRO@
+#ifndef UNITY_SCOPES_VERSION_MAJOR
+#    define UNITY_SCOPES_VERSION_MAJOR @UNITY_SCOPES_MAJOR@
+#endif
 
-#define UNITY_SCOPES_VERSION_STRING "@UNITY_SCOPES_VERSION@"
+#ifndef UNITY_SCOPES_VERSION_MINOR
+#    define UNITY_SCOPES_VERSION_MINOR @UNITY_SCOPES_MINOR@
+#endif
+
+#ifndef UNITY_SCOPES_VERSION_MICRO
+#    define UNITY_SCOPES_VERSION_MICRO @UNITY_SCOPES_MICRO@
+#endif
+
+#define UNITY_SCOPES_VERSION_STR(s) #s
+#define UNITY_SCOPES_VERSION_XSTR(s) UNITY_SCOPES_VERSION_STR(s)
+
+#define UNITY_SCOPES_VERSION_STRING UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MAJOR) "." \
+                                    UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MINOR) "." \
+                                    UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MICRO)
 
 /**
 \brief Top-level namespace for all things Unity-related.
@@ -54,12 +67,14 @@ namespace scopes
 Version information is represented as
 <i>&lt;<code>major</code>&gt;</i>.<i>&lt;<code>minor</code>&gt;</i>.<i>&lt;<code>micro</code>&gt;</i>.
 
-Releases that differ in the major or minor version number are binary incompatible.
+Releases that differ in the major version number are binary incompatible.
 
-Releases of the library that differ only in the micro version number are binary compatible with older releases,
+Releases of the library that differ in the minor or micro version number are binary compatible with older releases,
 so client code does not need to be recompiled to use the newer library version.
 
 Changes in the micro version number indicate bug fixes.
+
+Changes in the minor version number indicate feature additions that are binary compatible.
 */
 
 /**
@@ -101,7 +116,7 @@ The version string is also available as the macro <code>UNITY_SCOPES_VERSION_STR
 /// @cond
 UNITY_API
 /// @endcond
-const char* str();    // Returns "major.minor.micro"
+const char* version_string();    // Returns "major.minor.micro"
 
 /// }@
 

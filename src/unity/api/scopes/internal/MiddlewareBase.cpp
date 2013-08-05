@@ -18,6 +18,8 @@
 
 #include <unity/api/scopes/internal/MiddlewareBase.h>
 
+#include <cassert>
+
 using namespace std;
 
 namespace unity

@@ -30,6 +30,9 @@ void EXPORT inc_destroy();
 int EXPORT num_start();
 void EXPORT inc_start();
 
+int EXPORT num_run();
+void EXPORT inc_run();
+
 int EXPORT num_stop();
 void EXPORT inc_stop();
 

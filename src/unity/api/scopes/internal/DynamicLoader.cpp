@@ -19,6 +19,7 @@
 #include <unity/api/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
 #include <dlfcn.h>
 
 using namespace std;
@@ -35,13 +36,41 @@ namespace scopes
 namespace internal
 {
 
-DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
-    : path_(path)
-    , unload_(ul)
+DynamicLoader::LibraryHandles DynamicLoader::handles_;
+mutex DynamicLoader::mutex_;
+
+DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
+    path_(path),
+    handle_(nullptr),
+    unload_(ul)
 {
+    // Prevent concurrent access to handles_ and guard against concurrent
+    // calls to dlopen()/dlclose(), which are not thread-safe.
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    // If the caller doesn't want dlclose() to be called, we look whether we've loaded
+    // this library previously and, if so, re-use its handle.
+    if (ul == Unload::noclose)
+    {
+        auto it = handles_.find(path);
+        if (it != handles_.end())
+        {
+            handle_ = it->second;
+            assert(handle_);
+            return;
+        }
+    }
+
+    assert(ul == Unload::automatic || handle_ == nullptr);
+
     if ((handle_ = dlopen(path.c_str(), b == Binding::lazy ? RTLD_LAZY : RTLD_NOW)) == nullptr)
     {
         throw ResourceException(dlerror());
+    }
+
+    if (ul == Unload::noclose)
+    {
+        handles_[path] = handle_; // Remember the library for re-use.
     }
 }
 
@@ -49,6 +78,8 @@ DynamicLoader::~DynamicLoader() noexcept
 {
     if (unload_ == Unload::automatic)
     {
+        assert(handle_);
+        lock_guard<decltype(mutex_)> lock(mutex_);
         dlclose(handle_);
     }
 }
@@ -62,7 +93,7 @@ DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 {
     // The ugly cast is needed because a void* (returned by dlsym()) is not compatible with a function pointer.
     VoidFunc func;
-    *(void **)&func = find_variable(symbol);
+    *(void**)&func = find_variable(symbol);
     return func;
 }
 

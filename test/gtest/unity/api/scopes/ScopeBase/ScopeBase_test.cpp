@@ -27,7 +27,7 @@ using namespace unity::api::scopes::internal;
 
 namespace
 {
-    char const* scopelib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/ScopeBase/libscopelib.so";
+char const* scopelib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/ScopeBase/libscopelib.so";
 }
 
 bool create_called = false;
@@ -60,17 +60,12 @@ TEST(ScopeBase, basic)
     int vminor;
     int vmicro;
 
-    b->compiled_version(vmajor, vminor, vmicro);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR, vmajor);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
-    EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
-
     b->runtime_version(vmajor, vminor, vmicro);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR, vmajor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
 
-    b->start();
+    b->start(nullptr);
     b->stop();
     destroy(b);
 }

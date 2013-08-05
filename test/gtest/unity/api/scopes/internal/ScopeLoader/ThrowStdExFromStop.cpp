@@ -16,41 +16,44 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/ScopeBase.h>
-
 #include "MyScope.h"
 #include "Counters.h"
+
+#include <unity/api/scopes/internal/ScopeLoader.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 
-class MyThrowingScope : public MyScope
+class EXPORT MyThrowingScope : public MyScope
 {
 public:
-    virtual void stop() { inc_stop(); throw std::logic_error("stop failure"); }
+    virtual void stop() override
+    {
+        inc_stop();
+        throw std::logic_error("stop failure");
+    }
 };
 
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    inc_create();
-    return new MyThrowingScope;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        inc_create();
+        return new MyThrowingScope;
+    }
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    inc_destroy();
-    delete scope_base;
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        inc_destroy();
+        delete scope_base;
+    }
 
 }

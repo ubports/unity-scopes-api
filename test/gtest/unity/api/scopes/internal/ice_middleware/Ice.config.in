@@ -1,0 +1,5 @@
+Ice.Plugin.IceUDS.cpp.IceUDS=@IceUDS_LIBDIR@/IceUDS,1.0:create_Ice_UDS
+testscope.Endpoints=uds -f @CMAKE_CURRENT_BINARY_DIR@/testscope
+testscope_OOB.Endpoints=uds -f @CMAKE_CURRENT_BINARY_DIR@/testscope_OOB
+
+Ice.Warn.UnusedProperties=1

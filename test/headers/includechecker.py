@@ -26,6 +26,7 @@ forbidden = {'boost',
              'gtk',
              'Qt',
              'dbus.h',
+             'Ice',
              }
 
 #
