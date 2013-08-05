@@ -30,30 +30,38 @@ using namespace std;
 class ScopeA : public MyScope
 {
 public:
-    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override { inc_start(); return VERSION; }
-    virtual void stop() override { inc_stop(); }
+    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override
+    {
+        inc_start();
+        return VERSION;
+    }
+
+    virtual void stop() override
+    {
+        inc_stop();
+    }
 };
 
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    inc_create();
-    return new ScopeA;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        inc_create();
+        return new ScopeA;
+    }
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    inc_destroy();
-    delete scope_base;
-    set_scopeA_var(1);
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        inc_destroy();
+        delete scope_base;
+        set_scopeA_var(1);
+    }
 
 }

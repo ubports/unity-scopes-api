@@ -21,14 +21,14 @@
 extern "C"
 {
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-test_function()
-{
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    test_function()
+    {
+    }
 
-EXPORT
-int test_variable;
+    EXPORT
+    int test_variable;
 
 }

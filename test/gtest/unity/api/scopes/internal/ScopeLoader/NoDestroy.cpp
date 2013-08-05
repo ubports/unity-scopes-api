@@ -26,13 +26,13 @@
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    inc_create();
-    return new MyScope;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        inc_create();
+        return new MyScope;
+    }
 
 }

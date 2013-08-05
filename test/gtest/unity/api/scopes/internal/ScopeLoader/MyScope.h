@@ -36,9 +36,20 @@ public:
         inc_start();
         return VERSION;
     }
-    virtual void stop() override { inc_stop(); }
-    virtual void run() override { inc_run(); }
-    virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) override {}
+
+    virtual void stop() override
+    {
+        inc_stop();
+    }
+
+    virtual void run() override
+    {
+        inc_run();
+    }
+
+    virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) override
+    {
+    }
 };
 
 #endif

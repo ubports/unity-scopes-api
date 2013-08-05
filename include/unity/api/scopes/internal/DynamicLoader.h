@@ -78,8 +78,14 @@ class UNITY_API DynamicLoader : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(DynamicLoader);
 
-    enum class Binding { lazy, now };
-    enum class Unload { automatic, noclose };
+    enum class Binding
+    {
+        lazy, now
+    };
+    enum class Unload
+    {
+        automatic, noclose
+    };
 
     static UPtr create(std::string const& path, Binding b = Binding::lazy, Unload ul = Unload::automatic);
 

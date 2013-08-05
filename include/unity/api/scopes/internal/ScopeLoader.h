@@ -84,19 +84,28 @@ private:
 
     std::thread scope_thread_;
 
-    enum class ScopeState { Created, Stopped, Started, Finished, Failed };
+    enum class ScopeState
+    {
+        Created, Stopped, Started, Finished, Failed
+    };
     ScopeState scope_state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;
 
-    enum class ScopeCmd { None, Start, Stop, Finish };
+    enum class ScopeCmd
+    {
+        None, Start, Stop, Finish
+    };
     ScopeCmd cmd_;
     std::condition_variable cmd_changed_;
     std::mutex cmd_mutex_;
 
     std::thread run_thread_;
 
-    enum class AppState { Created, Started, Stopped };
+    enum class AppState
+    {
+        Created, Started, Stopped
+    };
     AppState run_thread_state_;
     std::condition_variable run_thread_changed_;
     std::mutex run_thread_mutex_;

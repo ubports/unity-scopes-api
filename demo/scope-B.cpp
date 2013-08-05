@@ -109,20 +109,20 @@ private:
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    return new MyScope;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        return new MyScope;
+    }
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    delete scope_base;
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        delete scope_base;
+    }
 
 }

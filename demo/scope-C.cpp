@@ -33,7 +33,10 @@ using namespace unity::api::scopes;
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy::SPtr const&) override { return VERSION; }
+    virtual int start(RegistryProxy::SPtr const&) override
+    {
+        return VERSION;
+    }
 
     virtual void stop() override {}
 
@@ -43,7 +46,7 @@ public:
         for (;;)
         {
             std::unique_lock<std::mutex> lock(mutex_);
-            condvar_.wait(lock, [this]{ return !queries_.empty(); });   // Wait until we have a query
+            condvar_.wait(lock, [this] { return !queries_.empty(); });  // Wait until we have a query
 
             auto qd = queries_.front();
             queries_.pop_front();
@@ -82,20 +85,20 @@ private:
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    return new MyScope;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        return new MyScope;
+    }
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    delete scope_base;
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        delete scope_base;
+    }
 
 }

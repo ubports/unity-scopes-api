@@ -26,27 +26,27 @@
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    inc_create();
-    return nullptr;
-}
-
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    inc_destroy();
-    // We use an abort instead of EXPECT_EQ because we can't see the symbols
-    // in gtest.a here.
-    if (scope_base != nullptr)
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
     {
-        abort();
+        inc_create();
+        return nullptr;
     }
-}
+
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        inc_destroy();
+        // We use an abort instead of EXPECT_EQ because we can't see the symbols
+        // in gtest.a here.
+        if (scope_base != nullptr)
+        {
+            abort();
+        }
+    }
 
 }

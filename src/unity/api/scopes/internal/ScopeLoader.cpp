@@ -55,11 +55,11 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
 
     // Look for the scope create and destroy functions in the plug-in.
     CreateFunction create_func = reinterpret_cast<CreateFunction>(
-            dyn_loader_->find_function(UNITY_API_SCOPE_CREATE_SYMSTR)
-    );
+                                     dyn_loader_->find_function(UNITY_API_SCOPE_CREATE_SYMSTR)
+                                 );
     DestroyFunction destroy_func = reinterpret_cast<DestroyFunction>(
-            dyn_loader_->find_function(UNITY_API_SCOPE_DESTROY_SYMSTR)
-    );
+                                       dyn_loader_->find_function(UNITY_API_SCOPE_DESTROY_SYMSTR)
+                                   );
 
     // Make a new thread. The thread initializes the scope and then waits for commands to transition
     // between the Stopped and Started state, or to the Finished state.
@@ -79,7 +79,7 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
 
     // Wait until the thread is running
     unique_lock<mutex> lock(state_mutex_);
-    state_changed_.wait(lock, [this]{ return scope_state_ != ScopeState::Created; });
+    state_changed_.wait(lock, [this] { return scope_state_ != ScopeState::Created; });
 
     // Check that we initialized successfully.
     if (scope_state_ == ScopeState::Failed)
@@ -126,7 +126,7 @@ void ScopeLoader::unload()
             lock.unlock();
             stop();
             lock.lock();
-            state_changed_.wait(lock, [this]{ return scope_state_ != ScopeState::Started; });
+            state_changed_.wait(lock, [this] { return scope_state_ != ScopeState::Started; });
             if (run_thread_.joinable())
             {
                 run_thread_.join();
@@ -291,8 +291,8 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                 unique_lock<mutex> lock(state_mutex_);
                 scope_state_ = ScopeState::Failed;
                 exception_ = make_exception_ptr(
-                                unity::ResourceException("Scope " + scope_name_ +
-                                                         " returned nullptr from " + UNITY_API_SCOPE_CREATE_SYMSTR));
+                                 unity::ResourceException("Scope " + scope_name_ +
+                                                          " returned nullptr from " + UNITY_API_SCOPE_CREATE_SYMSTR));
             }
             state_changed_.notify_all();
             return;
@@ -315,7 +315,7 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
         unique_lock<mutex> lock(cmd_mutex_);
         while (!done)
         {
-            cmd_changed_.wait(lock, [this]{ return cmd_ != ScopeCmd::None; });
+            cmd_changed_.wait(lock, [this] { return cmd_ != ScopeCmd::None; });
             switch (cmd_)
             {
                 case ScopeCmd::Start:
@@ -347,14 +347,14 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                     {
                         scope_state_ = ScopeState::Failed;
                         exception_ = make_exception_ptr(
-                                        unity::ResourceException("Scope " + scope_name_ + ": exception in start()"));
+                                         unity::ResourceException("Scope " + scope_name_ + ": exception in start()"));
                         throw;
                     }
                     catch (...)
                     {
                         scope_state_ = ScopeState::Failed;
                         exception_ = make_exception_ptr(
-                                        unity::ResourceException("Scope " + scope_name_ + ": unknown exception in start()"));
+                                         unity::ResourceException("Scope " + scope_name_ + ": unknown exception in start()"));
                         throw;
                     }
 
@@ -367,7 +367,7 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                     // We wait until the thread leaves the Created state, otherwise it becomes possible
                     // to end up with more than one running application thread if start()/stop()
                     // are called rapidly in succession.
-                    run_thread_changed_.wait(applock, [this]{ return run_thread_state_ != AppState::Created; });
+                    run_thread_changed_.wait(applock, [this] { return run_thread_state_ != AppState::Created; });
                     break;
                 }
                 case ScopeCmd::Stop:
@@ -387,14 +387,14 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                     {
                         scope_state_ = ScopeState::Failed;
                         exception_ = make_exception_ptr(
-                                        unity::ResourceException("scope " + scope_name_ + ": exception in stop()"));
+                                         unity::ResourceException("scope " + scope_name_ + ": exception in stop()"));
                         throw;
                     }
                     catch (...)
                     {
                         scope_state_ = ScopeState::Failed;
                         exception_ = make_exception_ptr(
-                                        unity::ResourceException("scope " + scope_name_ + ": unknown exception in stop()"));
+                                         unity::ResourceException("scope " + scope_name_ + ": unknown exception in stop()"));
                         throw;
                     }
                     lock.unlock();
@@ -423,13 +423,13 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
     catch (std::exception const& e)
     {
         exception_ = make_exception_ptr(
-                        unity::ResourceException("scope " + scope_name_ + ": terminated due to exception"));
+                         unity::ResourceException("scope " + scope_name_ + ": terminated due to exception"));
         handle_thread_exception();
     }
     catch (...)
     {
         exception_ = make_exception_ptr(
-                        unity::ResourceException("scope " + scope_name_ + ": terminated"));
+                         unity::ResourceException("scope " + scope_name_ + ": terminated"));
         handle_thread_exception();
     }
 }
@@ -463,7 +463,7 @@ void ScopeLoader::run_application(ScopeBase* scope)
         {
             lock_guard<mutex> lock(state_mutex_);
             exception_ = make_exception_ptr(
-                            unity::ResourceException("Scope " + scope_name_ + ": exception in run()"));
+                             unity::ResourceException("Scope " + scope_name_ + ": exception in run()"));
             scope_state_ = ScopeState::Failed;
         }
         state_changed_.notify_all();

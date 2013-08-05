@@ -27,7 +27,7 @@ using namespace unity::api::scopes::internal;
 
 namespace
 {
-    char const* scopelib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/ScopeBase/libscopelib.so";
+char const* scopelib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/ScopeBase/libscopelib.so";
 }
 
 bool create_called = false;

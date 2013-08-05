@@ -38,30 +38,38 @@ public:
         return VERSION;
     }
 
-    virtual void stop() { inc_stop(); }
-    virtual void run() { inc_run(); }
+    virtual void stop()
+    {
+        inc_stop();
+    }
+
+    virtual void run()
+    {
+        inc_run();
+    }
+
     virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) {}
 };
 
 extern "C"
 {
 
-EXPORT
-unity::api::scopes::ScopeBase*
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
-{
-    inc_create();
-    return new MyScope;
-}
+    EXPORT
+    unity::api::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        inc_create();
+        return new MyScope;
+    }
 
-EXPORT
-void
-// cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
-{
-    inc_destroy();
-    delete scope_base;
-}
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        inc_destroy();
+        delete scope_base;
+    }
 
 }

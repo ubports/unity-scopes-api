@@ -49,7 +49,7 @@ public:
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock, [this]{ return this->query_complete_; });
+        condvar_.wait(lock, [this] { return this->query_complete_; });
     }
 
     Reply() :
