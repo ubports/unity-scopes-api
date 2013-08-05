@@ -34,32 +34,30 @@ namespace internal
 
 const char* RuntimeConfig::RUNTIME_CONFIG_GROUP = "Runtime";
 
+namespace
+{
+    const string registry_identity_str = "Registry.Identity";
+    const string registry_configfile_str = "Registry.Configfile";
+    const string default_middleware_str = "Default.Middleware";
+    const string factory_configfile_str = "Factory.Configfile";
+}
+
 RuntimeConfig::RuntimeConfig(string const& configfile) :
     ConfigBase(configfile)
 {
-    registry_identity_ = parser()->get_string(RUNTIME_CONFIG_GROUP, "Registry.Identity");
-    if (registry_identity_.empty())
+    registry_identity_ = get_string(RUNTIME_CONFIG_GROUP, registry_identity_str);
+    auto pos = registry_identity_.find_first_of("@:/");
+    if (pos != string::npos)
     {
-        throw_ex("Illegal empty value for Registry.Identity");
+        throw_ex("Illegal character in value for " + registry_identity_str + ": \"" + registry_identity_ +
+                 "\": identity cannot contain '" + registry_identity_[pos] + "'");
     }
 
-    registry_configfile_ = parser()->get_string(RUNTIME_CONFIG_GROUP, "Registry.Configfile");
-    if (registry_identity_.empty())
-    {
-        throw_ex("Illegal empty value for Registry.Configfile");
-    }
+    registry_configfile_ = get_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
 
-    default_middleware_ = parser()->get_string(RUNTIME_CONFIG_GROUP, "Default.Middleware");
-    if (default_middleware_.empty())
-    {
-        throw_ex("Illegal empty value for Default.ClientMiddleware");
-    }
+    default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
 
-    factory_configfile_ = parser()->get_string(RUNTIME_CONFIG_GROUP, "Factory.ConfigFile");
-    if (factory_configfile_.empty())
-    {
-        throw_ex("Illegal empty value for Factory.ConfigFile");
-    }
+    factory_configfile_ = get_string(RUNTIME_CONFIG_GROUP, factory_configfile_str);
 }
 
 RuntimeConfig::~RuntimeConfig() noexcept

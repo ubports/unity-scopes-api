@@ -18,7 +18,7 @@
 
 #include <unity/api/scopes/internal/RegistryConfig.h>
 
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <unity/UnityExceptions.h>
 
 using namespace std;
 
@@ -42,25 +42,25 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     identity_ = identity;
     if (identity.empty())
     {
-        throw ConfigException("Registry identity cannot be an empty string");
+        throw InvalidArgumentException("Registry identity cannot be an empty string");
     }
-    mw_kind_ = parser()->get_string(REGISTRY_CONFIG_GROUP, "Middleware");
-    endpoint_ = parser()->get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
-    mw_configfile_ = parser()->get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Configfile");
+    mw_kind_ = get_middleware(REGISTRY_CONFIG_GROUP, "Middleware");
+    endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
+    mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Configfile");
 }
 
 RegistryConfig::~RegistryConfig() noexcept
 {
 }
 
-string RegistryConfig::mw_kind() const
-{
-    return mw_kind_;
-}
-
 string RegistryConfig::identity() const
 {
     return identity_;
+}
+
+string RegistryConfig::mw_kind() const
+{
+    return mw_kind_;
 }
 
 string RegistryConfig::endpoint() const

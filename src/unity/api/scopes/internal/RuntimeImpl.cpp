@@ -42,39 +42,32 @@ namespace internal
 RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     destroyed_(false)
 {
-    // Create the middleware factory and get the registry identity and config filename.
-    string registry_identity;
     try
     {
+        // Create the middleware factory and get the registry identity and config filename.
+        string registry_identity;
+
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string factory_configfile = config.factory_configfile();
         middleware_factory_.reset(new MiddlewareFactory(factory_configfile));
         registry_configfile_ = config.registry_configfile();
         registry_identity = config.registry_identity();
-    }
-    catch (unity::Exception const& e)
-    {
-        throw ConfigException("cannot create MiddlewareFactory: config file: " + configfile);
-    }
 
-    // Create the registry proxy.
-    try
-    {
-        RegistryConfig config(registry_identity, registry_configfile_);
-        string identity = config.identity();
-        string kind = config.mw_kind();
-        string configfile = config.mw_configfile();
-        string endpoint = config.endpoint();
+        // Create the registry proxy.
+        RegistryConfig r_config(registry_identity, registry_configfile_);
+        string kind = r_config.mw_kind();
+        string configfile = r_config.mw_configfile();
+        string endpoint = r_config.endpoint();
 
         middleware_ = middleware_factory_->create(scope_name, kind, configfile);
         middleware_->start();
-        auto registry_proxy = middleware_->create_registry_proxy(identity, endpoint);
+        auto registry_proxy = middleware_->create_registry_proxy(registry_identity, endpoint);
         registry_ = RegistryProxyImpl::create(registry_proxy);
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("cannot create registry proxy: config file: " + registry_configfile_);
+        throw ConfigException("cannot instantiate run time for " + scope_name + ", config file: " + configfile);
     }
 }
 
@@ -84,11 +77,11 @@ RuntimeImpl::~RuntimeImpl() noexcept
     {
         destroy();
     }
-    catch (unity::Exception const& e)
+    catch (unity::Exception const& e) // LCOV_EXCL_LINE
     {
         // TODO: log error
     }
-    catch (...)
+    catch (...) // LCOV_EXCL_LINE
     {
         // TODO: log error
     }

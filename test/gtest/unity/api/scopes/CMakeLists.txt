@@ -1,3 +1,5 @@
 add_subdirectory(internal)
+add_subdirectory(Runtime)
 add_subdirectory(ScopeBase)
+add_subdirectory(ScopeExceptions)
 add_subdirectory(Version)

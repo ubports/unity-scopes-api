@@ -19,6 +19,7 @@
 #include <unity/api/scopes/internal/ConfigBase.h>
 
 #include <unity/api/scopes/ScopeExceptions.h>
+#include <unity/UnityExceptions.h>
 #include <unity/util/IniParser.h>
 
 #include <sstream>
@@ -50,6 +51,39 @@ ConfigBase::~ConfigBase() noexcept
 shared_ptr<util::IniParser> ConfigBase::parser() const noexcept
 {
     return parser_;
+}
+
+string ConfigBase::get_string(string const& group, string const& key) const
+{
+    string val = parser_->get_string(group, key);
+    if (val.empty())
+    {
+        throw_ex("Illegal empty value for " + key);
+    }
+    return val;
+}
+
+string ConfigBase::get_optional_string(string const& group, string const& key) const
+{
+    try
+    {
+        return parser_->get_string(group, key);
+    }
+    catch (unity::LogicException const&)
+    {
+        return string();
+    }
+}
+
+string ConfigBase::get_middleware(string const& group, string const& key) const
+{
+    string val = get_string(group, key);
+    if (val != "Ice" && val != "REST")
+    {
+        throw_ex("Illegal value for " + key + ": \"" + val +
+                 "\": legal values are \"Ice\" and \"REST\"");
+    }
+    return val;
 }
 
 void ConfigBase::throw_ex(string const& reason) const

@@ -1,0 +1,5 @@
+[Runtime]
+Registry.Identity = Registry
+Registry.Configfile = Registry.ini
+Default.Middleware =
+Factory.Configfile = Factory.ini

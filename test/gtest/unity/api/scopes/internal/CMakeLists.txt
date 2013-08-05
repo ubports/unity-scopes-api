@@ -1,3 +1,7 @@
+add_subdirectory(ConfigBase)
 add_subdirectory(DynamicLoader)
 add_subdirectory(ice_middleware)
+add_subdirectory(RegistryConfig)
+add_subdirectory(RuntimeConfig)
+add_subdirectory(RuntimeImpl)
 add_subdirectory(ScopeLoader)

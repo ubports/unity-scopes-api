@@ -46,8 +46,11 @@ public:
 
     unity::util::IniParser::SPtr parser() const noexcept;
 
-protected:
-    void throw_ex(::std::string const& reason) const;
+    virtual std::string get_string(std::string const& group, std::string const& key) const;
+    virtual std::string get_optional_string(std::string const& group, std::string const& key) const;
+    virtual std::string get_middleware(std::string const& group, std::string const& key) const;
+
+    virtual void throw_ex(::std::string const& reason) const;
 
 private:
     unity::util::IniParser::SPtr parser_;
