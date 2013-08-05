@@ -3,6 +3,7 @@
     Memcheck:Leak
     ...
     fun:_ZN3Ice10initializeERKNS_18InitializationDataEi
+    ...
 }
 
 {
@@ -10,6 +11,42 @@
     Memcheck:Leak
     ...
     fun:_ZN3Ice11PropertiesI4loadERKSs
+    ...
+}
+
+{
+    Ice::DefaultsAndOverrides
+    Memcheck:Leak
+    fun:_Znwm
+    ...
+    fun:_ZNSsC1EPKcRKSaIcE
+    ...
+}
+
+{
+    Ice::unescapeString
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+    fun:_ZNSs4_Rep8_M_cloneERKSaIcEm
+    fun:_ZNSs7reserveEm
+    fun:_ZN15IceUtilInternal14unescapeStringERKSsmm
+    ...
+}
+
+{
+    Ice::ThreadPool
+    Memcheck:Leak
+    fun:_Znwm
+    ...
+    fun:_ZN11IceInternal10ThreadPool12nextThreadIdEv
+}
+
+{
+    Ice::EndpointFactctoryManager
+    Memcheck:Leak
+    ...
+    fun:_ZNK11IceInternal22EndpointFactoryManager6createERKSsb
 }
 
 {
@@ -18,5 +55,21 @@
     fun:calloc
     fun:_dl_allocate_tls
     fun:pthread_create@@GLIBC_2.2.5
-    fun:_ZNSt6thread15_M_start_threadESt10shared_ptrINS_10_Impl_baseEE
+    ...
+}
+
+{
+    g_keyfile_new_leak
+    Memcheck:Leak
+    ...
+    fun:g_key_file_new
+    ...
+}
+
+{
+    g_keyfile_load_leak
+    Memcheck:Leak
+    ...
+    fun:g_key_file_load_from_file
+    ...
 }
