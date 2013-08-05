@@ -64,6 +64,40 @@ public:
     virtual std::exception_ptr self() const override;
 };
 
+namespace internal
+{
+class ConfigExceptionImpl;
+}
+
+/**
+\brief Exception to indicate that something went wrong with the contents of configuration files.
+*/
+
+class UNITY_API ConfigException : public unity::Exception
+{
+public:
+    /**
+    \brief Constructs the exception.
+    \param reason Further details about the cause of the exception.
+    */
+    explicit ConfigException(std::string const& reason);
+    //! @cond
+    ConfigException(ConfigException const&);
+    ConfigException& operator=(ConfigException const&);
+    virtual ~ConfigException() noexcept;
+    //! @endcond
+
+    /**
+    \brief Returns the fully-qualified name of the exception.
+    */
+    virtual char const* what() const noexcept override;
+
+    /**
+    \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    */
+    virtual std::exception_ptr self() const override;
+};
+
 } // namespace scopes
 
 } // namespace api

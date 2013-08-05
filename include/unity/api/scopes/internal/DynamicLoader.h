@@ -22,6 +22,8 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
+#include <map>
+#include <mutex>
 #include <string>
 
 namespace unity
@@ -71,9 +73,11 @@ namespace internal
 //  int_func(5);
 //
 
-class UNITY_API DynamicLoader : public unity::util::DefinesPtrs<DynamicLoader>, private util::NonCopyable
+class UNITY_API DynamicLoader : private util::NonCopyable
 {
 public:
+    UNITY_DEFINES_PTRS(DynamicLoader);
+
     enum class Binding { lazy, now };
     enum class Unload { automatic, noclose };
 
@@ -94,6 +98,10 @@ private:
     std::string path_;
     void* handle_;
     Unload unload_;
+
+    typedef std::map<std::string, void*> LibraryHandles;
+    static LibraryHandles handles_;                        // Handles of libraries that will not be unloaded
+    static std::mutex mutex_;                              // Protects m_handle_map
 };
 
 } // namespace internal

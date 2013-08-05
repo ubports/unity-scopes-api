@@ -44,7 +44,8 @@ int micro_version()
     return UNITY_SCOPES_VERSION_MICRO;
 }
 
-char const* str()
+char const*
+version_string()
 {
     return UNITY_SCOPES_VERSION_STRING;
 }

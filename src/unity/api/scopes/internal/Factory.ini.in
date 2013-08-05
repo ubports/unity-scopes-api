@@ -1,0 +1,4 @@
+[MiddlewareFactory]
+
+Ice.Configfile = Ice.Config
+REST.Configfile = REST.Config

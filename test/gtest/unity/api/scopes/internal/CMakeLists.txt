@@ -1,2 +1,3 @@
 add_subdirectory(DynamicLoader)
+add_subdirectory(ice_middleware)
 add_subdirectory(ScopeLoader)

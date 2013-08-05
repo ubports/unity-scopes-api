@@ -15,26 +15,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower) # Build types should always be lowercase but sometimes they are not.
 
-include(EnableCoverageReport)
-#####################################################################
-# Enable code coverage calculation with gcov/gcovr/lcov
-# Usage:
-#  * Switch build type to coverage (use ccmake or cmake-gui)
-#  * Invoke make, make test, make coverage (or ninja if you use that backend)
-#  * Find html report in subdir coveragereport
-#  * Find xml report suitable for jenkins in coverage.xml
-#####################################################################
-if(cmake_build_type_lower MATCHES coverage)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
-
-  # We add -g when building with coverage so valgrind reports line numbers.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
-endif()
-
 # Static C++ checks
 
 find_program(CPPCHECK_COMMAND NAMES cppcheck)
@@ -66,6 +46,16 @@ else()
     message(WARNING "Cannot find valgrind: valgrind target will not be available")
 endif()
 
+# TODO: For now, we need to use Ice 3.5 built from source until the Debian package becomes available.
+# The tarball is available here: http://zeroc.com/download/Ice/3.5/Ice-3.5.0.tar.gz
+# To build Ice, go to <source_root>/cpp, and do "make; make test; sudo make install".
+# The default config is fine. If you want to install somewhere else, edit the cpp/config/Make.rules file.
+set(IceRoot /usr)
+if (NOT EXISTS ${IceRoot}/include/Ice/Ice.h)
+    message(FATAL_ERROR "Cannot find Ice development files. You need to build Ice 3.5 from source and install it, and set IceRoot in CMakeLists.txt accordingly. Then set LD_LIBRARY_PATH to include the Ice lib64 directory, set PATH to include the Ice bin directory, and try again.")
+endif()
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${IceRoot}/lib64")
 
 include(FindPkgConfig)
 find_package(Boost 1.49.0 COMPONENTS regex REQUIRED)
@@ -73,12 +63,17 @@ pkg_check_modules(UNITY_API libunity-api REQUIRED)
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS})
 
+# UNIX Domain Socket transport plug-in for Ice.
+pkg_check_modules(IceUDS libIceUDS REQUIRED)
+
 # Standard install paths
 include(GNUInstallDirs)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
+    ${CMAKE_BINARY_DIR}
+    ${IceRoot}/include
     ${OTHER_INCLUDE_DIRS}
 )
 
@@ -87,7 +82,13 @@ include_directories(
 # Exported functions and classes are prefixed by a UNITY_API macro,
 # which explicitly exports a symbol if UNITY_DLL_EXPORTS is defined.
 add_definitions(-DUNITY_DLL_EXPORTS)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+
+# TODO: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
+# base class from a static library without an unresolved dependency. But, without static linking, we can't
+# do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
+# with visbility=default.
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")   # HACK
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-permissive -pedantic -Wall -Wextra")
 
@@ -105,7 +106,6 @@ endif()
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
 set(UNITY_SCOPES_MICRO 0)
-set(UNITY_SCOPES_VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}")
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -117,7 +117,10 @@ set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 set(OTHER_LIBS
     ${OTHER_LIBS}
     unity-api
+    Ice
+    IceUtil
     dl
+    pthread
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
@@ -125,7 +128,14 @@ set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 
 # All the libraries we need to link a gtest executable. (We link the tests against a static version
 # so we can do whitebox testing on internal classes.
-set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB} ${OTHER_LIBS})
+
+# TODO: HACK: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
+# base class from a static library without an unresolved dependency. But, without static linking, we can't
+# do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
+# with visbility=default.
+
+# set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB} ${OTHER_LIBS})
+set(TESTLIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS}) # HACK
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
@@ -136,10 +146,91 @@ set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_PREFIX} CACHE PATH "Destination
 include(CTest)
 enable_testing()
 
-# add subdirectories to build
+# Add subdirectories.
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(slice)
+add_subdirectory(demo)
+
+# Custom rules to compile Slice files
+foreach(file ${SLICE_FILES})
+
+    string(REPLACE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" build_dir ${file})
+    get_filename_component(build_dir ${build_dir} PATH)
+
+    get_filename_component(slice_file ${file} NAME)
+    string(REPLACE ".ice" ".cpp" src_file ${slice_file})
+    string(REPLACE ".ice" ".h" hdr_file ${slice_file})
+
+    set(src_file ${build_dir}/${src_file})
+    set(hdr_file ${build_dir}/${hdr_file})
+
+    string(REPLACE "${CMAKE_BINARY_DIR}/" "" relative_build_dir ${build_dir})
+
+    add_custom_command(OUTPUT ${src_file} ${hdr_file}
+                       DEPENDS ${file}
+                       COMMAND slice2cpp --output-dir=${build_dir} --include-dir ${relative_build_dir} ${file})
+
+    set(SLICE_HDRS ${SLICE_HDRS} ${hdr_file})
+    set(SLICE_SRC ${SLICE_SRC} ${src_file})
+endforeach()
+
+# Set up coverage testing
+include(EnableCoverageReport)
+#####################################################################
+# Enable code coverage calculation with gcov/gcovr/lcov
+# Usage:
+#  * Switch build type to coverage (use ccmake or cmake-gui)
+#  * Invoke make, make test, make coverage (or ninja if you use that backend)
+#  * Find html report in subdir coveragereport
+#  * Find xml report suitable for jenkins in coverage.xml
+#####################################################################
+if(cmake_build_type_lower MATCHES coverage)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+
+    # We add -g when building with coverage so valgrind reports line numbers.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
+endif()
+
+# Pseudo-library of object files. We need a dynamic version of the library for normal clients,
+# and a static version for the whitebox tests, so we can write unit tests for classes in the internal namespaces
+# (because, for the .so, non-public APIs are compiled with -fvisibility=hidden).
+# Everything is compiled with -fPIC, so the same object files are suitable for either library.
+# Here, we create an object library that then is used to link the static and dynamic
+# libraries, without having to compile each source file twice with different compile flags.
+
+set(UNITY_SCOPES_LIB_OBJ ${UNITY_SCOPES_LIB}-obj)
+add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${SLICE_SRC})
+set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
+
+# Use the object files to make the shared library.
+set(UNITY_SCOPES_SOVERSION 0)
+add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    SOVERSION ${UNITY_SCOPES_SOVERSION}
+)
+
+# Use the object files to make the static library.
+add_library(${UNITY_SCOPES_STATIC_LIB} STATIC $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
+set_target_properties(${UNITY_SCOPES_STATIC_LIB} PROPERTIES OUTPUT_NAME ${UNITY_SCOPES_LIB})
+
+# Only the dynamic library gets installed.
+install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
+
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    SOVERSION ${UNITY_SCOPES_SOVERSION}
+)
+
+# Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
   ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} FILTER /usr/include ${CMAKE_SOURCE_DIR}/test/* ${CMAKE_BINARY_DIR}/*)

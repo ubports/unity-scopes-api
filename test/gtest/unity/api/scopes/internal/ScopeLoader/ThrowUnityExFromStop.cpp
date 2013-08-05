@@ -16,21 +16,24 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/UnityExceptions.h>
-
 #include "MyScope.h"
 #include "Counters.h"
+
+#include <unity/api/scopes/internal/ScopeLoader.h>
+#include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 
-class MyThrowingScope : public MyScope
+class EXPORT MyThrowingScope : public MyScope
 {
 public:
-    virtual void stop() { inc_stop(); throw unity::LogicException("stop failure"); }
+    virtual void stop() override
+    {
+        inc_stop();
+        throw unity::LogicException("stop failure");
+    }
 };
 
 extern "C"

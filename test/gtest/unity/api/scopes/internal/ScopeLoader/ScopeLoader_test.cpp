@@ -16,8 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <unity/api/scopes/internal/RegistryProxyImpl.h>
+#include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/internal/MiddlewareBase.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -29,28 +30,25 @@
 #include <time.h>
 
 using namespace std;
+using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
-
-class MiddlewareStub : public MiddlewareBase
-{
-public:
-    MiddlewareStub() = default;
-    ~MiddlewareStub() noexcept {}
-    virtual void start(std::string const&) override {}
-    virtual void stop() override {}
-};
 
 namespace
 {
     char const* scope_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libTestScope.so";
+    char const* bad_version_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libBadVersion.so";
     char const* no_destroy_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libNoDestroy.so";
     char const* null_return_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libNullReturn.so";
+    char const* throw_unity_ex_from_run_lib
+        = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromRun.so";
     char const* throw_unity_ex_from_start_lib
         = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromStart.so";
     char const* throw_unity_ex_from_stop_lib
         = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromStop.so";
     char const* throw_std_ex_from_stop_lib
         = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowStdExFromStop.so";
+    char const* throw_unknown_ex_from_start_lib
+        = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnknownExFromStart.so";
     char const* throw_unknown_ex_from_stop_lib
         = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnknownExFromStop.so";
     char const* scopeA
@@ -63,7 +61,7 @@ namespace
 // before we test for the counter values because the thread responds
 // asynchronously to our commands and may take a little while to catch up.
 
-void wait(long millisec = 10)
+void wait(long millisec = 20)
 {
     struct timespec tv;
     tv.tv_sec = millisec / 1000;
@@ -71,22 +69,19 @@ void wait(long millisec = 10)
     nanosleep(&tv, nullptr);
 }
 
-// We make that global and initialize it once, in the first test. Thereafter,
-// we use this same instance for all the calls to load().
+// Need to make a dummy registry proxy because, if we pass a null shared_ptr to load(),
+// load() throws an exception.
 
-MiddlewareBase::SPtr mw;
+RegistryProxy::SPtr registry(RegistryProxyImpl::create(nullptr));
 
 // Basic test.
 
 TEST(ScopeLoader, basic)
 {
-    try
-    {
-    mw.reset(new MiddlewareStub);  // One-time initialization
-
     reset_counters();
+
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, registry);
         wait();
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
@@ -97,25 +92,66 @@ TEST(ScopeLoader, basic)
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
     EXPECT_EQ(0, num_start());
+    EXPECT_EQ(0, num_run());
     EXPECT_EQ(0, num_stop());
+}
+
+// Check that we get an exception for a null registry proxy.
+
+TEST(ScopeLoader, null_registry)
+{
+    try
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, nullptr);
+        FAIL();
     }
     catch (unity::Exception const& e)
     {
-        cerr << e.to_string() << endl;
+        EXPECT_EQ("unity::InvalidArgumentException: Cannot load scope \"testScope\": null registry proxy",
+                  e.to_string());
     }
+}
+
+TEST(ScopeLoader, version_mismatch)
+{
+    reset_counters();
+
+    try
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", bad_version_lib, registry);
+        sl->start();
+        wait();
+        sl->unload();
+        FAIL();
+    }
+    catch (unity::Exception const& e)
+    {
+        boost::regex r("unity::ResourceException: scope testScope: terminated due to exception:\n"
+                       "    unity::ResourceException: Scope testScope was compiled with major version 666 of the "
+                       "Unity scopes run time. This version is incompatible with the current major version "
+                       "\\([0-9]+\\)\\.");
+        EXPECT_TRUE(boost::regex_match(e.to_string(), r));
+    }
+    EXPECT_EQ(1, num_create());
+    EXPECT_EQ(1, num_destroy());
+    EXPECT_EQ(1, num_start());
+    EXPECT_EQ(0, num_run());
+    EXPECT_EQ(0, num_stop());
 }
 
 TEST(ScopeLoader, stop)
 {
     reset_counters();
+
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, registry);
 
         // Check that calling stop on a stopped thread does nothing.
         sl->stop();
         wait();
         EXPECT_EQ(0, num_start());
         EXPECT_EQ(0, num_stop());
+        EXPECT_TRUE(sl->scope_base());  // Just so we get coverage
 
         sl->stop();
         wait();
@@ -126,22 +162,26 @@ TEST(ScopeLoader, stop)
         sl->start();
         wait();
         EXPECT_EQ(1, num_start());
+        EXPECT_EQ(1, num_run());
         EXPECT_EQ(0, num_stop());
 
         sl->start();
         wait();
         EXPECT_EQ(1, num_start());
+        EXPECT_EQ(1, num_run());
         EXPECT_EQ(0, num_stop());
 
         // Call stop/start/stop and check counts. We need to wait a little between calls to allow
         // the thread to catch up.
         sl->stop();
         wait();
+        EXPECT_EQ(1, num_stop());
         sl->start();
         wait();
         sl->stop();
         wait();
         EXPECT_EQ(2, num_start());
+        EXPECT_EQ(2, num_run());
         EXPECT_EQ(2, num_stop());
     }
 }
@@ -151,8 +191,9 @@ TEST(ScopeLoader, stop)
 TEST(ScopeLoader, unload_while_started)
 {
     reset_counters();
+
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, registry);
 
         sl->start();
         wait();
@@ -161,6 +202,7 @@ TEST(ScopeLoader, unload_while_started)
     }
     wait();
     EXPECT_EQ(1, num_start());
+    EXPECT_EQ(1, num_run());
     EXPECT_EQ(1, num_stop());
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -171,9 +213,10 @@ TEST(ScopeLoader, unload_while_started)
 TEST(ScopeLoader, no_library)
 {
     reset_counters();
+
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", "no_such_lib", mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", "no_such_lib", registry);
         FAIL();
     }
     catch (unity::Exception const& e)
@@ -190,9 +233,10 @@ TEST(ScopeLoader, no_library)
 TEST(ScopeLoader, no_load)
 {
     reset_counters();
+
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", no_destroy_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", no_destroy_lib, registry);
         FAIL();
     }
     catch (unity::Exception const& e)
@@ -209,14 +253,38 @@ TEST(ScopeLoader, no_load)
 TEST(ScopeLoader, null_return)
 {
     reset_counters();
+
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib, registry);
         FAIL();
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Failed to initialize thread for scope \"testScope\"", e.to_string());
+        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_api_scope_create",
+                  e.to_string());
+        EXPECT_EQ(1, num_create());
+        EXPECT_EQ(1, num_destroy());
+    }
+}
+
+// Same thing again, but this time with an explicit unload
+
+TEST(ScopeLoader, null_return_unload)
+{
+    reset_counters();
+
+    try
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib, registry);
+        wait();
+        sl->unload();
+        FAIL();
+    }
+    catch (unity::Exception const& e)
+    {
+        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_api_scope_create",
+                  e.to_string());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(1, num_destroy());
     }
@@ -227,9 +295,66 @@ TEST(ScopeLoader, null_return)
 TEST(ScopeLoader, throw_unity_exception_from_start)
 {
     reset_counters();
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, mw);
-    sl->start();
-    wait();
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, registry);
+        try
+        {
+            sl->start();
+            wait();
+            sl->unload();
+            wait();
+            FAIL();
+        }
+        catch (unity::Exception const& e)
+        {
+            EXPECT_EQ("unity::ResourceException: scope testScope: terminated due to exception:\n"
+                      "    unity::LogicException: start failure",
+                      e.to_string());
+        }
+    }
+    EXPECT_EQ(0, num_stop());
+    EXPECT_EQ(1, num_create());
+    EXPECT_EQ(1, num_destroy());
+}
+
+// Same again, but without an explicit unload, just so we get coverage in the destructor.
+
+TEST(ScopeLoader, throw_unity_exception_from_start_no_unload)
+{
+    reset_counters();
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, registry);
+        sl->start();
+        wait();
+    }
+    EXPECT_EQ(0, num_stop());
+    EXPECT_EQ(1, num_create());
+    EXPECT_EQ(1, num_destroy());
+}
+
+// Test that things behave as expected if start() throws an unknown exception.
+
+TEST(ScopeLoader, throw_unknown_exception_from_start)
+{
+    reset_counters();
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_start_lib, registry);
+        try
+        {
+            sl->start();
+            wait();
+            sl->unload();
+            wait();
+            EXPECT_TRUE(sl->scope_base());
+            FAIL();
+        }
+        catch (unity::Exception const& e)
+        {
+            EXPECT_EQ("unity::ResourceException: scope testScope: terminated:\n"
+                      "    unknown exception",
+                      e.to_string());
+        }
+    }
     EXPECT_EQ(0, num_stop());
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -239,23 +364,29 @@ TEST(ScopeLoader, throw_unity_exception_from_start)
 
 TEST(ScopeLoader, throw_unity_exception_from_stop)
 {
+    reset_counters();
+    try
     {
-        reset_counters();
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib, mw);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib, registry);
         sl->start();
         wait();
         sl->stop();
         wait();
         EXPECT_EQ(1, num_start());
+        EXPECT_EQ(1, num_run());
         EXPECT_EQ(1, num_stop());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(1, num_destroy());
+        sl->unload();
+        EXPECT_TRUE(sl->scope_base());
+        FAIL();
     }
-
-    EXPECT_EQ(1, num_start());
-    EXPECT_EQ(1, num_stop());
-    EXPECT_EQ(1, num_create());
-    EXPECT_EQ(1, num_destroy());
+    catch (unity::ResourceException const& e)
+    {
+        EXPECT_EQ("unity::ResourceException: scope testScope: terminated due to exception:\n"
+                  "    unity::LogicException: stop failure",
+                  e.to_string());
+    }
 }
 
 // Test that things behave as expected if stop() throws a std exception.
@@ -263,12 +394,55 @@ TEST(ScopeLoader, throw_unity_exception_from_stop)
 TEST(ScopeLoader, throw_std_exception_from_stop)
 {
     reset_counters();
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_std_ex_from_stop_lib, mw);
-    sl->start();
-    wait();
-    sl->stop();
-    wait();
+    try
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_std_ex_from_stop_lib, registry);
+        sl->start();
+        wait();
+        sl->stop();
+        wait();
+        EXPECT_EQ(1, num_start());
+        EXPECT_EQ(1, num_run());
+        EXPECT_EQ(1, num_stop());
+        EXPECT_EQ(1, num_create());
+        EXPECT_EQ(1, num_destroy());
+        sl->unload();
+        EXPECT_TRUE(sl->scope_base());
+        FAIL();
+    }
+    catch (unity::ResourceException const& e)
+    {
+        EXPECT_EQ("unity::ResourceException: scope testScope: terminated due to exception:\n"
+                  "    stop failure",
+                  e.to_string());
+    }
+}
+
+// Test that things behave as expected if run() throws a Unity exception.
+
+TEST(ScopeLoader, throw_unity_exception_from_run)
+{
+    reset_counters();
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_run_lib, registry);
+        try
+        {
+            sl->start();
+            wait();
+            sl->unload();
+            wait();
+            FAIL();
+        }
+        catch (unity::Exception const& e)
+        {
+            EXPECT_EQ("unity::ResourceException: Scope testScope: exception in run():\n"
+                      "    unity::LogicException: run failure",
+                      e.to_string());
+        }
+    }
+
     EXPECT_EQ(1, num_start());
+    EXPECT_EQ(1, num_run());
     EXPECT_EQ(1, num_stop());
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -279,15 +453,27 @@ TEST(ScopeLoader, throw_std_exception_from_stop)
 TEST(ScopeLoader, throw_unknown_exception_from_stop)
 {
     reset_counters();
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_stop_lib, mw);
-    sl->start();
-    wait();
-    sl->stop();
-    wait();
-    EXPECT_EQ(1, num_start());
-    EXPECT_EQ(1, num_stop());
-    EXPECT_EQ(1, num_create());
-    EXPECT_EQ(1, num_destroy());
+    try
+    {
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_stop_lib, registry);
+        sl->start();
+        wait();
+        sl->stop();
+        wait();
+        EXPECT_EQ(1, num_start());
+        EXPECT_EQ(1, num_run());
+        EXPECT_EQ(1, num_stop());
+        EXPECT_EQ(1, num_create());
+        EXPECT_EQ(1, num_destroy());
+        sl->unload();
+        FAIL();
+    }
+    catch (unity::ResourceException const& e)
+    {
+        EXPECT_EQ("unity::ResourceException: scope testScope: terminated:\n"
+                  "    unknown exception",
+                  e.to_string());
+    }
 }
 
 // Test that things behave as expected if unload is called more than once
@@ -295,26 +481,129 @@ TEST(ScopeLoader, throw_unknown_exception_from_stop)
 TEST(ScopeLoader, unload)
 {
     reset_counters();
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, mw);
+
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, registry);
+    sl->start();
+    wait();
+    sl->stop();
     sl->unload();
     wait();
     sl->unload();
     wait();
+
+    EXPECT_EQ(1, num_start());
+    EXPECT_EQ(1, num_run());
+    EXPECT_EQ(1, num_stop());
+    EXPECT_EQ(1, num_create());
+    EXPECT_EQ(1, num_destroy());
 }
 
-// Test that we can have more than once scope loaded without getting confused which one we are talking to.
+// Test that things behave as expected if unload is called while the scope is running and stop() throws
+
+TEST(ScopeLoader, unload_stop_exception)
+{
+    reset_counters();
+
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib, registry);
+    sl->start();
+    wait();
+    try
+    {
+        sl->unload();
+        FAIL();
+    }
+    catch (unity::Exception const& e)
+    {
+        EXPECT_EQ("unity::ResourceException: scope testScope: terminated due to exception:\n"
+                  "    unity::LogicException: stop failure",
+                  e.to_string());
+    }
+
+    // Call unload again to make sure that the second time, it doesn't throw.
+    try
+    {
+        sl->unload();
+    }
+    catch (...)
+    {
+        FAIL();
+    }
+}
+
+// Test that start() throws an exception after unload()
+
+TEST(ScopeLoader, restart_exception)
+{
+    reset_counters();
+
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, registry);
+    sl->start();
+    wait();
+    sl->unload();
+    wait();
+    try
+    {
+        sl->start();
+        FAIL();
+    }
+    catch (unity::Exception const& e)
+    {
+        EXPECT_EQ("unity::LogicException: Cannot start scope \"testScope\" in Finished state", e.to_string());
+    }
+}
+
+// Test that start() and stop() throw for scope in Failed state
+
+TEST(ScopeLoader, restart_failed)
+{
+    reset_counters();
+
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, registry);
+    try
+    {
+        sl->start();
+        wait();
+        sl->unload();
+        wait();
+        FAIL();
+    }
+    catch (unity::Exception const&)
+    {
+    }
+
+    try
+    {
+        sl->start();
+    }
+    catch (unity::Exception const& e)
+    {
+        EXPECT_EQ("unity::LogicException: Cannot start scope \"testScope\" in Failed state", e.to_string());
+    }
+
+    try
+    {
+        sl->stop();
+    }
+    catch (unity::Exception const& e)
+    {
+        EXPECT_EQ("unity::LogicException: Cannot stop scope \"testScope\" in Failed state", e.to_string());
+    }
+}
+
+// Test that we can have more than one scope loaded without getting confused which one we are talking to.
 
 TEST(ScopeLoader, two_scopes)
 {
     reset_counters();
     clear_vars();
 
-    ScopeLoader::UPtr slA = ScopeLoader::load("scopeA", scopeA, mw);
+    ScopeLoader::UPtr slA = ScopeLoader::load("scopeA", scopeA, registry);
     slA->start();
     wait();
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_start());
-    ScopeLoader::UPtr slB = ScopeLoader::load("scopeB", scopeB, mw);
+
+    ScopeLoader::UPtr slB = ScopeLoader::load("scopeB", scopeB, registry);
     slB->start();
     wait();
     EXPECT_EQ(2, num_create());
@@ -334,7 +623,4 @@ TEST(ScopeLoader, two_scopes)
 
     EXPECT_EQ(1, get_scopeA_var());
     EXPECT_EQ(2, get_scopeB_var());
-
-    // Get rid of the middleware stub again, otherwise coverage reporting says the destructor wasn't called.
-    mw = nullptr;
 }

@@ -56,11 +56,46 @@ char const*
 MiddlewareException::
 what() const noexcept
 {
-    return "unity::api::scopes::MiddleWareException";
+    return "unity::api::scopes::MiddlewareException";
 }
 
 exception_ptr
 MiddlewareException::
+self() const
+{
+    return make_exception_ptr(*this);
+}
+
+ConfigException::
+ConfigException(string const& reason)
+    : Exception(make_shared<unity::ExceptionImplBase>(this, reason))
+{
+}
+
+ConfigException::
+ConfigException(ConfigException const&) = default;
+
+//! @cond
+
+ConfigException&
+ConfigException::
+operator=(ConfigException const&) = default;
+
+
+ConfigException::
+~ConfigException() noexcept = default;
+
+//! @endcond
+
+char const*
+ConfigException::
+what() const noexcept
+{
+    return "unity::api::scopes::ConfigException";
+}
+
+exception_ptr
+ConfigException::
 self() const
 {
     return make_exception_ptr(*this);

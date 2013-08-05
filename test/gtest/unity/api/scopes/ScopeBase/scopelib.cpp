@@ -25,10 +25,10 @@ class EXPORT MyScope : public unity::api::scopes::ScopeBase
 public:
     MyScope() {}
 
-    virtual void start() override {}
+    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override { return VERSION; }
     virtual void stop() override {}
-
-    virtual void query(std::string const&, std::function<void(std::string const&)>) override {}
+    virtual void run() override {}
+    virtual void query(std::string const&, unity::api::scopes::ReplyProxy::SPtr const&) override {}
 
 protected:
     virtual ~MyScope() {}

@@ -16,20 +16,23 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/ScopeBase.h>
-
 #include "MyScope.h"
 #include "Counters.h"
+
+#include <unity/api/scopes/internal/ScopeLoader.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 
-class MyThrowingScope : public MyScope
+class EXPORT MyThrowingScope : public MyScope
 {
 public:
-    virtual void stop() { inc_stop(); throw 42; }
+    virtual void stop() override
+    {
+        inc_stop();
+        throw 42;
+    }
 };
 
 extern "C"
