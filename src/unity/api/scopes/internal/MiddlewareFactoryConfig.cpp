@@ -37,8 +37,6 @@ const char* MiddlewareFactoryConfig::MIDDLEWARE_FACTORY_CONFIG_GROUP = "Middlewa
 MiddlewareFactoryConfig::MiddlewareFactoryConfig(string const& configfile) :
     ConfigBase(configfile)
 {
-    ice_configfile_ = parser()->get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "Ice.Configfile");
-    rest_configfile_ = parser()->get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "REST.Configfile");
 }
 
 MiddlewareFactoryConfig::~MiddlewareFactoryConfig() noexcept
@@ -47,12 +45,12 @@ MiddlewareFactoryConfig::~MiddlewareFactoryConfig() noexcept
 
 string MiddlewareFactoryConfig::ice_configfile() const
 {
-    return ice_configfile_;
+    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "Ice.Configfile");
 }
 
 string MiddlewareFactoryConfig::rest_configfile() const
 {
-    return rest_configfile_;
+    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "REST.Configfile");
 }
 } // namespace internal
 

@@ -41,14 +41,14 @@ public:
     RegistryConfig(std::string const& identity, std::string const& configfile);
     ~RegistryConfig() noexcept;
 
-    std::string mw_kind() const;
     std::string identity() const;
+    std::string mw_kind() const;
     std::string endpoint() const;
     std::string mw_configfile() const;
 
 private:
-    std::string mw_kind_;
     std::string identity_;
+    std::string mw_kind_;
     std::string endpoint_;
     std::string mw_configfile_;
 };

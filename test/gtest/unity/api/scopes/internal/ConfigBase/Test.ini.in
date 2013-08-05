@@ -1,0 +1,6 @@
+[SomeGroup]
+Empty =
+Ice.Middleware = Ice
+REST.Middleware = REST
+Ice.BadMiddleware = foo
+REST.BadMiddleware = bar
