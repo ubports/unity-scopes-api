@@ -1,0 +1,6 @@
+configure_file(Factory.ini.in Factory.ini)
+
+add_executable(MiddlewareFactoryConfig_test MiddlewareFactoryConfig_test.cpp)
+target_link_libraries(MiddlewareFactoryConfig_test ${TESTLIBS})
+
+add_test(MiddlewareFactoryConfig MiddlewareFactoryConfig_test)
