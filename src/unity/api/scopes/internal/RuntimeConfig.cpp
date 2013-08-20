@@ -39,6 +39,7 @@ namespace
     const string registry_identity_str = "Registry.Identity";
     const string registry_configfile_str = "Registry.Configfile";
     const string default_middleware_str = "Default.Middleware";
+    const string default_middleware_configfile_str = "Configfile";
     const string factory_configfile_str = "Factory.Configfile";
 }
 
@@ -56,6 +57,9 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     registry_configfile_ = get_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
 
     default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
+
+    default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
+                                                default_middleware_ + "." + default_middleware_configfile_str);
 
     factory_configfile_ = get_string(RUNTIME_CONFIG_GROUP, factory_configfile_str);
 }
@@ -77,6 +81,11 @@ string RuntimeConfig::registry_configfile() const
 string RuntimeConfig::default_middleware() const
 {
     return default_middleware_;
+}
+
+string RuntimeConfig::default_middleware_configfile() const
+{
+    return default_middleware_configfile_;
 }
 
 string RuntimeConfig::factory_configfile() const

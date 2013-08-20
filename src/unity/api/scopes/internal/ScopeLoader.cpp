@@ -40,7 +40,7 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProxy::SPtr const& registry) :
+ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProxy const& registry) :
     scope_name_(name),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
     registry_(registry),
@@ -110,7 +110,7 @@ ScopeLoader::~ScopeLoader() noexcept
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& name, string const& libpath, RegistryProxy::SPtr const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& name, string const& libpath, RegistryProxy const& registry)
 {
     return UPtr(new ScopeLoader(name, libpath, registry));
 }

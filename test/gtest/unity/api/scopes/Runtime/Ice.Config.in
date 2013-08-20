@@ -1,4 +1,4 @@
 Ice.Plugin.IceUDS.cpp.IceUDS=@IceUDS_LIBDIR@/IceUDS,1.0:create_Ice_UDS
-Ice.Warn.UnusedProperties=1
+#Ice.Warn.UnusedProperties=1
 
 testscope.Endpoints = uds -f testscope-socket

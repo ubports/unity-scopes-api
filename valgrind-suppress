@@ -1,3 +1,8 @@
+# Leak suppressions for Ice below are all for bogus "possibly lost" reports.
+# In all cases, we ultimately end up in the std::string library, which does
+# weird things with pointers that point somewhere into the middle of an allocated
+# block to avoid copies. In turn, that causes bogus reports from valgrind.
+
 {
     Ice::initialize
     Memcheck:Leak
@@ -35,6 +40,17 @@
 }
 
 {
+    Ice::setProperty
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+    fun:_ZNSs12_S_constructIPcEES0_T_S1_RKSaIcESt20forward_iterator_tag
+    fun:_ZNSsC1ERKSsmm
+    fun:_ZN15IceUtilInternal4trimERKSs
+    fun:_ZN3Ice11PropertiesI11setPropertyERKSsS2_
+}
+
+{
     Ice::ThreadPool
     Memcheck:Leak
     fun:_Znwm
@@ -43,11 +59,13 @@
 }
 
 {
-    Ice::EndpointFactctoryManager
+    Ice::EndpointFactoryManager
     Memcheck:Leak
     ...
     fun:_ZNK11IceInternal22EndpointFactoryManager6createERKSsb
 }
+
+# Bogus "possibly leaked" reports for pthreads
 
 {
     Thread create leak
@@ -57,6 +75,8 @@
     fun:pthread_create@@GLIBC_2.2.5
     ...
 }
+
+# Bogus "possibly leaked" reports for glib .ini file parser
 
 {
     g_keyfile_new_leak
@@ -71,5 +91,21 @@
     Memcheck:Leak
     ...
     fun:g_key_file_load_from_file
+    ...
+}
+
+# Bogus "possibly lost" report for
+#
+#   string s("hello");
+#   foo(s + " world");
+
+{
+    StringCatenation
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+    fun:_ZNSs4_Rep8_M_cloneERKSaIcEm
+    fun:_ZNSs7reserveEm
+    fun:_ZNSs6appendEPKcm
     ...
 }

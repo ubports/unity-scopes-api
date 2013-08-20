@@ -18,8 +18,10 @@
 
 #include <unity/api/scopes/internal/ice_middleware/RegistryI.h>
 
-#include <unity/api/scopes/internal/ice_middleware/IceScopeProxy.h>
+#include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
+#include <unity/api/scopes/internal/ice_middleware/IceScope.h>
 #include <unity/api/scopes/internal/RegistryObject.h>
+#include <unity/api/scopes/ScopeExceptions.h>
 
 using namespace std;
 
@@ -55,17 +57,18 @@ RegistryI::~RegistryI() noexcept
 
 middleware::ScopePrx RegistryI::find(std::string const& name, Ice::Current const&) // noexcept
 {
+    middleware::ScopePrx sp;
     try
     {
-        MWScopeProxy::SPtr p = ro_->find(name);
-        IceScopeProxy::SPtr ice_proxy = dynamic_pointer_cast<IceScopeProxy>(p);
-        return ice_proxy ? ice_proxy->proxy() : nullptr;
+        MWScopeProxy p = ro_->find(name);
+        IceScopeProxy isp = dynamic_pointer_cast<IceScope>(p);
+        sp = middleware::ScopePrx::uncheckedCast(isp->proxy());
     }
-    catch (...)
+    catch (NotFoundException const& e)
     {
-        // TODO: Log error
-        return nullptr;
+        throw middleware::NotFoundException(e.name());
     }
+    return sp;
 }
 
 middleware::ScopeDict RegistryI::list(Ice::Current const&) // noexcept
@@ -76,9 +79,10 @@ middleware::ScopeDict RegistryI::list(Ice::Current const&) // noexcept
         RegistryObject::MWScopeMap sm = ro_->list();
         for (auto const& it : sm)
         {
-            IceScopeProxy::SPtr ice_proxy = dynamic_pointer_cast<IceScopeProxy>(it.second);
-            assert(ice_proxy);
-            sd[it.first] = ice_proxy->proxy();
+            IceScopeProxy isp = dynamic_pointer_cast<IceScope>(it.second);
+            assert(isp);
+            sd[it.first] = middleware::ScopePrx::uncheckedCast(isp->proxy());
+            assert(sd[it.first]);
         }
     }
     catch (...)

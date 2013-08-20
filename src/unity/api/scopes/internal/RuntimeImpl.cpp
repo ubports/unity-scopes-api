@@ -19,7 +19,7 @@
 #include <unity/api/scopes/internal/RuntimeImpl.h>
 
 #include <unity/api/scopes/internal/RegistryConfig.h>
-#include <unity/api/scopes/internal/RegistryProxyImpl.h>
+#include <unity/api/scopes/internal/RegistryImpl.h>
 #include <unity/api/scopes/internal/RuntimeConfig.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -42,6 +42,11 @@ namespace internal
 RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     destroyed_(false)
 {
+    if (scope_name.empty())
+    {
+        throw InvalidArgumentException("Cannot instantiate a run time with an empty scope name");
+    }
+
     try
     {
         // Create the middleware factory and get the registry identity and config filename.
@@ -49,25 +54,26 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
 
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
+        string middleware_configfile = config.default_middleware_configfile();
         string factory_configfile = config.factory_configfile();
         middleware_factory_.reset(new MiddlewareFactory(factory_configfile));
         registry_configfile_ = config.registry_configfile();
         registry_identity = config.registry_identity();
 
-        // Create the registry proxy.
-        RegistryConfig r_config(registry_identity, registry_configfile_);
-        string kind = r_config.mw_kind();
-        string configfile = r_config.mw_configfile();
-        string endpoint = r_config.endpoint();
-
-        middleware_ = middleware_factory_->create(scope_name, kind, configfile);
+        middleware_ = middleware_factory_->create(scope_name, default_middleware, middleware_configfile);
         middleware_->start();
-        auto registry_proxy = middleware_->create_registry_proxy(registry_identity, endpoint);
-        registry_ = RegistryProxyImpl::create(registry_proxy);
+
+        // Create the registry proxy.
+        RegistryConfig reg_config(registry_identity, registry_configfile_);
+        string reg_mw_configfile = reg_config.mw_configfile();
+        string reg_endpoint = reg_config.endpoint();
+
+        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity, reg_endpoint);
+        registry_ = RegistryImpl::create(registry_mw_proxy);
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("cannot instantiate run time for " + scope_name + ", config file: " + configfile);
+        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + configfile);
     }
 }
 
@@ -112,7 +118,7 @@ MiddlewareFactory const* RuntimeImpl::factory() const
     return middleware_factory_.get();
 }
 
-RegistryProxy::SPtr RuntimeImpl::registry() const
+RegistryProxy RuntimeImpl::registry() const
 {
     if (destroyed_.load())
     {

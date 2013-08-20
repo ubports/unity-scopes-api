@@ -46,3 +46,17 @@ TEST(ConfigException, state)
         EXPECT_EQ(e.reason(), e2.reason());
     }
 }
+
+TEST(NotFoundException, state)
+{
+    {
+        NotFoundException e("some error", "name");
+        EXPECT_STREQ("unity::api::scopes::NotFoundException", e.what());
+        EXPECT_EQ("name", e.name());
+        EXPECT_THROW(rethrow_exception(e.self()), NotFoundException);
+        NotFoundException e2("blah", "name");
+        e2 = e;
+        EXPECT_EQ(e.reason(), e2.reason());
+        EXPECT_EQ(e.name(), e2.name());
+    }
+}

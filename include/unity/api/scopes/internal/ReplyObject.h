@@ -49,7 +49,7 @@ public:
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
-    void send(std::string const& result);
+    void push(std::string const& result);
     void finished();
 
 private:

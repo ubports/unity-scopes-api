@@ -31,9 +31,39 @@ module internal
 module middleware
 {
 
+enum ValueType { StringType, IntType, BoolType };
+
+class ValueBase
+{
+    ValueType type;
+};
+
+class StringValue extends ValueBase
+{
+    string value;
+};
+
+class IntValue extends ValueBase
+{
+    int value;
+};
+
+class BoolValue extends ValueBase
+{
+    bool value;
+};
+
+dictionary<string, ValueBase> ValueDict;
+
+// Callback interface for the results returned by a query. We instantiate a separate reply object
+// for each query and pass a proxy to the reply object to createQuery(). In turn, the reply proxy
+// ends up inside the scope implementation, which uses it to push the results. Thsi means that the
+// query identity is implicit in the reply object that is passed. The reply object is registered
+// on its object adapter with a UUID as the identity.
+
 interface Reply
 {
-    void send(string result);
+    void push(string result);
     void finished();
 };
 

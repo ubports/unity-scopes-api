@@ -17,6 +17,7 @@
  */
 
 #include <unity/api/scopes/ScopeBase.h>
+#include <unity/api/scopes/Reply.h>
 
 #include <iostream>
 
@@ -25,25 +26,53 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-// Example scope A: replies synchronously to a query. (Replies are returned before returning from the query() method.)
+// Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
+
+class MyQuery : public QueryBase
+{
+public:
+    MyQuery(string const& scope_name, string const& query) :
+        QueryBase(scope_name),
+        query_(query)
+    {
+        cerr << "MyQuery/" << query << " created" << endl;
+    }
+
+    ~MyQuery() noexcept
+    {
+        cerr << "MyQuery/" << query_ << " destroyed" << endl;
+    }
+
+    virtual void cancelled(ReplyProxy const&) override
+    {
+    }
+
+    virtual void run(ReplyProxy const& reply) override
+    {
+        reply->push("scope-A: result 1 for query \"" + query_ + "\"");
+        cout << "scope-A: query \"" << query_ << "\" complete" << endl;
+    }
+
+private:
+    string query_;
+};
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy::SPtr const&) override
+    virtual int start(RegistryProxy const&) override
     {
         return VERSION;
     }
+
     virtual void stop() override {}
     virtual void run() override {}
-    virtual void query(string const& q, ReplyProxy::SPtr const& reply) override
+
+    virtual QueryBase::UPtr create_query(string const& q) override
     {
-        cout << "scope-A: received query string \"" << q << "\"" << endl;
-
-        reply->send("scope-A: result 1 for query \"" + q + "\"");
-        reply->finished();  // Optional
-
-        cout << "scope-A: query \"" << q << "\" complete" << endl;
+        QueryBase::UPtr query(new MyQuery("scope-A", q));  // TODO: scope name should come from the run time
+        cout << "scope-A: created query: \"" << q << "\"" << endl;
+        return query;
     }
 };
 

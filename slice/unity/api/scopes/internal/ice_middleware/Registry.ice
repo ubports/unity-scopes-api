@@ -35,9 +35,14 @@ interface Scope;
 
 dictionary<string, Scope*> ScopeDict;
 
+exception NotFoundException
+{
+    string scopeName;
+};
+
 interface Registry
 {
-    Scope* find(string name);
+    Scope* find(string name) throws NotFoundException;
     ScopeDict list();
 };
 

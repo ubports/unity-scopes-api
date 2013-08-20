@@ -38,15 +38,12 @@ main(int, char**)
     {
         RuntimeImpl::UPtr rt = RuntimeImpl::create(scope_name);
         MiddlewareBase::SPtr mw = rt->factory()->create(scope_name, "Ice", "Ice.Config");
-        // TODO: Need to call start on mw?
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, "lib" + scope_name + ".so", rt->registry());
         loader->start();
-        ScopeObject::SPtr scope(new ScopeObject(loader->scope_base()));
+        ScopeObject::SPtr scope(new ScopeObject(scope_name, loader->scope_base()));
         mw->add_scope_object(scope_name, scope);
-        // Call run here?
         mw->wait_for_shutdown();
     }
-
     catch (unity::Exception const& e)
     {
         cerr << e.to_string() << endl;

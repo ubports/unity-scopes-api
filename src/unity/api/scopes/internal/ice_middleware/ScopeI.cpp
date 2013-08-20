@@ -22,9 +22,10 @@
 
 #include <unity/api/scopes/internal/ice_middleware/ScopeI.h>
 
+#include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
 #include <slice/unity/api/scopes/internal/ice_middleware/Reply.h>
-#include <unity/api/scopes/internal/ice_middleware/IceReplyProxy.h>
-#include <unity/api/scopes/internal/ReplyProxyImpl.h>
+#include <unity/api/scopes/internal/ice_middleware/IceQueryCtrl.h>
+#include <unity/api/scopes/internal/ice_middleware/IceReply.h>
 
 using namespace std;
 
@@ -43,7 +44,7 @@ namespace internal
 namespace ice_middleware
 {
 
-ScopeI::ScopeI(MiddlewareBase* mw_base, ScopeObject::SPtr const& so) :
+ScopeI::ScopeI(IceMiddleware* mw_base, ScopeObject::SPtr const& so) :
     mw_base_(mw_base),
     so_(so)
 {
@@ -59,18 +60,27 @@ ScopeI::~ScopeI() noexcept
 // comment. That's because they really are noexcept, but we can't say this in the signature
 // because we are deriving from the Slice-generated base.
 
-// Process incoming query request from a client and forward it to the scope implementation.
-
-void ScopeI::query(string const& q, middleware::ReplyPrx const& r, Ice::Current const&) // noexcept
+middleware::QueryCtrlPrx ScopeI::createQuery(string const& q,
+                                             middleware::ReplyPrx const& r,
+                                             Ice::Current const&) // noexcept
 {
+    middleware::QueryCtrlPrx ctrl;
     try
     {
-        ReplyProxy::SPtr reply = ReplyProxyImpl::create(MWReplyProxy::SPtr(new IceReplyProxy(mw_base_, r)));
-        so_->query(q, reply);
+        MWReplyProxy reply(new IceReply(mw_base_, r));
+        MWQueryCtrlProxy mw_ctrl = so_->create_query(q, reply, mw_base_);
+        assert(mw_ctrl);
+        IceQueryCtrlProxy iqcp = dynamic_pointer_cast<IceQueryCtrl>(mw_ctrl);
+        assert(iqcp);
+        ctrl = middleware::QueryCtrlPrx::uncheckedCast(iqcp->proxy());
+        assert(ctrl);
     }
     catch (...)
     {
+        // TODO: log error
+        throw;
     }
+    return ctrl;
 }
 
 } // namespace ice_middleware

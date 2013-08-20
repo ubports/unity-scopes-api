@@ -3,3 +3,4 @@ Registry.Identity = Registry
 Registry.Configfile = Registry.ini
 Default.Middleware = Ice
 Factory.Configfile =
+Ice.Configfile = Ice.Config

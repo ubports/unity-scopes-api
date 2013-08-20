@@ -41,14 +41,14 @@ main(int, char**)
         MiddlewareBase::SPtr mwB = rtB->factory()->create(scope_nameB, "Ice", "Ice.Config");
         ScopeLoader::SPtr loaderB = ScopeLoader::load(scope_nameB, "lib" + scope_nameB + ".so", rtB->registry());
         loaderB->start();
-        ScopeObject::SPtr scopeB(new ScopeObject(loaderB->scope_base()));
+        ScopeObject::SPtr scopeB(new ScopeObject(scope_nameB, loaderB->scope_base()));
         mwB->add_scope_object(scope_nameB, scopeB);
 
         RuntimeImpl::UPtr rtC = RuntimeImpl::create(scope_nameC);
         MiddlewareBase::SPtr mwC = rtC->factory()->create(scope_nameC, "Ice", "Ice.Config");
         ScopeLoader::SPtr loaderC = ScopeLoader::load(scope_nameC, "lib" + scope_nameC + ".so", rtC->registry());
         loaderC->start();
-        ScopeObject::SPtr scopeC(new ScopeObject(loaderC->scope_base()));
+        ScopeObject::SPtr scopeC(new ScopeObject(scope_nameC, loaderC->scope_base()));
         mwC->add_scope_object(scope_nameC, scopeC);
 
         mwB->wait_for_shutdown();

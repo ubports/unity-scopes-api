@@ -1,7 +1,7 @@
 configure_file(Factory.ini.in Factory.ini)
 configure_file(Ice.Config.in Ice.Config)
 configure_file(Registry.ini.in Registry.ini)
-configure_file(Scopes.ini.in Scopes.ini)
+configure_file(Runtime.ini.in Runtime.ini)
 
 add_executable(RuntimeImpl_test RuntimeImpl_test.cpp)
 target_link_libraries(RuntimeImpl_test ${TESTLIBS})

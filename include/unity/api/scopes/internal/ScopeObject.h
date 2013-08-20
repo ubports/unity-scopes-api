@@ -20,7 +20,10 @@
 #define UNITY_API_SCOPES_INTERNAL_SCOPEOBJECT_H
 
 #include <unity/api/scopes/internal/AbstractObject.h>
-#include <unity/api/scopes/ReplyProxy.h>
+#include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/api/scopes/internal/MWReplyProxyFwd.h>
+
+#include <string>
 
 namespace unity
 {
@@ -36,6 +39,8 @@ class ScopeBase;
 namespace internal
 {
 
+class MiddlewareBase;
+
 // A ScopeObject sits in between the incoming requests from the middleware layer and the
 // ScopeBase-derived implementation provided by the scope. It forwards incoming
 // queries to the actual scope. This allows us to intercept all queries for a scope.
@@ -45,14 +50,15 @@ class ScopeObject final : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
 
-    ScopeObject(ScopeBase* scope_base_);
+    ScopeObject(std::string const& scope_name, ScopeBase* scope_base_);
     virtual ~ScopeObject() noexcept;
 
     // Remote operation implementations
-    void query(std::string const& q, ReplyProxy::SPtr const& reply);
+    MWQueryCtrlProxy create_query(std::string const& q, MWReplyProxy const& reply, MiddlewareBase* mw_base);
 
 private:
-    ScopeBase* scope_base_;
+    std::string const scope_name_;
+    ScopeBase* const scope_base_;
 };
 
 } // namespace internal

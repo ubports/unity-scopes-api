@@ -44,7 +44,7 @@ class ReplyI : public middleware::Reply
 public:
     ReplyI(ReplyObject::SPtr const& ro);
 
-    virtual void send(std::string const& result, Ice::Current const&) override;
+    virtual void push(std::string const& result, Ice::Current const&) override;
     virtual void finished(Ice::Current const&) override;
 
 private:

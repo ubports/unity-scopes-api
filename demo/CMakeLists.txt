@@ -1,3 +1,10 @@
+configure_file(client.ini.in client.ini)
+configure_file(Factory.ini.in Factory.ini)
+configure_file(Runtime.ini.in Runtime.ini)
+configure_file(Registry.ini.in Registry.ini)
+configure_file(Ice.Registry.Config.in Ice.Registry.Config)
+configure_file(Ice.Config.in Ice.Config)
+
 add_library(scope-A MODULE scope-A.cpp)
 add_library(scope-B MODULE scope-B.cpp)
 add_library(scope-C MODULE scope-C.cpp)

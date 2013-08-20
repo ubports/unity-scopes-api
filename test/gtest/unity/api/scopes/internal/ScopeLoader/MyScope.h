@@ -29,9 +29,9 @@ class EXPORT MyScope : public unity::api::scopes::ScopeBase
 {
 public:
     MyScope() {}
-    virtual ~MyScope() {}
+    virtual ~MyScope() noexcept {}
 
-    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&) override
+    virtual int start(unity::api::scopes::RegistryProxy const&) override
     {
         inc_start();
         return VERSION;
@@ -47,8 +47,9 @@ public:
         inc_run();
     }
 
-    virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) override
+    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&) override
     {
+        return nullptr;
     }
 };
 

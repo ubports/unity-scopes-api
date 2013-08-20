@@ -1,9 +1,13 @@
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/IceMiddleware.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/IceObjectProxy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/IceRegistryProxy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/IceReplyProxy.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/IceScopeProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceQuery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceQueryCtrl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceRegistry.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IceScope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp

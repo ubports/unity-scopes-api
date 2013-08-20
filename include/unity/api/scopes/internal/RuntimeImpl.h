@@ -46,7 +46,7 @@ public:
     void destroy();
 
     MiddlewareFactory const* factory() const;
-    RegistryProxy::SPtr registry() const;
+    RegistryProxy registry() const;
     std::string registry_configfile() const;
 
     ~RuntimeImpl() noexcept;
@@ -57,7 +57,7 @@ private:
     std::atomic_bool destroyed_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
-    mutable RegistryProxy::SPtr registry_;
+    mutable RegistryProxy registry_;
     mutable std::string registry_configfile_;
 };
 

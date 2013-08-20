@@ -34,24 +34,26 @@ namespace scopes
 namespace internal
 {
 
-class MiddlewareBase;
-
 namespace ice_middleware
 {
+
+class IceMiddleware;
 
 // Server-side implementation of a scope object.
 
 class ScopeI : public middleware::Scope
 {
 public:
-    ScopeI(MiddlewareBase* mw_base, ScopeObject::SPtr const& ro);
+    ScopeI(IceMiddleware* mw_base, ScopeObject::SPtr const& ro);
     virtual ~ScopeI() noexcept;
 
     // Slice operations
-    virtual void query(std::string const& q, middleware::ReplyPrx const& r, Ice::Current const&) override;
+    virtual middleware::QueryCtrlPrx createQuery(std::string const& q,
+                                                 middleware::ReplyPrx const& r,
+                                                 Ice::Current const&) override;
 
 private:
-    MiddlewareBase* mw_base_;
+    IceMiddleware* mw_base_;
     ScopeObject::SPtr so_;
 };
 

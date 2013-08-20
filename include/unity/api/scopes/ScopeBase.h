@@ -19,14 +19,9 @@
 #ifndef UNITY_API_SCOPES_SCOPEBASE_H
 #define UNITY_API_SCOPES_SCOPEBASE_H
 
-#include <unity/SymbolExport.h>
-#include <unity/util/NonCopyable.h>
-#include <unity/api/scopes/RegistryProxy.h>
-#include <unity/api/scopes/ReplyProxy.h>
+#include <unity/api/scopes/QueryBase.h>
+#include <unity/api/scopes/RegistryProxyFwd.h>
 #include <unity/api/scopes/Version.h>
-
-#include <memory>
-#include <iostream> // TODO:REMOVE THIS
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -127,7 +122,7 @@ class UNITY_API ScopeBase : private util::NonCopyable
 {
 public:
     /// @cond
-    virtual ~ScopeBase();
+    virtual ~ScopeBase() noexcept;
     /// @endcond
 
     /**
@@ -145,7 +140,7 @@ public:
     to refuse to load the scope. The return value is used to ensure that the shared library
     containing the scope is ABI compatible with the Unity scopes run time.
     */
-    virtual int start(RegistryProxy::SPtr const& registry) = 0;
+    virtual int start(RegistryProxy const& registry) = 0;
 
     /**
     \brief Called by the Unity run time when the scope should shut down.
@@ -169,17 +164,14 @@ public:
     virtual void run() = 0;
 
     /**
-    \brief Called by the Unity run time when scope should process a query.
+    \brief Called by the Unity run time when a scope needs to instantiate a query.
     TODO: complete documentation.
 
-    Calls to query() are made by an arbitrary thread. If the scope is configured to run single-threaded, all calls
-    to query() are made by the same thread. If the scope is configured to run multi-threaded, each call to query()
-    is made by an arbitrary thread, and several calls to query() may be made concurrently.
     */
-    virtual void query(std::string const& q, ReplyProxy::SPtr const& reply) = 0;
+    virtual QueryBase::UPtr create_query(std::string const& q) = 0;
 
     /**
-    \brief This method returns the version information for the scopes API that the scope was linked with.
+    \brief Returns the version information for the scopes API that the scope was linked with.
     */
     void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 

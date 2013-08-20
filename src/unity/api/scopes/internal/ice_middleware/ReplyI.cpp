@@ -18,8 +18,6 @@
 
 #include <unity/api/scopes/internal/ice_middleware/ReplyI.h>
 
-#include <unity/api/scopes/ScopeBase.h>
-
 #include <Ice/ObjectAdapter.h>
 
 using namespace std;
@@ -51,16 +49,16 @@ ReplyI::ReplyI(ReplyObject::SPtr const& ro) :
 // comment. That's because they really are noexcept, but we can't say this in the signature
 // because we are deriving from the Slice-generated base.
 
-void ReplyI::send(string const& result, Ice::Current const& c)  // noexcept
+void ReplyI::push(string const& result, Ice::Current const& c)  // noexcept
 {
     if (finished_.load())
     {
-        return; // Ignore calls to send() after finished() completes.
+        return; // Ignore calls to push() after finished() completes.
     }
 
     try
     {
-        ro_->send(result);
+        ro_->push(result);
     }
     catch (...)
     {

@@ -17,11 +17,10 @@
  */
 
 
+#include <unity/api/scopes/internal/MiddlewareFactory.h>
 #include <unity/api/scopes/internal/RegistryConfig.h>
 #include <unity/api/scopes/internal/RegistryObject.h>
 #include <unity/api/scopes/internal/RuntimeConfig.h>
-#include <unity/api/scopes/internal/RuntimeImpl.h>
-#include <unity/api/scopes/internal/ScopeProxyImpl.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -38,41 +37,53 @@ main(int, char*[])
 
     try
     {
-        // Get the identity of the registry from config. We need this to instantiate the run time.
+        MiddlewareBase::SPtr middleware;
         string registry_identity;
         {
-            RuntimeConfig c;
-            registry_identity = c.registry_identity();
-        }
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create(registry_identity);
+            // Get the main config.
+            string registry_configfile;
+            string registry_middleware;
+            string factory_configfile;
+            {
+                RuntimeConfig c;
+                registry_identity = c.registry_identity();
+                registry_configfile = c.registry_configfile();
+                factory_configfile = c.factory_configfile();
+            }
 
-        // Instantiate and start middleware.
+            string registry_kind;
+            string registry_endpoint;
+            string registry_mw_configfile;
+            {
+                RegistryConfig c(registry_identity, registry_configfile);
+                registry_kind = c.mw_kind();
+                registry_endpoint = c.endpoint();
+                registry_mw_configfile = c.mw_configfile();
+            }
 
-        MiddlewareBase::SPtr middleware;
-        {
-            RegistryConfig config(registry_identity, runtime->registry_configfile());
-            string mw_kind = config.mw_kind();
-            string mw_configfile = config.mw_configfile();
+            // Instantiate the middleware factory
+            MiddlewareFactory factory(factory_configfile);
 
+            cerr << "registry: creating middleware: " << registry_mw_configfile << endl;
             // TODO: dodgy: why pass the identity a second time when the runtime already has it?
-            middleware = runtime->factory()->create(registry_identity, mw_kind, mw_configfile);
+            middleware = factory.create(registry_identity, registry_kind, registry_mw_configfile);
+            middleware->start();
         }
-        //middleware->start();
 
         // Instantiate the registry implementation.
         RegistryObject::SPtr registry(new RegistryObject);
 
         // TODO: populate registry here
 
-        // TODO: temporary hack for demonstratioun purposes. The actual scopes need to be retrieved from
+        // TODO: temporary hack for demonstration purposes. The actual scopes need to be retrieved from
         //       configuration instead.
-        auto proxy = middleware->create_scope_proxy("scope-A", "uds -f /tmp/scope-A");
+        auto proxy = middleware->create_scope_proxy("scope-A", "uds -f sockets/scope-A-ctrl");
         registry->add(string("scope-A"), proxy);
-        proxy = middleware->create_scope_proxy("scope-B", "uds -f /tmp/scope-B");
+        proxy = middleware->create_scope_proxy("scope-B", "uds -f sockets/scope-B-ctrl");
         registry->add("scope-B", proxy);
-        proxy = middleware->create_scope_proxy("scope-C", "uds -f /tmp/scope-C");
+        proxy = middleware->create_scope_proxy("scope-C", "uds -f sockets/scope-C-ctrl");
         registry->add("scope-C", proxy);
-        proxy = middleware->create_scope_proxy("scope-D", "uds -f /tmp/scope-D");
+        proxy = middleware->create_scope_proxy("scope-D", "uds -f sockets/scope-D-ctrl");
         registry->add("scope-D", proxy);
 
         // END TODO temporary hack
@@ -83,7 +94,6 @@ main(int, char*[])
 
         // Wait until we are done.
         middleware->wait_for_shutdown();
-        runtime->destroy();
     }
     catch (unity::Exception const& e)
     {

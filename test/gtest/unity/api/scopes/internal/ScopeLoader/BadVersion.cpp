@@ -30,25 +30,28 @@ class EXPORT MyScope : public unity::api::scopes::ScopeBase
 {
 public:
     MyScope() {}
-    virtual ~MyScope() {}
+    virtual ~MyScope() noexcept {}
 
-    virtual int start(unity::api::scopes::RegistryProxy::SPtr const&)
+    virtual int start(unity::api::scopes::RegistryProxy const&) override
     {
         inc_start();
         return VERSION;
     }
 
-    virtual void stop()
+    virtual void stop() override
     {
         inc_stop();
     }
 
-    virtual void run()
+    virtual void run() override
     {
         inc_run();
     }
 
-    virtual void query(std::string const& /* q */, unity::api::scopes::ReplyProxy::SPtr const& /* reply */) {}
+    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&) override
+    {
+        return nullptr;
+    }
 };
 
 extern "C"

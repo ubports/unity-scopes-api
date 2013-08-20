@@ -33,7 +33,7 @@ ScopeBase::ScopeBase()
 {
 }
 
-ScopeBase::~ScopeBase()
+ScopeBase::~ScopeBase() noexcept
 {
 }
 

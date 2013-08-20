@@ -18,12 +18,20 @@
 
 #include <unity/api/scopes/internal/ScopeObject.h>
 
+#include <unity/api/scopes/internal/MiddlewareBase.h>
+#include <unity/api/scopes/internal/MWQuery.h>
+#include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/api/scopes/internal/MWReply.h>
+#include <unity/api/scopes/internal/QueryObject.h>
+#include <unity/api/scopes/internal/ReplyImpl.h>
 #include <unity/api/scopes/ScopeBase.h>
-#include <unity/Exception.h>
+#include <unity/UnityExceptions.h>
 
 #include <cassert>
+#include <sstream>
 
 using namespace std;
+using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
 namespace unity
@@ -38,7 +46,8 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(ScopeBase* scope_base) :
+ScopeObject::ScopeObject(string const& scope_name, ScopeBase* scope_base) :
+    scope_name_(scope_name),
     scope_base_(scope_base)
 {
     assert(scope_base);
@@ -48,22 +57,52 @@ ScopeObject::~ScopeObject() noexcept
 {
 }
 
-void ScopeObject::query(std::string const& q, ReplyProxy::SPtr const& reply)
+MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
+                                           MWReplyProxy const& reply,
+                                           MiddlewareBase* mw_base)
 {
     if (!reply)
     {
         // We can't assert here because the null proxy may have been sent by a broken client, that is,
-        // it can be null because it was sent by the remote end as null.
+        // it can be null because it was sent by the remote end as null. This should never happen but,
+        // to be safe, we don't assert, in case someone is running a broken client.
 
         // TODO: log error about incoming request containing an invalid reply proxy.
-        return;
+
+        throw LogicException("Scope \"" + scope_name_ + "\": create_query(\"" + q + "\") called with null reply proxy");
     }
 
-    // If the query() method of the scope throws, we make sure that we call finished() on the reply,
-    // so the originator of the query gets its finished() method invoked.
+    // Ask scope to instantiate a new query.
+    QueryBase::SPtr query_base = scope_base_->create_query(q);
+    if (!query_base)
+    {
+        // TODO: log error, scope returned null pointer.
+        throw ResourceException("Scope \"" + scope_name_ + "\" returned nullptr from create_query(\"" + q + "\")");
+    }
+
+    MWQueryCtrlProxy ctrl_proxy;
     try
     {
-        scope_base_->query(q, reply);
+        // Instantiate the query ctrl and connect it to the middleware.
+        QueryCtrlObject::SPtr co(new QueryCtrlObject);
+        ctrl_proxy = mw_base->add_query_ctrl_object(co);
+
+        // Instantiate the query. We tell it what the ctrl is so,
+        // when the query completes, it can tell the ctrl object
+        // to destroy itself.
+        QueryObject::SPtr qo(new QueryObject(query_base, reply, ctrl_proxy));
+        MWQueryProxy query = mw_base->add_query_object(qo);
+
+        // We tell the ctrl what the query facade is so, when cancel() is sent
+        // to the ctrl, it can forward it to the facade.
+        co->set_query(qo);
+
+        // Start the query. We call via the middleware, which calls
+        // the run() implementation in a different thread, so we cannot block here.
+        // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
+        // count high until the run() request arrives in the query via the middleware.
+        qo->set_self(qo);
+        query->run(reply);
     }
     catch (unity::Exception const& e)
     {
@@ -75,6 +114,7 @@ void ScopeObject::query(std::string const& q, ReplyProxy::SPtr const& reply)
         {
         }
         // TODO: log error
+        throw;
     }
     catch (...)
     {
@@ -86,7 +126,9 @@ void ScopeObject::query(std::string const& q, ReplyProxy::SPtr const& reply)
         {
         }
         // TODO: log error
+        throw;
     }
+    return ctrl_proxy;
 }
 
 } // namespace internal

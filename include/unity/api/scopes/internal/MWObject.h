@@ -19,7 +19,7 @@
 #ifndef UNITY_API_REPLYS_INTERNAL_MWOBJECT_H
 #define UNITY_API_REPLYS_INTERNAL_MWOBJECT_H
 
-#include <unity/util/DefinesPtrs.h>
+#include <unity/api/scopes/internal/MWObjectProxyFwd.h>
 
 namespace unity
 {
@@ -36,16 +36,14 @@ namespace internal
 class MiddlewareBase;
 
 // Base class for the MW<something>Object hierarchy. We store the pointer to the middleware here,
-// which is needed to, for example, registry callback objects (such as a Reply object) with the middleware.
+// which is needed to, for example, register callback objects (such as a Reply object) with the middleware.
 
 class MWObject
 {
 public:
-    UNITY_DEFINES_PTRS(MWObject);
-
     virtual ~MWObject() noexcept;
 
-    MiddlewareBase* mw_base() const noexcept;
+    virtual MiddlewareBase* mw_base() const noexcept = 0;
 
 protected:
     MWObject(MiddlewareBase* mw_base);

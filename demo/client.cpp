@@ -16,14 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/RegistryProxy.h>
+#include <unity/api/scopes/QueryCtrl.h>
+#include <unity/api/scopes/Registry.h>
+#include <unity/api/scopes/ReplyBase.h>
 #include <unity/api/scopes/Runtime.h>
-#include <unity/api/scopes/ReplyProxy.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
 #include <iostream>
 #include <mutex>
+#include <unistd.h>
 
 using namespace std;
 using namespace unity::api::scopes;
@@ -31,12 +33,14 @@ using namespace unity::api::scopes;
 class Reply : public ReplyBase
 {
 public:
-    virtual void send(string const& result)
+    virtual bool push(string const& result) override
     {
         cout << "received result: " << result << endl;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        return !query_complete_;
     }
 
-    virtual void finished()
+    virtual void finished() override
     {
         cout << "query complete" << endl;
         {
@@ -77,23 +81,28 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("");
+        Runtime::UPtr rt = Runtime::create("client");
 
-        RegistryProxy::SPtr r = rt->registry();
+        RegistryProxy r = rt->registry();
         if (!r)
         {
             cerr << "could not get proxy for registry" << endl;
             return 1;
         }
-        ScopeProxy::SPtr s = r->find(scope_name);
+        ScopeProxy s = r->find(scope_name);
         if (!s)
         {
             cerr << "no such scope: " << scope_name << endl;
             return 1;
         }
         shared_ptr<Reply> reply(new Reply);
-        s->query(search_string, reply);     // Asynchronous, returns without waiting for query to be received by target.
-        reply->wait_until_finished();
+        QueryCtrlProxy ctrl = s->create_query(search_string, reply);     // Returns immediately
+        if (ctrl)
+        {
+            cerr << "created query" << endl;
+            ctrl->cancel();
+            reply->wait_until_finished();
+        }
     }
 
     catch (unity::Exception const& e)

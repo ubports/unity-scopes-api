@@ -35,13 +35,6 @@ namespace internal
 
 // Factory to make middleware instances available.
 //
-// The lookup functions for the client-side use lazy initialization. The middleware
-// instance is created when caller first asks for it, and the same single instance
-// is always returned thereafter. The client-side middleware(s) are shut down when the factory
-// is destroyed.
-//
-// The create functions for the server-side pass ownership to the caller.
-//
 // This class is thread-safe.
 
 class MiddlewareFactory final : private util::NonCopyable
@@ -72,20 +65,21 @@ private:
         std::string server_name;
         std::string kind;
 
-        struct Compare
+        bool operator<(MiddlewareData const& rhs) const
         {
-            bool operator()(MiddlewareData const& lhs, MiddlewareData const& rhs) const
+            if (server_name < rhs.server_name)
             {
-                if (lhs.server_name < rhs.server_name)
-                {
-                    return true;
-                }
-                return lhs.kind < rhs.kind;
+                return true;
             }
-        };
+            if (server_name > rhs.server_name)
+            {
+                return false;
+            }
+            return kind < rhs.kind;
+        }
     };
 
-    mutable std::map<MiddlewareData, MiddlewareBase::SPtr, MiddlewareData::Compare> mw_map_;
+    mutable std::map<MiddlewareData, MiddlewareBase::SPtr> mw_map_;
     mutable std::mutex mutex_;
 };
 

@@ -56,7 +56,7 @@ void Runtime::destroy()
     p->destroy();
 }
 
-RegistryProxy::SPtr Runtime::registry() const
+RegistryProxy Runtime::registry() const
 {
     return p->registry();
 }

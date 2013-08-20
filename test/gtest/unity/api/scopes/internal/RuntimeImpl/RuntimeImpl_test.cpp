@@ -69,9 +69,19 @@ TEST(RuntimeImpl, error)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: cannot instantiate run time for testscope, "
+        EXPECT_EQ("unity::api::scopes::ConfigException: Cannot instantiate run time for testscope, "
                   "config file: NoSuchFile.ini:\n"
                   "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
+                  e.to_string());
+    }
+
+    try
+    {
+        RuntimeImpl::UPtr rt = RuntimeImpl::create("");
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        EXPECT_EQ("unity::InvalidArgumentException: Cannot instantiate a run time with an empty scope name",
                   e.to_string());
     }
 }

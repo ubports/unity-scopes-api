@@ -98,6 +98,49 @@ public:
     virtual std::exception_ptr self() const override;
 };
 
+namespace internal
+{
+class NotFoundExceptionImpl;
+}
+
+/**
+\brief Exception to indicate that an object wasn't found by a lookup function.
+*/
+
+class UNITY_API NotFoundException : public unity::Exception
+{
+public:
+    /**
+    \brief Constructs the exception.
+    \param reason Further details about the cause of the exception.
+    \param name The name of the object that was not found.
+    */
+    explicit NotFoundException(std::string const& reason, std::string const& name);
+    //! @cond
+    NotFoundException(NotFoundException const&);
+    NotFoundException& operator=(NotFoundException const&);
+    virtual ~NotFoundException() noexcept;
+    //! @endcond
+
+    /**
+    \brief Returns the fully-qualified name of the exception.
+    */
+    virtual char const* what() const noexcept override;
+
+    /**
+    \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    */
+    virtual std::exception_ptr self() const override;
+
+    /**
+    \brief Returns the name that was passed to the constructor.
+    */
+    virtual std::string name() const;
+
+private:
+    std::shared_ptr<internal::NotFoundExceptionImpl> p;
+};
+
 } // namespace scopes
 
 } // namespace api

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryProxyImpl.h>
+#include <unity/api/scopes/internal/RegistryImpl.h>
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/internal/ScopeLoader.h>
 #include <unity/UnityExceptions.h>
@@ -61,8 +61,10 @@ char const* scopeB
 // Function to sleep for specified number of milliseconds. We use this
 // before we test for the counter values because the thread responds
 // asynchronously to our commands and may take a little while to catch up.
+// This is particularly true when testing under valgrind, where things
+// are slower.
 
-void wait(long millisec = 20)
+void wait(long millisec = 100)
 {
     struct timespec tv;
     tv.tv_sec = millisec / 1000;
@@ -73,7 +75,7 @@ void wait(long millisec = 20)
 // Need to make a dummy registry proxy because, if we pass a null shared_ptr to load(),
 // load() throws an exception.
 
-RegistryProxy::SPtr registry(RegistryProxyImpl::create(nullptr));
+RegistryProxy registry(RegistryImpl::create(nullptr));
 
 // Basic test.
 

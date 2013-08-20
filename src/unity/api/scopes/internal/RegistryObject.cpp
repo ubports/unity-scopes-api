@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/internal/RegistryObject.h>
 
+#include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;
@@ -48,7 +49,7 @@ RegistryObject::~RegistryObject() noexcept
 //       logging in the <something>I class (except for things that are application related, such as
 //       the semantics for the reply object, which are implemented in the ReplyObject class.
 
-MWScopeProxy::SPtr RegistryObject::find(std::string const& scope_name)
+MWScopeProxy RegistryObject::find(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -59,7 +60,11 @@ MWScopeProxy::SPtr RegistryObject::find(std::string const& scope_name)
     lock_guard<decltype(mutex_)> lock(mutex_);
 
     auto const& it = scopes_.find(scope_name);
-    return it == scopes_.end() ? nullptr : it->second;
+    if (it == scopes_.end())
+    {
+        throw NotFoundException("Registry::find(): no such scope",  scope_name);
+    }
+    return it->second;
 }
 
 RegistryObject::MWScopeMap RegistryObject::list()
@@ -68,7 +73,7 @@ RegistryObject::MWScopeMap RegistryObject::list()
     return scopes_;
 }
 
-void RegistryObject::add(std::string const& scope_name, MWScopeProxy::SPtr const& scope)
+void RegistryObject::add(std::string const& scope_name, MWScopeProxy const& scope)
 {
     // If the name is empty, it was sent as empty by the remote client.
     // TODO: also check for names containing a slash, because that won't work if we use

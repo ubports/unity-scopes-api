@@ -31,11 +31,17 @@ module internal
 module middleware
 {
 
+interface QueryCtrl;
 interface Reply;
+
+// Factory for queries. The Scope object runs on the ctrl-adapter.
+// createQuery() creates a Query object on the normal adapter, and a QueryCtrl object
+// on the ctrl-adapter. It then calls run() on the Query object to set it executing in its own thread, before
+// returning the QueryCtrl proxy that permits cancellation. This guarantees that createQuery() will not block.
 
 interface Scope
 {
-    void query(string q, Reply* r);
+    QueryCtrl* createQuery(string q, Reply* r);
 };
 
 }; // ice_middleware

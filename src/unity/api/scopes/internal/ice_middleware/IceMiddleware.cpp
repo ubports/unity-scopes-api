@@ -18,8 +18,13 @@
 
 #include <unity/api/scopes/internal/ice_middleware/IceMiddleware.h>
 
-#include <unity/api/scopes/internal/ice_middleware/IceRegistryProxy.h>
-#include <unity/api/scopes/internal/ice_middleware/IceScopeProxy.h>
+#include <unity/api/scopes/internal/ice_middleware/IceQueryCtrl.h>
+#include <unity/api/scopes/internal/ice_middleware/IceQuery.h>
+#include <unity/api/scopes/internal/ice_middleware/IceRegistry.h>
+#include <unity/api/scopes/internal/ice_middleware/IceReply.h>
+#include <unity/api/scopes/internal/ice_middleware/IceScope.h>
+#include <unity/api/scopes/internal/ice_middleware/QueryCtrlI.h>
+#include <unity/api/scopes/internal/ice_middleware/QueryI.h>
 #include <unity/api/scopes/internal/ice_middleware/RegistryI.h>
 #include <unity/api/scopes/internal/ice_middleware/ReplyI.h>
 #include <unity/api/scopes/internal/ice_middleware/RethrowException.h>
@@ -49,29 +54,38 @@ namespace internal
 namespace ice_middleware
 {
 
-IceMiddleware::IceMiddleware(string const& server_name, string const& configfile)
+namespace
 {
-    // For an empty server name, we use a UUID is the server name (which becomes the adapter
-    // name). This allows us to have clients (such as the Dash) that are not scopes themselves
-    // and do not need a well-known endpoint to receive incoming queries.
-    if (server_name.empty())
-    {
-        server_name_ = IceUtil::generateUUID();
-    }
-    else
-    {
-        server_name_ = server_name;
-    }
 
+char const* ctrl_suffix = "-ctrl";    // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-reply";  // Appended to server_name_ to create reply adapter name
+
+} // namespace
+
+IceMiddleware::IceMiddleware(string const& server_name, string const& configfile)
+    : server_name_(server_name)
+{
+    assert(!server_name.empty());
     try
     {
         Ice::PropertiesPtr props = Ice::createProperties();
         props->load(configfile);
-        if (server_name.empty())
-        {
-            // TODO: get directory from config
-            props->setProperty(server_name_ + ".Endpoints",  "uds -f /tmp/scope-client-" + server_name_);
-        }
+
+        // TODO: get directory from config
+
+        // Set properties for the object adapters. We need to do this before we create the communicator
+        // because Ice reads properties only once, during communicator creation.
+
+        // TODO: dubious, because -f path may not be last in the endpoint config need to parse out the endpoint
+        // or maybe get it from the adapter.
+        props->setProperty(server_name_ + ctrl_suffix + ".Endpoints",  props->getProperty(server_name_ + ".Endpoints") + ctrl_suffix);
+        props->setProperty(server_name_ + reply_suffix + ".Endpoints",  props->getProperty(server_name_ + ".Endpoints") + reply_suffix);
+
+        // The -ctrl adapter gets its own thread pool with a single thread.
+        props->setProperty(server_name_ + ctrl_suffix + ".ThreadPool.Size", "1");
+
+        // TODO: configurable pool size for normal and reply adapter
+
         Ice::InitializationData init_data;
         init_data.properties = props;
         ic_ = Ice::initialize(init_data);
@@ -101,17 +115,6 @@ IceMiddleware::~IceMiddleware() noexcept
 
 void IceMiddleware::start()
 {
-    try
-    {
-        lock_guard<mutex> lock(mutex_);
-        adapter_ = ic_->createObjectAdapter(server_name_);
-        adapter_->activate();
-    }
-    catch (Ice::Exception const& e)
-    {
-        // TODO: log exception
-        rethrow_ice_ex(e);
-    }
 }
 
 void IceMiddleware::stop()
@@ -120,14 +123,19 @@ void IceMiddleware::stop()
     {
         // TODO: need to cancel any outstanding stuff here?
         // TODO: need to disable proxy?
-        Ice::ObjectAdapterPtr a;
+
+        AdapterMap am;
         {
             lock_guard<mutex> lock(mutex_);
-            a = adapter_;
-            adapter_ = nullptr;
+            am = am_;
+            am_.clear();
         }
-        a->deactivate();
-        a->waitForDeactivate();
+        for (auto a : am)
+        {
+            a.second->deactivate();
+            a.second->waitForDeactivate();
+        }
+        am.clear();
     }
     catch (Ice::Exception const& e)
     {
@@ -149,19 +157,19 @@ void IceMiddleware::wait_for_shutdown()
     }
 }
 
-MWRegistryProxy::SPtr IceMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
+MWRegistryProxy IceMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
 {
-    MWRegistryProxy::SPtr proxy;
+    MWRegistryProxy proxy;
     try
     {
-        string proxyString = identity + ":" + endpoint;
-        Ice::ObjectPrx o = ic_->stringToProxy(proxyString);
-        if (!o)
+        string proxy_string = identity + ":" + endpoint;
+        middleware::RegistryPrx r = middleware::RegistryPrx::uncheckedCast(ic_->stringToProxy(proxy_string));
+        if (!r)
         {
             // TODO: throw config exception
             assert(false);
         }
-        proxy.reset(new IceRegistryProxy(this, o));
+        proxy.reset(new IceRegistry(this, r));
     }
     catch (Ice::Exception const& e)
     {
@@ -170,18 +178,18 @@ MWRegistryProxy::SPtr IceMiddleware::create_registry_proxy(string const& identit
     return proxy;
 }
 
-MWScopeProxy::SPtr IceMiddleware::create_scope_proxy(string const& identity, string const& endpoint)
+MWScopeProxy IceMiddleware::create_scope_proxy(string const& identity, string const& endpoint)
 {
-    MWScopeProxy::SPtr proxy;
+    MWScopeProxy proxy;
     try
     {
         string proxy_string = identity + ":" + endpoint;
-        Ice::ObjectPrx o = ic_->stringToProxy(proxy_string);
-        if (!o)
+        middleware::ScopePrx s = middleware::ScopePrx::uncheckedCast(ic_->stringToProxy(proxy_string));
+        if (!s)
         {
             throw ConfigException("Ice: could not create proxy from string \"" + proxy_string + "\"");
         }
-        proxy.reset(new IceScopeProxy(this, o));
+        proxy.reset(new IceScope(this, s));
     }
     catch (Ice::Exception const& e)
     {
@@ -191,16 +199,56 @@ MWScopeProxy::SPtr IceMiddleware::create_scope_proxy(string const& identity, str
     return proxy;
 }
 
-MWRegistryProxy::SPtr IceMiddleware::add_registry_object(string const& identity, RegistryObject::SPtr const& registry)
+MWQueryCtrlProxy IceMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl)
+{
+    assert(ctrl);
+
+    MWQueryCtrlProxy proxy;
+    try
+    {
+        QueryCtrlIPtr ci = new QueryCtrlI(ctrl);
+        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
+        proxy.reset(new IceQueryCtrl(this, middleware::QueryCtrlPrx::uncheckedCast(safe_add(a, ci))));
+    }
+    catch (Ice::Exception const& e)
+    {
+        // TODO: log exception
+        rethrow_ice_ex(e);
+    }
+    return proxy;
+}
+
+MWQueryProxy IceMiddleware::add_query_object(QueryObject::SPtr const& query)
+{
+    assert(query);
+
+    MWQueryProxy proxy;
+    try
+    {
+        QueryIPtr qi = new QueryI(this, query);
+        Ice::ObjectAdapterPtr a = find_adapter(server_name_);
+        proxy.reset(new IceQuery(this, middleware::QueryPrx::uncheckedCast(safe_add(a, qi))));
+    }
+    catch (Ice::Exception const& e)
+    {
+        // TODO: log exception
+        rethrow_ice_ex(e);
+    }
+    return proxy;
+}
+
+
+MWRegistryProxy IceMiddleware::add_registry_object(string const& identity, RegistryObject::SPtr const& registry)
 {
     assert(!identity.empty());
     assert(registry);
 
-    MWRegistryProxy::SPtr proxy;
+    MWRegistryProxy proxy;
     try
     {
         RegistryIPtr ri = new RegistryI(registry);
-        proxy.reset(new IceRegistryProxy(this, safe_add(ri, identity)));
+        Ice::ObjectAdapterPtr a = find_adapter(server_name_);
+        proxy.reset(new IceRegistry(this, middleware::RegistryPrx::uncheckedCast(safe_add(a, ri, identity))));
     }
     catch (Ice::Exception const& e)
     {
@@ -210,16 +258,36 @@ MWRegistryProxy::SPtr IceMiddleware::add_registry_object(string const& identity,
     return proxy;
 }
 
-MWScopeProxy::SPtr IceMiddleware::add_scope_object(string const& identity, ScopeObject::SPtr const& scope)
+MWReplyProxy IceMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
+{
+    assert(reply);
+
+    MWReplyProxy proxy;
+    try
+    {
+        ReplyIPtr si = new ReplyI(reply);
+        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + reply_suffix);
+        proxy.reset(new IceReply(this, middleware::ReplyPrx::uncheckedCast(safe_add(a, si))));
+    }
+    catch (Ice::Exception const& e)
+    {
+        // TODO: log exception
+        rethrow_ice_ex(e);
+    }
+    return proxy;
+}
+
+MWScopeProxy IceMiddleware::add_scope_object(string const& identity, ScopeObject::SPtr const& scope)
 {
     assert(!identity.empty());
     assert(scope);
 
-    MWScopeProxy::SPtr proxy;
+    MWScopeProxy proxy;
     try
     {
         ScopeIPtr si = new ScopeI(this, scope);
-        proxy.reset(new IceScopeProxy(this, safe_add(si, identity)));
+        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
+        proxy.reset(new IceScope(this, middleware::ScopePrx::uncheckedCast(safe_add(a, si, identity))));
     }
     catch (Ice::Exception const& e)
     {
@@ -229,24 +297,7 @@ MWScopeProxy::SPtr IceMiddleware::add_scope_object(string const& identity, Scope
     return proxy;
 }
 
-MWReplyProxy::SPtr IceMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
-{
-    assert(reply);
-
-    MWReplyProxy::SPtr proxy;
-    try
-    {
-        ReplyIPtr si = new ReplyI(reply);
-        proxy.reset(new IceReplyProxy(this, safe_add(si)));
-    }
-    catch (Ice::Exception const& e)
-    {
-        // TODO: log exception
-        rethrow_ice_ex(e);
-    }
-    return proxy;
-}
-
+#if 0
 void IceMiddleware::remove_object(string const& identity)
 {
     try
@@ -267,18 +318,37 @@ void IceMiddleware::remove_object(string const& identity)
         rethrow_ice_ex(e);
     }
 }
+#endif
 
-Ice::ObjectPrx IceMiddleware::safe_add(Ice::ObjectPtr const& obj, string const& identity)
+Ice::ObjectAdapterPtr IceMiddleware::find_adapter(string const& name)
+{
+    lock_guard<mutex> lock(mutex_);
+
+    auto it = am_.find(name);
+    if (it != am_.end())
+    {
+        return it->second;
+    }
+
+    Ice::ObjectAdapterPtr a = ic_->createObjectAdapter(name);
+    a->activate();
+    am_[name] = a;
+    return a;
+}
+
+Ice::ObjectPrx IceMiddleware::safe_add(Ice::ObjectAdapterPtr& adapter,
+                                       Ice::ObjectPtr const& obj,
+                                       string const& identity)
 {
     Ice::Identity id;
     id.name = identity.empty() ? IceUtil::generateUUID() : identity;
 
     lock_guard<mutex> lock(mutex_);
-    if (!adapter_)
+    if (!adapter)
     {
         throw LogicException("Cannot add object to stopped middleware");
     }
-    return adapter_->add(obj, id);
+    return adapter->add(obj, id);
 }
 
 } // namespace ice_middleware

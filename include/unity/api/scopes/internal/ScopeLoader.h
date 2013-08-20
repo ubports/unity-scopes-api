@@ -46,7 +46,7 @@ public:
 
     // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy
     // so we can pass it to the scope's start method.
-    static UPtr load(std::string const& scope_name, std::string const& libpath, RegistryProxy::SPtr const& registry);
+    static UPtr load(std::string const& scope_name, std::string const& libpath, RegistryProxy const& registry);
 
     // unload() explicitly finalizes the scope. This is called by the destructor too, but calling it explicity
     // allows the caller to receive any exceptions that may have been produced by the scope thread.
@@ -69,7 +69,7 @@ public:
     ~ScopeLoader() noexcept;
 
 private:
-    ScopeLoader(std::string const& name, std::string const& path, RegistryProxy::SPtr const& registry);
+    ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);
     void run_scope(unity::api::scopes::CreateFunction create_func, unity::api::scopes::DestroyFunction destroy_func);
     void handle_thread_exception();
 
@@ -79,7 +79,7 @@ private:
     std::string scope_name_;
     unity::api::scopes::ScopeBase* scope_base_;
     unity::api::scopes::internal::DynamicLoader::UPtr dyn_loader_;
-    unity::api::scopes::RegistryProxy::SPtr registry_;
+    unity::api::scopes::RegistryProxy registry_;
     std::exception_ptr exception_;
 
     std::thread scope_thread_;

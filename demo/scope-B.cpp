@@ -16,6 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <unity/api/scopes/Registry.h>
+#include <unity/api/scopes/Reply.h>
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -31,13 +33,13 @@ using namespace unity::api::scopes;
 // A Reply instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class Reply : public ReplyBase
+class SubReply : public ReplyBase
 {
 public:
-    virtual void send(string const& result) override
+    virtual bool push(string const& result) override
     {
         cout << "received result from " << scope_name_ << ": " << result << endl;
-        upstream_->send(result);
+        return upstream_->push(result);
     }
 
     virtual void finished() override
@@ -45,7 +47,7 @@ public:
         cout << "query to " << scope_name_ << " complete" << endl;
     }
 
-    Reply(string const& scope_name, ReplyProxy::SPtr const& upstream) :
+    SubReply(string const& scope_name, ReplyProxy const& upstream) :
         scope_name_(scope_name),
         upstream_(upstream)
     {
@@ -53,57 +55,70 @@ public:
 
 private:
     string scope_name_;
-    ReplyProxy::SPtr upstream_;
+    ReplyProxy upstream_;
 };
 
-// MyScope agregates from C and D.
+class MyQuery : public QueryBase
+{
+public:
+    MyQuery(string const& scope_name,
+            string const& query,
+            ScopeProxy const& scope_c,
+            ScopeProxy const& scope_d) :
+        QueryBase(scope_name),
+        scope_name_(scope_name),
+        query_(query),
+        scope_c_(scope_c),
+        scope_d_(scope_d)
+    {
+    }
+
+    virtual void cancelled(ReplyProxy const&)
+    {
+        cout << "query to " << scope_name_ << " was cancelled" << endl;
+    }
+
+    virtual void run(ReplyProxy const& upstream_reply)
+    {
+        ReplyBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
+        create_subquery(query_, scope_c_, reply);
+        create_subquery(query_, scope_d_, reply);
+    }
+
+private:
+    string scope_name_;
+    string query_;
+    ScopeProxy scope_c_;
+    ScopeProxy scope_d_;
+};
+
+// MyScope aggregates from C and D.
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy::SPtr const& registry) override
+    virtual int start(RegistryProxy const& registry) override
     {
         // Lock up scopes C and D in the registry and remember their proxies.
         scope_c_ = registry->find("scope-C");
-        if (!scope_c_)
-        {
-            throw unity::ResourceException("Cannot locate scope-C in registry");
-        }
         scope_d_ = registry->find("scope-D");
-        if (!scope_d_)
-        {
-            throw unity::ResourceException("Cannot locate scope-D in registry");
-        }
         return VERSION;
     }
 
     virtual void stop() override {}
+
     virtual void run() override {}
 
-    virtual void query(string const& q, ReplyProxy::SPtr const& reply) override
+    virtual QueryBase::UPtr create_query(string const& q) override
     {
-        cout << "scope-B: received query string \"" << q << "\"" << endl;
-        cout << "scope-B: forwarding query to scope-C and scope-D" << endl;
-
-        shared_ptr<Reply> r;
-
-        // Make a Reply instance and forward the query to C. C will deliver its
-        // results to that Reply instance.
-        r.reset(new Reply("scope-C", reply));
-        scope_c_->query(q, r);
-
-        // Do the same thing for D.
-        r.reset(new Reply("scope-D", reply));
-        scope_d_->query(q, r);
-
-        // We are done. As the replies trickle in, the two reply instance (kept alive by our run time)
-        // forward the results upstream.
-        cout << "scope-B: query \"" << q << "\" complete" << endl;
+        QueryBase::UPtr query(new MyQuery("scope-B", q, scope_c_, scope_d_));  // TODO: scope name should come from the run time
+        cout << "scope-B: created query: \"" << q << "\"" << endl;
+        return query;
     }
 
 private:
-    ScopeProxy::SPtr scope_c_;
-    ScopeProxy::SPtr scope_d_;
+    ScopeProxy scope_c_;
+    ScopeProxy scope_d_;
 };
 
 extern "C"

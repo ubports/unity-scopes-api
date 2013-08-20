@@ -19,7 +19,6 @@
 #ifndef UNITY_API_SCOPES_REPLYBASE_H
 #define UNITY_API_SCOPES_REPLYBASE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -36,9 +35,10 @@ namespace scopes
 
 /**
 \brief Abstract base class to receive the results of a query.
+TODO: fix doc
 The scope application code must instantiate a class derived from ReplyBase and pass that instance as
 a parameter to the ScopeProxy::query() method. Once a query is sent, the scopes run time repeatedly
-invokes the send() method, once for each result returned by the query. Once a query is complete,
+invokes the push() method, once for each result returned by the query. Once a query is complete,
 the finished() method is called once, to inform the caller that the query is complete.
 */
 
@@ -53,8 +53,10 @@ public:
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
+    \return The return value is `true` if the query is still active. Otherwise, if the query
+    is finished or was cancelled, the return value is `false`.
     */
-    virtual void send(std::string const& result) = 0;
+    virtual bool push(std::string const& result) = 0;
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.

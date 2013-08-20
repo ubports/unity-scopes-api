@@ -19,7 +19,11 @@
 #ifndef UNITY_API_SCOPES_RUNTIME_H
 #define UNITY_API_SCOPES_RUNTIME_H
 
-#include <unity/api/scopes/RegistryProxy.h>
+#include <unity/api/scopes/RegistryProxyFwd.h>
+#include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
+
+#include <string>
 
 namespace unity
 {
@@ -37,12 +41,13 @@ class RuntimeImpl;
 
 /**
 \brief The main object to access the scopes run time.
+
 All interactions with the scopes run time require a Runtime object to be instantiated first. The Runtime instance
 controls the overall life cycle; once a Runtime instance goes out of scope, the application must not make further
 calls on any instance obtained via the destroyed Runtime.
 
 The application must instantiate a Runtime object only after `main()` is entered, and it must destroy the instance
-before leaving `main()`; failure to do so result in undefined behavior.
+before leaving `main()`; failure to do so results in undefined behavior.
 */
 
 class UNITY_API Runtime : private util::NonCopyable
@@ -55,17 +60,23 @@ public:
     /**
     \brief The default configuration file (relative to the current directory) if none is passed to create().
     */
-    static constexpr char const* DFLT_CONFIGFILE = "Scopes.ini";
+    static constexpr char const* DFLT_CONFIGFILE = "Runtime.ini";
 
     /**
     \brief Instantiates the scopes run time for the scope with the given name and (optional) configuration file.
+
     The life time of the run time is under control of the caller. Letting the returned `unique_ptr` go out
     of scope shuts down the run time.
+
+    You _must not_ create a Runtime instance until after `main()` is entered, and you _must_ destroy it
+    before leaving `main()` (either by explicitly calling destroy(), or by letting the returned
+    `unique_ptr` go out of scope). Failure to do so causes undefined behavior.
     */
     static UPtr create(std::string const& scope_name, std::string const& configfile = DFLT_CONFIGFILE);
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
+
     Calling destroy() is optional; the destructor implicitly calls destroy() if it was not called explicitly.
     However, no exceptions are thrown by the destructor. If you want to log or handle any exceptions during
     shutdown, call destroy() explicitly before letting the `unique_ptr` returned by create() go out of scope.
@@ -74,14 +85,17 @@ public:
 
     /**
     \brief Returns a proxy to the Registry object.
+
     The returned proxy allows application code to interact with the registry, which provides access to the available
     scopes.
     */
-    RegistryProxy::SPtr registry() const;
+    RegistryProxy registry() const;
 
     /**
     \brief Destroys a Runtime instance.
+
     The destructor implicitly calls destroy() if the application code does not explicitly destroy the instance.
+    You _must not_ permit a Runtime instance to persist beyond the end of `main()`; doing so has undefined behavior.
     */
     ~Runtime() noexcept;
 

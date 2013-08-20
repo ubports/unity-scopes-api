@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
 #include <unity/api/scopes/internal/AbstractObject.h>
-#include <unity/api/scopes/internal/MWScopeProxy.h>
+#include <unity/api/scopes/internal/MWScope.h>
 
 #include <map>
 #include <mutex>
@@ -46,13 +46,13 @@ public:
     virtual ~RegistryObject() noexcept;
 
     // Remote operation implementations
-    MWScopeProxy::SPtr find(std::string const& scope_name);
+    MWScopeProxy find(std::string const& scope_name);
 
-    typedef std::map<std::string, MWScopeProxy::SPtr> MWScopeMap;
+    typedef std::map<std::string, MWScopeProxy> MWScopeMap;
     MWScopeMap list();
 
     // Local operations to modify the map
-    void add(std::string const& scope_name, MWScopeProxy::SPtr const& scope);
+    void add(std::string const& scope_name, MWScopeProxy const& scope);
     void remove(std::string const& scope_name);
 
 private:
