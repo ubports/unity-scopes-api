@@ -31,8 +31,7 @@ using namespace unity::api::scopes;
 class MyQuery : public QueryBase
 {
 public:
-    MyQuery(string const& scope_name, string const& query) :
-        QueryBase(scope_name),
+    MyQuery(string const& query) :
         query_(query)
     {
         cerr << "MyQuery/" << query << " created" << endl;
@@ -60,7 +59,7 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy const&) override
+    virtual int start(string const&, RegistryProxy const&) override
     {
         return VERSION;
     }
@@ -70,7 +69,7 @@ public:
 
     virtual QueryBase::UPtr create_query(string const& q) override
     {
-        QueryBase::UPtr query(new MyQuery("scope-A", q));  // TODO: scope name should come from the run time
+        QueryBase::UPtr query(new MyQuery(q));
         cout << "scope-A: created query: \"" << q << "\"" << endl;
         return query;
     }

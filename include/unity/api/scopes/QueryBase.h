@@ -66,7 +66,7 @@ public:
 
 protected:
     /// @cond
-    QueryBase(std::string const& query_string);
+    QueryBase();
     /// @endcond
 
 private:

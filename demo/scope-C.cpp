@@ -127,8 +127,7 @@ private:
 class MyQuery : public QueryBase
 {
 public:
-    MyQuery(string const& scope_name, string const& query, Queue& queue) :
-        QueryBase(scope_name),
+    MyQuery(string const& query, Queue& queue) :
         query_(query),
         queue_(queue)
     {
@@ -164,8 +163,9 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy const&) override
+    virtual int start(string const& scope_name, RegistryProxy const&) override
     {
+        scope_name_ = scope_name;
         return VERSION;
     }
 
@@ -200,11 +200,12 @@ public:
 
     virtual QueryBase::UPtr create_query(string const& q) override
     {
-        cout << "scope-C: created query: \"" << q << "\"" << endl;
-        return QueryBase::UPtr(new MyQuery("scope-C", q, queue));  // TODO: scope name should come from the run time
+        cout << scope_name_ << ": created query: \"" << q << "\"" << endl;
+        return QueryBase::UPtr(new MyQuery(q, queue));
     }
 
 private:
+    string scope_name_;
     Queue queue;
 };
 

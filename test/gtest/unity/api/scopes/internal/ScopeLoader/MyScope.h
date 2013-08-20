@@ -31,7 +31,7 @@ public:
     MyScope() {}
     virtual ~MyScope() noexcept {}
 
-    virtual int start(unity::api::scopes::RegistryProxy const&) override
+    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override
     {
         inc_start();
         return VERSION;

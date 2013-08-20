@@ -65,7 +65,7 @@ TEST(ScopeBase, basic)
     EXPECT_EQ(UNITY_SCOPES_VERSION_MINOR, vminor);
     EXPECT_EQ(UNITY_SCOPES_VERSION_MICRO, vmicro);
 
-    b->start(nullptr);
+    b->start("some_scope", nullptr);
     b->stop();
     destroy(b);
 }

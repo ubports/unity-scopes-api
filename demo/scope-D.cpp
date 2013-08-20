@@ -102,7 +102,6 @@ public:
     MyQuery(string const& scope_name,
             string const& query,
             std::function<void(string const&, ReplyProxy const&)> const& add_func) :
-        QueryBase(scope_name),
         scope_name_(scope_name),
         query_(query),
         add_func_(add_func)
@@ -153,8 +152,9 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy const&) override
+    virtual int start(string const& scope_name, RegistryProxy const&) override
     {
+        scope_name_ = scope_name;
         return VERSION;
     }
 
@@ -178,13 +178,13 @@ public:
             {
                 for (int i = 0; i < 4; ++i)
                 {
-                    if (!reply_proxy->push("scope-D: result " + to_string(i) + " for query \"" + query + "\""))
+                    if (!reply_proxy->push(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\""))
                     {
                         break; // Query was cancelled
                     }
                     sleep(1);
                 }
-                cerr << "scope-D: query \"" << query << "\" complete" << endl;
+                cerr << scope_name_ << ": query \"" << query << "\" complete" << endl;
             }
         }
     }
@@ -197,8 +197,8 @@ public:
     virtual QueryBase::UPtr create_query(string const& q) override
     {
         auto add_func = [this](string const& q, ReplyProxy const& p) { this->add_query(q, p); };
-        QueryBase::UPtr query(new MyQuery("scope-D", q, add_func));  // TODO: scope name should come from the run time
-        cerr << "scope-D: created query: \"" << q << "\"" << endl;
+        QueryBase::UPtr query(new MyQuery(scope_name_, q, add_func));
+        cerr << scope_name_ << ": created query: \"" << q << "\"" << endl;
         return query;
     }
 
@@ -208,6 +208,7 @@ public:
     }
 
 private:
+    string scope_name_;
     Queue queue;
     std::atomic_bool done;
 };

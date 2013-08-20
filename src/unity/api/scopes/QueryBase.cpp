@@ -31,7 +31,7 @@ namespace api
 namespace scopes
 {
 
-QueryBase::QueryBase(string const&) :   // TODO: why pass a string here that isn't used? Scope name?
+QueryBase::QueryBase() :
     p(new internal::QueryBaseImpl)
 {
 }

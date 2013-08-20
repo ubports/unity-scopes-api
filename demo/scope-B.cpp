@@ -65,7 +65,6 @@ public:
             string const& query,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
-        QueryBase(scope_name),
         scope_name_(scope_name),
         query_(query),
         scope_c_(scope_c),
@@ -97,11 +96,14 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(RegistryProxy const& registry) override
+    virtual int start(string const& scope_name, RegistryProxy const& registry) override
     {
+        scope_name_ = scope_name;
+
         // Lock up scopes C and D in the registry and remember their proxies.
         scope_c_ = registry->find("scope-C");
         scope_d_ = registry->find("scope-D");
+
         return VERSION;
     }
 
@@ -111,12 +113,13 @@ public:
 
     virtual QueryBase::UPtr create_query(string const& q) override
     {
-        QueryBase::UPtr query(new MyQuery("scope-B", q, scope_c_, scope_d_));  // TODO: scope name should come from the run time
+        QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q << "\"" << endl;
         return query;
     }
 
 private:
+    string scope_name_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };

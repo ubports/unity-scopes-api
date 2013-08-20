@@ -25,7 +25,7 @@ class EXPORT MyScope : public unity::api::scopes::ScopeBase
 public:
     MyScope() {}
 
-    virtual int start(unity::api::scopes::RegistryProxy const&) override
+    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override
     {
         return VERSION;
     }

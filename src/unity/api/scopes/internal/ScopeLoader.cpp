@@ -329,7 +329,7 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                     // Tell the scope to initialize itself.
                     try
                     {
-                        const int s_version = scope_base_->start(registry_);
+                        const int s_version = scope_base_->start(scope_name_, registry_);
                         const int maj_version = major_version();
                         if (s_version != maj_version)
                         {
