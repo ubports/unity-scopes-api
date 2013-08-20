@@ -22,6 +22,7 @@
 #include <unity/api/scopes/Variant.h>
 
 #include <map>
+#include <string>
 
 namespace unity
 {
@@ -35,7 +36,7 @@ namespace scopes
 /**
 \brief A map of <string, Variant> pairs.
 */
-typedef std::map<string, Variant> VariantMap;
+typedef std::map<std::string, Variant> VariantMap;
 
 } // namespace scopes
 

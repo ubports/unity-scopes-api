@@ -1,4 +1,3 @@
-configure_file(client.ini.in client.ini)
 configure_file(Factory.ini.in Factory.ini)
 configure_file(Runtime.ini.in Runtime.ini)
 configure_file(Registry.ini.in Registry.ini)
