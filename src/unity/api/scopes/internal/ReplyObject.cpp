@@ -40,7 +40,8 @@ namespace internal
 
 ReplyObject::ReplyObject(ReplyBase::SPtr const& reply_base) :
     reply_base_(reply_base),
-    finished_(false)
+    finished_(false),
+    num_push_(0)
 {
     assert(reply_base);
 }
@@ -70,7 +71,11 @@ void ReplyObject::push(std::string const& result)
     // even if the client side is broken, the server side here maintains the
     // correct guarantees.
     //
-    // We rethrow any exceptiosn to give the skeleton class that calls us
+    // Calls to push() can be dispatched concurrently if the reply side is
+    // configured with more than one thread. However, finished() is dispatched
+    // only once all executing concurrent push() calls have completed.
+    //
+    // We rethrow any exceptions to give the skeleton class that calls us
     // a chance to any clean-up it needs to do, such as unregistering itself
     // from the middleware.
 
@@ -78,16 +83,34 @@ void ReplyObject::push(std::string const& result)
     //       Think about making a template that takes a functor to wrap this up.
     if (finished_.load())
     {
-        return;
+        return; // Ignore replies that arrive after finished().
     }
 
+    assert(num_push_ >= 0);
+
+    unique_lock<mutex> lock(mutex_);
     try
     {
-        reply_base_->push(result);      // Forward the result to the application code.
+        ++num_push_;
+        lock.unlock();
+        reply_base_->push(result);      // Forward the result to the application code outside synchronization.
+        lock.lock();
+        if (--num_push_ == 0)
+        {
+            lock.unlock();
+            idle_.notify_one();
+        }
     }
     catch (unity::Exception const& e)
     {
         // TODO: log error
+        if (--num_push_ == 0)
+        {
+            lock.unlock();
+            idle_.notify_one();
+        }
+        lock.unlock();
+
         try
         {
             finished();
@@ -100,6 +123,13 @@ void ReplyObject::push(std::string const& result)
     catch (...)
     {
         // TODO: log error
+        if (--num_push_ == 0)
+        {
+            lock.unlock();
+            idle_.notify_one();
+        }
+        lock.unlock();
+
         try
         {
             finished();
@@ -122,32 +152,27 @@ void ReplyObject::finished()
         return;
     }
 
+    // Only one thread can reach this point, any others were thrown out above.
+
+    unique_lock<mutex> lock(mutex_);
     try
     {
-        reply_base_->finished();    // Inform the application code that the query is complete.
+        // Wait until all currently executing calls to push() have completed.
+        assert(num_push_ >= 0);
+        idle_.wait(lock, [this] { return num_push_ == 0; });
+        lock.unlock();
+        reply_base_->finished();    // Inform the application code that the query is complete outside synchronization.
     }
     catch (unity::Exception const& e)
     {
+        lock.unlock();
         // TODO: log error
-        try
-        {
-            finished();
-        }
-        catch (...)
-        {
-        }
         throw;
     }
     catch (...)
     {
+        lock.unlock();
         // TODO: log error
-        try
-        {
-            finished();
-        }
-        catch (...)
-        {
-        }
         throw;
     }
 }

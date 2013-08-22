@@ -42,7 +42,7 @@ public:
         cerr << "MyQuery/" << query_ << " destroyed" << endl;
     }
 
-    virtual void cancelled(ReplyProxy const&) override
+    virtual void cancelled() override
     {
     }
 

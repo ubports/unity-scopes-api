@@ -31,24 +31,27 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-// Simple queue that stores query/reply pairs.
+// Simple queue that stores query-string/reply pairs, using MyQuery* as a key for removal.
 // The put() method adds a pair at the tail, and the get() method returns a pair at the head.
 // get() suspends the caller until an item is available or until the queue is told to finish.
 // get() returns true if it returns a pair, false if the queue was told to finish.
+// remove() searches for the entry with the given key and erases it.
+
+class MyQuery;
 
 class Queue
 {
 public:
-    void put(string const& query, ReplyProxy const& reply_proxy)
+    void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
     {
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            queries_.push_back(QueryData { query, reply_proxy });
+            queries_.push_back(QueryData { query, query_string, reply_proxy });
         }
         condvar_.notify_one();
     }
 
-    bool get(string& query, ReplyProxy& reply_proxy)
+    bool get(string& query_string, ReplyProxy& reply_proxy)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
@@ -61,20 +64,20 @@ public:
         {
             auto qd = queries_.front();
             queries_.pop_front();
-            query = qd.query;
+            query_string = qd.query_string;
             reply_proxy = qd.reply_proxy;
         }
         return !done_;
     }
 
-    void remove(ReplyProxy const& reply_proxy)
+    void remove(MyQuery const* query)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        QueryData qd { "", reply_proxy };
+        QueryData qd { query, "", nullptr };
         auto it = std::find(queries_.begin(), queries_.end(), qd);
         if (it != queries_.end())
         {
-            cerr << "Queue: removed query: " << it->query << endl;
+            cerr << "Queue: removed query: " << it->query_string << endl;
             queries_.erase(it);
         }
         else
@@ -101,14 +104,13 @@ public:
 private:
     struct QueryData
     {
-        string query;
+        MyQuery const* query;
+        string query_string;
         ReplyProxy reply_proxy;
 
         bool operator==(QueryData const& rhs) const
         {
-            // No need to compare query strings because
-            // reply proxies are unique per query.
-            return reply_proxy == rhs.reply_proxy;
+            return query == rhs.query;
         }
     };
 
@@ -139,19 +141,19 @@ public:
         cerr << "My Query destroyed" << endl;
     }
 
-    virtual void cancelled(ReplyProxy const& reply) override
+    virtual void cancelled() override
     {
         // Remove this query from the queue, if it is still there.
         // If it isn't, and the worker thread is still working on this
         // query, the worker thread's next call to push() will return false,
         // causing the worker thread to stop working on this query.
-        queue_.remove(reply);
+        queue_.remove(this);
         cerr << "scope-C: \"" + query_ + "\" cancelled" << endl;
     }
 
     virtual void run(ReplyProxy const& reply) override
     {
-        queue_.put(query_, reply);
+        queue_.put(this, query_, reply);
         cerr << "scope-C: run() returning" << endl;
     }
 
@@ -185,7 +187,7 @@ public:
                 cerr << "worker thread terminating, queue was cleared" << endl;
                 break;  // stop() was called.
             }
-            for (int i = 0; i < 3; ++i)
+            for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
                 if (!reply->push("scope-C: result " + to_string(i) + " for query \"" + query + "\""))

@@ -49,7 +49,8 @@ QueryCtrlProxy QueryBase::create_subquery(string const& query_string,
 
 void QueryBase::cancel()
 {
-    p->cancel();
+    p->cancel();    // Forward cancel to subquery
+    cancelled();    // Inform this query that it was cancelled
 }
 
 } // namespace scopes

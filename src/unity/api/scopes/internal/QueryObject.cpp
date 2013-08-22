@@ -23,10 +23,10 @@
 #include <unity/api/scopes/internal/QueryCtrlObject.h>
 #include <unity/api/scopes/internal/ReplyImpl.h>
 #include <unity/api/scopes/QueryBase.h>
+#include <unity/api/scopes/Reply.h>
 #include <unity/Exception.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 using namespace unity::api::scopes::internal;
@@ -60,9 +60,7 @@ QueryObject::~QueryObject() noexcept
     assert(ctrl_);
     try
     {
-        cerr << "QO: calling ctrl::destroy" << endl;
         ctrl_->destroy();
-        cerr << "QO: destruction complete" << endl;
     }
     catch (...)
     {
@@ -74,8 +72,10 @@ void QueryObject::run(MWReplyProxy const& reply)
 {
     assert(self_);
 
-    // Create the reply proxy to pass to query_base_.
+    // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
+    // if cancel() is called later.
     auto reply_proxy = ReplyImpl::create(reply, self_);
+    reply_proxy_ = reply_proxy;                         
 
     // The reply proxy now holds our reference count high, so
     // we can drop our own smart pointer.
@@ -90,17 +90,16 @@ void QueryObject::cancel(SPtr const& self)
 {
     assert(self);
 
-    // Send finished() to up-stream client to tell him the query is done.
-    reply_->finished();     // Oneway, can't block
+    auto rp = reply_proxy_.lock();
+    if (rp)
+    {
+        // Send finished() to up-stream client to tell him the query is done.
+        rp->finished();     // Oneway, can't block
+    }
 
-    // Forward the cancellation to any subqueries that may be running.
-    cerr << "QO: forwarding cancel" << endl;
+    // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
+    // The query base also calls the cancelled() callback to inform the application code.
     query_base_->cancel();
-
-    // Inform scope that its query was cancelled. This will cause run() on the query to return,
-    // which triggers removal from the middleware. However, this QueryObject may still hang around
-    // if there are references to it elsewhere.
-    query_base_->cancelled(ReplyImpl::create(reply_, self));
 }
 
 // The point of keeping a shared_ptr to ourselves is to make sure this QueryObject cannot

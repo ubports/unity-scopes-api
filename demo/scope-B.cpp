@@ -72,7 +72,7 @@ public:
     {
     }
 
-    virtual void cancelled(ReplyProxy const&)
+    virtual void cancelled()
     {
         cout << "query to " << scope_name_ << " was cancelled" << endl;
     }

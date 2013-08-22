@@ -23,6 +23,7 @@
 #include <unity/api/scopes/ReplyBase.h>
 
 #include <atomic>
+#include <condition_variable>
 
 namespace unity
 {
@@ -55,6 +56,9 @@ public:
 private:
     ReplyBase::SPtr reply_base_;
     std::atomic_bool finished_;
+    std::mutex mutex_;
+    std::condition_variable idle_;
+    int num_push_;
 };
 
 } // namespace internal

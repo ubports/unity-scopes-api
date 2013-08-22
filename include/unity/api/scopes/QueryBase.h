@@ -52,7 +52,7 @@ class UNITY_API QueryBase : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(QueryBase);
 
-    virtual void cancelled(ReplyProxy const& reply) = 0;   // Originator cancelled the query
+    virtual void cancelled() = 0;                          // Originator cancelled the query
     virtual void run(ReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // Create a sub-query.

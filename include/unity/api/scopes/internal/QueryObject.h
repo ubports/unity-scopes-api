@@ -22,6 +22,7 @@
 #include <unity/api/scopes/internal/AbstractObject.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/api/scopes/ReplyProxyFwd.h>
 
 #include <mutex>
 
@@ -67,6 +68,7 @@ public:
 private:
     std::shared_ptr<QueryBase> query_base_;
     MWReplyProxy reply_;
+    std::weak_ptr<Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     SPtr self_;
 };

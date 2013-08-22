@@ -20,6 +20,7 @@
 #include <unity/api/scopes/Reply.h>
 #include <unity/api/scopes/ScopeBase.h>
 
+#include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <iostream>
@@ -33,24 +34,27 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-// Simple queue that stores query/reply pairs.
+// Simple queue that stores query-string/reply pairs, using MyQuery* as a key for removal.
 // The put() method adds a pair at the tail, and the get() method returns a pair at the head.
 // get() suspends the caller until an item is available or until the queue is told to finish.
 // get() returns true if it returns a pair, false if the queue was told to finish.
+// remove() searches for the entry with the given key and erases it.
+
+class MyQuery;
 
 class Queue
 {
 public:
-    void put(string const& query, ReplyProxy const& reply_proxy)
+    void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
     {
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            queries_.push_back(QueryData { query, reply_proxy });
+            queries_.push_back(QueryData { query, query_string, reply_proxy });
         }
         condvar_.notify_one();
     }
 
-    bool get(string& query, ReplyProxy& reply_proxy)
+    bool get(string& query_string, ReplyProxy& reply_proxy)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
@@ -63,16 +67,33 @@ public:
         {
             auto qd = queries_.front();
             queries_.pop_front();
-            query = qd.query;
+            query_string = qd.query_string;
             reply_proxy = qd.reply_proxy;
         }
         return !done_;
+    }
+
+    void remove(MyQuery const* query)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        QueryData qd { query, "", nullptr };
+        auto it = std::find(queries_.begin(), queries_.end(), qd);
+        if (it != queries_.end())
+        {
+            cerr << "Queue: removed query: " << it->query_string << endl;
+            queries_.erase(it);
+        }
+        else
+        {
+            cerr << "Queue: did not find entry to be removed" << endl;
+        }
     }
 
     void finish()
     {
         {
             std::unique_lock<std::mutex> lock(mutex_);
+            queries_.clear();
             done_ = true;
         }
         condvar_.notify_all();
@@ -86,8 +107,14 @@ public:
 private:
     struct QueryData
     {
-        string query;
+        MyQuery const* query;
+        string query_string;
         ReplyProxy reply_proxy;
+
+        bool operator==(QueryData const& rhs) const
+        {
+            return query == rhs.query;
+        }
     };
 
     std::list<QueryData> queries_;
@@ -101,10 +128,10 @@ class MyQuery : public QueryBase
 public:
     MyQuery(string const& scope_name,
             string const& query,
-            std::function<void(string const&, ReplyProxy const&)> const& add_func) :
+            Queue& queue) :
         scope_name_(scope_name),
         query_(query),
-        add_func_(add_func)
+        queue_(queue)
     {
         cerr << "query instance for \"" << scope_name_ << ":" << query << "\" created" << endl;
     }
@@ -114,7 +141,7 @@ public:
         cerr << "query instance for \"" << scope_name_ << ":" << query_ << "\" destroyed" << endl;
     }
 
-    virtual void cancelled(ReplyProxy const&) override
+    virtual void cancelled() override
     {
         // Informational callback to let a query know when it was cancelled. The query should
         // clean up any resources it has allocated, stop pushing results, and arrange for
@@ -135,13 +162,13 @@ public:
         // run(). It is OK to push results on the reply from a different thread.
         // The only obligation on run() is that, if cancelled() is called, and run() is still active
         // at that time, run() must tidy up and return in a timely fashion.
-        add_func_(query_, reply);
+        queue_.put(this, query_, reply);
     }
 
 private:
     string scope_name_;
     string query_;
-    std::function<void(string const&, ReplyProxy const&)> add_func_;
+    Queue& queue_;
 };
 
 // Example scope D: replies asynchronously to queries.
@@ -160,8 +187,8 @@ public:
 
     virtual void stop() override
     {
-        queue.finish();
-        done.store(true);
+        queue_.finish();
+        done_.store(true);
     }
 
     virtual void run() override
@@ -170,13 +197,13 @@ public:
         // It's OK for run() to be empty and return immediately, or to take as long it likes to complete.
         // The only obligation is that, if the scopes run time calls stop(), run() must tidy up and return
         // in as timely a manner as possible.
-        while (!done.load())
+        while (!done_.load())
         {
             string query;
             ReplyProxy reply_proxy;
-            if (queue.get(query, reply_proxy) && !done.load())
+            if (queue_.get(query, reply_proxy) && !done_.load())
             {
-                for (int i = 0; i < 4; ++i)
+                for (int i = 1; i < 5; ++i)
                 {
                     if (!reply_proxy->push(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\""))
                     {
@@ -189,28 +216,22 @@ public:
         }
     }
 
-    void add_query(string const& query, ReplyProxy const& reply_proxy)
-    {
-        queue.put(query, reply_proxy);
-    }
-
     virtual QueryBase::UPtr create_query(string const& q) override
     {
-        auto add_func = [this](string const& q, ReplyProxy const& p) { this->add_query(q, p); };
-        QueryBase::UPtr query(new MyQuery(scope_name_, q, add_func));
+        QueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
         cerr << scope_name_ << ": created query: \"" << q << "\"" << endl;
         return query;
     }
 
     MyScope()
-        : done(false)
+        : done_(false)
     {
     }
 
 private:
     string scope_name_;
-    Queue queue;
-    std::atomic_bool done;
+    Queue queue_;
+    std::atomic_bool done_;
 };
 
 // External entry points to allocate and deallocate the scope.

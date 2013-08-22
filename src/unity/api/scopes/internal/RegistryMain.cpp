@@ -64,7 +64,6 @@ main(int, char*[])
             // Instantiate the middleware factory
             MiddlewareFactory factory(factory_configfile);
 
-            cerr << "registry: creating middleware: " << registry_mw_configfile << endl;
             // TODO: dodgy: why pass the identity a second time when the runtime already has it?
             middleware = factory.create(registry_identity, registry_kind, registry_mw_configfile);
             middleware->start();

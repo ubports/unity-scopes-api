@@ -47,7 +47,7 @@ QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy co
 {
     assert(ctrl_proxy);
     assert(reply_proxy);
-    // We remember the reply proxy so, when the query is canceled, we can
+    // We remember the reply proxy so, when the query is cancelled, we can
     // inform the reply object belonging to this query that the query is finished.
 }
 
@@ -62,7 +62,7 @@ void QueryCtrlImpl::cancel()
         // Forward cancellation down-stream to the query. This does not block.
         ctrl_proxy_->cancel();
 
-        // Indicate that this query is complete. Calling vi the MWReplyProxy ensures
+        // Indicate (to ourselves) that this query is complete. Calling via the MWReplyProxy ensures
         // the finished() call will be processed by a seperate server-side thread,
         // so we cannot block here.
         reply_proxy_->finished();
