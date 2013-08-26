@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEQUERYCTRL_H
 
 #include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
-#include <unity/api/scopes/internal/ice_middleware/IceObject.h>
+#include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceQueryCtrlProxyFwd.h>
 #include <unity/api/scopes/internal/MWQueryCtrl.h>
 
@@ -39,7 +39,7 @@ namespace internal
 namespace ice_middleware
 {
 
-class IceQueryCtrl : public virtual IceObject, public virtual MWQueryCtrl
+class IceQueryCtrl : public virtual IceObjectProxy, public virtual MWQueryCtrl
 {
 public:
     IceQueryCtrl(IceMiddleware* mw_base, middleware::QueryCtrlPrx const& p) noexcept;

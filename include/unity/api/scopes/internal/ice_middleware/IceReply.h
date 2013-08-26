@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEREPLY_H
 
 #include <slice/unity/api/scopes/internal/ice_middleware/Reply.h>
-#include <unity/api/scopes/internal/ice_middleware/IceObject.h>
+#include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceReplyProxyFwd.h>
 #include <unity/api/scopes/internal/MWReply.h>
 
@@ -39,7 +39,7 @@ namespace internal
 namespace ice_middleware
 {
 
-class IceReply : public virtual IceObject, public MWReply
+class IceReply : public virtual IceObjectProxy, public MWReply
 {
 public:
     IceReply(IceMiddleware* mw_base, middleware::ReplyPrx const& p) noexcept;

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MWObject.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
 
 #include <cassert>
 
@@ -35,17 +35,17 @@ namespace scopes
 namespace internal
 {
 
-MWObject::MWObject(MiddlewareBase* mw_base) :
+MWObjectProxy::MWObjectProxy(MiddlewareBase* mw_base) :
     mw_base_(mw_base)
 {
     assert(mw_base);
 }
 
-MWObject::~MWObject() noexcept
+MWObjectProxy::~MWObjectProxy() noexcept
 {
 }
 
-MiddlewareBase* MWObject::mw_base() const noexcept
+MiddlewareBase* MWObjectProxy::mw_base() const noexcept
 {
     return mw_base_;
 }

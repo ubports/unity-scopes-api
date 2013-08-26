@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
 #define UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
 
-#include <unity/api/scopes/internal/MWObject.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/api/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
@@ -36,7 +36,7 @@ namespace scopes
 namespace internal
 {
 
-class MWScope : public virtual MWObject
+class MWScope : public virtual MWObjectProxy
 {
 public:
     virtual ~MWScope() noexcept;

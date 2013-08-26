@@ -117,11 +117,12 @@ TEST(Reaper, basic)
             v[4]->destroy();
             v[9]->destroy();
             EXPECT_EQ(7, r->size());
-            // We call destroy again, to make sure that it's safe to call it twice even if the first time
+            // We call destroy again, to make sure that it's safe to call it twice even though the first time
             // around, the destroy actually removed the item.
             v[0]->destroy();
             v[4]->destroy();
             v[9]->destroy();
+            EXPECT_EQ(7, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
@@ -163,20 +164,25 @@ TEST(Reaper, expiry)
         auto e2 = r->add(bind(&Counter::increment, &c));
 
         // One second later, they still must both be there.
-        sleep(1);
+        this_thread::sleep_for(chrono::milliseconds(1000));
         EXPECT_EQ(2, r->size());
         EXPECT_EQ(0, c.get());
 
         // Refresh one of the entries.
         e2->refresh();
 
-        // Two seconds later, one of them must have disappeared.
-        sleep(2);
+        // 1.2 seconds later, one of them must have disappeared.
+        this_thread::sleep_for(chrono::milliseconds(1200));
         EXPECT_EQ(1, r->size());
         EXPECT_EQ(1, c.get());
 
-        // One second later, the second entry must have disappeared.
-        sleep(1);
+        // 0.6 seconds later, the second entry must still be around.
+        this_thread::sleep_for(chrono::milliseconds(600));
+        EXPECT_EQ(1, r->size());
+        EXPECT_EQ(1, c.get());
+
+        // 0.4 seconds later, the second entry must have disappeared.
+        this_thread::sleep_for(chrono::milliseconds(400));
         EXPECT_EQ(0, r->size());
         EXPECT_EQ(2, c.get());
     }

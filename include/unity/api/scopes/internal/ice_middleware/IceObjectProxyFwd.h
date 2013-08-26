@@ -36,8 +36,8 @@ namespace internal
 namespace ice_middleware
 {
 
-class IceObject;
-typedef std::shared_ptr<IceObject> IceObjectProxy;
+class IceObjectProxy;
+typedef std::shared_ptr<IceObjectProxy> IceProxy;
 
 } // namespace ice_middleware
 

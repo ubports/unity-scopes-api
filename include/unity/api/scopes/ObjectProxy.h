@@ -16,14 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEOBJECT_H
-#define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEOBJECT_H
+#ifndef UNITY_API_SCOPES_OBJECTPROXY_H
+#define UNITY_API_SCOPES_OBJECTPROXY_H
 
-#include <unity/api/scopes/internal/ice_middleware/IceObjectProxyFwd.h>
-#include <unity/api/scopes/internal/ice_middleware/IceMiddleware.h>
-#include <unity/api/scopes/internal/MWObject.h>
-
-#include <Ice/Proxy.h>
+#include <unity/api/scopes/ObjectProxyFwd.h>
+#include <unity/SymbolExport.h>
 
 namespace unity
 {
@@ -36,29 +33,25 @@ namespace scopes
 
 namespace internal
 {
+class ObjectProxyImpl;
+}
 
-namespace ice_middleware
-{
+// TODO: currently incomplete, so there is no true base proxy. The technique outlined in http://tinyrul.com/3w6elg
+// would be suitable to get covariant return for a pimpl() method that returns a shared_ptr. That way, the pimpl()
+// method could be protected here in the base, and we could use ladder inheritance for both the hierarchies
+// rooted at ObjectProxy and ObjectProxyImpl.
 
-// An Ice proxy that points at some Ice object, but without a specific type.
-
-class IceObject : public virtual MWObject
+class UNITY_API ObjectProxy
 {
 public:
-    IceObject(IceMiddleware* mw_base, Ice::ObjectPrx const& p) noexcept;
-    virtual ~IceObject() noexcept;
-
-    virtual IceMiddleware* mw_base() const noexcept;
-
-    virtual Ice::ObjectPrx proxy() const noexcept;
+    ObjectProxy();
+    virtual ~ObjectProxy() noexcept;
 
 private:
-    Ice::ObjectPrx proxy_;
+    friend class internal::ObjectProxyImpl;
+
+    std::shared_ptr<internal::ObjectProxyImpl> p;
 };
-
-} // namespace ice_middleware
-
-} // namespace internal
 
 } // namespace scopes
 

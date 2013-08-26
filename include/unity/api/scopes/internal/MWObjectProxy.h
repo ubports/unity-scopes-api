@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_REPLYS_INTERNAL_MWOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_MWOBJECT_H
+#ifndef UNITY_API_REPLYS_INTERNAL_MWOBJECTPROXY_H
+#define UNITY_API_REPLYS_INTERNAL_MWOBJECTPROXY_H
 
 #include <unity/api/scopes/internal/MWObjectProxyFwd.h>
 
@@ -35,18 +35,18 @@ namespace internal
 
 class MiddlewareBase;
 
-// Base class for the MW<something>Object hierarchy. We store the pointer to the middleware here,
+// Base class for the MW<something>Proxy hierarchy. We store the pointer to the middleware here,
 // which is needed to, for example, register callback objects (such as a Reply object) with the middleware.
 
-class MWObject
+class MWObjectProxy
 {
 public:
-    virtual ~MWObject() noexcept;
+    virtual ~MWObjectProxy() noexcept;
 
     virtual MiddlewareBase* mw_base() const noexcept = 0;
 
 protected:
-    MWObject(MiddlewareBase* mw_base);
+    MWObjectProxy(MiddlewareBase* mw_base);
 
 private:
     MiddlewareBase* mw_base_;

@@ -33,7 +33,7 @@ namespace internal
 {
 
 MWRegistry::MWRegistry(MiddlewareBase* mw_base) :
-    MWObject(mw_base)
+    MWObjectProxy(mw_base)
 {
 }
 

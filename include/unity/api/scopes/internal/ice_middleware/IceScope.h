@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICESCOPE_H
 
 #include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
-#include <unity/api/scopes/internal/ice_middleware/IceObject.h>
+#include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceScopeProxyFwd.h>
 #include <unity/api/scopes/internal/MWScope.h>
 
@@ -39,7 +39,7 @@ namespace internal
 namespace ice_middleware
 {
 
-class IceScope : public virtual IceObject, public virtual MWScope
+class IceScope : public virtual IceObjectProxy, public virtual MWScope
 {
 public:
     IceScope(IceMiddleware* mw_base, middleware::ScopePrx const& p) noexcept;

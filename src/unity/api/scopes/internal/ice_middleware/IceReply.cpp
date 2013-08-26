@@ -38,8 +38,8 @@ namespace ice_middleware
 {
 
 IceReply::IceReply(IceMiddleware* mw_base, middleware::ReplyPrx const& p) noexcept :
-    MWObject(mw_base),
-    IceObject(mw_base, p->ice_oneway()),
+    MWObjectProxy(mw_base),
+    IceObjectProxy(mw_base, p->ice_oneway()),
     MWReply(mw_base)
 {
     assert(p);

@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEREGISTRY_H
 
 #include <slice/unity/api/scopes/internal/ice_middleware/Registry.h>
-#include <unity/api/scopes/internal/ice_middleware/IceObject.h>
+#include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceRegistryProxyFwd.h>
 #include <unity/api/scopes/internal/MWRegistry.h>
 
@@ -42,7 +42,7 @@ namespace ice_middleware
 // Client-side registry proxy for Ice. The implementation forwards the invocations via Ice,
 // and translates the parameters and return value between the Ice types and the public types.
 
-class IceRegistry : public virtual IceObject, public virtual MWRegistry
+class IceRegistry : public virtual IceObjectProxy, public virtual MWRegistry
 {
 public:
     IceRegistry(IceMiddleware* mw_base, middleware::RegistryPrx const& p) noexcept;

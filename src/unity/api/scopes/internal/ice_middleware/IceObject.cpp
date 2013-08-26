@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ice_middleware/IceObject.h>
+#include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 
 using namespace std;
 
@@ -35,23 +35,23 @@ namespace internal
 namespace ice_middleware
 {
 
-IceObject::IceObject(IceMiddleware* mw_base, Ice::ObjectPrx const& p) noexcept :
-    MWObject(mw_base),
+IceObjectProxy::IceObjectProxy(IceMiddleware* mw_base, Ice::ObjectPrx const& p) noexcept :
+    MWObjectProxy(mw_base),
     proxy_(p)
 {
     assert(p);
 }
 
-IceObject::~IceObject() noexcept
+IceObjectProxy::~IceObjectProxy() noexcept
 {
 }
 
-IceMiddleware* IceObject::mw_base() const noexcept
+IceMiddleware* IceObjectProxy::mw_base() const noexcept
 {
-    return dynamic_cast<IceMiddleware*>(MWObject::mw_base());
+    return dynamic_cast<IceMiddleware*>(MWObjectProxy::mw_base());
 }
 
-Ice::ObjectPrx IceObject::proxy() const noexcept
+Ice::ObjectPrx IceObjectProxy::proxy() const noexcept
 {
     return proxy_;
 }

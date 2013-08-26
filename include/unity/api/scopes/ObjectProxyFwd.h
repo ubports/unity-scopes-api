@@ -30,8 +30,8 @@ namespace api
 namespace scopes
 {
 
-class Object;
-typedef std::shared_ptr<Object> ObjectProxy;
+class ObjectProxy;
+typedef std::shared_ptr<ObjectProxy> Proxy;
 
 } // namespace scopes
 

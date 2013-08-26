@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_MWQUERYCTRL_H
 #define UNITY_API_SCOPES_INTERNAL_MWQUERYCTRL_H
 
-#include <unity/api/scopes/internal/MWObject.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
 
 namespace unity
@@ -34,7 +34,7 @@ namespace scopes
 namespace internal
 {
 
-class MWQueryCtrl : public virtual MWObject
+class MWQueryCtrl : public virtual MWObjectProxy
 {
 public:
     virtual ~MWQueryCtrl() noexcept;

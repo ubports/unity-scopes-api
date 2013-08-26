@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_REPLY_H
 #define UNITY_API_SCOPES_REPLY_H
 
-#include <unity/api/scopes/Object.h>
+#include <unity/api/scopes/ObjectProxy.h>
 #include <unity/api/scopes/ReplyProxyFwd.h>
 
 namespace unity
@@ -41,7 +41,7 @@ class ReplyImpl;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class UNITY_API Reply : public Object
+class UNITY_API Reply : public ObjectProxy
 {
 public:
     Reply(Reply const&) = default;

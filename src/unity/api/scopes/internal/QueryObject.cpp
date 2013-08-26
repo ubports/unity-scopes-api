@@ -75,7 +75,7 @@ void QueryObject::run(MWReplyProxy const& reply)
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     auto reply_proxy = ReplyImpl::create(reply, self_);
-    reply_proxy_ = reply_proxy;                         
+    reply_proxy_ = reply_proxy;
 
     // The reply proxy now holds our reference count high, so
     // we can drop our own smart pointer.

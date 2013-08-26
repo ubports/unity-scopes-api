@@ -1,7 +1,7 @@
 add_subdirectory(internal)
 
 set(SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/Object.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp

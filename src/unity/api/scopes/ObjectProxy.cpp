@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Object.h>
+#include <unity/api/scopes/ObjectProxy.h>
 
-#include <unity/api/scopes/internal/ObjectImpl.h>
+#include <unity/api/scopes/internal/ObjectProxyImpl.h>
 
 namespace unity
 {
@@ -32,17 +32,17 @@ namespace scopes
 namespace internal
 {
 
-class ObjectImpl;
+class ObjectProxyImpl;
 
 } // namespace internal
 
 //! @cond
 
-Object::Object()
+ObjectProxy::ObjectProxy()
 {
 }
 
-Object::~Object() noexcept
+ObjectProxy::~ObjectProxy() noexcept
 {
 }
 

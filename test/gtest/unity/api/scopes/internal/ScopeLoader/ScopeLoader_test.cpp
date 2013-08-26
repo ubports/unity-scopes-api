@@ -27,8 +27,6 @@
 #include "Counters.h"
 #include "PerScopeVariables.h"
 
-#include <time.h>
-
 using namespace std;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
@@ -66,10 +64,7 @@ char const* scopeB
 
 void wait(long millisec = 100)
 {
-    struct timespec tv;
-    tv.tv_sec = millisec / 1000;
-    tv.tv_nsec = millisec % 1000 * 1000000;
-    nanosleep(&tv, nullptr);
+    this_thread::sleep_for(chrono::milliseconds(millisec));
 }
 
 // Need to make a dummy registry proxy because, if we pass a null shared_ptr to load(),

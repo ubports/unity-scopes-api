@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_MWREGISTRY_H
 #define UNITY_API_SCOPES_INTERNAL_MWREGISTRY_H
 
-#include <unity/api/scopes/internal/MWObject.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/Registry.h>
 
 namespace unity
@@ -34,7 +34,7 @@ namespace scopes
 namespace internal
 {
 
-class MWRegistry : public virtual MWObject
+class MWRegistry : public virtual MWObjectProxy
 {
 public:
     // Remote operation implementation

@@ -128,7 +128,7 @@ public:
     // For example, a reap interval of 1 second and expiry interval of 5 seconds means that the
     // callback for an entry will be made once the entry has not been refreshed for at least 5 seconds
     // and at most 6 seconds.
-    // The reap interval must be less than or equal to the expiry interval because this would allow
+    // The reap interval must be less than or equal to the expiry interval. Otherwise, we would allow
     // entries to not be refreshed for longer than their expiry interval, then be refreshed again, and
     // not be reaped on the next pass.
     //
@@ -152,11 +152,9 @@ private:
     Reaper(int reap_interval, int expiry_interval, DestroyPolicy p);
     void set_self(std::weak_ptr<Reaper> const& self) noexcept;
 
-    void refresh(ReapItem const& handle);   // Updates timestamp for an entry and moves it to the head of the list
-
     void run();                             // Start function for reaper thread
 
-    void remove_zombies(reaper_private::Reaplist const&) noexcept;   // Helper functon
+    void remove_zombies(reaper_private::Reaplist const&) noexcept;   // Invokes callbacks for expired entries
 
     std::weak_ptr<Reaper> self_;            // We keep a weak reference to ourselves, to pass to each ReapItem.
     std::chrono::seconds reap_interval_;    // How frequently we look for entries to reap

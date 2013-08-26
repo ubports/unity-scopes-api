@@ -33,7 +33,7 @@ namespace internal
 {
 
 MWQuery::MWQuery(MiddlewareBase* mw_base) :
-    MWObject(mw_base)
+    MWObjectProxy(mw_base)
 {
 }
 

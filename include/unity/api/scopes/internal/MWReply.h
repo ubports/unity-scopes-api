@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_MWREPLY_H
 #define UNITY_API_SCOPES_INTERNAL_MWREPLY_H
 
-#include <unity/api/scopes/internal/MWObject.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
 
 #include <string>
@@ -36,7 +36,7 @@ namespace scopes
 namespace internal
 {
 
-class MWReply : public virtual MWObject
+class MWReply : public virtual MWObjectProxy
 {
 public:
     virtual ~MWReply() noexcept;

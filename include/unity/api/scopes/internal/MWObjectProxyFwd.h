@@ -33,8 +33,8 @@ namespace scopes
 namespace internal
 {
 
-class MWObject;
-typedef std::shared_ptr<MWObject> MWObjectProxy;
+class MWObjectProxy;
+typedef std::shared_ptr<MWObjectProxy> MWProxy;
 
 } // namespace internal
 

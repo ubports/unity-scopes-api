@@ -40,8 +40,8 @@ namespace ice_middleware
 {
 
 IceQuery::IceQuery(IceMiddleware* mw_base, middleware::QueryPrx const& p) noexcept :
-    MWObject(mw_base),
-    IceObject(mw_base, p->ice_oneway()),
+    MWObjectProxy(mw_base),
+    IceObjectProxy(mw_base, p->ice_oneway()),
     MWQuery(mw_base)
 {
     assert(p);

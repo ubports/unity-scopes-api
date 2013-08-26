@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_REGISTRY_H
 #define UNITY_API_SCOPES_REGISTRY_H
 
-#include <unity/api/scopes/Object.h>
+#include <unity/api/scopes/ObjectProxy.h>
 #include <unity/api/scopes/RegistryProxyFwd.h>
 #include <unity/api/scopes/Scope.h>
 
@@ -49,7 +49,7 @@ typedef std::map<std::string, ScopeProxy> ScopeMap;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class UNITY_API Registry : public Object
+class UNITY_API Registry : public ObjectProxy
 {
 public:
     /// @cond

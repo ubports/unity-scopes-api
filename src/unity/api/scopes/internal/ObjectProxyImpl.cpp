@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_OBJECTIMPL_H
-#define UNITY_INTERNAL_OBJECTIMPL_H
+#include <unity/api/scopes/internal/ObjectProxyImpl.h>
 
-#include<unity/api/scopes/internal/MWObjectProxyFwd.h>
-#include<unity/api/scopes/ObjectProxyFwd.h>
+#include <unity/api/scopes/internal/MWObjectProxy.h>
+#include <unity/api/scopes/ObjectProxy.h>
+
+using namespace std;
 
 namespace unity
 {
@@ -34,19 +35,19 @@ namespace scopes
 namespace internal
 {
 
-class ObjectImpl final
+ObjectProxyImpl::ObjectProxyImpl(MWProxy const& mw_proxy) :
+    mw_proxy_(mw_proxy)
 {
-public:
-    ObjectImpl(MWObjectProxy const& mw_proxy);
-    ~ObjectImpl() noexcept;
+}
 
-private:
+ObjectProxyImpl::~ObjectProxyImpl() noexcept
+{
+}
 
-    static ObjectProxy create(MWObjectProxy const& mw_proxy);
-
-private:
-    MWObjectProxy mw_proxy_;
-};
+Proxy ObjectProxyImpl::create(MWProxy const&)
+{
+    return Proxy(new ObjectProxy);
+}
 
 } // namespace internal
 
@@ -55,5 +56,3 @@ private:
 } // namespace api
 
 } // namespace unity
-
-#endif

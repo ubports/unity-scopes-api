@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_QUERYCTRL_H
 #define UNITY_API_SCOPES_QUERYCTRL_H
 
-#include <unity/api/scopes/Object.h>
+#include <unity/api/scopes/ObjectProxy.h>
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 
 namespace unity
@@ -40,7 +40,7 @@ class QueryCtrlImpl;
 \brief QueryCtrl allows a query to be cancelled.
 */
 
-class UNITY_API QueryCtrl : public Object
+class UNITY_API QueryCtrl : public ObjectProxy
 {
 public:
     /**

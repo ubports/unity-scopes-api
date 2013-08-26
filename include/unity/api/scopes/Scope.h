@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_SCOPE_H
 #define UNITY_API_SCOPES_SCOPE_H
 
-#include <unity/api/scopes/Object.h>
+#include <unity/api/scopes/ObjectProxy.h>
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/ReplyBase.h>
 #include <unity/api/scopes/ScopeProxyFwd.h>
@@ -42,7 +42,7 @@ class ScopeImpl;
 \brief Allows queries to be sent to a scope and results for the query to be retrieved.
 */
 
-class UNITY_API Scope : public Object
+class UNITY_API Scope : public ObjectProxy
 {
 public:
     /**

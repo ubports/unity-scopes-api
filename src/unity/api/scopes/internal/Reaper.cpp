@@ -61,7 +61,7 @@ void ReapItem::refresh() noexcept
 
     // If the reaper is still around, remove the entry from the list
     // and put it back on the front, updating the time stamp.
-    Reaper::SPtr reaper = reaper_.lock();
+    auto const reaper = reaper_.lock();
     if (reaper)
     {
         lock_guard<mutex> lock(reaper->mutex_);
@@ -86,7 +86,7 @@ void ReapItem::destroy() noexcept
         return;
     }
 
-    Reaper::SPtr reaper = reaper_.lock();
+    auto const reaper = reaper_.lock();
     if (reaper)
     {
         lock_guard<mutex> lock(reaper->mutex_);
@@ -159,7 +159,7 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
         throw unity::InvalidArgumentException("Reaper: invalid null callback passed to add().");
     }
 
-    // Put new ReapItem at the head of the list.
+    // Put new Item at the head of the list.
     reaper_private::Reaplist::iterator ri;
     size_t list_size;
     {
@@ -192,9 +192,9 @@ size_t Reaper::size() const noexcept
 
 void Reaper::run()
 {
+    unique_lock<mutex> lock(mutex_);
     for (;;)
     {
-        unique_lock<mutex> lock(mutex_);
         if (list_.empty())
         {
             // If no items are in the list, we wait until there is at least one item
@@ -223,10 +223,9 @@ void Reaper::run()
             return;
         }
 
-        // Now we run along the list from the tail towards the head. For any entry on the list
+        // We run along the list from the tail towards the head. For any entry on the list
         // that is too old, we copy it to a zombie list. We use a strictly less comparison for
         // the timestamp, so if the entry is exactly expiry_interval_ old, it will be reaped.
-
         reaper_private::Reaplist zombies;
         if (finish_ && policy_ == CallbackOnDestroy)
         {
@@ -253,15 +252,14 @@ void Reaper::run()
         // Callbacks are made outside the synchronization, so we can't deadlock if a
         // a callback invokes a method on the reaper or a ReapItem.
         lock.unlock();
-
-        remove_zombies(zombies);
+        remove_zombies(zombies);    // noexcept
+        lock.lock();
 
         if (finish_)
         {
-            return; // No more to do
+            return;
         }
     }
-    assert(false);
 }
 
 void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept

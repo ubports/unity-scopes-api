@@ -42,8 +42,8 @@ namespace ice_middleware
 {
 
 IceRegistry::IceRegistry(IceMiddleware* mw_base, middleware::RegistryPrx const& p) noexcept :
-    MWObject(mw_base),
-    IceObject(mw_base, p),
+    MWObjectProxy(mw_base),
+    IceObjectProxy(mw_base, p),
     MWRegistry(mw_base)
 {
     assert(p);

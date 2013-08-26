@@ -43,8 +43,8 @@ namespace ice_middleware
 {
 
 IceScope::IceScope(IceMiddleware* mw_base, middleware::ScopePrx const& p) noexcept :
-    MWObject(mw_base),
-    IceObject(mw_base, p),
+    MWObjectProxy(mw_base),
+    IceObjectProxy(mw_base, p),
     MWScope(mw_base)
 {
     // No assert here, it's legal to create a nil proxy for a scope (for example, when RegistryProxy::find()

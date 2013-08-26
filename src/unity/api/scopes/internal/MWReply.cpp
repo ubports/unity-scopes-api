@@ -33,7 +33,7 @@ namespace internal
 {
 
 MWReply::MWReply(MiddlewareBase* mw_base) :
-    MWObject(mw_base)
+    MWObjectProxy(mw_base)
 {
 }
 
