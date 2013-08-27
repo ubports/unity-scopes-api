@@ -21,6 +21,8 @@
 
 #include <unity/api/scopes/internal/AbstractObject.h>
 
+#include <atomic>
+
 namespace unity
 {
 
@@ -35,11 +37,6 @@ namespace internal
 
 class QueryObject;
 
-// A QueryCtrlObject sits in between the incoming requests from the middleware layer and the
-// QueryCtrlBase-derived implementation. This allows us to receive cancel requests. In turn,
-// the implementation of this object ensures that the corresponding ReplyObject is disabled.
-// TODO: Probably need to flesh out this comment.
-
 class QueryCtrlObject final : public AbstractObject
 {
 public:
@@ -52,12 +49,13 @@ public:
     void cancel();
     void destroy();
 
-    // Called by create_query() after instantiation to tell this ctrl what its corresponding query proxy
-    // and query facade are.
+    // Called by create_query() after instantiation to tell this ctrl what its corresponding
+    // query facade is.
     void set_query(std::shared_ptr<QueryObject> const& qo);
 
 private:
     std::weak_ptr<QueryObject> qo_;
+    std::atomic_bool destroyed_;
 };
 
 } // namespace internal

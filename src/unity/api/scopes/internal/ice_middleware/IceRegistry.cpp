@@ -62,7 +62,7 @@ ScopeProxy IceRegistry::find(std::string const& scope_name)
         middleware::ScopePrx p = self->find(scope_name);
         assert(p);
         IceScopeProxy isp(new IceScope(mw_base(), p));
-        sp = ScopeImpl::create(isp);
+        sp = ScopeImpl::create(isp, mw_base()->runtime());
     }
     catch (middleware::NotFoundException const& e)
     {
@@ -87,7 +87,7 @@ ScopeMap IceRegistry::list()
         {
             assert(it.second);
             IceScopeProxy isp(new IceScope(mw_base(), it.second));
-            ScopeProxy proxy = ScopeImpl::create(isp);
+            ScopeProxy proxy = ScopeImpl::create(isp, mw_base()->runtime());
             sm[it.first] = proxy;
         }
     }

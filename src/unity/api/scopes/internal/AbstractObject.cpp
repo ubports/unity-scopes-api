@@ -18,6 +18,10 @@
 
 #include <unity/api/scopes/internal/AbstractObject.h>
 
+#include <cassert>
+
+using namespace std;
+
 namespace unity
 {
 
@@ -36,6 +40,24 @@ AbstractObject::AbstractObject()
 
 AbstractObject::~AbstractObject() noexcept
 {
+}
+
+void AbstractObject::set_disconnect_function(function<void()> func) noexcept
+{
+    assert(func);
+    disconnect_func_ = func;
+}
+
+void AbstractObject::disconnect() noexcept
+{
+    try
+    {
+        assert(disconnect_func_);
+        disconnect_func_();
+    }
+    catch (...)
+    {
+    }
 }
 
 } // namespace internal

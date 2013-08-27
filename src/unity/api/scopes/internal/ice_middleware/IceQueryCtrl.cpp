@@ -39,9 +39,12 @@ namespace ice_middleware
 
 IceQueryCtrl::IceQueryCtrl(IceMiddleware* mw_base, middleware::QueryCtrlPrx const& p) noexcept :
     MWObjectProxy(mw_base),
-    IceObjectProxy(mw_base, p->ice_oneway()),
+    IceObjectProxy(mw_base, p->ice_oneway()->ice_collocationOptimized(false)),
     MWQueryCtrl(mw_base)
 {
+    // We turn off collocation optimization so a oneway call to destroy() by the QueryObject is dispatched
+    // in a separated thread. (Without this, because Query and QueryCtrl share a communicator, the
+    // call will be dispatched collocation optimized, that is, as a direct synchronous twoway call.)
     assert(p);
 }
 

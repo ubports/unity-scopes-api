@@ -21,7 +21,6 @@
 
 #include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
 
-#include <atomic>
 #include <memory>
 
 namespace unity
@@ -55,7 +54,6 @@ private:
     void destroy(Ice::Current const&) noexcept;
 
     std::shared_ptr<QueryCtrlObject> co_;
-    std::atomic_bool destroyed_;
 };
 
 typedef IceUtil::Handle<QueryCtrlI> QueryCtrlIPtr;

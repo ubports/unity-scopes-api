@@ -20,6 +20,7 @@
 #include <unity/api/scopes/Reply.h>
 
 #include <iostream>
+#include <thread>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
@@ -34,10 +35,12 @@ public:
     MyQuery(string const& query) :
         query_(query)
     {
+        cerr << "MyQuery/" << query << " created" << endl;
     }
 
     ~MyQuery() noexcept
     {
+        cerr << "MyQuery/" << query_ << " destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -46,8 +49,10 @@ public:
 
     virtual void run(ReplyProxy const& reply) override
     {
-        reply->push("scope-A: result 1 for query \"" + query_ + "\"");
-        cout << "scope-A: query \"" << query_ << "\" complete" << endl;
+        cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
+        this_thread::sleep_for(chrono::seconds(20));
+        reply->push("scope-slow: result 1 for query \"" + query_ + "\"");
+        cout << "scope-slow: query \"" << query_ << "\" complete" << endl;
     }
 
 private:
@@ -68,7 +73,7 @@ public:
     virtual QueryBase::UPtr create_query(string const& q) override
     {
         QueryBase::UPtr query(new MyQuery(q));
-        cout << "scope-A: created query: \"" << q << "\"" << endl;
+        cout << "scope-slow: created query: \"" << q << "\"" << endl;
         return query;
     }
 };

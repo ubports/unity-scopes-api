@@ -20,6 +20,7 @@
 #define UNITY_API_REPLYS_INTERNAL_REPLYOBJECT_H
 
 #include <unity/api/scopes/internal/AbstractObject.h>
+#include <unity/api/scopes/internal/Reaper.h>
 #include <unity/api/scopes/ReplyBase.h>
 
 #include <atomic>
@@ -37,6 +38,8 @@ namespace scopes
 namespace internal
 {
 
+class RuntimeImpl;
+
 // A ReplyObject sits in between the incoming requests from the middleware layer and the
 // ReplyBase-derived implementation provided by the scope.
 // This allows us to intercept all replies.
@@ -46,15 +49,16 @@ class ReplyObject final : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ReplyBase::SPtr const& reply_base);
+    ReplyObject(ReplyBase::SPtr const& reply_base, RuntimeImpl const* runtime);
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
-    void push(std::string const& result);
-    void finished();
+    void push(std::string const& result) noexcept;
+    void finished() noexcept;
 
 private:
-    ReplyBase::SPtr reply_base_;
+    ReplyBase::SPtr const reply_base_;
+    ReapItem::SPtr reap_item_;
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;

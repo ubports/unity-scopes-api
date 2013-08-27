@@ -56,10 +56,10 @@ public:
     virtual ~QueryObject() noexcept;
 
     // Remote operation implementation
-    void run(MWReplyProxy const& reply);
+    void run(MWReplyProxy const& reply) noexcept;
 
     // Called locally only, by QueryCtrlObject.
-    void cancel(std::shared_ptr<QueryObject> const& self);
+    void cancel();
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.

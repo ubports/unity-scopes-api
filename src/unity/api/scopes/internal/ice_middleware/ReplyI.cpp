@@ -38,8 +38,7 @@ namespace ice_middleware
 {
 
 ReplyI::ReplyI(ReplyObject::SPtr const& ro) :
-    ro_(ro),
-    finished_(false)
+    ro_(ro)
 {
     assert(ro);
 }
@@ -49,56 +48,14 @@ ReplyI::ReplyI(ReplyObject::SPtr const& ro) :
 // comment. That's because they really are noexcept, but we can't say this in the signature
 // because we are deriving from the Slice-generated base.
 
-void ReplyI::push(string const& result, Ice::Current const& c)  // noexcept
+void ReplyI::push(string const& result, Ice::Current const&)  // noexcept
 {
-    if (finished_.load())
-    {
-        return; // Ignore calls to push() after finished() completes.
-    }
-
-    try
-    {
-        ro_->push(result);
-    }
-    catch (...)
-    {
-        // TODO: log error
-        finished(c);
-    }
+    ro_->push(result);
 }
 
-void ReplyI::finished(Ice::Current const& c)  // noexcept
+void ReplyI::finished(Ice::Current const&)  // noexcept
 {
-    if (finished_.exchange(true))
-    {
-        return;
-    }
-
-    try
-    {
-        try
-        {
-            ro_->finished();
-        }
-        catch (...)
-        {
-            // Any errors are logged already.
-        }
-
-        // Remove self from object adapter, which will end up destroying this Reply servant.
-        try
-        {
-            c.adapter->remove(c.id);
-        }
-        catch (...)
-        {
-            // TODO: log error
-        }
-    }
-    catch (...)
-    {
-        // TODO: log error
-    }
+    ro_->finished();
 }
 
 } // namespace ice_middleware

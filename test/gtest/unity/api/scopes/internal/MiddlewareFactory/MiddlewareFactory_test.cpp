@@ -27,7 +27,7 @@ using namespace unity::api::scopes::internal;
 
 TEST(MiddlewareFactory, basic)
 {
-    MiddlewareFactory f("Factory.ini");
+    MiddlewareFactory f("Factory.ini", (RuntimeImpl*)0x1);
     EXPECT_EQ(nullptr, f.find("nosuchscope", "Ice"));
     MiddlewareBase::SPtr not_found;
     MiddlewareBase::SPtr mw = f.find("testscope", "Ice");
@@ -40,7 +40,7 @@ TEST(MiddlewareFactory, BadKind)
 {
     try
     {
-        MiddlewareFactory f("Factory.ini");
+        MiddlewareFactory f("Factory.ini", (RuntimeImpl*)0x1);
         f.create("somescope", "NoSuchMiddleware", "Ice.Config");
         FAIL();
     }
@@ -54,7 +54,7 @@ TEST(MiddlewareFactory, BadIniFile)
 {
     try
     {
-        MiddlewareFactory f("NoSuchFile.ini");
+        MiddlewareFactory f("NoSuchFile.ini", (RuntimeImpl*)0x1);
         FAIL();
     }
     catch (ConfigException const& e)

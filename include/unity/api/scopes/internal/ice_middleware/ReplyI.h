@@ -49,7 +49,6 @@ public:
 
 private:
     ReplyObject::SPtr ro_;
-    std::atomic_bool finished_;
 };
 
 typedef IceUtil::Handle<ReplyI> ReplyIPtr;

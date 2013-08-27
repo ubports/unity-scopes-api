@@ -37,11 +37,11 @@ main(int, char**)
     try
     {
         RuntimeImpl::UPtr rt = RuntimeImpl::create(scope_name);
-        MiddlewareBase::SPtr mw = rt->factory()->create(scope_name, "Ice", "Ice.Config");
-        ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, "lib" + scope_name + ".so", rt->registry());
+        MiddlewareBase::SPtr mw = rt->factory()->create(rt->scope_name(), "Ice", "Ice.Config");
+        ScopeLoader::SPtr loader = ScopeLoader::load(rt->scope_name(), "lib" + rt->scope_name() + ".so", rt->registry());
         loader->start();
-        ScopeObject::SPtr scope(new ScopeObject(scope_name, loader->scope_base()));
-        mw->add_scope_object(scope_name, scope);
+        ScopeObject::SPtr scope(new ScopeObject(rt.get(), loader->scope_base()));
+        mw->add_scope_object(rt->scope_name(), scope);
         mw->wait_for_shutdown();
     }
     catch (unity::Exception const& e)

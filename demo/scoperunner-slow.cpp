@@ -32,10 +32,11 @@ main(int, char**)
 {
     // TODO: the hard-wired strings here need to be read from config.
 
-    string scope_name = string("scope-A");
+    string scope_name = string("scope-slow");
 
     try
     {
+        RuntimeImpl::UPtr x;
         RuntimeImpl::UPtr rt = RuntimeImpl::create(scope_name);
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, "lib" + scope_name + ".so", rt->registry());
         loader->start();

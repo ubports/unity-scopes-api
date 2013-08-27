@@ -33,11 +33,9 @@ using namespace unity::api::scopes;
 class Reply : public ReplyBase
 {
 public:
-    virtual bool push(string const& result) override
+    virtual void push(string const& result) override
     {
         cout << "received result: " << result << endl;
-        lock_guard<decltype(mutex_)> lock(mutex_);
-        return !query_complete_;
     }
 
     virtual void finished() override
@@ -84,25 +82,10 @@ int main(int argc, char* argv[])
         Runtime::UPtr rt = Runtime::create("client");
 
         RegistryProxy r = rt->registry();
-        if (!r)
-        {
-            cerr << "could not get proxy for registry" << endl;
-            return 1;
-        }
         ScopeProxy s = r->find(scope_name);
-        if (!s)
-        {
-            cerr << "no such scope: " << scope_name << endl;
-            return 1;
-        }
         shared_ptr<Reply> reply(new Reply);
-        QueryCtrlProxy ctrl = s->create_query(search_string, reply);     // Returns immediately
-        if (ctrl)
-        {
-            cerr << "created query" << endl;
-            ctrl->cancel();
-            reply->wait_until_finished();
-        }
+        s->create_query(search_string, reply);     // Returns immediately
+        reply->wait_until_finished();
     }
 
     catch (unity::Exception const& e)

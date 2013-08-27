@@ -40,6 +40,7 @@ namespace internal
 {
 
 class MiddlewareBase;
+class RuntimeImpl;
 
 // A ScopeObject sits in between the incoming requests from the middleware layer and the
 // ScopeBase-derived implementation provided by the scope. It forwards incoming
@@ -50,14 +51,14 @@ class ScopeObject final : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
 
-    ScopeObject(std::string const& scope_name, ScopeBase* scope_base_);
+    ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
     virtual ~ScopeObject() noexcept;
 
     // Remote operation implementations
     MWQueryCtrlProxy create_query(std::string const& q, MWReplyProxy const& reply, MiddlewareBase* mw_base);
 
 private:
-    std::string const scope_name_;
+    RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
 };
 

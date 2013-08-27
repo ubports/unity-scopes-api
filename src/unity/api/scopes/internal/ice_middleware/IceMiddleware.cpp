@@ -62,8 +62,9 @@ char const* reply_suffix = "-reply";  // Appended to server_name_ to create repl
 
 } // namespace
 
-IceMiddleware::IceMiddleware(string const& server_name, string const& configfile)
-    : server_name_(server_name)
+IceMiddleware::IceMiddleware(string const& server_name, string const& configfile, RuntimeImpl* runtime) :
+    MiddlewareBase(runtime),
+    server_name_(server_name)
 {
     assert(!server_name.empty());
     try
@@ -208,7 +209,9 @@ MWQueryCtrlProxy IceMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr cons
     {
         QueryCtrlIPtr ci = new QueryCtrlI(ctrl);
         Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
-        proxy.reset(new IceQueryCtrl(this, middleware::QueryCtrlPrx::uncheckedCast(safe_add(a, ci))));
+        function<void()> df;
+        proxy.reset(new IceQueryCtrl(this, middleware::QueryCtrlPrx::uncheckedCast(safe_add(df, a, ci))));
+        ctrl->set_disconnect_function(df);
     }
     catch (Ice::Exception const& e)
     {
@@ -227,7 +230,9 @@ MWQueryProxy IceMiddleware::add_query_object(QueryObject::SPtr const& query)
     {
         QueryIPtr qi = new QueryI(this, query);
         Ice::ObjectAdapterPtr a = find_adapter(server_name_);
-        proxy.reset(new IceQuery(this, middleware::QueryPrx::uncheckedCast(safe_add(a, qi))));
+        function<void()> df;
+        proxy.reset(new IceQuery(this, middleware::QueryPrx::uncheckedCast(safe_add(df, a, qi))));
+        query->set_disconnect_function(df);
     }
     catch (Ice::Exception const& e)
     {
@@ -248,7 +253,9 @@ MWRegistryProxy IceMiddleware::add_registry_object(string const& identity, Regis
     {
         RegistryIPtr ri = new RegistryI(registry);
         Ice::ObjectAdapterPtr a = find_adapter(server_name_);
-        proxy.reset(new IceRegistry(this, middleware::RegistryPrx::uncheckedCast(safe_add(a, ri, identity))));
+        function<void()> df;
+        proxy.reset(new IceRegistry(this, middleware::RegistryPrx::uncheckedCast(safe_add(df, a, ri, identity))));
+        registry->set_disconnect_function(df);
     }
     catch (Ice::Exception const& e)
     {
@@ -267,7 +274,9 @@ MWReplyProxy IceMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
     {
         ReplyIPtr si = new ReplyI(reply);
         Ice::ObjectAdapterPtr a = find_adapter(server_name_ + reply_suffix);
-        proxy.reset(new IceReply(this, middleware::ReplyPrx::uncheckedCast(safe_add(a, si))));
+        function<void()> df;
+        proxy.reset(new IceReply(this, middleware::ReplyPrx::uncheckedCast(safe_add(df, a, si))));
+        reply->set_disconnect_function(df);
     }
     catch (Ice::Exception const& e)
     {
@@ -287,7 +296,9 @@ MWScopeProxy IceMiddleware::add_scope_object(string const& identity, ScopeObject
     {
         ScopeIPtr si = new ScopeI(this, scope);
         Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
-        proxy.reset(new IceScope(this, middleware::ScopePrx::uncheckedCast(safe_add(a, si, identity))));
+        function<void()> df;
+        proxy.reset(new IceScope(this, middleware::ScopePrx::uncheckedCast(safe_add(df, a, si, identity))));
+        scope->set_disconnect_function(df);
     }
     catch (Ice::Exception const& e)
     {
@@ -296,29 +307,6 @@ MWScopeProxy IceMiddleware::add_scope_object(string const& identity, ScopeObject
     }
     return proxy;
 }
-
-#if 0
-void IceMiddleware::remove_object(string const& identity)
-{
-    try
-    {
-        Ice::Identity id;
-        id.name = identity;
-
-        lock_guard<mutex> lock(mutex_);
-        if (!adapter_)
-        {
-            throw LogicException("Cannot remove object from stopped middleware");
-        }
-        adapter_->remove(id);
-    }
-    catch (Ice::Exception const& e)
-    {
-        // TODO: log exception
-        rethrow_ice_ex(e);
-    }
-}
-#endif
 
 Ice::ObjectAdapterPtr IceMiddleware::find_adapter(string const& name)
 {
@@ -336,7 +324,8 @@ Ice::ObjectAdapterPtr IceMiddleware::find_adapter(string const& name)
     return a;
 }
 
-Ice::ObjectPrx IceMiddleware::safe_add(Ice::ObjectAdapterPtr& adapter,
+Ice::ObjectPrx IceMiddleware::safe_add(std::function<void()>& disconnect_func,
+                                       Ice::ObjectAdapterPtr const& adapter,
                                        Ice::ObjectPtr const& obj,
                                        string const& identity)
 {
@@ -348,6 +337,15 @@ Ice::ObjectPrx IceMiddleware::safe_add(Ice::ObjectAdapterPtr& adapter,
     {
         throw LogicException("Cannot add object to stopped middleware");
     }
+    disconnect_func = [adapter, id] {
+        try
+        {
+            adapter->remove(id);
+        }
+        catch (...)
+        {
+        }
+    };
     return adapter->add(obj, id);
 }
 

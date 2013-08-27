@@ -33,6 +33,8 @@ namespace scopes
 namespace internal
 {
 
+class RuntimeImpl;
+
 // Factory to make middleware instances available.
 //
 // This class is thread-safe.
@@ -42,7 +44,7 @@ class MiddlewareFactory final : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(MiddlewareFactory);
 
-    MiddlewareFactory(std::string const& configfile);
+    MiddlewareFactory(std::string const& configfile, RuntimeImpl* runtime);
     ~MiddlewareFactory() noexcept;
 
     // Returns the middleware with the given name and kind. If that middleware hasn't been created yet,
@@ -79,6 +81,7 @@ private:
         }
     };
 
+    RuntimeImpl* const runtime_;
     mutable std::map<MiddlewareData, MiddlewareBase::SPtr> mw_map_;
     mutable std::mutex mutex_;
 };

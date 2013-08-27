@@ -40,9 +40,11 @@ namespace scopes
 namespace internal
 {
 
-ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy) :
-    mw_proxy_(mw_proxy)
+ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime) :
+    mw_proxy_(mw_proxy),
+    runtime_(runtime)
 {
+    assert(runtime);
 }
 
 ScopeImpl::~ScopeImpl() noexcept
@@ -70,20 +72,21 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, ReplyBase::SPtr const& r
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ReplyObject::SPtr ro(new ReplyObject(reply));
+        ReplyObject::SPtr ro(new ReplyObject(reply, runtime_));
         MWReplyProxy rp = mw_proxy_->mw_base()->add_reply_object(ro); // ResourcePtr to remove it if exception?
 
         // Forward the the create_query() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return
         // the QueryCtrlProxy. Because the Scope implementation has a separate
         // thread for create_query() calls, this is guaranteed not to block for
-        // any length of time. (No application code other than the QueryBase constructor is called by create_query()
-        // on the server side.)
+        // any length of time. (No application code other than the QueryBase constructor
+        // is called by create_query() on the server side.)
         ctrl = mw_proxy_->create_query(q, rp);
         assert(ctrl);
     }
     catch (unity::Exception const& e)
     {
+        // TODO: log error
         try
         {
             // TODO: if things go wrong, we need to make sure that the reply object
@@ -94,14 +97,14 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, ReplyBase::SPtr const& r
         catch (...)
         {
         }
-        // TODO: log error
+        throw;
     }
     return ctrl;
 }
 
-ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy)
+ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime)
 {
-    return ScopeProxy(new Scope(new ScopeImpl(mw_proxy)));
+    return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime)));
 }
 
 } // namespace internal

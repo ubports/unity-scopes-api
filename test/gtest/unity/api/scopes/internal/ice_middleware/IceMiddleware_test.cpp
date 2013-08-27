@@ -21,13 +21,16 @@
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
+using namespace unity::api::scopes::internal;
 using namespace unity::api::scopes::internal::ice_middleware;
 
 // Basic test.
 
 TEST(IceMiddleware, basic)
 {
-    IceMiddleware im("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ice_middleware/Ice.config");
+    IceMiddleware im("testscope",
+                     TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ice_middleware/Ice.config",
+                     (RuntimeImpl*)0x1);
     im.start();
     sleep(1);
     im.stop();

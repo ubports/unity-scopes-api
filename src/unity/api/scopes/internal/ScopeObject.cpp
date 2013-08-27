@@ -23,7 +23,7 @@
 #include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/api/scopes/internal/MWReply.h>
 #include <unity/api/scopes/internal/QueryObject.h>
-#include <unity/api/scopes/internal/ReplyImpl.h>
+#include <unity/api/scopes/internal/RuntimeImpl.h>
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -46,10 +46,11 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(string const& scope_name, ScopeBase* scope_base) :
-    scope_name_(scope_name),
+ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
+    runtime_(runtime),
     scope_base_(scope_base)
 {
+    assert(runtime);
     assert(scope_base);
 }
 
@@ -69,7 +70,8 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 
         // TODO: log error about incoming request containing an invalid reply proxy.
 
-        throw LogicException("Scope \"" + scope_name_ + "\": create_query(\"" + q + "\") called with null reply proxy");
+        throw LogicException("Scope \"" + runtime_->scope_name() + "\": create_query(\"" +
+                             q + "\") called with null reply proxy");
     }
 
     // Ask scope to instantiate a new query.
@@ -77,7 +79,8 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     if (!query_base)
     {
         // TODO: log error, scope returned null pointer.
-        throw ResourceException("Scope \"" + scope_name_ + "\" returned nullptr from create_query(\"" + q + "\")");
+        throw ResourceException("Scope \"" + runtime_->scope_name() +
+                                "\" returned nullptr from create_query(\"" + q + "\")");
     }
 
     MWQueryCtrlProxy ctrl_proxy;
@@ -91,7 +94,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
         QueryObject::SPtr qo(new QueryObject(query_base, reply, ctrl_proxy));
-        MWQueryProxy query = mw_base->add_query_object(qo);
+        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.
@@ -102,7 +105,8 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
         // count high until the run() request arrives in the query via the middleware.
         qo->set_self(qo);
-        query->run(reply);
+
+        query_proxy->run(reply);
     }
     catch (unity::Exception const& e)
     {

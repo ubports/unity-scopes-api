@@ -36,10 +36,10 @@ using namespace unity::api::scopes;
 class SubReply : public ReplyBase
 {
 public:
-    virtual bool push(string const& result) override
+    virtual void push(string const& result) override
     {
         cout << "received result from " << scope_name_ << ": " << result << endl;
-        return upstream_->push(result);
+        upstream_->push(result);
     }
 
     virtual void finished() override

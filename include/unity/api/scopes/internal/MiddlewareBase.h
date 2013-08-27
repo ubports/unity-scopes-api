@@ -43,6 +43,8 @@ class ScopeBase;
 namespace internal
 {
 
+class RuntimeImpl;
+
 // Abstract base class for our middleware transport. Any control functions we need can be added here
 // as pure virtual functions. This is used by the remainder of the code to do things to the middleware
 // without knowing which middleware it actually is.
@@ -52,7 +54,7 @@ class MiddlewareBase : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(MiddlewareBase);
 
-    MiddlewareBase();
+    MiddlewareBase(RuntimeImpl* runtime);
     virtual ~MiddlewareBase() noexcept;
 
     virtual void start() = 0;
@@ -68,7 +70,10 @@ public:
     virtual MWReplyProxy add_reply_object(ReplyObject::SPtr const& reply) = 0;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) = 0;
 
-    // virtual void remove_object(std::string const& identity) = 0;
+    RuntimeImpl* runtime() const noexcept;
+
+private:
+    RuntimeImpl* const runtime_;
 };
 
 } // namespace internal

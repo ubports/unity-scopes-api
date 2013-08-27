@@ -39,16 +39,17 @@ class RuntimeImpl;
 class RegistryImpl final
 {
 public:
-    RegistryImpl(MWRegistryProxy const& mw_proxy);
+    RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
     ~RegistryImpl() noexcept;
 
     ScopeProxy find(std::string const& scope_name);
     ScopeMap list();
 
-    static RegistryProxy create(MWRegistryProxy const& mw_proxy);
+    static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
 
 private:
-    MWRegistryProxy mw_proxy_;
+    MWRegistryProxy const mw_proxy_;
+    RuntimeImpl* const runtime_;
 };
 
 } // namespace internal

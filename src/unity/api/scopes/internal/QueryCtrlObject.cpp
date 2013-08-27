@@ -37,7 +37,8 @@ namespace scopes
 namespace internal
 {
 
-QueryCtrlObject::QueryCtrlObject()
+QueryCtrlObject::QueryCtrlObject() :
+    destroyed_(false)
 {
 }
 
@@ -47,27 +48,30 @@ QueryCtrlObject::~QueryCtrlObject() noexcept
 
 void QueryCtrlObject::cancel()
 {
-    // Forward the cancellation to the facade. Converting our weak reference
-    // to a strong reference and letting the strong reference go out of scope
-    // means that we release the facade. (The facade object may hang around
-    // if there are still other references to it.)
-    // We pass the shared_ptr to the facade we are invoking on so the facade
-    // can construct a reply proxy to pass to cancel.
+    if (destroyed_.exchange(true))
+    {
+        return;
+    }
 
     QueryObject::SPtr qo = qo_.lock();
     if (qo)
     {
-        qo->cancel(qo);
+        qo->cancel();
     }
+    disconnect();
 }
 
 void QueryCtrlObject::destroy()
 {
-    // Nothing to do; calling middleware unregisters us.
+    if (destroyed_.exchange(true))
+    {
+        return;
+    }
+    disconnect();
 }
 
-// Called by create_query() to tell us what the query proxy and facade object
-// are. We use the facade object to forward cancellation.
+// Called by create_query() to tell us what the query facade object
+// is. We use the query facade object to forward cancellation.
 
 void QueryCtrlObject::set_query(QueryObject::SPtr const& qo)
 {

@@ -34,12 +34,19 @@ namespace scopes
 namespace internal
 {
 
-MiddlewareBase::MiddlewareBase()
+MiddlewareBase::MiddlewareBase(RuntimeImpl* runtime) :
+    runtime_(runtime)
 {
+    assert(runtime);
 }
 
 MiddlewareBase::~MiddlewareBase() noexcept
 {
+}
+
+RuntimeImpl* MiddlewareBase::runtime() const noexcept
+{
+    return runtime_;
 }
 
 } // namespace internal

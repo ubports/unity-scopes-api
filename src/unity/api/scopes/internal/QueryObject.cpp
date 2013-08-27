@@ -60,7 +60,7 @@ QueryObject::~QueryObject() noexcept
     assert(ctrl_);
     try
     {
-        ctrl_->destroy();
+        ctrl_->destroy(); // Oneway, won't block
     }
     catch (...)
     {
@@ -68,28 +68,39 @@ QueryObject::~QueryObject() noexcept
     }
 }
 
-void QueryObject::run(MWReplyProxy const& reply)
+void QueryObject::run(MWReplyProxy const& reply) noexcept
 {
     assert(self_);
 
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     auto reply_proxy = ReplyImpl::create(reply, self_);
+    assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
     // The reply proxy now holds our reference count high, so
-    // we can drop our own smart pointer.
+    // we can drop our own smart pointer and disconnect from the middleware.
     self_ = nullptr;
+    disconnect();
 
     // Synchronous call into scope implementation.
     // On return, replies for the query may still be outstanding.
-    query_base_->run(reply_proxy);
+    try
+    {
+        query_base_->run(reply_proxy);
+    }
+    catch (unity::Exception const& e)
+    {
+        // TODO: log error
+    }
+    catch (...)
+    {
+        // TODO: log error
+    }
 }
 
-void QueryObject::cancel(SPtr const& self)
+void QueryObject::cancel()
 {
-    assert(self);
-
     auto rp = reply_proxy_.lock();
     if (rp)
     {

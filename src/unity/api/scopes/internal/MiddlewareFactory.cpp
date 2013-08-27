@@ -39,8 +39,11 @@ namespace scopes
 namespace internal
 {
 
-MiddlewareFactory::MiddlewareFactory(string const& configfile)
+MiddlewareFactory::MiddlewareFactory(string const& configfile, RuntimeImpl* runtime) :
+    runtime_(runtime)
 {
+    assert(runtime);
+
     try
     {
         MiddlewareFactoryConfig config(configfile);
@@ -72,7 +75,7 @@ MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
     {
         case Kind_Ice:
         {
-            mw.reset(new ice_middleware::IceMiddleware(server_name, configfile));
+            mw.reset(new ice_middleware::IceMiddleware(server_name, configfile, runtime_));
             break;
         }
         case Kind_REST:

@@ -53,10 +53,8 @@ public:
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
-    \return The return value is `true` if the query is still active. Otherwise, if the query
-    is finished or was cancelled, the return value is `false`.
     */
-    virtual bool push(std::string const& result) = 0;
+    virtual void push(std::string const& result) = 0;
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.

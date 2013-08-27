@@ -41,8 +41,17 @@ public:
 
     virtual ~AbstractObject() noexcept;
 
+    // Sets callback to allow this facade to disconnect itself from the middleware.
+    // Called by disconnect().
+    void set_disconnect_function(std::function<void()> func) noexcept;
+
 protected:
     AbstractObject();
+
+    void disconnect() noexcept; // Disconnect self from middleware
+
+private:
+    std::function<void()> disconnect_func_;
 };
 
 } // namespace internal

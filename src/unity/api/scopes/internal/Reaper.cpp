@@ -210,8 +210,10 @@ void Reaper::run()
             // But, if have just done a scan, we sleep for at least reap_interval_, so there is
             // at most one pass every reap_interval_.
             auto const now = chrono::steady_clock::now();
-            auto const wait_until_first_expiry = now - list_.back().timestamp;
-            auto const wakeup_time = max(now + wait_until_first_expiry, now + reap_interval_);
+            auto const oldest_item_age = chrono::duration_cast<chrono::milliseconds>(now - list_.back().timestamp);
+            auto const reap_interval = chrono::duration_cast<chrono::milliseconds>(reap_interval_);
+            auto const sleep_interval = max(expiry_interval_ - oldest_item_age, reap_interval);
+            auto const wakeup_time = now + sleep_interval;
             while (!finish_ && do_work_.wait_until(lock, wakeup_time) != cv_status::timeout)
                 ;
         }

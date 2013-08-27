@@ -40,13 +40,15 @@ class ScopeBase;
 namespace internal
 {
 
+class RuntimeImpl;
+
 namespace ice_middleware
 {
 
 class IceMiddleware : public MiddlewareBase
 {
 public:
-    IceMiddleware(std::string const& server_name, std::string const& configfile);
+    IceMiddleware(std::string const& server_name, std::string const& configfile, RuntimeImpl* runtime);
     virtual ~IceMiddleware() noexcept;
 
     virtual void start() override;
@@ -67,7 +69,8 @@ public:
 private:
     Ice::ObjectAdapterPtr find_adapter(std::string const& name);    // Creates adapter if it doesn't exist yet
 
-    Ice::ObjectPrx safe_add(Ice::ObjectAdapterPtr& adapter,
+    Ice::ObjectPrx safe_add(std::function<void()>& disconnect_func, // out parameter
+                            Ice::ObjectAdapterPtr const& adapter,
                             Ice::ObjectPtr const& obj,
                             std::string const& identity = "");
 

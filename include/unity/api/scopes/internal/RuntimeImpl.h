@@ -21,6 +21,7 @@
 
 #include <unity/api/scopes/internal/MiddlewareBase.h>
 #include <unity/api/scopes/internal/MiddlewareFactory.h>
+#include <unity/api/scopes/internal/Reaper.h>
 #include <unity/api/scopes/Runtime.h>
 
 #include <atomic>
@@ -45,9 +46,12 @@ public:
     static UPtr create(std::string const& scope_name, std::string const& configfile = Runtime::DFLT_CONFIGFILE);
     void destroy();
 
+    std::string scope_name() const;
     MiddlewareFactory const* factory() const;
     RegistryProxy registry() const;
     std::string registry_configfile() const;
+    std::string registry_identity() const;
+    Reaper::SPtr reply_reaper() const;
 
     ~RuntimeImpl() noexcept;
 
@@ -55,10 +59,14 @@ private:
     RuntimeImpl(std::string const& scope_name, std::string const& configfile);
 
     std::atomic_bool destroyed_;
+    std::string scope_name_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
     mutable RegistryProxy registry_;
     mutable std::string registry_configfile_;
+    mutable std::string registry_identity_;
+    mutable Reaper::SPtr reply_reaper_;
+    mutable std::mutex mutex_;                          // For lazy initialization of reply_reaper_
 };
 
 } // namespace internal

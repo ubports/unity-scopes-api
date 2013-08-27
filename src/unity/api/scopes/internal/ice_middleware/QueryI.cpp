@@ -57,29 +57,10 @@ QueryI::~QueryI() noexcept
 // comment. That's because they really are noexcept, but we can't say this in the signature
 // because we are deriving from the Slice-generated base.
 
-void QueryI::run(middleware::ReplyPrx const& r, Ice::Current const& c)  // noexcept
+void QueryI::run(middleware::ReplyPrx const& r, Ice::Current const&)  // noexcept
 {
-    try
-    {
-        MWReplyProxy reply(new IceReply(mw_base_, r));
-        qo_->run(reply);                                // Blocking local call, forward to facade
-    }
-    catch (...)
-    {
-        // TODO: log error
-    }
-
-    // Now that run() has returned, the QueryI has done its job. Note that this only deregisters this QueryI
-    // from the object adapter. If a reference to qo_ (the facade object) is still held elsewhere (by a reply proxy),
-    // the facade object will hang around.
-    try
-    {
-        c.adapter->remove(c.id);
-    }
-    catch (...)
-    {
-        assert(false);
-    }
+    MWReplyProxy reply(new IceReply(mw_base_, r));
+    qo_->run(reply);
 }
 
 } // namespace ice_middleware

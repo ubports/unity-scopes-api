@@ -41,8 +41,7 @@ namespace ice_middleware
 {
 
 QueryCtrlI::QueryCtrlI(QueryCtrlObject::SPtr const& co) :
-    co_(co),
-    destroyed_(false)
+    co_(co)
 {
 }
 
@@ -50,68 +49,14 @@ QueryCtrlI::~QueryCtrlI()
 {
 }
 
-// When a query is cancelled, we inform the control
-// object of the cancellation and, once that call
-// returns, commit suicide.
-
-void QueryCtrlI::cancel(Ice::Current const& c)
+void QueryCtrlI::cancel(Ice::Current const&)
 {
-    cerr << "QueryCtrlI: cancel: " << c.id.name << endl;
-    if (destroyed_.exchange(true))
-    {
-        cerr << "QueryCtrlI: already cancelled/destroyed: " << c.id.name << endl;
-        return; // No exception thrown here. It's a oneway invocation, so the exception won't go anywhere.
-    }
-
-    try
-    {
-        co_->cancel();  // Forward cancel request to facade object
-    }
-    catch (...)
-    {
-        // TODO: log error
-    }
-
-    try
-    {
-        c.adapter->remove(c.id);
-    }
-    catch (...)
-    {
-        // The remove may fail if the query has finished already, so no exception here.
-    }
+    co_->cancel();
 }
 
-// If a query is never cancelled, once it has has pushed its
-// last result, the QueryObject instructs us to commit suicide.
-// directly.
-
-void QueryCtrlI::destroy(Ice::Current const& c) noexcept
+void QueryCtrlI::destroy(Ice::Current const&) noexcept
 {
-    cerr << "QueryCtrlI: destroy: " << c.id.name << endl;
-    if (destroyed_.exchange(true))
-    {
-        cerr << "QueryCtrlI: already cancelled/destroyed: " << c.id.name << endl;
-        return; // No exception thrown here. It's a oneway invocation, so the exception won't go anywhere.
-    }
-
-    try
-    {
-        co_->destroy();  // Forward destroy request to facade object
-    }
-    catch (...)
-    {
-        // TODO: log error
-    }
-
-    try
-    {
-        c.adapter->remove(c.id);
-    }
-    catch (...)
-    {
-        // The remove may fail if the query was cancelled previously, so no exception here.
-    }
+    co_->destroy();
 }
 
 } // namespace ice_middleware

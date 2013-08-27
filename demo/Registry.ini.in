@@ -1,4 +1,4 @@
 [Registry]
 Middleware = Ice
-Ice.Endpoint = uds -f sockets/Registry
+Ice.Endpoint = uds -f uds-Registry
 Ice.Configfile = Ice.Registry.Config

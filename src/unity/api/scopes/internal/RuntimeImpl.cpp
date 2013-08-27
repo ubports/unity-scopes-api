@@ -24,6 +24,8 @@
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
+
 using namespace std;
 using namespace unity::api::scopes;
 
@@ -40,7 +42,8 @@ namespace internal
 {
 
 RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
-    destroyed_(false)
+    destroyed_(false),
+    scope_name_(scope_name)
 {
     if (scope_name.empty())
     {
@@ -50,26 +53,25 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     try
     {
         // Create the middleware factory and get the registry identity and config filename.
-        string registry_identity;
-
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         string factory_configfile = config.factory_configfile();
-        middleware_factory_.reset(new MiddlewareFactory(factory_configfile));
+        middleware_factory_.reset(new MiddlewareFactory(factory_configfile, this));
         registry_configfile_ = config.registry_configfile();
-        registry_identity = config.registry_identity();
+        registry_identity_ = config.registry_identity();
+        assert(!registry_identity_.empty());
 
         middleware_ = middleware_factory_->create(scope_name, default_middleware, middleware_configfile);
         middleware_->start();
 
         // Create the registry proxy.
-        RegistryConfig reg_config(registry_identity, registry_configfile_);
+        RegistryConfig reg_config(registry_identity_, registry_configfile_);
         string reg_mw_configfile = reg_config.mw_configfile();
         string reg_endpoint = reg_config.endpoint();
 
-        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity, reg_endpoint);
-        registry_ = RegistryImpl::create(registry_mw_proxy);
+        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, reg_endpoint);
+        registry_ = RegistryImpl::create(registry_mw_proxy, this);
     }
     catch (unity::Exception const& e)
     {
@@ -106,7 +108,13 @@ void RuntimeImpl::destroy()
         middleware_->stop();
         middleware_ = nullptr;
         middleware_factory_.reset(nullptr);
+        reply_reaper_ = nullptr;
     }
+}
+
+string RuntimeImpl::scope_name() const
+{
+    return scope_name_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const
@@ -130,6 +138,22 @@ RegistryProxy RuntimeImpl::registry() const
 string RuntimeImpl::registry_configfile() const
 {
     return registry_configfile_;
+}
+
+string RuntimeImpl::registry_identity() const
+{
+    return registry_identity_;
+}
+
+Reaper::SPtr RuntimeImpl::reply_reaper() const
+{
+    // We lazily create a reaper the first time we are asked for it, which happens when the first query is created.
+    lock_guard<mutex> lock(mutex_);
+    if (!reply_reaper_)
+    {
+        reply_reaper_ = Reaper::create(1, 5); // TODO: configurable timeouts
+    }
+    return reply_reaper_;
 }
 
 } // namespace internal
