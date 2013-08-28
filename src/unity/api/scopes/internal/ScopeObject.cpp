@@ -59,6 +59,7 @@ ScopeObject::~ScopeObject() noexcept
 }
 
 MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
+                                           VariantMap const& hints,
                                            MWReplyProxy const& reply,
                                            MiddlewareBase* mw_base)
 {
@@ -75,7 +76,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     }
 
     // Ask scope to instantiate a new query.
-    QueryBase::SPtr query_base = scope_base_->create_query(q);
+    QueryBase::SPtr query_base = scope_base_->create_query(q, hints);
     if (!query_base)
     {
         // TODO: log error, scope returned null pointer.

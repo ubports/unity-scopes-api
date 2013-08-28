@@ -80,8 +80,8 @@ public:
     virtual void run(ReplyProxy const& upstream_reply)
     {
         ReplyBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
-        create_subquery(query_, scope_c_, reply);
-        create_subquery(query_, scope_d_, reply);
+        create_subquery(scope_c_, query_, VariantMap(), reply);
+        create_subquery(scope_d_, query_, VariantMap(), reply);
     }
 
 private:
@@ -111,7 +111,7 @@ public:
 
     virtual void run() override {}
 
-    virtual QueryBase::UPtr create_query(string const& q) override
+    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q << "\"" << endl;

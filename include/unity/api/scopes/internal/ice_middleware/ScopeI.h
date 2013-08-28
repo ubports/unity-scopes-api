@@ -49,6 +49,7 @@ public:
 
     // Slice operations
     virtual middleware::QueryCtrlPrx createQuery(std::string const& q,
+                                                 middleware::ValueDict const& hints,
                                                  middleware::ReplyPrx const& r,
                                                  Ice::Current const&) override;
 

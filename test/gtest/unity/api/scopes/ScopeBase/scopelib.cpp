@@ -33,7 +33,8 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&) override
+    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&,
+                                                             unity::api::scopes::VariantMap const&) override
     {
         return nullptr;
     }

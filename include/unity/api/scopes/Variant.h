@@ -19,6 +19,8 @@
 #ifndef UNITY_API_SCOPES_VARIANT_H
 #define UNITY_API_SCOPES_VARIANT_H
 
+#include <unity/SymbolExport.h>
+
 #include <memory>
 #include <string>
 
@@ -42,7 +44,7 @@ class VariantImpl;
 \brief Simple variant class that can hold an integer, a boolean, or a string.
 */
 
-class Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
+class UNITY_API Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
 {
 public:
     /**
@@ -93,9 +95,9 @@ public:
     //@}
 
     /**@name Value assignment
-    The assignment operators replace the value currently held by a Variant with the supplied value (potentially
-    changing the type of the value held by the Variant. (Assigning a `const char*` to a Variant stores the
-    corresponding `std::string` value.)
+    The assignment operators replace the value currently held by a Variant with the supplied value, potentially
+    changing the type of the value held by the Variant. Assigning a `const char*` to a Variant stores the
+    corresponding `std::string` value.
     */
     //{@
     Variant& operator=(int val) noexcept;
@@ -121,9 +123,9 @@ public:
     If a Variant currently stores a value of different type, these methods throw `unity::LogicException`.
     */
     //{@
-    int get_int();
-    bool get_bool();
-    std::string get_string();
+    int get_int() const;
+    bool get_bool() const;
+    std::string get_string() const;
     //@}
 
     /**@name Observers

@@ -84,7 +84,10 @@ int main(int argc, char* argv[])
         RegistryProxy r = rt->registry();
         ScopeProxy s = r->find(scope_name);
         shared_ptr<Reply> reply(new Reply);
-        s->create_query(search_string, reply);     // Returns immediately
+        VariantMap vm;
+        vm["cardinality"] = 10;
+        vm["locale"] = "C";
+        s->create_query(search_string, vm, reply);     // Returns immediately
         reply->wait_until_finished();
     }
 

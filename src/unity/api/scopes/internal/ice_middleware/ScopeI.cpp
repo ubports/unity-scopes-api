@@ -26,6 +26,7 @@
 #include <unity/api/scopes/internal/ice_middleware/slice/Reply.h>
 #include <unity/api/scopes/internal/ice_middleware/IceQueryCtrl.h>
 #include <unity/api/scopes/internal/ice_middleware/IceReply.h>
+#include <unity/api/scopes/internal/ice_middleware/VariantValueConverter.h>
 
 using namespace std;
 
@@ -61,6 +62,7 @@ ScopeI::~ScopeI() noexcept
 // because we are deriving from the Slice-generated base.
 
 middleware::QueryCtrlPrx ScopeI::createQuery(string const& q,
+                                             middleware::ValueDict const& hints,
                                              middleware::ReplyPrx const& r,
                                              Ice::Current const&) // noexcept
 {
@@ -68,7 +70,7 @@ middleware::QueryCtrlPrx ScopeI::createQuery(string const& q,
     try
     {
         MWReplyProxy reply(new IceReply(mw_base_, r));
-        MWQueryCtrlProxy mw_ctrl = so_->create_query(q, reply, mw_base_);
+        MWQueryCtrlProxy mw_ctrl = so_->create_query(q, to_variant_map(hints), reply, mw_base_);
         assert(mw_ctrl);
         IceQueryCtrlProxy iqcp = dynamic_pointer_cast<IceQueryCtrl>(mw_ctrl);
         assert(iqcp);

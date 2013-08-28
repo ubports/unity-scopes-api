@@ -200,7 +200,7 @@ public:
         }
     }
 
-    virtual QueryBase::UPtr create_query(string const& q) override
+    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
     {
         cout << scope_name_ << ": created query: \"" << q << "\"" << endl;
         return QueryBase::UPtr(new MyQuery(q, queue));

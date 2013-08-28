@@ -23,6 +23,7 @@
 #include <unity/api/scopes/internal/ice_middleware/IceQueryCtrl.h>
 #include <unity/api/scopes/internal/ice_middleware/IceReply.h>
 #include <unity/api/scopes/internal/ice_middleware/RethrowException.h>
+#include <unity/api/scopes/internal/ice_middleware/VariantValueConverter.h>
 #include <unity/api/scopes/internal/QueryCtrlImpl.h>
 
 using namespace std;
@@ -55,7 +56,9 @@ IceScope::~IceScope() noexcept
 {
 }
 
-QueryCtrlProxy IceScope::create_query(std::string const& q, MWReplyProxy const& reply)
+QueryCtrlProxy IceScope::create_query(std::string const& q,
+                                      VariantMap const& hints,
+                                      MWReplyProxy const& reply)
 {
     QueryCtrlProxy ctrl;
     try
@@ -63,7 +66,7 @@ QueryCtrlProxy IceScope::create_query(std::string const& q, MWReplyProxy const& 
         auto self = middleware::ScopePrx::uncheckedCast(proxy());
         IceReplyProxy irp = dynamic_pointer_cast<IceReply>(reply);
         middleware::ReplyPrx rp = middleware::ReplyPrx::uncheckedCast(irp->proxy());
-        middleware::QueryCtrlPrx qcp = self->createQuery(q, rp);
+        middleware::QueryCtrlPrx qcp = self->createQuery(q, to_value_dict(hints), rp);
 
         IceQueryCtrlProxy iqc(new IceQueryCtrl(mw_base(), qcp));
         ctrl = QueryCtrlImpl::create(iqc, reply);

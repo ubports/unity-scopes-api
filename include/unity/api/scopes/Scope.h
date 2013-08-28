@@ -23,6 +23,7 @@
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/ReplyBase.h>
 #include <unity/api/scopes/ScopeProxyFwd.h>
+#include <unity/api/scopes/VariantMap.h>
 
 namespace unity
 {
@@ -52,7 +53,7 @@ public:
     results for the query typically will arrive only after the query() method completes (but may
     also arrive while the query() method is still running.
     */
-    QueryCtrlProxy create_query(std::string const& q, ReplyBase::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReplyBase::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

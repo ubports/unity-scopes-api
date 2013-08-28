@@ -45,6 +45,7 @@ public:
 
     virtual void cancelled() override
     {
+        cerr << "MyQuery/" << query_ << " cancelled" << endl;
     }
 
     virtual void run(ReplyProxy const& reply) override
@@ -70,10 +71,23 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual QueryBase::UPtr create_query(string const& q) override
+    virtual QueryBase::UPtr create_query(string const& q, VariantMap const& hints) override
     {
         QueryBase::UPtr query(new MyQuery(q));
         cout << "scope-slow: created query: \"" << q << "\"" << endl;
+
+        auto it = hints.find("cardinality");
+        if (it != hints.end())
+        {
+            cerr << "result cardinality: " << it->second.get_int() << endl;
+        }
+
+        it = hints.find("locale");
+        if (it != hints.end())
+        {
+            cerr << "locale: " << it->second.get_string() << endl;
+        }
+        
         return query;
     }
 };

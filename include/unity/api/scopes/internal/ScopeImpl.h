@@ -23,6 +23,7 @@
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/ReplyBase.h>
 #include <unity/api/scopes/ScopeProxyFwd.h>
+#include <unity/api/scopes/VariantMap.h>
 
 namespace unity
 {
@@ -44,7 +45,7 @@ public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
     ~ScopeImpl() noexcept;
 
-    QueryCtrlProxy create_query(std::string const& q, ReplyBase::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReplyBase::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
 

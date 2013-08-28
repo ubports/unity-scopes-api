@@ -22,6 +22,7 @@
 #include <unity/api/scopes/internal/AbstractObject.h>
 #include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/api/scopes/VariantMap.h>
 
 #include <string>
 
@@ -55,7 +56,10 @@ public:
     virtual ~ScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(std::string const& q, MWReplyProxy const& reply, MiddlewareBase* mw_base);
+    MWQueryCtrlProxy create_query(std::string const& q,
+                                  VariantMap const& hints,
+                                  MWReplyProxy const& reply,
+                                  MiddlewareBase* mw_base);
 
 private:
     RuntimeImpl* const runtime_;

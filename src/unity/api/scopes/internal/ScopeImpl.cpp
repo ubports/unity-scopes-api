@@ -50,7 +50,7 @@ ScopeImpl::~ScopeImpl() noexcept
 {
 }
 
-QueryCtrlProxy ScopeImpl::create_query(string const& q, ReplyBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints, ReplyBase::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     try
@@ -66,7 +66,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, ReplyBase::SPtr const& r
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = mw_proxy_->create_query(q, rp);
+        ctrl = mw_proxy_->create_query(q, hints, rp);
         assert(ctrl);
     }
     catch (unity::Exception const& e)

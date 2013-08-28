@@ -175,7 +175,7 @@ endforeach()
 # all Slice files if any one of them changes
 add_custom_command(OUTPUT ${SLICE_SRC} ${SLICE_HDRS}
                    DEPENDS ${SLICE_FILES}
-                   COMMAND slice2cpp --output-dir=${build_dir} --include-dir ${relative_build_dir} ${SLICE_FILES})
+                   COMMAND slice2cpp --output-dir=${build_dir} -I${CMAKE_SOURCE_DIR}/src --include-dir ${relative_build_dir} ${SLICE_FILES})
 
 
 # Set up coverage testing

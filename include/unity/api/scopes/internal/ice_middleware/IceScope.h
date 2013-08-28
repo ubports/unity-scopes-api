@@ -45,7 +45,9 @@ public:
     IceScope(IceMiddleware* mw_base, middleware::ScopePrx const& p) noexcept;
     virtual ~IceScope() noexcept;
 
-    virtual QueryCtrlProxy create_query(std::string const& q, MWReplyProxy const& reply) override;
+    virtual QueryCtrlProxy create_query(std::string const& q,
+                                        VariantMap const& hints,
+                                        MWReplyProxy const& reply) override;
 };
 
 } // namespace ice_middleware

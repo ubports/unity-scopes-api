@@ -173,7 +173,7 @@ public:
     TODO: complete documentation.
 
     */
-    virtual QueryBase::UPtr create_query(std::string const& q) = 0;
+    virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

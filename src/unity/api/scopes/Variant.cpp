@@ -121,7 +121,7 @@ bool Variant::operator<(Variant const& rhs) const noexcept
     return p->v < rhs.p->v;
 }
 
-int Variant::get_int()
+int Variant::get_int() const
 {
     try
     {
@@ -133,7 +133,7 @@ int Variant::get_int()
     }
 }
 
-bool Variant::get_bool()
+bool Variant::get_bool() const
 {
     try
     {
@@ -145,7 +145,7 @@ bool Variant::get_bool()
     }
 }
 
-string Variant::get_string()
+string Variant::get_string() const
 {
     try
     {

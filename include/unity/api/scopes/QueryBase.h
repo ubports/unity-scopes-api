@@ -22,6 +22,7 @@
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/ReplyProxyFwd.h>
 #include <unity/api/scopes/ScopeProxyFwd.h>
+#include <unity/api/scopes/VariantMap.h>
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -56,8 +57,9 @@ public:
     virtual void run(ReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // Create a sub-query.
-    QueryCtrlProxy create_subquery(std::string const& query_string,
-                                   ScopeProxy const& scope,
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   VariantMap const& hints,
                                    std::shared_ptr<ReplyBase> const& reply);
 
     /// @cond

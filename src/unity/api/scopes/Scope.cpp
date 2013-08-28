@@ -40,9 +40,9 @@ Scope::~Scope() noexcept
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& q, ReplyBase::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, ReplyBase::SPtr const& reply) const
 {
-    return p->create_query(q, reply);
+    return p->create_query(q, hints, reply);
 }
 
 //! @endcond

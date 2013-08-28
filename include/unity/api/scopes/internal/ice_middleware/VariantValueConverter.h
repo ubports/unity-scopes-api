@@ -16,14 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
-#define UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
+#ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_VARIANTVALUECONVERTER_H
+#define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_VARIANTVALUECONVERTER_H
 
-#include <unity/api/scopes/internal/MWObjectProxy.h>
-#include <unity/api/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/api/scopes/internal/MWScopeProxyFwd.h>
-#include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/ValueDict.h>
 
 namespace unity
 {
@@ -37,16 +34,18 @@ namespace scopes
 namespace internal
 {
 
-class MWScope : public virtual MWObjectProxy
+namespace ice_middleware
 {
-public:
-    virtual ~MWScope() noexcept;
 
-    virtual QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+// Utility functions to convert to/from Variant and Value, and to/from VariantMap and ValueDict.
 
-protected:
-    MWScope(MiddlewareBase* mw_base);
-};
+middleware::ValueBasePtr to_value(Variant const& v);
+Variant to_variant(middleware::ValueBasePtr const& v);
+
+middleware::ValueDict to_value_dict(VariantMap const& vm);
+VariantMap to_variant_map(middleware::ValueDict const& vd);
+
+} // namespace ice_middleware
 
 } // namespace internal
 

@@ -22,6 +22,7 @@
 #include <unity/api/scopes/internal/QueryCtrlImpl.h>
 
 #include <unity/api/scopes/ScopeProxyFwd.h>
+#include <unity/api/scopes/VariantMap.h>
 
 #include <vector>
 
@@ -45,8 +46,9 @@ public:
     QueryBaseImpl();
     ~QueryBaseImpl() noexcept;
 
-    QueryCtrlProxy create_subquery(std::string const& query_string,
-                                   ScopeProxy const& scope,
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   VariantMap const& hints,
                                    std::shared_ptr<ReplyBase> const& reply);
     void cancel();
 
