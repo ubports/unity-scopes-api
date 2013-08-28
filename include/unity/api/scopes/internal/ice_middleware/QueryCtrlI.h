@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_QUERYCTRLI_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_QUERYCTRLI_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/QueryCtrl.h>
 
 #include <memory>
 

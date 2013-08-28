@@ -18,7 +18,7 @@
 
 #include <unity/api/scopes/internal/ice_middleware/RegistryI.h>
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Scope.h>
 #include <unity/api/scopes/internal/ice_middleware/IceScope.h>
 #include <unity/api/scopes/internal/RegistryObject.h>
 #include <unity/api/scopes/ScopeExceptions.h>

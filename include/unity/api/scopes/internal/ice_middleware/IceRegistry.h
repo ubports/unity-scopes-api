@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEREGISTRY_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEREGISTRY_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Registry.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Registry.h>
 #include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceRegistryProxyFwd.h>
 #include <unity/api/scopes/internal/MWRegistry.h>

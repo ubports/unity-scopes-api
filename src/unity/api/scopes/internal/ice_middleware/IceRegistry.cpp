@@ -18,7 +18,7 @@
 
 #include <unity/api/scopes/internal/ice_middleware/IceRegistry.h>
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Scope.h>
 #include <unity/api/scopes/internal/ice_middleware/IceScope.h>
 #include <unity/api/scopes/internal/ice_middleware/RethrowException.h>
 #include <unity/api/scopes/internal/ScopeImpl.h>

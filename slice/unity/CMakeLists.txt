@@ -1,4 +1,0 @@
-add_subdirectory(api)
-
-file(GLOB sf "${CMAKE_CURRENT_SOURCE_DIR}/*.ice")
-set(SLICE_FILES ${SLICE_FILES} ${sf} PARENT_SCOPE)

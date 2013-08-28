@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_REPLYI_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_REPLYI_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Reply.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Reply.h>
 #include <unity/api/scopes/internal/ReplyObject.h>
 
 namespace unity

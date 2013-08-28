@@ -1,4 +1,5 @@
 add_subdirectory(ice_middleware)
+set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
@@ -30,7 +31,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
 )
-
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
 
 set(CONFIG_FILE_PREFIX "var/unity/api/scopes/config")

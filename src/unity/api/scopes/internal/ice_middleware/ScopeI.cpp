@@ -22,8 +22,8 @@
 
 #include <unity/api/scopes/internal/ice_middleware/ScopeI.h>
 
-#include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
-#include <slice/unity/api/scopes/internal/ice_middleware/Reply.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/QueryCtrl.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Reply.h>
 #include <unity/api/scopes/internal/ice_middleware/IceQueryCtrl.h>
 #include <unity/api/scopes/internal/ice_middleware/IceReply.h>
 

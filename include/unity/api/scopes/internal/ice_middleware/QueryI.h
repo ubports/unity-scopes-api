@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_QUERYI_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_QUERYI_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Query.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Query.h>
 
 #include <memory>
 

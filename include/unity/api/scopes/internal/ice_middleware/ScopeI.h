@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_SCOPEI_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_SCOPEI_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/Scope.h>
 #include <unity/api/scopes/internal/ScopeObject.h>
 
 namespace unity

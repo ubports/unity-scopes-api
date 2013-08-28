@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEQUERYCTRL_H
 #define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_ICEQUERYCTRL_H
 
-#include <slice/unity/api/scopes/internal/ice_middleware/QueryCtrl.h>
+#include <unity/api/scopes/internal/ice_middleware/slice/QueryCtrl.h>
 #include <unity/api/scopes/internal/ice_middleware/IceObjectProxy.h>
 #include <unity/api/scopes/internal/ice_middleware/IceQueryCtrlProxyFwd.h>
 #include <unity/api/scopes/internal/MWQueryCtrl.h>

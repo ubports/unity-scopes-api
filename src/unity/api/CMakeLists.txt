@@ -1,5 +1,6 @@
 add_subdirectory(internal)
 add_subdirectory(scopes)
+set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 
 set(SRC
 )

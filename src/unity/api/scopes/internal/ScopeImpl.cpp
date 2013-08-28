@@ -18,7 +18,6 @@
 
 #include <unity/api/scopes/internal/ScopeImpl.h>
 
-#include <slice/unity/api/scopes/internal/ice_middleware/Scope.h>
 #include <unity/api/scopes/internal/MiddlewareBase.h>
 #include <unity/api/scopes/internal/QueryCtrlImpl.h>
 #include <unity/api/scopes/Scope.h>
@@ -51,29 +50,15 @@ ScopeImpl::~ScopeImpl() noexcept
 {
 }
 
-// We swallow exceptions because there is nothing
-// a scope can resonably do to recover.
-
 QueryCtrlProxy ScopeImpl::create_query(string const& q, ReplyBase::SPtr const& reply) const
 {
-    // TODO: what if query was sent, but replies never arrive?
-    //       Eventually, we have to time out and call finished(),
-    //       otherwise the caller will never get rid of the reply object.
-    //       Probably need to run a reaper thread, or reclaim timed-out
-    //       reply objects as part of running a new query.
-    //       Not that hard to do: put each reply object at the head of
-    //       a doubly-linked list with a time stamp of last use.
-    //       Every time the reply object is used, put it back at the head.
-    //       when scanning for timed-out reply objects, traverse the list
-    //       from the tail, checking time stamps and kill any objects that
-    //       are to old (evictor pattern).
     QueryCtrlProxy ctrl;
     try
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
         ReplyObject::SPtr ro(new ReplyObject(reply, runtime_));
-        MWReplyProxy rp = mw_proxy_->mw_base()->add_reply_object(ro); // ResourcePtr to remove it if exception?
+        MWReplyProxy rp = mw_proxy_->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return

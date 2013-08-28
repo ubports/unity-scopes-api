@@ -72,7 +72,7 @@ include(GNUInstallDirs)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
-    ${CMAKE_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/src
     ${IceRoot}/include
     ${OTHER_INCLUDE_DIRS}
 )
@@ -150,7 +150,6 @@ enable_testing()
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(slice)
 add_subdirectory(demo)
 
 # Custom rules to compile Slice files
@@ -166,15 +165,18 @@ foreach(file ${SLICE_FILES})
     set(src_file ${build_dir}/${src_file})
     set(hdr_file ${build_dir}/${hdr_file})
 
-    string(REPLACE "${CMAKE_BINARY_DIR}/" "" relative_build_dir ${build_dir})
-
-    add_custom_command(OUTPUT ${src_file} ${hdr_file}
-                       DEPENDS ${file}
-                       COMMAND slice2cpp --output-dir=${build_dir} --include-dir ${relative_build_dir} ${file})
+    string(REPLACE "${CMAKE_BINARY_DIR}/src/" "" relative_build_dir ${build_dir})
 
     set(SLICE_HDRS ${SLICE_HDRS} ${hdr_file})
     set(SLICE_SRC ${SLICE_SRC} ${src_file})
 endforeach()
+
+# cmake cannot analyze include file dependencies of .ice files, so the easiest option is to recompile
+# all Slice files if any one of them changes
+add_custom_command(OUTPUT ${SLICE_SRC} ${SLICE_HDRS}
+                   DEPENDS ${SLICE_FILES}
+                   COMMAND slice2cpp --output-dir=${build_dir} --include-dir ${relative_build_dir} ${SLICE_FILES})
+
 
 # Set up coverage testing
 include(EnableCoverageReport)
