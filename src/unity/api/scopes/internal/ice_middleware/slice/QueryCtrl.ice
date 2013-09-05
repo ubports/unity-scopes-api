@@ -34,11 +34,11 @@ module middleware
 // The separate QueryCtrl object solely exists so we can cancel a query
 // without the risk of blocking. The QueryCtrl::cancel() method is on the -ctrl
 // adapter, whereas the Query object is on the normal adapter. This means
-// we alwasy have a thread available to respond to an incoming cancel request.
+// we always have a thread available to respond to an incoming cancel request.
 
 interface QueryCtrl
 {
-    void cancel();  // Called as oneway, tells the corresponding query it has been cancelled
+    void cancel();  // Called as oneway, tells the corresponding query that it has been cancelled
     void destroy(); // Used by Query to destroy this QueryCtrl once query is done.
 };
 

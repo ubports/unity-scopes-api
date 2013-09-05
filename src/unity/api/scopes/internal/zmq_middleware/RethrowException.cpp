@@ -16,10 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_RETHROWEXCEPTION_H
-#define UNITY_API_SCOPES_INTERNAL_ICEMIDDLEWARE_RETHROWEXCEPTION_H
+#include <unity/api/scopes/internal/zmq_middleware/RethrowException.h>
 
-#include <Ice/Exception.h>
+#include <unity/api/scopes/ScopeExceptions.h>
+
+using namespace std;
 
 namespace unity
 {
@@ -33,12 +34,17 @@ namespace scopes
 namespace internal
 {
 
-namespace ice_middleware
+namespace zmq_middleware
 {
 
-// Convert an Ice exception to a unity::MiddlewareException and throw it.
+// Convert a zmq exception to a unity::MiddlewareException and throw it.
 
-void rethrow_ice_ex(Ice::Exception const& e);
+void rethrow_zmq_ex(zmqpp::exception const&)
+{
+    // We use an empty reason because zmq exceptions return the reason from what(),
+    // which is included when we eventually print the exception.
+    throw unity::api::scopes::MiddlewareException("");
+}
 
 } // namespace ice_middleware
 
@@ -49,5 +55,3 @@ void rethrow_ice_ex(Ice::Exception const& e);
 } // namespace api
 
 } // namespace unity
-
-#endif

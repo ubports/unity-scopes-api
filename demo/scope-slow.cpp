@@ -87,7 +87,7 @@ public:
         {
             cerr << "locale: " << it->second.get_string() << endl;
         }
-        
+
         return query;
     }
 };

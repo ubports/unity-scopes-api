@@ -1,6 +1,9 @@
 add_subdirectory(ice_middleware)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 
+add_subdirectory(zmq_middleware)
+set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
+
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
@@ -30,6 +33,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
 

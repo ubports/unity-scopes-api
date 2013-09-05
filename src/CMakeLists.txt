@@ -1,5 +1,6 @@
 add_subdirectory(unity)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
+set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 # Set up package config.
 configure_file(lib${UNITY_SCOPES_LIB}.pc.in lib${UNITY_SCOPES_LIB}.pc @ONLY)

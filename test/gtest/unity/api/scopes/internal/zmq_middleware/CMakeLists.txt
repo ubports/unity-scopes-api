@@ -1,0 +1,2 @@
+add_subdirectory(ObjectAdapter)
+add_subdirectory(ZmqMiddleware)

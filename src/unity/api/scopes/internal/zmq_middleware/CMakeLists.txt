@@ -1,0 +1,9 @@
+add_subdirectory(capnproto)
+set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
+
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ObjectAdapter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqMiddleware.cpp
+)
+set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

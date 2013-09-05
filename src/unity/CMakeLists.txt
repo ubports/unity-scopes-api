@@ -1,6 +1,7 @@
 add_subdirectory(api)
 add_subdirectory(internal)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
+set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
     #${CMAKE_CURRENT_SOURCE_DIR}/Exception.cpp
