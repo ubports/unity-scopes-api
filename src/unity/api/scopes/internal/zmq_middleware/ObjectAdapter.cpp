@@ -18,6 +18,10 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
+#include <unity/api/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <zmqpp/message.hpp>
@@ -64,6 +68,11 @@ ObjectAdapter::~ObjectAdapter() noexcept
     wait_for_shutdown();
 }
 
+ZmqMiddleware* ObjectAdapter::mw() const
+{
+    return &mw_;
+}
+
 string ObjectAdapter::name() const
 {
     return name_;
@@ -74,7 +83,7 @@ string ObjectAdapter::endpoint() const
     return endpoint_;
 }
 
-ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<AbstractObject> const& obj)
+ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> const& obj)
 {
     if (id.empty())
     {
@@ -93,6 +102,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<AbstractObjec
         s << "ObjectAdapter::add(): " << "cannot add id \"" << id << "\": id already used (adapter: " << name_  << ")";
         throw MiddlewareException(s.str());
     }
+    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id));
 }
 
 void ObjectAdapter::remove(std::string const& id)
@@ -102,25 +112,21 @@ void ObjectAdapter::remove(std::string const& id)
     if (it == servants_.end())
     {
         ostringstream s;
-        s << "ObjectAdapter::remove(): " << "cannot remove id \"" << id << "\": id not present (adapter: "
-          << name_ << ")";
+        s << "ObjectAdapter::remove(): " << "cannot remove id \"" << id << "\": id not present (adapter: " << name_ << ")";
         throw MiddlewareException(s.str());
     }
     servants_.erase(it);
 }
 
-shared_ptr<AbstractObject> ObjectAdapter::find(std::string const& id) const
+shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const noexcept
 {
     lock_guard<mutex> lock(mutex_);
     auto it = servants_.find(id);
-    if (it == servants_.end())
+    if (it != servants_.end())
     {
-        ostringstream s;
-        s << "ObjectAdapter::find(): " << "cannot find id \"" << id << "\": id not present (adapter: "
-          << name_ << ")";
-        throw MiddlewareException(s.str());
+        return it->second;
     }
-    return it->second;
+    return shared_ptr<ServantBase>();
 }
 
 void ObjectAdapter::activate() noexcept
@@ -136,7 +142,7 @@ void ObjectAdapter::activate() noexcept
         case ShuttingDown:
         {
             // Wait until shutdown in progress has completed before re-activating.
-            // Coverage excluded here because the window in which we are in this state is too
+            // Coverage excluded here because the window for which we are in this state is too
             // small to hit with a test.
             state_changed_.wait(lock, [this]{ return state_ == Inactive; }); // LCOV_EXCL_LINE
             // FALLTHROUGH
@@ -170,7 +176,7 @@ void ObjectAdapter::shutdown() noexcept
         case Activating:
         {
             // Wait until activation in progress has completed before shutting down.
-            // Coverage excluded here because the window in which we are in this state is too
+            // Coverage excluded here because the window for which we are in this state is too
             // small to hit with a test.
             state_changed_.wait(lock, [this]{ return state_ == Active; }); // LCOV_EXCL_LINE
             // FALLTHROUGH
@@ -179,18 +185,14 @@ void ObjectAdapter::shutdown() noexcept
         {
             state_ = ShuttingDown;      // No notify_all() for this because no-one waits for that state.
             ctrl_->send("stop");        // Sending anything will cause the broker and workers to stop.
+            lock.unlock();              // Unlock here because workers may still be processing requests.
             for (auto& w : workers_)    // Join with all the workers.
             {
                 w.join();
             }
             broker_.join();
             workers_.clear();
-            //backend_.reset(nullptr);
-
-            // We clear the servant map outside the synchronization, so it is not possible for the destructor
-            // of a servant to cause deadlock by calling back into this adapter.
-            lock.unlock();
-            ServantMap().swap(servants_);   // Not need for a try block. The AbstractObject destructor is noexcept.
+            ServantMap().swap(servants_);   // Not need for a try block. The ServantBase destructor is noexcept.
             lock.lock();
             state_ = Inactive;
             lock.unlock();
@@ -309,26 +311,26 @@ void ObjectAdapter::broker_thread()
             poller.poll();
             if (poller.has_input(ctrl))
             {
-                // When the ctrl socket becomes ready, wee need to get out of here.
+                // When the ctrl socket becomes ready, we need to get out of here.
                 // We stop reading more requests from the router, but continue processing
                 // while there are still replies outstanding.
+                ctrl.receive(message);
+                ctrl.close();
                 shutting_down = true;
             }
-            if (!shutting_down && poller.has_input(*frontend_))
+            if (!shutting_down && poller.has_input(*frontend_)) // Once shutting down, we no longer read incoming messages.
             {
                 int flag;
                 do
                 {
-                    cerr << "broker: calling frontend receive" << endl;
                     frontend_->receive(message);
-                    cerr << "broker: frontend receive returned" << endl;
                     flag = frontend_->has_more_parts() ? zmqpp::socket::send_more : zmqpp::socket::normal;
                     backend_->send(message, flag);
                 }
                 while (flag == zmqpp::socket::send_more);
                 ++pending_requests;
             }
-            if (poller.has_input(*backend_))
+            if (pending_requests != 0 && poller.has_input(*backend_))
             {
                 int flag;
                 do
@@ -345,13 +347,13 @@ void ObjectAdapter::broker_thread()
             {
                 frontend_->close();
                 backend_->close();
-                ctrl.close();
                 return;
             }
         }
     }
     catch (...) // LCOV_EXCL_LINE
     {
+        // TODO: Not good enough. Need to deal with receive() and send() failures above
         lock_guard<mutex> lock(ready_mutex_);       // LCOV_EXCL_LINE
         ready_.set_exception(current_exception());  // LCOV_EXCL_LINE
     }
@@ -359,27 +361,12 @@ void ObjectAdapter::broker_thread()
 
 void ObjectAdapter::oneway_thread()
 {
+    // TODO: this can probably combined with twoway_thread into a single dispatch thread for both modes.
     if (--num_workers_ == 0)
     {
         lock_guard<mutex> lock(ready_mutex_);
         ready_.set_value();
     }
-
-#if 0
-    zmqpp::socket s(mw_.context(), zmqpp::socket_type::dealer);
-    s.connect("inproc://" + name_);
-    try
-    {
-    }
-    catch (...)
-    {
-        // Sockets are not thread-safe, so we need to close here rather than
-        // relying on the destructor. (If we do that, the destructor will be
-        // invoked by the calling thread instead of this thread).
-        // http://zeromq.org/whitepapers:0mq-termination
-        s.close();
-    }
-#endif
 }
 
 void ObjectAdapter::twoway_thread()
@@ -390,57 +377,116 @@ void ObjectAdapter::twoway_thread()
         ctrl.connect("inproc://" + name_ + "_adapter_ctrl");
         ctrl.subscribe("");
 
-        zmqpp::socket s(mw_.context(), zmqpp::socket_type::request);
+        zmqpp::socket s(mw_.context(), zmqpp::socket_type::reply);
         s.connect("inproc://" + name_);
+        ZmqReceiver receiver(s);
+        ZmqSender sender(s);
 
         zmqpp::poller poller;
         poller.add(ctrl);
         poller.add(s);
 
-        if (--num_workers_ == 0)
+        if (--num_workers_ == 0)    // Last worker to reach this point notifies the parent.
         {
-            {
-                lock_guard<mutex> lock(ready_mutex_);
-                ready_.set_value();
-            }
+            lock_guard<mutex> lock(ready_mutex_);
+            ready_.set_value();
         }
 
+        struct Current current;
+        current.adapter = this;     // Stays the same for all invocations, so we set this once only.
+
+        bool finish = false;
         for (;;)
         {
-            cerr << "worker: waiting for input" << endl;
-            poller.poll();
-            if (poller.has_input(ctrl))
+            if (finish)
             {
-                ctrl.close();
                 s.close();
                 return;
             }
-            if (poller.has_input(s))
+
+            poller.poll();
+            if (poller.has_input(ctrl)) // Parent sent a stop message, so we are supposed to go away.
             {
-                zmqpp::message request;
-                cerr << "worker: calling receive" << endl;
-                s.receive(request);
+                zmqpp::message message;
+                ctrl.receive(message);
+                ctrl.close();
+                finish = true;
+            }
 
-                // wake up follower
+            if (!finish && poller.has_input(s)) // We stop reading new incoming messages once told to finish.
+            {
+                // Unmarshal the type-independent part of the message (id, operation name, mode).
+                unique_ptr<capnp::SegmentArrayMessageReader> message;
+                capnproto::Request::Reader req;
+                try
+                {
+                    // Unmarshal generic part of the message.
+                    auto segments = receiver.receive();
+                    message.reset(new capnp::SegmentArrayMessageReader(segments));
+                    req = message->getRoot<capnproto::Request>();
+                    current.id = req.getId().cStr();
+                    current.op_name = req.getOpName().cStr();
+                    if (current.id.empty() || current.op_name.empty() || !req.hasMode())
+                    {
+                        capnp::MallocMessageBuilder b;
+                        auto exr = create_unknown_response(b, "Invalid message header");
+                        sender.send(exr);
+                        continue;
+                    }
+                    auto mode = req.getMode();
+                    if (mode != capnproto::RequestMode::TWOWAY) // Can't do oneway on a twoway adapter.
+                    {
+                        ostringstream s;
+                        s << "ObjectAdapter: oneway invocation sent to twoway adapter "
+                          << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                        capnp::MallocMessageBuilder b;
+                        auto exr = create_unknown_response(b, s.str());
+                        sender.send(exr);
+                        continue;
+                    }
+                }
+                catch (std::exception const& e)
+                {
+                    // We get here if receive() throws. It will do that if the isn't an integral number
+                    // of words in the received message.
+                    capnp::MallocMessageBuilder b;
+                    ostringstream s;
+                    s << "ObjectAdapter: error unmarshaling request header "
+                      << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
+                    auto exr = create_unknown_response(b, s.str());
+                    sender.send(exr);
+                    continue;
+                }
 
-                string payload;
-                request >> payload;
-                cerr << "received message: " << payload << endl;
-                zmqpp::message response;
-                response << "response";
-                s.send(response);
-                cerr << "sent response" << endl;
+                // Look for a servant with matching id.
+                auto servant = find(current.id);
+                if (!servant)
+                {
+                    capnp::MallocMessageBuilder b;
+                    auto exr = create_object_not_exist_response(b, current.id, endpoint_, name_);
+                    sender.send(exr);
+                    continue;
+                }
+
+                // We have a target object, so we can ask it to unmarshal the in-params, forward
+                // the invocation to the application-provided method, and to marshal the results.
+                auto in_params = req.getInParams<capnp::DynamicObject>();
+                capnp::MallocMessageBuilder b;
+                auto r = b.initRoot<capnproto::Response>();
+                servant->safe_dispatch_(current, in_params, r); // noexcept
+                sender.send(b.getSegmentsForOutput());
             }
         }
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        lock_guard<mutex> lock(ready_mutex_);       // LCOV_EXCL_LINE
-        ready_.set_exception(current_exception());  // LCOV_EXCL_LINE
+        // Something has seriously gone wrong, such as a failure from poll()
+        // TODO: log error
+        throw;  // LCOV_EXCL_LINE
     }
 }
 
-} // namespace ice_middleware
+} // namespace zmq_middleware
 
 } // namespace internal
 

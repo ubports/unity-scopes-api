@@ -18,15 +18,19 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
+#include <unity/api/scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/api/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+#include <capnp/serialize.h>
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
-
-#include <future>
-#include <thread>
 
 using namespace std;
 using namespace unity;
@@ -44,7 +48,6 @@ void wait(int millisec = 20)
 {
     this_thread::sleep_for(chrono::milliseconds(millisec));
 }
-
 
 // Basic test.
 
@@ -180,8 +183,28 @@ TEST(ObjectAdapter, wait_for_shutdown)
     EXPECT_TRUE(delay_millisecs <= delay.count());
 }
 
-struct MyObject : public AbstractObject
+class MyDelegate : public AbstractObject
 {
+};
+
+using namespace std::placeholders;
+
+// Mock servant that does nothing but return success.
+
+class MyServant : public ServantBase
+{
+public:
+    MyServant() :
+        ServantBase(make_shared<MyDelegate>(), { { "success_op", bind(&MyServant::success_op, this, _1, _2, _3) } })
+    {
+    }
+
+    virtual void success_op(Current const&,
+                            capnp::DynamicObject::Reader&,
+                            capnproto::Response::Builder& r)
+    {
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    }
 };
 
 TEST(ObjectAdapter, add_remove_find)
@@ -214,7 +237,7 @@ TEST(ObjectAdapter, add_remove_find)
                   e.to_string());
     }
 
-    shared_ptr<MyObject> o(new MyObject);
+    shared_ptr<MyServant> o(new MyServant);
     a.add("fred", o);
     auto f = a.find("fred");
     EXPECT_EQ(o, f);
@@ -243,14 +266,385 @@ TEST(ObjectAdapter, add_remove_find)
                   e.to_string());
     }
 
-    try
+    EXPECT_EQ(nullptr, a.find("fred").get());
+}
+
+TEST(ObjectAdapter, dispatch_twoway_as_oneway)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::ONEWAY);    // No good for twoway adapter.
+    request.setId("id");
+    request.setOpName("operation_name");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
+    EXPECT_STREQ("ObjectAdapter: oneway invocation sent to twoway adapter"
+                 " (id: id, adapter: testscope, op: operation_name)",
+                 ex.getUnknown().cStr());
+}
+
+TEST(ObjectAdapter, dispatch_not_exist)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    // No servant registered, check that we get an ObjectNotExistException
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("id");
+    request.setOpName("operation_name");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::OBJECT_NOT_EXIST, ex.which());
+
+    auto one = ex.getObjectNotExist();
+    EXPECT_TRUE(one.hasProxy());
+    auto proxy = one.getProxy();
+    EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
+    EXPECT_STREQ("id", proxy.getIdentity().cStr());
+    EXPECT_TRUE(one.hasAdapter());
+    EXPECT_STREQ("testscope", one.getAdapter().cStr());
+}
+
+TEST(ObjectAdapter, bad_header)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    // No servant registered, check that we get an ObjectNotExistException
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("id");
+    // Bad header: missing operation name
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
+    EXPECT_STREQ("Invalid message header", ex.getUnknown().cStr());
+}
+
+TEST(ObjectAdapter, corrupt_header)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    // No servant registered, check that we get an ObjectNotExistException
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    // Make a malformed message header so we get coverage on the exception case.
+    capnp::word buf[1];
+    *reinterpret_cast<uint64_t*>(buf) = 0x99;
+    kj::ArrayPtr<capnp::word const> badword(&buf[0], 1);
+    kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments(&badword, 1);
+    sender.send(segments);
+
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
+    string msg = ex.getUnknown().cStr();
+    boost::regex r("ObjectAdapter: error unmarshaling request header.*");
+    EXPECT_TRUE(boost::regex_match(msg, r));
+}
+
+TEST(ObjectAdapter, invoke_ok)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    shared_ptr<MyServant> o(new MyServant);
+    a.add("some_id", o);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setOpName("success_op");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+}
+
+// Servant that returns object not exist
+
+class ThrowONEServant : public ServantBase
+{
+public:
+    ThrowONEServant() :
+        ServantBase(make_shared<MyDelegate>(), { { "ONE_op", bind(&ThrowONEServant::ONE_op, this, _1, _2, _3) } })
     {
-        auto f = a.find("fred");
     }
-    catch (MiddlewareException const& e)
+
+    virtual void ONE_op(Current const& current,
+                        capnp::DynamicObject::Reader&,
+                        capnproto::Response::Builder& r)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::find(): cannot find id \"fred\":"
-                  " id not present (adapter: testscope)",
-                  e.to_string());
+        r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+        marshal_object_not_exist_exception(r, current.id, current.adapter->endpoint(), current.adapter->name());
     }
+};
+
+TEST(ObjectAdapter, invoke_object_not_exist)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    shared_ptr<ThrowONEServant> o(new ThrowONEServant);
+    a.add("some_id", o);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setOpName("ONE_op");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::OBJECT_NOT_EXIST, ex.which());
+
+    auto one = ex.getObjectNotExist();
+    EXPECT_TRUE(one.hasProxy());
+    auto proxy = one.getProxy();
+    EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
+    EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_TRUE(one.hasAdapter());
+    EXPECT_STREQ("testscope", one.getAdapter().cStr());
+}
+
+TEST(ObjectAdapter, invoke_operation_not_exist)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    shared_ptr<MyServant> o(new MyServant);
+    a.add("some_id", o);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setOpName("operation_name");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    auto ex = response.getPayload<capnproto::RuntimeException>();
+    EXPECT_EQ(capnproto::RuntimeException::OPERATION_NOT_EXIST, ex.which());
+
+    auto opne = ex.getOperationNotExist();
+    EXPECT_TRUE(opne.hasProxy());
+    auto proxy = opne.getProxy();
+    EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
+    EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_TRUE(opne.hasAdapter());
+    EXPECT_STREQ("testscope", opne.getAdapter().cStr());
+    EXPECT_TRUE(opne.hasAdapter());
+    EXPECT_STREQ("operation_name", opne.getOpName().cStr());
+}
+
+// Make sure that we do actually run threaded if the adapte has more than one thread.
+
+class CountingServant : public ServantBase
+{
+public:
+    CountingServant() :
+        ServantBase(make_shared<MyDelegate>(), { { "count_op", bind(&CountingServant::count_op, this, _1, _2, _3) } }),
+        concurrent_(0),
+        max_concurrent_(0),
+        num_invocations_(0)
+    {
+    }
+
+    virtual void count_op(Current const&,
+                          capnp::DynamicObject::Reader&,
+                          capnproto::Response::Builder& r)
+    {
+        ++num_invocations_;
+        atomic_int num(++concurrent_);
+        max_concurrent_.store(max(num, max_concurrent_));
+        wait(100);
+        --concurrent_;
+
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    }
+
+    int max_concurrent() const noexcept
+    {
+        return max_concurrent_;
+    }
+
+    int num_invocations() const noexcept
+    {
+        return num_invocations_;
+    }
+
+private:
+    atomic_int concurrent_;
+    atomic_int max_concurrent_;
+    atomic_int num_invocations_;
+};
+
+void invoke_thread(ZmqMiddleware* mw)
+{
+    zmqpp::socket s(mw->context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setOpName("count_op");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    auto reply_segments = receiver.receive();
+    capnp::SegmentArrayMessageReader reader(reply_segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+}
+
+TEST(ObjectAdapter, threading)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    const int num_threads = 5;
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", num_threads, ObjectAdapter::Type::Twoway);
+    a.activate();
+
+    // Single servant to which we send requests concurrently.
+    shared_ptr<CountingServant> o(new CountingServant);
+    a.add("some_id", o);
+
+    // Create num_requests threads that each send a synchronous request.
+    const int num_requests = 20;
+
+    vector<thread> invokers;
+    for (auto i = 0; i < num_requests; ++i)
+    {
+        invokers.push_back(thread(invoke_thread, &mw));
+    }
+    for (auto& i : invokers)
+    {
+        i.join();
+    }
+
+    // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
+    // in the servant ensures that we actually reach the maximum of num_threads.
+    EXPECT_EQ(num_requests, o->num_invocations());
+    EXPECT_EQ(num_threads, o->max_concurrent());
 }

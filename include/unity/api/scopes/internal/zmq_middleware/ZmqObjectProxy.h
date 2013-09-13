@@ -2,16 +2,16 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public Lzmqnse version 3 as
+ * it under the terms of the Lesser GNU General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Lesser GNU General Public Lzmqnse for more details.
+ * Lesser GNU General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public Lzmqnse
- * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
+ * You should have received a copy of the Lesser GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQOBJECTPROXY_H
 #define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQOBJECTPROXY_H
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqProxyFwd.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/api/scopes/internal/MWObjectProxy.h>
 
@@ -38,17 +38,22 @@ namespace internal
 namespace zmq_middleware
 {
 
-// A Zmq proxy that points at some Zmq object, but without a specific type.
+// An Zmq proxy that points at some Zmq object, but without a specific type.
 
 class ZmqObjectProxy : public virtual MWObjectProxy
 {
 public:
-    ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& id, std::string const& endpoint);
+    ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
     virtual ~ZmqObjectProxy() noexcept;
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 
+    virtual std::string endpoint() const;
+    virtual std::string identity() const;
+
 private:
+    std::string endpoint_;
+    std::string identity_;
 };
 
 } // namespace zmq_middleware

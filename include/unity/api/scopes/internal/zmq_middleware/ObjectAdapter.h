@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 #define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqProxy.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
 #include <unity/util/NonCopyable.h>
 #include <zmqpp/socket.hpp>
@@ -44,11 +44,10 @@ namespace scopes
 namespace internal
 {
 
-class AbstractObject;
-
 namespace zmq_middleware
 {
 
+class ServantBase;
 class ZmqMiddleware;
 
 class ObjectAdapter final : private util::NonCopyable
@@ -58,12 +57,13 @@ public:
     ObjectAdapter(ZmqMiddleware& mw, std::string const& name, std::string const& endpoint, int pool_size, Type t);
     ~ObjectAdapter() noexcept;
 
+    ZmqMiddleware* mw() const;
     std::string name() const;
     std::string endpoint() const;
 
-    ZmqProxy add(std::string const& id, std::shared_ptr<AbstractObject> const& obj);
+    ZmqProxy add(std::string const& id, std::shared_ptr<ServantBase> const& obj);
     void remove(std::string const& id);
-    std::shared_ptr<AbstractObject> find(std::string const& id) const;
+    std::shared_ptr<ServantBase> find(std::string const& id) const noexcept;
 
     void activate() noexcept;
     void shutdown() noexcept;
@@ -96,7 +96,7 @@ private:
     std::condition_variable state_changed_;
 
     // Map of object identity and servant pairs
-    typedef std::unordered_map<std::string, std::shared_ptr<AbstractObject>> ServantMap;
+    typedef std::unordered_map<std::string, std::shared_ptr<ServantBase>> ServantMap;
     ServantMap servants_;
 
     mutable std::mutex mutex_;

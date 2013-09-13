@@ -26,7 +26,7 @@ $Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto");
 
 struct Value
 {
-    val : union
+    union
     {
         intVal    @0 : Int32;
         boolVal   @1 : Bool;

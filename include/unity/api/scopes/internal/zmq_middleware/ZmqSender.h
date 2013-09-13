@@ -16,14 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_API_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
+#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
 
-#include <unity/api/scopes/internal/AbstractObject.h>
-#include <unity/api/scopes/internal/MWScope.h>
+#include <unity/util/NonCopyable.h>
+#include <capnp/common.h>
+#include <zmqpp/socket.hpp>
 
-#include <map>
-#include <mutex>
+#include <memory>
+#include <vector>
 
 namespace unity
 {
@@ -37,30 +38,23 @@ namespace scopes
 namespace internal
 {
 
-// Maintains a map of <scope name, scope proxy> pairs.
+namespace zmq_middleware
+{
 
-class RegistryObject final : public AbstractObject
+// Simple message sender. Sends a Cap'n Proto segment list sending each segment as a zmq message part.
+
+class ZmqSender final : private util::NonCopyable
 {
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
+    ZmqSender(zmqpp::socket& s);
 
-    RegistryObject();
-    virtual ~RegistryObject() noexcept;
-
-    // Remote operation implementations
-    MWScopeProxy find(std::string const& scope_name);
-
-    typedef std::map<std::string, MWScopeProxy> MWScopeMap;
-    MWScopeMap list();
-
-    // Local operations to modify the map
-    void add(std::string const& scope_name, MWScopeProxy const& scope);
-    void remove(std::string const& scope_name);
+    void send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments);
 
 private:
-    mutable MWScopeMap scopes_;
-    mutable std::mutex mutex_;
+    zmqpp::socket& s_;
 };
+
+} // namespace zmq_middleware
 
 } // namespace internal
 

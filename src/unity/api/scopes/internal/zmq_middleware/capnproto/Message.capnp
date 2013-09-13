@@ -26,8 +26,9 @@ $Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto");
 
 enum RequestMode
 {
-    oneway @0;
-    twoway @1;
+    unused @0;  # Prevents hasMode() from returning true if value wasn't sent
+    oneway @1;
+    twoway @2;
 }
 
 # A request contains the invocation mode, identity of the target object, an operation name, and the
@@ -47,9 +48,10 @@ struct Request
 
 enum ResponseStatus
 {
-    success          @0;
-    runtimeException @1;
-    userException    @2;
+    unused           @0;    # Prevents hasStatus() from returning true if value wasn't set
+    success          @1;
+    runtimeException @2;
+    userException    @3;
 }
 
 # A response is the response status, plus any payload. The payload is the out-parameters and return value (if any),
@@ -67,30 +69,27 @@ using Proxy = import "Proxy.capnp";
 
 struct OperationNotExistException
 {
-    proxy  @0 : Proxy.Proxy;        # The proxy for the request that raised the exception
-    opName @1 : Text;               # Name of operation that wasn't found
+    proxy   @0 : Proxy.Proxy;       # The proxy for the request that raised the exception
+    adapter @1 : Text;              # Name of corresponding adapter
+    opName  @2 : Text;              # Name of operation that wasn't found
 }
 
 struct ObjectNotExistException
 {
-    proxy  @0 : Proxy.Proxy;        # The proxy for the request that raised the exception
+    proxy  @0  : Proxy.Proxy;       # The proxy for the request that raised the exception
+    adapter @1 : Text;              # Name of corresponding adapter
 }
 
-# Generic representation of a runtime exception. Holds the type of the exception plus a union of all the exceptions
-# that are possible.
-
-enum RuntimeExceptionType
-{
-    operationNotExist @0;
-    objectNotExist    @1;
-}
+# Generic representation of a runtime exception. Holds the a union of all the exceptions that are possible.
+# The unknown exception deals with the servant throwing something we don't understand at all,
+# in which case the best we can do is marshal its type name.
 
 struct RuntimeException
 {
-    type @0 : RuntimeExceptionType;
-    exception : union 
+    union
     {
-        operationNotExist @1 : OperationNotExistException;
-        objectNotExist    @2 : ObjectNotExistException;
+        operationNotExist @0 : OperationNotExistException;
+        objectNotExist    @1 : ObjectNotExistException;
+        unknown           @2 : Text;
     }
 }

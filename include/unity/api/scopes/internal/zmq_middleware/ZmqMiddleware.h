@@ -79,7 +79,7 @@ private:
     std::mutex mutex_;
 };
 
-} // namespace ice_middleware
+} // namespace zmq_middleware
 
 } // namespace internal
 

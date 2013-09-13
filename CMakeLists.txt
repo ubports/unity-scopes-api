@@ -59,7 +59,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${IceRoot}/lib64")
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
-find_package(Protobuf REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS})
@@ -125,7 +124,8 @@ set(OTHER_LIBS
     IceUtil
     zmqpp
     zmq
-    protobuf
+    capnp
+    kj
     dl
     pthread
 )
