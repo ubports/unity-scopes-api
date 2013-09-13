@@ -74,8 +74,7 @@ private:
 
     // Thread start functions
     void broker_thread();
-    void oneway_thread();
-    void twoway_thread();
+    void worker_thread();
 
     ZmqMiddleware& mw_;
     std::string name_;

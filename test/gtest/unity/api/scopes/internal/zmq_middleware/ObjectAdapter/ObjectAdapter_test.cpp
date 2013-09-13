@@ -59,6 +59,7 @@ TEST(ObjectAdapter, basic)
     // Instantiate and destroy oneway and twoway adapters with single and multiple threads.
     {
         ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+        EXPECT_EQ(&mw, a.mw());
         EXPECT_EQ("testscope", a.name());
         EXPECT_EQ("ipc://testscope", a.endpoint());
     }
@@ -269,7 +270,7 @@ TEST(ObjectAdapter, add_remove_find)
     EXPECT_EQ(nullptr, a.find("fred").get());
 }
 
-TEST(ObjectAdapter, dispatch_twoway_as_oneway)
+TEST(ObjectAdapter, dispatch_oneway_to_twoway)
 {
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
                      (RuntimeImpl*)0x1);
@@ -302,6 +303,32 @@ TEST(ObjectAdapter, dispatch_twoway_as_oneway)
     EXPECT_STREQ("ObjectAdapter: oneway invocation sent to twoway adapter"
                  " (id: id, adapter: testscope, op: operation_name)",
                  ex.getUnknown().cStr());
+}
+
+TEST(ObjectAdapter, dispatch_twoway_to_oneway)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Oneway);
+    a.activate();
+
+    zmqpp::socket s(mw.context(), zmqpp::socket_type::push);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);    // No good for oneway adapter.
+    request.setId("id");
+    request.setOpName("operation_name");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    // We need to wait a little while, otherwise the adapter will have shut down before
+    // it receives the oneway message. No real test here--this is for coverage.
+    wait(100);
 }
 
 TEST(ObjectAdapter, dispatch_not_exist)
@@ -595,7 +622,7 @@ private:
     atomic_int num_invocations_;
 };
 
-void invoke_thread(ZmqMiddleware* mw)
+void invoke_thread(ZmqMiddleware* mw, ObjectAdapter::Type t)
 {
     zmqpp::socket s(mw->context(), zmqpp::socket_type::request);
     s.connect("ipc://testscope");
@@ -604,19 +631,22 @@ void invoke_thread(ZmqMiddleware* mw)
 
     capnp::MallocMessageBuilder b;
     auto request = b.initRoot<capnproto::Request>();
-    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setMode(t == ObjectAdapter::Type::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
     request.setId("some_id");
     request.setOpName("count_op");
 
     auto segments = b.getSegmentsForOutput();
     sender.send(segments);
-    auto reply_segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(reply_segments);
-    auto response = reader.getRoot<capnproto::Response>();
-    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+    if (t == ObjectAdapter::Type::Twoway)
+    {
+        auto reply_segments = receiver.receive();
+        capnp::SegmentArrayMessageReader reader(reply_segments);
+        auto response = reader.getRoot<capnproto::Response>();
+        EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+    }
 }
 
-TEST(ObjectAdapter, threading)
+TEST(ObjectAdapter, twoway_threading)
 {
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
                      (RuntimeImpl*)0x1);
@@ -636,12 +666,48 @@ TEST(ObjectAdapter, threading)
     vector<thread> invokers;
     for (auto i = 0; i < num_requests; ++i)
     {
-        invokers.push_back(thread(invoke_thread, &mw));
+        invokers.push_back(thread(invoke_thread, &mw, ObjectAdapter::Type::Twoway));
     }
     for (auto& i : invokers)
     {
         i.join();
     }
+
+    // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
+    // in the servant ensures that we actually reach the maximum of num_threads.
+    EXPECT_EQ(num_requests, o->num_invocations());
+    EXPECT_EQ(num_threads, o->max_concurrent());
+}
+
+TEST(ObjectAdapter, oneway_threading)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    const int num_threads = 5;
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", num_threads, ObjectAdapter::Type::Oneway);
+    a.activate();
+
+    // Single servant to which we send requests concurrently.
+    shared_ptr<CountingServant> o(new CountingServant);
+    a.add("some_id", o);
+
+    // Create num_requests threads that each send a synchronous request.
+    const int num_requests = 20;
+
+    vector<thread> invokers;
+    for (auto i = 0; i < num_requests; ++i)
+    {
+        invokers.push_back(thread(invoke_thread, &mw, ObjectAdapter::Type::Oneway));
+    }
+    for (auto& i : invokers)
+    {
+        i.join();
+    }
+    // We need to delay here, otherwise we end up destroying the adapter before
+    // the oneway invocations are processed.
+    wait(1000);
 
     // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
     // in the servant ensures that we actually reach the maximum of num_threads.

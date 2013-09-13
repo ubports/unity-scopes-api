@@ -58,6 +58,12 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
         parts_.push_back(string());
         string& str = parts_.back();
         s_.receive(str);
+        if (str.empty())
+        {
+            // For pull sockets, receive() returns zero bytes about half the time, even after
+            // poll() has signalled that data is ready. We ignore these.
+            continue;
+        }
 
         if (str.size() % sizeof(capnp::word) != 0)      // Received message must contain an integral number of words.
         {

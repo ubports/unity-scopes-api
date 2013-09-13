@@ -248,12 +248,11 @@ void ObjectAdapter::run_workers()
         ready_ = promise<void>();
     }
     {
-        auto start_func = type_ == Type::Oneway ? &ObjectAdapter::oneway_thread : &ObjectAdapter::twoway_thread;
         auto f = ready_.get_future();
         num_workers_.store(pool_size_);
         for (auto i = 0; i < pool_size_; ++i)
         {
-            workers_.push_back(thread(start_func, this));
+            workers_.push_back(thread(&ObjectAdapter::worker_thread, this));
         }
         f.wait();
         try
@@ -277,17 +276,18 @@ void ObjectAdapter::broker_thread()
         {
             ctrl.connect("inproc://" + name_ + "_adapter_ctrl");
             ctrl.subscribe("");
+            poller.add(ctrl);
 
             assert(!frontend_);
-            frontend_.reset(new zmqpp::socket(mw_.context(), zmqpp::socket_type::router));
+            auto socket_type = type_ == Type::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
+            frontend_.reset(new zmqpp::socket(mw_.context(), socket_type));
             frontend_->bind(endpoint_);
+            poller.add(*frontend_);
 
             assert(!backend_);
-            backend_.reset(new zmqpp::socket(mw_.context(), zmqpp::socket_type::dealer));
+            socket_type = type_ == Type::Twoway ? zmqpp::socket_type::dealer : zmqpp::socket_type::push;
+            backend_.reset(new zmqpp::socket(mw_.context(), socket_type));
             backend_->bind("inproc://" + name_);
-
-            poller.add(ctrl);
-            poller.add(*frontend_);
             poller.add(*backend_);
 
             {
@@ -328,7 +328,10 @@ void ObjectAdapter::broker_thread()
                     backend_->send(message, flag);
                 }
                 while (flag == zmqpp::socket::send_more);
-                ++pending_requests;
+                if (type_ == Type::Twoway)
+                {
+                    ++pending_requests; // Only twoway requests require us to wait for replies
+                }
             }
             if (pending_requests != 0 && poller.has_input(*backend_))
             {
@@ -353,38 +356,29 @@ void ObjectAdapter::broker_thread()
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        // TODO: Not good enough. Need to deal with receive() and send() failures above
-        lock_guard<mutex> lock(ready_mutex_);       // LCOV_EXCL_LINE
-        ready_.set_exception(current_exception());  // LCOV_EXCL_LINE
+        // TODO: Log error
+        throw;
     }
 }
 
-void ObjectAdapter::oneway_thread()
-{
-    // TODO: this can probably combined with twoway_thread into a single dispatch thread for both modes.
-    if (--num_workers_ == 0)
-    {
-        lock_guard<mutex> lock(ready_mutex_);
-        ready_.set_value();
-    }
-}
-
-void ObjectAdapter::twoway_thread()
+void ObjectAdapter::worker_thread()
 {
     try
     {
+        zmqpp::poller poller;
+
         zmqpp::socket ctrl(mw_.context(), zmqpp::socket_type::subscribe);
         ctrl.connect("inproc://" + name_ + "_adapter_ctrl");
         ctrl.subscribe("");
+        poller.add(ctrl);
 
-        zmqpp::socket s(mw_.context(), zmqpp::socket_type::reply);
+        auto socket_type = type_ == Type::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
+        zmqpp::socket s(mw_.context(), socket_type);
         s.connect("inproc://" + name_);
+        poller.add(s);
+
         ZmqReceiver receiver(s);
         ZmqSender sender(s);
-
-        zmqpp::poller poller;
-        poller.add(ctrl);
-        poller.add(s);
 
         if (--num_workers_ == 0)    // Last worker to reach this point notifies the parent.
         {
@@ -428,20 +422,35 @@ void ObjectAdapter::twoway_thread()
                     current.op_name = req.getOpName().cStr();
                     if (current.id.empty() || current.op_name.empty() || !req.hasMode())
                     {
-                        capnp::MallocMessageBuilder b;
-                        auto exr = create_unknown_response(b, "Invalid message header");
-                        sender.send(exr);
+                        if (type_ == Type::Twoway)
+                        {
+                            capnp::MallocMessageBuilder b;
+                            auto exr = create_unknown_response(b, "Invalid message header");
+                            sender.send(exr);
+                        }
+                        else
+                        {
+                            // TODO: log error
+                        }
                         continue;
                     }
                     auto mode = req.getMode();
-                    if (mode != capnproto::RequestMode::TWOWAY) // Can't do oneway on a twoway adapter.
+                    auto expected_mode = type_ == Type::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
+                    if (mode != expected_mode) // Can't do oneway on a twoway adapter and vice-versa.
                     {
-                        ostringstream s;
-                        s << "ObjectAdapter: oneway invocation sent to twoway adapter "
-                          << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
-                        capnp::MallocMessageBuilder b;
-                        auto exr = create_unknown_response(b, s.str());
-                        sender.send(exr);
+                        if (type_ == Type::Twoway)
+                        {
+                            ostringstream s;
+                            s << "ObjectAdapter: oneway invocation sent to twoway adapter "
+                              << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                            capnp::MallocMessageBuilder b;
+                            auto exr = create_unknown_response(b, s.str());
+                            sender.send(exr);
+                        }
+                        else
+                        {
+                            // TODO: log error
+                        }
                         continue;
                     }
                 }
@@ -449,12 +458,19 @@ void ObjectAdapter::twoway_thread()
                 {
                     // We get here if receive() throws. It will do that if the isn't an integral number
                     // of words in the received message.
-                    capnp::MallocMessageBuilder b;
-                    ostringstream s;
-                    s << "ObjectAdapter: error unmarshaling request header "
-                      << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
-                    auto exr = create_unknown_response(b, s.str());
-                    sender.send(exr);
+                    if (type_ == Type::Twoway)
+                    {
+                        capnp::MallocMessageBuilder b;
+                        ostringstream s;
+                        s << "ObjectAdapter: error unmarshaling request header "
+                          << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
+                        auto exr = create_unknown_response(b, s.str());
+                        sender.send(exr);
+                    }
+                    else
+                    {
+                        // TODO: log error
+                    }
                     continue;
                 }
 
@@ -462,9 +478,12 @@ void ObjectAdapter::twoway_thread()
                 auto servant = find(current.id);
                 if (!servant)
                 {
-                    capnp::MallocMessageBuilder b;
-                    auto exr = create_object_not_exist_response(b, current.id, endpoint_, name_);
-                    sender.send(exr);
+                    if (type_ == Type::Twoway)
+                    {
+                        capnp::MallocMessageBuilder b;
+                        auto exr = create_object_not_exist_response(b, current.id, endpoint_, name_);
+                        sender.send(exr);
+                    }
                     continue;
                 }
 
@@ -474,7 +493,10 @@ void ObjectAdapter::twoway_thread()
                 capnp::MallocMessageBuilder b;
                 auto r = b.initRoot<capnproto::Response>();
                 servant->safe_dispatch_(current, in_params, r); // noexcept
-                sender.send(b.getSegmentsForOutput());
+                if (type_ == Type::Twoway)
+                {
+                    sender.send(b.getSegmentsForOutput());
+                }
             }
         }
     }
