@@ -580,7 +580,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     EXPECT_STREQ("operation_name", opne.getOpName().cStr());
 }
 
-// Make sure that we do actually run threaded if the adapte has more than one thread.
+// Make sure that we do actually run threaded if the adapter has more than one thread.
 
 class CountingServant : public ServantBase
 {
@@ -706,8 +706,11 @@ TEST(ObjectAdapter, oneway_threading)
         i.join();
     }
     // We need to delay here, otherwise we end up destroying the adapter before
-    // the oneway invocations are processed.
-    wait(1000);
+    // the oneway invocations are processed. We process num_threads requests
+    // in parallel, so the total time will be roughly the number of requests
+    // divided by the number of requests (which is the number of "batches",
+    // plus a bit of slack.
+    wait(((num_requests / num_threads) + 1) * 100 + 100);
 
     // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
     // in the servant ensures that we actually reach the maximum of num_threads.
