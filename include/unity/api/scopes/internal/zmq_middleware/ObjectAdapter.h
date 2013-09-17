@@ -53,8 +53,11 @@ class ZmqMiddleware;
 class ObjectAdapter final : private util::NonCopyable
 {
 public:
-    enum Type { Oneway, Twoway };
-    ObjectAdapter(ZmqMiddleware& mw, std::string const& name, std::string const& endpoint, int pool_size, Type t);
+    ObjectAdapter(ZmqMiddleware& mw,
+                  std::string const& name,
+                  std::string const& endpoint,
+                  RequestType t,
+                  int pool_size);
     ~ObjectAdapter() noexcept;
 
     ZmqMiddleware* mw() const;
@@ -79,7 +82,7 @@ private:
     ZmqMiddleware& mw_;
     std::string name_;
     std::string endpoint_;
-    Type type_;
+    RequestType type_;
     int pool_size_;
     std::unique_ptr<zmqpp::socket> frontend_;   // Connected to endpoint, visible to clients
     std::unique_ptr<zmqpp::socket> backend_;    // Workers read from this

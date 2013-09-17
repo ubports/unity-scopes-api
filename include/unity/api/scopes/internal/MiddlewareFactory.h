@@ -59,7 +59,7 @@ public:
 private:
     MiddlewareBase::SPtr find_unlocked(std::string const& server_name, std::string const& kind) const;
 
-    enum Kind { Kind_Ice, Kind_REST };
+    enum Kind { Kind_Zmq, Kind_REST };
     static Kind to_kind(::std::string const& kind);
 
     struct MiddlewareData

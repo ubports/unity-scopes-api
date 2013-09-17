@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/api/scopes/internal/zmq_middleware/RequestType.h>
 
 using namespace std;
 
@@ -35,25 +35,9 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
-    MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
-    MWReply(mw_base)
+string to_string(RequestType t)
 {
-}
-
-ZmqReply::~ZmqReply() noexcept
-{
-}
-
-void ZmqReply::push(std::string const& result)
-{
-    // TODO
-}
-
-void ZmqReply::finished()
-{
-    // TODO
+    return t == RequestType::Oneway ? "oneway" : "twoway";
 }
 
 } // namespace zmq_middleware

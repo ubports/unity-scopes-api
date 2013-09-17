@@ -97,7 +97,7 @@ void RegistryI::find_(Current const&,
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
         auto find_response = r.initPayload<capnproto::Registry::FindResponse>().initResponse();
-        find_response.initException().setName(e.name().c_str());
+        find_response.initNotFoundException().setName(e.name().c_str());
     }
 }
 

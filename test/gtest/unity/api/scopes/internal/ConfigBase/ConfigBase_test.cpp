@@ -72,17 +72,17 @@ TEST(ConfigBase, non_optional_string)
 TEST(ConfigBase, middleware)
 {
     MyConfig c("Test.ini");
-    EXPECT_EQ("Ice", c.get_middleware("SomeGroup", "Ice.Middleware"));
+    EXPECT_EQ("Zmq", c.get_middleware("SomeGroup", "Zmq.Middleware"));
     EXPECT_EQ("REST", c.get_middleware("SomeGroup", "REST.Middleware"));
     try
     {
-        c.get_middleware("SomeGroup", "Ice.BadMiddleware");
+        c.get_middleware("SomeGroup", "Zmq.BadMiddleware");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal value for Ice.BadMiddleware: \"foo\": "
-                  "legal values are \"Ice\" and \"REST\"",
+        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
+                  "legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }
     try
@@ -93,7 +93,7 @@ TEST(ConfigBase, middleware)
     catch (ConfigException const& e)
     {
         EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
-                  "legal values are \"Ice\" and \"REST\"",
+                  "legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }
 }

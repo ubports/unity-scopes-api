@@ -31,9 +31,9 @@ TEST(RegistryConfig, basic)
 {
     RegistryConfig c("Registry", "Registry.ini");
     EXPECT_EQ("Registry", c.identity());
-    EXPECT_EQ("Ice", c.mw_kind());
-    EXPECT_EQ("-f /tmp/socket_for_registry", c.endpoint());
-    EXPECT_EQ("Ice.Config", c.mw_configfile());
+    EXPECT_EQ("Zmq", c.mw_kind());
+    EXPECT_EQ("ipc:///tmp/socket_for_registry", c.endpoint());
+    EXPECT_EQ("Zmq.ini", c.mw_configfile());
 }
 
 TEST(RegistryConfig, RegistryIDEmpty)

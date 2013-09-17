@@ -40,7 +40,7 @@ namespace zmq_middleware
 
 ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity),
+    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway),
     MWScope(mw_base)
 {
 }

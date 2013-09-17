@@ -22,6 +22,7 @@
 #include <unity/api/scopes/internal/MiddlewareBase.h>
 #include <unity/api/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/api/scopes/internal/ThreadPool.h>
 
 #include <zmqpp/context.hpp>
 
@@ -66,7 +67,8 @@ public:
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) override;
 
     // virtual void remove_object(std::string const& identity);
-    zmqpp::context& context() noexcept;
+    zmqpp::context* context() const noexcept;
+    ThreadPool* invoke_pool() const noexcept;
 
 private:
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name);
@@ -76,7 +78,9 @@ private:
 
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
+
+    std::unique_ptr<ThreadPool> invokers_;
 };
 
 } // namespace zmq_middleware

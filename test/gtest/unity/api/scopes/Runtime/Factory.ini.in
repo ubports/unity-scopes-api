@@ -1,2 +1,2 @@
 [MiddlewareFactory]
-Ice.Configfile =
+Zmq.Configfile =

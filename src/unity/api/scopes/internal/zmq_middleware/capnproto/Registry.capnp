@@ -46,8 +46,8 @@ struct FindResponse
 {
     response : union
     {
-        returnValue @0 : Proxy.Proxy;
-        exception   @1 : NotFoundException;
+        returnValue         @0 : Proxy.Proxy;
+        notFoundException   @1 : NotFoundException;
     }
 }
 

@@ -58,13 +58,8 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_resp
                                                                                      std::string const& id,
                                                                                      std::string const& endpoint,
                                                                                      std::string const& adapter);
-#if 0
-kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_operation_not_exist_response(capnp::MessageBuilder& b,
-                                                                                        std::string const& id,
-                                                                                        std::string const& endpoint,
-                                                                                        std::string const& adapter,
-                                                                                        std::string const& op_name);
-#endif
+
+void throw_if_runtime_exception(capnproto::Response::Reader const& reader);
 
 } // namespace zmq_middleware
 

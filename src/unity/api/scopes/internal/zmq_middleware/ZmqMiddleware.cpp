@@ -18,10 +18,15 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
+#include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/api/scopes/internal/zmq_middleware/RethrowException.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
+#include <iostream> // TODO: remove this
 
 using namespace std;
 
@@ -53,7 +58,11 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile
     server_name_(server_name)
 {
     // TODO: get directory from config
+    // TODO: get pool size from config
     assert(!server_name.empty());
+
+    cerr << (void*)(context()) << endl;
+    cerr << (void*)(&context_) << endl;
     try
     {
 #if 0
@@ -154,55 +163,30 @@ void ZmqMiddleware::wait_for_shutdown()
 
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
 {
+    MWRegistryProxy proxy;
     try
     {
+        proxy.reset(new ZmqRegistry(this, endpoint, identity));
     }
     catch (zmqpp::exception const& e)
     {
         rethrow_zmq_ex(e);
     }
-#if 0
-    MWRegistryProxy proxy;
-    try
-    {
-        string proxy_string = identity + ":" + endpoint;
-        middleware::RegistryPrx r = middleware::RegistryPrx::uncheckedCast(ic_->stringToProxy(proxy_string));
-        if (!r)
-        {
-            // TODO: throw config exception
-            assert(false);
-        }
-        proxy.reset(new IceRegistry(this, r));
-    }
-    catch (Ice::Exception const& e)
-    {
-        rethrow_ice_ex(e);
-    }
     return proxy;
-#endif
 }
 
 MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string const& endpoint)
 {
-#if 0
     MWScopeProxy proxy;
     try
     {
-        string proxy_string = identity + ":" + endpoint;
-        middleware::ScopePrx s = middleware::ScopePrx::uncheckedCast(ic_->stringToProxy(proxy_string));
-        if (!s)
-        {
-            throw ConfigException("Ice: could not create proxy from string \"" + proxy_string + "\"");
-        }
-        proxy.reset(new IceScope(this, s));
+        proxy.reset(new ZmqScope(this, endpoint, identity));
     }
-    catch (Ice::Exception const& e)
+    catch (zmqpp::exception const& e)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        rethrow_zmq_ex(e);
     }
     return proxy;
-#endif
 }
 
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl)
@@ -323,9 +307,25 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
 #endif
 }
 
-zmqpp::context& ZmqMiddleware::context() noexcept
+zmqpp::context* ZmqMiddleware::context() const noexcept
 {
-    return context_;
+    cerr << "In context(): instantiating socket" << endl;
+    zmqpp::socket tmp(context_, zmqpp::socket_type::subscribe);
+    cerr << "In context(): connecting" << endl;
+    try
+    {
+        tmp.connect("inproc://_adapter_ctrl"); // Once we can read from here, that's the command to stop.
+    }
+    catch (...)
+    {
+    }
+    cerr << "In context(): returning " << (void*) &context_ << endl;
+    return const_cast<zmqpp::context*>(&context_);
+}
+
+ThreadPool* ZmqMiddleware::invoke_pool() const noexcept
+{
+    return invokers_.get();
 }
 
 namespace
@@ -356,32 +356,31 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
 
     // We don't have the requested adapter yet, so we create it on the fly.
     int pool_size;
-    ObjectAdapter::Type type;
+    RequestType type;
     if (has_suffix(name, ctrl_suffix))
     {
         // The ctrl adapter is single-threaded and supports oneway operations only.
         pool_size = 1;
-        type = ObjectAdapter::Type::Oneway;
+        type = RequestType::Oneway;
     }
     else if (has_suffix(name, reply_suffix))
     {
         // The reply adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
-        type = ObjectAdapter::Type::Oneway;
+        type = RequestType::Oneway;
     }
     else
     {
         // The normal adapter is single- or multi-threaded and supports twoway operations only.
         // TODO: get pool size from config
         pool_size = 1;
-        type = ObjectAdapter::Type::Twoway;
-        // TODO: get pool size from config
+        type = RequestType::Twoway;
     }
     // TODO: get directory of adapter from config
     string endpoint = "ipc://" + name;
 
-    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, pool_size, type));
+    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, type, pool_size));
     am_[name] = a;
     return a;
 }

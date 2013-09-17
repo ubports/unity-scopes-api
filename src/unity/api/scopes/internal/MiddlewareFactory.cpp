@@ -18,8 +18,9 @@
 
 #include <unity/api/scopes/internal/MiddlewareFactory.h>
 
-#include <unity/api/scopes/internal/ice_middleware/IceMiddleware.h>
+// #include <unity/api/scopes/internal/ice_middleware/IceMiddleware.h>
 #include <unity/api/scopes/internal/MiddlewareFactoryConfig.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 
 #include <cassert>
@@ -73,9 +74,16 @@ MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
 
     switch (to_kind(kind))
     {
+        /*
         case Kind_Ice:
         {
             mw.reset(new ice_middleware::IceMiddleware(server_name, configfile, runtime_));
+            break;
+        }
+        */
+        case Kind_Zmq:
+        {
+            mw.reset(new zmq_middleware::ZmqMiddleware(server_name, configfile, runtime_));
             break;
         }
         case Kind_REST:
@@ -111,9 +119,9 @@ MiddlewareBase::SPtr MiddlewareFactory::find_unlocked(string const& server_name,
 MiddlewareFactory::Kind MiddlewareFactory::to_kind(string const& kind)
 {
     Kind k;
-    if (kind == "Ice")
+    if (kind == "Zmq")
     {
-        k = Kind_Ice;
+        k = Kind_Zmq;
     }
     else if (kind == "REST")
     {

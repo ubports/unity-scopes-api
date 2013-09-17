@@ -1,6 +1,6 @@
 [SomeGroup]
 Empty =
-Ice.Middleware = Ice
+Zmq.Middleware = Zmq
 REST.Middleware = REST
-Ice.BadMiddleware = foo
+Zmq.BadMiddleware = foo
 REST.BadMiddleware = bar

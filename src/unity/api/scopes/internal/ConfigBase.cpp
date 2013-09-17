@@ -78,10 +78,10 @@ string ConfigBase::get_optional_string(string const& group, string const& key) c
 string ConfigBase::get_middleware(string const& group, string const& key) const
 {
     string val = get_string(group, key);
-    if (val != "Ice" && val != "REST")
+    if (val != "Zmq" && val != "REST")
     {
         throw_ex("Illegal value for " + key + ": \"" + val +
-                 "\": legal values are \"Ice\" and \"REST\"");
+                 "\": legal values are \"Zmq\" and \"REST\"");
     }
     return val;
 }

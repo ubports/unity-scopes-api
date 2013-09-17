@@ -18,6 +18,13 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
+#include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
+
+#include <zmqpp/socket.hpp>
+
 using namespace std;
 
 namespace unity
@@ -35,10 +42,11 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, RequestType t) :
     MWObjectProxy(mw_base),
     endpoint_(endpoint),
-    identity_(identity)
+    identity_(identity),
+    type_(t)
 {
     assert(!endpoint.empty());
     assert(!identity.empty());
@@ -61,6 +69,43 @@ string ZmqObjectProxy::endpoint() const
 string ZmqObjectProxy::identity() const
 {
     return identity_;
+}
+
+RequestType ZmqObjectProxy::type() const
+{
+    return type_;
+}
+
+// Returns a request message with the mode, operation name, endpoint, and identity set for this proxy.
+
+capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const
+{
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(type_ == RequestType::Oneway ? capnproto::RequestMode::ONEWAY : capnproto::RequestMode::TWOWAY);
+    request.setOpName(operation_name.c_str());
+    request.setId(identity_.c_str());
+    return request;
+}
+
+// Get a socket to the endpoint for this proxy, write the request on the wire and, if the invocation
+// is twoway, return a reader for the response.
+
+unique_ptr<capnp::SegmentArrayMessageReader> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
+{
+    thread_local static ConnectionPool pool(*mw_base()->context());
+
+    zmqpp::socket& s = pool.find(endpoint(), type());
+    ZmqSender sender(s);
+    sender.send(out_params.getSegmentsForOutput());
+
+    unique_ptr<capnp::SegmentArrayMessageReader> reader;
+    if (type() == RequestType::Twoway)
+    {
+        ZmqReceiver receiver(s);
+        auto segments = receiver.receive();
+        reader.reset(new capnp::SegmentArrayMessageReader(segments));
+    }
+    return reader;
 }
 
 } // namespace zmq_middleware

@@ -50,21 +50,21 @@ endif()
 # The tarball is available here: http://zeroc.com/download/Ice/3.5/Ice-3.5.0.tar.gz
 # To build Ice, go to <source_root>/cpp, and do "make; make test; sudo make install".
 # The default config is fine. If you want to install somewhere else, edit the cpp/config/Make.rules file.
-set(IceRoot /usr)
-if (NOT EXISTS ${IceRoot}/include/Ice/Ice.h)
-    message(FATAL_ERROR "Cannot find Ice development files. You need to build Ice 3.5 from source and install it, and set IceRoot in CMakeLists.txt accordingly. Then set LD_LIBRARY_PATH to include the Ice lib64 directory, set PATH to include the Ice bin directory, and try again.")
-endif()
-
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${IceRoot}/lib64")
+# set(IceRoot /usr)
+# if (NOT EXISTS ${IceRoot}/include/Ice/Ice.h)
+#     message(FATAL_ERROR "Cannot find Ice development files. You need to build Ice 3.5 from source and install it, and set IceRoot in CMakeLists.txt accordingly. Then set LD_LIBRARY_PATH to include the Ice lib64 directory, set PATH to include the Ice bin directory, and try again.")
+# endif()
+#
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${IceRoot}/lib64")
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
-set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS})
+set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # UNIX Domain Socket transport plug-in for Ice.
-pkg_check_modules(IceUDS libIceUDS REQUIRED)
+# pkg_check_modules(IceUDS libIceUDS REQUIRED)
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -73,7 +73,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_BINARY_DIR}/src
-    ${IceRoot}/include
+#    ${IceRoot}/include
     ${OTHER_INCLUDE_DIRS}
 )
 
@@ -119,19 +119,16 @@ set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
-    unity-api
-    Ice
-    IceUtil
     zmqpp
     zmq
     capnp
     kj
-    dl
     pthread
+    dl
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
-set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
+set(LIBS ${UNITY_SCOPES_LIB})
 
 # All the libraries we need to link a gtest executable. (We link the tests against a static version
 # so we can do whitebox testing on internal classes.
@@ -141,8 +138,8 @@ set(LIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 # do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
 # with visbility=default.
 
-# set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB} ${OTHER_LIBS})
-set(TESTLIBS ${UNITY_SCOPES_LIB} ${OTHER_LIBS}) # HACK
+# set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB})
+set(TESTLIBS ${UNITY_SCOPES_LIB}) # HACK
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
@@ -160,29 +157,29 @@ add_subdirectory(test)
 add_subdirectory(demo)
 
 # Custom rules to compile Slice files
-foreach(file ${SLICE_FILES})
-
-    string(REPLACE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" build_dir ${file})
-    get_filename_component(build_dir ${build_dir} PATH)
-
-    get_filename_component(slice_file ${file} NAME)
-    string(REPLACE ".ice" ".cpp" src_file ${slice_file})
-    string(REPLACE ".ice" ".h" hdr_file ${slice_file})
-
-    set(src_file ${build_dir}/${src_file})
-    set(hdr_file ${build_dir}/${hdr_file})
-
-    string(REPLACE "${CMAKE_BINARY_DIR}/src/" "" relative_build_dir ${build_dir})
-
-    set(SLICE_HDRS ${SLICE_HDRS} ${hdr_file})
-    set(SLICE_SRC ${SLICE_SRC} ${src_file})
-endforeach()
-
-# cmake cannot analyze include file dependencies of .ice files, so the easiest option is to recompile
-# all Slice files if any one of them changes
-add_custom_command(OUTPUT ${SLICE_SRC} ${SLICE_HDRS}
-                   DEPENDS ${SLICE_FILES}
-                   COMMAND slice2cpp --output-dir=${build_dir} -I${CMAKE_SOURCE_DIR}/src --include-dir ${relative_build_dir} ${SLICE_FILES})
+# foreach(file ${SLICE_FILES})
+#
+#     string(REPLACE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" build_dir ${file})
+#     get_filename_component(build_dir ${build_dir} PATH)
+#
+#     get_filename_component(slice_file ${file} NAME)
+#     string(REPLACE ".ice" ".cpp" src_file ${slice_file})
+#     string(REPLACE ".ice" ".h" hdr_file ${slice_file})
+#
+#     set(src_file ${build_dir}/${src_file})
+#     set(hdr_file ${build_dir}/${hdr_file})
+#
+#     string(REPLACE "${CMAKE_BINARY_DIR}/src/" "" relative_build_dir ${build_dir})
+#
+#     set(SLICE_HDRS ${SLICE_HDRS} ${hdr_file})
+#     set(SLICE_SRC ${SLICE_SRC} ${src_file})
+# endforeach()
+#
+# # cmake cannot analyze include file dependencies of .ice files, so the easiest option is to recompile
+# # all Slice files if any one of them changes
+# add_custom_command(OUTPUT ${SLICE_SRC} ${SLICE_HDRS}
+#                    DEPENDS ${SLICE_FILES}
+#                    COMMAND slice2cpp --output-dir=${build_dir} -I${CMAKE_SOURCE_DIR}/src --include-dir ${relative_build_dir} ${SLICE_FILES})
 
 ## Custom rules to compile .proto files
 #foreach(file ${PROTO_FILES})
@@ -271,6 +268,7 @@ set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
     VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
+target_link_libraries(${UNITY_SCOPES_LIB} -Wl,--no-undefined ${OTHER_LIBS})
 
 # Use the object files to make the static library.
 add_library(${UNITY_SCOPES_STATIC_LIB} STATIC $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)

@@ -95,7 +95,7 @@ TEST(ServantBase, success)
 {
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
                      (RuntimeImpl*)0x1);
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
     Current current;
     current.op_name = "op";
     current.adapter = &a;   // Dummy needed for the throw code to get at the adapter name and endpoint.
@@ -112,7 +112,7 @@ TEST(ServantBase, exceptions)
 {
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
                      (RuntimeImpl*)0x1);
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", 1, ObjectAdapter::Type::Twoway);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
     Current current;
     current.op_name = "op";
     current.adapter = &a;   // Dummy needed for the throw code to get at the adapter name and endpoint.

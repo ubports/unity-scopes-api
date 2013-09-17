@@ -16,7 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/api/scopes/internal/ThreadPool.h>
+
+#include <unity/UnityExceptions.h>
 
 using namespace std;
 
@@ -32,31 +34,29 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
+ThreadPool::~ThreadPool() noexcept
 {
-
-ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
-    MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
-    MWReply(mw_base)
-{
+    {
+        lock_guard<mutex> lock(mutex_);
+        done_ = true;
+    }
+    cond_.notify_all();
 }
 
-ZmqReply::~ZmqReply() noexcept
+void ThreadPool::run()
 {
+    unique_lock<mutex> lock(mutex_);
+    for (;;)
+    {
+        cond_.wait(lock, [this]{ return done_ || !queue_.empty(); });
+        if (done_)
+        {
+            return;
+        }
+        auto task = queue_.wait_and_pop();
+        task();
+    }
 }
-
-void ZmqReply::push(std::string const& result)
-{
-    // TODO
-}
-
-void ZmqReply::finished()
-{
-    // TODO
-}
-
-} // namespace zmq_middleware
 
 } // namespace internal
 

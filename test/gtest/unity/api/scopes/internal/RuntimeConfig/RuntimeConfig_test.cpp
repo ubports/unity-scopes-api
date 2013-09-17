@@ -30,7 +30,7 @@ TEST(RuntimeConfig, basic)
     RuntimeConfig c;
     EXPECT_EQ("Registry", c.registry_identity());
     EXPECT_EQ("Registry.ini", c.registry_configfile());
-    EXPECT_EQ("Ice", c.default_middleware());
+    EXPECT_EQ("Zmq", c.default_middleware());
     EXPECT_EQ("Factory.ini", c.factory_configfile());
 }
 
@@ -101,7 +101,7 @@ TEST(RuntimeConfig, BadMiddleware)
     catch (ConfigException const& e)
     {
         EXPECT_EQ("unity::api::scopes::ConfigException: \"BadMW.ini\": Illegal value for Default.Middleware: "
-                  "\"Foo\": legal values are \"Ice\" and \"REST\"",
+                  "\"Foo\": legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }
 }

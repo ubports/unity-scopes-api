@@ -18,6 +18,8 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
 
+#include <unity/api/scopes/ScopeExceptions.h>
+
 #include <capnp/serialize.h>
 
 #include <cassert>
@@ -106,18 +108,38 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_resp
     return b.getSegmentsForOutput();
 }
 
-#if 0
-kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_operation_not_exist_response(capnp::MessageBuilder& b,
-                                                                                        string const& id,
-                                                                                        string const& endpoint,
-                                                                                        string const& adapter,
-                                                                                        string const& op_name)
+void throw_if_runtime_exception(capnproto::Response::Reader const& response)
 {
-    auto response = b.initRoot<capnproto::Response>();
-    marshal_operation_not_exist_exception(response, id, endpoint, adapter, op_name);
-    return b.getSegmentsForOutput();
+    if (response.getStatus() != capnproto::ResponseStatus::RUNTIME_EXCEPTION)
+    {
+        return;
+    }
+    auto payload = response.getPayload<capnproto::RuntimeException>();
+    switch (payload.which())
+    {
+        case capnproto::RuntimeException::OPERATION_NOT_EXIST:
+        {
+            auto opne = payload.getOperationNotExist();
+            auto proxy = opne.getProxy();
+            string msg = string("Operation \"") + opne.getOpName().cStr() + "\" does not exist "
+                         "(adapter = " + opne.getAdapter().cStr() + ", endpoint = " +
+                         proxy.getEndpoint().cStr() + ", identity = " + proxy.getIdentity().cStr() + ")";
+            throw MiddlewareException(msg);
+        }
+        case capnproto::RuntimeException::OBJECT_NOT_EXIST:
+        {
+            auto one = payload.getObjectNotExist();
+            auto proxy = one.getProxy();
+            string msg = string("Object does not exist (adapter = ") + one.getAdapter().cStr() + ", endpoint = " +
+                         proxy.getEndpoint().cStr() + ", identity = " + proxy.getIdentity().cStr() + ")";
+            throw MiddlewareException(msg);
+        }
+        case capnproto::RuntimeException::UNKNOWN:
+        {
+            throw MiddlewareException(payload.getUnknown().cStr());
+        }
+    }
 }
-#endif
 
 } // namespace zmq_middleware
 
