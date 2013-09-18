@@ -26,8 +26,6 @@
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <iostream> // TODO: remove this
-
 using namespace std;
 
 namespace unity
@@ -61,8 +59,6 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile
     // TODO: get pool size from config
     assert(!server_name.empty());
 
-    cerr << (void*)(context()) << endl;
-    cerr << (void*)(&context_) << endl;
     try
     {
 #if 0
@@ -309,17 +305,6 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
 
 zmqpp::context* ZmqMiddleware::context() const noexcept
 {
-    cerr << "In context(): instantiating socket" << endl;
-    zmqpp::socket tmp(context_, zmqpp::socket_type::subscribe);
-    cerr << "In context(): connecting" << endl;
-    try
-    {
-        tmp.connect("inproc://_adapter_ctrl"); // Once we can read from here, that's the command to stop.
-    }
-    catch (...)
-    {
-    }
-    cerr << "In context(): returning " << (void*) &context_ << endl;
     return const_cast<zmqpp::context*>(&context_);
 }
 

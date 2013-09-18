@@ -270,11 +270,23 @@ void ObjectAdapter::broker_thread()
 {
     try
     {
-        cerr << "OA: " << (void*)mw_.context() << endl;
         zmqpp::socket ctrl(*mw_.context(), zmqpp::socket_type::subscribe);
         zmqpp::poller poller;
         try
         {
+            // HACK: gcc 4.8.1 generates bad code for this function. Without at least an extra 17 bytes on
+            //       the stack here, we get a segfault. The same code works fine without the hack with gcc 4.7.3.
+            //       This is *not* a race condition. It looks like incorrect register allocation.
+            //       The idea of hack_function_ is to stop the compiler from optimizing the buf_ variable away as
+            //       unused. By passing its address to a function in another compilation unit, the compiler cannot
+            //       optmize it away.
+            // TODO: Check for later versions of gcc whether this has been fixed by commenting out the three lines
+            //       below and running the tests in debug mode. If there is no more segfault in the ObjectAdapter_test,
+            //       things are OK.
+            extern void hack_function_(char*);
+            char buf_[17];
+            hack_function_(buf_);
+
             ctrl.connect("inproc://" + name_ + "_adapter_ctrl"); // Once we can read from here, that's the command to stop.
             ctrl.subscribe("");
             poller.add(ctrl);
@@ -375,7 +387,6 @@ void ObjectAdapter::worker_thread()
     {
         zmqpp::poller poller;
 
-        cerr << "worker: " << (void*)mw_.context() << endl;
         zmqpp::socket ctrl(*mw_.context(), zmqpp::socket_type::subscribe); // ctrl becomes ready for reading when we are told to stop.
         ctrl.connect("inproc://" + name_ + "_adapter_ctrl");
         ctrl.subscribe("");

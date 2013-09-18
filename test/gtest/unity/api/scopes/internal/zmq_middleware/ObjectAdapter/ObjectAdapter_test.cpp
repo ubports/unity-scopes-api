@@ -82,7 +82,6 @@ TEST(ObjectAdapter, basic)
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
         a.activate();
     }
-#if 0
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
@@ -128,10 +127,7 @@ TEST(ObjectAdapter, basic)
         a.shutdown();
         a.wait_for_shutdown();
     }
-#endif
 }
-
-#if 0
 
 TEST(ObjectAdapter, state_change)
 {
@@ -723,4 +719,3 @@ TEST(ObjectAdapter, oneway_threading)
     EXPECT_EQ(num_requests, o->num_invocations());
     EXPECT_EQ(num_threads, o->max_concurrent());
 }
-#endif
