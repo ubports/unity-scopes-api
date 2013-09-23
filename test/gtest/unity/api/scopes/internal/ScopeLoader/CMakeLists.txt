@@ -18,6 +18,4 @@ add_library(ThrowStdExFromStop MODULE ThrowStdExFromStop.cpp)
 add_library(ThrowUnknownExFromStart MODULE ThrowUnknownExFromStart.cpp)
 add_library(ThrowUnknownExFromStop MODULE ThrowUnknownExFromStop.cpp)
 
-configure_file(Ice.Config.in ${CMAKE_CURRENT_BINARY_DIR}/Ice.Config)
-
 add_test(ScopeLoader ScopeLoader_test)

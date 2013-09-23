@@ -21,9 +21,11 @@
 
 #include <unity/util/NonCopyable.h>
 
+#include <cassert>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 
 namespace unity
 {
@@ -38,28 +40,46 @@ namespace internal
 {
 
 // Simple thread-safe queue of items.
+// If the queue is destroyed while threads are blocked in wait_and_pop(), wait_and_pop() throws std::runtime_error.
 
 template<typename T>
 class ThreadSafeQueue final : private util::NonCopyable
 {
 public:
-    ThreadSafeQueue() = default;
-    ~ThreadSafeQueue() noexcept {};
+    typedef T value_type;
+
+    ThreadSafeQueue();
+    ~ThreadSafeQueue() noexcept;
 
     void push(T const& item);
     void push(T&& item);
     T wait_and_pop();
-    bool try_pop(T&& item);
+    bool try_pop(T& item);
     bool empty() const noexcept;
+    size_t size() const noexcept;
 
 private:
     std::queue<T> queue_;
     mutable std::mutex mutex_;
     std::condition_variable cond_;
+    bool done_;
 };
 
 template<typename T>
-inline
+ThreadSafeQueue<T>::ThreadSafeQueue() :
+    done_(false)
+{
+}
+
+template<typename T>
+ThreadSafeQueue<T>::~ThreadSafeQueue() noexcept
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    done_ = true;
+    cond_.notify_all();
+}
+
+template<typename T>
 void ThreadSafeQueue<T>::push(T const& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -68,7 +88,6 @@ void ThreadSafeQueue<T>::push(T const& item)
 }
 
 template<typename T>
-inline
 void ThreadSafeQueue<T>::push(T&& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -77,36 +96,44 @@ void ThreadSafeQueue<T>::push(T&& item)
 }
 
 template<typename T>
-inline
 T ThreadSafeQueue<T>::wait_and_pop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return queue_.size() != 0; });
+    cond_.wait(lock, [this] { return done_ || queue_.size() != 0; });
+    if (done_)
+    {
+        throw std::runtime_error("ThreadSafeQueue: queue destroyed while thread was blocked in wait_and_pop()");
+    }
     T item = std::move(queue_.front());
     queue_.pop();
     return item;
 }
 
 template<typename T>
-inline
-bool ThreadSafeQueue<T>::try_pop(T&& item)
+bool ThreadSafeQueue<T>::try_pop(T& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (queue_.empty())
     {
         return false;
     }
-    item = move(queue_.front());
+    item = std::move(queue_.front());
     queue_.pop();
     return true;
 }
 
 template<typename T>
-inline
 bool ThreadSafeQueue<T>::empty() const noexcept
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return queue_.empty();
+}
+
+template<typename T>
+size_t ThreadSafeQueue<T>::size() const noexcept
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return queue_.size();
 }
 
 } // namespace internal

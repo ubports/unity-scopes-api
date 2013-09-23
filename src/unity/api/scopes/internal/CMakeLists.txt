@@ -1,6 +1,3 @@
-#add_subdirectory(ice_middleware)
-#set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
-
 add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
@@ -34,17 +31,13 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
 
 set(CONFIG_FILE_PREFIX "var/unity/api/scopes/config")
 
-#configure_file(Registry.config.in ${CMAKE_CURRENT_BINARY_DIR}/Registry.config)
-
 add_executable(scope-registry RegistryMain.cpp zmq_middleware/RegistryI.cpp)
 target_link_libraries(scope-registry ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 
-configure_file(Factory.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Factory.ini)
-# configure_file(Ice.Registry.config.in ${CMAKE_CURRENT_BINARY_DIR}/Ice.Registry.config)
-configure_file(Registry.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Registry.ini)
-configure_file(Runtime.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini)
+configure_file(RegistryMain.ini.in ${CMAKE_CURRENT_BINARY_DIR}/RegistryMain.ini)

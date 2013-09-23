@@ -23,6 +23,8 @@
 #include <unity/api/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/api/scopes/internal/ThreadPool.h>
+#include <unity/api/scopes/internal/UniqueID.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
 
@@ -46,6 +48,7 @@ namespace zmq_middleware
 {
 
 class ObjectAdapter;
+class ServantBase;
 
 class ZmqMiddleware final : public MiddlewareBase
 {
@@ -60,27 +63,36 @@ public:
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
 
-    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl);
-    virtual MWQueryProxy add_query_object(QueryObject::SPtr const& query);
+    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) override;
+    virtual MWQueryProxy add_query_object(QueryObject::SPtr const& query) override;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObject::SPtr const& registry) override;
     virtual MWReplyProxy add_reply_object(ReplyObject::SPtr const& reply) override;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) override;
 
-    // virtual void remove_object(std::string const& identity);
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool() const noexcept;
 
 private:
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name);
 
+    ZmqProxy safe_add(std::function<void()>& disconnect_func,
+                      std::shared_ptr<ObjectAdapter> const& adapter,
+                      std::string const& identity,
+                      std::shared_ptr<ServantBase> const& servant);
+
     std::string server_name_;
-    zmqpp::context context_;
 
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
-    mutable std::mutex mutex_;
 
     std::unique_ptr<ThreadPool> invokers_;
+    mutable std::mutex mutex_;
+    zmqpp::context context_;
+    UniqueID unique_id_;
+
+    enum State { Stopped, Starting, Started };
+    State state_;
+    std::condition_variable state_changed_;
 };
 
 } // namespace zmq_middleware

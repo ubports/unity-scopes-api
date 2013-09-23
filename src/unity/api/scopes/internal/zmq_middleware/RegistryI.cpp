@@ -48,7 +48,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, Scope*> ScopeDict;
+dictionary<string, Scope*> ScopeDictMap;
 
 exception NotFoundException
 {

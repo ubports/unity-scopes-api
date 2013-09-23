@@ -16,15 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryImpl.h>
+#ifndef UNITY_API_SCOPES_INTERNAL_UNIQUEID_H
+#define UNITY_API_SCOPES_INTERNAL_UNIQUEID_H
 
-#include <unity/api/scopes/internal/MWRegistry.h>
-#include <unity/api/scopes/ScopeExceptions.h>
-#include <unity/UnityExceptions.h>
+#include <unity/util/NonCopyable.h>
 
-#include <cassert>
-
-using namespace std;
+#include <iomanip>
+#include <mutex>
+#include <random>
+#include <sstream>
+#include <string>
 
 namespace unity
 {
@@ -38,31 +39,25 @@ namespace scopes
 namespace internal
 {
 
-RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime) :
-    mw_proxy_(mw_proxy),
-    runtime_(runtime)
-{
-    assert(runtime);
-}
+// Poor man's thread-safe unique ID generator.
+// Generates a random number concatenated with a counter.
+// Return value is a string of 16 hex digits.
 
-RegistryImpl::~RegistryImpl() noexcept
+class UniqueID : private util::NonCopyable
 {
-}
+public:
+    UniqueID();
+    explicit UniqueID(std::mt19937::result_type seed);
 
-ScopeProxy RegistryImpl::find(std::string const& scope_name)
-{
-    return mw_proxy_->find(scope_name);
-}
+    std::string gen();
 
-ScopeMap RegistryImpl::list()
-{
-    return mw_proxy_->list();
-}
-
-RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
-{
-    return RegistryProxy(new Registry(new RegistryImpl(mw_proxy, runtime)));
-}
+private:
+    std::mt19937 engine;
+    std::uniform_int_distribution<uint32_t> uniform_dist;
+    int counter;
+    std::ostringstream s;
+    std::mutex m;
+};
 
 } // namespace internal
 
@@ -71,3 +66,5 @@ RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl*
 } // namespace api
 
 } // namespace unity
+
+#endif

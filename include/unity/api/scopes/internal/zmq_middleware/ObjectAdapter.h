@@ -93,7 +93,7 @@ private:
     std::promise<void> ready_;                  // For handshake with child threads
     std::mutex ready_mutex_;                    // Protects ready_
 
-    enum AdapterState { Inactive, Activating, Active, ShuttingDown };
+    enum AdapterState { Inactive, Active, ShuttingDown };
     AdapterState state_;
     std::condition_variable state_changed_;
 

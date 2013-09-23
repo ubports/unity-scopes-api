@@ -20,7 +20,15 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/api/scopes/internal/zmq_middleware/QueryI.h>
+#include <unity/api/scopes/internal/zmq_middleware/QueryCtrlI.h>
+#include <unity/api/scopes/internal/zmq_middleware/RegistryI.h>
+#include <unity/api/scopes/internal/zmq_middleware/ReplyI.h>
+#include <unity/api/scopes/internal/zmq_middleware/ScopeI.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqQuery.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/api/scopes/internal/zmq_middleware/RethrowException.h>
 #include <unity/api/scopes/ScopeExceptions.h>
@@ -46,58 +54,33 @@ namespace zmq_middleware
 namespace
 {
 
+char const* query_suffix = "-query";  // Appended to server_name_ to create query adapter name
 char const* ctrl_suffix = "-ctrl";    // Appended to server_name_ to create control adapter name
 char const* reply_suffix = "-reply";  // Appended to server_name_ to create reply adapter name
 
 } // namespace
 
-ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile, RuntimeImpl* runtime) :
+ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile, RuntimeImpl* runtime)
+try :
     MiddlewareBase(runtime),
-    server_name_(server_name)
+    server_name_(server_name),
+    state_(Stopped)
 {
-    // TODO: get directory from config
-    // TODO: get pool size from config
     assert(!server_name.empty());
 
-    try
-    {
-#if 0
-        Ice::PropertiesPtr props = Ice::createProperties();
-        props->load(configfile);
-
-
-        // Set properties for the object adapters. We need to do this before we create the communicator
-        // because Ice reads properties only once, during communicator creation.
-
-        // TODO: dubious, because -f path may not be last in the endpoint config need to parse out the endpoint
-        // or maybe get it from the adapter.
-        props->setProperty(server_name_ + ctrl_suffix + ".Endpoints",  props->getProperty(server_name_ + ".Endpoints") + ctrl_suffix);
-        props->setProperty(server_name_ + reply_suffix + ".Endpoints",  props->getProperty(server_name_ + ".Endpoints") + reply_suffix);
-
-        // The -ctrl adapter gets its own thread pool with a single thread.
-        props->setProperty(server_name_ + ctrl_suffix + ".ThreadPool.Size", "1");
-
-        // TODO: configurable pool size for normal and reply adapter
-
-        Ice::InitializationData init_data;
-        init_data.properties = props;
-        ic_ = Ice::initialize(init_data);
-#endif
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
+    // TODO: read config from file (thread pool size, invocation timeout, etc.
+}
+catch (zmqpp::exception const& e)
+{
+    rethrow_zmq_ex(e);
 }
 
 ZmqMiddleware::~ZmqMiddleware() noexcept
 {
     try
     {
-#if 0
         stop();
-        ic_->destroy();
-#endif
+        wait_for_shutdown();
     }
     catch (zmqpp::exception const& e)
     {
@@ -111,50 +94,76 @@ ZmqMiddleware::~ZmqMiddleware() noexcept
 
 void ZmqMiddleware::start()
 {
+    unique_lock<mutex> lock(mutex_);
+
+    switch (state_)
+    {
+        case Started:
+        case Starting:
+        {
+            return; // Already started, or about to start, no-op
+        }
+        case Stopped:
+        {
+            // TODO: get directory from config
+            // TODO: get pool size from config
+            invokers_.reset(new ThreadPool(1));
+            state_ = Started;
+            lock.unlock();
+            state_changed_.notify_all();
+            break;
+        }
+        default:
+        {
+            assert(false);
+        }
+    }
 }
 
 void ZmqMiddleware::stop()
 {
-#if 0
-    try
+    unique_lock<mutex> lock(mutex_);
+    switch (state_)
     {
-        // TODO: need to cancel any outstanding stuff here?
-        // TODO: need to disable proxy?
-
-        AdapterMap am;
+        case Stopped:
         {
-            lock_guard<mutex> lock(mutex_);
-            am = am_;
-            am_.clear();
+            break;  // Already stopped, or about to stop, no-op
         }
-        for (auto a : am)
+        case Starting:
         {
-            a.second->deactivate();
-            a.second->waitForDeactivate();
+            // Wait until start in progress has completed before stopping
+            // Coverage excluded here because the window for which we are in this state is too
+            // small to hit with a test.
+            state_changed_.wait(lock, [this]{ return state_ == Started; }); // LCOV_EXCL_LINE
+            // FALLTHROUGH
         }
-        am.clear();
+        case Started:
+        {
+            invokers_.reset();          // No more outgoing invocations
+            for (auto& pair : am_)
+            {
+                pair.second->shutdown();
+            }
+            for (auto& pair : am_)
+            {
+                pair.second->wait_for_shutdown();
+            }
+            state_ = Stopped;
+            lock.unlock();
+            state_changed_.notify_all();
+            break;
+        }
+        default:
+        {
+            assert(false);  // LCOV_EXCL_LINE
+        }
     }
-    catch (Zmq::exception const& e)
-    {
-        // TODO: log exception
-        rethrow_zmq_ex(e);
-    }
-#endif
 }
 
 void ZmqMiddleware::wait_for_shutdown()
 {
-#if 0
-    try
-    {
-        ic_->waitForShutdown();
-    }
-    catch (Ice::Exception const& e)
-    {
-        // TODO: log exception
-        rethrow_ice_ex(e);
-    }
-#endif
+    unique_lock<mutex> lock(mutex_);
+    state_changed_.wait(lock, [this]{ return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
@@ -187,120 +196,110 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
 
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl)
 {
-#if 0
     assert(ctrl);
 
     MWQueryCtrlProxy proxy;
     try
     {
-        QueryCtrlIPtr ci = new QueryCtrlI(ctrl);
-        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
+        shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
+        auto adapter = find_adapter(server_name_ + ctrl_suffix);
         function<void()> df;
-        proxy.reset(new IceQueryCtrl(this, middleware::QueryCtrlPrx::uncheckedCast(safe_add(df, a, ci))));
+        auto proxy = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
+        return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity()));
     }
-    catch (Ice::Exception const& e)
+    catch (...)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        throw; // TODO
     }
     return proxy;
-#endif
 }
 
 MWQueryProxy ZmqMiddleware::add_query_object(QueryObject::SPtr const& query)
 {
-#if 0
     assert(query);
 
     MWQueryProxy proxy;
     try
     {
-        QueryIPtr qi = new QueryI(this, query);
-        Ice::ObjectAdapterPtr a = find_adapter(server_name_);
+        shared_ptr<QueryI> qi(make_shared<QueryI>(query));
+        auto adapter = find_adapter(server_name_ + query_suffix);
         function<void()> df;
-        proxy.reset(new IceQuery(this, middleware::QueryPrx::uncheckedCast(safe_add(df, a, qi))));
+        auto proxy = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
+        return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity()));
     }
-    catch (Ice::Exception const& e)
+    catch (...)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        throw; // TODO
     }
     return proxy;
-#endif
 }
 
 
 MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, RegistryObject::SPtr const& registry)
 {
-#if 0
     assert(!identity.empty());
     assert(registry);
 
     MWRegistryProxy proxy;
     try
     {
-        RegistryIPtr ri = new RegistryI(registry);
-        Ice::ObjectAdapterPtr a = find_adapter(server_name_);
+        shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
+        auto adapter = find_adapter(server_name_);
         function<void()> df;
-        proxy.reset(new IceRegistry(this, middleware::RegistryPrx::uncheckedCast(safe_add(df, a, ri, identity))));
+        auto proxy = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
+        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity()));
     }
-    catch (Ice::Exception const& e)
+    catch (...)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        throw; // TODO
     }
     return proxy;
-#endif
 }
 
 MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
 {
-#if 0
     assert(reply);
 
     MWReplyProxy proxy;
     try
     {
-        ReplyIPtr si = new ReplyI(reply);
-        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + reply_suffix);
+        shared_ptr<ReplyI> ri(make_shared<ReplyI>(reply));
+        auto adapter = find_adapter(server_name_ + reply_suffix);
         function<void()> df;
-        proxy.reset(new IceReply(this, middleware::ReplyPrx::uncheckedCast(safe_add(df, a, si))));
+        auto proxy = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
+        return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity()));
     }
-    catch (Ice::Exception const& e)
+    catch (...)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        throw; // TODO
     }
     return proxy;
-#endif
 }
 
 MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject::SPtr const& scope)
 {
-#if 0
     assert(!identity.empty());
     assert(scope);
 
     MWScopeProxy proxy;
     try
     {
-        ScopeIPtr si = new ScopeI(this, scope);
-        Ice::ObjectAdapterPtr a = find_adapter(server_name_ + ctrl_suffix);
+        shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
+        auto adapter = find_adapter(server_name_);
         function<void()> df;
-        proxy.reset(new IceScope(this, middleware::ScopePrx::uncheckedCast(safe_add(df, a, si, identity))));
+        auto proxy = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
+        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity()));
     }
-    catch (Ice::Exception const& e)
+    catch (...)
     {
-        // TODO: log exception
-        rethrow_ice_ex(e);
+        throw; // TODO
     }
     return proxy;
-#endif
 }
 
 zmqpp::context* ZmqMiddleware::context() const noexcept
@@ -342,7 +341,14 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
     // We don't have the requested adapter yet, so we create it on the fly.
     int pool_size;
     RequestType type;
-    if (has_suffix(name, ctrl_suffix))
+    if (has_suffix(name, query_suffix))
+    {
+        // The query adapter is single or multi-thread and supports oneway operations only.
+        // TODO: get pool size from config
+        pool_size = 1;
+        type = RequestType::Oneway;
+    }
+    else if (has_suffix(name, ctrl_suffix))
     {
         // The ctrl adapter is single-threaded and supports oneway operations only.
         pool_size = 1;
@@ -363,11 +369,39 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
         type = RequestType::Twoway;
     }
     // TODO: get directory of adapter from config
-    string endpoint = "ipc://" + name;
+    // The query adapter is always inproc.
+    string endpoint = (has_suffix(name, query_suffix) ? "inproc://" : "ipc://") + name;
 
     shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, type, pool_size));
+    a->activate();
     am_[name] = a;
     return a;
+}
+
+ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
+                                 shared_ptr<ObjectAdapter> const& adapter,
+                                 string const& identity,
+                                 shared_ptr<ServantBase> const& servant)
+{
+    string id = identity.empty() ? unique_id_.gen() : identity;
+
+#if 0 // TODO: is this necessary? Needs to match what happens in stop()
+    lock_guard<mutex> lock(mutex_);
+    if (!adapter)
+    {
+        throw LogicException("Cannot add object to stopped middleware");
+    }
+#endif
+    disconnect_func = [adapter, id] {
+        try
+        {
+            adapter->remove(id);
+        }
+        catch (...)
+        {
+        }
+    };
+    return adapter->add(id, servant);
 }
 
 } // namespace zmq_middleware

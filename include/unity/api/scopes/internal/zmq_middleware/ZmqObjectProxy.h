@@ -22,11 +22,9 @@
 #include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <unity/api/scopes/internal/zmq_middleware/RequestType.h>
-#if 0
-#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
-#endif
-#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
 
 #include <capnp/message.h>
 
@@ -45,6 +43,8 @@ namespace internal
 namespace zmq_middleware
 {
 
+class ZmqReceiver;
+
 // An Zmq proxy that points at some Zmq object, but without a specific type.
 
 class ZmqObjectProxy : public virtual MWObjectProxy
@@ -61,7 +61,7 @@ public:
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
-    std::unique_ptr<capnp::SegmentArrayMessageReader> invoke_(capnp::MessageBuilder& out_params);
+    std::unique_ptr<ZmqReceiver> invoke_(capnp::MessageBuilder& out_params);
 
     // TODO: commented out for now (see below)
 #if 0

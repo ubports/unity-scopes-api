@@ -44,6 +44,11 @@ ConnectionPool::ConnectionPool(zmqpp::context& context) :
 {
 }
 
+ConnectionPool::~ConnectionPool()
+{
+    pool_.clear();
+}
+
 zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestType t)
 {
     assert(!endpoint.empty());
@@ -66,6 +71,7 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestType t)
     // No existing connection yet, establish one.
     zmqpp::socket_type stype = t == RequestType::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push;
     zmqpp::socket s(context_, stype);
+    s.set(zmqpp::socket_option::linger, 0);
     s.connect(endpoint);
     return pool_.emplace(endpoint, Connection { move(s), t }).first->second.socket;
 }

@@ -16,12 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
+#include <unity/api/scopes/internal/UniqueID.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryProxyFwd.h>
-#include <unity/api/scopes/internal/MWQuery.h>
+using namespace std;
 
 namespace unity
 {
@@ -35,19 +32,26 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
+UniqueID::UniqueID() :
+    UniqueID(random_device()())
 {
+}
 
-class ZmqQuery : public virtual ZmqObjectProxy, public virtual MWQuery
+UniqueID::UniqueID(mt19937::result_type seed) :
+    engine(seed),
+    counter(0)
 {
-public:
-    ZmqQuery(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqQuery() noexcept;
+    s << hex << setfill('0');
+}
 
-    virtual void run(MWReplyProxy const& reply) override;
-};
-
-} // namespace zmq_middleware
+string UniqueID::gen()
+{
+    lock_guard<std::mutex> lock(m);
+    s << setw(8) << uniform_dist(engine) << setw(8) << counter++;
+    string id(s.str());
+    s.str("");
+    return id;
+}
 
 } // namespace internal
 
@@ -56,5 +60,3 @@ public:
 } // namespace api
 
 } // namespace unity
-
-#endif

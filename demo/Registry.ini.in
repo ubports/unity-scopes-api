@@ -1,4 +1,4 @@
 [Registry]
-Middleware = Ice
-Ice.Endpoint = uds -f uds-Registry
-Ice.Configfile = Ice.Registry.Config
+Middleware = Zmq
+Zmq.Endpoint = ipc://Registry
+Zmq.Configfile = Zmq.ini

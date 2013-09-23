@@ -17,6 +17,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqMiddleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqQueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqReceiver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqRegistry.cpp

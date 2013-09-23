@@ -65,8 +65,8 @@ QueryCtrlI::~QueryCtrlI() noexcept
 }
 
 void QueryCtrlI::cancel_(Current const&,
-                         capnp::DynamicObject::Reader& in_params,
-                         capnproto::Response::Builder& r)
+                         capnp::DynamicObject::Reader&,
+                         capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<QueryCtrlObject>(del());
     delegate->cancel();
@@ -74,7 +74,7 @@ void QueryCtrlI::cancel_(Current const&,
 
 void QueryCtrlI::destroy_(Current const&,
                           capnp::DynamicObject::Reader&,
-                          capnproto::Response::Builder& r)
+                          capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<QueryCtrlObject>(del());
     delegate->destroy();

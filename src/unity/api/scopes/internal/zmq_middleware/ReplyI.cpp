@@ -53,8 +53,8 @@ interface Reply
 using namespace std::placeholders;
 
 ReplyI::ReplyI(ReplyObject::SPtr const& ro) :
-    ServantBase(ro, { { "push_", bind(&ReplyI::push_, this, _1, _2, _3) },
-                      { "finished_", bind(&ReplyI::finished_, this, _1, _2, _3) } })
+    ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
+                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
 {
 }
 

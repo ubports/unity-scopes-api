@@ -48,6 +48,7 @@ private:
     virtual void cancel_(Current const& current,
                          capnp::DynamicObject::Reader& in_params,
                          capnproto::Response::Builder& r);
+
     virtual void destroy_(Current const& current,
                           capnp::DynamicObject::Reader& in_params,
                           capnproto::Response::Builder& r);

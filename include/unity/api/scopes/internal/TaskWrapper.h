@@ -57,13 +57,20 @@ public:
 
     void operator()()
     {
+
         task_->call();
+    }
+
+    bool valid() const
+    {
+        return task_ ? task_->valid() : false;
     }
 
 private:
     struct WrapperBase
     {
         virtual void call() = 0;
+        virtual bool valid() const = 0;
         virtual ~WrapperBase() noexcept {};
     };
 
@@ -71,15 +78,23 @@ private:
     struct WrapperType : WrapperBase
     {
         F f_;
+
         WrapperType(F&& f) :
             f_(std::move(f))
         {
         }
+
+        virtual ~WrapperType() noexcept {};
+
         void call()
         {
             f_();
-        };
-        virtual ~WrapperType() noexcept {};
+        }
+
+        bool valid() const
+        {
+            return f_.valid();
+        }
     };
 
     std::unique_ptr<WrapperBase> task_;

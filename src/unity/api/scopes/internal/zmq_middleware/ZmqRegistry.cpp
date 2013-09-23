@@ -43,6 +43,25 @@ namespace internal
 namespace zmq_middleware
 {
 
+/*
+
+interface Scope;
+
+dictionary<string, Scope*> ScopeDictMap;
+
+exception NotFoundException
+{
+    string scopeName;
+};
+
+interface Registry
+{
+    Scope* find(string name) throws NotFoundException;
+    ScopeDict list();
+};
+
+*/
+
 ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway),
@@ -56,75 +75,63 @@ ZmqRegistry::~ZmqRegistry() noexcept
 
 ScopeProxy ZmqRegistry::find(std::string const& scope_name)
 {
-    try
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "find");
+    auto in_params = request.initInParams<capnproto::Registry::FindRequest>();
+    in_params.setName(scope_name.c_str());
+
+    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    future.wait();
+    auto receiver = future.get();
+    auto segments = receiver->receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto find_response = response.getPayload<capnproto::Registry::FindResponse>().getResponse();
+    switch (find_response.which())
     {
-        capnp::MallocMessageBuilder request_builder;
-        auto request = make_request_(request_builder, "find");
-        auto in_params = request.initInParams<capnproto::Registry::FindRequest>();
-        in_params.setName(scope_name.c_str());
-
-        auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
-        future.wait();
-        auto reader = future.get();
-        auto response = reader->getRoot<capnproto::Response>();
-        throw_if_runtime_exception(response);
-
-        auto find_response = response.getPayload<capnproto::Registry::FindResponse>().getResponse();
-        switch (find_response.which())
+        case capnproto::Registry::FindResponse::Response::RETURN_VALUE:
         {
-            case capnproto::Registry::FindResponse::Response::RETURN_VALUE:
-            {
-                auto proxy = find_response.getReturnValue();
-                ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-                return ScopeImpl::create(p, mw_base()->runtime());
-            }
-            case capnproto::Registry::FindResponse::Response::NOT_FOUND_EXCEPTION:
-            {
-                auto ex = find_response.getNotFoundException();
-                throw MiddlewareException(string("Registry::find(): \"") + ex.getName().cStr() + "\": no such scope");
-            }
-            default:
-            {
-                throw MiddlewareException(string("Registry::find(): unknown user exception"));
-            }
+            auto proxy = find_response.getReturnValue();
+            ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+            return ScopeImpl::create(p, mw_base()->runtime());
         }
-    }
-    catch (...)
-    {
-        // TODO: throw MiddlewareException? Catch hierarcy unity::Exception -> std::Exception -> ... ???
-        throw;
+        case capnproto::Registry::FindResponse::Response::NOT_FOUND_EXCEPTION:
+        {
+            auto ex = find_response.getNotFoundException();
+            throw NotFoundException("Registry::find(): no such scope", ex.getName().cStr());
+        }
+        default:
+        {
+            throw MiddlewareException("Registry::find(): unknown user exception");
+        }
     }
 }
 
 ScopeMap ZmqRegistry::list()
 {
-    try
-    {
-        capnp::MallocMessageBuilder request_builder;
-        make_request_(request_builder, "list");
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "list");
 
-        auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
-        future.wait();
-        auto reader = future.get();
-        auto response = reader->getRoot<capnproto::Response>();
-        throw_if_runtime_exception(response);
+    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    future.wait();
+    auto receiver = future.get();
+    auto segments = receiver->receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
 
-        auto list_response = response.getPayload<capnproto::Registry::ListResponse>();
-        auto pairs = list_response.getReturnValue().getPairs();
-        ScopeMap sm;
-        for (size_t i = 0; i < pairs.size(); ++i)
-        {
-            auto proxy = pairs[i].getScopeProxy();
-            ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-            sm[pairs[i].getName().cStr()] = ScopeImpl::create(p, mw_base()->runtime());
-        }
-        return sm;
-    }
-    catch (...)
+    auto list_response = response.getPayload<capnproto::Registry::ListResponse>();
+    auto pairs = list_response.getReturnValue().getPairs();
+    ScopeMap sm;
+    for (size_t i = 0; i < pairs.size(); ++i)
     {
-        // TODO: ???
-        throw;
+        auto proxy = pairs[i].getScopeProxy();
+        ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+        sm[pairs[i].getName().cStr()] = ScopeImpl::create(p, mw_base()->runtime());
     }
+    return sm;
 }
 
 } // namespace zmq_middleware

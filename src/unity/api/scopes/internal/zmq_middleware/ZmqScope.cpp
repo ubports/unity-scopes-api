@@ -18,8 +18,12 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
 
-#include <unity/api/scopes/internal/ScopeImpl.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <unity/api/scopes/internal/QueryCtrlImpl.h>
+#include <unity/api/scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/api/scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
 
 using namespace std;
 
@@ -38,6 +42,20 @@ namespace internal
 namespace zmq_middleware
 {
 
+/*
+
+dictionary<string, Value> ValueDict;
+
+interface QueryCtrl;
+interface Reply;
+
+interface Scope
+{
+    QueryCtrl* create_query(string query, ValueDict hints, Reply* replyProxy);
+};
+
+*/
+
 ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway),
@@ -51,8 +69,31 @@ ZmqScope::~ZmqScope() noexcept
 
 QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply)
 {
-    // TODO
-    return QueryCtrlProxy();
+    capnp::MallocMessageBuilder request_builder;
+    auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
+    {
+        auto request = make_request_(request_builder, "create_query");
+        auto in_params = request.initInParams<capnproto::Scope::CreateQueryRequest>();
+        in_params.setQuery(q.c_str());
+        auto h = in_params.initHints();
+        to_value_dict(hints, h);
+        auto p = in_params.initReplyProxy();
+        p.setEndpoint(reply_proxy->endpoint().c_str());
+        p.setIdentity(reply_proxy->identity().c_str());
+    }
+
+    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    future.wait();
+
+    auto receiver = future.get();
+    auto segments = receiver->receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto proxy = response.getPayload<capnproto::Scope::CreateQueryResponse>().getReturnValue();
+    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    return QueryCtrlImpl::create(p, reply_proxy);
 }
 
 } // namespace zmq_middleware

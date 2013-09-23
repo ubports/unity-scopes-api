@@ -16,7 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqQuery.h>
+
+#include <unity/api/scopes/internal/zmq_middleware/capnproto/Query.capnp.h>
+#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
 
 using namespace std;
 
@@ -37,38 +40,33 @@ namespace zmq_middleware
 
 /*
 
-interface QueryCtrl
+interface Query
 {
-    void cancel();  // Oneway
-    void destroy(); // Oneway
+    void run(Reply* r);
 };
 
 */
 
-ZmqQueryCtrl::ZmqQueryCtrl(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqQuery::ZmqQuery(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
-    MWQueryCtrl(mw_base)
+    MWQuery(mw_base)
 {
 }
 
-ZmqQueryCtrl::~ZmqQueryCtrl() noexcept
+ZmqQuery::~ZmqQuery() noexcept
 {
 }
 
-void ZmqQueryCtrl::cancel()
+void ZmqQuery::run(MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
-    make_request_(request_builder, "cancel");
-
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
-    future.wait();
-}
-
-void ZmqQueryCtrl::destroy()
-{
-    capnp::MallocMessageBuilder request_builder;
-    make_request_(request_builder, "destroy");
+    auto request = make_request_(request_builder, "run");
+    auto in_params = request.initInParams<capnproto::Query::RunRequest>();
+    auto proxy = in_params.initReplyProxy();
+    auto rp = dynamic_pointer_cast<ZmqReply>(reply);
+    proxy.setEndpoint(rp->endpoint().c_str());
+    proxy.setIdentity(rp->identity().c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
     future.wait();

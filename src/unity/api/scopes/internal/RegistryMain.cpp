@@ -53,15 +53,15 @@ main(int, char*[])
 
         // TODO: temporary hack for demonstration purposes. The actual scopes need to be retrieved from
         //       configuration instead.
-        auto proxy = middleware->create_scope_proxy("scope-A", "uds -f uds-scope-A-ctrl");
-        registry->add(string("scope-A"), proxy);
-        proxy = middleware->create_scope_proxy("scope-B", "uds -f uds-scope-B-ctrl");
+        auto proxy = middleware->create_scope_proxy("scope-A", "ipc://scope-A");
+        registry->add("scope-A", proxy);
+        proxy = middleware->create_scope_proxy("scope-B", "ipc://scope-B");
         registry->add("scope-B", proxy);
-        proxy = middleware->create_scope_proxy("scope-C", "uds -f uds-scope-C-ctrl");
+        proxy = middleware->create_scope_proxy("scope-C", "ipc://scope-C");
         registry->add("scope-C", proxy);
-        proxy = middleware->create_scope_proxy("scope-D", "uds -f uds-scope-D-ctrl");
+        proxy = middleware->create_scope_proxy("scope-D", "ipc://scope-D");
         registry->add("scope-D", proxy);
-        proxy = middleware->create_scope_proxy("scope-slow", "uds -f uds-scope-slow-ctrl");
+        proxy = middleware->create_scope_proxy("scope-slow", "ipc://scope-slow");
         registry->add("scope-slow", proxy);
 
         // END TODO temporary hack

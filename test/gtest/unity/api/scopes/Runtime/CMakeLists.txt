@@ -1,5 +1,4 @@
 configure_file(Factory.ini.in Factory.ini)
-configure_file(Ice.Config.in Ice.Config)
 configure_file(Registry.ini.in Registry.ini)
 configure_file(Runtime.ini.in Runtime.ini)
 

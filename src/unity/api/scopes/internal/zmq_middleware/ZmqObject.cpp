@@ -20,7 +20,6 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
 
 #include <zmqpp/socket.hpp>
@@ -90,7 +89,7 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
 // Get a socket to the endpoint for this proxy, write the request on the wire and, if the invocation
 // is twoway, return a reader for the response.
 
-unique_ptr<capnp::SegmentArrayMessageReader> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
+unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
 {
     thread_local static ConnectionPool pool(*mw_base()->context());
 
@@ -98,14 +97,7 @@ unique_ptr<capnp::SegmentArrayMessageReader> ZmqObjectProxy::invoke_(capnp::Mess
     ZmqSender sender(s);
     sender.send(out_params.getSegmentsForOutput());
 
-    unique_ptr<capnp::SegmentArrayMessageReader> reader;
-    if (type() == RequestType::Twoway)
-    {
-        ZmqReceiver receiver(s);
-        auto segments = receiver.receive();
-        reader.reset(new capnp::SegmentArrayMessageReader(segments));
-    }
-    return reader;
+    return unique_ptr<ZmqReceiver>(new ZmqReceiver(s));
 }
 
 } // namespace zmq_middleware

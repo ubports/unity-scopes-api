@@ -47,36 +47,14 @@ namespace zmq_middleware
 
 /*
 
-enum ValueType { IntType, BoolType, StringType };
-
-class ValueBase
-{
-    ValueType type;
-};
-
-dictionary<string, ValueBase> ValueDict;
-
-class IntValue extends ValueBase
-{
-    int value;
-};
-
-class BoolValue extends ValueBase
-{
-    bool value;
-};
-
-class StringValue extends ValueBase
-{
-    string value;
-};
+dictionary<string, Value> ValueDict;
 
 interface QueryCtrl;
 interface Reply;
 
 interface Scope
 {
-    QueryCtrl* createQuery(string q, ValueDict hints, Reply* r);
+    QueryCtrl* create_query(string query, ValueDict hints, Reply* replyProxy);
 };
 
 */

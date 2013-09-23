@@ -37,7 +37,7 @@ main(int, char**)
     try
     {
         RuntimeImpl::UPtr rt = RuntimeImpl::create(scope_name);
-        MiddlewareBase::SPtr mw = rt->factory()->create(rt->scope_name(), "Ice", "Ice.Config");
+        MiddlewareBase::SPtr mw = rt->factory()->create(rt->scope_name(), "Zmq", "Zmq.Config");
         ScopeLoader::SPtr loader = ScopeLoader::load(rt->scope_name(), "lib" + rt->scope_name() + ".so", rt->registry());
         loader->start();
         ScopeObject::SPtr scope(new ScopeObject(rt.get(), loader->scope_base()));

@@ -34,26 +34,57 @@ namespace scopes
 namespace internal
 {
 
+ThreadPool::ThreadPool(int size)
+{
+    if (size < 1)
+    {
+        throw InvalidArgumentException("ThreadPool(): invalid pool size: " + std::to_string(size));
+    }
+
+    queue_.reset(new TaskQueue);
+
+    try
+    {
+        for (int i = 0; i < size; ++i)
+        {
+            threads_.push_back(std::thread(&ThreadPool::run, this));
+        }
+    }
+    catch (std::exception const&)   // LCOV_EXCL_LINE
+    {
+        throw unity::ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
+    }
+}
+
 ThreadPool::~ThreadPool() noexcept
 {
+    try
     {
-        lock_guard<mutex> lock(mutex_);
-        done_ = true;
+        queue_.reset(nullptr);
+        for (size_t i = 0; i < threads_.size(); ++i)
+        {
+            threads_[i].join();
+        }
     }
-    cond_.notify_all();
+    catch (...) // LCOV_EXCL_LINE
+    {
+        assert(false);  // LCOV_EXCL_LINE
+    }
 }
 
 void ThreadPool::run()
 {
-    unique_lock<mutex> lock(mutex_);
     for (;;)
     {
-        cond_.wait(lock, [this]{ return done_ || !queue_.empty(); });
-        if (done_)
+        TaskQueue::value_type task;
+        try
         {
-            return;
+            task = queue_->wait_and_pop();
         }
-        auto task = queue_.wait_and_pop();
+        catch (...)
+        {
+            return; // wait_and_pop() throws if the queue is destroyed while threads are blocked on it.
+        }
         task();
     }
 }

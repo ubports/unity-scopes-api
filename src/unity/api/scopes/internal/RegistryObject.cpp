@@ -43,12 +43,6 @@ RegistryObject::~RegistryObject() noexcept
 {
 }
 
-// TODO: throwing below is pointless because we are hanging off the skeleton. Instead, we need to log.
-// TODO: examine unified stragegy for all <something>I classes to unify exception handling and logging.
-//       it might be better to just throw all way through the hierarchy and do the final handling and
-//       logging in the <something>I class (except for things that are application related, such as
-//       the semantics for the reply object, which are implemented in the ReplyObject class.
-
 MWScopeProxy RegistryObject::find(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
@@ -109,7 +103,6 @@ void RegistryObject::remove(std::string const& scope_name)
     }
     scopes_.erase(it);
 }
-
 
 } // namespace internal
 

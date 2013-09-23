@@ -1,6 +1,0 @@
-Ice.Plugin.IceUDS.cpp.IceUDS = @IceUDS_LIBDIR@/IceUDS,1.0:create_Ice_UDS
-Registry.Endpoints = uds -f uds-Registry
-
-#Ice.Trace.Network = 3
-#Ice.Trace.Protocol = 1
-#Ice.Warn.UnusedProperties = 1

@@ -49,10 +49,11 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ConnectionPool : private util::NonCopyable
+class ConnectionPool final : private util::NonCopyable
 {
 public:
     ConnectionPool(zmqpp::context& context);
+    ~ConnectionPool();
     zmqpp::socket& find(std::string const& endpoint, RequestType t);
 
 private:

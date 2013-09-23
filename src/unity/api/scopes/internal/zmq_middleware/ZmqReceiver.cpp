@@ -60,9 +60,10 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
         s_.receive(str);
         if (str.empty())
         {
-            // For pull sockets, receive() returns zero bytes about half the time, even after
-            // poll() has signalled that data is ready. We ignore these.
-            continue;
+            // For pull sockets, receive() returns zero bytes when the socket is closed.
+            // TODO: dodgy, need to think about this. Need to prevent unmarshaling code
+            // from falling over if zero is returned in the middle of a multi-part message.
+            break;
         }
 
         if (str.size() % sizeof(capnp::word) != 0)      // Received message must contain an integral number of words.
@@ -79,11 +80,15 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
         }
         else
         {
+            // No coverage here because std::string appears to always have its buffer word-aligned.
+            // Because the standard doesn't guarantee this though, and it might change in the future,
+            // the code below remains enabled.
+            //
             // String buffer is not word-aligned, make a copy and point at that.
-            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);
-            memcpy(words.get(), buf, str.size());
-            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));
-            copied_parts_.push_back(move(words));
+            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);                    // LCOV_EXCL_LINE
+            memcpy(words.get(), buf, str.size());                                           // LCOV_EXCL_LINE
+            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));     // LCOV_EXCL_LINE
+            copied_parts_.push_back(move(words));                                           // LCOV_EXCL_LINE
         }
     }
     while (s_.has_more_parts());

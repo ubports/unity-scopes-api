@@ -38,7 +38,7 @@ main(int, char**)
     try
     {
         RuntimeImpl::UPtr rtB = RuntimeImpl::create(scope_nameB);
-        MiddlewareBase::SPtr mwB = rtB->factory()->create(rtB->scope_name(), "Ice", "Ice.Config");
+        MiddlewareBase::SPtr mwB = rtB->factory()->create(rtB->scope_name(), "Zmq", "Zmq.Config");
         ScopeLoader::SPtr loaderB = ScopeLoader::load(rtB->scope_name(), "lib" + rtB->scope_name() + ".so",
                                                       rtB->registry());
         loaderB->start();
@@ -46,7 +46,7 @@ main(int, char**)
         mwB->add_scope_object(rtB->scope_name(), scopeB);
 
         RuntimeImpl::UPtr rtC = RuntimeImpl::create(scope_nameC);
-        MiddlewareBase::SPtr mwC = rtC->factory()->create(rtC->scope_name(), "Ice", "Ice.Config");
+        MiddlewareBase::SPtr mwC = rtC->factory()->create(rtC->scope_name(), "Zmq", "Zmq.Config");
         ScopeLoader::SPtr loaderC = ScopeLoader::load(rtC->scope_name(), "lib" + rtC->scope_name() + ".so",
                                                       rtC->registry());
         loaderC->start();

@@ -46,25 +46,11 @@ else()
     message(WARNING "Cannot find valgrind: valgrind target will not be available")
 endif()
 
-# TODO: For now, we need to use Ice 3.5 built from source until the Debian package becomes available.
-# The tarball is available here: http://zeroc.com/download/Ice/3.5/Ice-3.5.0.tar.gz
-# To build Ice, go to <source_root>/cpp, and do "make; make test; sudo make install".
-# The default config is fine. If you want to install somewhere else, edit the cpp/config/Make.rules file.
-# set(IceRoot /usr)
-# if (NOT EXISTS ${IceRoot}/include/Ice/Ice.h)
-#     message(FATAL_ERROR "Cannot find Ice development files. You need to build Ice 3.5 from source and install it, and set IceRoot in CMakeLists.txt accordingly. Then set LD_LIBRARY_PATH to include the Ice lib64 directory, set PATH to include the Ice bin directory, and try again.")
-# endif()
-#
-# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${IceRoot}/lib64")
-
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
-
-# UNIX Domain Socket transport plug-in for Ice.
-# pkg_check_modules(IceUDS libIceUDS REQUIRED)
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -73,7 +59,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_BINARY_DIR}/src
-#    ${IceRoot}/include
     ${OTHER_INCLUDE_DIRS}
 )
 
@@ -87,6 +72,13 @@ add_definitions(-DUNITY_DLL_EXPORTS)
 # base class from a static library without an unresolved dependency. But, without static linking, we can't
 # do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
 # with visbility=default.
+# Longer term, we can either build two libraries each time, one with hidden and one with default visibility,
+# and link the tests against the default visibility one, but the demos against the hidden one. Problem is that
+# this will compile everything twice for every build.
+# Or we can build a single library with visibility=default in debug and coverage mode, and build the library
+# with visibliity=hidden only in release mode. But this means that we can't run the tests against the
+# library build with release mode.
+
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")   # HACK
 
@@ -155,54 +147,6 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(demo)
-
-# Custom rules to compile Slice files
-# foreach(file ${SLICE_FILES})
-#
-#     string(REPLACE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" build_dir ${file})
-#     get_filename_component(build_dir ${build_dir} PATH)
-#
-#     get_filename_component(slice_file ${file} NAME)
-#     string(REPLACE ".ice" ".cpp" src_file ${slice_file})
-#     string(REPLACE ".ice" ".h" hdr_file ${slice_file})
-#
-#     set(src_file ${build_dir}/${src_file})
-#     set(hdr_file ${build_dir}/${hdr_file})
-#
-#     string(REPLACE "${CMAKE_BINARY_DIR}/src/" "" relative_build_dir ${build_dir})
-#
-#     set(SLICE_HDRS ${SLICE_HDRS} ${hdr_file})
-#     set(SLICE_SRC ${SLICE_SRC} ${src_file})
-# endforeach()
-#
-# # cmake cannot analyze include file dependencies of .ice files, so the easiest option is to recompile
-# # all Slice files if any one of them changes
-# add_custom_command(OUTPUT ${SLICE_SRC} ${SLICE_HDRS}
-#                    DEPENDS ${SLICE_FILES}
-#                    COMMAND slice2cpp --output-dir=${build_dir} -I${CMAKE_SOURCE_DIR}/src --include-dir ${relative_build_dir} ${SLICE_FILES})
-
-## Custom rules to compile .proto files
-#foreach(file ${PROTO_FILES})
-#
-#    string(REPLACE "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}" build_dir ${file})
-#    get_filename_component(build_dir ${build_dir} PATH)
-#
-#    get_filename_component(proto_file ${file} NAME)
-#    string(REPLACE ".proto" ".pb.cc" src_file ${proto_file})
-#    string(REPLACE ".proto" ".pb.h" hdr_file ${proto_file})
-#
-#    set(src_file ${build_dir}/${src_file})
-#    set(hdr_file ${build_dir}/${hdr_file})
-#
-#    set(PROTO_HDRS ${PROTO_HDRS} ${hdr_file})
-#    set(PROTO_SRC ${PROTO_SRC} ${src_file})
-#endforeach()
-#
-## cmake cannot analyze include file dependencies of .proto files, so the easiest option is to recompile
-## all .proto files if any one of them changes
-#add_custom_command(OUTPUT ${PROTO_SRC} ${PROTO_HDRS}
-#                   DEPENDS ${PROTO_FILES}
-#                   COMMAND protoc --cpp_out=${CMAKE_BINARY_DIR}/src -I${CMAKE_SOURCE_DIR}/src ${PROTO_FILES})
 
 # Custom rules to compile .capnp files
 foreach(file ${CAPNPROTO_FILES})

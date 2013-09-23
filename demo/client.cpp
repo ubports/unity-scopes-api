@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("client");
+        Runtime::UPtr rt = Runtime::create("dash");
 
         RegistryProxy r = rt->registry();
         ScopeProxy s = r->find(scope_name);
@@ -88,7 +88,9 @@ int main(int argc, char* argv[])
         vm["cardinality"] = 10;
         vm["locale"] = "C";
         s->create_query(search_string, vm, reply);     // Returns immediately
+        cerr << "client: created query" << endl;
         reply->wait_until_finished();
+        cerr << "client: wait returned" << endl;
     }
 
     catch (unity::Exception const& e)

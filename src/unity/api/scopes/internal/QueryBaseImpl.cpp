@@ -52,7 +52,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
 {
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries
-    // without intervention from the scope application doee.
+    // without intervention from the scope application code.
     QueryCtrlProxy qcp = scope->create_query(query_string, hints, reply);
     subqueries_.push_back(qcp);
     return qcp;
@@ -64,7 +64,7 @@ void QueryBaseImpl::cancel()
     {
         ctrl->cancel(); // Forward the cancellation to any subqueries that might be active
     }
-    // We release the memory for the subquery controls here. That's just a micro-optimazition
+    // We release the memory for the subquery controls here. That's just a micro-optimization
     // because this QueryBase will be destroyed shortly anyway, once the cancelled() method
     // of the application returns. (Not deallocating here would work too.)
     vector<QueryCtrlProxy>().swap(subqueries_);

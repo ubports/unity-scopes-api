@@ -41,9 +41,7 @@ namespace zmq_middleware
 
 void rethrow_zmq_ex(zmqpp::exception const&)
 {
-    // We use an empty reason because zmq exceptions return the reason from what(),
-    // which is included when we eventually print the exception.
-    throw unity::api::scopes::MiddlewareException("");
+    throw unity::api::scopes::MiddlewareException("zmqpp exception");
 }
 
 } // namespace ice_middleware

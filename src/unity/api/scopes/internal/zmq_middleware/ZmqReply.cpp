@@ -18,6 +18,8 @@
 
 #include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
 
+#include <unity/api/scopes/internal/zmq_middleware/capnproto/Reply.capnp.h>
+
 using namespace std;
 
 namespace unity
@@ -35,6 +37,16 @@ namespace internal
 namespace zmq_middleware
 {
 
+/*
+
+interface Reply
+{
+    void push(string result);   // oneway
+    void finished();            // oneway
+};
+
+*/
+
 ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
@@ -48,12 +60,22 @@ ZmqReply::~ZmqReply() noexcept
 
 void ZmqReply::push(std::string const& result)
 {
-    // TODO
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "push");
+    auto in_params = request.initInParams<capnproto::Reply::PushRequest>();
+    in_params.setResult(result.c_str());
+
+    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    future.wait();
 }
 
 void ZmqReply::finished()
 {
-    // TODO
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "finished");
+
+    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    future.wait();
 }
 
 } // namespace zmq_middleware

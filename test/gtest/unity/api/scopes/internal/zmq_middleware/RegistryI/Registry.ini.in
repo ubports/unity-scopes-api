@@ -1,0 +1,7 @@
+[Runtime]
+Registry.Identity = Registry
+
+[Registry]
+Middleware = Zmq
+Zmq.Endpoint = ipc://./Registry
+Zmq.Configfile = Zmq.ini

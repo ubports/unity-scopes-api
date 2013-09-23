@@ -1,0 +1,6 @@
+[Runtime]
+Registry.Identity = Registry
+Registry.Configfile = @CMAKE_CURRENT_BINARY_DIR@/Registry.ini
+Default.Middleware = Zmq
+Zmq.Configfile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
+Factory.Configfile = @CMAKE_CURRENT_BINARY_DIR@/Factory.ini

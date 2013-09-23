@@ -45,8 +45,7 @@ namespace internal
 class ThreadPool final : private util::NonCopyable
 {
 public:
-    template<typename StartFunc>
-    ThreadPool(int size, StartFunc func);
+    ThreadPool(int size);
     ~ThreadPool() noexcept;
 
     template<typename F>
@@ -55,39 +54,13 @@ public:
     void run();
 
 private:
-    ThreadSafeQueue<unity::api::scopes::internal::TaskWrapper> queue_;
+    typedef ThreadSafeQueue<unity::api::scopes::internal::TaskWrapper> TaskQueue;
+    std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
     std::mutex mutex_;
     std::condition_variable cond_;
     bool done_;
 };
-
-template<typename StartFunc>
-ThreadPool::ThreadPool(int size, StartFunc func)
-    : done_(false)
-{
-    if (size < 1)
-    {
-        throw InvalidArgumentException("ThreadPool(): invalid pool size: " + std::to_string(size));
-    }
-
-    try
-    {
-        for (int i = 0; i < size; ++i)
-        {
-            threads_.push_back(std::thread(func, this));
-        }
-    }
-    catch (...)
-    {
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            done_ = true;
-        }
-        cond_.notify_all();
-        throw;
-    }
-}
 
 template<typename F>
 std::future<typename std::result_of<F()>::type> ThreadPool::submit(F f)
@@ -96,7 +69,7 @@ std::future<typename std::result_of<F()>::type> ThreadPool::submit(F f)
 
     std::packaged_task<ResultType()> task(std::move(f));
     std::future<ResultType> result(task.get_future());
-    queue_.push(move(task));
+    queue_->push(move(task));
     return result;
 }
 

@@ -93,7 +93,7 @@ class NotFoundExceptionImpl : public unity::ExceptionImplBase
 {
 public:
     NotFoundExceptionImpl(NotFoundException const* owner, string const& reason, string const& name) :
-        ExceptionImplBase(owner, reason),
+        ExceptionImplBase(owner, reason + " (name = " + name + ")"),
         name_(name)
     {
     }

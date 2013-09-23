@@ -58,7 +58,7 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
         }
         default:
         {
-            assert(false);
+            assert(false);  // LCOV_EXCL_LINE
         }
     }
 }
@@ -81,7 +81,7 @@ Variant to_variant(capnproto::Value::Reader const& r)
         }
         default:
         {
-            assert(false);
+            assert(false);  // LCOV_EXCL_LINE
         }
     }
 }

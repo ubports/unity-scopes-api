@@ -1,4 +1,4 @@
-add_subdirectory(ice_middleware)
+add_subdirectory(zmq_middleware)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
