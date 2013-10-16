@@ -52,11 +52,11 @@ public:
 
 private:
     virtual void find_(Current const& current,
-                       capnp::DynamicObject::Reader& in_params,
+                       capnp::ObjectPointer::Reader& in_params,
                        capnproto::Response::Builder& r);
 
     virtual void list_(Current const& current,
-                       capnp::DynamicObject::Reader& in_params,
+                       capnp::ObjectPointer::Reader& in_params,
                        capnproto::Response::Builder& r);
 };
 

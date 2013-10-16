@@ -174,7 +174,7 @@ TEST(ObjectAdapter, wait_for_shutdown)
     a.activate();
     int delay_millisecs = 100;
 
-    packaged_task<void()> task([&]{ wait(delay_millisecs); a.shutdown(); });
+    packaged_task<void()> task([&] { wait(delay_millisecs); a.shutdown(); });
     auto const start_time = chrono::steady_clock::now();
     thread(move(task)).detach();
 
@@ -201,7 +201,7 @@ public:
     }
 
     virtual void success_op(Current const&,
-                            capnp::DynamicObject::Reader&,
+                            capnp::ObjectPointer::Reader&,
                             capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
@@ -298,7 +298,7 @@ TEST(ObjectAdapter, dispatch_oneway_to_twoway)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
     EXPECT_STREQ("ObjectAdapter: oneway invocation sent to twoway adapter"
                  " (id: id, adapter: testscope, op: operation_name)",
@@ -360,7 +360,7 @@ TEST(ObjectAdapter, dispatch_not_exist)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::OBJECT_NOT_EXIST, ex.which());
 
     auto one = ex.getObjectNotExist();
@@ -401,7 +401,7 @@ TEST(ObjectAdapter, bad_header)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
     EXPECT_STREQ("Invalid message header", ex.getUnknown().cStr());
 }
@@ -434,7 +434,7 @@ TEST(ObjectAdapter, corrupt_header)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
     string msg = ex.getUnknown().cStr();
     boost::regex r("ObjectAdapter: error unmarshaling request header.*");
@@ -484,7 +484,7 @@ public:
     }
 
     virtual void ONE_op(Current const& current,
-                        capnp::DynamicObject::Reader&,
+                        capnp::ObjectPointer::Reader&,
                         capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
@@ -523,7 +523,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::OBJECT_NOT_EXIST, ex.which());
 
     auto one = ex.getObjectNotExist();
@@ -566,7 +566,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     auto response = reader.getRoot<capnproto::Response>();
     EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload<capnproto::RuntimeException>();
+    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
     EXPECT_EQ(capnproto::RuntimeException::OPERATION_NOT_EXIST, ex.which());
 
     auto opne = ex.getOperationNotExist();
@@ -595,7 +595,7 @@ public:
     }
 
     virtual void count_op(Current const&,
-                          capnp::DynamicObject::Reader&,
+                          capnp::ObjectPointer::Reader&,
                           capnproto::Response::Builder& r)
     {
         ++num_invocations_;

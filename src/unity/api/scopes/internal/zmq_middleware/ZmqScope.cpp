@@ -73,7 +73,7 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
     {
         auto request = make_request_(request_builder, "create_query");
-        auto in_params = request.initInParams<capnproto::Scope::CreateQueryRequest>();
+        auto in_params = request.initInParams().getAs<capnproto::Scope::CreateQueryRequest>();
         in_params.setQuery(q.c_str());
         auto h = in_params.initHints();
         to_value_dict(hints, h);
@@ -82,7 +82,7 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();
 
     auto receiver = future.get();
@@ -91,7 +91,7 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto proxy = response.getPayload<capnproto::Scope::CreateQueryResponse>().getReturnValue();
+    auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
     ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
     return QueryCtrlImpl::create(p, reply_proxy);
 }

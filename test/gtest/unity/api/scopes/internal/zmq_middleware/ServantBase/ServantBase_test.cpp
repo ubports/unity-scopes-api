@@ -53,7 +53,7 @@ public:
     }
 
     virtual void op(Current const&,
-                    capnp::DynamicObject::Reader&,
+                    capnp::ObjectPointer::Reader&,
                     capnproto::Response::Builder& r)
     {
 
@@ -103,7 +103,7 @@ TEST(ServantBase, success)
     MyServant s(MyServant::NoException);
     capnp::MallocMessageBuilder b;
     auto response = b.initRoot<capnproto::Response>();
-    capnp::DynamicObject::Reader in_params;
+    capnp::ObjectPointer::Reader in_params;
     s.safe_dispatch_(current, in_params, response);
     EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
 }
@@ -121,10 +121,10 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::UnityException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::DynamicObject::Reader in_params;
+        capnp::ObjectPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
-        auto ex = response.getPayload<capnproto::RuntimeException>();
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
         EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
         EXPECT_STREQ("unity::SyscallException: system call blew up (errno = 99)", ex.getUnknown().cStr());
     }
@@ -133,10 +133,10 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::StdException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::DynamicObject::Reader in_params;
+        capnp::ObjectPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
-        auto ex = response.getPayload<capnproto::RuntimeException>();
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
         EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
         EXPECT_STREQ("std::bad_alloc", ex.getUnknown().cStr());
     }
@@ -145,10 +145,10 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::OtherException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::DynamicObject::Reader in_params;
+        capnp::ObjectPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
-        auto ex = response.getPayload<capnproto::RuntimeException>();
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
         EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
         EXPECT_STREQ("unknown exception", ex.getUnknown().cStr());
     }
@@ -158,11 +158,11 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::NoException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::DynamicObject::Reader in_params;
+        capnp::ObjectPointer::Reader in_params;
         current.op_name = "no_such_op";
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
-        auto ex = response.getPayload<capnproto::RuntimeException>();
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
         EXPECT_EQ(capnproto::RuntimeException::OPERATION_NOT_EXIST, ex.which());
         EXPECT_STREQ("no_such_op", ex.getOperationNotExist().getOpName().cStr());
     }

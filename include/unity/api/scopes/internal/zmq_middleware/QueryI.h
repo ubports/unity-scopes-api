@@ -46,7 +46,7 @@ public:
 
 private:
     virtual void run_(Current const& current,
-                      capnp::DynamicObject::Reader& in_params,
+                      capnp::ObjectPointer::Reader& in_params,
                       capnproto::Response::Builder& r);
 };
 
