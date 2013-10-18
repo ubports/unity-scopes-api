@@ -63,17 +63,17 @@ ReplyI::~ReplyI() noexcept
 }
 
 void ReplyI::push_(Current const&,
-                   capnp::DynamicObject::Reader& in_params,
+                   capnp::ObjectPointer::Reader& in_params,
                    capnproto::Response::Builder&)
 {
-    auto req = in_params.as<capnproto::Reply::PushRequest>();
+    auto req = in_params.getAs<capnproto::Reply::PushRequest>();
     auto result = req.getResult().cStr();
     auto delegate = dynamic_pointer_cast<ReplyObject>(del());
     delegate->push(result);
 }
 
 void ReplyI::finished_(Current const&,
-                       capnp::DynamicObject::Reader&,
+                       capnp::ObjectPointer::Reader&,
                        capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<ReplyObject>(del());

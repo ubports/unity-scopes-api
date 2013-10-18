@@ -134,7 +134,7 @@ void ZmqMiddleware::stop()
             // Wait until start in progress has completed before stopping
             // Coverage excluded here because the window for which we are in this state is too
             // small to hit with a test.
-            state_changed_.wait(lock, [this]{ return state_ == Started; }); // LCOV_EXCL_LINE
+            state_changed_.wait(lock, [this] { return state_ == Started; }); // LCOV_EXCL_LINE
             // FALLTHROUGH
         }
         case Started:
@@ -163,7 +163,7 @@ void ZmqMiddleware::stop()
 void ZmqMiddleware::wait_for_shutdown()
 {
     unique_lock<mutex> lock(mutex_);
-    state_changed_.wait(lock, [this]{ return state_ == Stopped; }); // LCOV_EXCL_LINE
+    state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
@@ -392,7 +392,8 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
         throw LogicException("Cannot add object to stopped middleware");
     }
 #endif
-    disconnect_func = [adapter, id] {
+    disconnect_func = [adapter, id]
+    {
         try
         {
             adapter->remove(id);

@@ -77,10 +77,10 @@ RegistryI::~RegistryI() noexcept
 }
 
 void RegistryI::find_(Current const&,
-                      capnp::DynamicObject::Reader& in_params,
+                      capnp::ObjectPointer::Reader& in_params,
                       capnproto::Response::Builder& r)
 {
-    auto req = in_params.as<capnproto::Registry::FindRequest>();
+    auto req = in_params.getAs<capnproto::Registry::FindRequest>();
     string name = req.getName().cStr();
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
     try
@@ -88,7 +88,7 @@ void RegistryI::find_(Current const&,
         auto proxy = dynamic_pointer_cast<ZmqObjectProxy>(delegate->find(name));
         assert(proxy);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
-        auto find_response = r.initPayload<capnproto::Registry::FindResponse>().initResponse();
+        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
         auto p = find_response.initReturnValue();
         p.setEndpoint(proxy->endpoint().c_str());
         p.setIdentity(proxy->identity().c_str());
@@ -96,19 +96,19 @@ void RegistryI::find_(Current const&,
     catch (NotFoundException const& e)
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto find_response = r.initPayload<capnproto::Registry::FindResponse>().initResponse();
+        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
         find_response.initNotFoundException().setName(e.name().c_str());
     }
 }
 
 void RegistryI::list_(Current const&,
-                      capnp::DynamicObject::Reader&,
+                      capnp::ObjectPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
     auto scope_map = delegate->list();
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto rv = r.initPayload<capnproto::Registry::ListResponse>().initReturnValue();
+    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue();
     auto list = rv.initPairs(scope_map.size());
     int i = 0;
     for (auto const& pair : scope_map)

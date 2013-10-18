@@ -72,10 +72,10 @@ ScopeI::~ScopeI() noexcept
 }
 
 void ScopeI::create_query_(Current const& current,
-                      capnp::DynamicObject::Reader& in_params,
-                      capnproto::Response::Builder& r)
+                           capnp::ObjectPointer::Reader& in_params,
+                           capnproto::Response::Builder& r)
 {
-    auto req = in_params.as<capnproto::Scope::CreateQueryRequest>();
+    auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
     auto query = req.getQuery().cStr();
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
@@ -84,7 +84,7 @@ void ScopeI::create_query_(Current const& current,
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query, hints, reply_proxy, current.adapter->mw()));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto create_query_response = r.initPayload<capnproto::Scope::CreateQueryResponse>();
+    auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());

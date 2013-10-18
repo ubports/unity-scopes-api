@@ -50,7 +50,7 @@ void marshal_unknown_exception(capnproto::Response::Builder& r, string const& s)
     payload.setUnknown(text);
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.setPayload<capnproto::RuntimeException>(ex.getRoot<capnproto::RuntimeException>());
+    r.getPayload().setAs<capnproto::RuntimeException>(ex.getRoot<capnproto::RuntimeException>());
 }
 
 void marshal_object_not_exist_exception(capnproto::Response::Builder& r,
@@ -68,7 +68,7 @@ void marshal_object_not_exist_exception(capnproto::Response::Builder& r,
     one.setAdapter(adapter.c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.setPayload<capnproto::ObjectNotExistException>(ex.getRoot<capnproto::ObjectNotExistException>());
+    r.getPayload().setAs<capnproto::ObjectNotExistException>(ex.getRoot<capnproto::ObjectNotExistException>());
 }
 
 void marshal_operation_not_exist_exception(capnproto::Response::Builder& r,
@@ -88,7 +88,7 @@ void marshal_operation_not_exist_exception(capnproto::Response::Builder& r,
     opne.setOpName(op_name.c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.setPayload<capnproto::OperationNotExistException>(ex.getRoot<capnproto::OperationNotExistException>());
+    r.getPayload().setAs<capnproto::OperationNotExistException>(ex.getRoot<capnproto::OperationNotExistException>());
 }
 
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_unknown_response(capnp::MessageBuilder& b, string const& s)
@@ -114,7 +114,7 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
     {
         return;
     }
-    auto payload = response.getPayload<capnproto::RuntimeException>();
+    auto payload = response.getPayload().getAs<capnproto::RuntimeException>();
     switch (payload.which())
     {
         case capnproto::RuntimeException::OPERATION_NOT_EXIST:

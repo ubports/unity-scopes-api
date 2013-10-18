@@ -62,10 +62,10 @@ void ZmqReply::push(std::string const& result)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "push");
-    auto in_params = request.initInParams<capnproto::Reply::PushRequest>();
+    auto in_params = request.initInParams().getAs<capnproto::Reply::PushRequest>();
     in_params.setResult(result.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();
 }
 
@@ -74,7 +74,7 @@ void ZmqReply::finished()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "finished");
 
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();
 }
 

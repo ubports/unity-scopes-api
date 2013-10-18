@@ -145,7 +145,7 @@ void ObjectAdapter::activate() noexcept
             // Wait until shutdown in progress has completed before re-activating.
             // Coverage excluded here because the window for which we are in this state is too
             // small to hit with a test.
-            state_changed_.wait(lock, [this]{ return state_ == Inactive; }); // LCOV_EXCL_LINE
+            state_changed_.wait(lock, [this] { return state_ == Inactive; }); // LCOV_EXCL_LINE
             // FALLTHROUGH
         }
         case Inactive:
@@ -239,10 +239,10 @@ void ObjectAdapter::run_workers()
         {
             f.get();
         }
-catch (std::exception const& e)
-{
-    throw;
-}
+        catch (std::exception const& e)
+        {
+            throw;
+        }
         catch (...) // LCOV_EXCL_LINE
         {
             throw MiddlewareException("ObjectAdapter::run_workers(): broker thread failure (adapter: " + name_ + ")"); // LCOV_EXCL_LINE
@@ -524,7 +524,7 @@ void ObjectAdapter::worker_thread()
 
                 // We have a target object, so we can ask it to unmarshal the in-params, forward
                 // the invocation to the application-provided method, and to marshal the results.
-                auto in_params = req.getInParams<capnp::DynamicObject>();
+                auto in_params = req.getInParams();
                 capnp::MallocMessageBuilder b;
                 auto r = b.initRoot<capnproto::Response>();
                 servant->safe_dispatch_(current, in_params, r); // noexcept

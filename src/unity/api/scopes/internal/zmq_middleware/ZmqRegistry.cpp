@@ -77,10 +77,10 @@ ScopeProxy ZmqRegistry::find(std::string const& scope_name)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "find");
-    auto in_params = request.initInParams<capnproto::Registry::FindRequest>();
+    auto in_params = request.initInParams().getAs<capnproto::Registry::FindRequest>();
     in_params.setName(scope_name.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();
     auto receiver = future.get();
     auto segments = receiver->receive();
@@ -88,7 +88,7 @@ ScopeProxy ZmqRegistry::find(std::string const& scope_name)
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto find_response = response.getPayload<capnproto::Registry::FindResponse>().getResponse();
+    auto find_response = response.getPayload().getAs<capnproto::Registry::FindResponse>().getResponse();
     switch (find_response.which())
     {
         case capnproto::Registry::FindResponse::Response::RETURN_VALUE:
@@ -114,7 +114,7 @@ ScopeMap ZmqRegistry::list()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
 
-    auto future = mw_base()->invoke_pool()->submit([&]{ return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();
     auto receiver = future.get();
     auto segments = receiver->receive();
@@ -122,7 +122,7 @@ ScopeMap ZmqRegistry::list()
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto list_response = response.getPayload<capnproto::Registry::ListResponse>();
+    auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
     auto pairs = list_response.getReturnValue().getPairs();
     ScopeMap sm;
     for (size_t i = 0; i < pairs.size(); ++i)
