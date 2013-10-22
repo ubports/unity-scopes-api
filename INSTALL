@@ -26,6 +26,17 @@ Build dependencies
 
 See debian/control for the list of packages required to build and test the code.
 
+Some dependencies need to be installed manually as they are not yet available in Ubuntu:
+- Cap'n Proto:
+  $ git clone https://github.com/kentonv/capnproto.git
+  $ cd capnproto/c++
+  $ ./configure && make && sudo make install
+
+- Zmq (zeromq, latest version of 3.x from http://zeromq.org), or alternatively libzmq3-dev from the repository.
+
+- Zmqpp:
+  $ git clone https://github.com/benjamg/zmqpp.git
+  $ cd zmqpp && make && sudo make install
 
 Building the code
 -----------------
