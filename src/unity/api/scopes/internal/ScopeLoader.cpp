@@ -140,7 +140,11 @@ void ScopeLoader::unload()
         case ScopeState::Failed:
         {
             remembered_exception.swap(exception_); // We throw only once if unload is called several times.
-            cmd_ = ScopeCmd::Finish;
+            {
+                // cppcheck-suppress unreadVariable
+                lock_guard<mutex> lock(cmd_mutex_);
+                cmd_ = ScopeCmd::Finish;
+            }
         }
         // FALLTHROUGH
         case ScopeState::Finished:
