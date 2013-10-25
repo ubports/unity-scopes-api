@@ -1,5 +1,6 @@
 add_subdirectory(ConfigBase)
 add_subdirectory(DynamicLoader)
+add_subdirectory(EventLogger)
 add_subdirectory(MiddlewareFactory)
 add_subdirectory(MiddlewareFactoryConfig)
 add_subdirectory(Reaper)
