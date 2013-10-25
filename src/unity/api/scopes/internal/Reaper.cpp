@@ -126,8 +126,8 @@ Reaper::~Reaper() noexcept
     {
         lock_guard<mutex> lock(mutex_);
         finish_ = true;
+        do_work_.notify_one();
     }
-    do_work_.notify_one();
     reap_thread_.join();
 }
 
@@ -161,17 +161,15 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
 
     // Put new Item at the head of the list.
     reaper_private::Reaplist::iterator ri;
-    size_t list_size;
     {
         lock_guard<mutex> lock(mutex_);
         Item item(cb);
         list_.push_front(item); // LRU order
         ri = list_.begin();
-        list_size = list_.size();
-    }
-    if (list_size == 1) // List just became non-empty
-    {
-        do_work_.notify_one();  // Wake up reaper thread
+        if (list_.size() == 1) // List just became non-empty
+        {
+            do_work_.notify_one();  // Wake up reaper thread
+        }
     }
 
     // Make a new ReapItem.

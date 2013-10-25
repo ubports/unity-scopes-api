@@ -41,10 +41,8 @@ public:
     virtual void finished() override
     {
         cout << "query complete" << endl;
-        {
-            unique_lock<decltype(mutex_)> lock(mutex_);
-            query_complete_ = true;
-        }
+        unique_lock<decltype(mutex_)> lock(mutex_);
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
