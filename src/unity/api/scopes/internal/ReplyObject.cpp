@@ -117,7 +117,6 @@ void ReplyObject::push(std::string const& result) noexcept
     lock.lock();
     if (--num_push_ == 0)
     {
-        lock.unlock();
         idle_.notify_one();
     }
 }
