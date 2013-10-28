@@ -27,7 +27,7 @@
 
 TEST(SimpleTracepoint, basic_trace_test)
 {
-  system("rm -R ./lttng-trace");
+  system("rm -R -f ./lttng-trace");
   system("lttng create trace_session -o ./lttng-trace");
   system("lttng enable-event -a -s trace_session -u");
   system("lttng start trace_session");
