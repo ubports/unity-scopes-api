@@ -6,13 +6,13 @@ add_executable(
   SimpleTracepoint_test
 
   SimpleTracepoint_test.cpp
-  test_tp.cpp
+  TestProvider_tp.cpp
 )
 
 add_library(
   testtracer
 
-  test_tp.c
+  TestProvider_tp.c
 )
 
 target_link_libraries(

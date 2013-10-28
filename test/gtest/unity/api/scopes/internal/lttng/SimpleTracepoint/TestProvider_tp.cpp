@@ -16,7 +16,6 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#define TRACEPOINT_CREATE_PROBES
+#define TRACEPOINT_DEFINE
 
-#include <test_tp.h>
-#include <lttng/tracepoint-event.h>
+#include <TestProvider_tp.h>

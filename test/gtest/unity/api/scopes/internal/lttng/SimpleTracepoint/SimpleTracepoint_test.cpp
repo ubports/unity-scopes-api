@@ -16,11 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <test_tp.h>
+#include <TestProvider_tp.h>
 
 #include <fstream>
 #include <gtest/gtest.h>
-#include <memory>
 #include <string>
 
 // Basic trace test.

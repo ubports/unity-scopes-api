@@ -16,31 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#if !defined(SIMPLETRACEPOINTTEST_TEST_TP_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
-#define SIMPLETRACEPOINTTEST_TEST_TP_H
+#define TRACEPOINT_CREATE_PROBES
 
-#undef TRACEPOINT_PROVIDER
-#undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_PROVIDER test_provider
-#define TRACEPOINT_INCLUDE <test_tp.h>
-
-#include <unity/api/scopes/internal/lttng/SimpleTracepoint.h>
-#include <stdint.h>
-
-SIMPLE_TRACEPOINT(
-  event1,
-  TRACE_DEBUG,
-  stp_integer(int64_t, a),
-  stp_integer(int, b),
-  stp_float(float, c),
-  stp_string(d)
-)
-
-SIMPLE_TRACEPOINT(
-  event2,
-  TRACE_DEBUG,
-  stp_float(double, a),
-  stp_integer(uint32_t, b)
-)
-
-#endif /* SIMPLETRACEPOINTTEST_TEST_TP_H */
+#include <TestProvider_tp.h>
+#include <lttng/tracepoint-event.h>
