@@ -21,16 +21,26 @@
 
 #undef TRACEPOINT_PROVIDER
 #undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_PROVIDER unity_scopes_api
-#define TRACEPOINT_INCLUDE <unity/api/scopes/internal/lttng/UnityScopesApi_tp.h>
+#define TRACEPOINT_PROVIDER test_provider
+#define TRACEPOINT_INCLUDE <test_tp.h>
 
 #include <unity/api/scopes/internal/lttng/simple_tracepoint.h>
 #include <stdint.h>
 
 SIMPLE_TRACEPOINT(
-  trace,
+  event1,
   TRACE_DEBUG,
-  stp_integer(int, value)
+  stp_integer(int64_t, a),
+  stp_integer(int, b),
+  stp_float(float, c),
+  stp_string(d)
+)
+
+SIMPLE_TRACEPOINT(
+  event2,
+  TRACE_DEBUG,
+  stp_float(double, a),
+  stp_integer(uint32_t, b)
 )
 
 #endif /* UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H */
