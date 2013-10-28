@@ -16,14 +16,12 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/api/scopes/internal/lttng/LttngLogger.h>
-
 #include <fstream>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
-using namespace unity::api::scopes::internal;
+//using namespace unity::api::scopes::internal;
 
 // Basic trace test.
 
@@ -34,9 +32,9 @@ TEST(EventLogger, basic_trace_test)
   system("lttng enable-event -a -s trace_session -u");
   system("lttng start trace_session");
 
-  auto logger = std::unique_ptr< EventLogger >( new lttng::LttngLogger() );
-  logger->received_event( 0, 1, 2.3, "four" );
-  logger->received_event2( 5, 6 );
+//  auto logger = std::unique_ptr< EventLogger >( new lttng::LttngLogger() );
+//  logger->received_event( 0, 1, 2.3, "four" );
+//  logger->received_event2( 5, 6 );
 
   system("lttng stop");
   system("lttng view -t ./lttng-trace > ./lttng-trace/trace.txt");

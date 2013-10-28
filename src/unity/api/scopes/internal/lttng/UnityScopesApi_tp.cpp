@@ -18,15 +18,4 @@
 
 #define TRACEPOINT_DEFINE
 
-#include <unity/api/scopes/internal/lttng/LttngLogger.h>
-#include <unity/api/scopes/internal/lttng/LttngLogger_tp.h>
-
-void unity::api::scopes::internal::lttng::LttngLogger::received_event(int64_t when, int type, float code, const char *value)
-{
-  simple_tracepoint(unity_scopes_api, received_event, when, type, code, value);
-}
-
-void unity::api::scopes::internal::lttng::LttngLogger::received_event2(int src_fd, uint32_t seq_id)
-{
-  simple_tracepoint(unity_scopes_api, received_event2, src_fd, seq_id);
-}
+#include <unity/api/scopes/internal/lttng/UnityScopesApi_tp.h>
