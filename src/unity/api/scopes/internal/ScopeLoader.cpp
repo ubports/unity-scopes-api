@@ -140,13 +140,17 @@ void ScopeLoader::unload()
         case ScopeState::Failed:
         {
             remembered_exception.swap(exception_); // We throw only once if unload is called several times.
-            cmd_ = ScopeCmd::Finish;
+            {
+                // cppcheck-suppress unreadVariable
+                lock_guard<mutex> lock(cmd_mutex_);
+                cmd_ = ScopeCmd::Finish;
+            }
         }
         // FALLTHROUGH
         case ScopeState::Finished:
         {
-            lock.unlock();
             cmd_changed_.notify_all();
+            lock.unlock();
             if (run_thread_.joinable())            // If unload is called more than once, don't join a second time.
             {
                 run_thread_.join();
@@ -183,11 +187,9 @@ void ScopeLoader::start()
     {
         case ScopeState::Stopped:
         {
-            {
-                // cppcheck-suppress unreadVariable
-                lock_guard<mutex> lock(cmd_mutex_);
-                cmd_ = ScopeCmd::Start;
-            }
+            // cppcheck-suppress unreadVariable
+            lock_guard<mutex> lock(cmd_mutex_);
+            cmd_ = ScopeCmd::Start;
             cmd_changed_.notify_all();
             break;
         }
@@ -225,12 +227,11 @@ void ScopeLoader::stop()
     {
         case ScopeState::Started:
         {
-            {
-                // cppcheck-suppress unreadVariable
-                lock_guard<mutex> lock(cmd_mutex_);
-                cmd_ = ScopeCmd::Stop;
-            }
+            // cppcheck-suppress unreadVariable
+            lock_guard<mutex> lock(cmd_mutex_);
+            cmd_ = ScopeCmd::Stop;
             cmd_changed_.notify_all();
+            break;
         }
         case ScopeState::Stopped:
         case ScopeState::Finished:
@@ -286,26 +287,22 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
         unity::util::ResourcePtr<ScopeBase*, decltype(destroy_func)> scope_base(create_func(), destroy_func);
         if (scope_base.get() == nullptr)
         {
-            {
-                // cppcheck-suppress unreadVariable
-                unique_lock<mutex> lock(state_mutex_);
-                scope_state_ = ScopeState::Failed;
-                exception_ = make_exception_ptr(
-                                 unity::ResourceException("Scope " + scope_name_ +
-                                                          " returned nullptr from " + UNITY_API_SCOPE_CREATE_SYMSTR));
-            }
+            // cppcheck-suppress unreadVariable
+            unique_lock<mutex> lock(state_mutex_);
+            scope_state_ = ScopeState::Failed;
+            exception_ = make_exception_ptr(
+                             unity::ResourceException("Scope " + scope_name_ +
+                                                      " returned nullptr from " + UNITY_API_SCOPE_CREATE_SYMSTR));
             state_changed_.notify_all();
             return;
         }
 
         // Notify the parent thread that we are ready to go.
         {
-            {
-                // cppcheck-suppress unreadVariable
-                unique_lock<mutex> lock(state_mutex_);
-                scope_state_ = ScopeState::Stopped;
-                scope_base_ = scope_base.get();
-            }
+            // cppcheck-suppress unreadVariable
+            unique_lock<mutex> lock(state_mutex_);
+            scope_state_ = ScopeState::Stopped;
+            scope_base_ = scope_base.get();
             state_changed_.notify_all();
         }
 
@@ -397,7 +394,6 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
                                          unity::ResourceException("scope " + scope_name_ + ": unknown exception in stop()"));
                         throw;
                     }
-                    lock.unlock();
                     if (run_thread_.joinable())
                     {
                         run_thread_.join();
@@ -436,11 +432,9 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
 
 void ScopeLoader::handle_thread_exception()
 {
-    {
-        // cppcheck-suppress unreadVariable
-        lock_guard<mutex> lock(state_mutex_);
-        scope_state_ = ScopeState::Failed;
-    }
+    // cppcheck-suppress unreadVariable
+    lock_guard<mutex> lock(state_mutex_);
+    scope_state_ = ScopeState::Failed;
     state_changed_.notify_all();
 }
 
@@ -465,24 +459,20 @@ void ScopeLoader::run_application(ScopeBase* scope)
             exception_ = make_exception_ptr(
                              unity::ResourceException("Scope " + scope_name_ + ": exception in run()"));
             scope_state_ = ScopeState::Failed;
+            state_changed_.notify_all();
         }
-        state_changed_.notify_all();
 
-        {
-            // cppcheck-suppress unreadVariable
-            lock_guard<mutex> lock(cmd_mutex_);
-            cmd_ = ScopeCmd::Stop;
-        }
+        // cppcheck-suppress unreadVariable
+        lock_guard<mutex> lock(cmd_mutex_);
+        cmd_ = ScopeCmd::Stop;
         cmd_changed_.notify_all();
     }
 }
 
 void ScopeLoader::notify_app_thread_started()
 {
-    {
-        unique_lock<mutex> lock(run_thread_mutex_);
-        run_thread_state_ = AppState::Started;
-    }
+    unique_lock<mutex> lock(run_thread_mutex_);
+    run_thread_state_ = AppState::Started;
     run_thread_changed_.notify_all();
 }
 

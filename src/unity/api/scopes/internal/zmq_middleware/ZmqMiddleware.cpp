@@ -109,7 +109,6 @@ void ZmqMiddleware::start()
             // TODO: get pool size from config
             invokers_.reset(new ThreadPool(1));
             state_ = Started;
-            lock.unlock();
             state_changed_.notify_all();
             break;
         }
@@ -149,7 +148,6 @@ void ZmqMiddleware::stop()
                 pair.second->wait_for_shutdown();
             }
             state_ = Stopped;
-            lock.unlock();
             state_changed_.notify_all();
             break;
         }

@@ -152,7 +152,6 @@ void ObjectAdapter::activate() noexcept
         {
             run_workers();
             state_ = Active;
-            lock.unlock();
             state_changed_.notify_all();
             break;
         }
@@ -200,7 +199,6 @@ void ObjectAdapter::shutdown() noexcept
             ServantMap().swap(servants_);   // Not need for a try block. The ServantBase destructor is noexcept.
             lock.lock();
             state_ = Inactive;
-            lock.unlock();
             state_changed_.notify_all();
             break;
         }
