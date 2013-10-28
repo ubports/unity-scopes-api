@@ -40,13 +40,13 @@ template< typename... T > void simple_tracepoint_unused_args( T&&... ) {}
 
 /* SIMPLE_TRACEPOINT */
 
-#define SIMPLE_TRACEPOINT( name, loglevel, stp_t1, ... )\
+#define SIMPLE_TRACEPOINT( name, loglevel, ... )\
   TRACEPOINT_EVENT(\
     TRACEPOINT_PROVIDER,\
     name,\
-    TP_ARGS( _STP_ARGS( stp_t1, __VA_ARGS__ ) ),\
+    TP_ARGS( _STP_ARGS( __VA_ARGS__ ) ),\
     TP_FIELDS(\
-      _STP_FIELDS( stp_t1, __VA_ARGS__ )\
+      _STP_FIELDS( __VA_ARGS__ )\
     )\
   )\
   TRACEPOINT_LOGLEVEL( TRACEPOINT_PROVIDER, name, loglevel )
