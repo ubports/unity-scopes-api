@@ -7,12 +7,14 @@ add_executable(
 
   SimpleTracepoint_test.cpp
   TestProvider_tp.cpp
+  TestProvider2_tp.cpp
 )
 
 add_library(
   testtracer
 
   TestProvider_tp.c
+  TestProvider2_tp.c
 )
 
 target_link_libraries(

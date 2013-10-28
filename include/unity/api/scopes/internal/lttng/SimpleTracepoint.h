@@ -21,6 +21,8 @@
 
 #include <lttng/tracepoint.h>
 
+/* simple_tracepoint */
+
 /*
  * The STAP_PROBEV() macro from sdt.h (SystemTap) used by
  * the tracepoint() macro from lttng/tracepoint.h fails to

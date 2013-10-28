@@ -17,6 +17,7 @@
  */
 
 #include <TestProvider_tp.h>
+#include <TestProvider2_tp.h>
 
 #include <fstream>
 #include <gtest/gtest.h>
@@ -34,6 +35,9 @@ TEST(SimpleTracepoint, basic_trace_test)
   simple_tracepoint( test_provider, event1, 0, 1, 2.3, "four" );
   simple_tracepoint( test_provider, event2, 5.6, 7 );
 
+  simple_tracepoint( test_provider2, event3, 8, 9, 10.11, "twelve" );
+  simple_tracepoint( test_provider2, event4, 13.14, 15 );
+
   system("lttng stop");
   system("lttng view -t ./lttng-trace > ./lttng-trace/trace.txt");
   system("lttng destroy trace_session");
@@ -46,4 +50,9 @@ TEST(SimpleTracepoint, basic_trace_test)
   EXPECT_NE( std::string::npos, trace.find("{ a = 0, b = 1, c = 2.3, d = \"four\" }") );
   EXPECT_NE( std::string::npos, trace.find("test_provider:event2:") );
   EXPECT_NE( std::string::npos, trace.find("{ a = 5.6, b = 7 }") );
+
+  EXPECT_NE( std::string::npos, trace.find("test_provider2:event3:") );
+  EXPECT_NE( std::string::npos, trace.find("{ a = 8, b = 9, c = 10.11, d = \"twelve\" }") );
+  EXPECT_NE( std::string::npos, trace.find("test_provider2:event4:") );
+  EXPECT_NE( std::string::npos, trace.find("{ a = 13.14, b = 15 }") );
 }
