@@ -3,9 +3,9 @@ include_directories(
 )
 
 add_executable(
-  simple_tracepoint_test
+  SimpleTracepoint_test
 
-  simple_tracepoint_test.cpp
+  SimpleTracepoint_test.cpp
   test_tp.cpp
 )
 
@@ -16,7 +16,7 @@ add_library(
 )
 
 target_link_libraries(
-  simple_tracepoint_test
+  SimpleTracepoint_test
 
   ${TESTLIBS}
   testtracer
@@ -30,6 +30,7 @@ target_link_libraries(
 )
 
 add_test(
-  simple_tracepoint
-  simple_tracepoint_test
+  SimpleTracepoint
+
+  SimpleTracepoint_test
 )

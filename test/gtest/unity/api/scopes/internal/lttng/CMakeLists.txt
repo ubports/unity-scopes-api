@@ -1,1 +1,1 @@
-add_subdirectory(simple_tracepoint)
+add_subdirectory(SimpleTracepoint)

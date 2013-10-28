@@ -24,7 +24,7 @@
 #define TRACEPOINT_PROVIDER unity_scopes_api
 #define TRACEPOINT_INCLUDE <unity/api/scopes/internal/lttng/UnityScopesApi_tp.h>
 
-#include <unity/api/scopes/internal/lttng/simple_tracepoint.h>
+#include <unity/api/scopes/internal/lttng/SimpleTracepoint.h>
 #include <stdint.h>
 
 SIMPLE_TRACEPOINT(

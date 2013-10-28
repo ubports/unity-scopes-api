@@ -16,15 +16,15 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#if !defined(UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
-#define UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H
+#if !defined(SIMPLETRACEPOINTTEST_TEST_TP_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
+#define SIMPLETRACEPOINTTEST_TEST_TP_H
 
 #undef TRACEPOINT_PROVIDER
 #undef TRACEPOINT_INCLUDE
 #define TRACEPOINT_PROVIDER test_provider
 #define TRACEPOINT_INCLUDE <test_tp.h>
 
-#include <unity/api/scopes/internal/lttng/simple_tracepoint.h>
+#include <unity/api/scopes/internal/lttng/SimpleTracepoint.h>
 #include <stdint.h>
 
 SIMPLE_TRACEPOINT(
@@ -43,4 +43,4 @@ SIMPLE_TRACEPOINT(
   stp_integer(uint32_t, b)
 )
 
-#endif /* UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H */
+#endif /* SIMPLETRACEPOINTTEST_TEST_TP_H */

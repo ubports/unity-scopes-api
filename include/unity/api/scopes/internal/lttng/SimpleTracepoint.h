@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef SIMPLE_TRACEPOINT_H_
-#define SIMPLE_TRACEPOINT_H_
+#ifndef SIMPLETRACEPOINT_H_
+#define SIMPLETRACEPOINT_H_
 
 #include <lttng/tracepoint.h>
 
@@ -150,4 +150,4 @@ template< typename... T > void simple_tracepoint_unused_args( T&&... ) {}
 #define _STP_FIELDS_10( a, b, c, d, e, f, g, h, i, j )\
   _TPF( a ) _TPF( b ) _TPF( c ) _TPF( d ) _TPF( e ) _TPF( f ) _TPF( g ) _TPF( h ) _TPF( i ) _TPF( j )
 
-#endif /* SIMPLE_TRACEPOINT_H_ */
+#endif /* SIMPLETRACEPOINT_H_ */

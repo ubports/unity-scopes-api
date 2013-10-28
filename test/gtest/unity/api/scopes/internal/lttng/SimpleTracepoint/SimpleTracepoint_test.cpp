@@ -25,7 +25,7 @@
 
 // Basic trace test.
 
-TEST(simple_tracepoint, basic_trace_test)
+TEST(SimpleTracepoint, basic_trace_test)
 {
   system("rm -R ./lttng-trace");
   system("lttng create trace_session -o ./lttng-trace");
