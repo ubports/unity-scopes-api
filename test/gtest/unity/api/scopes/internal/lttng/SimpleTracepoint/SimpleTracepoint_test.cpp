@@ -38,7 +38,7 @@ TEST(SimpleTracepoint, basic_trace_test)
   simple_tracepoint( test_provider2, event3, 8, 9, 10.11, "twelve" );
   simple_tracepoint( test_provider2, event4, 13.14, 15 );
 
-  system("lttng stop");
+  system("lttng stop trace_session");
   system("lttng view -t ./lttng-trace > ./lttng-trace/trace.txt");
   system("lttng destroy trace_session");
 
