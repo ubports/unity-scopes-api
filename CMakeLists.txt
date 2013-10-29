@@ -49,8 +49,14 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
-pkg_check_modules(PC_LTTNG_UST lttng-ust REQUIRED)
-pkg_check_modules(PC_LIBURCU_BP liburcu-bp REQUIRED)
+
+pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
+pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
+find_program(LTTNG_EXECUTABLE lttng)
+if (NOT LTTNG_EXECUTABLE)
+    message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
+endif()
+
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
