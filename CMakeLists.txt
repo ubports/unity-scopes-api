@@ -145,6 +145,7 @@ enable_testing()
 # Add subdirectories.
 add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
 

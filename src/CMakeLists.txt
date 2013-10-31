@@ -1,13 +1,19 @@
-add_subdirectory(unity)
+add_subdirectory(internal)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
-# Set up package config.
-configure_file(lib${UNITY_SCOPES_LIB}.pc.in lib${UNITY_SCOPES_LIB}.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}.pc DESTINATION ${LIB_INSTALL_PREFIX}/pkgconfig)
-
-set (SRC
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeExceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Variant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Version.cpp
 )
-
-# Parent needs to know what all the source files are, for generating doc and the like.
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
