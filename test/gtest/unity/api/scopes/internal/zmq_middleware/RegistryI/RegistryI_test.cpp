@@ -21,7 +21,7 @@
 #include <scopes/internal/RegistryConfig.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/UniqueID.h>
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 

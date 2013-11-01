@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/ZmqRegistry.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/ScopeImpl.h>

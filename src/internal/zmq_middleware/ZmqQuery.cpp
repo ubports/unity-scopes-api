@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/ZmqQuery.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Query.capnp.h>
+#include <internal/zmq_middleware/capnproto/Query.capnp.h>
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
 
 using namespace std;

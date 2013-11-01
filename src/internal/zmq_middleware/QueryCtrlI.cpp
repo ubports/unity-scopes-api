@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/QueryCtrlI.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/QueryCtrl.capnp.h>
+#include <internal/zmq_middleware/capnproto/QueryCtrl.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/QueryCtrlObject.h>
 

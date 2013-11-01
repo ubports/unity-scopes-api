@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
 
 #include <capnp/dynamic.h>
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <unity/util/NonCopyable.h>
 
 #include <memory>

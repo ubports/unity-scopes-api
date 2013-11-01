@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/ScopeI.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>

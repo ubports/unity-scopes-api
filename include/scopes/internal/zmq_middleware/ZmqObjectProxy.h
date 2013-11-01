@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQOBJECTPROXY_H
 
 #include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <scopes/internal/zmq_middleware/RequestType.h>
 #include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>

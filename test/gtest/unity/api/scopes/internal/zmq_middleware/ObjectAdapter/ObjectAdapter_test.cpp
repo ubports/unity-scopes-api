@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <scopes/internal/zmq_middleware/ServantBase.h>
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqMiddleware.h>

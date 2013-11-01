@@ -18,7 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/QueryI.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Query.capnp.h>
+#include <internal/zmq_middleware/capnproto/Query.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
 #include <scopes/internal/QueryObject.h>
