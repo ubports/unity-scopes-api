@@ -76,6 +76,14 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestType t)
     return pool_.emplace(endpoint, Connection { move(s), t }).first->second.socket;
 }
 
+void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket socket, RequestType t)
+{
+    assert(!endpoint.empty());
+
+    lock_guard<mutex> lock(mutex_);
+    pool_.emplace(endpoint, Connection { move(socket), t });
+}
+
 } // namespace zmq_middleware
 
 } // namespace internal
