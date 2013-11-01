@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/QueryBaseImpl.h>
+#include <scopes/internal/QueryBaseImpl.h>
 
-#include <unity/api/scopes/QueryCtrl.h>
-#include <unity/api/scopes/Scope.h>
+#include <scopes/QueryCtrl.h>
+#include <scopes/Scope.h>
 
 #include <cassert>
 

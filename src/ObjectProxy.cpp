@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/ObjectProxy.h>
+#include <scopes/ObjectProxy.h>
 
-#include <unity/api/scopes/internal/ObjectProxyImpl.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 
 namespace unity
 {

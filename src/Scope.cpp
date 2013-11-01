@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Scope.h>
+#include <scopes/Scope.h>
 
-#include <unity/api/scopes/internal/ScopeImpl.h>
+#include <scopes/internal/ScopeImpl.h>
 
 namespace unity
 {

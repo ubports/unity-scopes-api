@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryImpl.h>
+#include <scopes/internal/RegistryImpl.h>
 
-#include <unity/api/scopes/internal/MWRegistry.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/MWRegistry.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeImpl.h>
+#include <scopes/internal/ScopeImpl.h>
 
-#include <unity/api/scopes/internal/MiddlewareBase.h>
-#include <unity/api/scopes/internal/QueryCtrlImpl.h>
-#include <unity/api/scopes/Scope.h>
+#include <scopes/internal/MiddlewareBase.h>
+#include <scopes/internal/QueryCtrlImpl.h>
+#include <scopes/Scope.h>
 #include <unity/Exception.h>
 
 #include <cassert>

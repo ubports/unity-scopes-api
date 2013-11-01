@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
+#include <scopes/internal/zmq_middleware/ConnectionPool.h>
+#include <scopes/internal/zmq_middleware/ZmqException.h>
+#include <scopes/internal/zmq_middleware/ZmqSender.h>
 
 #include <zmqpp/socket.hpp>
 

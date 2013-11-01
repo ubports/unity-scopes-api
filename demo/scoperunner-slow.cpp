@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RuntimeImpl.h>
-#include <unity/api/scopes/internal/ScopeLoader.h>
-#include <unity/api/scopes/internal/ScopeObject.h>
+#include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/ScopeLoader.h>
+#include <scopes/internal/ScopeObject.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>

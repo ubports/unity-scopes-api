@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Reply.h>
+#include <scopes/Reply.h>
 
-#include <unity/api/scopes/internal/ReplyImpl.h>
+#include <scopes/internal/ReplyImpl.h>
 
 namespace unity
 {

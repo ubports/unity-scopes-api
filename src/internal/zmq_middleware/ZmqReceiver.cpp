@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <scopes/internal/zmq_middleware/ZmqReceiver.h>
 
 #include <cassert>
 #include <cstdint>

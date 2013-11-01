@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 
 using namespace std;
 

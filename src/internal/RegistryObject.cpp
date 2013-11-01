@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryObject.h>
+#include <scopes/internal/RegistryObject.h>
 
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;

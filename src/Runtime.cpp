@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Runtime.h>
+#include <scopes/Runtime.h>
 
-#include <unity/api/scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/RuntimeImpl.h>
 
 using namespace std;
 

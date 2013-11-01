@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/QueryCtrlI.h>
+#include <scopes/internal/zmq_middleware/QueryCtrlI.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/capnproto/QueryCtrl.capnp.h>
-#include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <unity/api/scopes/internal/QueryCtrlObject.h>
+#include <scopes/internal/zmq_middleware/capnproto/QueryCtrl.capnp.h>
+#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/QueryCtrlObject.h>
 
 #include <cassert>
 

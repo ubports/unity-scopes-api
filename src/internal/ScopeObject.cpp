@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeObject.h>
+#include <scopes/internal/ScopeObject.h>
 
-#include <unity/api/scopes/internal/MiddlewareBase.h>
-#include <unity/api/scopes/internal/MWQuery.h>
-#include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <unity/api/scopes/internal/MWReply.h>
-#include <unity/api/scopes/internal/QueryObject.h>
-#include <unity/api/scopes/internal/RuntimeImpl.h>
-#include <unity/api/scopes/ScopeBase.h>
+#include <scopes/internal/MiddlewareBase.h>
+#include <scopes/internal/MWQuery.h>
+#include <scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <scopes/internal/MWReply.h>
+#include <scopes/internal/QueryObject.h>
+#include <scopes/internal/RuntimeImpl.h>
+#include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

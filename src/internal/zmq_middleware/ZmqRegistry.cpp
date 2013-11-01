@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <scopes/internal/zmq_middleware/ZmqRegistry.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/api/scopes/internal/ScopeImpl.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <scopes/internal/zmq_middleware/ZmqException.h>
+#include <scopes/internal/zmq_middleware/ZmqScope.h>
+#include <scopes/internal/ScopeImpl.h>
+#include <scopes/ScopeExceptions.h>
 
 #include <capnp/message.h>
 

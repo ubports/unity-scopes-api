@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryConfig.h>
+#include <scopes/internal/RegistryConfig.h>
 
 #include <unity/UnityExceptions.h>
 

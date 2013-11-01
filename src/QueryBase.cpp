@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/QueryBase.h>
+#include <scopes/QueryBase.h>
 
-#include <unity/api/scopes/internal/QueryBaseImpl.h>
+#include <scopes/internal/QueryBaseImpl.h>
 
 using namespace std;
 

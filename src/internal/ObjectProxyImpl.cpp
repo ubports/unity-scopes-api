@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ObjectProxyImpl.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 
-#include <unity/api/scopes/internal/MWObjectProxy.h>
-#include <unity/api/scopes/ObjectProxy.h>
+#include <scopes/internal/MWObjectProxy.h>
+#include <scopes/ObjectProxy.h>
 
 using namespace std;
 

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/AbstractObject.h>
+#include <scopes/internal/AbstractObject.h>
 
 #include <cassert>
 

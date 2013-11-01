@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/RegistryI.h>
+#include <scopes/internal/zmq_middleware/RegistryI.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
-#include <unity/api/scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/api/scopes/internal/RegistryObject.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/ZmqScope.h>
+#include <scopes/internal/RegistryObject.h>
+#include <scopes/ScopeExceptions.h>
 
 #include <cassert>
 

@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/RethrowException.h>
+#include <scopes/internal/zmq_middleware/RethrowException.h>
 
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/ScopeExceptions.h>
 
 using namespace std;
 

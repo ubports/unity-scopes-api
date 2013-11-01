@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
+#include <scopes/internal/zmq_middleware/ZmqException.h>
 
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/ScopeExceptions.h>
 
 #include <capnp/serialize.h>
 

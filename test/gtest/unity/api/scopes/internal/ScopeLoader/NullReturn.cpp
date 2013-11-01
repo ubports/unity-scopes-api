@@ -19,7 +19,7 @@
 #include "MyScope.h"
 #include "Counters.h"
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
+#include <scopes/internal/ScopeLoader.h>
 
 #include <cassert>
 

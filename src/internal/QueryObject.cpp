@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/QueryObject.h>
+#include <scopes/internal/QueryObject.h>
 
-#include <unity/api/scopes/internal/MWQueryCtrl.h>
-#include <unity/api/scopes/internal/MWReply.h>
-#include <unity/api/scopes/internal/QueryCtrlObject.h>
-#include <unity/api/scopes/internal/ReplyImpl.h>
-#include <unity/api/scopes/QueryBase.h>
-#include <unity/api/scopes/Reply.h>
+#include <scopes/internal/MWQueryCtrl.h>
+#include <scopes/internal/MWReply.h>
+#include <scopes/internal/QueryCtrlObject.h>
+#include <scopes/internal/ReplyImpl.h>
+#include <scopes/QueryBase.h>
+#include <scopes/Reply.h>
 #include <unity/Exception.h>
 
 #include <cassert>

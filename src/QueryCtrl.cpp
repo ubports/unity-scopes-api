@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/QueryCtrl.h>
+#include <scopes/QueryCtrl.h>
 
-#include <unity/api/scopes/internal/QueryCtrlImpl.h>
+#include <scopes/internal/QueryCtrlImpl.h>
 
 namespace unity
 {

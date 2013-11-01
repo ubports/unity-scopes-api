@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MiddlewareFactory.h>
+#include <scopes/internal/MiddlewareFactory.h>
 
-// #include <unity/api/scopes/internal/ice_middleware/IceMiddleware.h>
-#include <unity/api/scopes/internal/MiddlewareFactoryConfig.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+// #include <scopes/internal/ice_middleware/IceMiddleware.h>
+#include <scopes/internal/MiddlewareFactoryConfig.h>
+#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <scopes/ScopeExceptions.h>
 
 #include <cassert>
 

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MWObjectProxy.h>
+#include <scopes/internal/MWObjectProxy.h>
 
 #include <cassert>
 

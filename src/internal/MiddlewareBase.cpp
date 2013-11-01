@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MiddlewareBase.h>
+#include <scopes/internal/MiddlewareBase.h>
 
 #include <cassert>
 

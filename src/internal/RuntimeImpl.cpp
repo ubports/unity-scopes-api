@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/RuntimeImpl.h>
 
-#include <unity/api/scopes/internal/RegistryConfig.h>
-#include <unity/api/scopes/internal/RegistryImpl.h>
-#include <unity/api/scopes/internal/RuntimeConfig.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/RegistryConfig.h>
+#include <scopes/internal/RegistryImpl.h>
+#include <scopes/internal/RuntimeConfig.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

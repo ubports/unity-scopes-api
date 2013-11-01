@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ReplyObject.h>
+#include <scopes/internal/ReplyObject.h>
 
-#include <unity/api/scopes/internal/RuntimeImpl.h>
-#include <unity/api/scopes/ReplyBase.h>
+#include <scopes/internal/RuntimeImpl.h>
+#include <scopes/ReplyBase.h>
 #include <unity/Exception.h>
 
 #include <cassert>

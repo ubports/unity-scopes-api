@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/ReplyBase.h>
+#include <scopes/ReplyBase.h>
 
 using namespace std;
 

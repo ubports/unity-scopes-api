@@ -16,22 +16,22 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/ConnectionPool.h>
-#include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <unity/api/scopes/internal/zmq_middleware/QueryI.h>
-#include <unity/api/scopes/internal/zmq_middleware/QueryCtrlI.h>
-#include <unity/api/scopes/internal/zmq_middleware/RegistryI.h>
-#include <unity/api/scopes/internal/zmq_middleware/ReplyI.h>
-#include <unity/api/scopes/internal/zmq_middleware/ScopeI.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqQuery.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqRegistry.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReply.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/api/scopes/internal/zmq_middleware/RethrowException.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/zmq_middleware/ConnectionPool.h>
+#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/QueryI.h>
+#include <scopes/internal/zmq_middleware/QueryCtrlI.h>
+#include <scopes/internal/zmq_middleware/RegistryI.h>
+#include <scopes/internal/zmq_middleware/ReplyI.h>
+#include <scopes/internal/zmq_middleware/ScopeI.h>
+#include <scopes/internal/zmq_middleware/ZmqQuery.h>
+#include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <scopes/internal/zmq_middleware/ZmqReply.h>
+#include <scopes/internal/zmq_middleware/ZmqScope.h>
+#include <scopes/internal/zmq_middleware/RethrowException.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;

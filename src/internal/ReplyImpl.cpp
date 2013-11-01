@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ReplyImpl.h>
+#include <scopes/internal/ReplyImpl.h>
 
-#include <unity/api/scopes/internal/MiddlewareBase.h>
-#include <unity/api/scopes/internal/MWReply.h>
-#include <unity/api/scopes/internal/RuntimeImpl.h>
-#include <unity/api/scopes/ScopeExceptions.h>
-#include <unity/api/scopes/Reply.h>
+#include <scopes/internal/MiddlewareBase.h>
+#include <scopes/internal/MWReply.h>
+#include <scopes/internal/RuntimeImpl.h>
+#include <scopes/ScopeExceptions.h>
+#include <scopes/Reply.h>
 
 #include <cassert>
 

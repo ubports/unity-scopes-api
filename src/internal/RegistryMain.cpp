@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MiddlewareFactory.h>
-#include <unity/api/scopes/internal/RegistryConfig.h>
-#include <unity/api/scopes/internal/RegistryObject.h>
-#include <unity/api/scopes/internal/RuntimeConfig.h>
-#include <unity/api/scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/MiddlewareFactory.h>
+#include <scopes/internal/RegistryConfig.h>
+#include <scopes/internal/RegistryObject.h>
+#include <scopes/internal/RuntimeConfig.h>
+#include <scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>

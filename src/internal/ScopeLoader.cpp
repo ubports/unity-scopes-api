@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ScopeLoader.h>
+#include <scopes/internal/ScopeLoader.h>
 
-#include <unity/api/scopes/Version.h>
+#include <scopes/Version.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 

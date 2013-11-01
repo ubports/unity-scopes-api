@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/QueryCtrlObject.h>
+#include <scopes/internal/QueryCtrlObject.h>
 
-#include <unity/api/scopes/internal/QueryObject.h>
+#include <scopes/internal/QueryObject.h>
 
 #include <cassert>
 
