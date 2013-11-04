@@ -97,6 +97,12 @@ if (Werror)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 
+option(IPC_MONITORING "Enable IPC traffic monitoring")
+
+if(IPC_MONITORING)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_IPC_MONITOR")
+endif()
+
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)

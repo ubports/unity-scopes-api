@@ -42,7 +42,6 @@ namespace internal
 namespace zmq_middleware
 {
 
-#define MONITOR_ENVVAR "LIBUNITY_SCOPES_ENABLE_MONITOR"
 #define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
 
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, RequestType t) :
@@ -109,19 +108,19 @@ unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_param
 {
     thread_local static ConnectionPool pool(*mw_base()->context());
 
-    static bool monitoring_enabled = std::getenv(MONITOR_ENVVAR) != nullptr;
-
     zmqpp::socket& s = pool.find(endpoint(), type());
     ZmqSender sender(s);
     auto segments = out_params.getSegmentsForOutput();
     sender.send(segments);
 
-    if (monitoring_enabled) {
+#ifdef ENABLE_IPC_MONITOR
+    if (true) {
         register_monitor_socket(pool, *mw_base()->context());
         zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT, RequestType::Oneway);
         auto word_arr = capnp::messageToFlatArray(segments);
         monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
     }
+#endif
 
     return unique_ptr<ZmqReceiver>(new ZmqReceiver(s));
 }
