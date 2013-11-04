@@ -33,6 +33,8 @@ namespace api
 namespace scopes
 {
 
+class ResultItem;
+
 namespace internal
 {
 
@@ -50,7 +52,7 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
     ~ReplyImpl() noexcept;
 
-    bool push(std::string const& result);
+    bool push(unity::api::scopes::ResultItem const& result);
     void finished();
 
     static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);

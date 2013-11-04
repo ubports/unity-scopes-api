@@ -17,6 +17,7 @@
  */
 
 #include <unity/api/scopes/ScopeBase.h>
+#include <unity/api/scopes/ResultItem.h>
 #include <unity/api/scopes/Reply.h>
 
 #include <algorithm>
@@ -185,7 +186,9 @@ public:
             for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
-                if (!reply->push("scope-C: result " + to_string(i) + " for query \"" + query + "\""))
+                ResultItem result;
+                result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
+                if (!reply->push(result))
                 {
                     cerr << "worker thread: push returned false" << endl;
                     break; // Query was cancelled

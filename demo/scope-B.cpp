@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/Registry.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -36,7 +37,7 @@ using namespace unity::api::scopes;
 class SubReply : public ReplyBase
 {
 public:
-    virtual void push(string const& result) override
+    virtual void push(ResultItem const& result) override
     {
         cout << "received result from " << scope_name_ << ": " << result << endl;
         upstream_->push(result);

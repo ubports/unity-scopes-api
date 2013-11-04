@@ -17,6 +17,7 @@
  */
 
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 
 #include <unity/api/scopes/internal/ReplyImpl.h>
 
@@ -40,7 +41,7 @@ Reply::~Reply() noexcept
 {
 }
 
-bool Reply::push(std::string const& result) const
+bool Reply::push(ResultItem const& result) const
 {
     return p->push(result);
 }

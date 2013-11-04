@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 
 #include <iostream>
 #include <thread>
@@ -52,7 +53,9 @@ public:
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
-        reply->push("scope-slow: result 1 for query \"" + query_ + "\"");
+        ResultItem result;
+        result.set_title("scope-slow: result 1 for query \"" + query_ + "\"");
+        reply->push(result);
         cout << "scope-slow: query \"" << query_ << "\" complete" << endl;
     }
 

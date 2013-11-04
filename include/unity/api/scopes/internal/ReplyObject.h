@@ -22,6 +22,7 @@
 #include <unity/api/scopes/internal/AbstractObject.h>
 #include <unity/api/scopes/internal/Reaper.h>
 #include <unity/api/scopes/ReplyBase.h>
+#include <unity/api/scopes/VariantMap.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -53,7 +54,7 @@ public:
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
-    void push(std::string const& result) noexcept;
+    void push(VariantMap const& result) noexcept;
     void finished() noexcept;
 
 private:

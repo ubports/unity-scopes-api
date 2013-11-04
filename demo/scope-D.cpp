@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/RegistryProxyFwd.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 #include <unity/api/scopes/ScopeBase.h>
 
 #include <algorithm>
@@ -200,7 +201,9 @@ public:
             {
                 for (int i = 1; i < 5; ++i)
                 {
-                    if (!reply_proxy->push(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\""))
+                    ResultItem result;
+                    result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
+                    if (!reply_proxy->push(result))
                     {
                         break; // Query was cancelled
                     }

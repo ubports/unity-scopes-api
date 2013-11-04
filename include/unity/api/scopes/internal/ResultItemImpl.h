@@ -13,15 +13,14 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#ifndef UNITY_API_SCOPES_RESULTITEMIMPL_H
+#define UNITY_API_SCOPES_RESULTITEMIMPL_H
 
-#include <unity/api/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <unity/api/scopes/internal/MWReply.h>
+#include <string>
+#include <unity/api/scopes/VariantMap.h>
 
 namespace unity
 {
@@ -35,20 +34,29 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
-
-class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
+class ResultItemImpl
 {
 public:
-    ZmqReply(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqReply() noexcept;
+    void set_uri(std::string const& uri);
+    void set_title(std::string const& title);
+    void set_icon(std::string const& icon);
+    void set_dnd_uri(std::string const& dnd_uri);
+    void set_renderer_hint(std::string const& name, Variant const& value);
 
-    virtual void push(VariantMap const& result) override;
-    virtual void finished() override;
+    std::string get_uri() const;
+    std::string get_title() const;
+    std::string get_icon() const;
+    std::string get_dnd_uri() const;
+
+    const VariantMap to_variant() const;
+    void from_variant(VariantMap const& var);
+
+private:
+    std::string uri;
+    std::string title;
+    std::string icon;
+    std::string dnd_uri;
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 
@@ -57,5 +65,6 @@ public:
 } // namespace api
 
 } // namespace unity
+
 
 #endif

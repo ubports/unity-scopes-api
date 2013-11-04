@@ -17,9 +17,10 @@
  */
 
 #include <unity/api/scopes/internal/ReplyObject.h>
-
+#include <unity/api/scopes/internal/ResultItemImpl.h>
 #include <unity/api/scopes/internal/RuntimeImpl.h>
 #include <unity/api/scopes/ReplyBase.h>
+#include <unity/api/scopes/ResultItem.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -60,7 +61,7 @@ ReplyObject::~ReplyObject() noexcept
     }
 }
 
-void ReplyObject::push(std::string const& result) noexcept
+void ReplyObject::push(VariantMap const& result) noexcept
 {
     // We catch all exeptions so, if the application's push() method throws,
     // we can call finished(). Finished will be called exactly once, whether
@@ -90,7 +91,9 @@ void ReplyObject::push(std::string const& result) noexcept
     lock.unlock();
     try
     {
-        reply_base_->push(result);      // Forward the result to the application code outside synchronization.
+        ResultItem result_item;
+        result_item.p->from_variant(result);
+        reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
     }
     catch (unity::Exception const& e)
     {

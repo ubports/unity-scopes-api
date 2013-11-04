@@ -21,8 +21,7 @@
 
 #include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
-
-#include <string>
+#include <unity/api/scopes/VariantMap.h>
 
 namespace unity
 {
@@ -41,7 +40,7 @@ class MWReply : public virtual MWObjectProxy
 public:
     virtual ~MWReply() noexcept;
 
-    virtual void push(std::string const& result) = 0;
+    virtual void push(VariantMap const& result) = 0;
     virtual void finished() = 0;
 
 protected:

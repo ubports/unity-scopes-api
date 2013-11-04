@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 
 #include <iostream>
 
@@ -46,7 +47,9 @@ public:
 
     virtual void run(ReplyProxy const& reply) override
     {
-        reply->push("scope-A: result 1 for query \"" + query_ + "\"");
+        ResultItem res;
+        res.set_title("scope-A: result 1 for query \"" + query_ + "\"");
+        reply->push(res);
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;
     }
 

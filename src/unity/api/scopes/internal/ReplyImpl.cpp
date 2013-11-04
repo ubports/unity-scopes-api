@@ -21,8 +21,10 @@
 #include <unity/api/scopes/internal/MiddlewareBase.h>
 #include <unity/api/scopes/internal/MWReply.h>
 #include <unity/api/scopes/internal/RuntimeImpl.h>
+#include <unity/api/scopes/internal/ResultItemImpl.h>
 #include <unity/api/scopes/ScopeExceptions.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/ResultItem.h>
 
 #include <cassert>
 
@@ -61,13 +63,13 @@ ReplyImpl::~ReplyImpl() noexcept
     }
 }
 
-bool ReplyImpl::push(std::string const& result)
+bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 {
     if (!finished_.load())
     {
         try
         {
-            mw_proxy_->push(result);
+            mw_proxy_->push(result.p->to_variant());
             return true;
         }
         catch (MiddlewareException const& e)
