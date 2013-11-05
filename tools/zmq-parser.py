@@ -46,7 +46,8 @@ reply_capnp = capnp.load(schema_base_dir + "Reply.capnp", None, import_dirs)
 context = zmq.Context()
 
 receiver = context.socket(zmq.SUB)
-receiver.setsockopt(zmq.SUBSCRIBE, "")
+# the second argument can't be unicode, using encode() will make it work in py3
+receiver.setsockopt(zmq.SUBSCRIBE, "".encode())
 receiver.connect("ipc:///tmp/scopes-monitor2")
 
 def increase_indent(text, num_spaces = 2):
@@ -58,10 +59,10 @@ msg_num = 0
 while True:
     message = receiver.recv(0, False)
     cur_time = datetime.now().strftime("%H:%M:%S.%f")
-    print cur_time, "received", len(message.bytes), "byte message:"
+    print(cur_time, "received", len(message.bytes), "byte message:")
     # FIXME: how come we never see Reply messages?
     request = msg_capnp.Request.from_bytes(message.bytes)
-    print request
+    print(request)
     inParams = request.inParams
     nested = None
     if inParams:
@@ -74,10 +75,10 @@ while True:
             nested = inParams.as_struct(reply_capnp.PushRequest)
 
         if nested:
-            print "  inParams as <%s>:" % nested.schema.node.displayName
-            print increase_indent(str(nested))
+            print("  inParams as <%s>:" % nested.schema.node.displayName)
+            print(increase_indent(str(nested)))
         elif request._has("inParams"):
-            print "  inParams: [unknown message type]"
-    print "=========================================="
+            print("  inParams: [unknown message type]")
+    print("==========================================")
 
     msg_num = msg_num + 1
