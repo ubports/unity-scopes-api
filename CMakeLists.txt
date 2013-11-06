@@ -246,14 +246,16 @@ endif()
 #
 # Documentation
 #
-# Pass -DDEVEL_DOCS=y to cmake for more detailed documentation
+# Pass -DDEVEL_DOCS=ON to cmake for more detailed documentation
+
+option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
     message(WARNING "Cannot generate documentation: doxygen and/or graphviz not found")
 else()
-    if (DEVEL_DOCS MATCHES y)
+    if (DEVEL_DOCS)
       message(STATUS "Creaing devel documentation")
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile-devel.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     else()
