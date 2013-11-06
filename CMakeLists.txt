@@ -49,6 +49,14 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
+
+pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
+pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
+find_program(LTTNG_EXECUTABLE lttng)
+if (NOT LTTNG_EXECUTABLE)
+    message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
+endif()
+
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
@@ -67,6 +75,8 @@ include_directories(
 # Exported functions and classes are prefixed by a UNITY_API macro,
 # which explicitly exports a symbol if UNITY_DLL_EXPORTS is defined.
 add_definitions(-DUNITY_DLL_EXPORTS)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
 # TODO: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
 # base class from a static library without an unresolved dependency. But, without static linking, we can't
@@ -117,6 +127,7 @@ set(OTHER_LIBS
     kj
     pthread
     dl
+    lttngtracer
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
