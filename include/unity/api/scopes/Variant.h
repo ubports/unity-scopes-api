@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 namespace unity
 {
@@ -32,6 +33,10 @@ namespace api
 
 namespace scopes
 {
+
+class Variant;
+
+typedef std::map<std::string, Variant> VariantMap;
 
 namespace internal
 {
@@ -50,7 +55,7 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Int, Bool, String };
+    enum Type { Int, Bool, String, Dict };
 
     /**@name Constructors and destructor
     */
@@ -79,6 +84,8 @@ public:
     */
     explicit Variant(char const* val);          // Required to prevent Variant("Hello") from storing a bool
 
+    explicit Variant(VariantMap const& val);
+
     /**
     \brief Destructor.
     */
@@ -104,6 +111,7 @@ public:
     Variant& operator=(bool val) noexcept;
     Variant& operator=(std::string const& val);
     Variant& operator=(char const* val);        // Required to prevent v = "Hello" from storing a bool
+    Variant& operator=(VariantMap const& val);
     //@}
 
     /**@name Comparison operators
@@ -126,6 +134,7 @@ public:
     int get_int() const;
     bool get_bool() const;
     std::string get_string() const;
+    VariantMap get_dict() const;
     //@}
 
     /**@name Observers

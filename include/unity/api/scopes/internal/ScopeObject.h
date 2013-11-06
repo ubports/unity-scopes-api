@@ -22,7 +22,7 @@
 #include <unity/api/scopes/internal/AbstractObject.h>
 #include <unity/api/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 #include <string>
 

@@ -21,7 +21,7 @@
 
 #include <unity/api/scopes/internal/MWObjectProxy.h>
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 namespace unity
 {

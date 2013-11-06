@@ -53,6 +53,7 @@ void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
 
 void ResultItemImpl::set_renderer_hint(std::string const& name, Variant const& value)
 {
+    render_hints[name] = value;
 }
 
 std::string ResultItemImpl::get_uri() const
@@ -82,6 +83,7 @@ const VariantMap ResultItemImpl::to_variant() const
     var["title"] = title;
     var["icon"] = icon;
     var["dnd_uri"] = dnd_uri;
+    var["render_hints"] = render_hints;
     return var;
 }
 
@@ -106,6 +108,10 @@ void ResultItemImpl::from_variant(VariantMap const& var)
         throw MiddlewareException("Missing 'dnd_uri'");
     dnd_uri = it->second.get_string();
 
+    it = var.find("render_hints");
+    if (it == var.end())
+        throw MiddlewareException("Missing 'render_hints'");
+    render_hints = it->second.get_dict();
 }
 
 } // namespace internal

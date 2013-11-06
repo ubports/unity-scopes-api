@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_VARIANTCONVERTER_H
 #define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_VARIANTCONVERTER_H
 
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 #include <unity/api/scopes/internal/zmq_middleware/capnproto/ValueDict.capnp.h>
 
 namespace unity

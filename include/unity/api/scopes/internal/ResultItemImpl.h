@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_RESULTITEMIMPL_H
 
 #include <string>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 namespace unity
 {
@@ -56,6 +56,7 @@ private:
     std::string title;
     std::string icon;
     std::string dnd_uri;
+    VariantMap render_hints;
 };
 
 } // namespace internal

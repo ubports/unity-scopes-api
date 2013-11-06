@@ -22,7 +22,7 @@
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
 #include <unity/api/scopes/ReplyProxyFwd.h>
 #include <unity/api/scopes/ScopeProxyFwd.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>

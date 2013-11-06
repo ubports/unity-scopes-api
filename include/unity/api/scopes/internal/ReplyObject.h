@@ -22,7 +22,7 @@
 #include <unity/api/scopes/internal/AbstractObject.h>
 #include <unity/api/scopes/internal/Reaper.h>
 #include <unity/api/scopes/ReplyBase.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 #include <atomic>
 #include <condition_variable>

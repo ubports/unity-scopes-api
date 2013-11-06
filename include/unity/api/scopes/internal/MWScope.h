@@ -23,7 +23,7 @@
 #include <unity/api/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/api/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/api/scopes/QueryCtrlProxyFwd.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 namespace unity
 {

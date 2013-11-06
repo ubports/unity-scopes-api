@@ -22,7 +22,7 @@
 #include <unity/api/scopes/internal/QueryCtrlImpl.h>
 
 #include <unity/api/scopes/ScopeProxyFwd.h>
-#include <unity/api/scopes/VariantMap.h>
+#include <unity/api/scopes/Variant.h>
 
 #include <vector>
 
