@@ -23,7 +23,6 @@
 #include <unity/api/scopes/Variant.h>
 #include <string>
 #include <memory>
-#include <ostream>
 
 namespace unity
 {
@@ -65,8 +64,6 @@ private:
     friend class internal::ReplyImpl;
     friend std::ostream& operator<<(std::ostream &, unity::api::scopes::ResultItem const&);
 };
-
-std::ostream& operator<<(std::ostream &str, unity::api::scopes::ResultItem const& result);
 
 } // namespace scopes
 

@@ -81,11 +81,6 @@ std::string ResultItem::get_dnd_uri() const
     return p->get_dnd_uri();
 }
 
-std::ostream& operator<<(std::ostream &str, unity::api::scopes::ResultItem const& result)
-{
-    return str;
-}
-
 //! @endcond
 
 } // namespace scopes
