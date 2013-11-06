@@ -62,7 +62,6 @@ private:
     friend class internal::ResultItemImpl;
     friend class internal::ReplyObject;
     friend class internal::ReplyImpl;
-    friend std::ostream& operator<<(std::ostream &, unity::api::scopes::ResultItem const&);
 };
 
 } // namespace scopes

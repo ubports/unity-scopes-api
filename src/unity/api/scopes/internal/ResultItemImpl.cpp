@@ -104,6 +104,7 @@ void ResultItemImpl::from_variant(VariantMap const& var)
         throw MiddlewareException("Missing 'icon'");
     icon = it->second.get_string();
 
+    it = var.find("dnd_uri");
     if (it == var.end())
         throw MiddlewareException("Missing 'dnd_uri'");
     dnd_uri = it->second.get_string();
