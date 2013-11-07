@@ -24,7 +24,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <future>
-#include <thread>
 
 namespace unity
 {
@@ -57,9 +56,6 @@ private:
     typedef ThreadSafeQueue<unity::api::scopes::internal::TaskWrapper> TaskQueue;
     std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
-    std::mutex mutex_;
-    std::condition_variable cond_;
-    bool done_;
 };
 
 template<typename F>

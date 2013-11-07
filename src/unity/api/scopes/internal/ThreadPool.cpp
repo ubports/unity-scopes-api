@@ -52,15 +52,15 @@ ThreadPool::ThreadPool(int size)
     }
     catch (std::exception const&)   // LCOV_EXCL_LINE
     {
-        throw unity::ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
+        throw ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
     }
 }
 
 ThreadPool::~ThreadPool() noexcept
 {
+    queue_->destroy();
     try
     {
-        queue_.reset(nullptr);
         for (size_t i = 0; i < threads_.size(); ++i)
         {
             threads_[i].join();
@@ -74,14 +74,14 @@ ThreadPool::~ThreadPool() noexcept
 
 void ThreadPool::run()
 {
+    TaskQueue::value_type task;
     for (;;)
     {
-        TaskQueue::value_type task;
         try
         {
             task = queue_->wait_and_pop();
         }
-        catch (...)
+        catch (runtime_error const&)
         {
             return; // wait_and_pop() throws if the queue is destroyed while threads are blocked on it.
         }

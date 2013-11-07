@@ -77,11 +77,47 @@ TEST(ThreadSafeQueue, exception)
     unique_ptr<ThreadSafeQueue<string>> q(new ThreadSafeQueue<string>);
     q->push("fred");
     auto f = waiter_ready.get_future();
-    auto t = thread(&waiter_thread, q.get());
+    auto t = thread(waiter_thread, q.get());
     f.wait();
     this_thread::sleep_for(chrono::milliseconds(50));   // Make sure child thread has time to call wait_and_pop()
     q.reset();
     t.join();
+}
+
+atomic_int count;
+
+void int_reader_thread(ThreadSafeQueue<int>* q)
+{
+    try
+    {
+        q->wait_and_pop();
+        FAIL();
+    }
+    catch (std::runtime_error const&)
+    {
+        ++count;
+    }
+}
+
+TEST(ThreadSafeQueue, wait_for_threads)
+{
+    ThreadSafeQueue<int> q;
+    count = 0;
+    vector<thread> threads;
+    for (auto i = 0; i < 20; ++i)
+    {
+        threads.push_back(thread(int_reader_thread, &q));
+    }
+    this_thread::sleep_for(chrono::milliseconds(300));
+
+    // Destroy the queue while multiple threads are sleeping in wait_and_pop().
+    q.destroy();
+
+    for (auto& t : threads)
+    {
+        t.join();
+    }
+    EXPECT_EQ(50, count);
 }
 
 class MoveOnly
