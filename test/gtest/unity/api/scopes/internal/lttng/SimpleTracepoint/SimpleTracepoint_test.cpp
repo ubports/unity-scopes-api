@@ -27,6 +27,10 @@
 
 TEST(SimpleTracepoint, basic_trace_test)
 {
+  // ensure that the LTTng session daemon is running in the background
+  // (this call is harmless if the daemon is already running)
+  system("lttng-sessiond -d");
+
   system("rm -R -f ./lttng-trace");
   system("lttng create trace_session -o ./lttng-trace");
   system("lttng enable-event -a -s trace_session -u");
