@@ -17,6 +17,7 @@
  */
 
 #include <unity/api/scopes/ResultItem.h>
+#include <unity/api/scopes/Category.h>
 #include <unity/api/scopes/internal/ResultItemImpl.h>
 #include <gtest/gtest.h>
 
@@ -26,7 +27,8 @@ using namespace unity::api::scopes::internal;
 // basic test of ResultIem setters and getters
 TEST(ResultItem, basic)
 {
-    ResultItem result;
+    auto cat = std::shared_ptr<Category>(new Category("1"));
+    ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
     result.set_icon("an icon");
@@ -41,7 +43,8 @@ TEST(ResultItem, basic)
 // test conversion to VariantMap
 TEST(ResultItemImpl, to_variant)
 {
-    ResultItemImpl result;
+    auto cat = std::shared_ptr<Category>(new Category("1"));
+    ResultItemImpl result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
     result.set_icon("an icon");
@@ -62,7 +65,8 @@ TEST(ResultItemImpl, to_variant)
 // test conversion to VariantMap
 TEST(ResultItemImpl, from_variant)
 {
-    ResultItemImpl result;
+    auto cat = std::shared_ptr<Category>(new Category("1"));
+    ResultItemImpl result(cat);
     VariantMap vm;
     vm["uri"] = "http://ubuntu.com";
     vm["dnd_uri"] = "http://canonical.com";

@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/ScopeBase.h>
 #include <unity/api/scopes/ResultItem.h>
+#include <unity/api/scopes/Category.h>
 #include <unity/api/scopes/Reply.h>
 
 #include <algorithm>
@@ -186,7 +187,8 @@ public:
             for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
-                ResultItem result;
+                auto cat = std::shared_ptr<Category>(new Category("cat1"));
+                ResultItem result(cat);
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
                 if (!reply->push(result))
                 {

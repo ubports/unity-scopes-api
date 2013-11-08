@@ -20,6 +20,7 @@
 #include <unity/api/scopes/internal/ResultItemImpl.h>
 #include <unity/api/scopes/internal/RuntimeImpl.h>
 #include <unity/api/scopes/ReplyBase.h>
+#include <unity/api/scopes/Category.h>
 #include <unity/api/scopes/ResultItem.h>
 #include <unity/Exception.h>
 
@@ -91,7 +92,8 @@ void ReplyObject::push(VariantMap const& result) noexcept
     lock.unlock();
     try
     {
-        ResultItem result_item;
+        auto cat = std::shared_ptr<Category>(new Category("")); //FIXME: set proper category once categories are (de)serialized
+        ResultItem result_item(cat);
         result_item.p->from_variant(result);
         reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
     }

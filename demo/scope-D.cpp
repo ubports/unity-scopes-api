@@ -18,6 +18,7 @@
 
 #include <unity/api/scopes/RegistryProxyFwd.h>
 #include <unity/api/scopes/Reply.h>
+#include <unity/api/scopes/Category.h>
 #include <unity/api/scopes/ResultItem.h>
 #include <unity/api/scopes/ScopeBase.h>
 
@@ -201,7 +202,8 @@ public:
             {
                 for (int i = 1; i < 5; ++i)
                 {
-                    ResultItem result;
+                    auto cat = std::shared_ptr<Category>(new Category("cat1"));
+                    ResultItem result(cat);
                     result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
                     if (!reply_proxy->push(result))
                     {

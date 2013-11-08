@@ -16,12 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULTITEMIMPL_H
-#define UNITY_API_SCOPES_RESULTITEMIMPL_H
+#ifndef UNITY_API_SCOPES_CATEGORYIMPL_H
+#define UNITY_API_SCOPES_CATEGORYIMPL_H
 
+#include <unity/util/NonCopyable.h>
 #include <string>
-#include <memory>
-#include <unity/api/scopes/Variant.h>
 
 namespace unity
 {
@@ -32,37 +31,17 @@ namespace api
 namespace scopes
 {
 
-class Category;
-
 namespace internal
 {
 
-class ResultItemImpl
+class UNITY_API CategoryImpl : private util::NonCopyable
 {
 public:
-    ResultItemImpl(std::shared_ptr<Category> category);
-
-    void set_uri(std::string const& uri);
-    void set_title(std::string const& title);
-    void set_icon(std::string const& icon);
-    void set_dnd_uri(std::string const& dnd_uri);
-    void set_renderer_hint(std::string const& name, Variant const& value);
-
-    std::string get_uri() const;
-    std::string get_title() const;
-    std::string get_icon() const;
-    std::string get_dnd_uri() const;
-
-    const VariantMap to_variant() const;
-    void from_variant(VariantMap const& var);
+    CategoryImpl(std::string const& id);
+    std::string const& get_id() const;
 
 private:
-    std::shared_ptr<Category> category;
-    std::string uri;
-    std::string title;
-    std::string icon;
-    std::string dnd_uri;
-    VariantMap render_hints;
+    std::string id;
 };
 
 } // namespace internal
@@ -72,6 +51,5 @@ private:
 } // namespace api
 
 } // namespace unity
-
 
 #endif

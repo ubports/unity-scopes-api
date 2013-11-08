@@ -17,7 +17,6 @@
  */
 
 #include <unity/api/scopes/ResultItem.h>
-
 #include <unity/api/scopes/internal/ResultItemImpl.h>
 
 namespace unity
@@ -31,8 +30,8 @@ namespace scopes
 
 //! @cond
 
-ResultItem::ResultItem()
-    : p(new internal::ResultItemImpl())
+ResultItem::ResultItem(std::shared_ptr<Category> category)
+    : p(new internal::ResultItemImpl(category))
 {
 }
 

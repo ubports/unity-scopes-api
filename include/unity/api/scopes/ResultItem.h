@@ -21,6 +21,7 @@
 
 #include <unity/util/NonCopyable.h>
 #include <unity/api/scopes/Variant.h>
+#include <unity/api/scopes/Category.h>
 #include <string>
 #include <memory>
 
@@ -43,7 +44,7 @@ namespace internal
 class UNITY_API ResultItem : private util::NonCopyable
 {
 public:
-    ResultItem();
+    ResultItem(Category::SPtr category);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);

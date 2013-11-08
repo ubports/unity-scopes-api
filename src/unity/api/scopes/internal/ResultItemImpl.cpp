@@ -18,6 +18,9 @@
 
 #include <unity/api/scopes/internal/ResultItemImpl.h>
 #include <unity/api/scopes/ScopeExceptions.h>
+#include <unity/api/scopes/Category.h>
+
+#include <cassert>
 
 namespace unity
 {
@@ -30,6 +33,12 @@ namespace scopes
 
 namespace internal
 {
+
+ResultItemImpl::ResultItemImpl(Category::SPtr category)
+    : category(category)
+{
+    assert(category);
+}
 
 void ResultItemImpl::set_uri(std::string const& uri)
 {
@@ -84,6 +93,7 @@ const VariantMap ResultItemImpl::to_variant() const
     var["icon"] = icon;
     var["dnd_uri"] = dnd_uri;
     var["render_hints"] = render_hints;
+    var["cat_id"] = category->get_id();
     return var;
 }
 
@@ -113,6 +123,8 @@ void ResultItemImpl::from_variant(VariantMap const& var)
     if (it == var.end())
         throw MiddlewareException("Missing 'render_hints'");
     render_hints = it->second.get_dict();
+
+   // TODO: handle cat_id; needs access to deserialized categories to set ptr to an instance
 }
 
 } // namespace internal
