@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 

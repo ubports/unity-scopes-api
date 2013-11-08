@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/UniqueID.h>
+#include <scopes/internal/UniqueID.h>
 
 #include <gtest/gtest.h>
 
