@@ -17,4 +17,5 @@ target_link_libraries(
 
   lttng-ust
   urcu-bp
+  dl
 )
