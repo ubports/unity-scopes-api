@@ -38,6 +38,7 @@ Some dependencies need to be installed manually as they are not yet available in
   $ git clone https://github.com/benjamg/zmqpp.git
   $ cd zmqpp && make && sudo make install
 
+
 Building the code
 -----------------
 
@@ -66,6 +67,7 @@ To build with the flags for coverage testing enabled:
 If you do not have libunity-api installed, build it from source and install it somewhere, then set
 PKG_CONFIG_PATH to include the lib/<arch>/pkgconfig directory.
 
+
 Running the tests
 -----------------
 
@@ -90,11 +92,6 @@ To get coverage output:
 This drops the coverage tests into the coveragereport directory. (The coverage target is available
 only if the code was built with -DCMAKE_BUILD_TYPE=coverage.)
 
-Note that, with gcc 4.7.2 and cmake 2.8.10, you may get a bunch of
-warnings. To fix this, you can build cmake 2.8.10 with the following patch:
-
-http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=61ace1df2616e472d056b302e4269cbf112fb020#patch1
-
 Unfortunately, it is not possibly to get 100% coverage for some files,
 mainly due to gcc's generation of two destructors for dynamic and non-
 dynamic instances. For abstract base classes and for classes that
@@ -103,9 +100,23 @@ to be reported as uncovered.
 
 There are also issues with some functions in header files that are
 incorrectly reported as uncovered due to inlining, as well as
-the impossibility of covering defensive assert(false) statements,
-such as an assert in the default branch of a switch, where the
-switch is meant to handle all possible cases explicitly.
+issues with templates that are reported as partially covered even though
+the tests cover them completely.
+
+To deal with unreachable code (such as defensive assert(false) statements
+assert in the default branch of a switch, where the switch handles all
+possible cases explicitly), you can add a comment
+
+    // LCOV_EXCL_LINE
+
+to the relevant line or bracket a block of code with
+
+    // LCOV_EXCL_START
+    ...
+    // LCOV_EXCL_STOP
+
+Be judicious about coverage exclusions and add them only if there truly
+is no feasible way to cover the code with a test!
 
 If you run a binary and get lots of warnings about a "merge mismatch for summaries",
 this is caused by having made changes to the source that add or remove code
@@ -114,7 +125,9 @@ into the old coverage output. You can get rid of this problem by running
 
     $ make clean-coverage
 
-This deletes all the .gcda files, allowing the merge to succeed again.
+This deletes all the .gcda files, allowing the merge to (sometimes) succeed again.
+If this still doesn't work, the easiest work-around is to blow away the entire contents
+of the build directory and start over from scratch :-(
 
 If lcov complains about unrecognized lines involving '=====',
 you can patch geninfo and gcovr as explained here:
@@ -124,6 +137,22 @@ https://bugs.launchpad.net/gcovr/+bug/1086695/comments/2
 To run the static C++ checks:
 
     $ make cppcheck
+
+
+Documentation
+-------------
+
+To generate the doc:
+
+    $ make doc
+
+By default, this target generates documentation only for the public API.
+
+You can set the cmake option DEVEL_DOCS=ON to generate documentation that includes the internal API:
+
+    $ cmake -DDEVEL_DOCS=ON ..
+
+This is useful mainly for browsing--the internal API does not include doxygen comments.
 
 
 Installation
