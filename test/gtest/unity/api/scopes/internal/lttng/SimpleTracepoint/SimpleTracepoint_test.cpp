@@ -27,6 +27,8 @@
 
 TEST(SimpleTracepoint, basic_trace_test)
 {
+  dlopen( TRACEPOINT_LIB, RTLD_NOW );
+
   // ensure that the LTTng session daemon is running in the background
   // (this call is harmless if the daemon is already running)
   system("lttng-sessiond -d");

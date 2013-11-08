@@ -17,5 +17,6 @@
  */
 
 #define TRACEPOINT_DEFINE
+#define TRACEPOINT_PROBE_DYNAMIC_LINKAGE
 
 #include <TestProvider2_tp.h>
