@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Registry.h>
-#include <unity/api/scopes/Reply.h>
-#include <unity/api/scopes/ResultItem.h>
-#include <unity/api/scopes/ScopeBase.h>
+#include <scopes/Registry.h>
+#include <scopes/Reply.h>
+#include <scopes/ResultItem.h>
+#include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>

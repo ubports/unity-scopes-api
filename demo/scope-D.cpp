@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/RegistryProxyFwd.h>
-#include <unity/api/scopes/Reply.h>
-#include <unity/api/scopes/Category.h>
-#include <unity/api/scopes/ResultItem.h>
-#include <unity/api/scopes/ScopeBase.h>
+#include <scopes/RegistryProxyFwd.h>
+#include <scopes/Reply.h>
+#include <scopes/Category.h>
+#include <scopes/ResultItem.h>
+#include <scopes/ScopeBase.h>
 
 #include <algorithm>
 #include <atomic>

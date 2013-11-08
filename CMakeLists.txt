@@ -156,6 +156,7 @@ enable_testing()
 # Add subdirectories.
 add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
 
@@ -246,13 +247,21 @@ endif()
 #
 # Documentation
 #
+# Pass -DDEVEL_DOCS=ON to cmake for more detailed documentation
+
+option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
     message(WARNING "Cannot generate documentation: doxygen and/or graphviz not found")
 else()
-    configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    if (DEVEL_DOCS)
+      message(STATUS "Creaing devel documentation")
+      configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile-devel.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    else()
+      configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    endif()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile

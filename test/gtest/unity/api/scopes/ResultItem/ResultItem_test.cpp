@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/api/scopes/ResultItem.h>
-#include <unity/api/scopes/Category.h>
-#include <unity/api/scopes/internal/ResultItemImpl.h>
+#include <scopes/ResultItem.h>
+#include <scopes/Category.h>
+#include <scopes/internal/ResultItemImpl.h>
 #include <gtest/gtest.h>
 
 using namespace unity::api::scopes;
