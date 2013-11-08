@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ConfigBase.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <scopes/internal/ConfigBase.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>

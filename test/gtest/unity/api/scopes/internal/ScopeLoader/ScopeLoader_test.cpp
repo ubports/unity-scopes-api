@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/RegistryImpl.h>
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/api/scopes/internal/ScopeLoader.h>
+#include <scopes/internal/RegistryImpl.h>
+#include <scopes/ScopeBase.h>
+#include <scopes/internal/ScopeLoader.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>

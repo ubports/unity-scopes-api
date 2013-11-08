@@ -62,7 +62,7 @@ Header file conventions
 All header files are underneath include/unity/api/scopes. Source code always includes
 headers using the full pathname, for example:
 
-  #include <unity/api/scopes/ScopeBase.h>
+  #include <scopes/ScopeBase.h>
 
 All source code uses angle brackets (<...>) for #include
 directives. Double quotes ("...") are never used because the lookup

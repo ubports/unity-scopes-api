@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/QueryCtrl.h>
-#include <unity/api/scopes/Registry.h>
-#include <unity/api/scopes/ReplyBase.h>
-#include <unity/api/scopes/Runtime.h>
+#include <scopes/QueryCtrl.h>
+#include <scopes/Registry.h>
+#include <scopes/ReplyBase.h>
+#include <scopes/Runtime.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
