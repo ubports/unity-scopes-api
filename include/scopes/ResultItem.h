@@ -41,6 +41,12 @@ namespace internal
     class ReplyObject;
 }
 
+
+/**
+   \brief ResultItem encapsulates the basic attributes of any result
+   returned by the Scope.
+*/
+
 class UNITY_API ResultItem : private util::NonCopyable
 {
 public:

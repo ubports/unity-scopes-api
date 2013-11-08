@@ -38,6 +38,11 @@ namespace internal
     class CategoryImpl;
 }
 
+/**
+   \brief Category represents a set of related results returned by a scope
+   and displayed within a single pane in the Unity dash.
+   \see ResultItem
+*/
 class UNITY_API Category : private util::NonCopyable
 {
 public:
@@ -45,7 +50,7 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-Category(std::string const& id); //TODO: pass renderer
+    Category(std::string const& id); //TODO: pass renderer
     std::string const& get_id() const;
 
 private:
