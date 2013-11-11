@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/ThreadSafeQueue.h>
+#include <scopes/internal/ThreadSafeQueue.h>
 
 #include <gtest/gtest.h>
 

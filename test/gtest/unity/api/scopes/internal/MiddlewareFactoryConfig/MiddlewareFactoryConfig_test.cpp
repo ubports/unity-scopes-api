@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/MiddlewareFactoryConfig.h>
+#include <scopes/internal/MiddlewareFactoryConfig.h>
 
 #include <gtest/gtest.h>
 

@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/api/scopes/Reply.h>
+#include <scopes/ScopeBase.h>
+#include <scopes/Reply.h>
 
 #include <iostream>
 #include <thread>

@@ -1,9 +1,0 @@
-add_subdirectory(internal)
-add_subdirectory(scopes)
-set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
-set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
-
-set(SRC
-)
-
-set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

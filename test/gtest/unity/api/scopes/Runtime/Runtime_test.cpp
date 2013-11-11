@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Runtime.h>
+#include <scopes/Runtime.h>
 
 #include <gtest/gtest.h>
 
