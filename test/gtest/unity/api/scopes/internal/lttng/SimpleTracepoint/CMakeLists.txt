@@ -11,17 +11,18 @@ add_executable(
 )
 
 add_library(
-  testtracer
+  testtracer SHARED
 
   TestProvider_tp.c
   TestProvider2_tp.c
 )
 
+add_definitions(-DTRACEPOINT_LIB="${CMAKE_CURRENT_BINARY_DIR}/libtesttracer.so")
+
 target_link_libraries(
   SimpleTracepoint_test
 
   ${TESTLIBS}
-  testtracer
 )
 
 target_link_libraries(
@@ -29,6 +30,7 @@ target_link_libraries(
 
   lttng-ust
   urcu-bp
+  dl
 )
 
 add_test(

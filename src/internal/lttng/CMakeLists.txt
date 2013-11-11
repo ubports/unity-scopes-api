@@ -7,7 +7,7 @@ set(
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
 
 add_library(
-  lttngtracer
+  lttngtracer SHARED
 
   UnityScopesApi_tp.c
 )
@@ -17,4 +17,5 @@ target_link_libraries(
 
   lttng-ust
   urcu-bp
+  dl
 )

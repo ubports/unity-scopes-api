@@ -17,5 +17,6 @@
  */
 
 #define TRACEPOINT_DEFINE
+#define TRACEPOINT_PROBE_DYNAMIC_LINKAGE
 
 #include <scopes/internal/lttng/UnityScopesApi_tp.h>
