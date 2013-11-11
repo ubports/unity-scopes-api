@@ -21,7 +21,7 @@
 # A monitor listening to all scopes capnproto messages passed via zeromq.
 # Meant to be used for debugging. Note that you need to enable the monitoring
 # code inside ZmqObject for this to capture anything - this is currently done
-# via a cmake option (-DIPC_MONITORING=ON). You also need to run 
+# via a cmake option (-DIPC_MONITORING=ON). You also need to run
 # the zmq-monitor-host.py script.
 
 import zmq

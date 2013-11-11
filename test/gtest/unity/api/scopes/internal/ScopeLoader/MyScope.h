@@ -21,7 +21,7 @@
 
 #include "Counters.h"
 
-#include <unity/api/scopes/ScopeBase.h>
+#include <scopes/ScopeBase.h>
 
 // Test scope class that allows us to count the number of calls to start(), run(), and stop().
 

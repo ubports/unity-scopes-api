@@ -44,4 +44,3 @@ while True:
     if sender in sockets:
         msg = sender.recv()
         aggregator.send(msg)
-

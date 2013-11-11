@@ -49,6 +49,14 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api REQUIRED)
+
+pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
+pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
+find_program(LTTNG_EXECUTABLE lttng)
+if (NOT LTTNG_EXECUTABLE)
+    message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
+endif()
+
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
@@ -67,6 +75,8 @@ include_directories(
 # Exported functions and classes are prefixed by a UNITY_API macro,
 # which explicitly exports a symbol if UNITY_DLL_EXPORTS is defined.
 add_definitions(-DUNITY_DLL_EXPORTS)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
 # TODO: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
 # base class from a static library without an unresolved dependency. But, without static linking, we can't
@@ -151,6 +161,7 @@ enable_testing()
 # Add subdirectories.
 add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
 
@@ -241,13 +252,21 @@ endif()
 #
 # Documentation
 #
+# Pass -DDEVEL_DOCS=ON to cmake for more detailed documentation
+
+option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
     message(WARNING "Cannot generate documentation: doxygen and/or graphviz not found")
 else()
-    configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    if (DEVEL_DOCS)
+      message(STATUS "Creaing devel documentation")
+      configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile-devel.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    else()
+      configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
+    endif()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
