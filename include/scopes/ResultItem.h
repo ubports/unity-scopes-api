@@ -40,13 +40,15 @@ namespace internal
 
 /**
    \brief ResultItem encapsulates the basic attributes of any result
-   returned by the Scope.
+   returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
+   calling Reply::push.
 */
 
 class UNITY_API ResultItem
 {
 public:
     explicit ResultItem(Category::SPtr category);
+    ResultItem(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category);
     ResultItem(Category::SPtr category, const VariantMap &variant_map);
     ResultItem(ResultItem const& other);
     virtual ~ResultItem();

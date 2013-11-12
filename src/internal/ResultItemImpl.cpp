@@ -43,6 +43,19 @@ ResultItemImpl::ResultItemImpl(Category::SPtr category)
     }
 }
 
+ResultItemImpl::ResultItemImpl(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category)
+    : uri_(uri),
+      title_(title),
+      icon_(icon),
+      dnd_uri_(dnd_uri_),
+      category_(category)
+{
+    if (category_ == nullptr)
+    {
+        throw InvalidArgumentException("ResultItemImpl(): null category");
+    }
+}
+
 ResultItemImpl::ResultItemImpl(Category::SPtr category, const VariantMap& variant_map)
     : ResultItemImpl(category)
 {
