@@ -33,18 +33,20 @@ TEST(ResultItem, basic)
     result.set_title("a title");
     result.set_icon("an icon");
     result.set_dnd_uri("http://canonical.com");
+    result.add_metadata("foo", Variant("bar"));
 
     EXPECT_EQ("http://ubuntu.com", result.uri());
     EXPECT_EQ("a title", result.title());
     EXPECT_EQ("an icon", result.icon());
     EXPECT_EQ("http://canonical.com", result.dnd_uri());
+    EXPECT_EQ("bar", result.variant_map()["foo"].get_string());
 }
 
 // test conversion to VariantMap
-TEST(ResultItemImpl, variant_map)
+TEST(ResultItem, variant_map)
 {
     auto cat = std::shared_ptr<Category>(new Category("1"));
-    ResultItemImpl result(cat);
+    ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
     result.set_icon("an icon");
@@ -55,25 +57,25 @@ TEST(ResultItemImpl, variant_map)
     EXPECT_EQ("an icon", result.icon());
     EXPECT_EQ("http://canonical.com", result.dnd_uri());
 
-    auto var = result.to_variant_map();
+    auto var = result.variant_map();
     EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
     EXPECT_EQ("a title", var["title"].get_string());
     EXPECT_EQ("an icon", var["icon"].get_string());
     EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
+    EXPECT_EQ("1", var["cat_id"].get_string());
 }
 
 // test conversion to VariantMap
-TEST(ResultItemImpl, from_variant)
+TEST(ResultItem, from_variant)
 {
-    auto cat = std::shared_ptr<Category>(new Category("1"));
-    ResultItemImpl result(cat);
     VariantMap vm;
     vm["uri"] = "http://ubuntu.com";
     vm["dnd_uri"] = "http://canonical.com";
     vm["title"] = "a title";
     vm["icon"] = "an icon";
-    vm["render_hints"] = VariantMap();
-    result.from_variant_map(vm);
+
+    auto cat = std::shared_ptr<Category>(new Category("1"));
+    ResultItem result(cat, vm);
 
     EXPECT_EQ("http://ubuntu.com", result.uri());
     EXPECT_EQ("a title", result.title());

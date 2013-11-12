@@ -68,7 +68,7 @@ bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
     {
         try
         {
-            mw_proxy_->push(result.p->to_variant_map());
+            mw_proxy_->push(result.variant_map());
             return true;
         }
         catch (MiddlewareException const& e)

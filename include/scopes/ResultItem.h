@@ -36,8 +36,6 @@ namespace scopes
 namespace internal
 {
     class ResultItemImpl;
-    class ReplyImpl;
-    class ReplyObject;
 }
 
 /**
@@ -50,10 +48,10 @@ class UNITY_API ResultItem
 public:
     explicit ResultItem(Category::SPtr category);
     ResultItem(Category::SPtr category, const VariantMap &variant_map);
-    ResultItem(const ResultItem &other);
+    ResultItem(ResultItem const& other);
     virtual ~ResultItem();
 
-    ResultItem& operator=(const ResultItem& other);
+    ResultItem& operator=(ResultItem const& other);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
@@ -67,12 +65,12 @@ public:
     std::string dnd_uri() const;
     Category::SPtr category() const;
 
+    VariantMap variant_map() const;
+
 private:
     std::shared_ptr<internal::ResultItemImpl> p;
 
     friend class internal::ResultItemImpl;
-    friend class internal::ReplyObject;
-    friend class internal::ReplyImpl;
 };
 
 } // namespace scopes

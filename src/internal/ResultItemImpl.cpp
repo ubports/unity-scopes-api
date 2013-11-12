@@ -20,8 +20,7 @@
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
-
-#include <cassert>
+#include <sstream>
 
 namespace unity
 {
@@ -72,7 +71,11 @@ void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
 
 void ResultItemImpl::add_metadata(std::string const& key, Variant const& value)
 {
-    //TODO
+    if (!metadata_)
+    {
+        metadata_.reset(new VariantMap());
+    }
+    (*metadata_)[key] = value;
 }
 
 std::string ResultItemImpl::uri() const
@@ -100,7 +103,7 @@ Category::SPtr ResultItemImpl::category() const
     return category_;
 }
 
-VariantMap ResultItemImpl::to_variant_map() const
+VariantMap ResultItemImpl::variant_map() const
 {
     VariantMap var;
     var["uri"] = uri_;
@@ -108,6 +111,20 @@ VariantMap ResultItemImpl::to_variant_map() const
     var["icon"] = icon_;
     var["dnd_uri"] = dnd_uri_;
     var["cat_id"] = category_->id();
+
+    if (metadata_)
+    {
+        for (auto const& kv: *metadata_)
+        {
+            if (var.find(kv.first) != var.end())
+            {
+                std::ostringstream s;
+                s << "Can't overwrite internal attribute: " << kv.first;
+                throw MiddlewareException(s.str());
+            }
+            var[kv.first] = kv.second;
+        }
+    }
     return var;
 }
 

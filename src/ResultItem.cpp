@@ -40,7 +40,7 @@ ResultItem::ResultItem(Category::SPtr category, const VariantMap &variant_map)
 {
 }
 
-ResultItem::ResultItem(const ResultItem &other)
+ResultItem::ResultItem(ResultItem const& other)
     : p(new internal::ResultItemImpl(*(other.p)))
 {
 }
@@ -49,7 +49,7 @@ ResultItem::~ResultItem()
 {
 }
 
-ResultItem& ResultItem::operator=(const ResultItem& other)
+ResultItem& ResultItem::operator=(ResultItem const& other)
 {
     if (this != &other)
     {
@@ -106,6 +106,11 @@ std::string ResultItem::dnd_uri() const
 Category::SPtr ResultItem::category() const
 {
     return p->category();
+}
+
+VariantMap ResultItem::variant_map() const
+{
+    return p->variant_map();
 }
 
 //! @endcond

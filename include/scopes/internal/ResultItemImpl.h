@@ -56,14 +56,16 @@ public:
     std::string dnd_uri() const;
     Category::SPtr category() const;
 
-    VariantMap to_variant_map() const;
-    void from_variant_map(VariantMap const& var);
+    VariantMap variant_map() const;
 
 private:
+    void from_variant_map(VariantMap const& var);
+
     std::string uri_;
     std::string title_;
     std::string icon_;
     std::string dnd_uri_;
+    std::shared_ptr<VariantMap> metadata_;
     std::shared_ptr<Category> category_;
 };
 
