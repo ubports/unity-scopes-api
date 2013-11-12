@@ -85,19 +85,23 @@ TEST(ResultItem, variant_map_excp)
 }
 
 // test conversion from VariantMap
-TEST(ResultItem, from_variant)
+TEST(ResultItem, from_variant_map)
 {
     VariantMap vm;
     vm["uri"] = "http://ubuntu.com";
     vm["dnd_uri"] = "http://canonical.com";
     vm["title"] = "a title";
     vm["icon"] = "an icon";
+    vm["foo"] = "bar"; // custom attribute
 
     auto cat = std::shared_ptr<Category>(new Category("1"));
     ResultItem result(cat, vm);
 
+    auto var = result.variant_map();
     EXPECT_EQ("http://ubuntu.com", result.uri());
     EXPECT_EQ("a title", result.title());
     EXPECT_EQ("an icon", result.icon());
     EXPECT_EQ("http://canonical.com", result.dnd_uri());
+    EXPECT_EQ("bar", (*var)["foo"].get_string());
+    EXPECT_EQ("1", (*var)["cat_id"].get_string());
 }

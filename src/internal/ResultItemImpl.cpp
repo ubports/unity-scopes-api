@@ -34,6 +34,8 @@ namespace scopes
 namespace internal
 {
 
+const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri"};
+
 ResultItemImpl::ResultItemImpl(Category::SPtr category)
     : category_(category)
 {
@@ -47,7 +49,7 @@ ResultItemImpl::ResultItemImpl(std::string const& uri, std::string const& title,
     : uri_(uri),
       title_(title),
       icon_(icon),
-      dnd_uri_(dnd_uri_),
+      dnd_uri_(dnd_uri),
       category_(category)
 {
     if (category_ == nullptr)
@@ -177,6 +179,17 @@ void ResultItemImpl::from_variant_map(VariantMap const& var)
     if (it == var.end())
         throw MiddlewareException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
+
+    if (var.size() > standard_attrs.size())
+    {
+        for (auto const& kv: var)
+        {
+            if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
+            {
+                add_metadata(kv.first, kv.second);
+            }
+        }
+    }
 }
 
 } // namespace internal

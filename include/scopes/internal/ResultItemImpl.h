@@ -21,6 +21,7 @@
 
 #include <string>
 #include <memory>
+#include <unordered_set>
 #include <scopes/Variant.h>
 #include <scopes/Category.h>
 
@@ -62,6 +63,7 @@ public:
 private:
     void from_variant_map(VariantMap const& var);
     static void throw_on_empty(std::string const& name, std::string const& value);
+    static const std::unordered_set<std::string> standard_attrs;
 
     std::string uri_;
     std::string title_;
