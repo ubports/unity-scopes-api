@@ -203,8 +203,7 @@ public:
                 for (int i = 1; i < 5; ++i)
                 {
                     auto cat = std::shared_ptr<Category>(new Category("cat1"));
-                    ResultItem result(cat);
-                    result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
+                    ResultItem result("uri", scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri", cat);
                     if (!reply_proxy->push(result))
                     {
                         break; // Query was cancelled

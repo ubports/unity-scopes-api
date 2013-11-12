@@ -188,8 +188,7 @@ public:
             {
                 cerr << "worker thread: pushing" << endl;
                 auto cat = std::shared_ptr<Category>(new Category("cat1"));
-                ResultItem result(cat);
-                result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
+                ResultItem result("uri", "scope-C: result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri", cat);
                 if (!reply->push(result))
                 {
                     cerr << "worker thread: push returned false" << endl;
