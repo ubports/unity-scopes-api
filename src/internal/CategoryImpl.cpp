@@ -33,13 +33,13 @@ namespace internal
 //! @cond
 
 CategoryImpl::CategoryImpl(std::string const& id)
-    : id(id)
+    : id_(id)
 {
 }
 
-std::string const& CategoryImpl::get_id() const
+std::string const& CategoryImpl::id() const
 {
-    return id;
+    return id_;
 }
 
 } // namespace internal

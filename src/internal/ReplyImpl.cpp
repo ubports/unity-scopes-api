@@ -68,7 +68,7 @@ bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
     {
         try
         {
-            mw_proxy_->push(result.p->to_variant_map()); //FIXME cat_id?
+            mw_proxy_->push(result.p->to_variant_map());
             return true;
         }
         catch (MiddlewareException const& e)

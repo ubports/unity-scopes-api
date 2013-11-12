@@ -35,9 +35,9 @@ Category::Category(std::string const& id)
 {
 }
 
-std::string const& Category::get_id() const
+std::string const& Category::id() const
 {
-    return p->get_id();
+    return p->id();
 }
 
 //! @endcond

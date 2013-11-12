@@ -51,7 +51,7 @@ public:
 /// @endcond
 
     Category(std::string const& id); //TODO: pass renderer
-    std::string const& get_id() const;
+    std::string const& id() const;
 
 private:
     std::shared_ptr<internal::CategoryImpl> p;

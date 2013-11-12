@@ -38,10 +38,10 @@ class UNITY_API CategoryImpl : private util::NonCopyable
 {
 public:
     CategoryImpl(std::string const& id);
-    std::string const& get_id() const;
+    std::string const& id() const;
 
 private:
-    std::string id;
+    std::string id_;
 };
 
 } // namespace internal

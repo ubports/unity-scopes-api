@@ -107,6 +107,7 @@ VariantMap ResultItemImpl::to_variant_map() const
     var["title"] = title_;
     var["icon"] = icon_;
     var["dnd_uri"] = dnd_uri_;
+    var["cat_id"] = category_->id();
     return var;
 }
 
