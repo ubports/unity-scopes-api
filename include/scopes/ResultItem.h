@@ -47,10 +47,30 @@ namespace internal
 class UNITY_API ResultItem
 {
 public:
+
+    /**
+       \brief Creates a ResultItem instance assigned to given category, with all base attributes initially empty.
+     */
     explicit ResultItem(Category::SPtr category);
+
+    /**
+       \brief Creates a ResultItem instance assigned to given category and using provided values for all base attributes.
+     */
     ResultItem(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category);
+
+    /**
+       \brief Creates a ResultItem instance assigned to given category and using values of all base attributes from a variant_map dictionary.
+    */
     ResultItem(Category::SPtr category, const VariantMap &variant_map);
+
+    /**
+       \brief Creates a ResultItem that is a copy of another ResultItem.
+    */
     ResultItem(ResultItem const& other);
+
+    /**
+       \brief Destructor.
+    */
     virtual ~ResultItem();
 
     ResultItem& operator=(ResultItem const& other);
@@ -67,6 +87,10 @@ public:
     std::string dnd_uri() const;
     Category::SPtr category() const;
 
+    /**
+       \brief Returns a dictionary of all attributes of this ResultItem instance.
+       \return dictionary of all base attributes and custom attributes set with add_metadata call.
+    */
     std::shared_ptr<VariantMap> variant_map() const;
 
 private:
