@@ -28,19 +28,34 @@ using namespace unity::api::scopes::internal;
 TEST(ResultItem, basic)
 {
     auto cat = std::shared_ptr<Category>(new Category("1"));
-    ResultItem result(cat);
-    result.set_uri("http://ubuntu.com");
-    result.set_title("a title");
-    result.set_icon("an icon");
-    result.set_dnd_uri("http://canonical.com");
-    result.add_metadata("foo", Variant("bar"));
 
-    EXPECT_EQ("http://ubuntu.com", result.uri());
-    EXPECT_EQ("a title", result.title());
-    EXPECT_EQ("an icon", result.icon());
-    EXPECT_EQ("http://canonical.com", result.dnd_uri());
-    EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
-    EXPECT_EQ("1", result.category()->id());
+    {
+        ResultItem result(cat);
+        result.set_uri("http://ubuntu.com");
+        result.set_title("a title");
+        result.set_icon("an icon");
+        result.set_dnd_uri("http://canonical.com");
+        result.add_metadata("foo", Variant("bar"));
+
+        EXPECT_EQ("http://ubuntu.com", result.uri());
+        EXPECT_EQ("a title", result.title());
+        EXPECT_EQ("an icon", result.icon());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
+        EXPECT_EQ("1", result.category()->id());
+    }
+
+    {
+        ResultItem result("http://ubuntu.com", "a title", "an icon", "http://canonical.com", cat);
+        result.add_metadata("foo", Variant("bar"));
+
+        EXPECT_EQ("http://ubuntu.com", result.uri());
+        EXPECT_EQ("a title", result.title());
+        EXPECT_EQ("an icon", result.icon());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
+        EXPECT_EQ("1", result.category()->id());
+   }
 }
 
 // test conversion to VariantMap
