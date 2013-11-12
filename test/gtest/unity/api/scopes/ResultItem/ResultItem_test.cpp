@@ -18,7 +18,7 @@
 
 #include <scopes/ResultItem.h>
 #include <scopes/Category.h>
-#include <scopes/internal/ResultItemImpl.h>
+#include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
 using namespace unity::api::scopes;
@@ -40,6 +40,7 @@ TEST(ResultItem, basic)
     EXPECT_EQ("an icon", result.icon());
     EXPECT_EQ("http://canonical.com", result.dnd_uri());
     EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
+    EXPECT_EQ("1", result.category()->id());
 }
 
 // test conversion to VariantMap
@@ -65,7 +66,25 @@ TEST(ResultItem, variant_map)
     EXPECT_EQ("1", (*var)["cat_id"].get_string());
 }
 
-// test conversion to VariantMap
+// test exceptions when converting to VariantMap
+TEST(ResultItem, variant_map_excp)
+{
+    auto cat = std::shared_ptr<Category>(new Category("1"));
+    ResultItem result(cat);
+
+    // throw until all required attributes are non-empty
+    EXPECT_THROW(result.variant_map(), unity::InvalidArgumentException);
+    result.set_uri("http://ubuntu.com");
+    EXPECT_THROW(result.variant_map(), unity::InvalidArgumentException);
+    result.set_title("a title");
+    EXPECT_THROW(result.variant_map(), unity::InvalidArgumentException);
+    result.set_icon("an icon");
+    EXPECT_THROW(result.variant_map(), unity::InvalidArgumentException);
+    result.set_dnd_uri("http://canonical.com");
+    EXPECT_NO_THROW(result.variant_map());
+}
+
+// test conversion from VariantMap
 TEST(ResultItem, from_variant)
 {
     VariantMap vm;
