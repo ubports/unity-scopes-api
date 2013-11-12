@@ -18,6 +18,7 @@
 
 #include <scopes/internal/ResultItemImpl.h>
 #include <scopes/ScopeExceptions.h>
+#include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
 
 #include <cassert>
@@ -35,96 +36,101 @@ namespace internal
 {
 
 ResultItemImpl::ResultItemImpl(Category::SPtr category)
-    : category(category)
+    : category_(category)
 {
-    assert(category);
+    if (category_ == nullptr)
+    {
+        throw InvalidArgumentException("ResultItemImpl(): null category");
+    }
+}
+
+ResultItemImpl::ResultItemImpl(Category::SPtr category, const VariantMap& variant_map)
+    : ResultItemImpl(category)
+{
+    from_variant_map(variant_map);
 }
 
 void ResultItemImpl::set_uri(std::string const& uri)
 {
-    this->uri = uri;
+    uri_ = uri;
 }
 
 void ResultItemImpl::set_title(std::string const& title)
 {
-    this->title = title;
+    title_ = title;
 }
 
 void ResultItemImpl::set_icon(std::string const& icon)
 {
-    this->icon = icon;
+    icon_ = icon;
 }
 
 void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
 {
-    this->dnd_uri = dnd_uri;
+    dnd_uri_ = dnd_uri;
 }
 
-void ResultItemImpl::set_renderer_hint(std::string const& name, Variant const& value)
+void ResultItemImpl::add_metadata(std::string const& key, Variant const& value)
 {
-    render_hints[name] = value;
+    //TODO
 }
 
-std::string ResultItemImpl::get_uri() const
+std::string ResultItemImpl::uri() const
 {
-    return uri;
+    return uri_;
 }
 
-std::string ResultItemImpl::get_title() const
+std::string ResultItemImpl::title() const
 {
-    return title;
+    return title_;
 }
 
-std::string ResultItemImpl::get_icon() const
+std::string ResultItemImpl::icon() const
 {
-    return icon;
+    return icon_;
 }
 
-std::string ResultItemImpl::get_dnd_uri() const
+std::string ResultItemImpl::dnd_uri() const
 {
-    return dnd_uri;
+    return dnd_uri_;
 }
 
-const VariantMap ResultItemImpl::to_variant() const
+Category::SPtr ResultItemImpl::category() const
+{
+    return category_;
+}
+
+VariantMap ResultItemImpl::to_variant_map() const
 {
     VariantMap var;
-    var["uri"] = uri;
-    var["title"] = title;
-    var["icon"] = icon;
-    var["dnd_uri"] = dnd_uri;
-    var["render_hints"] = render_hints;
-    var["cat_id"] = category->get_id();
+    var["uri"] = uri_;
+    var["title"] = title_;
+    var["icon"] = icon_;
+    var["dnd_uri"] = dnd_uri_;
     return var;
 }
 
-void ResultItemImpl::from_variant(VariantMap const& var)
+void ResultItemImpl::from_variant_map(VariantMap const& var)
 {
     auto it = var.find("uri");
     if (it == var.end())
         throw MiddlewareException("Missing 'uri'");
-    uri = it->second.get_string();
+    uri_ = it->second.get_string();
 
     it = var.find("title");
     if (it == var.end())
         throw MiddlewareException("Missing 'title'");
-    title = it->second.get_string();
+    title_ = it->second.get_string();
 
     it = var.find("icon");
     if (it == var.end())
         throw MiddlewareException("Missing 'icon'");
-    icon = it->second.get_string();
+    icon_ = it->second.get_string();
 
     it = var.find("dnd_uri");
     if (it == var.end())
         throw MiddlewareException("Missing 'dnd_uri'");
-    dnd_uri = it->second.get_string();
-
-    it = var.find("render_hints");
-    if (it == var.end())
-        throw MiddlewareException("Missing 'render_hints'");
-    render_hints = it->second.get_dict();
-
-   // TODO: handle cat_id; needs access to deserialized categories to set ptr to an instance
+    dnd_uri_ = it->second.get_string();
 }
 
 } // namespace internal

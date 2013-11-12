@@ -34,14 +34,14 @@ TEST(ResultItem, basic)
     result.set_icon("an icon");
     result.set_dnd_uri("http://canonical.com");
 
-    EXPECT_EQ("http://ubuntu.com", result.get_uri());
-    EXPECT_EQ("a title", result.get_title());
-    EXPECT_EQ("an icon", result.get_icon());
-    EXPECT_EQ("http://canonical.com", result.get_dnd_uri());
+    EXPECT_EQ("http://ubuntu.com", result.uri());
+    EXPECT_EQ("a title", result.title());
+    EXPECT_EQ("an icon", result.icon());
+    EXPECT_EQ("http://canonical.com", result.dnd_uri());
 }
 
 // test conversion to VariantMap
-TEST(ResultItemImpl, to_variant)
+TEST(ResultItemImpl, variant_map)
 {
     auto cat = std::shared_ptr<Category>(new Category("1"));
     ResultItemImpl result(cat);
@@ -50,12 +50,12 @@ TEST(ResultItemImpl, to_variant)
     result.set_icon("an icon");
     result.set_dnd_uri("http://canonical.com");
 
-    EXPECT_EQ("http://ubuntu.com", result.get_uri());
-    EXPECT_EQ("a title", result.get_title());
-    EXPECT_EQ("an icon", result.get_icon());
-    EXPECT_EQ("http://canonical.com", result.get_dnd_uri());
+    EXPECT_EQ("http://ubuntu.com", result.uri());
+    EXPECT_EQ("a title", result.title());
+    EXPECT_EQ("an icon", result.icon());
+    EXPECT_EQ("http://canonical.com", result.dnd_uri());
 
-    auto var = result.to_variant();
+    auto var = result.to_variant_map();
     EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
     EXPECT_EQ("a title", var["title"].get_string());
     EXPECT_EQ("an icon", var["icon"].get_string());
@@ -73,10 +73,10 @@ TEST(ResultItemImpl, from_variant)
     vm["title"] = "a title";
     vm["icon"] = "an icon";
     vm["render_hints"] = VariantMap();
-    result.from_variant(vm);
+    result.from_variant_map(vm);
 
-    EXPECT_EQ("http://ubuntu.com", result.get_uri());
-    EXPECT_EQ("a title", result.get_title());
-    EXPECT_EQ("an icon", result.get_icon());
-    EXPECT_EQ("http://canonical.com", result.get_dnd_uri());
+    EXPECT_EQ("http://ubuntu.com", result.uri());
+    EXPECT_EQ("a title", result.title());
+    EXPECT_EQ("an icon", result.icon());
+    EXPECT_EQ("http://canonical.com", result.dnd_uri());
 }

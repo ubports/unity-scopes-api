@@ -19,7 +19,6 @@
 #ifndef UNITY_API_SCOPES_RESULTITEM_H
 #define UNITY_API_SCOPES_RESULTITEM_H
 
-#include <unity/util/NonCopyable.h>
 #include <scopes/Variant.h>
 #include <scopes/Category.h>
 #include <string>
@@ -41,27 +40,32 @@ namespace internal
     class ReplyObject;
 }
 
-
 /**
    \brief ResultItem encapsulates the basic attributes of any result
    returned by the Scope.
 */
 
-class UNITY_API ResultItem : private util::NonCopyable
+class UNITY_API ResultItem
 {
 public:
-    ResultItem(Category::SPtr category);
+    explicit ResultItem(Category::SPtr category);
+    ResultItem(Category::SPtr category, const VariantMap &variant_map);
+    ResultItem(const ResultItem &other);
+    virtual ~ResultItem();
+
+    ResultItem& operator=(const ResultItem& other);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
     void set_icon(std::string const& icon);
     void set_dnd_uri(std::string const& dnd_uri);
-    void set_renderer_hint(std::string const& name, Variant const& value);
+    void add_metadata(std::string const& key, Variant const& value);
 
-    std::string get_uri() const;
-    std::string get_title() const;
-    std::string get_icon() const;
-    std::string get_dnd_uri() const;
+    std::string uri() const;
+    std::string title() const;
+    std::string icon() const;
+    std::string dnd_uri() const;
+    Category::SPtr category() const;
 
 private:
     std::shared_ptr<internal::ResultItemImpl> p;

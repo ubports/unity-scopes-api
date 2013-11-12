@@ -93,8 +93,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     try
     {
         auto cat = std::shared_ptr<Category>(new Category("")); //FIXME: set proper category once categories are (de)serialized
-        ResultItem result_item(cat);
-        result_item.p->from_variant(result);
+        ResultItem result_item(cat, result); //FIXME cat_id?
         reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
     }
     catch (unity::Exception const& e)

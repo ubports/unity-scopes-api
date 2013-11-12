@@ -22,6 +22,7 @@
 #include <string>
 #include <memory>
 #include <scopes/Variant.h>
+#include <scopes/Category.h>
 
 namespace unity
 {
@@ -32,37 +33,38 @@ namespace api
 namespace scopes
 {
 
-class Category;
-
 namespace internal
 {
 
 class ResultItemImpl
 {
 public:
-    ResultItemImpl(std::shared_ptr<Category> category);
+    explicit ResultItemImpl(Category::SPtr category);
+    ResultItemImpl(Category::SPtr category, VariantMap const& variant_map);
+    ResultItemImpl(ResultItemImpl const& other) = default;
+    ResultItemImpl& operator=(ResultItemImpl const& other) = default;
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
     void set_icon(std::string const& icon);
     void set_dnd_uri(std::string const& dnd_uri);
-    void set_renderer_hint(std::string const& name, Variant const& value);
+    void add_metadata(std::string const& key, Variant const& value);
 
-    std::string get_uri() const;
-    std::string get_title() const;
-    std::string get_icon() const;
-    std::string get_dnd_uri() const;
+    std::string uri() const;
+    std::string title() const;
+    std::string icon() const;
+    std::string dnd_uri() const;
+    Category::SPtr category() const;
 
-    const VariantMap to_variant() const;
-    void from_variant(VariantMap const& var);
+    VariantMap to_variant_map() const;
+    void from_variant_map(VariantMap const& var);
 
 private:
-    std::shared_ptr<Category> category;
-    std::string uri;
-    std::string title;
-    std::string icon;
-    std::string dnd_uri;
-    VariantMap render_hints;
+    std::string uri_;
+    std::string title_;
+    std::string icon_;
+    std::string dnd_uri_;
+    std::shared_ptr<Category> category_;
 };
 
 } // namespace internal

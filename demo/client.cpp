@@ -36,7 +36,7 @@ class Reply : public ReplyBase
 public:
     virtual void push(ResultItem const& result) override
     {
-        cout << "received result: uri=" << result.get_uri() << " title=" << result.get_title() << endl;
+        cout << "received result: uri=" << result.uri() << " title=" << result.title() << endl;
     }
 
     virtual void finished() override

@@ -39,7 +39,7 @@ class SubReply : public ReplyBase
 public:
     virtual void push(ResultItem const& result) override
     {
-        cout << "received result from " << scope_name_ << ": " << result.get_uri() << ", " << result.get_title() << endl;
+        cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         upstream_->push(result);
     }
 

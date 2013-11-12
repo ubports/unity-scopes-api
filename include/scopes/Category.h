@@ -39,7 +39,7 @@ namespace internal
 }
 
 /**
-   \brief Category represents a set of related results returned by a scope
+   \brief Category represents a set of related results returned by scope
    and displayed within a single pane in the Unity dash.
    \see ResultItem
 */

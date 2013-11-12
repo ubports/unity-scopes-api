@@ -30,9 +30,32 @@ namespace scopes
 
 //! @cond
 
-ResultItem::ResultItem(std::shared_ptr<Category> category)
+ResultItem::ResultItem(Category::SPtr category)
     : p(new internal::ResultItemImpl(category))
 {
+}
+
+ResultItem::ResultItem(Category::SPtr category, const VariantMap &variant_map)
+    : p(new internal::ResultItemImpl(category, variant_map))
+{
+}
+
+ResultItem::ResultItem(const ResultItem &other)
+    : p(new internal::ResultItemImpl(*(other.p)))
+{
+}
+
+ResultItem::~ResultItem()
+{
+}
+
+ResultItem& ResultItem::operator=(const ResultItem& other)
+{
+    if (this != &other)
+    {
+        p = std::shared_ptr<internal::ResultItemImpl>(new internal::ResultItemImpl(*(other.p)));
+    }
+    return *this;
 }
 
 void ResultItem::set_uri(std::string const& uri)
@@ -55,29 +78,34 @@ void ResultItem::set_dnd_uri(std::string const& dnd_uri)
     p->set_dnd_uri(dnd_uri);
 }
 
-void ResultItem::set_renderer_hint(std::string const& name, Variant const& value)
+void ResultItem::add_metadata(std::string const& key, Variant const& value)
 {
-    p->set_renderer_hint(name, value);
+    p->add_metadata(key, value);
 }
 
-std::string ResultItem::get_uri() const
+std::string ResultItem::uri() const
 {
-    return p->get_uri();
+    return p->uri();
 }
 
-std::string ResultItem::get_title() const
+std::string ResultItem::title() const
 {
-    return p->get_title();
+    return p->title();
 }
 
-std::string ResultItem::get_icon() const
+std::string ResultItem::icon() const
 {
-    return p->get_icon();
+    return p->icon();
 }
 
-std::string ResultItem::get_dnd_uri() const
+std::string ResultItem::dnd_uri() const
 {
-    return p->get_dnd_uri();
+    return p->dnd_uri();
+}
+
+Category::SPtr ResultItem::category() const
+{
+    return p->category();
 }
 
 //! @endcond
