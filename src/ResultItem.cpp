@@ -108,7 +108,7 @@ Category::SPtr ResultItem::category() const
     return p->category();
 }
 
-VariantMap ResultItem::variant_map() const
+std::shared_ptr<VariantMap> ResultItem::variant_map() const
 {
     return p->variant_map();
 }

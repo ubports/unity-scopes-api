@@ -42,7 +42,7 @@ class MWReply : public virtual MWObjectProxy
 public:
     virtual ~MWReply() noexcept;
 
-    virtual void push(VariantMap const& result) = 0;
+    virtual void push(std::shared_ptr<VariantMap> result) = 0;
     virtual void finished() = 0;
 
 protected:

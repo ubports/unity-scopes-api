@@ -103,26 +103,41 @@ Category::SPtr ResultItemImpl::category() const
     return category_;
 }
 
-VariantMap ResultItemImpl::variant_map() const
+void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& value)
 {
-    VariantMap var;
-    var["uri"] = uri_;
-    var["title"] = title_;
-    var["icon"] = icon_;
-    var["dnd_uri"] = dnd_uri_;
-    var["cat_id"] = category_->id();
+    if (value.empty())
+    {
+        std::ostringstream s;
+        s << "Required attribute " << name << " is empty";
+        throw InvalidArgumentException(s.str());
+    }
+}
+
+std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
+{
+    throw_on_empty("uri", uri_);
+    throw_on_empty("title", title_);
+    throw_on_empty("icon", icon_);
+    throw_on_empty("dnd_uri", dnd_uri_);
+
+    auto var = std::shared_ptr<VariantMap>(new VariantMap());
+    (*var)["uri"] = uri_;
+    (*var)["title"] = title_;
+    (*var)["icon"] = icon_;
+    (*var)["dnd_uri"] = dnd_uri_;
+    (*var)["cat_id"] = category_->id();
 
     if (metadata_)
     {
         for (auto const& kv: *metadata_)
         {
-            if (var.find(kv.first) != var.end())
+            if (var->find(kv.first) != var->end())
             {
                 std::ostringstream s;
                 s << "Can't overwrite internal attribute: " << kv.first;
                 throw MiddlewareException(s.str());
             }
-            var[kv.first] = kv.second;
+            (*var)[kv.first] = kv.second;
         }
     }
     return var;

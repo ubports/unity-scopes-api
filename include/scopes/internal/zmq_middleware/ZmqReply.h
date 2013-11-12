@@ -44,7 +44,7 @@ public:
     ZmqReply(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
     virtual ~ZmqReply() noexcept;
 
-    virtual void push(VariantMap const& result) override;
+    virtual void push(std::shared_ptr<VariantMap> result) override;
     virtual void finished() override;
 };
 

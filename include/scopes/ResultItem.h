@@ -65,7 +65,7 @@ public:
     std::string dnd_uri() const;
     Category::SPtr category() const;
 
-    VariantMap variant_map() const;
+    std::shared_ptr<VariantMap> variant_map() const;
 
 private:
     std::shared_ptr<internal::ResultItemImpl> p;
