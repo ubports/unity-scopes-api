@@ -56,6 +56,9 @@ private:
     typedef ThreadSafeQueue<unity::api::scopes::internal::TaskWrapper> TaskQueue;
     std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
+    std::mutex mutex_;
+    std::promise<void> threads_ready_;
+    int num_threads_;
 };
 
 template<typename F>

@@ -117,7 +117,7 @@ TEST(ThreadSafeQueue, wait_for_threads)
     {
         t.join();
     }
-    EXPECT_EQ(50, count);
+    EXPECT_EQ(20, count);
 }
 
 class MoveOnly

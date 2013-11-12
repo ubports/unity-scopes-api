@@ -22,7 +22,6 @@
 #include <unity/util/NonCopyable.h>
 
 #include <atomic>
-#include <cassert>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -53,7 +52,7 @@ public:
     ThreadSafeQueue();
     ~ThreadSafeQueue() noexcept;
 
-    void destroy();
+    void destroy() noexcept;
     void push(T const& item);
     void push(T&& item);
     T wait_and_pop();
@@ -79,13 +78,7 @@ ThreadSafeQueue<T>::ThreadSafeQueue() :
 template<typename T>
 ThreadSafeQueue<T>::~ThreadSafeQueue() noexcept
 {
-    try
-    {
-        destroy();
-    }
-    catch (...) // LCOV_EXCL_LINE
-    {
-    }
+    destroy();
 
     // Don't destroy the object while there are still threads in wait_and_pop(), otherwise
     // a thread that wakes up in wait_and_pop() will try to re-lock the already-destroyed
@@ -95,7 +88,7 @@ ThreadSafeQueue<T>::~ThreadSafeQueue() noexcept
 }
 
 template<typename T>
-void ThreadSafeQueue<T>::destroy()
+void ThreadSafeQueue<T>::destroy() noexcept
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (done_)

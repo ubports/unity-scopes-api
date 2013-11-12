@@ -20,6 +20,8 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
+
 using namespace std;
 
 namespace unity
@@ -35,6 +37,7 @@ namespace internal
 {
 
 ThreadPool::ThreadPool(int size)
+    : num_threads_(size)
 {
     if (size < 1)
     {
@@ -45,10 +48,17 @@ ThreadPool::ThreadPool(int size)
 
     try
     {
+        {
+            lock_guard<mutex> lock(mutex_);
+            threads_ready_ = std::promise<void>();
+        }
         for (int i = 0; i < size; ++i)
         {
             threads_.push_back(std::thread(&ThreadPool::run, this));
         }
+        auto future = threads_ready_.get_future();
+        future.wait();
+        future.get();
     }
     catch (std::exception const&)   // LCOV_EXCL_LINE
     {
@@ -79,6 +89,13 @@ void ThreadPool::run()
     {
         try
         {
+            {
+                lock_guard<mutex> lock(mutex_);
+                if (--num_threads_ == 0)
+                {
+                    threads_ready_.set_value();
+                }
+            }
             task = queue_->wait_and_pop();
         }
         catch (runtime_error const&)
