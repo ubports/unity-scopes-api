@@ -127,7 +127,6 @@ set(OTHER_LIBS
     kj
     pthread
     dl
-    lttngtracer
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
