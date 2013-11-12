@@ -45,6 +45,7 @@ TEST(ResultItem, basic)
         EXPECT_EQ("1", result.category()->id());
     }
 
+    // full ctor
     {
         ResultItem result("http://ubuntu.com", "a title", "an icon", "http://canonical.com", cat);
         result.add_metadata("foo", Variant("bar"));
@@ -56,6 +57,62 @@ TEST(ResultItem, basic)
         EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
    }
+
+   // copy ctor
+   {
+        ResultItem result("uri a", "title a", "icon a", "dnd_uri a", cat);
+        ResultItem copy(result);
+
+        copy.set_uri("uri b");
+        copy.set_title("title b");
+        copy.set_icon("icon b");
+        copy.set_dnd_uri("dnd_uri b");
+
+        result.add_metadata("foo", Variant("bar"));
+        copy.add_metadata("foo", Variant("xyz"));
+
+        EXPECT_EQ("uri a", result.uri());
+        EXPECT_EQ("title a", result.title());
+        EXPECT_EQ("icon a", result.icon());
+        EXPECT_EQ("dnd_uri a", result.dnd_uri());
+        EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
+        EXPECT_EQ("1", result.category()->id());
+
+        EXPECT_EQ("uri b", copy.uri());
+        EXPECT_EQ("title b", copy.title());
+        EXPECT_EQ("icon b", copy.icon());
+        EXPECT_EQ("dnd_uri b", copy.dnd_uri());
+        EXPECT_EQ("xyz", (*copy.variant_map())["foo"].get_string());
+        EXPECT_EQ("1", copy.category()->id());
+    }
+
+   // assignment copy
+   {
+       ResultItem result("uri a", "title a", "icon a", "dnd_uri a", cat);
+       ResultItem copy = result;
+
+       copy.set_uri("uri b");
+       copy.set_title("title b");
+       copy.set_icon("icon b");
+       copy.set_dnd_uri("dnd_uri b");
+
+       result.add_metadata("foo", Variant("bar"));
+       copy.add_metadata("foo", Variant("xyz"));
+
+       EXPECT_EQ("uri a", result.uri());
+       EXPECT_EQ("title a", result.title());
+       EXPECT_EQ("icon a", result.icon());
+       EXPECT_EQ("dnd_uri a", result.dnd_uri());
+       EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
+       EXPECT_EQ("1", result.category()->id());
+
+       EXPECT_EQ("uri b", copy.uri());
+       EXPECT_EQ("title b", copy.title());
+       EXPECT_EQ("icon b", copy.icon());
+       EXPECT_EQ("dnd_uri b", copy.dnd_uri());
+       EXPECT_EQ("xyz", (*copy.variant_map())["foo"].get_string());
+       EXPECT_EQ("1", copy.category()->id());
+    }
 }
 
 // test conversion to VariantMap
