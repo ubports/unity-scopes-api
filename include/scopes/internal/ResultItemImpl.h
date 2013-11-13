@@ -41,7 +41,7 @@ class ResultItemImpl
 {
 public:
     explicit ResultItemImpl(Category::SPtr category);
-    ResultItemImpl(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category);
+    ResultItemImpl(Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri);
     ResultItemImpl(Category::SPtr category, VariantMap const& variant_map);
     ResultItemImpl(ResultItemImpl const& other) = default;
     ResultItemImpl& operator=(ResultItemImpl const& other) = default;

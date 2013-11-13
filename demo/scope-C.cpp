@@ -187,8 +187,8 @@ public:
             for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
-                auto cat = std::shared_ptr<Category>(new Category("cat1"));
-                ResultItem result("uri", "scope-C: result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri", cat);
+                auto cat = std::make_shared<Category>("cat1");
+                ResultItem result(cat, "uri", "scope-C: result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri");
                 if (!reply->push(result))
                 {
                     cerr << "worker thread: push returned false" << endl;

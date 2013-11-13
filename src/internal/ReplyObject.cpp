@@ -92,7 +92,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     lock.unlock();
     try
     {
-        auto cat = std::shared_ptr<Category>(new Category("")); //FIXME: set proper category once categories are (de)serialized
+        auto cat = std::make_shared<Category>(""); //FIXME: set proper category once categories are (de)serialized
         ResultItem result_item(cat, result);
         reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
     }

@@ -45,7 +45,7 @@ ResultItemImpl::ResultItemImpl(Category::SPtr category)
     }
 }
 
-ResultItemImpl::ResultItemImpl(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category)
+    ResultItemImpl::ResultItemImpl(Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri)
     : uri_(uri),
       title_(title),
       icon_(icon),
@@ -135,7 +135,7 @@ std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
     throw_on_empty("icon", icon_);
     throw_on_empty("dnd_uri", dnd_uri_);
 
-    auto var = std::shared_ptr<VariantMap>(new VariantMap());
+    auto var = std::make_shared<VariantMap>();
     (*var)["uri"] = uri_;
     (*var)["title"] = title_;
     (*var)["icon"] = icon_;

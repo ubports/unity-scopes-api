@@ -56,7 +56,7 @@ public:
     /**
        \brief Creates a ResultItem instance assigned to given category and using provided values for all base attributes.
      */
-    ResultItem(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category);
+    ResultItem(Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri);
 
     /**
        \brief Creates a ResultItem instance assigned to given category and using values of all base attributes from a variant_map dictionary.
@@ -74,6 +74,8 @@ public:
     virtual ~ResultItem();
 
     ResultItem& operator=(ResultItem const& other);
+    ResultItem(ResultItem&&) = default;
+    ResultItem& operator=(ResultItem&&) = default;
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);

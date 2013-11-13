@@ -49,7 +49,7 @@ public:
     virtual void run(ReplyProxy const& reply) override
     {
         auto cat = std::shared_ptr<Category>(new Category("cat1"));
-        ResultItem res("uri", "scope-A: result 1 for query \"" + query_ + "\"", "icon", "dnd_uri", cat);
+        ResultItem res(cat, "uri", "scope-A: result 1 for query \"" + query_ + "\"", "icon", "dnd_uri");
         reply->push(res);
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;
     }

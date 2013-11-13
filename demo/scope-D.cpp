@@ -202,8 +202,8 @@ public:
             {
                 for (int i = 1; i < 5; ++i)
                 {
-                    auto cat = std::shared_ptr<Category>(new Category("cat1"));
-                    ResultItem result("uri", scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri", cat);
+                    auto cat = std::make_shared<Category>("cat1");
+                    ResultItem result(cat, "uri", scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri");
                     if (!reply_proxy->push(result))
                     {
                         break; // Query was cancelled

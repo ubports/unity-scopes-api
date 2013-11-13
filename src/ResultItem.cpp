@@ -35,8 +35,8 @@ ResultItem::ResultItem(Category::SPtr category)
 {
 }
 
-ResultItem::ResultItem(std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri, Category::SPtr category)
-    : p(new internal::ResultItemImpl(uri, title, icon, dnd_uri, category))
+ResultItem::ResultItem( Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri)
+    : p(new internal::ResultItemImpl(category, uri, title, icon, dnd_uri))
 {
 }
 
@@ -58,7 +58,7 @@ ResultItem& ResultItem::operator=(ResultItem const& other)
 {
     if (this != &other)
     {
-        p = std::shared_ptr<internal::ResultItemImpl>(new internal::ResultItemImpl(*(other.p)));
+        p = std::make_shared<internal::ResultItemImpl>(*(other.p));
     }
     return *this;
 }
