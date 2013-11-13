@@ -26,13 +26,14 @@ Build dependencies
 
 See debian/control for the list of packages required to build and test the code.
 
+Most notably:
+  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev
+
 Some dependencies need to be installed manually as they are not yet available in Ubuntu:
 - Cap'n Proto:
   $ git clone https://github.com/kentonv/capnproto.git
   $ cd capnproto/c++ && ./setup-autotools.sh && autoreconf -i
   $ ./configure && make -j6 check && sudo make install
-
-- Zmq (zeromq, latest version of 3.x from http://zeromq.org), or alternatively libzmq3-dev from the repository.
 
 - Zmqpp:
   $ git clone https://github.com/benjamg/zmqpp.git
@@ -46,6 +47,7 @@ The simplest case is:
     $ mkdir build
     $ cd build
     $ cmake ..
+    $ make
 
 By default, the code is built in release mode. To build a debug version, use
 
@@ -54,77 +56,11 @@ By default, the code is built in release mode. To build a debug version, use
     $ cmake -DCMAKE_BUILD_TYPE=debug ..
     $ make
 
-For a release version, use -DCMAKE_BUILD_TYPE=release
-
-To build with the flags for coverage testing enabled:
-
-    $ mkdir buildcoverage
-    $ cd buildcoverage
-    $ cmake -DCMAKE_BUILD_TYPE=coverage
-    $ make
-
-If you do not have libunity-api installed, build it from source and install it somewhere, then set
-PKG_CONFIG_PATH to include the lib/<arch>/pkgconfig directory.
-
 Running the tests
 -----------------
 
     $ make
     $ make test
-
-Note that "make test" alone is dangerous because it does not rebuild
-any tests if either the library or the test files themselves need
-rebuilding. It's not possible to fix this with cmake because cmake cannot
-add build dependencies to built-in targets. To make sure that everything
-is up-to-date, run "make" before running "make test"!
-
-To run the tests with valgrind:
-
-    $ make valgrind
-
-To get coverage output:
-
-    $ make test
-    $ make coverage
-
-This drops the coverage tests into the coveragereport directory. (The coverage target is available
-only if the code was built with -DCMAKE_BUILD_TYPE=coverage.)
-
-Note that, with gcc 4.7.2 and cmake 2.8.10, you may get a bunch of
-warnings. To fix this, you can build cmake 2.8.10 with the following patch:
-
-http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=61ace1df2616e472d056b302e4269cbf112fb020#patch1
-
-Unfortunately, it is not possibly to get 100% coverage for some files,
-mainly due to gcc's generation of two destructors for dynamic and non-
-dynamic instances. For abstract base classes and for classes that
-prevent stack and static allocation, this causes one of the destructors
-to be reported as uncovered.
-
-There are also issues with some functions in header files that are
-incorrectly reported as uncovered due to inlining, as well as
-the impossibility of covering defensive assert(false) statements,
-such as an assert in the default branch of a switch, where the
-switch is meant to handle all possible cases explicitly.
-
-If you run a binary and get lots of warnings about a "merge mismatch for summaries",
-this is caused by having made changes to the source that add or remove code
-that was previously run, so the new coverage output cannot sensibly be merged
-into the old coverage output. You can get rid of this problem by running
-
-    $ make clean-coverage
-
-This deletes all the .gcda files, allowing the merge to succeed again.
-
-If lcov complains about unrecognized lines involving '=====',
-you can patch geninfo and gcovr as explained here:
-
-https://bugs.launchpad.net/gcovr/+bug/1086695/comments/2
-
-To run the static C++ checks:
-
-    $ make cppcheck
-
 
 Installation
 ------------
