@@ -45,22 +45,14 @@ TEST(ResultItem, basic)
         EXPECT_EQ("1", result.category()->id());
     }
 
-    // full ctor
+    // copy ctor
     {
-        ResultItem result(cat, "http://ubuntu.com", "a title", "an icon", "http://canonical.com");
-        result.add_metadata("foo", Variant("bar"));
+        ResultItem result(cat);
+        result.set_uri("uri a");
+        result.set_title("title a");
+        result.set_icon("icon a");
+        result.set_dnd_uri("dnd_uri a");
 
-        EXPECT_EQ("http://ubuntu.com", result.uri());
-        EXPECT_EQ("a title", result.title());
-        EXPECT_EQ("an icon", result.icon());
-        EXPECT_EQ("http://canonical.com", result.dnd_uri());
-        EXPECT_EQ("bar", (*result.variant_map())["foo"].get_string());
-        EXPECT_EQ("1", result.category()->id());
-   }
-
-   // copy ctor
-   {
-        ResultItem result(cat, "uri a", "title a", "icon a", "dnd_uri a");
         ResultItem copy(result);
 
         copy.set_uri("uri b");
@@ -88,7 +80,11 @@ TEST(ResultItem, basic)
 
    // assignment copy
    {
-       ResultItem result(cat, "uri a", "title a", "icon a", "dnd_uri a");
+       ResultItem result(cat);
+       result.set_uri("uri a");
+       result.set_title("title a");
+       result.set_icon("icon a");
+       result.set_dnd_uri("dnd_uri a");
        ResultItem copy = result;
 
        copy.set_uri("uri b");
