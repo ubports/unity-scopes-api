@@ -59,7 +59,7 @@ TODO: More explanation of the namespaces used and for what.
 Header file conventions
 -----------------------
 
-All header files are underneath include/unity/api/scopes. Source code always includes
+All header files are underneath include/scopes. Source code always includes
 headers using the full pathname, for example:
 
   #include <scopes/ScopeBase.h>
@@ -71,7 +71,7 @@ in the tree. (Not that this should happen, but it's better to be safe. If
 there are no duplicate names, inclusion with angle brackets behaves the
 same way as inclusion with double quotes.)
 
-All headers that are for public consumption appear in include/unity/api/scopes/*
+All headers that are for public consumption appear in include/scopes/*
 (provided the path does not include "internal").
 
 Public header directories contain a private header directory called
@@ -241,3 +241,9 @@ Building and installing the code
 --------------------------------
 
 See the INSTALL file.
+
+
+Development hints and tricks
+----------------------------
+
+See the HACKING file.

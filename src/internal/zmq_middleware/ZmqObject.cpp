@@ -23,6 +23,7 @@
 #include <scopes/internal/zmq_middleware/ZmqSender.h>
 
 #include <zmqpp/socket.hpp>
+#include <capnp/serialize.h>
 
 using namespace std;
 
@@ -40,6 +41,8 @@ namespace internal
 
 namespace zmq_middleware
 {
+
+#define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
 
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, RequestType t) :
     MWObjectProxy(mw_base),
@@ -86,6 +89,18 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
     return request;
 }
 
+void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& context)
+{
+    thread_local static bool monitor_initialized = false;
+    if (!monitor_initialized) {
+        monitor_initialized = true;
+        zmqpp::socket monitor_socket(context, zmqpp::socket_type::publish);
+        monitor_socket.connect(MONITOR_ENDPOINT);
+        monitor_socket.set(zmqpp::socket_option::linger, 0);
+        pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket), RequestType::Oneway);
+    }
+}
+
 // Get a socket to the endpoint for this proxy, write the request on the wire and, if the invocation
 // is twoway, return a reader for the response.
 
@@ -95,7 +110,17 @@ unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_param
 
     zmqpp::socket& s = pool.find(endpoint(), type());
     ZmqSender sender(s);
-    sender.send(out_params.getSegmentsForOutput());
+    auto segments = out_params.getSegmentsForOutput();
+    sender.send(segments);
+
+#ifdef ENABLE_IPC_MONITOR
+    if (true) {
+        register_monitor_socket(pool, *mw_base()->context());
+        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT, RequestType::Oneway);
+        auto word_arr = capnp::messageToFlatArray(segments);
+        monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
+    }
+#endif
 
     return unique_ptr<ZmqReceiver>(new ZmqReceiver(s));
 }
