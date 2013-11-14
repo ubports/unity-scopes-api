@@ -1,0 +1,4 @@
+add_executable(VariantConverter_test VariantConverter_test.cpp)
+target_link_libraries(VariantConverter_test ${TESTLIBS})
+
+add_test(VariantConverter VariantConverter_test)

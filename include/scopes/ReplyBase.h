@@ -33,6 +33,8 @@ namespace api
 namespace scopes
 {
 
+class ResultItem;
+
 /**
 \brief Abstract base class to receive the results of a query.
 TODO: fix doc
@@ -54,7 +56,7 @@ public:
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
     */
-    virtual void push(std::string const& result) = 0;
+    virtual void push(ResultItem const& result) = 0;
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.

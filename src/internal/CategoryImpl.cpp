@@ -13,16 +13,10 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_VARIANTMAP_H
-#define UNITY_API_SCOPES_VARIANTMAP_H
-
-#include <scopes/Variant.h>
-
-#include <map>
-#include <string>
+#include <scopes/internal/CategoryImpl.h>
 
 namespace unity
 {
@@ -33,15 +27,25 @@ namespace api
 namespace scopes
 {
 
-/**
-\brief A map of <string, Variant> pairs.
-*/
-typedef std::map<std::string, Variant> VariantMap;
+namespace internal
+{
+
+//! @cond
+
+CategoryImpl::CategoryImpl(std::string const& id)
+    : id_(id)
+{
+}
+
+std::string const& CategoryImpl::id() const
+{
+    return id_;
+}
+
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif

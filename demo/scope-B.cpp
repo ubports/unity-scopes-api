@@ -18,6 +18,7 @@
 
 #include <scopes/Registry.h>
 #include <scopes/Reply.h>
+#include <scopes/ResultItem.h>
 #include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -36,9 +37,9 @@ using namespace unity::api::scopes;
 class SubReply : public ReplyBase
 {
 public:
-    virtual void push(string const& result) override
+    virtual void push(ResultItem const& result) override
     {
-        cout << "received result from " << scope_name_ << ": " << result << endl;
+        cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         upstream_->push(result);
     }
 

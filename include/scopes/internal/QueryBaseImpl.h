@@ -20,9 +20,8 @@
 #define UNITY_INTERNAL_QUERYBASEIMPL_H
 
 #include <scopes/internal/QueryCtrlImpl.h>
-
 #include <scopes/ScopeProxyFwd.h>
-#include <scopes/VariantMap.h>
+#include <scopes/Variant.h>
 
 #include <vector>
 

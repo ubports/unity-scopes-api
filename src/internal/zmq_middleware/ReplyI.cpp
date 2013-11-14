@@ -21,6 +21,7 @@
 #include <internal/zmq_middleware/capnproto/Reply.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
+#include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/ReplyObject.h>
 
 using namespace std;
@@ -67,9 +68,9 @@ void ReplyI::push_(Current const&,
                    capnproto::Response::Builder&)
 {
     auto req = in_params.getAs<capnproto::Reply::PushRequest>();
-    auto result = req.getResult().cStr();
+    auto result = req.getResult();
     auto delegate = dynamic_pointer_cast<ReplyObject>(del());
-    delegate->push(result);
+    delegate->push(to_variant_map(result));
 }
 
 void ReplyI::finished_(Current const&,

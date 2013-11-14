@@ -56,6 +56,12 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
             b.setStringVal(v.get_string().c_str());
             break;
         }
+        case Variant::Dict:
+        {
+            auto vb = b.initDictVal();
+            to_value_dict(v.get_dict(), vb);
+            break;
+        }
         default:
         {
             assert(false);  // LCOV_EXCL_LINE
@@ -78,6 +84,10 @@ Variant to_variant(capnproto::Value::Reader const& r)
         case capnproto::Value::STRING_VAL:
         {
             return Variant(r.getStringVal().cStr());
+        }
+        case capnproto::Value::DICT_VAL:
+        {
+            return Variant(to_variant_map(r.getDictVal()));
         }
         default:
         {

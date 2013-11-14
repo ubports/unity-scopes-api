@@ -4,6 +4,7 @@ set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
@@ -26,6 +27,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ResultItemImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp

@@ -13,17 +13,16 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MWREPLY_H
-#define UNITY_API_SCOPES_INTERNAL_MWREPLY_H
+#ifndef UNITY_API_SCOPES_CATEGORY_H
+#define UNITY_API_SCOPES_CATEGORY_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/Variant.h>
-
+#include <unity/util/NonCopyable.h>
+#include <unity/util/DefinesPtrs.h>
 #include <string>
+#include <memory>
 
 namespace unity
 {
@@ -36,20 +35,27 @@ namespace scopes
 
 namespace internal
 {
+    class CategoryImpl;
+}
 
-class MWReply : public virtual MWObjectProxy
+/**
+   \brief Category represents a set of related results returned by scope
+   and displayed within a single pane in the Unity dash.
+   \see ResultItem
+*/
+class UNITY_API Category : private util::NonCopyable
 {
 public:
-    virtual ~MWReply() noexcept;
+/// @cond
+    UNITY_DEFINES_PTRS(Category);
+/// @endcond
 
-    virtual void push(std::shared_ptr<VariantMap> result) = 0;
-    virtual void finished() = 0;
+    Category(std::string const& id); //TODO: pass renderer
+    std::string const& id() const;
 
-protected:
-    MWReply(MiddlewareBase* mw_base);
+private:
+    std::shared_ptr<internal::CategoryImpl> p;
 };
-
-} // namespace internal
 
 } // namespace scopes
 

@@ -22,6 +22,7 @@
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/Reaper.h>
 #include <scopes/ReplyBase.h>
+#include <scopes/Variant.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -53,7 +54,7 @@ public:
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
-    void push(std::string const& result) noexcept;
+    void push(VariantMap const& result) noexcept;
     void finished() noexcept;
 
 private:

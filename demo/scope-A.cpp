@@ -18,6 +18,8 @@
 
 #include <scopes/ScopeBase.h>
 #include <scopes/Reply.h>
+#include <scopes/Category.h>
+#include <scopes/ResultItem.h>
 
 #include <iostream>
 
@@ -46,7 +48,13 @@ public:
 
     virtual void run(ReplyProxy const& reply) override
     {
-        reply->push("scope-A: result 1 for query \"" + query_ + "\"");
+        auto cat = std::shared_ptr<Category>(new Category("cat1"));
+        ResultItem res(cat);
+        res.set_uri("uri");
+        res.set_title("scope-A: result 1 for query \"" + query_ + "\"");
+        res.set_icon("icon");
+        res.set_dnd_uri("dnd_uri");
+        reply->push(res);
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;
     }
 

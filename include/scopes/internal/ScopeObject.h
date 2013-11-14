@@ -22,7 +22,7 @@
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/VariantMap.h>
+#include <scopes/Variant.h>
 
 #include <string>
 

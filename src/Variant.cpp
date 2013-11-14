@@ -38,7 +38,7 @@ namespace internal
 
 struct VariantImpl
 {
-    boost::variant<int, bool, string> v;
+    boost::variant<int, bool, string, VariantMap> v;
 };
 
 } // namespace internal
@@ -59,6 +59,11 @@ Variant::Variant(bool val) noexcept
 }
 
 Variant::Variant(std::string const& val)
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(VariantMap const& val)
     : p(new internal::VariantImpl { val })
 {
 }
@@ -100,6 +105,12 @@ Variant& Variant::operator=(bool val) noexcept
 }
 
 Variant& Variant::operator=(std::string const& val)
+{
+    p->v = val;
+    return *this;
+}
+
+Variant& Variant::operator=(VariantMap const& val)
 {
     p->v = val;
     return *this;
@@ -154,6 +165,18 @@ string Variant::get_string() const
     catch (std::exception const&)
     {
         throw LogicException("Variant does not contain a string value");
+    }
+}
+
+VariantMap Variant::get_dict() const
+{
+    try
+    {
+        return boost::get<VariantMap>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain a dictionary");
     }
 }
 

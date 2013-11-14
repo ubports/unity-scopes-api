@@ -17,9 +17,11 @@
  */
 
 #include <scopes/internal/ReplyObject.h>
-
+#include <scopes/internal/ResultItemImpl.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/ReplyBase.h>
+#include <scopes/Category.h>
+#include <scopes/ResultItem.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -60,7 +62,7 @@ ReplyObject::~ReplyObject() noexcept
     }
 }
 
-void ReplyObject::push(std::string const& result) noexcept
+void ReplyObject::push(VariantMap const& result) noexcept
 {
     // We catch all exeptions so, if the application's push() method throws,
     // we can call finished(). Finished will be called exactly once, whether
@@ -90,7 +92,9 @@ void ReplyObject::push(std::string const& result) noexcept
     lock.unlock();
     try
     {
-        reply_base_->push(result);      // Forward the result to the application code outside synchronization.
+        auto cat = std::make_shared<Category>(""); //FIXME: set proper category once categories are (de)serialized
+        ResultItem result_item(cat, result);
+        reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
     }
     catch (unity::Exception const& e)
     {

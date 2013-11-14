@@ -13,16 +13,13 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MWREPLY_H
-#define UNITY_API_SCOPES_INTERNAL_MWREPLY_H
+#ifndef UNITY_API_SCOPES_CATEGORYIMPL_H
+#define UNITY_API_SCOPES_CATEGORYIMPL_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/Variant.h>
-
+#include <unity/util/NonCopyable.h>
 #include <string>
 
 namespace unity
@@ -37,16 +34,14 @@ namespace scopes
 namespace internal
 {
 
-class MWReply : public virtual MWObjectProxy
+class UNITY_API CategoryImpl : private util::NonCopyable
 {
 public:
-    virtual ~MWReply() noexcept;
+    CategoryImpl(std::string const& id);
+    std::string const& id() const;
 
-    virtual void push(std::shared_ptr<VariantMap> result) = 0;
-    virtual void finished() = 0;
-
-protected:
-    MWReply(MiddlewareBase* mw_base);
+private:
+    std::string id_;
 };
 
 } // namespace internal
