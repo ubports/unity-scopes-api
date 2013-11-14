@@ -35,11 +35,6 @@ ResultItem::ResultItem(Category::SPtr category)
 {
 }
 
-ResultItem::ResultItem( Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri)
-    : p(new internal::ResultItemImpl(category, uri, title, icon, dnd_uri))
-{
-}
-
 ResultItem::ResultItem(Category::SPtr category, const VariantMap &variant_map)
     : p(new internal::ResultItemImpl(category, variant_map))
 {

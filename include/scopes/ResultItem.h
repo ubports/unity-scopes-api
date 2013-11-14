@@ -54,11 +54,6 @@ public:
     explicit ResultItem(Category::SPtr category);
 
     /**
-       \brief Creates a ResultItem instance assigned to given category and using provided values for all base attributes.
-     */
-    ResultItem(Category::SPtr category, std::string const& uri, std::string const& title, std::string const& icon, std::string const &dnd_uri);
-
-    /**
        \brief Creates a ResultItem instance assigned to given category and using values of all base attributes from a variant_map dictionary.
     */
     ResultItem(Category::SPtr category, const VariantMap &variant_map);

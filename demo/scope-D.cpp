@@ -203,7 +203,11 @@ public:
                 for (int i = 1; i < 5; ++i)
                 {
                     auto cat = std::make_shared<Category>("cat1");
-                    ResultItem result(cat, "uri", scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"", "icon", "dnd_uri");
+                    ResultItem result(cat);
+                    result.set_uri("uri");
+                    result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
+                    result.set_icon("icon");
+                    result.set_dnd_uri("dnd_uri");
                     if (!reply_proxy->push(result))
                     {
                         break; // Query was cancelled

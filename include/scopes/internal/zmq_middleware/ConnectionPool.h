@@ -55,6 +55,7 @@ public:
     ConnectionPool(zmqpp::context& context);
     ~ConnectionPool();
     zmqpp::socket& find(std::string const& endpoint, RequestType t);
+    void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestType t);
 
 private:
     struct Connection
