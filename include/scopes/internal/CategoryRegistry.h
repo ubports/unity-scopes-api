@@ -13,13 +13,16 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#ifndef UNITY_API_SCOPES_CATEGORREGISTRYY_H
+#define UNITY_API_SCOPES_CATEGORYREGISTRY_H
 
-#include <scopes/internal/ReplyImpl.h>
+#include <unity/util/NonCopyable.h>
+#include <scopes/Category.h>
+#include <string>
+#include <memory>
 
 namespace unity
 {
@@ -30,41 +33,27 @@ namespace api
 namespace scopes
 {
 
-//! @cond
-
-Reply::Reply(internal::ReplyImpl* impl)
-    : p(impl)
+namespace internal
 {
-}
 
-Reply::~Reply() noexcept
+class CategoryRegistry: private util::NonCopyable
 {
-}
+public:
+    CategoryRegistry() = default;
 
-Category::SCPtr Reply::add_category(std::string const &id, std::string const &renderer)
-{
-    return p->add_category(id, renderer);
-}
+    Category::SCPtr add_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr find_category(std::string const& id) const;
 
-Category::SCPtr Reply::find_category(std::string const& id) const
-{
-    return p->find_category(id);
-}
+private:
+    std::map<std::string, Category::SCPtr> categories_;
+};
 
-bool Reply::push(ResultItem const& result) const
-{
-    return p->push(result);
-}
-
-void Reply::finished() const
-{
-    return p->finished();
-}
-
-//! @endcond
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
+#endif

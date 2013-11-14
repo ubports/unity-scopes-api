@@ -21,6 +21,7 @@
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
+#include <scopes/Variant.h>
 #include <string>
 #include <memory>
 
@@ -50,8 +51,10 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-    Category(std::string const& id); //TODO: pass renderer
+    Category(std::string const& id, std::string const& renderer = ""); //TODO: pass real renderer
     std::string const& id() const;
+    
+    std::shared_ptr<VariantMap> variant_map() const;
 
 private:
     std::shared_ptr<internal::CategoryImpl> p;

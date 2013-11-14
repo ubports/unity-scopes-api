@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <vector>
 
 namespace unity
 {
@@ -37,6 +38,7 @@ namespace scopes
 class Variant;
 
 typedef std::map<std::string, Variant> VariantMap;
+typedef std::vector<Variant> VariantArray;
 
 namespace internal
 {
@@ -55,7 +57,7 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Int, Bool, String, Dict };
+    enum Type { Int, Bool, String, Double, Dict, Array };
 
     /**@name Constructors and destructor
     */
@@ -68,6 +70,11 @@ public:
     \brief Creates a Variant instance that stores the supplied integer.
     */
     explicit Variant(int val) noexcept;
+
+    /**
+       \brief Creates a Variant instance that stores the supplied double.
+    */
+    explicit Variant(double val) noexcept;
 
     /**
     \brief Creates a Variant instance that stores the supplied boolean.
@@ -85,6 +92,8 @@ public:
     explicit Variant(char const* val);          // Required to prevent Variant("Hello") from storing a bool
 
     explicit Variant(VariantMap const& val);
+    
+    explicit Variant(VariantArray const& val);
 
     /**
     \brief Destructor.
@@ -108,10 +117,12 @@ public:
     */
     //{@
     Variant& operator=(int val) noexcept;
+    Variant& operator=(double val) noexcept;
     Variant& operator=(bool val) noexcept;
     Variant& operator=(std::string const& val);
     Variant& operator=(char const* val);        // Required to prevent v = "Hello" from storing a bool
     Variant& operator=(VariantMap const& val);
+    Variant& operator=(VariantArray const& val);
     //@}
 
     /**@name Comparison operators
@@ -132,9 +143,11 @@ public:
     */
     //{@
     int get_int() const;
+    double get_double() const;
     bool get_bool() const;
     std::string get_string() const;
     VariantMap get_dict() const;
+    VariantArray get_array() const;
     //@}
 
     /**@name Observers

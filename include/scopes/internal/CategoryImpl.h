@@ -20,7 +20,9 @@
 #define UNITY_API_SCOPES_CATEGORYIMPL_H
 
 #include <unity/util/NonCopyable.h>
+#include <scopes/Variant.h>
 #include <string>
+#include <memory>
 
 namespace unity
 {
@@ -37,11 +39,13 @@ namespace internal
 class UNITY_API CategoryImpl : private util::NonCopyable
 {
 public:
-    CategoryImpl(std::string const& id);
+    CategoryImpl(std::string const& id, std::string const& renderer);
     std::string const& id() const;
+    std::shared_ptr<VariantMap> variant_map() const;
 
 private:
     std::string id_;
+    std::string renderer_;
 };
 
 } // namespace internal

@@ -20,7 +20,9 @@
 #define UNITY_INTERNAL_REPLYIMPL_H
 
 #include <scopes/internal/MWReplyProxyFwd.h>
+#include <scopes/internal/CategoryRegistry.h>
 #include <scopes/ReplyProxyFwd.h>
+#include <scopes/Category.h>
 
 #include <atomic>
 
@@ -52,6 +54,9 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
     ~ReplyImpl() noexcept;
 
+    Category::SCPtr add_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr find_category(std::string const& id) const;
+
     bool push(unity::api::scopes::ResultItem const& result);
     void finished();
 
@@ -60,8 +65,11 @@ public:
     typedef std::function<void()> CleanupFunc;
 
 private:
+    bool push(std::shared_ptr<VariantMap> variant_map);
+
     MWReplyProxy mw_proxy_;
     std::shared_ptr<QueryObject> qo_;
+    std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
 };
 

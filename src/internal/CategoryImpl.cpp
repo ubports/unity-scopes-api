@@ -32,14 +32,23 @@ namespace internal
 
 //! @cond
 
-CategoryImpl::CategoryImpl(std::string const& id)
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& renderer)
     : id_(id)
+    , renderer_(renderer)
 {
 }
 
 std::string const& CategoryImpl::id() const
 {
     return id_;
+}
+
+std::shared_ptr<VariantMap> CategoryImpl::variant_map() const
+{
+    auto var = std::make_shared<VariantMap>();
+    (*var)["id"] = id_;
+    //TODO serialize renderer
+    return var;
 }
 
 } // namespace internal

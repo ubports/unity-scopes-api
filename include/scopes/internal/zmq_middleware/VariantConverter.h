@@ -45,6 +45,9 @@ Variant to_variant(unity::api::scopes::internal::zmq_middleware::capnproto::Valu
 void to_value_dict(VariantMap const& vm, unity::api::scopes::internal::zmq_middleware::capnproto::ValueDict::Builder& b);
 VariantMap to_variant_map(unity::api::scopes::internal::zmq_middleware::capnproto::ValueDict::Reader const& r);
 
+void to_value_array(VariantArray const& va, capnp::List<capnproto::Value>::Builder& b);
+VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r);
+
 } // namespace zmq_middleware
 
 } // namespace internal

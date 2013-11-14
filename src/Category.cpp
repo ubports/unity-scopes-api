@@ -30,14 +30,18 @@ namespace scopes
 
 //! @cond
 
-Category::Category(std::string const& id)
-    : p(new internal::CategoryImpl(id))
+Category::Category(std::string const& id, std::string const& renderer)
+    : p(new internal::CategoryImpl(id, renderer))
 {
 }
 
 std::string const& Category::id() const
 {
     return p->id();
+}
+
+std::shared_ptr<VariantMap> Category::variant_map() const
+{
 }
 
 //! @endcond

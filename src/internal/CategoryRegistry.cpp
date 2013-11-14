@@ -13,13 +13,12 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
-
-#include <scopes/internal/ReplyImpl.h>
+#include <scopes/internal/CategoryRegistry.h>
+#include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -30,41 +29,37 @@ namespace api
 namespace scopes
 {
 
-//! @cond
-
-Reply::Reply(internal::ReplyImpl* impl)
-    : p(impl)
+namespace internal
 {
+
+Category::SCPtr CategoryRegistry::add_category(std::string const &id, std::string const &renderer)
+{
+    if (categories_.find(id) != categories_.end())
+    {
+        std::ostringstream s;
+        s << "Category " << id << " already defined";
+        throw InvalidArgumentException(s.str());
+    }
+    auto cat = std::make_shared<Category>(id, renderer);
+
 }
 
-Reply::~Reply() noexcept
+Category::SCPtr CategoryRegistry::find_category(std::string const& id) const
 {
+    auto it = categories_.find(id);
+    if (it != categories_.end())
+    {
+        return it->second;
+    }
+    return nullptr;
 }
 
-Category::SCPtr Reply::add_category(std::string const &id, std::string const &renderer)
-{
-    return p->add_category(id, renderer);
-}
-
-Category::SCPtr Reply::find_category(std::string const& id) const
-{
-    return p->find_category(id);
-}
-
-bool Reply::push(ResultItem const& result) const
-{
-    return p->push(result);
-}
-
-void Reply::finished() const
-{
-    return p->finished();
-}
-
-//! @endcond
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
+

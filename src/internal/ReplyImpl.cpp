@@ -44,6 +44,7 @@ namespace internal
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo) :
     mw_proxy_(mw_proxy),
     qo_(qo),
+    cat_registry_(new CategoryRegistry()),
     finished_(false)
 {
     assert(mw_proxy);
@@ -62,13 +63,40 @@ ReplyImpl::~ReplyImpl() noexcept
     }
 }
 
+Category::SCPtr ReplyImpl::add_category(std::string const &id, std::string const &renderer)
+{
+    auto cat = cat_registry_->find_category(id); // will throw if adding same category again
+    auto var = std::make_shared<VariantMap>();
+    (*var)["category"] = *(cat->variant_map());
+ 
+    // return category instance only if pushed successfuly (i.e. search wasn't finished)
+    if (push(var))
+    {
+        return cat;
+    }
+
+    return nullptr;
+}
+
+Category::SCPtr ReplyImpl::find_category(std::string const& id) const
+{
+    return cat_registry_->find_category(id);
+}
+
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
+{
+    auto var = std::make_shared<VariantMap>();
+    (*var)["result"] = *(result.variant_map());
+    return push(var);
+}
+
+bool ReplyImpl::push(std::shared_ptr<VariantMap> variant_map)
 {
     if (!finished_.load())
     {
         try
         {
-            mw_proxy_->push(result.variant_map());
+            mw_proxy_->push(variant_map);
             return true;
         }
         catch (MiddlewareException const& e)

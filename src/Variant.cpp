@@ -38,7 +38,7 @@ namespace internal
 
 struct VariantImpl
 {
-    boost::variant<int, bool, string, VariantMap> v;
+    boost::variant<int, bool, string, double, VariantMap, VariantArray> v;
 };
 
 } // namespace internal
@@ -49,6 +49,11 @@ Variant::Variant() noexcept
 }
 
 Variant::Variant(int val) noexcept
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(double val) noexcept
     : p(new internal::VariantImpl { val })
 {
 }
@@ -64,6 +69,11 @@ Variant::Variant(std::string const& val)
 }
 
 Variant::Variant(VariantMap const& val)
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(VariantArray const& val)
     : p(new internal::VariantImpl { val })
 {
 }
@@ -98,6 +108,12 @@ Variant& Variant::operator=(int val) noexcept
     return *this;
 }
 
+Variant& Variant::operator=(double val) noexcept
+{
+    p->v = val;
+    return *this;
+}
+
 Variant& Variant::operator=(bool val) noexcept
 {
     p->v = val;
@@ -111,6 +127,12 @@ Variant& Variant::operator=(std::string const& val)
 }
 
 Variant& Variant::operator=(VariantMap const& val)
+{
+    p->v = val;
+    return *this;
+}
+
+Variant& Variant::operator=(VariantArray const& val)
 {
     p->v = val;
     return *this;
@@ -141,6 +163,18 @@ int Variant::get_int() const
     catch (std::exception const&)
     {
         throw LogicException("Variant does not contain an int value");
+    }
+}
+
+double Variant::get_double() const
+{
+    try
+    {
+        return boost::get<double>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain a double value");
     }
 }
 
@@ -177,6 +211,18 @@ VariantMap Variant::get_dict() const
     catch (std::exception const&)
     {
         throw LogicException("Variant does not contain a dictionary");
+    }
+}
+
+VariantArray Variant::get_array() const
+{
+    try
+    {
+        return boost::get<VariantArray>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain an array");
     }
 }
 

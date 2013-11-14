@@ -21,6 +21,7 @@
 
 #include <scopes/ObjectProxy.h>
 #include <scopes/ReplyProxyFwd.h>
+#include <scopes/Category.h>
 
 namespace unity
 {
@@ -47,6 +48,9 @@ class UNITY_API Reply : public ObjectProxy
 {
 public:
     Reply(Reply const&) = default;
+
+    Category::SCPtr add_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr find_category(std::string const& id) const;
 
     // TODO: document return value from push()
     /**
