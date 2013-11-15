@@ -51,6 +51,7 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
+    Category(VariantMap const& variant_map); //TODO make priv
     Category(std::string const& id, std::string const& renderer = ""); //TODO: pass real renderer
     std::string const& id() const;
     

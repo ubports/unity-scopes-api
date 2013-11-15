@@ -32,16 +32,29 @@ namespace scopes
 namespace internal
 {
 
-Category::SCPtr CategoryRegistry::add_category(std::string const &id, std::string const &renderer)
+void CategoryRegistry::add_category(Category::SCPtr category)
 {
-    if (categories_.find(id) != categories_.end())
+    if (categories_.find(category->id()) != categories_.end())
     {
         std::ostringstream s;
-        s << "Category " << id << " already defined";
+        s << "Category " << category->id() << " already defined";
         throw InvalidArgumentException(s.str());
     }
-    auto cat = std::make_shared<Category>(id, renderer);
+    categories_[category->id()] = category;
+}
 
+Category::SCPtr CategoryRegistry::add_category(VariantMap const& variant_map)
+{
+    auto cat = std::make_shared<Category>(variant_map);
+    add_category(cat);
+    return cat;
+}
+
+Category::SCPtr CategoryRegistry::add_category(std::string const &id, std::string const &renderer)
+{
+    auto cat = std::make_shared<Category>(id, renderer);
+    add_category(cat);
+    return cat;
 }
 
 Category::SCPtr CategoryRegistry::find_category(std::string const& id) const

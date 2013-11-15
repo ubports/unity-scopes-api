@@ -51,12 +51,12 @@ public:
     /**
        \brief Creates a ResultItem instance assigned to given category, with all base attributes initially empty.
      */
-    explicit ResultItem(Category::SPtr category);
+    explicit ResultItem(Category::SCPtr category);
 
     /**
        \brief Creates a ResultItem instance assigned to given category and using values of all base attributes from a variant_map dictionary.
     */
-    ResultItem(Category::SPtr category, const VariantMap &variant_map);
+    ResultItem(Category::SCPtr category, const VariantMap &variant_map);
 
     /**
        \brief Creates a ResultItem that is a copy of another ResultItem.
@@ -82,7 +82,7 @@ public:
     std::string title() const;
     std::string icon() const;
     std::string dnd_uri() const;
-    Category::SPtr category() const;
+    Category::SCPtr category() const;
 
     /**
        \brief Returns a dictionary of all attributes of this ResultItem instance.

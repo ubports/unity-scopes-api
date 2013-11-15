@@ -36,7 +36,7 @@ namespace internal
 
 const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri"};
 
-ResultItemImpl::ResultItemImpl(Category::SPtr category)
+ResultItemImpl::ResultItemImpl(Category::SCPtr category)
     : category_(category)
 {
     if (category_ == nullptr)
@@ -45,7 +45,7 @@ ResultItemImpl::ResultItemImpl(Category::SPtr category)
     }
 }
 
-ResultItemImpl::ResultItemImpl(Category::SPtr category, const VariantMap& variant_map)
+ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& variant_map)
     : ResultItemImpl(category)
 {
     from_variant_map(variant_map);
@@ -100,7 +100,7 @@ std::string ResultItemImpl::dnd_uri() const
     return dnd_uri_;
 }
 
-Category::SPtr ResultItemImpl::category() const
+Category::SCPtr ResultItemImpl::category() const
 {
     return category_;
 }

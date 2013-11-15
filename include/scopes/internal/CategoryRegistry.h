@@ -16,11 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORREGISTRYY_H
+#ifndef UNITY_API_SCOPES_CATEGORYREGISTRY_H
 #define UNITY_API_SCOPES_CATEGORYREGISTRY_H
 
-#include <unity/util/NonCopyable.h>
 #include <scopes/Category.h>
+#include <scopes/Variant.h>
 #include <string>
 #include <memory>
 
@@ -36,13 +36,15 @@ namespace scopes
 namespace internal
 {
 
-class CategoryRegistry: private util::NonCopyable
+class CategoryRegistry
 {
 public:
     CategoryRegistry() = default;
 
+    Category::SCPtr add_category(VariantMap const& variant_map);
     Category::SCPtr add_category(std::string const &id, std::string const &renderer);
     Category::SCPtr find_category(std::string const& id) const;
+    void add_category(Category::SCPtr category);
 
 private:
     std::map<std::string, Category::SCPtr> categories_;

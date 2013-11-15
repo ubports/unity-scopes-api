@@ -21,6 +21,7 @@
 
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/Reaper.h>
+#include <scopes/internal/CategoryRegistry.h>
 #include <scopes/ReplyBase.h>
 #include <scopes/Variant.h>
 
@@ -60,6 +61,7 @@ public:
 private:
     ReplyBase::SPtr const reply_base_;
     ReapItem::SPtr reap_item_;
+    std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;

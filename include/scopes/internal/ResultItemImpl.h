@@ -40,8 +40,8 @@ namespace internal
 class ResultItemImpl
 {
 public:
-    explicit ResultItemImpl(Category::SPtr category);
-    ResultItemImpl(Category::SPtr category, VariantMap const& variant_map);
+    explicit ResultItemImpl(Category::SCPtr category);
+    ResultItemImpl(Category::SCPtr category, VariantMap const& variant_map);
     ResultItemImpl(ResultItemImpl const& other) = default;
     ResultItemImpl& operator=(ResultItemImpl const& other) = default;
 
@@ -55,7 +55,7 @@ public:
     std::string title() const;
     std::string icon() const;
     std::string dnd_uri() const;
-    Category::SPtr category() const;
+    Category::SCPtr category() const;
 
     std::shared_ptr<VariantMap> variant_map() const;
 
@@ -69,7 +69,7 @@ private:
     std::string icon_;
     std::string dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
-    std::shared_ptr<Category> category_;
+    Category::SCPtr category_;
 };
 
 } // namespace internal

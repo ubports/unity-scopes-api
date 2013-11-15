@@ -23,8 +23,10 @@
 #include <scopes/internal/ReplyImpl.h>
 #include <scopes/ResultItem.h>
 #include <scopes/ScopeExceptions.h>
+#include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
 
+#include <sstream>
 #include <cassert>
 
 using namespace std;
@@ -65,7 +67,7 @@ ReplyImpl::~ReplyImpl() noexcept
 
 Category::SCPtr ReplyImpl::add_category(std::string const &id, std::string const &renderer)
 {
-    auto cat = cat_registry_->find_category(id); // will throw if adding same category again
+    auto cat = cat_registry_->add_category(id, renderer); // will throw if adding same category again
     auto var = std::make_shared<VariantMap>();
     (*var)["category"] = *(cat->variant_map());
  
@@ -85,6 +87,16 @@ Category::SCPtr ReplyImpl::find_category(std::string const& id) const
 
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 {
+    // if this is an aggregator scope, it may be pushing result items obtained
+    // from ReplyObject without registering category first.
+    auto cat = cat_registry_->find_category(result.category()->id());
+    if (cat == nullptr)
+    {
+        std::ostringstream s;
+        s << "Unknown category " << result.category()->id();
+        throw InvalidArgumentException(s.str());
+    }
+
     auto var = std::make_shared<VariantMap>();
     (*var)["result"] = *(result.variant_map());
     return push(var);

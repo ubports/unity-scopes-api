@@ -32,6 +32,11 @@ namespace internal
 
 //! @cond
 
+CategoryImpl::CategoryImpl(VariantMap const& variant_map)
+{
+    //TODO
+}
+
 CategoryImpl::CategoryImpl(std::string const& id, std::string const& renderer)
     : id_(id)
     , renderer_(renderer)

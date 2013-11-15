@@ -35,6 +35,11 @@ Category::Category(std::string const& id, std::string const& renderer)
 {
 }
 
+Category::Category(VariantMap const& variant_map)
+    : p(new internal::CategoryImpl(variant_map))
+{
+}
+
 std::string const& Category::id() const
 {
     return p->id();
