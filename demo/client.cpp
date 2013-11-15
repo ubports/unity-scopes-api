@@ -37,12 +37,13 @@ public:
 
     virtual void push(Category::SCPtr category) override
     {
-        cout << "received category: id=" << category->id() << endl;
+        cout << "received category: id=" << category->id() << " title=" << category->title() << " icon=" << category->icon() << " template=" <<
+            category->renderer_template() << endl;
     }
 
     virtual void push(ResultItem const& result) override
     {
-        cout << "received result: uri=" << result.uri() << " title=" << result.title() << endl;
+        cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }
 
     virtual void finished() override
