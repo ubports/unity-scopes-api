@@ -92,7 +92,7 @@ public:
     explicit Variant(char const* val);          // Required to prevent Variant("Hello") from storing a bool
 
     explicit Variant(VariantMap const& val);
-    
+
     explicit Variant(VariantArray const& val);
 
     /**

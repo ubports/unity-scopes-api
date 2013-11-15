@@ -65,12 +65,17 @@ ReplyImpl::~ReplyImpl() noexcept
     }
 }
 
-Category::SCPtr ReplyImpl::add_category(std::string const &id, std::string const &renderer)
+void ReplyImpl::register_category(Category::SCPtr category)
 {
-    auto cat = cat_registry_->add_category(id, renderer); // will throw if adding same category again
+    cat_registry_->register_category(category); // will throw if that category id has already been registered
+}
+
+Category::SCPtr ReplyImpl::register_category(std::string const &id, std::string const &renderer)
+{
+    auto cat = cat_registry_->register_category(id, renderer); // will throw if adding same category again
     auto var = std::make_shared<VariantMap>();
     (*var)["category"] = *(cat->variant_map());
- 
+
     // return category instance only if pushed successfuly (i.e. search wasn't finished)
     if (push(var))
     {

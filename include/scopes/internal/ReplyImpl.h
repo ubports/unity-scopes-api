@@ -54,7 +54,8 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
     ~ReplyImpl() noexcept;
 
-    Category::SCPtr add_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr register_category(std::string const &id, std::string const &renderer);
+    void register_category(Category::SCPtr category);
     Category::SCPtr find_category(std::string const& id) const;
 
     bool push(unity::api::scopes::ResultItem const& result);

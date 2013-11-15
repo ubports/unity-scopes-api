@@ -37,6 +37,12 @@ using namespace unity::api::scopes;
 class SubReply : public ReplyBase
 {
 public:
+    virtual void push(Category::SCPtr category) override
+    {
+        cout << "received category: id=" << category->id() << endl;
+        upstream_->register_category(category);
+    }
+
     virtual void push(ResultItem const& result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;

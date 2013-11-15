@@ -41,10 +41,10 @@ class CategoryRegistry
 public:
     CategoryRegistry() = default;
 
-    Category::SCPtr add_category(VariantMap const& variant_map);
-    Category::SCPtr add_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr register_category(VariantMap const& variant_map);
+    Category::SCPtr register_category(std::string const &id, std::string const &renderer);
     Category::SCPtr find_category(std::string const& id) const;
-    void add_category(Category::SCPtr category);
+    void register_category(Category::SCPtr category);
 
 private:
     std::map<std::string, Category::SCPtr> categories_;

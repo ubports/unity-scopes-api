@@ -41,9 +41,14 @@ Reply::~Reply() noexcept
 {
 }
 
-Category::SCPtr Reply::add_category(std::string const &id, std::string const &renderer)
+Category::SCPtr Reply::register_category(std::string const &id, std::string const &renderer)
 {
-    return p->add_category(id, renderer);
+    return p->register_category(id, renderer);
+}
+
+void Reply::register_category(Category::SCPtr category)
+{
+    return p->register_category(category);
 }
 
 Category::SCPtr Reply::find_category(std::string const& id) const

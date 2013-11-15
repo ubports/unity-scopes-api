@@ -96,8 +96,8 @@ void ReplyObject::push(VariantMap const& result) noexcept
         auto it = result.find("category");
         if (it != result.end())
         {
-            auto cat = cat_registry_->add_category(it->second.get_dict());
-            //TODO push to application?
+            auto cat = cat_registry_->register_category(it->second.get_dict());
+            reply_base_->push(cat);
         }
 
         it = result.find("result");

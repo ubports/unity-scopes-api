@@ -40,7 +40,7 @@ TEST(Variant, basic)
         EXPECT_EQ(Variant::Type::Int, v.which());
         EXPECT_EQ(42, v.get_int());
     }
-    
+
     {
         Variant v(10.5f);
         EXPECT_EQ(Variant::Type::Double, v.which());
