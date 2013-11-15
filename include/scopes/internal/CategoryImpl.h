@@ -42,6 +42,9 @@ public:
     CategoryImpl(VariantMap const& variant_map);
     CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     std::string const& id() const;
+    std::string const& title() const;
+    std::string const& icon() const;
+    std::string const& renderer_template() const;
     std::shared_ptr<VariantMap> variant_map() const;
 
 private:

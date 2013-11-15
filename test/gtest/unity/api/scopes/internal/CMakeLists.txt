@@ -1,3 +1,4 @@
+add_subdirectory(CategoryRegistry)
 add_subdirectory(ConfigBase)
 add_subdirectory(DynamicLoader)
 add_subdirectory(lttng)

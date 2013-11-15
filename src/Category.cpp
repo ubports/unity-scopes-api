@@ -45,6 +45,21 @@ std::string const& Category::id() const
     return p->id();
 }
 
+std::string const& Category::icon() const
+{
+    return p->icon();
+}
+
+std::string const& Category::renderer_template() const
+{
+    return p->renderer_template();
+}
+
+std::string const& Category::title() const
+{
+    return p->title();
+}
+
 std::shared_ptr<VariantMap> Category::variant_map() const
 {
     return p->variant_map();
