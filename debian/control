@@ -31,7 +31,6 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends},
-         libunity-api0 (= ${binary:Version}),
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)
 
