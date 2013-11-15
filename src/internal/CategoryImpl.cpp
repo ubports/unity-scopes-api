@@ -36,30 +36,7 @@ namespace internal
 
 CategoryImpl::CategoryImpl(VariantMap const& variant_map)
 {
-    auto it = variant_map.find("id");
-    if (it == variant_map.end())
-    {
-        throw MiddlewareException("Missing 'id'");
-    }
-    id_ = it->second.get_string();
-
-    it = variant_map.find("title");
-    if (it != variant_map.end())
-    {
-        title_ = it->second.get_string();
-    }
-
-    it = variant_map.find("icon");
-    if (it != variant_map.end())
-    {
-        icon_ = it->second.get_string();
-    }
-
-    it = variant_map.find("renderer_template");
-    if (it != variant_map.end())
-    {
-        renderer_template_ = it->second.get_string();
-    }
+    from_variant_map(variant_map);
 }
 
 CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
@@ -103,6 +80,34 @@ std::shared_ptr<VariantMap> CategoryImpl::variant_map() const
     (*var)["icon"] = icon_;
     (*var)["renderer_template"] = renderer_template_;
     return var;
+}
+
+void CategoryImpl::from_variant_map(VariantMap const& variant_map)
+{
+    auto it = variant_map.find("id");
+    if (it == variant_map.end())
+    {
+        throw MiddlewareException("Missing 'id'");
+    }
+    id_ = it->second.get_string();
+
+    it = variant_map.find("title");
+    if (it != variant_map.end())
+    {
+        title_ = it->second.get_string();
+    }
+
+    it = variant_map.find("icon");
+    if (it != variant_map.end())
+    {
+        icon_ = it->second.get_string();
+    }
+
+    it = variant_map.find("renderer_template");
+    if (it != variant_map.end())
+    {
+        renderer_template_ = it->second.get_string();
+    }
 }
 
 } // namespace internal

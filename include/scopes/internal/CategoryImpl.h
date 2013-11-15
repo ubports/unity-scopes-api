@@ -48,6 +48,8 @@ public:
     std::shared_ptr<VariantMap> variant_map() const;
 
 private:
+    void from_variant_map(VariantMap const& variant_map);
+
     std::string id_;
     std::string title_;
     std::string icon_;
