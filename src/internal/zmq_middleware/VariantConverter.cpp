@@ -153,7 +153,7 @@ VariantMap to_variant_map(capnproto::ValueDict::Reader const& r)
 
 VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r)
 {
-    VariantArray va(r.size());
+    VariantArray va;
     for (auto const& el: r)
     {
         va.push_back(to_variant(el));
