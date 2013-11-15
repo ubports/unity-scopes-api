@@ -200,9 +200,9 @@ public:
             ReplyProxy reply_proxy;
             if (queue_.get(query, reply_proxy) && !done_.load())
             {
+                auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
                 for (int i = 1; i < 5; ++i)
                 {
-                    auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
                     ResultItem result(cat);
                     result.set_uri("uri");
                     result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
