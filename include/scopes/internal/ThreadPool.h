@@ -24,7 +24,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <future>
-#include <thread>
 
 namespace unity
 {
@@ -58,8 +57,8 @@ private:
     std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
     std::mutex mutex_;
-    std::condition_variable cond_;
-    bool done_;
+    std::promise<void> threads_ready_;
+    int num_threads_;
 };
 
 template<typename F>

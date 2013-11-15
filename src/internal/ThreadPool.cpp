@@ -20,6 +20,8 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
+
 using namespace std;
 
 namespace unity
@@ -35,6 +37,7 @@ namespace internal
 {
 
 ThreadPool::ThreadPool(int size)
+    : num_threads_(size)
 {
     if (size < 1)
     {
@@ -45,22 +48,29 @@ ThreadPool::ThreadPool(int size)
 
     try
     {
+        {
+            lock_guard<mutex> lock(mutex_);
+            threads_ready_ = std::promise<void>();
+        }
         for (int i = 0; i < size; ++i)
         {
             threads_.push_back(std::thread(&ThreadPool::run, this));
         }
+        auto future = threads_ready_.get_future();
+        future.wait();
+        future.get();
     }
     catch (std::exception const&)   // LCOV_EXCL_LINE
     {
-        throw unity::ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
+        throw ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
     }
 }
 
 ThreadPool::~ThreadPool() noexcept
 {
+    queue_->destroy();
     try
     {
-        queue_.reset(nullptr);
         for (size_t i = 0; i < threads_.size(); ++i)
         {
             threads_[i].join();
@@ -74,14 +84,21 @@ ThreadPool::~ThreadPool() noexcept
 
 void ThreadPool::run()
 {
+    TaskQueue::value_type task;
     for (;;)
     {
-        TaskQueue::value_type task;
         try
         {
+            {
+                lock_guard<mutex> lock(mutex_);
+                if (--num_threads_ == 0)
+                {
+                    threads_ready_.set_value();
+                }
+            }
             task = queue_->wait_and_pop();
         }
-        catch (...)
+        catch (runtime_error const&)
         {
             return; // wait_and_pop() throws if the queue is destroyed while threads are blocked on it.
         }
