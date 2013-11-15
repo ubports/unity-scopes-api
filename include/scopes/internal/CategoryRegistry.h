@@ -36,6 +36,11 @@ namespace scopes
 namespace internal
 {
 
+/**
+\brief Provides factory method for creating Category instances and keeps track of them.
+This class is for internal use, most of its functionality is exposed via register_category and find_category method
+of Reply class.
+*/
 class CategoryRegistry
 {
 public:

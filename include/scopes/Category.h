@@ -43,6 +43,7 @@ namespace internal
 /**
    \brief Category represents a set of related results returned by scope
    and displayed within a single pane in the Unity dash.
+   To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
 class UNITY_API Category : private util::NonCopyable
