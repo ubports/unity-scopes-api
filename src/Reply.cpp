@@ -41,9 +41,9 @@ Reply::~Reply() noexcept
 {
 }
 
-Category::SCPtr Reply::register_category(std::string const &id, std::string const &renderer)
+Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
 {
-    return p->register_category(id, renderer);
+    return p->register_category(id, title, icon, renderer_template);
 }
 
 void Reply::register_category(Category::SCPtr category)

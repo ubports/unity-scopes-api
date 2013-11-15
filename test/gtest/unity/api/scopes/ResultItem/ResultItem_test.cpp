@@ -18,6 +18,7 @@
 
 #include <scopes/ResultItem.h>
 #include <scopes/Category.h>
+#include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -27,7 +28,8 @@ using namespace unity::api::scopes::internal;
 // basic test of ResultIem setters and getters
 TEST(ResultItem, basic)
 {
-    auto cat = std::make_shared<Category>("1", "");
+    CategoryRegistry reg;
+    auto cat = reg.register_category("1", "title", "icon", "{}");
 
     {
         ResultItem result(cat);
@@ -114,7 +116,9 @@ TEST(ResultItem, basic)
 // test conversion to VariantMap
 TEST(ResultItem, variant_map)
 {
-    auto cat = std::make_shared<Category>("1", "");
+    CategoryRegistry reg;
+    auto cat = reg.register_category("1", "title", "icon", "{}");
+
     ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
@@ -137,7 +141,8 @@ TEST(ResultItem, variant_map)
 // test exceptions when converting to VariantMap
 TEST(ResultItem, variant_map_excp)
 {
-    auto cat = std::make_shared<Category>("1", "");
+    CategoryRegistry reg;
+    auto cat = reg.register_category("1", "title", "icon", "{}");
     ResultItem result(cat);
 
     // throw until all required attributes are non-empty
@@ -162,7 +167,8 @@ TEST(ResultItem, from_variant_map)
     vm["icon"] = "an icon";
     vm["foo"] = "bar"; // custom attribute
 
-    auto cat = std::make_shared<Category>("1", "");
+    CategoryRegistry reg;
+    auto cat = reg.register_category("1", "title", "icon", "{}");
     ResultItem result(cat, vm);
 
     auto var = result.variant_map();

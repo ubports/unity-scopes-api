@@ -45,14 +45,14 @@ void CategoryRegistry::register_category(Category::SCPtr category)
 
 Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_map)
 {
-    auto cat = std::make_shared<Category>(variant_map);
+    auto cat = std::shared_ptr<Category>(new Category(variant_map));
     register_category(cat);
     return cat;
 }
 
-Category::SCPtr CategoryRegistry::register_category(std::string const &id, std::string const &renderer)
+Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template)
 {
-    auto cat = std::make_shared<Category>(id, renderer);
+    auto cat = std::shared_ptr<Category>(new Category(id, title, icon, renderer_template));
     register_category(cat);
     return cat;
 }

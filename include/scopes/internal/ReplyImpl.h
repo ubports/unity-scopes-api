@@ -54,7 +54,7 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
     ~ReplyImpl() noexcept;
 
-    Category::SCPtr register_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     void register_category(Category::SCPtr category);
     Category::SCPtr find_category(std::string const& id) const;
 

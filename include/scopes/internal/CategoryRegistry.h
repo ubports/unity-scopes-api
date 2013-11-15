@@ -42,7 +42,7 @@ public:
     CategoryRegistry() = default;
 
     Category::SCPtr register_category(VariantMap const& variant_map);
-    Category::SCPtr register_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template);
     Category::SCPtr find_category(std::string const& id) const;
     void register_category(Category::SCPtr category);
 

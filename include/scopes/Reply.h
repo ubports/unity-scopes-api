@@ -49,7 +49,7 @@ class UNITY_API Reply : public ObjectProxy
 public:
     Reply(Reply const&) = default;
 
-    Category::SCPtr register_category(std::string const &id, std::string const &renderer);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     void register_category(Category::SCPtr category);
     Category::SCPtr find_category(std::string const& id) const;
 

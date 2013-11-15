@@ -70,9 +70,9 @@ void ReplyImpl::register_category(Category::SCPtr category)
     cat_registry_->register_category(category); // will throw if that category id has already been registered
 }
 
-Category::SCPtr ReplyImpl::register_category(std::string const &id, std::string const &renderer)
+Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
 {
-    auto cat = cat_registry_->register_category(id, renderer); // will throw if adding same category again
+    auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
     auto var = std::make_shared<VariantMap>();
     (*var)["category"] = *(cat->variant_map());
 

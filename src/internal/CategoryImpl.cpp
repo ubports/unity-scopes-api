@@ -17,6 +17,8 @@
  */
 
 #include <scopes/internal/CategoryImpl.h>
+#include <unity/UnityExceptions.h>
+#include <scopes/ScopeExceptions.h>
 
 namespace unity
 {
@@ -34,13 +36,25 @@ namespace internal
 
 CategoryImpl::CategoryImpl(VariantMap const& variant_map)
 {
-    //TODO
+    auto it = variant_map.find("id");
+    if (it == variant_map.end())
+    {
+        throw MiddlewareException("Missing 'id'");
+    }
+    id_ = it->second.get_string();
 }
 
-CategoryImpl::CategoryImpl(std::string const& id, std::string const& renderer)
-    : id_(id)
-    , renderer_(renderer)
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+    : id_(id),
+      title_(title),
+      icon_(icon),
+      renderer_template_(renderer_template)
 {
+    if (id.empty())
+    {
+        throw InvalidArgumentException("Category id must not be empty");
+    }
+    // it's ok if title and icon are empty.
 }
 
 std::string const& CategoryImpl::id() const

@@ -202,7 +202,7 @@ public:
             {
                 for (int i = 1; i < 5; ++i)
                 {
-                    auto cat = std::make_shared<Category>("cat1");
+                    auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
                     ResultItem result(cat);
                     result.set_uri("uri");
                     result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");

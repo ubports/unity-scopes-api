@@ -37,6 +37,7 @@ namespace scopes
 namespace internal
 {
     class CategoryImpl;
+    class CategoryRegistry;
 }
 
 /**
@@ -51,14 +52,16 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-    Category(VariantMap const& variant_map); //TODO make priv
-    Category(std::string const& id, std::string const& renderer = ""); //TODO: pass real renderer
     std::string const& id() const;
-
     std::shared_ptr<VariantMap> variant_map() const;
 
 private:
+    Category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category(VariantMap const& variant_map);
+
     std::shared_ptr<internal::CategoryImpl> p;
+
+    friend class internal::CategoryRegistry;
 };
 
 } // namespace scopes

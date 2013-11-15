@@ -40,13 +40,15 @@ class UNITY_API CategoryImpl : private util::NonCopyable
 {
 public:
     CategoryImpl(VariantMap const& variant_map);
-    CategoryImpl(std::string const& id, std::string const& renderer);
+    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     std::string const& id() const;
     std::shared_ptr<VariantMap> variant_map() const;
 
 private:
     std::string id_;
-    std::string renderer_;
+    std::string title_;
+    std::string icon_;
+    std::string renderer_template_;
 };
 
 } // namespace internal
