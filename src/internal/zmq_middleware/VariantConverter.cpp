@@ -134,7 +134,8 @@ void to_value_array(VariantArray const& va, capnp::List<capnproto::Value>::Build
     uint i = 0;
     for (auto const& el: va)
     {
-//        b.set(i, to_value(el, b[i])); ///???? FIXME
+        auto elm_bld = b[i];
+        to_value(el, elm_bld);
         ++i;
     }
 }

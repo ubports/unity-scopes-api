@@ -66,7 +66,9 @@ std::shared_ptr<VariantMap> CategoryImpl::variant_map() const
 {
     auto var = std::make_shared<VariantMap>();
     (*var)["id"] = id_;
-    //TODO serialize renderer
+    (*var)["title"] = title_;
+    (*var)["icon"] = icon_;
+    (*var)["renderer_template"] = renderer_template_;
     return var;
 }
 
