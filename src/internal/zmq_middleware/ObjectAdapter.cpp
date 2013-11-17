@@ -200,7 +200,10 @@ void ObjectAdapter::shutdown() noexcept
             {
             }
             workers_.clear();
-            ServantMap().swap(servants_);   // Not need for a try block. The ServantBase destructor is noexcept.
+            {
+                lock_guard<mutex> map_lock(map_mutex_);
+                ServantMap().swap(servants_);   // No need for a try block. The ServantBase destructor is noexcept.
+            }
             lock.lock();
             state_ = Inactive;
             state_changed_.notify_all();
