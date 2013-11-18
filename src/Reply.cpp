@@ -51,9 +51,9 @@ void Reply::register_category(Category::SCPtr category)
     return p->register_category(category);
 }
 
-Category::SCPtr Reply::find_category(std::string const& id) const
+Category::SCPtr Reply::lookup_category(std::string const& id) const
 {
-    return p->find_category(id);
+    return p->lookup_category(id);
 }
 
 bool Reply::push(ResultItem const& result) const

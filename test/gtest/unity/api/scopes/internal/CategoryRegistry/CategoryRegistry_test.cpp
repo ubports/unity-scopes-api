@@ -31,11 +31,11 @@ TEST(CategoryRegistry, basic)
 {
     CategoryRegistry reg;
     {
-        EXPECT_EQ(nullptr, reg.find_category("a"));
+        EXPECT_EQ(nullptr, reg.lookup_category("a"));
         auto cat = reg.register_category("a", "title", "icon", "{}");
         EXPECT_TRUE(cat != nullptr);
 
-        auto cat1 = reg.find_category("a");
+        auto cat1 = reg.lookup_category("a");
         EXPECT_TRUE(cat1 != nullptr);
         EXPECT_TRUE(cat == cat1);
     }

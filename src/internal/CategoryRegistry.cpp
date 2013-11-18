@@ -60,7 +60,7 @@ Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::
     return cat;
 }
 
-Category::SCPtr CategoryRegistry::find_category(std::string const& id) const
+Category::SCPtr CategoryRegistry::lookup_category(std::string const& id) const
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
     auto it = categories_.find(id);

@@ -63,7 +63,7 @@ public:
     \brief Finds category instance with give id.
     \return category instance or nullptr if not such category has been registered
     */
-    Category::SCPtr find_category(std::string const& id) const;
+    Category::SCPtr lookup_category(std::string const& id) const;
 
     /**
     \brief Register an existing category instance with this registry.

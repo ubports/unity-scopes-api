@@ -56,7 +56,7 @@ public:
 
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     void register_category(Category::SCPtr category);
-    Category::SCPtr find_category(std::string const& id) const;
+    Category::SCPtr lookup_category(std::string const& id) const;
 
     bool push(unity::api::scopes::ResultItem const& result);
     void finished();

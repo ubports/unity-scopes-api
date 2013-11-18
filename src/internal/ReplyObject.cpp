@@ -105,7 +105,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         {
             auto result_var = it->second.get_dict();
             auto cat_id = result_var["cat_id"].get_string();
-            auto cat = cat_registry_->find_category(cat_id);
+            auto cat = cat_registry_->lookup_category(cat_id);
             if (cat == nullptr)
             {
                 // TODO: this is an internal error; log error

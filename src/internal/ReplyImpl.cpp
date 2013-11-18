@@ -84,16 +84,16 @@ Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string 
     return nullptr;
 }
 
-Category::SCPtr ReplyImpl::find_category(std::string const& id) const
+Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
 {
-    return cat_registry_->find_category(id);
+    return cat_registry_->lookup_category(id);
 }
 
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 {
     // if this is an aggregator scope, it may be pushing result items obtained
     // from ReplyObject without registering category first.
-    auto cat = cat_registry_->find_category(result.category()->id());
+    auto cat = cat_registry_->lookup_category(result.category()->id());
     if (cat == nullptr)
     {
         std::ostringstream s;

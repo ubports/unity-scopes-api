@@ -184,7 +184,7 @@ public:
                 cerr << "worker thread terminating, queue was cleared" << endl;
                 break;  // stop() was called.
             }
-            auto cat = reply->find_category("cat1");
+            auto cat = reply->lookup_category("cat1");
             if (cat == nullptr)
             {
                 cat = reply->register_category("cat1", "Category 1", "", "{}");

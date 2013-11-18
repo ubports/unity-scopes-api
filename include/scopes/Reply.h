@@ -66,7 +66,7 @@ public:
     \brief Returns an instance of previously registered category.
     \return Category instance or nullptr if category hasn't been registered.
     */
-    Category::SCPtr find_category(std::string const& id) const;
+    Category::SCPtr lookup_category(std::string const& id) const;
 
     // TODO: document return value from push()
     /**
