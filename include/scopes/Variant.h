@@ -41,7 +41,7 @@ typedef std::map<std::string, Variant> VariantMap;
 namespace internal
 {
 
-class VariantImpl;
+struct VariantImpl;
 
 } // namespace internal
 
