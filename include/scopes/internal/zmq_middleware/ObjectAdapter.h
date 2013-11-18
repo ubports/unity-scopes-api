@@ -96,12 +96,12 @@ private:
     enum AdapterState { Inactive, Active, ShuttingDown };
     AdapterState state_;
     std::condition_variable state_changed_;
+    std::mutex state_mutex_;
 
     // Map of object identity and servant pairs
     typedef std::unordered_map<std::string, std::shared_ptr<ServantBase>> ServantMap;
     ServantMap servants_;
-
-    mutable std::mutex mutex_;
+    mutable std::mutex map_mutex_;
 };
 
 } // namespace zmq_middleware
