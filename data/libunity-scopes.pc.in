@@ -17,7 +17,7 @@
 #
 
 prefix=@CMAKE_INSTALL_PREFIX@
-includedir=${prefix}/include
+includedir=${prefix}/include/unity
 libdir=@LIBDIR@
 
 Name: lib@UNITY_SCOPES_LIB@

@@ -94,7 +94,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         throw InvalidArgumentException("ObjectAdapter::add(): invalid nullptr object (adapter: " + name_ + ")");
     }
 
-    lock_guard<mutex> lock(mutex_);
+    lock_guard<mutex> lock(map_mutex_);
     auto pair = servants_.insert(make_pair(id, obj));
     if (!pair.second)
     {
@@ -102,27 +102,31 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         s << "ObjectAdapter::add(): " << "cannot add id \"" << id << "\": id already used (adapter: " << name_  << ")";
         throw MiddlewareException(s.str());
     }
-    ZmqProxy p(new ZmqObjectProxy(&mw_, endpoint_, id, type_));
-    return p;
-    //return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_));
+    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_));
 }
 
 void ObjectAdapter::remove(std::string const& id)
 {
-    lock_guard<mutex> lock(mutex_);
-    auto it = servants_.find(id);
-    if (it == servants_.end())
+    shared_ptr<ServantBase> servant;
     {
-        ostringstream s;
-        s << "ObjectAdapter::remove(): " << "cannot remove id \"" << id << "\": id not present (adapter: " << name_ << ")";
-        throw MiddlewareException(s.str());
+        lock_guard<mutex> lock(map_mutex_);
+        auto it = servants_.find(id);
+        if (it == servants_.end())
+        {
+            ostringstream s;
+            s << "ObjectAdapter::remove(): " << "cannot remove id \"" << id << "\": id not present (adapter: " << name_ << ")";
+            throw MiddlewareException(s.str());
+        }
+        servant = it->second;
+        servants_.erase(it);
     }
-    servants_.erase(it);
+    // Servant goes out of scope here, outside the synchronization. This prevents deadlock if the servant
+    // destructor tries to manipulate the servant map.
 }
 
 shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const noexcept
 {
-    lock_guard<mutex> lock(mutex_);
+    lock_guard<mutex> lock(map_mutex_);
     auto it = servants_.find(id);
     if (it != servants_.end())
     {
@@ -133,7 +137,7 @@ shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const noexcep
 
 void ObjectAdapter::activate() noexcept
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
     switch (state_)
     {
         case Active:
@@ -164,7 +168,7 @@ void ObjectAdapter::activate() noexcept
 
 void ObjectAdapter::shutdown() noexcept
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
     switch (state_)
     {
         case Inactive:
@@ -196,7 +200,10 @@ void ObjectAdapter::shutdown() noexcept
             {
             }
             workers_.clear();
-            ServantMap().swap(servants_);   // Not need for a try block. The ServantBase destructor is noexcept.
+            {
+                lock_guard<mutex> map_lock(map_mutex_);
+                ServantMap().swap(servants_);   // No need for a try block. The ServantBase destructor is noexcept.
+            }
             lock.lock();
             state_ = Inactive;
             state_changed_.notify_all();
@@ -211,7 +218,7 @@ void ObjectAdapter::shutdown() noexcept
 
 void ObjectAdapter::wait_for_shutdown() noexcept
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
     state_changed_.wait(lock, [this]{ return state_ == Inactive; });
 }
 

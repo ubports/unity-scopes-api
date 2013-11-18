@@ -1,3 +1,5 @@
+set(HDR_INSTALL_DIR include)
+
 add_subdirectory(scopes)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

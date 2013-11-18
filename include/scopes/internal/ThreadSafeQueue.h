@@ -21,11 +21,12 @@
 
 #include <unity/util/NonCopyable.h>
 
-#include <cassert>
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <stdexcept>
+#include <thread>
 
 namespace unity
 {
@@ -51,6 +52,7 @@ public:
     ThreadSafeQueue();
     ~ThreadSafeQueue() noexcept;
 
+    void destroy() noexcept;
     void push(T const& item);
     void push(T&& item);
     T wait_and_pop();
@@ -63,20 +65,38 @@ private:
     mutable std::mutex mutex_;
     std::condition_variable cond_;
     bool done_;
+    std::atomic<int> num_waiters_;
 };
 
 template<typename T>
 ThreadSafeQueue<T>::ThreadSafeQueue() :
-    done_(false)
+    done_(false),
+    num_waiters_(0)
 {
 }
 
 template<typename T>
 ThreadSafeQueue<T>::~ThreadSafeQueue() noexcept
 {
+    destroy();
+
+    // Don't destroy the object while there are still threads in wait_and_pop(), otherwise
+    // a thread that wakes up in wait_and_pop() will try to re-lock the already-destroyed
+    // mutex.
+    while (num_waiters_.load() > 0)
+        std::this_thread::yield();  // LCOV_EXCL_LINE (impossible to reliably hit with a test)
+}
+
+template<typename T>
+void ThreadSafeQueue<T>::destroy() noexcept
+{
     std::lock_guard<std::mutex> lock(mutex_);
+    if (done_)
+    {
+        return;
+    }
     done_ = true;
-    cond_.notify_all();
+    cond_.notify_all(); // Wake up anyone asleep in wait_and_pop()
 }
 
 template<typename T>
@@ -99,13 +119,17 @@ template<typename T>
 T ThreadSafeQueue<T>::wait_and_pop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    ++num_waiters_;
     cond_.wait(lock, [this] { return done_ || queue_.size() != 0; });
     if (done_)
     {
+        lock.unlock();
+        --num_waiters_;
         throw std::runtime_error("ThreadSafeQueue: queue destroyed while thread was blocked in wait_and_pop()");
     }
     T item = std::move(queue_.front());
     queue_.pop();
+    --num_waiters_;
     return item;
 }
 
