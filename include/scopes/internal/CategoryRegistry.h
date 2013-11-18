@@ -61,7 +61,7 @@ public:
 
     /**
     \brief Finds category instance with give id.
-    \return category instance or nullptr if not such category has been registered
+    \return category instance or nullptr if no such category has been registered
     */
     Category::SCPtr lookup_category(std::string const& id) const;
 
