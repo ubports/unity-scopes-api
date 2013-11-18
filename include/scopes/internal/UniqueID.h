@@ -46,10 +46,10 @@ namespace internal
 class UniqueID : private util::NonCopyable
 {
 public:
-    UniqueID();
-    explicit UniqueID(std::mt19937::result_type seed);
+    UniqueID();                                         // Gets seed from std::random_device
+    explicit UniqueID(std::mt19937::result_type seed);  // Uses specified seed
 
-    std::string gen();
+    std::string gen();                                  // Returns a unique id
 
 private:
     std::mt19937 engine;
