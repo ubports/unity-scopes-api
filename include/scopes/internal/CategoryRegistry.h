@@ -23,6 +23,7 @@
 #include <scopes/Variant.h>
 #include <string>
 #include <memory>
+#include <mutex>
 
 namespace unity
 {
@@ -46,12 +47,32 @@ class CategoryRegistry
 public:
     CategoryRegistry() = default;
 
+    /**
+    \brief Deserializes category from a variant_map and registers it. Throws if category with same id exists.
+    \return category instance
+    */
     Category::SCPtr register_category(VariantMap const& variant_map);
+
+    /**
+    \brief Creates category from supplied parameters. Throws if category with same id exists.
+    \return category instance
+    */
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template);
+
+    /**
+    \brief Finds category instance with give id.
+    \return category instance or nullptr if not such category has been registered
+    */
     Category::SCPtr find_category(std::string const& id) const;
+
+    /**
+    \brief Register an existing category instance with this registry.
+    Throws if category with sane id exists.
+    */
     void register_category(Category::SCPtr category);
 
 private:
+    mutable std::recursive_mutex mutex_;
     std::map<std::string, Category::SCPtr> categories_;
 };
 

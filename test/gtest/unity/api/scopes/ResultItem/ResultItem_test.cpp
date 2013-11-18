@@ -165,6 +165,7 @@ TEST(ResultItem, from_variant_map)
     vm["dnd_uri"] = "http://canonical.com";
     vm["title"] = "a title";
     vm["icon"] = "an icon";
+    vm["cat_id"] = "2";
     vm["foo"] = "bar"; // custom attribute
 
     CategoryRegistry reg;

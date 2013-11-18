@@ -17,7 +17,6 @@
  */
 
 #include <scopes/internal/ResultItemImpl.h>
-#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
 #include <sstream>
@@ -34,7 +33,7 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri"};
+const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri", "cat_id"};
 
 ResultItemImpl::ResultItemImpl(Category::SCPtr category)
     : category_(category)
@@ -137,7 +136,7 @@ std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
             {
                 std::ostringstream s;
                 s << "Can't overwrite internal attribute: " << kv.first;
-                throw MiddlewareException(s.str());
+                throw InvalidArgumentException(s.str());
             }
             (*var)[kv.first] = kv.second;
         }
@@ -149,23 +148,30 @@ void ResultItemImpl::from_variant_map(VariantMap const& var)
 {
     auto it = var.find("uri");
     if (it == var.end())
-        throw MiddlewareException("Missing 'uri'");
+        throw InvalidArgumentException("Missing 'uri'");
     uri_ = it->second.get_string();
 
     it = var.find("title");
     if (it == var.end())
-        throw MiddlewareException("Missing 'title'");
+        throw InvalidArgumentException("Missing 'title'");
     title_ = it->second.get_string();
 
     it = var.find("icon");
     if (it == var.end())
-        throw MiddlewareException("Missing 'icon'");
+        throw InvalidArgumentException("Missing 'icon'");
     icon_ = it->second.get_string();
 
     it = var.find("dnd_uri");
     if (it == var.end())
-        throw MiddlewareException("Missing 'dnd_uri'");
+        throw InvalidArgumentException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
+
+    // cat_id is not really used as it's provided by category instance pointer,
+    // but the check is here for consistency and to make sure a valid variant
+    // is passed.
+    it = var.find("cat_id");
+    if (it == var.end())
+        throw InvalidArgumentException("Missing 'cat_id'");
 
     if (var.size() > standard_attrs.size())
     {

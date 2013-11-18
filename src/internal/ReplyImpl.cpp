@@ -68,16 +68,15 @@ ReplyImpl::~ReplyImpl() noexcept
 void ReplyImpl::register_category(Category::SCPtr category)
 {
     cat_registry_->register_category(category); // will throw if that category id has already been registered
+    push(category);
 }
 
 Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
 {
     auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
-    auto var = std::make_shared<VariantMap>();
-    (*var)["category"] = *(cat->variant_map());
 
     // return category instance only if pushed successfuly (i.e. search wasn't finished)
-    if (push(var))
+    if (push(cat))
     {
         return cat;
     }
@@ -104,6 +103,13 @@ bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 
     auto var = std::make_shared<VariantMap>();
     (*var)["result"] = *(result.variant_map());
+    return push(var);
+}
+
+bool ReplyImpl::push(Category::SCPtr category)
+{
+    auto var = std::make_shared<VariantMap>();
+    (*var)["category"] = *(category->variant_map());
     return push(var);
 }
 

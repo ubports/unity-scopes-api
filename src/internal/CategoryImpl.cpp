@@ -18,7 +18,6 @@
 
 #include <scopes/internal/CategoryImpl.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/ScopeExceptions.h>
 
 namespace unity
 {
@@ -87,7 +86,7 @@ void CategoryImpl::from_variant_map(VariantMap const& variant_map)
     auto it = variant_map.find("id");
     if (it == variant_map.end())
     {
-        throw MiddlewareException("Missing 'id'");
+        throw InvalidArgumentException("Missing 'id'");
     }
     id_ = it->second.get_string();
 
