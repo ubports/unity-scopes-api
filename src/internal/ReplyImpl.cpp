@@ -102,14 +102,14 @@ bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
     }
 
     auto var = std::make_shared<VariantMap>();
-    (*var)["result"] = *(result.variant_map());
+    (*var)["result"] = *(result.serialize());
     return push(var);
 }
 
 bool ReplyImpl::push(Category::SCPtr category)
 {
     auto var = std::make_shared<VariantMap>();
-    (*var)["category"] = *(category->variant_map());
+    (*var)["category"] = *(category->serialize());
     return push(var);
 }
 

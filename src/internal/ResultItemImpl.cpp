@@ -47,7 +47,7 @@ ResultItemImpl::ResultItemImpl(Category::SCPtr category)
 ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& variant_map)
     : ResultItemImpl(category)
 {
-    from_variant_map(variant_map);
+    deserialize(variant_map);
 }
 
 void ResultItemImpl::set_uri(std::string const& uri)
@@ -114,7 +114,7 @@ void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& 
     }
 }
 
-std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
+std::shared_ptr<VariantMap> ResultItemImpl::serialize() const
 {
     throw_on_empty("uri", uri_);
     throw_on_empty("title", title_);
@@ -144,7 +144,7 @@ std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
     return var;
 }
 
-void ResultItemImpl::from_variant_map(VariantMap const& var)
+void ResultItemImpl::deserialize(VariantMap const& var)
 {
     auto it = var.find("uri");
     if (it == var.end())

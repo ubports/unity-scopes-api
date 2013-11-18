@@ -45,10 +45,10 @@ public:
     std::string const& title() const;
     std::string const& icon() const;
     std::string const& renderer_template() const;
-    std::shared_ptr<VariantMap> variant_map() const;
+    std::shared_ptr<VariantMap> serialize() const;
 
 private:
-    void from_variant_map(VariantMap const& variant_map);
+    void deserialize(VariantMap const& variant_map);
 
     std::string id_;
     std::string title_;

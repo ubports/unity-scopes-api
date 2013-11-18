@@ -35,7 +35,7 @@ namespace internal
 
 CategoryImpl::CategoryImpl(VariantMap const& variant_map)
 {
-    from_variant_map(variant_map);
+    deserialize(variant_map);
 }
 
 CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
@@ -71,7 +71,7 @@ std::string const& CategoryImpl::renderer_template() const
     return renderer_template_;
 }
 
-std::shared_ptr<VariantMap> CategoryImpl::variant_map() const
+std::shared_ptr<VariantMap> CategoryImpl::serialize() const
 {
     auto var = std::make_shared<VariantMap>();
     (*var)["id"] = id_;
@@ -81,7 +81,7 @@ std::shared_ptr<VariantMap> CategoryImpl::variant_map() const
     return var;
 }
 
-void CategoryImpl::from_variant_map(VariantMap const& variant_map)
+void CategoryImpl::deserialize(VariantMap const& variant_map)
 {
     auto it = variant_map.find("id");
     if (it == variant_map.end())

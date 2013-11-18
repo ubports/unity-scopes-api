@@ -57,10 +57,10 @@ public:
     std::string dnd_uri() const;
     Category::SCPtr category() const;
 
-    std::shared_ptr<VariantMap> variant_map() const;
+    std::shared_ptr<VariantMap> serialize() const;
 
 private:
-    void from_variant_map(VariantMap const& var);
+    void deserialize(VariantMap const& var);
     static void throw_on_empty(std::string const& name, std::string const& value);
     static const std::unordered_set<std::string> standard_attrs;
 

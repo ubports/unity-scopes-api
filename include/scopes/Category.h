@@ -57,7 +57,7 @@ public:
     std::string const& title() const;
     std::string const& icon() const;
     std::string const& renderer_template() const;
-    std::shared_ptr<VariantMap> variant_map() const;
+    std::shared_ptr<VariantMap> serialize() const;
 
 private:
     Category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
