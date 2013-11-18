@@ -72,7 +72,7 @@ public:
     void register_category(Category::SCPtr category);
 
 private:
-    mutable std::recursive_mutex mutex_;
+    mutable std::mutex mutex_;
     std::map<std::string, Category::SCPtr> categories_;
 };
 

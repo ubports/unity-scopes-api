@@ -46,7 +46,6 @@ void CategoryRegistry::register_category(Category::SCPtr category)
 
 Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_map)
 {
-    std::lock_guard<decltype(mutex_)> lock(mutex_);
     auto cat = std::shared_ptr<Category>(new Category(variant_map));
     register_category(cat);
     return cat;
@@ -54,7 +53,6 @@ Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_ma
 
 Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template)
 {
-    std::lock_guard<decltype(mutex_)> lock(mutex_);
     auto cat = std::shared_ptr<Category>(new Category(id, title, icon, renderer_template));
     register_category(cat);
     return cat;
