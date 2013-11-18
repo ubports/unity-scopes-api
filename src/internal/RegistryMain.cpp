@@ -47,7 +47,7 @@ main(int, char*[])
         MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
 
         // Instantiate the registry implementation.
-        RegistryObject::SPtr registry(new RegistryObject);
+        RegistryObject::SPtr registry(make_shared<RegistryObject>());
 
         // TODO: populate registry here
 

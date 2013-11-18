@@ -46,7 +46,7 @@ ObjectProxyImpl::~ObjectProxyImpl() noexcept
 
 Proxy ObjectProxyImpl::create(MWProxy const&)
 {
-    return Proxy(new ObjectProxy);
+    return make_shared<ObjectProxy>();
 }
 
 } // namespace internal

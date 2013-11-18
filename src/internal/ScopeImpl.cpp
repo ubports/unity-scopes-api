@@ -57,7 +57,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ReplyObject::SPtr ro(new ReplyObject(reply, runtime_));
+        ReplyObject::SPtr ro(make_shared<ReplyObject>(reply, runtime_));
         MWReplyProxy rp = mw_proxy_->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a

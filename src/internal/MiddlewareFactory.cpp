@@ -74,21 +74,15 @@ MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
 
     switch (to_kind(kind))
     {
-        /*
-        case Kind_Ice:
-        {
-            mw.reset(new ice_middleware::IceMiddleware(server_name, configfile, runtime_));
-            break;
-        }
-        */
         case Kind_Zmq:
         {
-            mw.reset(new zmq_middleware::ZmqMiddleware(server_name, configfile, runtime_));
+            mw = make_shared<zmq_middleware::ZmqMiddleware>(server_name, configfile, runtime_);
             break;
         }
         case Kind_REST:
         {
             // TODO
+            abort();
             break;
         }
         default:

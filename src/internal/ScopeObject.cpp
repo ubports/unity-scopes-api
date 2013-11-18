@@ -88,13 +88,13 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     try
     {
         // Instantiate the query ctrl and connect it to the middleware.
-        QueryCtrlObject::SPtr co(new QueryCtrlObject);
+        QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
         ctrl_proxy = mw_base->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
-        QueryObject::SPtr qo(new QueryObject(query_base, reply, ctrl_proxy));
+        QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
         MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
