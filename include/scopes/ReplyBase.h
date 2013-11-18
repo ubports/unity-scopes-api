@@ -59,7 +59,12 @@ public:
     */
     virtual void push(ResultItem const& result) = 0;
 
-    virtual void push(Category::SCPtr category) = 0;
+    /**
+    \brief Called once by the scopes run time for each category that is returned by a query().
+    Default implementation does nothing.
+    */
+
+    virtual void push(Category::SCPtr category);
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.
