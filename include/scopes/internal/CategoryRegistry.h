@@ -60,8 +60,8 @@ public:
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template);
 
     /**
-    \brief Finds category instance with give id.
-    \return category instance or nullptr if no such category has been registered
+    \brief Finds category instance with given id. Throws if category hasn't been registered.
+    \return category instance.
     */
     Category::SCPtr lookup_category(std::string const& id) const;
 
