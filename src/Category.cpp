@@ -60,7 +60,7 @@ std::string Category::title() const
     return p->title();
 }
 
-std::shared_ptr<VariantMap> Category::serialize() const
+VariantMap Category::serialize() const
 {
     return p->serialize();
 }

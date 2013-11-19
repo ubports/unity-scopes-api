@@ -71,13 +71,13 @@ std::string const& CategoryImpl::renderer_template() const
     return renderer_template_;
 }
 
-std::shared_ptr<VariantMap> CategoryImpl::serialize() const
+VariantMap CategoryImpl::serialize() const
 {
-    auto var = std::make_shared<VariantMap>();
-    (*var)["id"] = id_;
-    (*var)["title"] = title_;
-    (*var)["icon"] = icon_;
-    (*var)["renderer_template"] = renderer_template_;
+    VariantMap var;
+    var["id"] = id_;
+    var["title"] = title_;
+    var["icon"] = icon_;
+    var["renderer_template"] = renderer_template_;
     return var;
 }
 

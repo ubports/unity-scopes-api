@@ -67,7 +67,7 @@ public:
 
 private:
     bool push(Category::SCPtr category);
-    bool push(std::shared_ptr<VariantMap> variant_map);
+    bool push(VariantMap const& variant_map);
 
     MWReplyProxy mw_proxy_;
     std::shared_ptr<QueryObject> qo_;

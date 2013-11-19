@@ -57,7 +57,7 @@ public:
     std::string dnd_uri() const;
     Category::SCPtr category() const;
 
-    std::shared_ptr<VariantMap> serialize() const;
+    VariantMap serialize() const;
 
 private:
     void deserialize(VariantMap const& var);

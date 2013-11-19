@@ -45,7 +45,7 @@ public:
     std::string const& title() const;
     std::string const& icon() const;
     std::string const& renderer_template() const;
-    std::shared_ptr<VariantMap> serialize() const;
+    VariantMap serialize() const;
 
 private:
     void deserialize(VariantMap const& variant_map);

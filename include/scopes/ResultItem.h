@@ -88,7 +88,7 @@ public:
        \brief Returns a dictionary of all attributes of this ResultItem instance.
        \return dictionary of all base attributes and custom attributes set with add_metadata call.
     */
-    std::shared_ptr<VariantMap> serialize() const;
+    VariantMap serialize() const;
 
 private:
     std::shared_ptr<internal::ResultItemImpl> p;

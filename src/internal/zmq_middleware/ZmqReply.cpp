@@ -61,14 +61,14 @@ ZmqReply::~ZmqReply() noexcept
 {
 }
 
-void ZmqReply::push(std::shared_ptr<VariantMap> result)
+void ZmqReply::push(VariantMap const& result)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "push");
     auto in_params = request.initInParams().getAs<capnproto::Reply::PushRequest>();
 
     auto resultBuilder = in_params.getResult();
-    to_value_dict(*result, resultBuilder);
+    to_value_dict(result, resultBuilder);
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();

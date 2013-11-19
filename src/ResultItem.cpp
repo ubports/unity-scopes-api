@@ -108,7 +108,7 @@ Category::SCPtr ResultItem::category() const
     return p->category();
 }
 
-std::shared_ptr<VariantMap> ResultItem::serialize() const
+VariantMap ResultItem::serialize() const
 {
     return p->serialize();
 }
