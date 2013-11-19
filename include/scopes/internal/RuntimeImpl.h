@@ -51,6 +51,8 @@ public:
     RegistryProxy registry() const;
     std::string registry_configfile() const;
     std::string registry_identity() const;
+    std::string registry_endpointdir() const;
+    std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
 
     ~RuntimeImpl() noexcept;
@@ -65,6 +67,8 @@ private:
     mutable RegistryProxy registry_;
     mutable std::string registry_configfile_;
     mutable std::string registry_identity_;
+    mutable std::string registry_endpointdir_;
+    mutable std::string registry_endpoint_;
     mutable Reaper::SPtr reply_reaper_;
     mutable std::mutex mutex_;                          // For lazy initialization of reply_reaper_
 };

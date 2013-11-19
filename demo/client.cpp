@@ -42,8 +42,10 @@ public:
     virtual void finished() override
     {
         cout << "query complete" << endl;
-        unique_lock<decltype(mutex_)> lock(mutex_);
-        query_complete_ = true;
+        {
+            unique_lock<decltype(mutex_)> lock(mutex_);
+            query_complete_ = true;
+        }
         condvar_.notify_one();
     }
 
@@ -86,7 +88,7 @@ int main(int argc, char* argv[])
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
-        s->create_query(search_string, vm, reply);     // Returns immediately
+        auto ctrl = s->create_query(search_string, vm, reply);     // Returns (almost) immediately
         cerr << "client: created query" << endl;
         reply->wait_until_finished();
         cerr << "client: wait returned" << endl;

@@ -24,6 +24,7 @@
 #include <scopes/internal/MWReplyProxyFwd.h>
 #include <scopes/internal/ThreadPool.h>
 #include <scopes/internal/UniqueID.h>
+#include <scopes/internal/zmq_middleware/ZmqConfig.h>
 #include <scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
@@ -61,6 +62,7 @@ public:
     virtual void wait_for_shutdown() override;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
+    virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) override;
@@ -73,7 +75,7 @@ public:
     ThreadPool* invoke_pool() const noexcept;
 
 private:
-    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name);
+    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,
                       std::shared_ptr<ObjectAdapter> const& adapter,
@@ -93,6 +95,8 @@ private:
     enum State { Stopped, Starting, Started };
     State state_;
     std::condition_variable state_changed_;
+
+    ZmqConfig config_;
 };
 
 } // namespace zmq_middleware

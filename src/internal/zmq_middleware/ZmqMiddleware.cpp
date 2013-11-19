@@ -18,6 +18,7 @@
 
 #include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
+#include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/QueryI.h>
@@ -64,11 +65,10 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile
 try :
     MiddlewareBase(runtime),
     server_name_(server_name),
-    state_(Stopped)
+    state_(Stopped),
+    config_(configfile)
 {
     assert(!server_name.empty());
-
-    // TODO: read config from file (thread pool size, invocation timeout, etc.
 }
 catch (zmqpp::exception const& e)
 {
@@ -178,6 +178,21 @@ MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, str
     return proxy;
 }
 
+MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
+{
+    MWScopeProxy proxy;
+    try
+    {
+        string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
+        proxy.reset(new ZmqScope(this, endpoint, identity));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
 MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string const& endpoint)
 {
     MWScopeProxy proxy;
@@ -200,7 +215,7 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr cons
     try
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
-        auto adapter = find_adapter(server_name_ + ctrl_suffix);
+        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir());
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
@@ -221,7 +236,7 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObject::SPtr const& query)
     try
     {
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
-        auto adapter = find_adapter(server_name_ + query_suffix);
+        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
@@ -244,7 +259,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     try
     {
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
-        auto adapter = find_adapter(server_name_);
+        auto adapter = find_adapter(server_name_, runtime()->registry_endpointdir());
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
@@ -265,7 +280,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
     try
     {
         shared_ptr<ReplyI> ri(make_shared<ReplyI>(reply));
-        auto adapter = find_adapter(server_name_ + reply_suffix);
+        auto adapter = find_adapter(server_name_ + reply_suffix, config_.public_dir());
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
@@ -287,7 +302,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_);
+        auto adapter = find_adapter(server_name_, config_.private_dir());
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
@@ -326,7 +341,7 @@ bool has_suffix(string const& s, string const& suffix)
 
 } // namespace
 
-shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
+shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir)
 {
     lock_guard<mutex> lock(mutex_);
 
@@ -341,7 +356,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
     RequestType type;
     if (has_suffix(name, query_suffix))
     {
-        // The query adapter is single or multi-thread and supports oneway operations only.
+        // The query adapter is single or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
         type = RequestType::Oneway;
@@ -366,9 +381,17 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name)
         pool_size = 1;
         type = RequestType::Twoway;
     }
-    // TODO: get directory of adapter from config
+
     // The query adapter is always inproc.
-    string endpoint = (has_suffix(name, query_suffix) ? "inproc://" : "ipc://") + name;
+    string endpoint;
+    if (has_suffix(name, query_suffix))
+    {
+        endpoint = "inproc://" + name;
+    }
+    else
+    {
+        endpoint = "ipc://" + endpoint_dir + "/" + name;
+    }
 
     shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, type, pool_size));
     a->activate();

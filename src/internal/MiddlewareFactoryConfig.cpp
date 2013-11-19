@@ -43,14 +43,14 @@ MiddlewareFactoryConfig::~MiddlewareFactoryConfig() noexcept
 {
 }
 
-string MiddlewareFactoryConfig::ice_configfile() const
+string MiddlewareFactoryConfig::zmq_configfile() const
 {
-    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "Ice.Configfile");
+    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "Zmq.ConfigFile");
 }
 
 string MiddlewareFactoryConfig::rest_configfile() const
 {
-    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "REST.Configfile");
+    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "REST.ConfigFile");
 }
 } // namespace internal
 

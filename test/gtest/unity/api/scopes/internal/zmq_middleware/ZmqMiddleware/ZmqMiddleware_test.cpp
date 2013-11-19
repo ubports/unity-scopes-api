@@ -29,7 +29,7 @@ using namespace unity::api::scopes::internal::zmq_middleware;
 TEST(ZmqMiddleware, basic)
 {
     ZmqMiddleware im("testscope",
-                     TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/Zmq.config",
+                     TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
     im.start();
     sleep(1);

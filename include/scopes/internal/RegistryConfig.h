@@ -43,14 +43,26 @@ public:
 
     std::string identity() const;
     std::string mw_kind() const;
+    std::string endpointdir() const;
     std::string endpoint() const;
     std::string mw_configfile() const;
+    std::string scope_installdir() const;       // Directory for Canonical scopes
+    std::string scope_group_configdir() const;  // Directory for Canonical scope group config files (colloecated scopes)
+    std::string oem_installdir() const;         // Directory for OEM scope config files
+    std::string oem_group_configdir() const;    // Directory for OEM scope group config files (collocated scopes)
+    std::string scoperunner_path() const;       // Path to scoperunner binary
 
 private:
     std::string identity_;
     std::string mw_kind_;
+    std::string endpointdir_;
     std::string endpoint_;
     std::string mw_configfile_;
+    std::string scope_installdir_;
+    std::string scope_group_configdir_;
+    std::string oem_installdir_;
+    std::string oem_group_configdir_;
+    std::string scoperunner_path_;
 };
 
 } // namespace internal

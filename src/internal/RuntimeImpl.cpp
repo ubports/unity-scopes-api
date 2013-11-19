@@ -68,9 +68,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         // Create the registry proxy.
         RegistryConfig reg_config(registry_identity_, registry_configfile_);
         string reg_mw_configfile = reg_config.mw_configfile();
-        string reg_endpoint = reg_config.endpoint();
+        registry_endpoint_ = reg_config.endpoint();
+        registry_endpointdir_ = reg_config.endpointdir();
 
-        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, reg_endpoint);
+        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
         registry_ = RegistryImpl::create(registry_mw_proxy, this);
     }
     catch (unity::Exception const& e)
@@ -104,6 +105,9 @@ void RuntimeImpl::destroy()
 {
     if (!destroyed_.exchange(true))
     {
+        // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
+        // to terminate. Otherwise, it's possible that we exit while threads are still running
+        // with undefined behavior.
         registry_ = nullptr;
         middleware_->stop();
         middleware_ = nullptr;
@@ -143,6 +147,16 @@ string RuntimeImpl::registry_configfile() const
 string RuntimeImpl::registry_identity() const
 {
     return registry_identity_;
+}
+
+string RuntimeImpl::registry_endpointdir() const
+{
+    return registry_endpointdir_;
+}
+
+string RuntimeImpl::registry_endpoint() const
+{
+    return registry_endpoint_;
 }
 
 Reaper::SPtr RuntimeImpl::reply_reaper() const

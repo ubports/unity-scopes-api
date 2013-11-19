@@ -72,7 +72,7 @@ TEST(RuntimeConfig, RegistryFileEmpty)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"RegFileEmpty.ini\": Illegal empty value for Registry.Configfile",
+        EXPECT_EQ("unity::api::scopes::ConfigException: \"RegFileEmpty.ini\": Illegal empty value for Registry.ConfigFile",
                   e.to_string());
     }
 }
@@ -115,7 +115,7 @@ TEST(RuntimeConfig, FactoryFileEmpty)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"FacFileEmpty.ini\": Illegal empty value for Factory.Configfile",
+        EXPECT_EQ("unity::api::scopes::ConfigException: \"FacFileEmpty.ini\": Illegal empty value for Factory.ConfigFile",
                   e.to_string());
     }
 }

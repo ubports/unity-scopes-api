@@ -1,3 +1,5 @@
+configure_file(Zmq.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini)
+
 add_executable(ServantBase_test ServantBase_test.cpp)
 target_link_libraries(ServantBase_test ${LIBS} ${TESTLIBS})
 

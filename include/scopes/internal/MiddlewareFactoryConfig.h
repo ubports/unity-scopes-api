@@ -41,11 +41,11 @@ public:
     MiddlewareFactoryConfig(std::string const& configfile);
     ~MiddlewareFactoryConfig() noexcept;
 
-    std::string ice_configfile() const;
+    std::string zmq_configfile() const;
     std::string rest_configfile() const;
 
 private:
-    std::string ice_configfile_;
+    std::string zmq_configfile_;
     std::string rest_configfile_;
 };
 

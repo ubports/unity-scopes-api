@@ -26,6 +26,6 @@ using namespace unity::api::scopes::internal;
 TEST(MiddlewareFactoryConfig, basic)
 {
     MiddlewareFactoryConfig c("Factory.ini");
-    EXPECT_EQ("Ice.Config", c.ice_configfile());
-    EXPECT_EQ("REST.Config", c.rest_configfile());
+    EXPECT_EQ("Zmq.ini", c.zmq_configfile());
+    EXPECT_EQ("REST.ini", c.rest_configfile());
 }

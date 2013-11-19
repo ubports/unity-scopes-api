@@ -14,6 +14,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ServantBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantConverter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqMiddleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqObject.cpp
