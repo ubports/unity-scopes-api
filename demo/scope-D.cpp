@@ -16,9 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/RegistryProxyFwd.h>
-#include <unity/api/scopes/Reply.h>
-#include <unity/api/scopes/ScopeBase.h>
+#include <scopes/RegistryProxyFwd.h>
+#include <scopes/Reply.h>
+#include <scopes/Category.h>
+#include <scopes/ResultItem.h>
+#include <scopes/ScopeBase.h>
 
 #include <algorithm>
 #include <atomic>
@@ -200,7 +202,13 @@ public:
             {
                 for (int i = 1; i < 5; ++i)
                 {
-                    if (!reply_proxy->push(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\""))
+                    auto cat = std::make_shared<Category>("cat1");
+                    ResultItem result(cat);
+                    result.set_uri("uri");
+                    result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
+                    result.set_icon("icon");
+                    result.set_dnd_uri("dnd_uri");
+                    if (!reply_proxy->push(result))
                     {
                         break; // Query was cancelled
                     }

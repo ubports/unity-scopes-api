@@ -26,17 +26,14 @@ Build dependencies
 
 See debian/control for the list of packages required to build and test the code.
 
-Some dependencies need to be installed manually as they are not yet available in Ubuntu:
-- Cap'n Proto:
-  $ git clone https://github.com/kentonv/capnproto.git
-  $ cd capnproto/c++
-  $ ./configure && make && sudo make install
+Most notably:
+  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev libcapnp-dev
 
-- Zmq (zeromq, latest version of 3.x from http://zeromq.org), or alternatively libzmq3-dev from the repository.
+Some dependencies need to be installed manually as they are not yet available in Ubuntu:
 
 - Zmqpp:
   $ git clone https://github.com/benjamg/zmqpp.git
-  $ cd zmqpp && make && sudo make install
+  $ cd zmqpp && make && sudo mkdir -p /usr/local/include/zmqpp && sudo make install
 
 
 Building the code
@@ -47,6 +44,7 @@ The simplest case is:
     $ mkdir build
     $ cd build
     $ cmake ..
+    $ make
 
 By default, the code is built in release mode. To build a debug version, use
 
@@ -55,88 +53,12 @@ By default, the code is built in release mode. To build a debug version, use
     $ cmake -DCMAKE_BUILD_TYPE=debug ..
     $ make
 
-For a release version, use -DCMAKE_BUILD_TYPE=release
-
-To build with the flags for coverage testing enabled:
-
-    $ mkdir buildcoverage
-    $ cd buildcoverage
-    $ cmake -DCMAKE_BUILD_TYPE=coverage
-    $ make
-
-If you do not have libunity-api installed, build it from source and install it somewhere, then set
-PKG_CONFIG_PATH to include the lib/<arch>/pkgconfig directory.
-
 
 Running the tests
 -----------------
 
     $ make
     $ make test
-
-Note that "make test" alone is dangerous because it does not rebuild
-any tests if either the library or the test files themselves need
-rebuilding. It's not possible to fix this with cmake because cmake cannot
-add build dependencies to built-in targets. To make sure that everything
-is up-to-date, run "make" before running "make test"!
-
-To run the tests with valgrind:
-
-    $ make valgrind
-
-To get coverage output:
-
-    $ make test
-    $ make coverage
-
-This drops the coverage tests into the coveragereport directory. (The coverage target is available
-only if the code was built with -DCMAKE_BUILD_TYPE=coverage.)
-
-Unfortunately, it is not possibly to get 100% coverage for some files,
-mainly due to gcc's generation of two destructors for dynamic and non-
-dynamic instances. For abstract base classes and for classes that
-prevent stack and static allocation, this causes one of the destructors
-to be reported as uncovered.
-
-There are also issues with some functions in header files that are
-incorrectly reported as uncovered due to inlining, as well as
-issues with templates that are reported as partially covered even though
-the tests cover them completely.
-
-To deal with unreachable code (such as defensive assert(false) statements
-assert in the default branch of a switch, where the switch handles all
-possible cases explicitly), you can add a comment
-
-    // LCOV_EXCL_LINE
-
-to the relevant line or bracket a block of code with
-
-    // LCOV_EXCL_START
-    ...
-    // LCOV_EXCL_STOP
-
-Be judicious about coverage exclusions and add them only if there truly
-is no feasible way to cover the code with a test!
-
-If you run a binary and get lots of warnings about a "merge mismatch for summaries",
-this is caused by having made changes to the source that add or remove code
-that was previously run, so the new coverage output cannot sensibly be merged
-into the old coverage output. You can get rid of this problem by running
-
-    $ make clean-coverage
-
-This deletes all the .gcda files, allowing the merge to (sometimes) succeed again.
-If this still doesn't work, the easiest work-around is to blow away the entire contents
-of the build directory and start over from scratch :-(
-
-If lcov complains about unrecognized lines involving '=====',
-you can patch geninfo and gcovr as explained here:
-
-https://bugs.launchpad.net/gcovr/+bug/1086695/comments/2
-
-To run the static C++ checks:
-
-    $ make cppcheck
 
 
 Documentation

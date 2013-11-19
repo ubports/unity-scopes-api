@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/Variant.h>
+#include <scopes/Variant.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -57,6 +57,19 @@ TEST(Variant, basic)
         Variant v("hello");
         EXPECT_EQ(Variant::Type::String, v.which());
         EXPECT_EQ("hello", v.get_string());
+    }
+
+    {
+        VariantMap m;
+        VariantMap inner;
+        inner["iron"] = Variant("maiden");
+        m["foo"] = Variant("bar");
+        m["hints"] = inner;
+        Variant v(m);
+        EXPECT_EQ(Variant::Type::Dict, v.which());
+        EXPECT_EQ("bar", v.get_dict()["foo"].get_string());
+        EXPECT_EQ(Variant::Type::Dict, v.get_dict()["hints"].which());
+        EXPECT_EQ("maiden", v.get_dict()["hints"].get_dict()["iron"].get_string());
     }
 
     {

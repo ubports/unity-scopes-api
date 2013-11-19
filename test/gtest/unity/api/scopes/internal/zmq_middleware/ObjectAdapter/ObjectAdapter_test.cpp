@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 
-#include <unity/api/scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <unity/api/scopes/internal/zmq_middleware/ServantBase.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqException.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqMiddleware.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqReceiver.h>
-#include <unity/api/scopes/internal/zmq_middleware/ZmqSender.h>
-#include <unity/api/scopes/ScopeExceptions.h>
+#include <internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <scopes/internal/zmq_middleware/ZmqException.h>
+#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <scopes/internal/zmq_middleware/ZmqSender.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.

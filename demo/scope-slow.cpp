@@ -16,8 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/api/scopes/Reply.h>
+#include <scopes/ScopeBase.h>
+#include <scopes/Reply.h>
+#include <scopes/ResultItem.h>
+#include <scopes/Category.h>
 
 #include <iostream>
 #include <thread>
@@ -52,7 +54,10 @@ public:
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
-        reply->push("scope-slow: result 1 for query \"" + query_ + "\"");
+        auto cat = std::make_shared<Category>("1");
+        ResultItem result(cat);
+        result.set_title("scope-slow: result 1 for query \"" + query_ + "\"");
+        reply->push(result);
         cout << "scope-slow: query \"" << query_ << "\" complete" << endl;
     }
 

@@ -16,8 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/api/scopes/ScopeBase.h>
-#include <unity/api/scopes/Reply.h>
+#include <scopes/ScopeBase.h>
+#include <scopes/ResultItem.h>
+#include <scopes/Category.h>
+#include <scopes/Reply.h>
 
 #include <algorithm>
 #include <condition_variable>
@@ -185,7 +187,13 @@ public:
             for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
-                if (!reply->push("scope-C: result " + to_string(i) + " for query \"" + query + "\""))
+                auto cat = std::make_shared<Category>("cat1");
+                ResultItem result(cat);
+                result.set_uri("uri");
+                result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
+                result.set_icon("icon");
+                result.set_dnd_uri("dnd_uri");
+                if (!reply->push(result))
                 {
                     cerr << "worker thread: push returned false" << endl;
                     break; // Query was cancelled
