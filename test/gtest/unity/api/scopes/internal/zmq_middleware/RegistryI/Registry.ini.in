@@ -3,8 +3,8 @@ Registry.Identity = Registry
 
 [Registry]
 Middleware = Zmq
-Zmq.Endpoint = ipc://@CMAKE_CURRENT_BINARY_DIR@/Registry
-Zmq.EndpointDir = @CMAKE_CURRENT_BINARY_DIR@
+Zmq.Endpoint = ipc:///tmp/Registry
+Zmq.EndpointDir = /tmp
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /tmp
 Scoperunner.Path = /tmp

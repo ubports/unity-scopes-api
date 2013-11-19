@@ -1,2 +1,2 @@
 [Zmq]
-EndpointDir.Public = @CMAKE_CURRENT_BINARY_DIR@
+EndpointDir.Public = /tmp
