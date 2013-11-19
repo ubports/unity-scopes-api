@@ -57,6 +57,12 @@ if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
 endif()
 
+find_program(CAPNPC_BIN capnpc)
+if(NOT CAPNPC_BIN)
+  message(FATAL_ERROR "Capnp compiler not found.")
+endif()
+set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
+
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
@@ -186,7 +192,7 @@ endforeach()
 # all files if any one of them changes
 add_custom_command(OUTPUT ${CAPNPROTO_SRC} ${CAPNPROTO_HDRS}
                    DEPENDS ${CAPNPROTO_FILES}
-                   COMMAND capnpc -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
+                   COMMAND ${CAPNPC_BIN} ${CAPNPC_FLAGS} -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
 
 # Set up coverage testing
 include(EnableCoverageReport)
