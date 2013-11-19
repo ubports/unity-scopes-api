@@ -1,5 +1,9 @@
-unity-scopes (0.1) raring; urgency=low
+unity-scopes (0.1-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Michi Henning ]
   * Initial release
+
+  [ Łukasz 'sil2100' Zemczak ]
+  * Automatic snapshot from revision 52 (bootstrap)
 
  -- Michi Henning <michi.henning@canonical.com>  Monday, 27 May 2013 12:52:22 +1000
