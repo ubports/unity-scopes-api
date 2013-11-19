@@ -73,6 +73,11 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
             to_value_array(v.get_array(), vb);
             break;
         }
+        case Variant::Null:
+        {
+            b.initNullVal();
+            break;
+        }
         default:
         {
             assert(false);  // LCOV_EXCL_LINE
@@ -107,6 +112,10 @@ Variant to_variant(capnproto::Value::Reader const& r)
         case capnproto::Value::ARRAY_VAL:
         {
             return Variant(to_variant_array(r.getArrayVal()));
+        }
+        case capnproto::Value::NULL_VAL:
+        {
+            return Variant::null();
         }
         default:
         {

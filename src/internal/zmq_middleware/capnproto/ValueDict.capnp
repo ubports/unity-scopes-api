@@ -22,7 +22,12 @@ using Cxx = import "/capnp/c++.capnp";
 
 $Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto");
 
-# ValueDict definition. A dictionary of name/Value pairs, where each Value can hold an int, bool, string or dict.
+struct NullVal
+{
+}
+
+# ValueDict definition. A dictionary of name/Value pairs, where each 
+# Value can hold an int, bool, string, double, dict, array or null.
 
 struct Value
 {
@@ -34,6 +39,7 @@ struct Value
         stringVal @3 : Text;
         dictVal   @4 : ValueDict;
         arrayVal  @5 : List(Value);
+        nullVal   @6 : NullVal;
     }
 }
 
