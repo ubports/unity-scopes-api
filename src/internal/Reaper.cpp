@@ -38,6 +38,8 @@ namespace scopes
 namespace internal
 {
 
+mutex ReapItem::mutex_;
+
 ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::iterator it) :
     reaper_(reaper),
     it_(it),
@@ -61,7 +63,12 @@ void ReapItem::refresh() noexcept
 
     // If the reaper is still around, remove the entry from the list
     // and put it back on the front, updating the time stamp.
-    auto const reaper = reaper_.lock();
+    weak_ptr<Reaper> wp_reaper;
+    {
+        lock_guard<mutex> lock(mutex_);
+        wp_reaper = reaper_;
+    }
+    auto const reaper = wp_reaper.lock();
     if (reaper)
     {
         lock_guard<mutex> lock(reaper->mutex_);
@@ -86,7 +93,12 @@ void ReapItem::destroy() noexcept
         return;
     }
 
-    auto const reaper = reaper_.lock();
+    weak_ptr<Reaper> wp_reaper;
+    {
+        lock_guard<mutex> lock(mutex_);
+        wp_reaper = reaper_;
+    }
+    auto const reaper = wp_reaper.lock();
     if (reaper)
     {
         lock_guard<mutex> lock(reaper->mutex_);
@@ -126,8 +138,8 @@ Reaper::~Reaper() noexcept
     {
         lock_guard<mutex> lock(mutex_);
         finish_ = true;
-        do_work_.notify_one();
     }
+    do_work_.notify_one();
     reap_thread_.join();
 }
 
@@ -139,14 +151,13 @@ Reaper::~Reaper() noexcept
 Reaper::SPtr Reaper::create(int reap_interval, int expiry_interval, DestroyPolicy p)
 {
     SPtr reaper(new Reaper(reap_interval, expiry_interval, p));
-    reaper->set_self(reaper);
+    reaper->set_self();
     return reaper;
 }
 
-void Reaper::set_self(std::weak_ptr<Reaper> const& self) noexcept
+void Reaper::set_self() noexcept
 {
-    assert(!self_.lock());
-    self_ = self;
+    self_ = shared_from_this();
 }
 
 // Add a new entry to the reaper. If the entry is not refreshed within the expiry interval,
@@ -161,15 +172,17 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
 
     // Put new Item at the head of the list.
     reaper_private::Reaplist::iterator ri;
+    size_t list_size;
     {
         lock_guard<mutex> lock(mutex_);
         Item item(cb);
         list_.push_front(item); // LRU order
         ri = list_.begin();
-        if (list_.size() == 1) // List just became non-empty
-        {
-            do_work_.notify_one();  // Wake up reaper thread
-        }
+        list_size = list_.size();
+    }
+    if (list_size == 1) // List just became non-empty
+    {
+        do_work_.notify_one();  // Wake up reaper thread
     }
 
     // Make a new ReapItem.
