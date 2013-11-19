@@ -31,6 +31,7 @@ TEST(CategoryRegistry, basic)
 {
     CategoryRegistry reg;
     {
+        EXPECT_EQ(nullptr, reg.lookup_category("a"));
         auto cat = reg.register_category("a", "title", "icon", "{}");
         EXPECT_TRUE(cat != nullptr);
 
@@ -59,7 +60,6 @@ TEST(CategoryRegistry, exceptions)
 {
     CategoryRegistry reg;
 
-    EXPECT_THROW(reg.lookup_category("a"), InvalidArgumentException);
     auto cat = reg.register_category("a", "title", "icon", "{}");
     EXPECT_THROW(reg.register_category("a", "title1", "icon1", "{}"), InvalidArgumentException);
     EXPECT_THROW(reg.register_category(cat), InvalidArgumentException);

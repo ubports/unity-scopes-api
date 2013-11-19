@@ -62,13 +62,11 @@ Category::SCPtr CategoryRegistry::lookup_category(std::string const& id) const
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
     auto it = categories_.find(id);
-    if (it == categories_.end())
+    if (it != categories_.end())
     {
-        std::ostringstream s;
-        s << "Unknown category " << id;
-        throw InvalidArgumentException(s.str());
+        return it->second;
     }
-    return it->second;
+    return nullptr;
 }
 
 } // namespace internal
