@@ -50,7 +50,7 @@ public:
     Reply(Reply const&) = default;
 
     /**
-    \brief Create and register a new Category. The category is automatically send to the source of the query.
+    \brief Create and register a new Category. The category is automatically sent to the source of the query.
     \return Category instance
     */
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);

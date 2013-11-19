@@ -40,22 +40,22 @@ Category::Category(VariantMap const& variant_map)
 {
 }
 
-std::string const& Category::id() const
+std::string Category::id() const
 {
     return p->id();
 }
 
-std::string const& Category::icon() const
+std::string Category::icon() const
 {
     return p->icon();
 }
 
-std::string const& Category::renderer_template() const
+std::string Category::renderer_template() const
 {
     return p->renderer_template();
 }
 
-std::string const& Category::title() const
+std::string Category::title() const
 {
     return p->title();
 }

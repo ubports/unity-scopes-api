@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORYREGISTRY_H
-#define UNITY_API_SCOPES_CATEGORYREGISTRY_H
+#ifndef UNITY_API_SCOPES_INTERNAL_CATEGORYREGISTRY_H
+#define UNITY_API_SCOPES_INTERNAL_CATEGORYREGISTRY_H
 
 #include <scopes/Category.h>
 #include <scopes/Variant.h>
@@ -38,7 +38,7 @@ namespace internal
 {
 
 /**
-\brief Provides factory method for creating Category instances and keeps track of them.
+\brief Provides factory method for creating Category instances and keeping track of them.
 This class is for internal use, most of its functionality is exposed via register_category and find_category method
 of Reply class.
 */

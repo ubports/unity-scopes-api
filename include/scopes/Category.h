@@ -53,10 +53,10 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-    std::string const& id() const;
-    std::string const& title() const;
-    std::string const& icon() const;
-    std::string const& renderer_template() const;
+    std::string id() const;
+    std::string title() const;
+    std::string icon() const;
+    std::string renderer_template() const;
     std::shared_ptr<VariantMap> serialize() const;
 
 private:
