@@ -36,9 +36,22 @@ namespace scopes
 namespace internal
 {
 
+struct NullVariant
+{
+    bool operator<(NullVariant const&) const
+    {
+        return false;
+    }
+
+    bool operator==(NullVariant const&) const
+    {
+        return true;
+    }
+};
+
 struct VariantImpl
 {
-    boost::variant<int, bool, string, double, VariantMap, VariantArray> v;
+    boost::variant<int, bool, string, double, VariantMap, VariantArray, NullVariant> v;
 };
 
 } // namespace internal
@@ -78,6 +91,11 @@ Variant::Variant(VariantArray const& val)
 {
 }
 
+Variant::Variant(internal::NullVariant const& val)
+    : p(new internal::VariantImpl { val })
+{
+}
+
 Variant::Variant(char const* val)
     : p(new internal::VariantImpl { string(val) })
 {
@@ -85,6 +103,12 @@ Variant::Variant(char const* val)
 
 Variant::~Variant() noexcept
 {
+}
+
+Variant const& Variant::null()
+{
+    static const Variant var = internal::NullVariant();
+    return var;
 }
 
 Variant::Variant(Variant const& other)
@@ -224,6 +248,11 @@ VariantArray Variant::get_array() const
     {
         throw LogicException("Variant does not contain an array");
     }
+}
+
+bool Variant::is_null() const
+{
+    return p->v.which() == Type::Null;
 }
 
 Variant::Type Variant::which() const noexcept

@@ -44,6 +44,7 @@ namespace internal
 {
 
 class VariantImpl;
+struct NullVariant;
 
 } // namespace internal
 
@@ -57,7 +58,7 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Int, Bool, String, Double, Dict, Array };
+    enum Type { Int, Bool, String, Double, Dict, Array, Null };
 
     /**@name Constructors and destructor
     */
@@ -94,6 +95,11 @@ public:
     explicit Variant(VariantMap const& val);
 
     explicit Variant(VariantArray const& val);
+
+    /**
+    \brief Construct a null variant.
+    */
+    static Variant const& null();
 
     /**
     \brief Destructor.
@@ -148,6 +154,12 @@ public:
     std::string get_string() const;
     VariantMap get_dict() const;
     VariantArray get_array() const;
+
+    /**
+    \brief Test if variant holds null value.
+    \return true if variant holds null.
+    */
+    bool is_null() const;
     //@}
 
     /**@name Observers
@@ -165,7 +177,10 @@ public:
     friend void swap(Variant&, Variant&) noexcept;
 
 private:
+    Variant(internal::NullVariant const&);
+
     std::unique_ptr<internal::VariantImpl> p;
+    friend class VariantImpl;
 };
 
 } // namespace scopes
