@@ -21,6 +21,7 @@
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
+#include <scopes/Category.h>
 
 #include <string>
 
@@ -57,6 +58,13 @@ public:
     \brief Called once by the scopes run time for each result that is returned by a query().
     */
     virtual void push(ResultItem const& result) = 0;
+
+    /**
+    \brief Called once by the scopes run time for each category that is returned by a query().
+    Default implementation does nothing.
+    */
+
+    virtual void push(Category::SCPtr category);
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.

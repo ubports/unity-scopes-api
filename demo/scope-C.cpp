@@ -184,10 +184,14 @@ public:
                 cerr << "worker thread terminating, queue was cleared" << endl;
                 break;  // stop() was called.
             }
+            auto cat = reply->lookup_category("cat1");
+            if (cat == nullptr)
+            {
+                cat = reply->register_category("cat1", "Category 1", "", "{}");
+            }
             for (int i = 1; i < 4; ++i)
             {
                 cerr << "worker thread: pushing" << endl;
-                auto cat = std::make_shared<Category>("cat1");
                 ResultItem result(cat);
                 result.set_uri("uri");
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");

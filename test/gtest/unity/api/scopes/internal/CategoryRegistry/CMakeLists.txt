@@ -1,0 +1,4 @@
+add_executable(CategoryRegistry_test CategoryRegistry_test.cpp)
+target_link_libraries(CategoryRegistry_test ${TESTLIBS})
+
+add_test(CategoryRegistry CategoryRegistry_test)

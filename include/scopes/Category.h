@@ -21,6 +21,7 @@
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
+#include <scopes/Variant.h>
 #include <string>
 #include <memory>
 
@@ -36,11 +37,13 @@ namespace scopes
 namespace internal
 {
     class CategoryImpl;
+    class CategoryRegistry;
 }
 
 /**
    \brief Category represents a set of related results returned by scope
    and displayed within a single pane in the Unity dash.
+   To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
 class UNITY_API Category : private util::NonCopyable
@@ -50,11 +53,19 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-    Category(std::string const& id); //TODO: pass renderer
-    std::string const& id() const;
+    std::string id() const;
+    std::string title() const;
+    std::string icon() const;
+    std::string renderer_template() const;
+    VariantMap serialize() const;
 
 private:
+    Category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category(VariantMap const& variant_map);
+
     std::shared_ptr<internal::CategoryImpl> p;
+
+    friend class internal::CategoryRegistry;
 };
 
 } // namespace scopes

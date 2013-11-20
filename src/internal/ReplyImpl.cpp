@@ -23,8 +23,10 @@
 #include <scopes/internal/ReplyImpl.h>
 #include <scopes/ResultItem.h>
 #include <scopes/ScopeExceptions.h>
+#include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
 
+#include <sstream>
 #include <cassert>
 
 using namespace std;
@@ -44,6 +46,7 @@ namespace internal
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo) :
     mw_proxy_(mw_proxy),
     qo_(qo),
+    cat_registry_(new CategoryRegistry()),
     finished_(false)
 {
     assert(mw_proxy);
@@ -62,13 +65,61 @@ ReplyImpl::~ReplyImpl() noexcept
     }
 }
 
+void ReplyImpl::register_category(Category::SCPtr category)
+{
+    cat_registry_->register_category(category); // will throw if that category id has already been registered
+    push(category);
+}
+
+Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+{
+    auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
+
+    // return category instance only if pushed successfuly (i.e. search wasn't finished)
+    if (push(cat))
+    {
+        return cat;
+    }
+
+    return nullptr;
+}
+
+Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
+{
+    return cat_registry_->lookup_category(id);
+}
+
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
+{
+    // if this is an aggregator scope, it may be pushing result items obtained
+    // from ReplyObject without registering category first.
+    auto cat = cat_registry_->lookup_category(result.category()->id());
+    if (cat == nullptr)
+    {
+        std::ostringstream s;
+        s << "Unknown category " << result.category()->id();
+        throw InvalidArgumentException(s.str());
+    }
+
+    VariantMap var;
+    var["result"] = result.serialize();
+    return push(var);
+}
+
+bool ReplyImpl::push(Category::SCPtr category)
+{
+    VariantMap var;
+    var["category"] = category->serialize();
+    return push(var);
+}
+
+bool ReplyImpl::push(VariantMap const& variant_map)
 {
     if (!finished_.load())
     {
         try
         {
-            mw_proxy_->push(result.variant_map());
+            mw_proxy_->push(variant_map);
             return true;
         }
         catch (MiddlewareException const& e)

@@ -29,9 +29,11 @@ struct Value
     union
     {
         intVal    @0 : Int32;
-        boolVal   @1 : Bool;
-        stringVal @2 : Text;
-        dictVal   @3 : ValueDict;
+        doubleVal @1 : Float64;
+        boolVal   @2 : Bool;
+        stringVal @3 : Text;
+        dictVal   @4 : ValueDict;
+        arrayVal  @5 : List(Value);
     }
 }
 

@@ -42,6 +42,12 @@ TEST(Variant, basic)
     }
 
     {
+        Variant v(10.5f);
+        EXPECT_EQ(Variant::Type::Double, v.which());
+        EXPECT_TRUE(v.get_double() - 10.5f < 0.00001f);
+    }
+
+    {
         Variant v(true);
         EXPECT_EQ(Variant::Type::Bool, v.which());
         EXPECT_EQ(true, v.get_bool());
@@ -70,6 +76,15 @@ TEST(Variant, basic)
         EXPECT_EQ("bar", v.get_dict()["foo"].get_string());
         EXPECT_EQ(Variant::Type::Dict, v.get_dict()["hints"].which());
         EXPECT_EQ("maiden", v.get_dict()["hints"].get_dict()["iron"].get_string());
+    }
+
+    {
+        VariantArray varr {Variant(1), Variant("foo")};
+        Variant v(varr);
+        EXPECT_EQ(Variant::Type::Array, v.which());
+        EXPECT_EQ(2, v.get_array().size());
+        EXPECT_EQ(1, v.get_array()[0].get_int());
+        EXPECT_EQ("foo", v.get_array()[1].get_string());
     }
 
     {

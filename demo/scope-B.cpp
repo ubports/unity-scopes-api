@@ -23,6 +23,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
+#include <cassert>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
@@ -37,10 +38,22 @@ using namespace unity::api::scopes;
 class SubReply : public ReplyBase
 {
 public:
+    virtual void push(Category::SCPtr category) override
+    {
+        cout << "received category: id=" << category->id() << endl;
+    }
+
     virtual void push(ResultItem const& result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
-        upstream_->push(result);
+        try
+        {
+            upstream_->push(result);
+        }
+        catch (const unity::InvalidArgumentException &e)
+        {
+            cerr << "error pushing result: " << e.what() << endl;
+        }
     }
 
     virtual void finished() override
@@ -80,6 +93,17 @@ public:
 
     virtual void run(ReplyProxy const& upstream_reply)
     {
+        // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
+        try
+        {
+            upstream_reply->register_category("cat1", "title", "icon", "{}");
+        }
+        catch (const unity::InvalidArgumentException &e) // this shouldn't happen
+        {
+            cerr << "error registering category: " << e.what() << endl;
+            assert(0);
+        }
+
         ReplyBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);

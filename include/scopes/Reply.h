@@ -21,6 +21,7 @@
 
 #include <scopes/ObjectProxy.h>
 #include <scopes/ReplyProxyFwd.h>
+#include <scopes/Category.h>
 
 namespace unity
 {
@@ -47,6 +48,25 @@ class UNITY_API Reply : public ObjectProxy
 {
 public:
     Reply(Reply const&) = default;
+
+    /**
+    \brief Create and register a new Category. The category is automatically sent to the source of the query.
+    \return Category instance
+    */
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+
+    /**
+    \brief Register an existing category instance and send it to the source of the query.
+    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating results and categories from
+    other scope(s).
+    */
+    void register_category(Category::SCPtr category);
+
+    /**
+    \brief Returns an instance of previously registered category.
+    \return Category instance or nullptr if category hasn't been registered.
+    */
+    Category::SCPtr lookup_category(std::string const& id) const;
 
     // TODO: document return value from push()
     /**
