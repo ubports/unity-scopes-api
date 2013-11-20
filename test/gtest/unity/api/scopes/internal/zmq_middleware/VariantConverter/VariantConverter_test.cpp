@@ -44,6 +44,7 @@ TEST(VariantConverter, basic)
         m["hints"] = inner;
         m["foo"] = Variant(1);
         m["bar"] = Variant(true);
+        m["nil"] = Variant::null();
         m["baz"] = arry;
         Variant v(m);
 
@@ -59,6 +60,7 @@ TEST(VariantConverter, basic)
     auto outerDict = resultVar.get_dict();
     EXPECT_EQ(1, outerDict["foo"].get_int());
     EXPECT_EQ(true, outerDict["bar"].get_bool());
+    EXPECT_TRUE(outerDict["nil"].is_null());
 
     EXPECT_EQ(Variant::Array, outerDict["baz"].which());
     auto varArray = outerDict["baz"].get_array();

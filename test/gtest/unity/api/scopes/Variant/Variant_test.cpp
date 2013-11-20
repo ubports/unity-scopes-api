@@ -160,6 +160,25 @@ TEST(Variant, basic)
     }
 }
 
+TEST(Variant, null)
+{
+    Variant v0(0);
+    EXPECT_FALSE(v0.is_null());
+
+    Variant v1 = Variant::null();
+    EXPECT_TRUE(v1.is_null());
+
+    Variant v2 = v1;
+    EXPECT_TRUE(v2.is_null());
+
+    Variant v3(v1);
+    EXPECT_TRUE(v3.is_null());
+
+    EXPECT_TRUE(v1 == v2);
+    EXPECT_FALSE(v1 < v2);
+    EXPECT_FALSE(v2 < v1);
+}
+
 TEST(Variant, exceptions)
 {
     try
