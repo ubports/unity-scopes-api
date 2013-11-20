@@ -41,6 +41,21 @@ Reply::~Reply() noexcept
 {
 }
 
+Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+{
+    return p->register_category(id, title, icon, renderer_template);
+}
+
+void Reply::register_category(Category::SCPtr category)
+{
+    return p->register_category(category);
+}
+
+Category::SCPtr Reply::lookup_category(std::string const& id) const
+{
+    return p->lookup_category(id);
+}
+
 bool Reply::push(ResultItem const& result) const
 {
     return p->push(result);

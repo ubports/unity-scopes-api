@@ -30,12 +30,12 @@ namespace scopes
 
 //! @cond
 
-ResultItem::ResultItem(Category::SPtr category)
+ResultItem::ResultItem(Category::SCPtr category)
     : p(new internal::ResultItemImpl(category))
 {
 }
 
-ResultItem::ResultItem(Category::SPtr category, const VariantMap &variant_map)
+ResultItem::ResultItem(Category::SCPtr category, const VariantMap &variant_map)
     : p(new internal::ResultItemImpl(category, variant_map))
 {
 }
@@ -103,14 +103,14 @@ std::string ResultItem::dnd_uri() const
     return p->dnd_uri();
 }
 
-Category::SPtr ResultItem::category() const
+Category::SCPtr ResultItem::category() const
 {
     return p->category();
 }
 
-std::shared_ptr<VariantMap> ResultItem::variant_map() const
+VariantMap ResultItem::serialize() const
 {
-    return p->variant_map();
+    return p->serialize();
 }
 
 //! @endcond

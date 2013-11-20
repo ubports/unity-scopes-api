@@ -39,6 +39,10 @@ ReplyBase::~ReplyBase() noexcept
 {
 }
 
+void ReplyBase::push(Category::SCPtr category)
+{
+}
+
 //! @endcond
 
 } // namespace scopes

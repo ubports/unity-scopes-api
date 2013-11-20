@@ -46,6 +46,11 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
             b.setIntVal(v.get_int());
             break;
         }
+        case Variant::Double:
+        {
+            b.setDoubleVal(v.get_double());
+            break;
+        }
         case Variant::Bool:
         {
             b.setBoolVal(v.get_bool());
@@ -60,6 +65,17 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
         {
             auto vb = b.initDictVal();
             to_value_dict(v.get_dict(), vb);
+            break;
+        }
+        case Variant::Array:
+        {
+            auto vb = b.initArrayVal(v.get_array().size());
+            to_value_array(v.get_array(), vb);
+            break;
+        }
+        case Variant::Null:
+        {
+            b.initNullVal();
             break;
         }
         default:
@@ -77,6 +93,10 @@ Variant to_variant(capnproto::Value::Reader const& r)
         {
             return Variant(r.getIntVal());
         }
+        case capnproto::Value::DOUBLE_VAL:
+        {
+            return Variant(r.getDoubleVal());
+        }
         case capnproto::Value::BOOL_VAL:
         {
             return Variant(r.getBoolVal());
@@ -88,6 +108,14 @@ Variant to_variant(capnproto::Value::Reader const& r)
         case capnproto::Value::DICT_VAL:
         {
             return Variant(to_variant_map(r.getDictVal()));
+        }
+        case capnproto::Value::ARRAY_VAL:
+        {
+            return Variant(to_variant_array(r.getArrayVal()));
+        }
+        case capnproto::Value::NULL_VAL:
+        {
+            return Variant::null();
         }
         default:
         {
@@ -109,6 +137,18 @@ void to_value_dict(VariantMap const& vm, capnproto::ValueDict::Builder& b)
     }
 }
 
+void to_value_array(VariantArray const& va, capnp::List<capnproto::Value>::Builder& b)
+{
+    assert(va.size() == b.size());
+    uint i = 0;
+    for (auto const& el: va)
+    {
+        auto elm_bld = b[i];
+        to_value(el, elm_bld);
+        ++i;
+    }
+}
+
 VariantMap to_variant_map(capnproto::ValueDict::Reader const& r)
 {
     VariantMap vm;
@@ -118,6 +158,17 @@ VariantMap to_variant_map(capnproto::ValueDict::Reader const& r)
         vm[pairs[i].getName().cStr()] = to_variant(pairs[i].getValue());
     }
     return vm;
+}
+
+VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r)
+{
+    VariantArray va;
+    for (auto const& el: r)
+    {
+        va.push_back(to_variant(el));
+    }
+
+    return va;
 }
 
 } // namespace zmq_middleware

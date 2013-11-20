@@ -36,9 +36,22 @@ namespace scopes
 namespace internal
 {
 
+struct NullVariant
+{
+    bool operator<(NullVariant const&) const
+    {
+        return false;
+    }
+
+    bool operator==(NullVariant const&) const
+    {
+        return true;
+    }
+};
+
 struct VariantImpl
 {
-    boost::variant<int, bool, string, VariantMap> v;
+    boost::variant<int, bool, string, double, VariantMap, VariantArray, NullVariant> v;
 };
 
 } // namespace internal
@@ -49,6 +62,11 @@ Variant::Variant() noexcept
 }
 
 Variant::Variant(int val) noexcept
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(double val) noexcept
     : p(new internal::VariantImpl { val })
 {
 }
@@ -68,6 +86,16 @@ Variant::Variant(VariantMap const& val)
 {
 }
 
+Variant::Variant(VariantArray const& val)
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(internal::NullVariant const& val)
+    : p(new internal::VariantImpl { val })
+{
+}
+
 Variant::Variant(char const* val)
     : p(new internal::VariantImpl { string(val) })
 {
@@ -75,6 +103,12 @@ Variant::Variant(char const* val)
 
 Variant::~Variant() noexcept
 {
+}
+
+Variant const& Variant::null()
+{
+    static const Variant var = internal::NullVariant();
+    return var;
 }
 
 Variant::Variant(Variant const& other)
@@ -98,6 +132,12 @@ Variant& Variant::operator=(int val) noexcept
     return *this;
 }
 
+Variant& Variant::operator=(double val) noexcept
+{
+    p->v = val;
+    return *this;
+}
+
 Variant& Variant::operator=(bool val) noexcept
 {
     p->v = val;
@@ -111,6 +151,12 @@ Variant& Variant::operator=(std::string const& val)
 }
 
 Variant& Variant::operator=(VariantMap const& val)
+{
+    p->v = val;
+    return *this;
+}
+
+Variant& Variant::operator=(VariantArray const& val)
 {
     p->v = val;
     return *this;
@@ -141,6 +187,18 @@ int Variant::get_int() const
     catch (std::exception const&)
     {
         throw LogicException("Variant does not contain an int value");
+    }
+}
+
+double Variant::get_double() const
+{
+    try
+    {
+        return boost::get<double>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain a double value");
     }
 }
 
@@ -178,6 +236,23 @@ VariantMap Variant::get_dict() const
     {
         throw LogicException("Variant does not contain a dictionary");
     }
+}
+
+VariantArray Variant::get_array() const
+{
+    try
+    {
+        return boost::get<VariantArray>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain an array");
+    }
+}
+
+bool Variant::is_null() const
+{
+    return p->v.which() == Type::Null;
 }
 
 Variant::Type Variant::which() const noexcept

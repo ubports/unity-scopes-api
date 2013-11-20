@@ -1,5 +1,5 @@
 Source: unity-scopes
-Priority: extra
+Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
                cmake,
@@ -8,12 +8,21 @@ Build-Depends: debhelper (>= 9),
                libgtest-dev,
                pkg-config,
                python3,
+               capnproto,
                libunity-api-dev,
+               libboost-regex-dev,
+               libcapnp-dev,
+               libzmq3-dev,
+               libzmqpp3,
+               libzmqpp-dev,
                liblttng-ust-dev,
                lttng-tools,
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://launchpad.net/unity-api
+# if you don't have have commit access to this branch but would like to upload
+# directly to Ubuntu, don't worry: your changes will be merged back into the
+# upstream branch
 Vcs-Bzr: lp:unity-scopes
 Vcs-Browser: https://code.launchpad.net/unity-scopes
 
@@ -30,7 +39,9 @@ Package: libunity-scopes-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: ${misc:Depends},
+Pre-Depends: ${misc:Pre-Depends},
+Depends: libunity-scopes0 (= ${binary:Version}),
+         ${misc:Depends},
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)
 

@@ -20,7 +20,7 @@ string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower) # Build types shoul
 find_program(CPPCHECK_COMMAND NAMES cppcheck)
 if (CPPCHECK_COMMAND)
     set(CPPCHECK_COMMAND_OPTIONS --check-config --inline-suppr --enable=all -q --error-exitcode=2)
-    set(CPPCHECK_COMMAND_OPTIONS ${CPPCHECK_COMMAND_OPTIONS} --template '{file}({line}): {severity} ({id}): {message}')
+    set(CPPCHECK_COMMAND_OPTIONS ${CPPCHECK_COMMAND_OPTIONS} --template "'{file}({line}): {severity} ({id}): {message}'")
     add_custom_target(cppcheck COMMAND ${CPPCHECK_COMMAND} ${CPPCHECK_COMMAND_OPTIONS}
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/test
@@ -56,6 +56,12 @@ find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
 endif()
+
+find_program(CAPNPC_BIN capnpc)
+if(NOT CAPNPC_BIN)
+  message(FATAL_ERROR "Capnp compiler not found.")
+endif()
+set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
@@ -190,7 +196,7 @@ endforeach()
 # all files if any one of them changes
 add_custom_command(OUTPUT ${CAPNPROTO_SRC} ${CAPNPROTO_HDRS}
                    DEPENDS ${CAPNPROTO_FILES}
-                   COMMAND capnpc -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
+                   COMMAND ${CAPNPC_BIN} ${CAPNPC_FLAGS} -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
 
 # Set up coverage testing
 include(EnableCoverageReport)

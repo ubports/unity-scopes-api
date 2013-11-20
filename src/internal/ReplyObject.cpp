@@ -43,6 +43,7 @@ namespace internal
 
 ReplyObject::ReplyObject(ReplyBase::SPtr const& reply_base, RuntimeImpl const* runtime) :
     reply_base_(reply_base),
+    cat_registry_(new CategoryRegistry()),
     finished_(false),
     num_push_(0)
 {
@@ -92,9 +93,30 @@ void ReplyObject::push(VariantMap const& result) noexcept
     lock.unlock();
     try
     {
-        auto cat = std::make_shared<Category>(""); //FIXME: set proper category once categories are (de)serialized
-        ResultItem result_item(cat, result);
-        reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
+        auto it = result.find("category");
+        if (it != result.end())
+        {
+            auto cat = cat_registry_->register_category(it->second.get_dict());
+            reply_base_->push(cat);
+        }
+
+        it = result.find("result");
+        if (it != result.end())
+        {
+            auto result_var = it->second.get_dict();
+            auto cat_id = result_var["cat_id"].get_string();
+            auto cat = cat_registry_->lookup_category(cat_id);
+            if (cat == nullptr)
+            {
+                // TODO: this is an internal error; log error
+                finished();
+            }
+            else
+            {
+                ResultItem result_item(cat, result_var);
+                reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
+            }
+        }
     }
     catch (unity::Exception const& e)
     {

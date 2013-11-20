@@ -17,7 +17,6 @@
  */
 
 #include <scopes/internal/ResultItemImpl.h>
-#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
 #include <sstream>
@@ -34,9 +33,9 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri"};
+const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri", "cat_id"};
 
-ResultItemImpl::ResultItemImpl(Category::SPtr category)
+ResultItemImpl::ResultItemImpl(Category::SCPtr category)
     : category_(category)
 {
     if (category_ == nullptr)
@@ -45,10 +44,10 @@ ResultItemImpl::ResultItemImpl(Category::SPtr category)
     }
 }
 
-ResultItemImpl::ResultItemImpl(Category::SPtr category, const VariantMap& variant_map)
+ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& variant_map)
     : ResultItemImpl(category)
 {
-    from_variant_map(variant_map);
+    deserialize(variant_map);
 }
 
 void ResultItemImpl::set_uri(std::string const& uri)
@@ -100,7 +99,7 @@ std::string ResultItemImpl::dnd_uri() const
     return dnd_uri_;
 }
 
-Category::SPtr ResultItemImpl::category() const
+Category::SCPtr ResultItemImpl::category() const
 {
     return category_;
 }
@@ -115,57 +114,64 @@ void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& 
     }
 }
 
-std::shared_ptr<VariantMap> ResultItemImpl::variant_map() const
+VariantMap ResultItemImpl::serialize() const
 {
     throw_on_empty("uri", uri_);
     throw_on_empty("title", title_);
     throw_on_empty("icon", icon_);
     throw_on_empty("dnd_uri", dnd_uri_);
 
-    auto var = std::make_shared<VariantMap>();
-    (*var)["uri"] = uri_;
-    (*var)["title"] = title_;
-    (*var)["icon"] = icon_;
-    (*var)["dnd_uri"] = dnd_uri_;
-    (*var)["cat_id"] = category_->id();
+    VariantMap var;
+    var["uri"] = uri_;
+    var["title"] = title_;
+    var["icon"] = icon_;
+    var["dnd_uri"] = dnd_uri_;
+    var["cat_id"] = category_->id();
 
     if (metadata_)
     {
         for (auto const& kv: *metadata_)
         {
-            if (var->find(kv.first) != var->end())
+            if (var.find(kv.first) != var.end())
             {
                 std::ostringstream s;
                 s << "Can't overwrite internal attribute: " << kv.first;
-                throw MiddlewareException(s.str());
+                throw InvalidArgumentException(s.str());
             }
-            (*var)[kv.first] = kv.second;
+            var[kv.first] = kv.second;
         }
     }
     return var;
 }
 
-void ResultItemImpl::from_variant_map(VariantMap const& var)
+void ResultItemImpl::deserialize(VariantMap const& var)
 {
     auto it = var.find("uri");
     if (it == var.end())
-        throw MiddlewareException("Missing 'uri'");
+        throw InvalidArgumentException("Missing 'uri'");
     uri_ = it->second.get_string();
 
     it = var.find("title");
     if (it == var.end())
-        throw MiddlewareException("Missing 'title'");
+        throw InvalidArgumentException("Missing 'title'");
     title_ = it->second.get_string();
 
     it = var.find("icon");
     if (it == var.end())
-        throw MiddlewareException("Missing 'icon'");
+        throw InvalidArgumentException("Missing 'icon'");
     icon_ = it->second.get_string();
 
     it = var.find("dnd_uri");
     if (it == var.end())
-        throw MiddlewareException("Missing 'dnd_uri'");
+        throw InvalidArgumentException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
+
+    // cat_id is not really used as it's provided by category instance pointer,
+    // but the check is here for consistency and to make sure a valid variant
+    // is passed.
+    it = var.find("cat_id");
+    if (it == var.end())
+        throw InvalidArgumentException("Missing 'cat_id'");
 
     if (var.size() > standard_attrs.size())
     {

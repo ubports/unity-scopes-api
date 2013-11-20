@@ -48,7 +48,7 @@ public:
 
     virtual void run(ReplyProxy const& reply) override
     {
-        auto cat = std::shared_ptr<Category>(new Category("cat1"));
+        auto cat = reply->register_category("cat1", "Category 1", "", "{}");
         ResultItem res(cat);
         res.set_uri("uri");
         res.set_title("scope-A: result 1 for query \"" + query_ + "\"");

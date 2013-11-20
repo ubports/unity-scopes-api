@@ -54,7 +54,7 @@ public:
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
-        auto cat = std::make_shared<Category>("1");
+        auto cat = reply->register_category("cat1", "Category 1", "", "{}");
         ResultItem result(cat);
         result.set_title("scope-slow: result 1 for query \"" + query_ + "\"");
         reply->push(result);

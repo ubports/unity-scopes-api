@@ -39,9 +39,13 @@ TEST(VariantConverter, basic)
         VariantMap m;
         VariantMap inner;
         inner["iron"] = Variant("maiden");
+
+        VariantArray arry { Variant(1), Variant(true) };
         m["hints"] = inner;
         m["foo"] = Variant(1);
         m["bar"] = Variant(true);
+        m["nil"] = Variant::null();
+        m["baz"] = arry;
         Variant v(m);
 
         to_value(v, builder);
@@ -56,6 +60,14 @@ TEST(VariantConverter, basic)
     auto outerDict = resultVar.get_dict();
     EXPECT_EQ(1, outerDict["foo"].get_int());
     EXPECT_EQ(true, outerDict["bar"].get_bool());
+    EXPECT_TRUE(outerDict["nil"].is_null());
+
+    EXPECT_EQ(Variant::Array, outerDict["baz"].which());
+    auto varArray = outerDict["baz"].get_array();
+    EXPECT_EQ(2, varArray.size());
+    EXPECT_EQ(1, varArray[0].get_int());
+    EXPECT_EQ(true, varArray[1].get_bool());
+
     auto innerDict = outerDict["hints"].get_dict();
     EXPECT_EQ("maiden", innerDict["iron"].get_string());
 }

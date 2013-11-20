@@ -49,10 +49,8 @@ class Queue
 public:
     void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
     {
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            queries_.push_back(QueryData { query, query_string, reply_proxy });
-        }
+        std::lock_guard<std::mutex> lock(mutex_);
+        queries_.push_back(QueryData { query, query_string, reply_proxy });
         condvar_.notify_one();
     }
 
@@ -62,7 +60,6 @@ public:
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
         if (done_)
         {
-            lock.unlock();
             condvar_.notify_all();
         }
         else
@@ -93,11 +90,9 @@ public:
 
     void finish()
     {
-        {
-            std::unique_lock<std::mutex> lock(mutex_);
-            queries_.clear();
-            done_ = true;
-        }
+        std::unique_lock<std::mutex> lock(mutex_);
+        queries_.clear();
+        done_ = true;
         condvar_.notify_all();
     }
 
@@ -205,9 +200,9 @@ public:
             ReplyProxy reply_proxy;
             if (queue_.get(query, reply_proxy) && !done_.load())
             {
+                auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
                 for (int i = 1; i < 5; ++i)
                 {
-                    auto cat = std::make_shared<Category>("cat1");
                     ResultItem result(cat);
                     result.set_uri("uri");
                     result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");

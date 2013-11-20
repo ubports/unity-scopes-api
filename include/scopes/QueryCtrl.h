@@ -64,7 +64,7 @@ private:
     friend class internal::QueryCtrlImpl;
     // @endcond
 
-    std::shared_ptr<internal::QueryCtrlImpl> p;
+    std::unique_ptr<internal::QueryCtrlImpl> p;
 };
 
 } // namespace scopes

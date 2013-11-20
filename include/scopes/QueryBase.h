@@ -76,7 +76,7 @@ private:
     void cancel();
     friend class internal::QueryObject;       // So QueryObject can call cancel()
 
-    std::shared_ptr<internal::QueryBaseImpl> p;
+    std::unique_ptr<internal::QueryBaseImpl> p;
 };
 
 } // namespace scopes
