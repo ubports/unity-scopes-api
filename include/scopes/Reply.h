@@ -100,7 +100,7 @@ private:
     Reply(internal::ReplyImpl* impl);         // Instantiable only by ReplyImpl
     friend class internal::ReplyImpl;
 
-    std::shared_ptr<internal::ReplyImpl> p;
+    std::unique_ptr<internal::ReplyImpl> p;
     std::shared_ptr<internal::QueryObject> qo;  // Used to reference
 };
 

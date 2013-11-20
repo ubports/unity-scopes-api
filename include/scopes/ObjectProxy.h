@@ -50,7 +50,7 @@ public:
 private:
     friend class internal::ObjectProxyImpl;
 
-    std::shared_ptr<internal::ObjectProxyImpl> p;
+    std::unique_ptr<internal::ObjectProxyImpl> p;
 };
 
 } // namespace scopes
