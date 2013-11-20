@@ -27,17 +27,14 @@ Build dependencies
 See debian/control for the list of packages required to build and test the code.
 
 Most notably:
-  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev
+  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev libcapnp-dev
 
 Some dependencies need to be installed manually as they are not yet available in Ubuntu:
-- Cap'n Proto:
-  $ git clone https://github.com/kentonv/capnproto.git
-  $ cd capnproto/c++ && ./setup-autotools.sh && autoreconf -i
-  $ ./configure && make -j6 check && sudo make install
 
 - Zmqpp:
   $ git clone https://github.com/benjamg/zmqpp.git
   $ cd zmqpp && make && sudo mkdir -p /usr/local/include/zmqpp && sudo make install
+
 
 Building the code
 -----------------
@@ -56,11 +53,29 @@ By default, the code is built in release mode. To build a debug version, use
     $ cmake -DCMAKE_BUILD_TYPE=debug ..
     $ make
 
+
 Running the tests
 -----------------
 
     $ make
     $ make test
+
+
+Documentation
+-------------
+
+To generate the doc:
+
+    $ make doc
+
+By default, this target generates documentation only for the public API.
+
+You can set the cmake option DEVEL_DOCS=ON to generate documentation that includes the internal API:
+
+    $ cmake -DDEVEL_DOCS=ON ..
+
+This is useful mainly for browsing--the internal API does not include doxygen comments.
+
 
 Installation
 ------------
