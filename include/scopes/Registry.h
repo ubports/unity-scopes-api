@@ -71,7 +71,7 @@ private:
     Registry(internal::RegistryImpl* impl);          // Instantiable only by RegistryImpl
     friend class internal::RegistryImpl;
 
-    std::shared_ptr<internal::RegistryImpl> p;
+    std::unique_ptr<internal::RegistryImpl> p;
 };
 
 } // namespace scopes

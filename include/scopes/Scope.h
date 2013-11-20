@@ -65,7 +65,7 @@ private:
     Scope(internal::ScopeImpl* impl);          // Instantiable only by ScopeImpl
     friend class internal::ScopeImpl;
 
-    std::shared_ptr<internal::ScopeImpl> p;
+    std::unique_ptr<internal::ScopeImpl> p;
 };
 
 } // namespace scopes
