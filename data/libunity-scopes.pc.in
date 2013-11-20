@@ -22,6 +22,7 @@ libdir=@LIBDIR@
 
 Name: lib@UNITY_SCOPES_LIB@
 Description: Unity Scopes API library
+Requires: libunity-api
 Version: @UNITY_SCOPES_MAJOR@.@UNITY_SCOPES_MINOR@
 Libs: -L${libdir} -l@UNITY_SCOPES_LIB@
 Cflags: -I${includedir}
