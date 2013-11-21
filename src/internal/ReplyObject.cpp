@@ -114,7 +114,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
             else
             {
                 ResultItem result_item(cat, result_var);
-                reply_base_->push(result_item);      // Forward the result to the application code outside synchronization.
+                reply_base_->push(std::move(result_item));      // Forward the result to the application code outside synchronization.
             }
         }
     }
