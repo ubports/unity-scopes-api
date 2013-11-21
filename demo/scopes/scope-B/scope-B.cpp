@@ -48,7 +48,7 @@ public:
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try
         {
-            upstream_->push(result);
+            upstream_->push(std::move(result));
         }
         catch (const unity::InvalidArgumentException &e)
         {
