@@ -35,7 +35,7 @@ using namespace unity::api::scopes;
 // A Reply instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class SubReply : public ReplyBase
+class SubReply : public ReceiverBase
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -104,7 +104,7 @@ public:
             assert(0);
         }
 
-        ReplyBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
+        ReceiverBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);
     }

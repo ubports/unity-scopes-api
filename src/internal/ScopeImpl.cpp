@@ -50,7 +50,7 @@ ScopeImpl::~ScopeImpl() noexcept
 {
 }
 
-QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints, ReplyBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     try

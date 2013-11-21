@@ -18,7 +18,7 @@
 
 #include <scopes/QueryCtrl.h>
 #include <scopes/Registry.h>
-#include <scopes/ReplyBase.h>
+#include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/ResultItem.h>
 #include <unity/UnityExceptions.h>
@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-class Reply : public ReplyBase
+class Reply : public ReceiverBase
 {
 public:
 

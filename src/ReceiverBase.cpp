@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ReplyBase.h>
+#include <scopes/ReceiverBase.h>
 
 using namespace std;
 
@@ -31,15 +31,15 @@ namespace scopes
 
 //! @cond
 
-ReplyBase::ReplyBase()
+ReceiverBase::ReceiverBase()
 {
 }
 
-ReplyBase::~ReplyBase() noexcept
+ReceiverBase::~ReceiverBase() noexcept
 {
 }
 
-void ReplyBase::push(Category::SCPtr category)
+void ReceiverBase::push(Category::SCPtr category)
 {
 }
 

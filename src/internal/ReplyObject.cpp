@@ -19,7 +19,7 @@
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/ResultItemImpl.h>
 #include <scopes/internal/RuntimeImpl.h>
-#include <scopes/ReplyBase.h>
+#include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/ResultItem.h>
 #include <unity/Exception.h>
@@ -41,7 +41,7 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ReplyBase::SPtr const& reply_base, RuntimeImpl const* runtime) :
+ReplyObject::ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime) :
     reply_base_(reply_base),
     cat_registry_(new CategoryRegistry()),
     finished_(false),

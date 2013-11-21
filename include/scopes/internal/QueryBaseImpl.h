@@ -34,7 +34,7 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
+class ReceiverBase;
 
 namespace internal
 {
@@ -48,7 +48,7 @@ public:
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    VariantMap const& hints,
-                                   std::shared_ptr<ReplyBase> const& reply);
+                                   std::shared_ptr<ReceiverBase> const& reply);
     void cancel();
 
 private:
