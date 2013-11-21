@@ -93,6 +93,7 @@ private:
              reaper_private::Reaplist::iterator it);    // Only Reaper can instantiate
 
     std::weak_ptr<Reaper> reaper_;                      // The reaper this item belongs with
+    static std::mutex mutex_;                           // Protects weak_ptr
     reaper_private::Reaplist::iterator it_;             // Position in reap list
     std::atomic_bool destroyed_;
 
@@ -108,7 +109,7 @@ private:
 // It is safe to let a reaper go out of scope while there are still ReapItems for it. The methods
 // on the ReapItem do nothing if they are called after the reaper is gone.
 
-class Reaper final : private util::NonCopyable
+class Reaper final : public std::enable_shared_from_this<Reaper>, private util::NonCopyable
 {
 public:
     UNITY_DEFINES_PTRS(Reaper);
@@ -150,7 +151,7 @@ public:
 
 private:
     Reaper(int reap_interval, int expiry_interval, DestroyPolicy p);
-    void set_self(std::weak_ptr<Reaper> const& self) noexcept;
+    void set_self() noexcept;
 
     void run();                             // Start function for reaper thread
 

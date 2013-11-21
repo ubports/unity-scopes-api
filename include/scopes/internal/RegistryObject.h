@@ -53,9 +53,8 @@ public:
     typedef std::map<std::string, MWScopeProxy> MWScopeMap;
     MWScopeMap list();
 
-    // Local operations to modify the map
-    void add(std::string const& scope_name, MWScopeProxy const& scope);
-    void remove(std::string const& scope_name);
+    bool add(std::string const& scope_name, MWScopeProxy const& scope);
+    bool remove(std::string const& scope_name);
 
 private:
     mutable MWScopeMap scopes_;

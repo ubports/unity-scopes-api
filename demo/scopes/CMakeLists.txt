@@ -1,0 +1,6 @@
+add_subdirectory(scope-A)
+add_subdirectory(scope-B)
+add_subdirectory(scope-C)
+add_subdirectory(scope-D)
+add_subdirectory(scope-N)
+add_subdirectory(scope-S)

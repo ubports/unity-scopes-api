@@ -1,5 +1,5 @@
 configure_file(Factory.ini.in Factory.ini)
-configure_file(Zmq.ini.in Zmq.Config)
+configure_file(Zmq.ini.in Zmq.ini)
 configure_file(Registry.ini.in Registry.ini)
 configure_file(Runtime.ini.in Runtime.ini)
 

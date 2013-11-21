@@ -31,6 +31,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultItemImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
@@ -38,10 +39,3 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
-
-set(CONFIG_FILE_PREFIX "var/unity/api/scopes/config")
-
-add_executable(scope-registry RegistryMain.cpp zmq_middleware/RegistryI.cpp)
-target_link_libraries(scope-registry ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
-
-configure_file(RegistryMain.ini.in ${CMAKE_CURRENT_BINARY_DIR}/RegistryMain.ini)

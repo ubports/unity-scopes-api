@@ -1,3 +1,1 @@
-Once transitioning to Saucy, replace all calls to new with make_shared where appropriate. (gcc 4.7 crashes a lot when calling make_shared.)
-
 Consider adding make_unique, which will be in C++ 14.

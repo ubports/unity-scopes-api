@@ -43,7 +43,7 @@ typedef std::vector<Variant> VariantArray;
 namespace internal
 {
 
-class VariantImpl;
+struct VariantImpl;
 struct NullVariant;
 
 } // namespace internal

@@ -1,3 +1,3 @@
 [MiddlewareFactory]
-Ice.Configfile = Ice.Config
-REST.Configfile = REST.Config
+Zmq.ConfigFile = Zmq.ini
+REST.ConfigFile = REST.ini

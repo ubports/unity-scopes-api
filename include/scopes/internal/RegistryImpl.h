@@ -49,7 +49,6 @@ public:
 
 private:
     MWRegistryProxy const mw_proxy_;
-    RuntimeImpl* const runtime_;
 };
 
 } // namespace internal

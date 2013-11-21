@@ -1,0 +1,31 @@
+Leaf scopes in this demo:
+
+- scope-A: returns 1 result
+- scope-C: returns 3 results
+- scope-D: returns 4 results
+- scope-N: minimal no-op scope that illustrates the simplest possible implementation
+- scope-S: slow scope; returns 1 result after 20 seconds
+
+Aggregating scopes:
+
+- scope-B aggregates from scope-C and scope-D, so it returns 7 results
+
+Processes:
+
+The scopes run as separate process, except for scope-B and scope-C, which run collocated in a single process.
+
+To start the registry, which automatically starts the processes, run
+
+$ ../scoperegistry/scoperegistry Runtime.ini
+
+You do not need to run the registry from the current directory. Just adjust the path to Runtime.ini to point at the Runtime.ini file in *this* directory.
+
+To send a query to a scope, run
+
+$ ./client <scope-letter> <query-string>
+
+For example:
+
+$ ./client B testquery
+
+TODO: The client currently looks for Runtime.ini in the current directory, so you need to run it from here.

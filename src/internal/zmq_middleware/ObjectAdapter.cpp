@@ -244,12 +244,11 @@ void ObjectAdapter::run_workers()
         {
             f.get();
         }
-        catch (std::exception const& e)
-        {
-            throw;
-        }
         catch (...) // LCOV_EXCL_LINE
         {
+            // TODO: Throwing here causes a segfault in _Unwind_Resume().
+            //       This appears to be a glibc problem during clean-up?
+            //       Reported here: https://bugs.launchpad.net/unity-scopes-api/+bug/1252870
             throw MiddlewareException("ObjectAdapter::run_workers(): broker thread failure (adapter: " + name_ + ")"); // LCOV_EXCL_LINE
         }
     }
@@ -318,6 +317,8 @@ void ObjectAdapter::broker_thread()
         }
         catch (...) // LCOV_EXCL_LINE
         {
+            // TODO: returning here, which happens, for example, if the directory for an endpoint does
+            //       not exist causes a crash in run_workers when the exception is caught and re-thrown;
             // TODO: log error
             lock_guard<mutex> lock(ready_mutex_);       // LCOV_EXCL_LINE
             ready_.set_exception(current_exception());  // LCOV_EXCL_LINE

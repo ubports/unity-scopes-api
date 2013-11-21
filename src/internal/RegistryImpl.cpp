@@ -22,8 +22,6 @@
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <cassert>
-
 using namespace std;
 
 namespace unity
@@ -38,11 +36,9 @@ namespace scopes
 namespace internal
 {
 
-RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime) :
-    mw_proxy_(mw_proxy),
-    runtime_(runtime)
+RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
+    mw_proxy_(mw_proxy)
 {
-    assert(runtime);
 }
 
 RegistryImpl::~RegistryImpl() noexcept

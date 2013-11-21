@@ -37,10 +37,10 @@ const char* RuntimeConfig::RUNTIME_CONFIG_GROUP = "Runtime";
 namespace
 {
     const string registry_identity_str = "Registry.Identity";
-    const string registry_configfile_str = "Registry.Configfile";
+    const string registry_configfile_str = "Registry.ConfigFile";
     const string default_middleware_str = "Default.Middleware";
-    const string default_middleware_configfile_str = "Configfile";
-    const string factory_configfile_str = "Factory.Configfile";
+    const string default_middleware_configfile_str = "ConfigFile";
+    const string factory_configfile_str = "Factory.ConfigFile";
 }
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :

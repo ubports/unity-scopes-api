@@ -49,3 +49,18 @@ TEST(RegistryConfig, RegistryIDEmpty)
                   e.to_string());
     }
 }
+
+TEST(RegistryConfig, ScoperunnerRelativePath)
+{
+    try
+    {
+        RegistryConfig c("Registry", "ScoperunnerRelativePath.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_EQ("unity::api::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
+                  "must be an absolute path",
+                  e.to_string());
+    }
+}

@@ -11,3 +11,4 @@ ${GTEST_SRC_DIR}/gtest_main.cc
 )
 
 set_target_properties(gtest PROPERTIES INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIR})
+set_target_properties(gtest PROPERTIES COMPILE_FLAGS -Wno-unused-private-field)

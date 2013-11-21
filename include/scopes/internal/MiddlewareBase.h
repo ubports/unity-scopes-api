@@ -62,6 +62,7 @@ public:
     virtual void wait_for_shutdown() = 0;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
+    virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) = 0;

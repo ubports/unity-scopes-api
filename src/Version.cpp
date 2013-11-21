@@ -18,8 +18,6 @@
 
 #include <scopes/Version.h>
 
-using namespace std;
-
 namespace unity
 {
 

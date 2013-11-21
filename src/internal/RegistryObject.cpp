@@ -67,9 +67,8 @@ RegistryObject::MWScopeMap RegistryObject::list()
     return scopes_;
 }
 
-void RegistryObject::add(std::string const& scope_name, MWScopeProxy const& scope)
+bool RegistryObject::add(std::string const& scope_name, MWScopeProxy const& scope)
 {
-    // If the name is empty, it was sent as empty by the remote client.
     // TODO: also check for names containing a slash, because that won't work if we use
     //       the name for a socket in the file system.
     if (scope_name.empty())
@@ -82,11 +81,14 @@ void RegistryObject::add(std::string const& scope_name, MWScopeProxy const& scop
     auto const& pair = scopes_.insert(make_pair(scope_name, scope));
     if (!pair.second)
     {
-        throw unity::LogicException("Registry: Scope \"" + scope_name + "\" is already in the registry");
+        scopes_.erase(pair.first);
+        scopes_.insert(make_pair(scope_name, scope));
+        return false;
     }
+    return true;
 }
 
-void RegistryObject::remove(std::string const& scope_name)
+bool RegistryObject::remove(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -96,12 +98,7 @@ void RegistryObject::remove(std::string const& scope_name)
 
     lock_guard<decltype(mutex_)> lock(mutex_);
 
-    auto const& it = scopes_.find(scope_name);
-    if (it == scopes_.end())
-    {
-        throw unity::LogicException("Registry: Scope \"" + scope_name + "\" is not in the registry");
-    }
-    scopes_.erase(it);
+    return scopes_.erase(scope_name) == 1;
 }
 
 } // namespace internal

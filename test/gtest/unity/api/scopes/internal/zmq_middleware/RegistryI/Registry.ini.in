@@ -3,5 +3,8 @@ Registry.Identity = Registry
 
 [Registry]
 Middleware = Zmq
-Zmq.Endpoint = ipc://./Registry
-Zmq.Configfile = Zmq.ini
+Zmq.Endpoint = ipc:///tmp/Registry
+Zmq.EndpointDir = /tmp
+Zmq.ConfigFile = Zmq.ini
+Scope.InstallDir = /tmp
+Scoperunner.Path = /tmp
