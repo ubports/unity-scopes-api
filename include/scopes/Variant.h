@@ -49,7 +49,7 @@ struct NullVariant;
 } // namespace internal
 
 /**
-\brief Simple variant class that can hold an integer, a boolean, or a string.
+\brief Simple variant class that can hold an integer, a boolean, a string, a double, a dictionary, an array or null value.
 */
 
 class UNITY_API Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
