@@ -22,7 +22,7 @@
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/Reaper.h>
 #include <scopes/internal/CategoryRegistry.h>
-#include <scopes/ReplyBase.h>
+#include <scopes/ReceiverBase.h>
 #include <scopes/Variant.h>
 
 #include <atomic>
@@ -43,7 +43,7 @@ namespace internal
 class RuntimeImpl;
 
 // A ReplyObject sits in between the incoming requests from the middleware layer and the
-// ReplyBase-derived implementation provided by the scope.
+// ReceiverBase-derived implementation provided by the scope.
 // This allows us to intercept all replies.
 
 class ReplyObject final : public AbstractObject
@@ -51,7 +51,7 @@ class ReplyObject final : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ReplyBase::SPtr const& reply_base, RuntimeImpl const* runtime);
+    ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime);
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
@@ -59,7 +59,7 @@ public:
     void finished() noexcept;
 
 private:
-    ReplyBase::SPtr const reply_base_;
+    ReceiverBase::SPtr const reply_base_;
     ReapItem::SPtr reap_item_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;

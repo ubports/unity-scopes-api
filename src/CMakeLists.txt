@@ -10,7 +10,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultItem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ReceiverBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp

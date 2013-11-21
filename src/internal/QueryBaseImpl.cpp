@@ -48,7 +48,7 @@ QueryBaseImpl::~QueryBaseImpl() noexcept
 QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               string const& query_string,
                                               VariantMap const& hints,
-                                              shared_ptr<ReplyBase> const& reply)
+                                              shared_ptr<ReceiverBase> const& reply)
 {
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries

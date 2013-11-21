@@ -32,10 +32,10 @@ using namespace unity::api::scopes;
 
 // Example scope B: aggregates from scope C and D.
 
-// A Reply instance remembers the query string and the reply object that was passed
+// A Receiver instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class SubReply : public ReplyBase
+class Receiver: public ReceiverBase
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -43,12 +43,12 @@ public:
         cout << "received category: id=" << category->id() << endl;
     }
 
-    virtual void push(ResultItem const& result) override
+    virtual void push(ResultItem result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try
         {
-            upstream_->push(result);
+            upstream_->push(std::move(result));
         }
         catch (const unity::InvalidArgumentException &e)
         {
@@ -61,7 +61,7 @@ public:
         cout << "query to " << scope_name_ << " complete" << endl;
     }
 
-    SubReply(string const& scope_name, ReplyProxy const& upstream) :
+    Receiver(string const& scope_name, ReplyProxy const& upstream) :
         scope_name_(scope_name),
         upstream_(upstream)
     {
@@ -104,7 +104,7 @@ public:
             assert(0);
         }
 
-        ReplyBase::SPtr reply(new SubReply(scope_name_, upstream_reply));
+        ReceiverBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);
     }

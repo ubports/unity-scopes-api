@@ -43,7 +43,7 @@ QueryBase::~QueryBase() noexcept
 QueryCtrlProxy QueryBase::create_subquery(ScopeProxy const& scope,
                                           string const& query_string,
                                           VariantMap const& hints,
-                                          shared_ptr<ReplyBase> const& reply)
+                                          shared_ptr<ReceiverBase> const& reply)
 {
     return p->create_subquery(scope, query_string, hints, reply);
 }

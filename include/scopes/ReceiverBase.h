@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYBASE_H
-#define UNITY_API_SCOPES_REPLYBASE_H
+#ifndef UNITY_API_SCOPES_RECEIVERBASE_H
+#define UNITY_API_SCOPES_RECEIVERBASE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -39,25 +39,25 @@ class ResultItem;
 /**
 \brief Abstract base class to receive the results of a query.
 TODO: fix doc
-The scope application code must instantiate a class derived from ReplyBase and pass that instance as
+The scope application code must instantiate a class derived from ReceiverBase and pass that instance as
 a parameter to the ScopeProxy::query() method. Once a query is sent, the scopes run time repeatedly
 invokes the push() method, once for each result returned by the query. Once a query is complete,
 the finished() method is called once, to inform the caller that the query is complete.
 */
 
-class UNITY_API ReplyBase : private util::NonCopyable
+class UNITY_API ReceiverBase : private util::NonCopyable
 {
 public:
     /// @cond
-    UNITY_DEFINES_PTRS(ReplyBase);
+    UNITY_DEFINES_PTRS(ReceiverBase);
 
-    virtual ~ReplyBase() noexcept;
+    virtual ~ReceiverBase() noexcept;
     /// @endcond
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
     */
-    virtual void push(ResultItem const& result) = 0;
+    virtual void push(ResultItem result) = 0;
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().
@@ -73,7 +73,7 @@ public:
 
 protected:
     /// @cond
-    ReplyBase();
+    ReceiverBase();
     /// @endcond
 };
 

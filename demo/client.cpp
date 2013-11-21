@@ -18,7 +18,7 @@
 
 #include <scopes/QueryCtrl.h>
 #include <scopes/Registry.h>
-#include <scopes/ReplyBase.h>
+#include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/ResultItem.h>
 #include <unity/UnityExceptions.h>
@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-class Reply : public ReplyBase
+class Receiver : public ReceiverBase
 {
 public:
 
@@ -41,7 +41,7 @@ public:
             category->renderer_template() << endl;
     }
 
-    virtual void push(ResultItem const& result) override
+    virtual void push(ResultItem result) override
     {
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }
@@ -62,7 +62,7 @@ public:
         condvar_.wait(lock, [this] { return this->query_complete_; });
     }
 
-    Reply() :
+    Receiver() :
         query_complete_(false)
     {
     }
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
         RegistryProxy r = rt->registry();
         ScopeProxy s = r->find(scope_name);
-        shared_ptr<Reply> reply(new Reply);
+        shared_ptr<Receiver> reply(new Receiver);
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
