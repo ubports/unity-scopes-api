@@ -11,9 +11,8 @@ Build-Depends: debhelper (>= 9),
                capnproto,
                libunity-api-dev,
                libboost-regex-dev,
-               libcapnp-dev,
+               libcapnp-dev (>= 0.4.0~),
                libzmq3-dev,
-               libzmqpp3,
                libzmqpp-dev,
                liblttng-ust-dev,
                lttng-tools,
@@ -41,6 +40,7 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes0 (= ${binary:Version}),
+         libzmqpp-dev,
          ${misc:Depends},
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)
