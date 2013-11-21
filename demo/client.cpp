@@ -41,7 +41,7 @@ public:
             category->renderer_template() << endl;
     }
 
-    virtual void push(ResultItem const& result) override
+    virtual void push(ResultItem result) override
     {
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }

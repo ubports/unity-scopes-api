@@ -43,7 +43,7 @@ public:
         cout << "received category: id=" << category->id() << endl;
     }
 
-    virtual void push(ResultItem const& result) override
+    virtual void push(ResultItem result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try
