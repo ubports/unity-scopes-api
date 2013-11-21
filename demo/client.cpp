@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-class Reply : public ReceiverBase
+class Receiver : public ReceiverBase
 {
 public:
 
@@ -62,7 +62,7 @@ public:
         condvar_.wait(lock, [this] { return this->query_complete_; });
     }
 
-    Reply() :
+    Receiver() :
         query_complete_(false)
     {
     }
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
         RegistryProxy r = rt->registry();
         ScopeProxy s = r->find(scope_name);
-        shared_ptr<Reply> reply(new Reply);
+        shared_ptr<Receiver> reply(new Receiver);
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
