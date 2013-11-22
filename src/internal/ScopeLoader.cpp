@@ -452,6 +452,7 @@ void ScopeLoader::run_application(ScopeBase* scope)
     }
     catch (...)
     {
+        // TODO: log this
         // Run throws, we remember the exception and send a stop command to ourselves, so the stop()
         // callback on the scope will still be called.
         {

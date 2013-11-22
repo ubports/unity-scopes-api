@@ -39,6 +39,11 @@ ScopeBase::~ScopeBase() noexcept
 
 //! @endcond
 
+void ScopeBase::run()
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = unity::api::scopes::major_version();

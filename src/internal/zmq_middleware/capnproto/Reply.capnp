@@ -35,21 +35,23 @@ using ValueDict = import "ValueDict.capnp";
 # Operations:
 #
 # void push(string result);
-# void finished();
+# enum FinishedReason { Finished, Cancelled, Error };
+# void finished(Reason r);
 
 struct PushRequest
 {
     result @0 : ValueDict.ValueDict;
 }
 
-struct PushResponse
+enum FinishedReason
 {
+    unused @0;
+    finished @1;
+    cancelled @2;
+    error @3;
 }
 
 struct FinishedRequest
 {
-}
-
-struct FinishedResponse
-{
+    reason @0 : FinishedReason;
 }

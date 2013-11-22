@@ -74,11 +74,36 @@ void ReplyI::push_(Current const&,
 }
 
 void ReplyI::finished_(Current const&,
-                       capnp::ObjectPointer::Reader&,
+                       capnp::ObjectPointer::Reader& in_params,
                        capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<ReplyObject>(del());
-    delegate->finished();
+    auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
+    auto r = req.getReason();
+    ReceiverBase::Reason reason;
+    switch (r)
+    {
+        case capnproto::Reply::FinishedReason::FINISHED:
+        {
+            reason = ReceiverBase::Finished;
+            break;
+        }
+        case capnproto::Reply::FinishedReason::CANCELLED:
+        {
+            reason = ReceiverBase::Cancelled;
+            break;
+        }
+        case capnproto::Reply::FinishedReason::ERROR:
+        {
+            reason = ReceiverBase::Error;
+            break;
+        }
+        default:
+        {
+            assert(false); // LCOV_EXCL_LINE
+        }
+    }
+    delegate->finished(reason);
 }
 
 } // namespace zmq_middleware

@@ -56,10 +56,10 @@ public:
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept;
-    void finished() noexcept;
+    void finished(ReceiverBase::Reason reason) noexcept;
 
 private:
-    ReceiverBase::SPtr const reply_base_;
+    ReceiverBase::SPtr const receiver_base_;
     ReapItem::SPtr reap_item_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;

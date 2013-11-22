@@ -76,12 +76,21 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     }
 
     // Ask scope to instantiate a new query.
-    QueryBase::SPtr query_base = scope_base_->create_query(q, hints);
-    if (!query_base)
+    QueryBase::SPtr query_base;
+    try
     {
-        // TODO: log error, scope returned null pointer.
+        query_base = scope_base_->create_query(q, hints);
+        if (!query_base)
+        {
+            // TODO: log error, scope returned null pointer.
+            throw ResourceException("Scope \"" + runtime_->scope_name() +
+                                    "\" returned nullptr from create_query(\"" + q + "\")");
+        }
+    }
+    catch (...)
+    {
         throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                "\" returned nullptr from create_query(\"" + q + "\")");
+                                "\" threw an exception from create_query(\"" + q + "\")");
     }
 
     MWQueryCtrlProxy ctrl_proxy;
@@ -113,7 +122,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         try
         {
-            reply->finished();
+            reply->finished(ReceiverBase::Error);
         }
         catch (...)
         {
@@ -125,7 +134,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         try
         {
-            reply->finished();
+            reply->finished(ReceiverBase::Error);
         }
         catch (...)
         {

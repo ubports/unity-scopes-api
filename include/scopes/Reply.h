@@ -101,7 +101,8 @@ private:
     friend class internal::ReplyImpl;
 
     std::unique_ptr<internal::ReplyImpl> p;
-    std::shared_ptr<internal::QueryObject> qo;  // Used to reference
+    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
+                                               // forward cancellation.
 };
 
 } // namespace scopes

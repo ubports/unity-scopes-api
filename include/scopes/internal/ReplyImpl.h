@@ -23,6 +23,7 @@
 #include <scopes/internal/CategoryRegistry.h>
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
+#include <scopes/ReceiverBase.h>
 
 #include <atomic>
 
@@ -60,6 +61,7 @@ public:
 
     bool push(unity::api::scopes::ResultItem const& result);
     void finished();
+    void finished(unity::api::scopes::ReceiverBase::Reason reason);
 
     static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
 
