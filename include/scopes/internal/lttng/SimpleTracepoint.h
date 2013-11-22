@@ -35,7 +35,6 @@
 #ifdef __clang__
 /* template< typename... T > void simple_tracepoint_unused_args( T&&... ) {} */
 #define simple_tracepoint( c, e, ... ) simple_tracepoint_unused_args( __VA_ARGS__ )
-#pragma message "Building with clang: Disabling LTTng tracepoints."
 #else
 #define simple_tracepoint( c, e, ... ) tracepoint( c, e, __VA_ARGS__ )
 #endif
