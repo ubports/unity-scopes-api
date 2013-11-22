@@ -68,9 +68,9 @@ void ResultItem::set_title(std::string const& title)
     p->set_title(title);
 }
 
-void ResultItem::set_icon(std::string const& icon)
+void ResultItem::set_art(std::string const& image)
 {
-    p->set_icon(icon);
+    p->set_art(image);
 }
 
 void ResultItem::set_dnd_uri(std::string const& dnd_uri)
@@ -93,9 +93,9 @@ std::string ResultItem::title() const
     return p->title();
 }
 
-std::string ResultItem::icon() const
+std::string ResultItem::art() const
 {
-    return p->icon();
+    return p->art();
 }
 
 std::string ResultItem::dnd_uri() const
