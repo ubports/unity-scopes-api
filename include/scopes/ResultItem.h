@@ -69,6 +69,8 @@ public:
     virtual ~ResultItem();
 
     ResultItem& operator=(ResultItem const& other);
+    ResultItem(ResultItem&&);
+    ResultItem& operator=(ResultItem&&);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
