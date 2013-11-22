@@ -70,7 +70,7 @@ public:
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
 
-    If push() throws an exception, the scopes run time calls 
+    If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
     */
     virtual void push(Category::SCPtr category);
 
