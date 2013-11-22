@@ -58,6 +58,10 @@ ResultItem& ResultItem::operator=(ResultItem const& other)
     return *this;
 }
 
+ResultItem::ResultItem(ResultItem&&) = default;
+
+ResultItem& ResultItem::operator=(ResultItem&&) = default;
+
 void ResultItem::set_uri(std::string const& uri)
 {
     p->set_uri(uri);
