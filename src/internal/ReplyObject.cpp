@@ -41,13 +41,13 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime) :
-    reply_base_(reply_base),
+ReplyObject::ReplyObject(ReceiverBase::SPtr const& receiver_base, RuntimeImpl const* runtime) :
+    receiver_base_(receiver_base),
     cat_registry_(new CategoryRegistry()),
     finished_(false),
     num_push_(0)
 {
-    assert(reply_base);
+    assert(receiver_base);
     assert(runtime);
     reap_item_ = runtime->reply_reaper()->add([this] { this->disconnect(); });
 }
@@ -56,7 +56,7 @@ ReplyObject::~ReplyObject() noexcept
 {
     try
     {
-        finished();
+        finished(ReceiverBase::Finished);
     }
     catch (...)
     {
@@ -90,14 +90,14 @@ void ReplyObject::push(VariantMap const& result) noexcept
     unique_lock<mutex> lock(mutex_);
     assert(num_push_ >= 0);
     ++num_push_;
-    lock.unlock();
+    lock.unlock(); // Forward invocations to application outside synchronization
     try
     {
         auto it = result.find("category");
         if (it != result.end())
         {
             auto cat = cat_registry_->register_category(it->second.get_dict());
-            reply_base_->push(cat);
+            receiver_base_->push(cat);
         }
 
         it = result.find("result");
@@ -109,12 +109,12 @@ void ReplyObject::push(VariantMap const& result) noexcept
             if (cat == nullptr)
             {
                 // TODO: this is an internal error; log error
-                finished();
+                finished(ReceiverBase::Error);
             }
             else
             {
                 ResultItem result_item(cat, result_var);
-                reply_base_->push(std::move(result_item));      // Forward the result to the application code outside synchronization.
+                receiver_base_->push(std::move(result_item));
             }
         }
     }
@@ -123,7 +123,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         // TODO: log error
         try
         {
-            finished();
+            finished(ReceiverBase::Error);
         }
         catch (...)
         {
@@ -134,7 +134,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         // TODO: log error
         try
         {
-            finished();
+            finished(ReceiverBase::Error);
         }
         catch (...)
         {
@@ -147,7 +147,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     }
 }
 
-void ReplyObject::finished() noexcept
+void ReplyObject::finished(ReceiverBase::Reason r) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -167,10 +167,10 @@ void ReplyObject::finished() noexcept
     unique_lock<mutex> lock(mutex_);
     assert(num_push_ >= 0);
     idle_.wait(lock, [this] { return num_push_ == 0; });
-    lock.unlock();
+    lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        reply_base_->finished();    // Inform the application code that the query is complete outside synchronization.
+        receiver_base_->finished(r);
     }
     catch (unity::Exception const& e)
     {

@@ -24,6 +24,7 @@
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/ReplyProxyFwd.h>
 
+#include <atomic>
 #include <mutex>
 
 namespace unity
@@ -61,6 +62,8 @@ public:
     // Called locally only, by QueryCtrlObject.
     void cancel();
 
+    bool pushable() const noexcept; // Called locallly only, by ReplyImpl
+
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(SPtr const& self);
@@ -70,6 +73,7 @@ private:
     MWReplyProxy reply_;
     std::weak_ptr<Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
+    std::atomic_bool pushable_;
     SPtr self_;
 };
 

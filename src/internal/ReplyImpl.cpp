@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <scopes/internal/ReplyImpl.h>
+
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/ResultItemImpl.h>
-#include <scopes/internal/ReplyImpl.h>
 #include <scopes/ResultItem.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -91,8 +92,8 @@ Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
 
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 {
-    // if this is an aggregator scope, it may be pushing result items obtained
-    // from ReplyObject without registering category first.
+    // If this is an aggregator scope, it may be pushing result items obtained
+    // from ReplyObject without registering a category first.
     auto cat = cat_registry_->lookup_category(result.category()->id());
     if (cat == nullptr)
     {
@@ -115,6 +116,11 @@ bool ReplyImpl::push(Category::SCPtr category)
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
+    if (!qo_->pushable())
+    {
+        return false; // Query was cancelled or had an error.
+    }
+
     if (!finished_.load())
     {
         try
@@ -125,7 +131,7 @@ bool ReplyImpl::push(VariantMap const& variant_map)
         catch (MiddlewareException const& e)
         {
             // TODO: log error
-            finished();
+            finished(ReceiverBase::Error);
             return false;
         }
     }
@@ -134,11 +140,16 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
+    finished(ReceiverBase::Finished);
+}
+
+void ReplyImpl::finished(ReceiverBase::Reason reason)
+{
     if (!finished_.exchange(true))
     {
         try
         {
-            mw_proxy_->finished();
+            mw_proxy_->finished(reason);
         }
         catch (MiddlewareException const& e)
         {

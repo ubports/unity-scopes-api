@@ -191,7 +191,6 @@ public:
             }
             for (int i = 1; i < 4; ++i)
             {
-                cerr << "worker thread: pushing" << endl;
                 ResultItem result(cat);
                 result.set_uri("uri");
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
@@ -199,7 +198,6 @@ public:
                 result.set_dnd_uri("dnd_uri");
                 if (!reply->push(result))
                 {
-                    cerr << "worker thread: push returned false" << endl;
                     break; // Query was cancelled
                 }
                 sleep(1);

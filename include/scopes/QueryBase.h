@@ -49,6 +49,8 @@ class QueryObject;
 
 // Abstract server-side base interface for a query that is executed inside a scope.
 
+// TODO: documentation
+
 class UNITY_API QueryBase : private util::NonCopyable
 {
 public:

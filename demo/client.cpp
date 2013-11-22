@@ -46,9 +46,9 @@ public:
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }
 
-    virtual void finished() override
+    virtual void finished(ReceiverBase::Reason reason) override
     {
-        cout << "query complete" << endl;
+        cout << "query complete, status: " << to_string(reason) << endl;
         {
             unique_lock<decltype(mutex_)> lock(mutex_);
             query_complete_ = true;

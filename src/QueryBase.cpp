@@ -50,7 +50,7 @@ QueryCtrlProxy QueryBase::create_subquery(ScopeProxy const& scope,
 
 void QueryBase::cancel()
 {
-    p->cancel();    // Forward cancel to subquery
+    p->cancel();    // Forward cancel to subqueries
     cancelled();    // Inform this query that it was cancelled
 }
 

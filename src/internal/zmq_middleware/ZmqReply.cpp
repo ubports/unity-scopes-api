@@ -74,10 +74,35 @@ void ZmqReply::push(VariantMap const& result)
     future.wait();
 }
 
-void ZmqReply::finished()
+void ZmqReply::finished(ReceiverBase::Reason reason)
 {
     capnp::MallocMessageBuilder request_builder;
-    make_request_(request_builder, "finished");
+    auto request = make_request_(request_builder, "finished");
+    auto in_params = request.initInParams().getAs<capnproto::Reply::FinishedRequest>();
+    capnproto::Reply::FinishedReason r;
+    switch (reason)
+    {
+        case ReceiverBase::Finished:
+        {
+            r = capnproto::Reply::FinishedReason::FINISHED;
+            break;
+        }
+        case ReceiverBase::Cancelled:
+        {
+            r = capnproto::Reply::FinishedReason::CANCELLED;
+            break;
+        }
+        case ReceiverBase::Error:
+        {
+            r = capnproto::Reply::FinishedReason::ERROR;
+            break;
+        }
+        default:
+        {
+            assert(false);
+        }
+    }
+    in_params.setReason(r);
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();

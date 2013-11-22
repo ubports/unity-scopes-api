@@ -58,7 +58,7 @@ public:
 
     /**
     \brief Returns a ScopeProxy for the scope with the given name.
-    @return If no scope with the given name exists, the returned `shared_ptr` stores a `nullptr`.
+    @return If no scope with the given name exists, find() throws NotFoundException.
     */
     ScopeProxy find(std::string const& scope_name) const;
 

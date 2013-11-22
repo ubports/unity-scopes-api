@@ -48,7 +48,8 @@ QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWQueryCtrlProxy const& ctrl) :
     query_base_(query_base),
     reply_(reply),
-    ctrl_(ctrl)
+    ctrl_(ctrl),
+    pushable_(true)
 {
     assert(query_base);
     assert(reply);
@@ -91,26 +92,38 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     }
     catch (unity::Exception const& e)
     {
+        pushable_ = false;
+        reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
     }
     catch (...)
     {
+        pushable_ = false;
+        reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
     }
 }
 
 void QueryObject::cancel()
 {
+    pushable_ = false;
     auto rp = reply_proxy_.lock();
     if (rp)
     {
         // Send finished() to up-stream client to tell him the query is done.
-        rp->finished();     // Oneway, can't block
+        // We send via the MWReplyProxy here because that allows passing
+        // a ReceiverBase::Reason (whereas the public ReplyProxy does not).
+        reply_->finished(ReceiverBase::Cancelled);     // Oneway, can't block
     }
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
     // The query base also calls the cancelled() callback to inform the application code.
     query_base_->cancel();
+}
+
+bool QueryObject::pushable() const noexcept
+{
+    return pushable_;
 }
 
 // The point of keeping a shared_ptr to ourselves is to make sure this QueryObject cannot
