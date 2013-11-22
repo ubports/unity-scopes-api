@@ -11,7 +11,13 @@ if(${PROJECT_BINARY_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
    message(FATAL_ERROR "In-tree build attempt detected, aborting. Set your build dir outside your source dir, delete CMakeCache.txt from source root and try again.")
 endif()
 
+include(CheckCXXSourceCompiles)
+CHECK_CXX_SOURCE_COMPILES("#ifdef __clang__\n#else\n#error \"Not clang.\"\n#endif\nint main(int argc, char **argv) { return 0; }" IS_CLANG)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
+if(IS_CLANG)
+  message(STATUS "Compiling with Clang, disabling lttng.")
+endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower) # Build types should always be lowercase but sometimes they are not.
 
@@ -238,7 +244,14 @@ set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
     VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
-target_link_libraries(${UNITY_SCOPES_LIB} -Wl,--no-undefined ${OTHER_LIBS})
+
+# Clang sanitizers don't work if --no-undefined is given as a linker argument.
+if(NOT IS_CLANG)
+  set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
+  LINK_FLAGS "-Wl,--no-undefined")
+endif()
+
+target_link_libraries(${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 
 # Use the object files to make the static library.
 add_library(${UNITY_SCOPES_STATIC_LIB} STATIC $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
