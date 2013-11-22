@@ -1,0 +1,189 @@
+/*!
+
+\page tutorial Tutorial
+
+This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples
+of various scopes see demo/scopes subdirectory.
+
+\section simplescope A simple scope which doesn't query other scopes.
+
+This is the typical case: a scope that connects to a remote or local backend, database etc. and provides results in response to search queries coming from a
+client (i.e. Unity Dash or another scope).
+
+\subsection scopebase Create a scope class that implements ScopeBase inteface.
+
+There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
+\link unity::api::scopes::ScopeBase::start() start\endlink and \link unity::api::scopes::ScopeBase::create_query() create_query\endlink methods. 
+
+\code{.cpp}
+class MyScope: public unity::api::scopes::ScopeBase
+{
+public:
+    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override;
+    virtual void stop() override;
+    virtual void run() override;
+    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const& query, unity::api::scopes::VariantMap const&) override;
+}
+\endcode
+
+The \link unity::api::scopes::ScopeBase::start() start\endlink method must, at the very least return ScopeBase::VERSION, e.g.
+
+\code{.cpp}
+int MyScope::start(string const&, unity::api::scopes::RegistryProxy const&)
+{
+    return ScopeBase::VERSION;
+}
+\endcode
+
+The \link unity::api::scopes::ScopeBase::stop() stop\endlink method should release any resources, such as network connections where applicable. See the
+documentation of \link unity::api::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::api::scopes::ScopeBase::run() ScopeBase::run\endlink;
+is useful; for typical and simple cases the implementation of run can be an empty function.
+
+The \link unity::api::scopes::QueryBase::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
+search queries from the Dash or other scopes. This method must return an instance of an object that implements
+\link unity::api::scopes::QueryBase QueryBase\endlink interface, e.g:
+
+\code{.cpp}
+QueryBase::UPtr MyScope::create_query(string const& query, VariantMap const&)
+{
+    QueryBase::UPtr q(new MyQuery(query));
+    return q;
+}
+\endcode
+
+\subsection querybase Create a query class that implements QueryBase interface.
+
+The central and most important method that needs to be implemented in this interface is \link unity::api::scopes::QueryBase run\endlink.
+This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
+matching the query.
+
+The \link unity::api::scopes::QueryBase run\endlink method gets passed an instance of ReplyProxy, which represents a receiver of query results. Please note
+that ReplyProxy is just a shared pointer for \link unity::api::scopes::Reply Reply\endlink object. The two most important
+methods of Reply object that every scope have to use are \link unity::api::scopes::Reply::register_category register_category\endlink
+and \link unity::api::scopes::Reply::push push\endlink.
+
+The \link unity::api::scopes::Reply::register_category register_category\endlink method is a factory method for creating new categories (see
+\link unity::api::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but it's recommended to create
+them as soon as possible (ideally as soon as they are known to the scope).
+
+Registering a category has the following effects:
+- it immediately allocates a space for it in the Dash (unless the client of this
+  scope is another scope).
+- it constitutes the order of categories in the Dash (they appear in the order
+  they were registered).
+- a space for registered category is removed (collapsed) by the Dash if category
+  turns out to be empty at the end of the search.
+
+The actual search results have to be wrapped inside \link unity::api::scopes::ResultItem ResultItem\endlink objects and
+passed to \link unity::api::scopes::Reply::push push\endlink.
+
+A typical implementation of run may look like this:
+
+\code{.cpp}
+void MyQuery::run(ReplyProxy const& reply)
+{
+    auto category = reply->register_category("recommended", "Recommended", icon, "");
+    //... query a local or remote backend
+
+    for every result returned by the backend
+    {
+        ...
+        ResultItem result(category); // create a result item in "recommended" category
+        result.set_uri(...);
+        result.set_title(...);
+        result.set_art(...);
+        result.set_dnd_uri(...);
+        result.add_metadata("my-custom-attribute", Variant(...)); // add arbitrary data as needed
+
+        reply->push(result); // send result to the client
+    }
+}
+\endcode
+
+\subsection export Export the scope.
+
+The scope needs to be compiled into a .so shared library and to be succesfully
+loaded at runtime it must provide two C functions to create and destroy it - a
+typical code snippet to do this looks as follows:
+
+\code{.cpp}
+extern "C" {
+    EXPORT unity::api::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION()
+    {
+        return new MyScope();
+    }
+
+    EXPORT void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    {
+        delete scope_base;
+    }
+}
+\endcode
+
+\section aggscope A simple aggregator scope which combines results from other scopes.
+
+Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
+implementation of run method of \link unity::api::scopes::QueryBase QueryBase\endlink and in the new class that has to implement
+\link unity::api::scopes::ReceiverBase ReceiverBase\endlink interface, which receives result from other scope(s).
+
+\subsection subquery Query another scopes via QueryBase::create_subquery()
+
+To send search query to another scope, use \link unity::api::scope::QueryBase create_subquery\endlink inside your implementation of QueryBase.
+This method requires - among search query string - an instance of \link unity::api::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
+\link unity::api::scopes::ReceiverBase ReceiverBase\endlink interface. ScopeProxy can be obtained from unity::api::scopes::RegistryProxy and the right place to
+do this is in the implementation of \link unity::api::scopes::ScopeBase::start() start()\endlink method of \link unity::api::scopes::ScopeBase ScopeBase\endlink interface.
+
+\code{.cpp}
+
+int MyScope::start(std::string const&, unity::api::scopes::RegistryProxy const& registry)
+{
+    try
+    {
+        scope_to_query_ = registry->find("scope-A"); // store the proxy for passing it further in create_query
+    }
+    catch (NotFoundException const& e)
+    {
+        ...
+    }
+    return VERSION;
+}
+
+unity::api::scopes::QueryBase::UPtr MyScope::create_query(std::string const& query, unity::api::scopes::VariantMap const&)
+{
+    QueryBase::UPtr q(new MyQuery(query, scope_to_query_));
+    return q;
+}
+
+...
+
+void MyQuery::run(unity::api::scopes::ReplyProxy const& upstream_reply) 
+{
+    auto category = reply->register_category("recommended", "Recommended", icon, "");
+    ReceiverBase::SPtr reply(new MyReceiver(upstream_reply, category));
+    create_subquery(scope_to_query_, query_, VariantMap(), reply);
+...
+}
+\endcode
+
+\subsection receiver Create a class that implements ReceiverBase interface
+
+The \link unity::api::scopes::ReceiverBase ReceiverBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
+implementation receive \link unity::api::scopes::ReceiverBase::push result items and categories\endlink returned by that query. A simple implementation of
+an aggregator scope may just register all categories it receives and push all received results upstream to the query originator, e.g.
+
+\code{.cpp}
+
+virtual void push(Category::SCPtr category) override
+{
+    upstream_->register_category(category);
+}
+
+void MyReceiver::push(ResultItem result)
+{
+    upstream_->push(std::move(result));
+}
+\endcode
+
+A more sophisticated aggregator scope can rearrange results it receives into a different set of categories, alter or enrich the results before pushing them
+upstream etc.
+*/
