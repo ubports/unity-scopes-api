@@ -32,7 +32,7 @@ namespace scopes
 //! @cond
 
 Scope::Scope(internal::ScopeImpl* impl) :
-    p(impl)
+    ObjectProxy(impl)
 {
 }
 
@@ -42,7 +42,12 @@ Scope::~Scope() noexcept
 
 QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const
 {
-    return p->create_query(q, hints, reply);
+    return fwd()->create_query(q, hints, reply);
+}
+
+internal::ScopeImpl* Scope::fwd() const
+{
+    return dynamic_cast<internal::ScopeImpl*>(pimpl());
 }
 
 //! @endcond

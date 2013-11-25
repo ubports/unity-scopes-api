@@ -36,20 +36,20 @@ namespace internal
 class ObjectProxyImpl;
 }
 
-// TODO: currently incomplete, so there is no true base proxy. The technique outlined in http://tinyrul.com/3w6elg
-// would be suitable to get covariant return for a pimpl() method that returns a shared_ptr. That way, the pimpl()
-// method could be protected here in the base, and we could use ladder inheritance for both the hierarchies
-// rooted at ObjectProxy and ObjectProxyImpl.
-
 class UNITY_API ObjectProxy
 {
 public:
     ObjectProxy();
     virtual ~ObjectProxy() noexcept;
 
-private:
-    friend class internal::ObjectProxyImpl;
+protected:
+    internal::ObjectProxyImpl* pimpl() const noexcept; // Non-virtual because we can't use covariance with incomplete types
+                                                       // Each derived proxy type implements a non-virtual fwd() method
+                                                       // that is called from within each operation to down-cast the pimpl().
+    ObjectProxy(internal::ObjectProxyImpl*);
+    friend class internal::ObjectProxyImpl; // Instantiated only by ObjectProxyImpl
 
+private:
     std::unique_ptr<internal::ObjectProxyImpl> p;
 };
 

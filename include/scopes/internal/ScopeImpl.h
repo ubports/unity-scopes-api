@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_SCOPEIMPL_H
 
 #include <scopes/internal/MWScopeProxyFwd.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/ScopeProxyFwd.h>
@@ -39,18 +40,19 @@ namespace internal
 
 class RuntimeImpl;
 
-class ScopeImpl final
+class ScopeImpl : public virtual ObjectProxyImpl
 {
 public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
-    ~ScopeImpl() noexcept;
+    virtual ~ScopeImpl() noexcept;
 
     QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
 
 private:
-    MWScopeProxy mw_proxy_;
+    MWScopeProxy fwd() const;
+
     RuntimeImpl* const runtime_;
 };
 

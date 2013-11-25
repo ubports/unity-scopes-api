@@ -45,7 +45,7 @@ namespace internal
 {
 
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo) :
-    mw_proxy_(mw_proxy),
+    ObjectProxyImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
     finished_(false)
@@ -125,7 +125,7 @@ bool ReplyImpl::push(VariantMap const& variant_map)
     {
         try
         {
-            mw_proxy_->push(variant_map);
+            fwd()->push(variant_map);
             return true;
         }
         catch (MiddlewareException const& e)
@@ -149,7 +149,7 @@ void ReplyImpl::finished(ReceiverBase::Reason reason)
     {
         try
         {
-            mw_proxy_->finished(reason);
+            fwd()->finished(reason);
         }
         catch (MiddlewareException const& e)
         {
@@ -160,7 +160,12 @@ void ReplyImpl::finished(ReceiverBase::Reason reason)
 
 ReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
 {
-    return ReplyProxy(new Reply(new ReplyImpl(mw_proxy, qo)));
+    return ReplyProxy(new Reply((new ReplyImpl(mw_proxy, qo))));
+}
+
+MWReplyProxy ReplyImpl::fwd() const
+{
+    return dynamic_pointer_cast<MWReply>(proxy());
 }
 
 } // namespace internal

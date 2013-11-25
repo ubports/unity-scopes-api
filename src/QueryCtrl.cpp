@@ -32,7 +32,7 @@ namespace scopes
 //! @cond
 
 QueryCtrl::QueryCtrl(internal::QueryCtrlImpl* impl)
-    : p(impl)
+    : ObjectProxy(impl)
 {
 }
 
@@ -42,7 +42,12 @@ QueryCtrl::~QueryCtrl() noexcept
 
 void QueryCtrl::cancel() const
 {
-    return p->cancel();
+    return fwd()->cancel();
+}
+
+internal::QueryCtrlImpl* QueryCtrl::fwd() const
+{
+    return dynamic_cast<internal::QueryCtrlImpl*>(pimpl());
 }
 
 //! @endcond

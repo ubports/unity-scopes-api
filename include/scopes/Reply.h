@@ -44,7 +44,7 @@ class ResultItem;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class UNITY_API Reply : public ObjectProxy
+class UNITY_API Reply : public virtual ObjectProxy
 {
 public:
     Reply(Reply const&) = default;
@@ -96,11 +96,13 @@ public:
     */
     virtual ~Reply() noexcept;
 
-private:
-    Reply(internal::ReplyImpl* impl);         // Instantiable only by ReplyImpl
+protected:
+    Reply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
 
-    std::unique_ptr<internal::ReplyImpl> p;
+private:
+    internal::ReplyImpl* fwd() const;
+
     std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
                                                // forward cancellation.
 };

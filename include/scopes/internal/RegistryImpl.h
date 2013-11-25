@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_REGISTRYIMPL_H
 
 #include <scopes/internal/MWRegistryProxyFwd.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/Registry.h>
 
 namespace unity
@@ -36,7 +37,7 @@ namespace internal
 
 class RuntimeImpl;
 
-class RegistryImpl final
+class RegistryImpl : public virtual ObjectProxyImpl
 {
 public:
     RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
@@ -48,7 +49,7 @@ public:
     static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
 
 private:
-    MWRegistryProxy const mw_proxy_;
+    MWRegistryProxy fwd() const;
 };
 
 } // namespace internal

@@ -34,17 +34,20 @@ namespace scopes
 namespace internal
 {
 
-class ObjectProxyImpl final
+class ObjectProxyImpl
 {
 public:
     ObjectProxyImpl(MWProxy const& mw_proxy);
-    ~ObjectProxyImpl() noexcept;
+    virtual ~ObjectProxyImpl() noexcept;
+
+protected:
+    MWProxy proxy() const;                          // Non-virtual because we cannot use covariance with incomplete types.
+                                                    // Each derived proxy implements a non-virtual fwd() method
+                                                    // that is called from within each operation to down-cast the MWProxy.
 
 private:
-
     static Proxy create(MWProxy const& mw_proxy);
 
-private:
     MWProxy mw_proxy_;
 };
 
