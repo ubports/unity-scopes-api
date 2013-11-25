@@ -72,6 +72,10 @@ public:
     ResultItem(ResultItem&&) = default;
     ResultItem& operator=(ResultItem&&) = default;
 
+    void store(ResultItem const& other);
+    bool has_stored_result() const;
+    ResultItem retrieve() const;
+
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
     void set_icon(std::string const& icon);

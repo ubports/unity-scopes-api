@@ -34,6 +34,8 @@ namespace api
 namespace scopes
 {
 
+class ResultItem;
+
 namespace internal
 {
 
@@ -42,8 +44,12 @@ class ResultItemImpl
 public:
     explicit ResultItemImpl(Category::SCPtr category);
     ResultItemImpl(Category::SCPtr category, VariantMap const& variant_map);
-    ResultItemImpl(ResultItemImpl const& other) = default;
-    ResultItemImpl& operator=(ResultItemImpl const& other) = default;
+    ResultItemImpl(ResultItemImpl const& other);
+    ResultItemImpl& operator=(ResultItemImpl const& other);
+
+    void store(ResultItem const& other);
+    bool has_stored_result() const;
+    ResultItem retrieve() const;
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
@@ -69,6 +75,7 @@ private:
     std::string icon_;
     std::string dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
+    std::shared_ptr<VariantMap> stored_result_;
     Category::SCPtr category_;
 };
 

@@ -58,6 +58,21 @@ ResultItem& ResultItem::operator=(ResultItem const& other)
     return *this;
 }
 
+void ResultItem::store(ResultItem const& other)
+{
+    p->store(other);
+}
+
+bool ResultItem::has_stored_result() const
+{
+    return p->has_stored_result();
+}
+
+ResultItem ResultItem::retrieve() const
+{
+    return p->retrieve();
+}
+
 void ResultItem::set_uri(std::string const& uri)
 {
     p->set_uri(uri);

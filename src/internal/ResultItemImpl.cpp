@@ -19,6 +19,7 @@
 #include <scopes/internal/ResultItemImpl.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
+#include <scopes/ResultItem.h>
 #include <sstream>
 
 namespace unity
@@ -40,7 +41,7 @@ ResultItemImpl::ResultItemImpl(Category::SCPtr category)
 {
     if (category_ == nullptr)
     {
-        throw InvalidArgumentException("ResultItemImpl(): null category");
+        throw InvalidArgumentException("ResultItem: null category");
     }
 }
 
@@ -48,6 +49,67 @@ ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& varia
     : ResultItemImpl(category)
 {
     deserialize(variant_map);
+}
+
+ResultItemImpl::ResultItemImpl(ResultItemImpl const& other)
+    : uri_(other.uri_),
+    title_(other.title_),
+    icon_(other.icon_),
+    dnd_uri_(other.dnd_uri_),
+    category_(other.category_)
+{
+    if (other.metadata_)
+    {
+        metadata_ = std::make_shared<VariantMap>(*(other.metadata_));
+    }
+    if (other.stored_result_)
+    {
+        stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
+    }
+}
+
+ResultItemImpl& ResultItemImpl::operator=(ResultItemImpl const& other)
+{
+    if (this != &other)
+    {
+        uri_ = other.uri_;
+        title_ = other.title_;
+        icon_ = other.icon_;
+        dnd_uri_ = other.dnd_uri_;
+        if (other.metadata_)
+        {
+            metadata_ = std::make_shared<VariantMap>(*(other.metadata_));
+        }
+        if (other.stored_result_)
+        {
+            stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
+        }
+        category_ = other.category_;
+    }
+    return *this;
+}
+
+void ResultItemImpl::store(ResultItem const& other)
+{
+    if (this == other.p.get())
+    {
+        throw InvalidArgumentException("ResultItem:: cannot store self");
+    }
+    stored_result_.reset(new VariantMap(other.serialize()));
+}
+
+bool ResultItemImpl::has_stored_result() const
+{
+    return stored_result_ != nullptr;
+}
+
+ResultItem ResultItemImpl::retrieve() const
+{
+    if (stored_result_ == nullptr)
+    {
+        throw InvalidArgumentException("ResultItem: no result has been stored");
+    }
+    return ResultItem(category_, *stored_result_); //FIXME: this category from the outer result!
 }
 
 void ResultItemImpl::set_uri(std::string const& uri)
@@ -141,41 +203,70 @@ VariantMap ResultItemImpl::serialize() const
             var[kv.first] = kv.second;
         }
     }
-    return var;
+
+    VariantMap outer;
+    outer["attrs"] = var;
+    if (stored_result_)
+    {
+        VariantMap stored_result_var;
+        stored_result_var["result"] = *stored_result_;
+        outer["internal"] = stored_result_var;
+    }
+    return outer;
 }
 
 void ResultItemImpl::deserialize(VariantMap const& var)
 {
-    auto it = var.find("uri");
+    // check for ["internal"]["result"] dict which holds stored result.
+    auto it = var.find("internal");
+    if (it != var.end())
+    {
+        it = it->second.get_dict().find("result");
+        if (it != var.end())
+        {
+            stored_result_.reset(new VariantMap(it->second.get_dict()));
+        }
+    }
+
+    // check for ["attrs"] dict which holds all attributes
+    it = var.find("attrs");
     if (it == var.end())
+    {
+        throw InvalidArgumentException("Invalid variant structure");
+    }
+
+    const VariantMap attrs = it->second.get_dict();
+
+    it = attrs.find("uri");
+    if (it == attrs.end())
         throw InvalidArgumentException("Missing 'uri'");
     uri_ = it->second.get_string();
 
-    it = var.find("title");
-    if (it == var.end())
+    it = attrs.find("title");
+    if (it == attrs.end())
         throw InvalidArgumentException("Missing 'title'");
     title_ = it->second.get_string();
 
-    it = var.find("icon");
-    if (it == var.end())
+    it = attrs.find("icon");
+    if (it == attrs.end())
         throw InvalidArgumentException("Missing 'icon'");
     icon_ = it->second.get_string();
 
-    it = var.find("dnd_uri");
-    if (it == var.end())
+    it = attrs.find("dnd_uri");
+    if (it == attrs.end())
         throw InvalidArgumentException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
 
     // cat_id is not really used as it's provided by category instance pointer,
-    // but the check is here for consistency and to make sure a valid variant
+    // but the check is here for consistency and to make sure a valid attrsiant
     // is passed.
-    it = var.find("cat_id");
-    if (it == var.end())
+    it = attrs.find("cat_id");
+    if (it == attrs.end())
         throw InvalidArgumentException("Missing 'cat_id'");
 
-    if (var.size() > standard_attrs.size())
+    if (attrs.size() > standard_attrs.size())
     {
-        for (auto const& kv: var)
+        for (auto const& kv: attrs)
         {
             if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
             {
