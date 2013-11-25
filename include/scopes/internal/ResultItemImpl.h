@@ -47,13 +47,13 @@ public:
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
-    void set_icon(std::string const& icon);
+    void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
     void add_metadata(std::string const& key, Variant const& value);
 
     std::string uri() const;
     std::string title() const;
-    std::string icon() const;
+    std::string art() const;
     std::string dnd_uri() const;
     Category::SCPtr category() const;
 
@@ -66,7 +66,7 @@ private:
 
     std::string uri_;
     std::string title_;
-    std::string icon_;
+    std::string art_;
     std::string dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
     Category::SCPtr category_;

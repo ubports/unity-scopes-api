@@ -69,18 +69,18 @@ public:
     virtual ~ResultItem();
 
     ResultItem& operator=(ResultItem const& other);
-    ResultItem(ResultItem&&) = default;
-    ResultItem& operator=(ResultItem&&) = default;
+    ResultItem(ResultItem&&);
+    ResultItem& operator=(ResultItem&&);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
-    void set_icon(std::string const& icon);
+    void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
     void add_metadata(std::string const& key, Variant const& value);
 
     std::string uri() const;
     std::string title() const;
-    std::string icon() const;
+    std::string art() const;
     std::string dnd_uri() const;
     Category::SCPtr category() const;
 

@@ -52,7 +52,7 @@ public:
         ResultItem res(cat);
         res.set_uri("uri");
         res.set_title("scope-A: result 1 for query \"" + query_ + "\"");
-        res.set_icon("icon");
+        res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;

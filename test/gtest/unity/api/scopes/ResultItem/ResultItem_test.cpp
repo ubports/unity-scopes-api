@@ -35,13 +35,13 @@ TEST(ResultItem, basic)
         ResultItem result(cat);
         result.set_uri("http://ubuntu.com");
         result.set_title("a title");
-        result.set_icon("an icon");
+        result.set_art("an icon");
         result.set_dnd_uri("http://canonical.com");
         result.add_metadata("foo", Variant("bar"));
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("a title", result.title());
-        EXPECT_EQ("an icon", result.icon());
+        EXPECT_EQ("an icon", result.art());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
         EXPECT_EQ("bar", result.serialize()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
@@ -52,14 +52,14 @@ TEST(ResultItem, basic)
         ResultItem result(cat);
         result.set_uri("uri a");
         result.set_title("title a");
-        result.set_icon("icon a");
+        result.set_art("icon a");
         result.set_dnd_uri("dnd_uri a");
 
         ResultItem copy(result);
 
         copy.set_uri("uri b");
         copy.set_title("title b");
-        copy.set_icon("icon b");
+        copy.set_art("icon b");
         copy.set_dnd_uri("dnd_uri b");
 
         result.add_metadata("foo", Variant("bar"));
@@ -67,14 +67,14 @@ TEST(ResultItem, basic)
 
         EXPECT_EQ("uri a", result.uri());
         EXPECT_EQ("title a", result.title());
-        EXPECT_EQ("icon a", result.icon());
+        EXPECT_EQ("icon a", result.art());
         EXPECT_EQ("dnd_uri a", result.dnd_uri());
         EXPECT_EQ("bar", result.serialize()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
 
         EXPECT_EQ("uri b", copy.uri());
         EXPECT_EQ("title b", copy.title());
-        EXPECT_EQ("icon b", copy.icon());
+        EXPECT_EQ("icon b", copy.art());
         EXPECT_EQ("dnd_uri b", copy.dnd_uri());
         EXPECT_EQ("xyz", copy.serialize()["foo"].get_string());
         EXPECT_EQ("1", copy.category()->id());
@@ -85,13 +85,13 @@ TEST(ResultItem, basic)
         ResultItem result(cat);
         result.set_uri("uri a");
         result.set_title("title a");
-        result.set_icon("icon a");
+        result.set_art("icon a");
         result.set_dnd_uri("dnd_uri a");
         ResultItem copy = result;
 
         copy.set_uri("uri b");
         copy.set_title("title b");
-        copy.set_icon("icon b");
+        copy.set_art("icon b");
         copy.set_dnd_uri("dnd_uri b");
 
         result.add_metadata("foo", Variant("bar"));
@@ -99,14 +99,14 @@ TEST(ResultItem, basic)
 
         EXPECT_EQ("uri a", result.uri());
         EXPECT_EQ("title a", result.title());
-        EXPECT_EQ("icon a", result.icon());
+        EXPECT_EQ("icon a", result.art());
         EXPECT_EQ("dnd_uri a", result.dnd_uri());
         EXPECT_EQ("bar", result.serialize()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
 
         EXPECT_EQ("uri b", copy.uri());
         EXPECT_EQ("title b", copy.title());
-        EXPECT_EQ("icon b", copy.icon());
+        EXPECT_EQ("icon b", copy.art());
         EXPECT_EQ("dnd_uri b", copy.dnd_uri());
         EXPECT_EQ("xyz", copy.serialize()["foo"].get_string());
         EXPECT_EQ("1", copy.category()->id());
@@ -122,18 +122,18 @@ TEST(ResultItem, serialize)
     ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
-    result.set_icon("an icon");
+    result.set_art("an icon");
     result.set_dnd_uri("http://canonical.com");
 
     EXPECT_EQ("http://ubuntu.com", result.uri());
     EXPECT_EQ("a title", result.title());
-    EXPECT_EQ("an icon", result.icon());
+    EXPECT_EQ("an icon", result.art());
     EXPECT_EQ("http://canonical.com", result.dnd_uri());
 
     auto var = result.serialize();
     EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
     EXPECT_EQ("a title", var["title"].get_string());
-    EXPECT_EQ("an icon", var["icon"].get_string());
+    EXPECT_EQ("an icon", var["art"].get_string());
     EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
     EXPECT_EQ("1", var["cat_id"].get_string());
 }
@@ -151,7 +151,7 @@ TEST(ResultItem, serialize_excp)
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_title("a title");
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_icon("an icon");
+    result.set_art("an icon");
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_dnd_uri("http://canonical.com");
     EXPECT_NO_THROW(result.serialize());
@@ -164,7 +164,7 @@ TEST(ResultItem, deserialize)
     vm["uri"] = "http://ubuntu.com";
     vm["dnd_uri"] = "http://canonical.com";
     vm["title"] = "a title";
-    vm["icon"] = "an icon";
+    vm["art"] = "an icon";
     vm["cat_id"] = "2";
     vm["foo"] = "bar"; // custom attribute
 
@@ -175,7 +175,7 @@ TEST(ResultItem, deserialize)
     auto var = result.serialize();
     EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
     EXPECT_EQ("a title", var["title"].get_string());
-    EXPECT_EQ("an icon", var["icon"].get_string());
+    EXPECT_EQ("an icon", var["art"].get_string());
     EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
     EXPECT_EQ("bar", var["foo"].get_string());
     EXPECT_EQ("1", var["cat_id"].get_string());
