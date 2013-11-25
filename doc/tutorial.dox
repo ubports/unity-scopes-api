@@ -85,7 +85,7 @@ void MyQuery::run(ReplyProxy const& reply)
     auto category = reply->register_category("recommended", "Recommended", icon, "");
     //... query a local or remote backend
 
-    for every result returned by the backend
+    for (auto res: backend.get_results(search_query)) // for every result returned by a backend
     {
         ...
         ResultItem result(category); // create a result item in "recommended" category
@@ -161,7 +161,7 @@ void MyQuery::run(unity::api::scopes::ReplyProxy const& upstream_reply)
     auto category = reply->register_category("recommended", "Recommended", icon, "");
     ReceiverBase::SPtr reply(new MyReceiver(upstream_reply, category));
     create_subquery(scope_to_query_, query_, VariantMap(), reply);
-...
+    ...
 }
 \endcode
 
