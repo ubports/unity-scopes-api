@@ -21,6 +21,7 @@
 
 #include <scopes/internal/MWReplyProxyFwd.h>
 #include <scopes/internal/CategoryRegistry.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
 #include <scopes/ReceiverBase.h>
@@ -49,11 +50,11 @@ class QueryObject;
 // Calls to push() after finished() was called are ignored.
 // If the proxy goes out of scope before finished was called, it implicitly calls finished().
 
-class ReplyImpl final
+class ReplyImpl : public virtual ObjectProxyImpl
 {
 public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
-    ~ReplyImpl() noexcept;
+    virtual ~ReplyImpl() noexcept;
 
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
     void register_category(Category::SCPtr category);
@@ -70,8 +71,8 @@ public:
 private:
     bool push(Category::SCPtr category);
     bool push(VariantMap const& variant_map);
+    MWReplyProxy fwd() const;
 
-    MWReplyProxy mw_proxy_;
     std::shared_ptr<QueryObject> qo_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;

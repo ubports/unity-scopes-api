@@ -37,7 +37,7 @@ namespace internal
 {
 
 RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
-    mw_proxy_(mw_proxy)
+    ObjectProxyImpl(mw_proxy)
 {
 }
 
@@ -47,17 +47,22 @@ RegistryImpl::~RegistryImpl() noexcept
 
 ScopeProxy RegistryImpl::find(std::string const& scope_name)
 {
-    return mw_proxy_->find(scope_name);
+    return fwd()->find(scope_name);
 }
 
 ScopeMap RegistryImpl::list()
 {
-    return mw_proxy_->list();
+    return fwd()->list();
 }
 
 RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
 {
     return RegistryProxy(new Registry(new RegistryImpl(mw_proxy, runtime)));
+}
+
+MWRegistryProxy RegistryImpl::fwd() const
+{
+    return dynamic_pointer_cast<MWRegistry>(proxy());
 }
 
 } // namespace internal

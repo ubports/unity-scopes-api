@@ -21,6 +21,7 @@
 
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/internal/MWReplyProxyFwd.h>
+#include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/QueryCtrlProxyFwd.h>
 
 namespace unity
@@ -41,19 +42,19 @@ namespace internal
 // Calls to push() after finished() was called are ignored.
 // If the proxy goes out of scope before finished was called, it implicitly calls finished().
 
-class QueryCtrlImpl final
+class QueryCtrlImpl : public virtual ObjectProxyImpl
 {
 public:
-    ~QueryCtrlImpl() noexcept;
+    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
+    virtual ~QueryCtrlImpl() noexcept;
 
     void cancel();
 
     static QueryCtrlProxy create(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
 
 private:
-    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
+    MWQueryCtrlProxy fwd() const;
 
-    MWQueryCtrlProxy ctrl_proxy_;
     MWReplyProxy reply_proxy_;
 };
 

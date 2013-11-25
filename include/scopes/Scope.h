@@ -43,7 +43,7 @@ class ScopeImpl;
 \brief Allows queries to be sent to a scope and results for the query to be retrieved.
 */
 
-class UNITY_API Scope : public ObjectProxy
+class UNITY_API Scope : public virtual ObjectProxy
 {
 public:
     /**
@@ -61,11 +61,12 @@ public:
     */
     virtual ~Scope() noexcept;
 
-private:
-    Scope(internal::ScopeImpl* impl);          // Instantiable only by ScopeImpl
+protected:
+    Scope(internal::ScopeImpl* impl);          // Instantiated only by ScopeImpl
     friend class internal::ScopeImpl;
 
-    std::unique_ptr<internal::ScopeImpl> p;
+private:
+    internal::ScopeImpl* fwd() const;
 };
 
 } // namespace scopes

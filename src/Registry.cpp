@@ -32,7 +32,7 @@ namespace scopes
 //! @cond
 
 Registry::Registry(internal::RegistryImpl* impl) :
-    p(impl)
+    ObjectProxy(impl)
 {
 }
 
@@ -44,12 +44,17 @@ Registry::~Registry() noexcept
 
 ScopeProxy Registry::find(std::string const& scope_name) const
 {
-    return p->find(scope_name);
+    return fwd()->find(scope_name);
 }
 
 ScopeMap Registry::list() const
 {
-    return p->list();
+    return fwd()->list();
+}
+
+internal::RegistryImpl* Registry::fwd() const
+{
+    return dynamic_cast<internal::RegistryImpl*>(pimpl());
 }
 
 } // namespace scopes

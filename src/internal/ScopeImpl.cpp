@@ -40,7 +40,7 @@ namespace internal
 {
 
 ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime) :
-    mw_proxy_(mw_proxy),
+    ObjectProxyImpl(mw_proxy),
     runtime_(runtime)
 {
     assert(runtime);
@@ -58,7 +58,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
         ReplyObject::SPtr ro(make_shared<ReplyObject>(reply, runtime_));
-        MWReplyProxy rp = mw_proxy_->mw_base()->add_reply_object(ro);
+        MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return
@@ -66,7 +66,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = mw_proxy_->create_query(q, hints, rp);
+        ctrl = fwd()->create_query(q, hints, rp);
         assert(ctrl);
     }
     catch (unity::Exception const& e)
@@ -90,6 +90,11 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime)
 {
     return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime)));
+}
+
+MWScopeProxy ScopeImpl::fwd() const
+{
+    return dynamic_pointer_cast<MWScope>(proxy());
 }
 
 } // namespace internal

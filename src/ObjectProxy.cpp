@@ -42,8 +42,18 @@ ObjectProxy::ObjectProxy()
 {
 }
 
+ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
+    p(pimpl)
+{
+}
+
 ObjectProxy::~ObjectProxy() noexcept
 {
+}
+
+internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
+{
+    return p.get();
 }
 
 //! @endcond
