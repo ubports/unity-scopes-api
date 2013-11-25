@@ -32,8 +32,8 @@ namespace scopes
 
 //! @cond
 
-Reply::Reply(internal::ReplyImpl* impl)
-    : p(impl)
+Reply::Reply(internal::ReplyImpl* impl) :
+    ObjectProxy(impl)
 {
 }
 
@@ -43,27 +43,32 @@ Reply::~Reply() noexcept
 
 Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
 {
-    return p->register_category(id, title, icon, renderer_template);
+    return fwd()->register_category(id, title, icon, renderer_template);
 }
 
 void Reply::register_category(Category::SCPtr category)
 {
-    return p->register_category(category);
+    return fwd()->register_category(category);
 }
 
 Category::SCPtr Reply::lookup_category(std::string const& id) const
 {
-    return p->lookup_category(id);
+    return fwd()->lookup_category(id);
 }
 
 bool Reply::push(ResultItem const& result) const
 {
-    return p->push(result);
+    return fwd()->push(result);
 }
 
 void Reply::finished() const
 {
-    return p->finished();
+    return fwd()->finished();
+}
+
+internal::ReplyImpl* Reply::fwd() const
+{
+    return dynamic_cast<internal::ReplyImpl*>(pimpl());
 }
 
 //! @endcond

@@ -40,7 +40,7 @@ class QueryCtrlImpl;
 \brief QueryCtrl allows a query to be cancelled.
 */
 
-class UNITY_API QueryCtrl : public ObjectProxy
+class UNITY_API QueryCtrl : public virtual ObjectProxy
 {
 public:
     /**
@@ -58,13 +58,12 @@ public:
     */
     virtual ~QueryCtrl() noexcept;
 
-private:
-    QueryCtrl(internal::QueryCtrlImpl* impl);         // Instantiable only by QueryCtrlImpl
-    // @cond
+protected:
+    QueryCtrl(internal::QueryCtrlImpl* impl);         // Instantiated only by QueryCtrlImpl
     friend class internal::QueryCtrlImpl;
-    // @endcond
 
-    std::unique_ptr<internal::QueryCtrlImpl> p;
+private:
+    internal::QueryCtrlImpl* fwd() const;
 };
 
 } // namespace scopes

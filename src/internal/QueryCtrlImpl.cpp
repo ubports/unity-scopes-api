@@ -42,7 +42,7 @@ namespace internal
 {
 
 QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy) :
-    ctrl_proxy_(ctrl_proxy),
+    ObjectProxyImpl(ctrl_proxy),
     reply_proxy_(reply_proxy)
 {
     assert(ctrl_proxy);
@@ -60,12 +60,12 @@ void QueryCtrlImpl::cancel()
     try
     {
         // Forward cancellation down-stream to the query. This does not block.
-        ctrl_proxy_->cancel();
+        fwd()->cancel();
 
         // Indicate (to ourselves) that this query is complete. Calling via the MWReplyProxy ensures
         // the finished() call will be processed by a seperate server-side thread,
         // so we cannot block here.
-        reply_proxy_->finished();
+        reply_proxy_->finished(ReceiverBase::Cancelled);
     }
     catch (MiddlewareException const& e)
     {
@@ -76,6 +76,11 @@ void QueryCtrlImpl::cancel()
 QueryCtrlProxy QueryCtrlImpl::create(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy)
 {
     return QueryCtrlProxy(new QueryCtrl(new QueryCtrlImpl(ctrl_proxy, reply_proxy)));
+}
+
+MWQueryCtrlProxy QueryCtrlImpl::fwd() const
+{
+    return dynamic_pointer_cast<MWQueryCtrl>(proxy());
 }
 
 } // namespace internal

@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <scopes/internal/ReplyImpl.h>
+
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/ResultItemImpl.h>
-#include <scopes/internal/ReplyImpl.h>
 #include <scopes/ResultItem.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -44,7 +45,7 @@ namespace internal
 {
 
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo) :
-    mw_proxy_(mw_proxy),
+    ObjectProxyImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
     finished_(false)
@@ -91,8 +92,8 @@ Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
 
 bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
 {
-    // if this is an aggregator scope, it may be pushing result items obtained
-    // from ReplyObject without registering category first.
+    // If this is an aggregator scope, it may be pushing result items obtained
+    // from ReplyObject without registering a category first.
     auto cat = cat_registry_->lookup_category(result.category()->id());
     if (cat == nullptr)
     {
@@ -115,17 +116,22 @@ bool ReplyImpl::push(Category::SCPtr category)
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
+    if (!qo_->pushable())
+    {
+        return false; // Query was cancelled or had an error.
+    }
+
     if (!finished_.load())
     {
         try
         {
-            mw_proxy_->push(variant_map);
+            fwd()->push(variant_map);
             return true;
         }
         catch (MiddlewareException const& e)
         {
             // TODO: log error
-            finished();
+            finished(ReceiverBase::Error);
             return false;
         }
     }
@@ -134,11 +140,16 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
+    finished(ReceiverBase::Finished);
+}
+
+void ReplyImpl::finished(ReceiverBase::Reason reason)
+{
     if (!finished_.exchange(true))
     {
         try
         {
-            mw_proxy_->finished();
+            fwd()->finished(reason);
         }
         catch (MiddlewareException const& e)
         {
@@ -149,7 +160,12 @@ void ReplyImpl::finished()
 
 ReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
 {
-    return ReplyProxy(new Reply(new ReplyImpl(mw_proxy, qo)));
+    return ReplyProxy(new Reply((new ReplyImpl(mw_proxy, qo))));
+}
+
+MWReplyProxy ReplyImpl::fwd() const
+{
+    return dynamic_pointer_cast<MWReply>(proxy());
 }
 
 } // namespace internal

@@ -49,6 +49,11 @@ Proxy ObjectProxyImpl::create(MWProxy const&)
     return make_shared<ObjectProxy>();
 }
 
+MWProxy ObjectProxyImpl::proxy() const
+{
+    return mw_proxy_;
+}
+
 } // namespace internal
 
 } // namespace scopes

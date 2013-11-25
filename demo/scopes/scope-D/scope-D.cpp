@@ -143,7 +143,7 @@ public:
         // Informational callback to let a query know when it was cancelled. The query should
         // clean up any resources it has allocated, stop pushing results, and arrange for
         // run() to return (if still active).
-        // Ignoring query cancelltion does not do any direct harm, but wastes CPU cycles: any
+        // Ignoring query cancellation does not do any direct harm, but wastes CPU cycles: any
         // results that are pushed once a query is cancelled are ignored anyway.
         // The main purpose of this callback to give queries a chance to stop doing whatever
         // work may still be in progress on a query. Note that cancellations are frequent;

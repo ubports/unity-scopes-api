@@ -49,7 +49,7 @@ typedef std::map<std::string, ScopeProxy> ScopeMap;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class UNITY_API Registry : public ObjectProxy
+class UNITY_API Registry : public virtual ObjectProxy
 {
 public:
     /// @cond
@@ -58,7 +58,7 @@ public:
 
     /**
     \brief Returns a ScopeProxy for the scope with the given name.
-    @return If no scope with the given name exists, the returned `shared_ptr` stores a `nullptr`.
+    @return If no scope with the given name exists, find() throws NotFoundException.
     */
     ScopeProxy find(std::string const& scope_name) const;
 
@@ -67,11 +67,12 @@ public:
     */
     ScopeMap list() const;
 
-private:
-    Registry(internal::RegistryImpl* impl);          // Instantiable only by RegistryImpl
+protected:
+    Registry(internal::RegistryImpl* impl);          // Instantiated only by RegistryImpl
     friend class internal::RegistryImpl;
 
-    std::unique_ptr<internal::RegistryImpl> p;
+private:
+    internal::RegistryImpl* fwd() const;
 };
 
 } // namespace scopes
