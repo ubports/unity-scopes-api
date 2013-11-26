@@ -39,6 +39,7 @@ class ReplyImpl;
 }
 
 class ResultItem;
+class CategoryRenderer;
 
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
@@ -53,7 +54,7 @@ public:
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
     \return Category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
 
     /**
     \brief Register an existing category instance and send it to the source of the query.

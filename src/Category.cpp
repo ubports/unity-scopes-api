@@ -30,7 +30,7 @@ namespace scopes
 
 //! @cond
 
-Category::Category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+Category::Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
     : p(new internal::CategoryImpl(id, title, icon, renderer_template))
 {
 }
@@ -50,7 +50,7 @@ std::string Category::icon() const
     return p->icon();
 }
 
-std::string Category::renderer_template() const
+CategoryRenderer const& Category::renderer_template() const
 {
     return p->renderer_template();
 }

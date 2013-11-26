@@ -26,6 +26,7 @@
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
+#include <scopes/CategoryRenderer.h>
 
 #include <sstream>
 #include <cassert>
@@ -72,7 +73,7 @@ void ReplyImpl::register_category(Category::SCPtr category)
     push(category);
 }
 
-Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
 {
     auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
 

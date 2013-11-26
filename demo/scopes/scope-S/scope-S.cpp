@@ -20,6 +20,7 @@
 #include <scopes/Reply.h>
 #include <scopes/ResultItem.h>
 #include <scopes/Category.h>
+#include <scopes/CategoryRenderer.h>
 
 #include <iostream>
 #include <thread>
@@ -34,8 +35,9 @@ using namespace unity::api::scopes;
 class MyQuery : public QueryBase
 {
 public:
-    MyQuery(string const& query) :
-        query_(query)
+    MyQuery(string const& query, CategoryRenderer const& renderer) :
+        query_(query),
+        renderer_(renderer)
     {
         cerr << "MyQuery/" << query << " created" << endl;
     }
@@ -54,7 +56,7 @@ public:
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
-        auto cat = reply->register_category("cat1", "Category 1", "", "{}");
+        auto cat = reply->register_category("cat1", "Category 1", "", renderer_);
         ResultItem result(cat);
         result.set_title("scope-slow: result 1 for query \"" + query_ + "\"");
         reply->push(result);
@@ -63,6 +65,7 @@ public:
 
 private:
     string query_;
+    CategoryRenderer renderer_;
 };
 
 class MyScope : public ScopeBase
@@ -78,7 +81,7 @@ public:
 
     virtual QueryBase::UPtr create_query(string const& q, VariantMap const& hints) override
     {
-        QueryBase::UPtr query(new MyQuery(q));
+        QueryBase::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q << "\"" << endl;
 
         auto it = hints.find("cardinality");
@@ -95,6 +98,9 @@ public:
 
         return query;
     }
+
+private:
+    CategoryRenderer renderer_;
 };
 
 extern "C"

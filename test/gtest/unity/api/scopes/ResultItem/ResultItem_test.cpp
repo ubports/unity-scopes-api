@@ -18,6 +18,7 @@
 
 #include <scopes/ResultItem.h>
 #include <scopes/Category.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -29,7 +30,8 @@ using namespace unity::api::scopes::internal;
 TEST(ResultItem, basic)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
 
     {
         ResultItem result(cat);
@@ -117,7 +119,8 @@ TEST(ResultItem, basic)
 TEST(ResultItem, serialize)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
 
     ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
@@ -142,7 +145,8 @@ TEST(ResultItem, serialize)
 TEST(ResultItem, serialize_excp)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     ResultItem result(cat);
 
     // throw until all required attributes are non-empty
@@ -169,7 +173,8 @@ TEST(ResultItem, deserialize)
     vm["foo"] = "bar"; // custom attribute
 
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     ResultItem result(cat, vm);
 
     auto var = result.serialize();

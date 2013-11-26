@@ -19,6 +19,7 @@
 #include <scopes/Registry.h>
 #include <scopes/Reply.h>
 #include <scopes/ResultItem.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -96,7 +97,8 @@ public:
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
         {
-            upstream_reply->register_category("cat1", "title", "icon", "{}");
+            CategoryRenderer rdr;
+            upstream_reply->register_category("cat1", "title", "icon", rdr);
         }
         catch (const unity::InvalidArgumentException &e) // this shouldn't happen
         {

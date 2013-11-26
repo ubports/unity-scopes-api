@@ -18,6 +18,7 @@
 
 #include <scopes/ScopeBase.h>
 #include <scopes/ResultItem.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/Category.h>
 #include <scopes/Reply.h>
 
@@ -187,7 +188,8 @@ public:
             auto cat = reply->lookup_category("cat1");
             if (cat == nullptr)
             {
-                cat = reply->register_category("cat1", "Category 1", "", "{}");
+                CategoryRenderer rdr;
+                cat = reply->register_category("cat1", "Category 1", "", rdr);
             }
             for (int i = 1; i < 4; ++i)
             {

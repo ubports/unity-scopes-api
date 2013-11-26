@@ -51,7 +51,7 @@ Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_ma
     return cat;
 }
 
-Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template)
+Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template)
 {
     auto cat = std::shared_ptr<Category>(new Category(id, title, icon, renderer_template));
     register_category(cat);

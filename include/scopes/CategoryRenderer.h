@@ -43,7 +43,7 @@ namespace internal
 class UNITY_API CategoryRenderer
 {
 public:
-    CategoryRenderer(std::string const& json_text = DEFAULT);
+    explicit CategoryRenderer(std::string const& json_text = DEFAULT);
     static CategoryRenderer from_file(std::string const& path);
 
     std::string data() const;

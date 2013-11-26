@@ -17,6 +17,7 @@
  */
 
 #include <scopes/internal/CategoryRegistry.h>
+#include <scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Variant.h>
 
@@ -31,8 +32,9 @@ TEST(CategoryRegistry, basic)
 {
     CategoryRegistry reg;
     {
+        CategoryRenderer rdr;
         EXPECT_EQ(nullptr, reg.lookup_category("a"));
-        auto cat = reg.register_category("a", "title", "icon", "{}");
+        auto cat = reg.register_category("a", "title", "icon", rdr);
         EXPECT_TRUE(cat != nullptr);
 
         auto cat1 = reg.lookup_category("a");
@@ -52,15 +54,16 @@ TEST(CategoryRegistry, basic)
         EXPECT_EQ("b", cat->id());
         EXPECT_EQ("title", cat->title());
         EXPECT_EQ("icon", cat->icon());
-        EXPECT_EQ("{\"a\":1}", cat->renderer_template());
+        EXPECT_EQ("{\"a\":1}", cat->renderer_template().data());
     }
 }
 
 TEST(CategoryRegistry, exceptions)
 {
     CategoryRegistry reg;
+    CategoryRenderer rdr;
 
-    auto cat = reg.register_category("a", "title", "icon", "{}");
-    EXPECT_THROW(reg.register_category("a", "title1", "icon1", "{}"), InvalidArgumentException);
+    auto cat = reg.register_category("a", "title", "icon", rdr);
+    EXPECT_THROW(reg.register_category("a", "title1", "icon1", rdr), InvalidArgumentException);
     EXPECT_THROW(reg.register_category(cat), InvalidArgumentException);
 }
