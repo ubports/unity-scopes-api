@@ -39,7 +39,7 @@ namespace
 {
     const string overrideable_str = "Override";
     const string scope_name_str = "LocalizedName";
-    const string icon_uri_str = "IconURI";
+    const string art_str = "Art";
     const string description_str = "Description";
     const string search_hint_str = "SearchHint";
     const string hot_key_str = "HotKey";
@@ -56,7 +56,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         overrideable_ = false;
     }
-    icon_uri_ = parser()->get_string(SCOPE_CONFIG_GROUP, icon_uri_str);
+    art_ = parser()->get_string(SCOPE_CONFIG_GROUP, art_str);
     localized_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_name_str);
     description_ = parser()->get_string(SCOPE_CONFIG_GROUP, description_str);
 
@@ -89,9 +89,9 @@ bool ScopeConfig::overrideable() const
     return overrideable_;
 }
 
-string ScopeConfig::icon_uri() const
+string ScopeConfig::art() const
 {
-    return icon_uri_;
+    return art_;
 }
 
 string ScopeConfig::localized_name() const

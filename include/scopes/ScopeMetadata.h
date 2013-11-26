@@ -46,7 +46,7 @@ public:
     ScopeMetadata& operator=(ScopeMetadata&&);
 
     std::string scope_name() const;
-    std::string icon_uri() const;
+    std::string art() const;
     ScopeProxy proxy() const;
     std::string localized_name() const; // localized
     std::string description() const;    // localized

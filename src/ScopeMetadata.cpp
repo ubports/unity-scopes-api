@@ -64,9 +64,9 @@ string ScopeMetadata::scope_name() const
     return p->scope_name();
 }
 
-string ScopeMetadata::icon_uri() const
+string ScopeMetadata::art() const
 {
-    return p->icon_uri();
+    return p->art();
 }
 
 ScopeProxy ScopeMetadata::proxy() const

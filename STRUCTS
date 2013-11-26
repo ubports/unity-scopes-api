@@ -23,7 +23,7 @@ ResultItem (returned by serialize()):
 =======================================
  'uri' : string
  'title' : string
- 'icon' : string
+ 'art' : string
  'dnd_uri' : string
  'cat_id' : string
  + any custom key-value attribute added by scope author.
@@ -32,13 +32,13 @@ Category (returned by serialize()):
 =====================================
  'id' : string
  'title' : string
- 'icon' : string
+ 'art' : string
  'renderer_template' : string
 
 ScopeMetaData (returned by serialize()):
 =====================================
  'scope_name' : string
- 'icon_uri' : string
+ 'art' : string
  'proxy' : dictionary
     'identity' : string
     'endpoint' : string

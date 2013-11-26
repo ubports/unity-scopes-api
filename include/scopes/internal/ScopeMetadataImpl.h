@@ -47,7 +47,7 @@ public:
     ScopeMetadataImpl& operator=(ScopeMetadataImpl&&) = default;
 
     std::string scope_name() const;
-    std::string icon_uri() const;
+    std::string art() const;
     ScopeProxy proxy() const;
     std::string localized_name() const; // localized
     std::string description() const;    // localized
@@ -55,7 +55,7 @@ public:
     std::string hot_key() const;        // localized, optional
 
     void set_scope_name(std::string const& scope_name);
-    void set_icon_uri(std::string const& icon_uri);
+    void set_art(std::string const& art);
     void set_proxy(ScopeProxy const& proxy);
     void set_localized_name(std::string const& localized_name);
     void set_description(std::string const& description);
@@ -71,7 +71,7 @@ private:
 
     MiddlewareBase* mw_;
     std::string scope_name_;
-    std::string icon_uri_;
+    std::string art_;
     ScopeProxy proxy_;
     std::string localized_name_;
     std::string description_;

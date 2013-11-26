@@ -165,7 +165,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             ScopeConfig sc(pair.second);
             mi->set_scope_name(sc.localized_name());
-            mi->set_icon_uri(sc.icon_uri());
+            mi->set_art(sc.art());
             mi->set_description(sc.description());
             try
             {

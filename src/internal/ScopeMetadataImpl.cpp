@@ -50,7 +50,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map)
 
 ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     scope_name_(other.scope_name_),
-    icon_uri_(other.icon_uri_),
+    art_(other.art_),
     proxy_(other.proxy_),
     localized_name_(other.localized_name_),
     description_(other.description_)
@@ -70,7 +70,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
     if (this != &rhs)
     {
         scope_name_ = rhs.scope_name_;
-        icon_uri_ = rhs.icon_uri_;
+        art_ = rhs.art_;
         proxy_ = rhs.proxy_;
         localized_name_ = rhs.localized_name_;
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
@@ -84,9 +84,9 @@ std::string ScopeMetadataImpl::scope_name() const
     return scope_name_;
 }
 
-std::string ScopeMetadataImpl::icon_uri() const
+std::string ScopeMetadataImpl::art() const
 {
-    return icon_uri_;
+    return art_;
 }
 
 ScopeProxy ScopeMetadataImpl::proxy() const
@@ -127,9 +127,9 @@ void ScopeMetadataImpl::set_scope_name(std::string const& scope_name)
     scope_name_ = scope_name;
 }
 
-void ScopeMetadataImpl::set_icon_uri(std::string const& icon_uri)
+void ScopeMetadataImpl::set_art(std::string const& art)
 {
-    icon_uri_ = icon_uri;
+    art_ = art;
 }
 
 void ScopeMetadataImpl::set_proxy(ScopeProxy const& proxy)
@@ -173,7 +173,7 @@ void throw_on_empty(std::string const& name, std::string const& value)
 VariantMap ScopeMetadataImpl::serialize() const
 {
     throw_on_empty("scope_name", scope_name_);
-    throw_on_empty("icon_uri", icon_uri_);
+    throw_on_empty("art", art_);
     if (!proxy_)
     {
         throw InvalidArgumentException("ScopeMetadataImpl::serialize(): required attribute 'proxy' is null");
@@ -183,7 +183,7 @@ VariantMap ScopeMetadataImpl::serialize() const
 
     VariantMap var;
     var["scope_name"] = scope_name_;
-    var["icon_uri"] = icon_uri_;
+    var["art"] = art_;
     VariantMap proxy;
     proxy["identity"] = proxy_->identity();
     proxy["endpoint"] = proxy_->endpoint();
@@ -226,9 +226,9 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     scope_name_ = it->second.get_string();
     throw_on_empty("scope_name", scope_name_);
 
-    it = find_or_throw(var, "icon_uri");
-    icon_uri_ = it->second.get_string();
-    throw_on_empty("icon_uri", icon_uri_);
+    it = find_or_throw(var, "art");
+    art_ = it->second.get_string();
+    throw_on_empty("art", art_);
 
     it = find_or_throw(var, "proxy");
     auto proxy = it->second.get_dict();
@@ -238,14 +238,14 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         throw InvalidArgumentException("ScopeMetadataImpl::deserialize(): missing 'proxy.identity'");
     }
     auto identity = it2->second.get_string();
-    throw_on_empty("proxy.identity", icon_uri_);
+    throw_on_empty("proxy.identity", art_);
     it2 = proxy.find("endpoint");
     if (it2 == proxy.end())
     {
         throw InvalidArgumentException("ScopeMetadataImpl::deserialize(): missing 'proxy.endpoint'");
     }
     auto endpoint = it2->second.get_string();
-    throw_on_empty("proxy.endpoint", icon_uri_);
+    throw_on_empty("proxy.endpoint", art_);
     auto mw_proxy = mw_->create_scope_proxy(identity, endpoint);
     proxy_ = ScopeImpl::create(mw_proxy, mw_->runtime());
 
