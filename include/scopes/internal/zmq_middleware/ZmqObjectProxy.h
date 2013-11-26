@@ -45,11 +45,12 @@ namespace zmq_middleware
 
 class ZmqReceiver;
 
-// An Zmq proxy that points at some Zmq object, but without a specific type.
+// A Zmq proxy that points at some Zmq object, but without a specific type.
 
 class ZmqObjectProxy : public virtual MWObjectProxy
 {
 public:
+    ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
     ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity, RequestType t);
     virtual ~ZmqObjectProxy() noexcept;
 
@@ -63,42 +64,11 @@ protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
     std::unique_ptr<ZmqReceiver> invoke_(capnp::MessageBuilder& out_params);
 
-    // TODO: commented out for now (see below)
-#if 0
-    template<typename F>
-    std::unique_ptr<capnp::SegmentArrayMessageReader> submit_request_(F f);
-#endif
-
 private:
     std::string endpoint_;
     std::string identity_;
     RequestType type_;
 };
-
-// TODO: Ideally, we would use this template because this is type-independent work, instead of having the
-// body of this method repeated in each operation of the derived proxy. But, for some reason, the getRoot
-// call below causes a syntax error. Need to try with clang to see whether there is a better error message.
-// Or maybe it's a gcc bug...
-
-#if 0
-template<typename F>
-std::unique_ptr<capnp::SegmentArrayMessageReader> ZmqObjectProxy::submit_request_(F f)
-{
-    try
-    {
-        auto future = mw_base()->invoke_pool()->submit(f);
-        future.wait();
-        auto reader = future.get();
-        auto response = reader->getRoot<capnproto::Response>();
-        throw_if_runtime_exception(response);
-        return reader;
-    }
-    catch (...)
-    {
-        throw; // TODO: what to do here?
-    }
-}
-#endif
 
 } // namespace zmq_middleware
 

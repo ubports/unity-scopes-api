@@ -21,6 +21,7 @@
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/RegistryObject.h>
 #include <scopes/ScopeExceptions.h>
@@ -48,7 +49,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, Scope*> ScopeDictMap;
+dictionary<string, VariantMap> ScopeMap;
 
 exception NotFoundException
 {
@@ -58,7 +59,7 @@ exception NotFoundException
 interface Registry
 {
     Scope* find(string name) throws NotFoundException;
-    ScopeDict list();
+    ScopeMap list();
 };
 
 */
@@ -85,13 +86,11 @@ void RegistryI::find_(Current const&,
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
     try
     {
-        auto proxy = dynamic_pointer_cast<ZmqObjectProxy>(delegate->find(name));
-        assert(proxy);
+        auto meta = delegate->find(name);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
         auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
-        auto p = find_response.initReturnValue();
-        p.setEndpoint(proxy->endpoint().c_str());
-        p.setIdentity(proxy->identity().c_str());
+        auto dict = find_response.initReturnValue();
+        to_value_dict(meta.serialize(), dict);
     }
     catch (NotFoundException const& e)
     {
@@ -106,18 +105,14 @@ void RegistryI::list_(Current const&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
-    auto scope_map = delegate->list();
+    auto metadata_map = delegate->list();
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue();
-    auto list = rv.initPairs(scope_map.size());
+    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue(metadata_map.size());
     int i = 0;
-    for (auto const& pair : scope_map)
+    for (auto& pair : metadata_map)
     {
-        list[i].setName(pair.first.c_str());
-        auto p = list[i].initScopeProxy();
-        auto sp = dynamic_pointer_cast<ZmqScope>(pair.second);
-        p.setEndpoint(sp->endpoint().c_str());
-        p.setIdentity(sp->identity().c_str());
+        auto dict = rv[i];
+        to_value_dict(pair.second.serialize(), dict);
         ++i;
     }
 }

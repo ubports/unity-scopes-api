@@ -21,6 +21,7 @@
 
 #include <scopes/internal/MWObjectProxy.h>
 #include <scopes/Registry.h>
+#include <scopes/ScopeMetadata.h>
 
 namespace unity
 {
@@ -38,7 +39,7 @@ class MWRegistry : public virtual MWObjectProxy
 {
 public:
     // Remote operation implementation
-    virtual ScopeProxy find(std::string const& scope_name) = 0;
+    virtual ScopeMetadata find(std::string const& scope_name) = 0;
     virtual ScopeMap list() = 0;
 
     virtual ~MWRegistry() noexcept;

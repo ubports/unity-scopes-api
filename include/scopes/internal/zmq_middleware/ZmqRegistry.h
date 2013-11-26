@@ -48,7 +48,7 @@ public:
     virtual ~ZmqRegistry() noexcept;
 
     // Remote operations.
-    virtual ScopeProxy find(std::string const& scope_name) override;
+    virtual ScopeMetadata find(std::string const& scope_name) override;
     virtual ScopeMap list() override;
 };
 

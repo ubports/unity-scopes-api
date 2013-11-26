@@ -19,6 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_MIDDLEWAREBASE_H
 #define UNITY_API_SCOPES_INTERNAL_MIDDLEWAREBASE_H
 
+#include <scopes/internal/MWObjectProxyFwd.h>
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/internal/MWQueryProxyFwd.h>
 #include <scopes/internal/MWRegistryProxyFwd.h>
@@ -60,6 +61,8 @@ public:
     virtual void start() = 0;
     virtual void stop() = 0;
     virtual void wait_for_shutdown() = 0;
+
+    virtual MWProxy create_proxy(std::string const& identity, std::string const& endpoint) = 0;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;

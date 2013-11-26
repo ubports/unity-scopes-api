@@ -40,10 +40,13 @@ public:
     ObjectProxyImpl(MWProxy const& mw_proxy);
     virtual ~ObjectProxyImpl() noexcept;
 
+    virtual std::string identity() const;
+    virtual std::string endpoint() const;
+
 protected:
-    MWProxy proxy() const;                          // Non-virtual because we cannot use covariance with incomplete types.
-                                                    // Each derived proxy implements a non-virtual fwd() method
-                                                    // that is called from within each operation to down-cast the MWProxy.
+    MWProxy proxy() const;                  // Non-virtual because we cannot use covariance with incomplete types.
+                                            // Each derived proxy implements a non-virtual fwd() method
+                                            // that is called from within each operation to down-cast the MWProxy.
 
 private:
     static Proxy create(MWProxy const& mw_proxy);

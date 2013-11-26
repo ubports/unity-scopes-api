@@ -25,6 +25,9 @@
 #include <scopes/internal/RuntimeConfig.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/ScopeConfig.h>
+#include <scopes/internal/ScopeMetadataImpl.h>
+#include <scopes/internal/ScopeImpl.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
@@ -94,7 +97,7 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
             }
             catch (FileException const& e)
             {
-                error(e.to_string() + ": scope group file ignored");
+                error("scope group config file ignored:\n" + e.to_string());
                 continue;
             }
 
@@ -105,7 +108,7 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
             }
             catch (LogicException const& e)
             {
-                error("group file \"" + file + ": file ignored: " + e.to_string());
+                error("group file \"" + file + ": file ignored:\n" + e.to_string());
                 continue;
             }
 
@@ -146,6 +149,48 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
     }
 
     return scope_groups;
+}
+
+// For each scope, open the config file for each scope, create the metadata info from the config,
+// and add an entry to the RegistryObject.
+
+void add_metadata(RegistryObject::SPtr const& registry,
+                  map<string, string> const& all_scopes,
+                  MiddlewareBase::SPtr const& mw)
+{
+    for (auto pair : all_scopes)
+    {
+        try
+        {
+            unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+            ScopeConfig sc(pair.second);
+            mi->set_scope_name(sc.localized_name());
+            mi->set_icon_uri(sc.icon_uri());
+            mi->set_description(sc.description());
+            try
+            {
+                mi->set_search_hint(sc.search_hint());
+            }
+            catch (NotFoundException const&)
+            {
+            }
+            try
+            {
+                mi->set_hot_key(sc.search_hint());
+            }
+            catch (NotFoundException const&)
+            {
+            }
+            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime());
+            mi->set_proxy(proxy);
+            auto meta = ScopeMetadataImpl::create(move(mi));
+            registry->add(pair.first, move(meta));
+        }
+        catch (unity::Exception const& e)
+        {
+            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.to_string());
+        }
+    }
 }
 
 void run_scopes(SignalThread& sigthread,
@@ -200,7 +245,7 @@ main(int argc, char* argv[])
     }
     char const* const config_file = argv[1];
 
-    int exit_status = 0;
+    int exit_status = 1;
 
     // Run a separate thread to deal with SIGCHLD. This allows us to report when a scope process exits abnormally.
     SignalThread signal_thread;
@@ -246,14 +291,21 @@ main(int argc, char* argv[])
         {
             string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
             string scope_name = strip_suffix(file_name, ".ini");
-            ScopeConfig config(path);
-            if (config.overrideable())
+            try
             {
-                overrideable_scopes[scope_name] = path;
+                ScopeConfig config(path);
+                if (config.overrideable())
+                {
+                    overrideable_scopes[scope_name] = path;
+                }
+                else
+                {
+                    fixed_scopes[scope_name] = path;
+                }
             }
-            else
+            catch (unity::Exception const& e)
             {
-                fixed_scopes[scope_name] = path;
+                error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.to_string());
             }
         }
 
@@ -297,13 +349,10 @@ main(int argc, char* argv[])
         RegistryObject::SPtr registry(new RegistryObject);
         middleware->add_registry_object(runtime->registry_identity(), registry);
 
-        // Add a proxy for each scope to the lookup table.
+        // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
         // they look for another scope in the registry.
-        for (auto pair : all_scopes)
-        {
-            registry->add(pair.first, middleware->create_scope_proxy(pair.first));
-        }
+        add_metadata(registry, all_scopes, middleware);
 
         // Start a scoperunner for each Canonical scope group and add the corresponding proxies to the registry
         run_scopes(signal_thread, scoperunner_path, config_file, canonical_groups);
@@ -313,31 +362,27 @@ main(int argc, char* argv[])
 
         // Wait until we are done.
         middleware->wait_for_shutdown();
+        exit_status = 0;
     }
     catch (unity::Exception const& e)
     {
         error(e.to_string());
-        exit_status = 1;
     }
     catch (std::exception const& e)
     {
         error(e.what());
-        exit_status = 1;
     }
     catch (string const& e)
     {
         error("fatal error: " + e);
-        exit_status = 1;
     }
     catch (char const* e)
     {
         error(string("fatal error: ") + e);
-        exit_status = 1;
     }
     catch (...)
     {
         error("terminated due to unknown exception");
-        exit_status = 1;
     }
 
     return exit_status;

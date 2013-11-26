@@ -19,9 +19,11 @@
 #include <scopes/internal/zmq_middleware/ZmqRegistry.h>
 
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/ScopeImpl.h>
+#include <scopes/internal/ScopeMetadataImpl.h>
 #include <scopes/ScopeExceptions.h>
 
 #include <capnp/message.h>
@@ -47,7 +49,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, Scope*> ScopeDictMap;
+dictionary<string, ScopeMetadata> ScopeDictMap;
 
 exception NotFoundException
 {
@@ -56,7 +58,7 @@ exception NotFoundException
 
 interface Registry
 {
-    Scope* find(string name) throws NotFoundException;
+    ScopeMetadata find(string name) throws NotFoundException;
     ScopeDict list();
 };
 
@@ -73,7 +75,7 @@ ZmqRegistry::~ZmqRegistry() noexcept
 {
 }
 
-ScopeProxy ZmqRegistry::find(std::string const& scope_name)
+ScopeMetadata ZmqRegistry::find(std::string const& scope_name)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "find");
@@ -93,9 +95,11 @@ ScopeProxy ZmqRegistry::find(std::string const& scope_name)
     {
         case capnproto::Registry::FindResponse::Response::RETURN_VALUE:
         {
-            auto proxy = find_response.getReturnValue();
-            ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-            return ScopeImpl::create(p, mw_base()->runtime());
+            auto md = find_response.getReturnValue();
+            VariantMap m = to_variant_map(md);
+            unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
+            smdi->deserialize(m);
+            return ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
         }
         case capnproto::Registry::FindResponse::Response::NOT_FOUND_EXCEPTION:
         {
@@ -123,13 +127,16 @@ ScopeMap ZmqRegistry::list()
     throw_if_runtime_exception(response);
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
-    auto pairs = list_response.getReturnValue().getPairs();
+    auto list = list_response.getReturnValue();
     ScopeMap sm;
-    for (size_t i = 0; i < pairs.size(); ++i)
+    for (size_t i = 0; i < list.size(); ++i)
     {
-        auto proxy = pairs[i].getScopeProxy();
-        ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-        sm[pairs[i].getName().cStr()] = ScopeImpl::create(p, mw_base()->runtime());
+        VariantMap m = to_variant_map(list[i]);
+        string scope_name = m["scope_name"].get_string();
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
+        smdi->deserialize(m);
+        ScopeMetadata d(ScopeMetadataImpl::create(move(smdi)));
+        sm.emplace(make_pair(move(scope_name), move(d)));
     }
     return sm;
 }

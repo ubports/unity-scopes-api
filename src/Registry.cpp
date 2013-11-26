@@ -42,7 +42,7 @@ Registry::~Registry() noexcept
 
 //! @endcond
 
-ScopeProxy Registry::find(std::string const& scope_name) const
+ScopeMetadata Registry::find(std::string const& scope_name) const
 {
     return fwd()->find(scope_name);
 }
@@ -50,6 +50,11 @@ ScopeProxy Registry::find(std::string const& scope_name) const
 ScopeMap Registry::list() const
 {
     return fwd()->list();
+}
+
+ScopeMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
+{
+    return fwd()->list_if(predicate);
 }
 
 internal::RegistryImpl* Registry::fwd() const

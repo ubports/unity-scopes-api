@@ -37,8 +37,6 @@ class MiddlewareBase;
 
 // Base class for the MW<something>Proxy hierarchy. We store the pointer to the middleware here,
 // which is needed to, for example, register callback objects (such as a Reply object) with the middleware.
-// We also keep a pointer to the run time, so we can get at other relevant deatils, such as a scope name,
-// reply object reaper, etc.
 
 class MWObjectProxy
 {
@@ -46,6 +44,9 @@ public:
     virtual ~MWObjectProxy() noexcept;
 
     virtual MiddlewareBase* mw_base() const noexcept = 0;
+
+    virtual std::string identity() const = 0;
+    virtual std::string endpoint() const = 0;
 
 protected:
     MWObjectProxy(MiddlewareBase* mw_base);

@@ -90,12 +90,12 @@ int main(int argc, char* argv[])
         Runtime::UPtr rt = Runtime::create("dash");
 
         RegistryProxy r = rt->registry();
-        ScopeProxy s = r->find(scope_name);
+        auto meta = r->find(scope_name);
         shared_ptr<Receiver> reply(new Receiver);
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
-        auto ctrl = s->create_query(search_string, vm, reply);     // Returns (almost) immediately
+        auto ctrl = meta.proxy()->create_query(search_string, vm, reply);     // Returns (almost) immediately
         cerr << "client: created query" << endl;
         reply->wait_until_finished();
         cerr << "client: wait returned" << endl;

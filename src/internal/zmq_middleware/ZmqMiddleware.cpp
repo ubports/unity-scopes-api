@@ -164,6 +164,20 @@ void ZmqMiddleware::wait_for_shutdown()
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
+MWProxy ZmqMiddleware::create_proxy(string const& identity, string const& endpoint)
+{
+    MWProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqObjectProxy(this, endpoint, identity));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
 {
     MWRegistryProxy proxy;

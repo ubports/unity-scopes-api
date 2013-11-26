@@ -126,8 +126,10 @@ public:
         scope_name_ = scope_name;
 
         // Lock up scopes C and D in the registry and remember their proxies.
-        scope_c_ = registry->find("scope-C");
-        scope_d_ = registry->find("scope-D");
+        auto meta_c = registry->find("scope-C");
+        scope_c_ = meta_c.proxy();
+        auto meta_d = registry->find("scope-D");
+        scope_d_ = meta_d.proxy();
 
         return VERSION;
     }

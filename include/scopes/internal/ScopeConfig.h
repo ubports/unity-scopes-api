@@ -41,10 +41,20 @@ public:
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig() noexcept;
 
-    bool overrideable() const;
+    bool overrideable() const;      // Optional, returns false if not present
+    std::string icon_uri() const;
+    std::string localized_name() const;
+    std::string description() const;
+    std::string search_hint() const;     // Optional, throws NotFoundException if not present
+    std::string hot_key() const;         // Optional, throws NotFoundException if not present
 
 private:
     bool overrideable_;
+    std::string icon_uri_;
+    std::string localized_name_;
+    std::string description_;
+    std::unique_ptr<std::string> search_hint_;
+    std::unique_ptr<std::string> hot_key_;
 };
 
 } // namespace internal

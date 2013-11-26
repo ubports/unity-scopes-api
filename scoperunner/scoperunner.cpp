@@ -200,7 +200,7 @@ main(int argc, char* argv[])
     }
     char const* const runtime_config = argv[1];
 
-    int exit_status = 0;
+    int exit_status = 1;
     try
     {
         vector<string> config_files;
@@ -218,27 +218,22 @@ main(int argc, char* argv[])
     catch (unity::Exception const& e)
     {
         error(e.to_string());
-        exit_status = 1;
     }
     catch (std::exception const& e)
     {
         error(e.what());
-        exit_status = 1;
     }
     catch (string const& e)
     {
         error("fatal error: " + e);
-        exit_status = 1;
     }
     catch (char const* e)
     {
         error(string("fatal error: ") + e);
-        exit_status = 1;
     }
     catch (...)
     {
         error("terminated due to unknown exception");
-        exit_status = 1;
     }
 
     return exit_status;

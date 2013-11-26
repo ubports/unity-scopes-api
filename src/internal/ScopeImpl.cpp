@@ -19,6 +19,7 @@
 #include <scopes/internal/ScopeImpl.h>
 
 #include <scopes/internal/MiddlewareBase.h>
+#include <scopes/internal/MWScope.h>
 #include <scopes/internal/QueryCtrlImpl.h>
 #include <scopes/Scope.h>
 #include <unity/Exception.h>

@@ -1,1 +1,4 @@
 [ScopeConfig]
+IconURI = scope-B.IconURI
+LocalizedName = scope-B.LocalizedName
+Description = scope-B.Description

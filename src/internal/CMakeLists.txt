@@ -34,6 +34,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp

@@ -36,7 +36,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-enum RequestType { Oneway, Twoway };
+enum RequestType { Unknown, Oneway, Twoway };
 
 std::string to_string(RequestType);
 
