@@ -4,6 +4,7 @@ set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
