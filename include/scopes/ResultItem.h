@@ -86,6 +86,13 @@ public:
     std::string title() const;
     std::string art() const;
     std::string dnd_uri() const;
+
+    /**
+      \brief Return category of this result.
+      Get category instance this result belongs to. Note that category will be undefined in activation and preview
+      handlers, in which case this method will return nullptr.
+      \return category instance or nullptr
+     */
     Category::SCPtr category() const;
 
     /**
@@ -95,6 +102,8 @@ public:
     VariantMap serialize() const;
 
 private:
+    explicit ResultItem(const VariantMap &variant_map);
+
     std::shared_ptr<internal::ResultItemImpl> p;
 
     friend class internal::ResultItemImpl;

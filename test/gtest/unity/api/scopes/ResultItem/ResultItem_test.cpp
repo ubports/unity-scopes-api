@@ -235,5 +235,5 @@ TEST(ResultItem, store)
     EXPECT_EQ("title1", inresult.title());
     EXPECT_EQ("icon1", inresult.art());
     EXPECT_EQ("dnduri1", inresult.dnd_uri());
-    EXPECT_EQ("2", inresult.category()->id()); //FIXME: this is not currently correct, needs to be fixed in the impl
+    EXPECT_EQ(nullptr, inresult.category());
 }

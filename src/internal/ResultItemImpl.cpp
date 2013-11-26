@@ -51,6 +51,11 @@ ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& varia
     deserialize(variant_map);
 }
 
+ResultItemImpl::ResultItemImpl(VariantMap const& variant_map)
+{
+    deserialize(variant_map);
+}
+
 ResultItemImpl::ResultItemImpl(ResultItemImpl const& other)
     : uri_(other.uri_),
     title_(other.title_),
@@ -109,7 +114,7 @@ ResultItem ResultItemImpl::retrieve() const
     {
         throw InvalidArgumentException("ResultItem: no result has been stored");
     }
-    return ResultItem(category_, *stored_result_); //FIXME: this category from the outer result!
+    return ResultItem(*stored_result_);
 }
 
 void ResultItemImpl::set_uri(std::string const& uri)
@@ -188,7 +193,11 @@ VariantMap ResultItemImpl::serialize() const
     var["title"] = title_;
     var["art"] = art_;
     var["dnd_uri"] = dnd_uri_;
-    var["cat_id"] = category_->id();
+
+    if (category_) // category may be missing for result received in activation/preview handlers
+    {
+        var["cat_id"] = category_->id();
+    }
 
     if (metadata_)
     {
@@ -256,13 +265,6 @@ void ResultItemImpl::deserialize(VariantMap const& var)
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
-
-    // cat_id is not really used as it's provided by category instance pointer,
-    // but the check is here for consistency and to make sure a valid attrsiant
-    // is passed.
-    it = attrs.find("cat_id");
-    if (it == attrs.end())
-        throw InvalidArgumentException("Missing 'cat_id'");
 
     if (attrs.size() > standard_attrs.size())
     {

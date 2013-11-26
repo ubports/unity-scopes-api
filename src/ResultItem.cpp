@@ -40,6 +40,11 @@ ResultItem::ResultItem(Category::SCPtr category, const VariantMap &variant_map)
 {
 }
 
+ResultItem::ResultItem(const VariantMap &variant_map)
+    : p(new internal::ResultItemImpl(variant_map))
+{
+}
+
 ResultItem::ResultItem(ResultItem const& other)
     : p(new internal::ResultItemImpl(*(other.p)))
 {
