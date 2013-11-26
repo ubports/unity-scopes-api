@@ -20,7 +20,7 @@
 #define UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
 
 #include <scopes/CategoryRenderer.h>
-#include <unity/util/NonCopyable.h>
+#include <unity/SymbolExport.h>
 #include <string>
 
 namespace unity

@@ -21,7 +21,7 @@
 
 #include <string>
 #include <memory>
-#include <unity/util/NonCopyable.h>
+#include <unity/SymbolExport.h>
 
 namespace unity
 {
@@ -47,6 +47,12 @@ public:
      \brief Creates CategoryRenderer from a JSON data.
      */
     explicit CategoryRenderer(std::string const& json_text = DEFAULT);
+
+    CategoryRenderer(CategoryRenderer const&);
+    CategoryRenderer& operator=(CategoryRenderer const&);
+
+    CategoryRenderer(CategoryRenderer&&);
+    CategoryRenderer& operator=(CategoryRenderer&&);
 
     /**
      \brief Creates CategoryRenderer from a text file.

@@ -41,6 +41,11 @@ CategoryRenderer::CategoryRenderer(std::string const& json_text)
 {
 }
 
+CategoryRenderer::CategoryRenderer(CategoryRenderer const&) = default;
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const&) = default;
+CategoryRenderer::CategoryRenderer(CategoryRenderer&&) = default;
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer&&) = default;
+
 CategoryRenderer CategoryRenderer::from_file(std::string const& path)
 {
     return internal::CategoryRendererImpl::from_file(path);
