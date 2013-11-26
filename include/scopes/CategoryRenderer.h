@@ -38,17 +38,35 @@ namespace internal
 }
 
 /**
-   \brief
+   \brief CategoryRenderer encapsulates category renderer template in JSON format.
 */
 class UNITY_API CategoryRenderer
 {
 public:
+    /**
+     \brief Creates CategoryRenderer from a JSON data.
+     */
     explicit CategoryRenderer(std::string const& json_text = DEFAULT);
+
+    /**
+     \brief Creates CategoryRenderer from a text file.
+     */
     static CategoryRenderer from_file(std::string const& path);
 
+    /**
+     \brief Returns complete renderer template definition in JSON format.
+     \return renderer template (JSON)
+     */
     std::string data() const;
 
+    /**
+      \brief A default template for generic use.
+     */
     static const std::string DEFAULT;
+
+    /**
+      \brief A template suitable for displaying music results.
+     */
     static const std::string MUSIC_GRID;
 
 private:
