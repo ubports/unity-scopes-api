@@ -2,15 +2,15 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Lesser GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
@@ -47,13 +47,13 @@ public:
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
-    void set_icon(std::string const& icon);
+    void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
     void add_metadata(std::string const& key, Variant const& value);
 
     std::string uri() const;
     std::string title() const;
-    std::string icon() const;
+    std::string art() const;
     std::string dnd_uri() const;
     Category::SCPtr category() const;
 
@@ -66,7 +66,7 @@ private:
 
     std::string uri_;
     std::string title_;
-    std::string icon_;
+    std::string art_;
     std::string dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
     Category::SCPtr category_;

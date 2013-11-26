@@ -2,15 +2,15 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Lesser GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
@@ -32,7 +32,7 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "icon", "dnd_uri", "cat_id"};
+const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri", "cat_id"};
 
 ResultItemImpl::ResultItemImpl(Category::SCPtr category)
     : category_(category)
@@ -59,9 +59,9 @@ void ResultItemImpl::set_title(std::string const& title)
     title_ = title;
 }
 
-void ResultItemImpl::set_icon(std::string const& icon)
+void ResultItemImpl::set_art(std::string const& image)
 {
-    icon_ = icon;
+    art_ = image;
 }
 
 void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
@@ -88,9 +88,9 @@ std::string ResultItemImpl::title() const
     return title_;
 }
 
-std::string ResultItemImpl::icon() const
+std::string ResultItemImpl::art() const
 {
-    return icon_;
+    return art_;
 }
 
 std::string ResultItemImpl::dnd_uri() const
@@ -115,13 +115,13 @@ VariantMap ResultItemImpl::serialize() const
 {
     throw_on_empty("uri", uri_);
     throw_on_empty("title", title_);
-    throw_on_empty("icon", icon_);
+    throw_on_empty("art", art_);
     throw_on_empty("dnd_uri", dnd_uri_);
 
     VariantMap var;
     var["uri"] = uri_;
     var["title"] = title_;
-    var["icon"] = icon_;
+    var["art"] = art_;
     var["dnd_uri"] = dnd_uri_;
     var["cat_id"] = category_->id();
 
@@ -152,10 +152,10 @@ void ResultItemImpl::deserialize(VariantMap const& var)
         throw InvalidArgumentException("Missing 'title'");
     title_ = it->second.get_string();
 
-    it = var.find("icon");
+    it = var.find("art");
     if (it == var.end())
-        throw InvalidArgumentException("Missing 'icon'");
-    icon_ = it->second.get_string();
+        throw InvalidArgumentException("Missing 'art'");
+    art_ = it->second.get_string();
 
     it = var.find("dnd_uri");
     if (it == var.end())
