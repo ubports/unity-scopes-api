@@ -33,6 +33,7 @@ namespace api
 
 namespace scopes
 {
+    class CategoryRenderer;
 
 namespace internal
 {
@@ -56,11 +57,11 @@ public:
     std::string id() const;
     std::string title() const;
     std::string icon() const;
-    std::string renderer_template() const;
+    CategoryRenderer const& renderer_template() const;
     VariantMap serialize() const;
 
 private:
-    Category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
 
     std::shared_ptr<internal::CategoryImpl> p;

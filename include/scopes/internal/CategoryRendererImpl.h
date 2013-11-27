@@ -16,14 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORYIMPL_H
-#define UNITY_API_SCOPES_CATEGORYIMPL_H
+#ifndef UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
+#define UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
 
-#include <unity/util/NonCopyable.h>
-#include <scopes/Variant.h>
 #include <scopes/CategoryRenderer.h>
+#include <unity/SymbolExport.h>
 #include <string>
-#include <memory>
 
 namespace unity
 {
@@ -37,24 +35,16 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API CategoryImpl : private util::NonCopyable
+class UNITY_API CategoryRendererImpl
 {
 public:
-    CategoryImpl(VariantMap const& variant_map);
-    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
-    std::string const& id() const;
-    std::string const& title() const;
-    std::string const& icon() const;
-    CategoryRenderer const& renderer_template() const;
-    VariantMap serialize() const;
+    CategoryRendererImpl(std::string const& json_text);
+    static CategoryRenderer from_file(std::string const& path);
+
+    std::string data() const;
 
 private:
-    void deserialize(VariantMap const& variant_map);
-
-    std::string id_;
-    std::string title_;
-    std::string icon_;
-    CategoryRenderer renderer_template_;
+    std::string data_;
 };
 
 } // namespace internal

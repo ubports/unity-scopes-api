@@ -16,14 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORYIMPL_H
-#define UNITY_API_SCOPES_CATEGORYIMPL_H
-
-#include <unity/util/NonCopyable.h>
-#include <scopes/Variant.h>
 #include <scopes/CategoryRenderer.h>
-#include <string>
-#include <memory>
+#include <scopes/internal/CategoryRendererImpl.h>
 
 namespace unity
 {
@@ -34,35 +28,32 @@ namespace api
 namespace scopes
 {
 
-namespace internal
+//! @cond
+
+CategoryRenderer::CategoryRenderer(std::string const& json_text)
+    : p(new internal::CategoryRendererImpl(json_text))
 {
+}
 
-class UNITY_API CategoryImpl : private util::NonCopyable
+CategoryRenderer::CategoryRenderer(CategoryRenderer const&) = default;
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const&) = default;
+CategoryRenderer::CategoryRenderer(CategoryRenderer&&) = default;
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer&&) = default;
+
+CategoryRenderer CategoryRenderer::from_file(std::string const& path)
 {
-public:
-    CategoryImpl(VariantMap const& variant_map);
-    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
-    std::string const& id() const;
-    std::string const& title() const;
-    std::string const& icon() const;
-    CategoryRenderer const& renderer_template() const;
-    VariantMap serialize() const;
+    return internal::CategoryRendererImpl::from_file(path);
+}
 
-private:
-    void deserialize(VariantMap const& variant_map);
+std::string CategoryRenderer::data() const
+{
+    return p->data();
+}
 
-    std::string id_;
-    std::string title_;
-    std::string icon_;
-    CategoryRenderer renderer_template_;
-};
-
-} // namespace internal
+//! @endcond
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif
