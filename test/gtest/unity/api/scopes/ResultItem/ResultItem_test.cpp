@@ -32,6 +32,7 @@ TEST(ResultItem, basic)
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat2 = reg.register_category("2", "title", "icon", rdr);
 
     {
         ResultItem result(cat);
@@ -47,6 +48,9 @@ TEST(ResultItem, basic)
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
         EXPECT_EQ("bar", result.serialize()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
+
+        result.set_category(cat2);
+        EXPECT_EQ("2", result.category()->id());
     }
 
     // copy ctor
@@ -159,6 +163,29 @@ TEST(ResultItem, serialize_excp)
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_dnd_uri("http://canonical.com");
     EXPECT_NO_THROW(result.serialize());
+}
+
+// test exceptions with null category
+TEST(ResultItem, exceptions)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    Category::SCPtr null_cat;
+
+    bool excp = false;
+    try
+    {
+        ResultItem r(null_cat);
+    }
+    catch (const unity::InvalidArgumentException& e)
+    {
+        excp = true;
+    }
+    EXPECT_TRUE(excp);
+
+    ResultItem result(cat);
+    EXPECT_THROW(result.set_category(null_cat), unity::InvalidArgumentException);
 }
 
 // test conversion from VariantMap
