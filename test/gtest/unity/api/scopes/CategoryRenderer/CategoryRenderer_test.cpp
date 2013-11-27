@@ -29,7 +29,7 @@ TEST(CategoryRenderer, basic)
 {
     CategoryRenderer rdr;
     EXPECT_TRUE(rdr.data().size() > 0);
-    EXPECT_EQ(CategoryRenderer::DEFAULT, rdr.data());
+    EXPECT_EQ(DEFAULT_RENDERER, rdr.data());
 }
 
 TEST(CategoryRenderer, from_file)

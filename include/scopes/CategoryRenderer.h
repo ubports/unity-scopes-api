@@ -38,27 +38,25 @@ namespace internal
 }
 
 /**
+  \brief A default template for generic use.
+ */
+#define DEFAULT_RENDERER R"({"template":{"renderer":"grid","overlay-mode":null},"components":{"title":"title","art":"art"}})"
+
+/**
+  \brief A template suitable for displaying music results.
+ */
+#define MUSIC_GRID_RENDERER R"({"template":{"renderer":"grid","overlay-mode":null},"components":{"title":"title","subtitle":"subtitle","art":"art"}})"
+
+/**
    \brief CategoryRenderer encapsulates category renderer template in JSON format.
 */
 class UNITY_API CategoryRenderer
 {
 public:
     /**
-      \brief A default template for generic use.
-     */
-    constexpr static const char* DEFAULT = R"({"template":{"renderer":"grid","overlay-mode":null},)"
-        R"("components":{"title":"title","art":"art"}})";
-
-    /**
-      \brief A template suitable for displaying music results.
-     */
-    constexpr static const char* MUSIC_GRID = R"({"template":{"renderer":"grid","overlay-mode":null},)"
-        R"("components":{"title":"title","subtitle":"subtitle","art":"art"}})";
-
-    /**
      \brief Creates CategoryRenderer from a JSON data.
      */
-    explicit CategoryRenderer(std::string const& json_text = DEFAULT);
+    explicit CategoryRenderer(std::string const& json_text = DEFAULT_RENDERER);
 
     CategoryRenderer(CategoryRenderer const&);
     CategoryRenderer& operator=(CategoryRenderer const&);

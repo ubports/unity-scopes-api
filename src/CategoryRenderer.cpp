@@ -30,9 +30,6 @@ namespace scopes
 
 //! @cond
 
-constexpr const char* CategoryRenderer::DEFAULT;
-constexpr const char* CategoryRenderer::MUSIC_GRID;
-
 CategoryRenderer::CategoryRenderer(std::string const& json_text)
     : p(new internal::CategoryRendererImpl(json_text))
 {
