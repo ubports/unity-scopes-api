@@ -1,9 +1,50 @@
-unity-scopes-api (0.1-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.1+14.04.20131127-0ubuntu1) trusty; urgency=low
 
   [ Michi Henning ]
   * Initial release
+  * Improved notes in INSTALL file.
+  * Fixed scoperegistry to use new scoperunner and to figure out which
+    scopes to run from config files. Still to do: deal with overrides
+    and OEM scopes, particularly the grouping aspect. SignalThread needs
+    to invoke a callback for clean shut-down on receipt of SIGINT.
+  * Added reason for why a call to finished() is made (finished,
+    cancelled, or error). Fixed incorrect return value from push() after
+    cancellation. Lots of doc fixes and other minor tidy-up.
+  * Made proxies properly polymorphic, so they derived from a common
+    base and no longer redudantly store the pimpl and the MWProxy at
+    each level of the hierarchy.
 
   [ Łukasz 'sil2100' Zemczak ]
   * Automatic snapshot from revision 52 (bootstrap)
+  * Format should be 1.0, not sure why I switched it invalidly
+  * Re-copyright sources to fit the LGPL-3 license. It's good to have
+    all sources in one license to avoid confusion - and I guess LGPL-3
+    was supposed to be the main one. Also, I guess Lzmqnse is a typo of
+    License, yes?.
 
- -- Michi Henning <michi.henning@canonical.com>  Mon, 27 May 2013 12:52:22 +1000
+  [ Michal Hruby ]
+  * Added requires for libunity-api to the pc file, so that linking
+    works properly when using unity exceptions.
+
+  [ Pawel Stolowski ]
+  * Implemented support for categories. Added double and array support
+    to the Variant class.
+  * Added support for null Variant.
+  * Renamed ReplyBase to ReceiverBase. Pass ResultItem by value to
+    ReceiverBase::push.
+  * First cut at scopes tutorial. Moved move ctor and move assignment
+    operator of ResultItem from the header file to .cpp to avoid ABI
+    issues in the future. Renamed 'icon' to 'art' in ResultItem.
+  * Added category setter to ResultItem.
+
+  [ Jussi Pakkanen ]
+  * Merged capnp fixes.
+  * Quote quotes.
+  * Use unique_ptrs for holding impl objects instead of shared_ptrs
+    where possible.
+  * Clang usability fixes.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 71
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 27 Nov 2013 12:03:03 +0000
