@@ -18,7 +18,6 @@
 
 #include <scopes/internal/ResultItemImpl.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/Category.h>
 #include <scopes/ResultItem.h>
 #include <sstream>
 
@@ -34,25 +33,10 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri", "cat_id"};
+const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri"};
 
 ResultItemImpl::ResultItemImpl()
 {
-}
-
-ResultItemImpl::ResultItemImpl(Category::SCPtr category)
-    : category_(category)
-{
-    if (category_ == nullptr)
-    {
-        throw InvalidArgumentException("ResultItem: null category");
-    }
-}
-
-ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& variant_map)
-    : ResultItemImpl(category)
-{
-    deserialize(variant_map);
 }
 
 ResultItemImpl::ResultItemImpl(VariantMap const& variant_map)
@@ -64,8 +48,7 @@ ResultItemImpl::ResultItemImpl(ResultItemImpl const& other)
     : uri_(other.uri_),
     title_(other.title_),
     art_(other.art_),
-    dnd_uri_(other.dnd_uri_),
-    category_(other.category_)
+    dnd_uri_(other.dnd_uri_)
 {
     if (other.metadata_)
     {
@@ -93,9 +76,12 @@ ResultItemImpl& ResultItemImpl::operator=(ResultItemImpl const& other)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
         }
-        category_ = other.category_;
     }
     return *this;
+}
+
+ResultItemImpl::~ResultItemImpl()
+{
 }
 
 void ResultItemImpl::store(ResultItem const& other)
@@ -170,11 +156,6 @@ std::string ResultItemImpl::dnd_uri() const
     return dnd_uri_;
 }
 
-Category::SCPtr ResultItemImpl::category() const
-{
-    return category_;
-}
-
 void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& value)
 {
     if (value.empty())
@@ -182,6 +163,14 @@ void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& 
         std::ostringstream s;
         s << "Required attribute " << name << " is empty";
         throw InvalidArgumentException(s.str());
+    }
+}
+
+void ResultItemImpl::serialize_internal(VariantMap& var) const
+{
+    if (stored_result_)
+    {
+        var["result"] = *stored_result_;
     }
 }
 
@@ -197,11 +186,6 @@ VariantMap ResultItemImpl::serialize() const
     var["title"] = title_;
     var["art"] = art_;
     var["dnd_uri"] = dnd_uri_;
-
-    if (category_) // category may be missing for ResultItem instance received in activation/preview handlers
-    {
-        var["cat_id"] = category_->id();
-    }
 
     if (metadata_)
     {
@@ -219,12 +203,11 @@ VariantMap ResultItemImpl::serialize() const
 
     VariantMap outer;
     outer["attrs"] = var;
-    if (stored_result_)
-    {
-        VariantMap stored_result_var;
-        stored_result_var["result"] = *stored_result_;
-        outer["internal"] = stored_result_var;
-    }
+
+    VariantMap intvar;
+    serialize_internal(intvar);
+    outer["internal"] = intvar;
+
     return outer;
 }
 
@@ -234,8 +217,9 @@ void ResultItemImpl::deserialize(VariantMap const& var)
     auto it = var.find("internal");
     if (it != var.end())
     {
-        it = it->second.get_dict().find("result");
-        if (it != var.end())
+        auto const& resvar = it->second.get_dict();
+        it = resvar.find("result");
+        if (it != resvar.end())
         {
             stored_result_.reset(new VariantMap(it->second.get_dict()));
         }

@@ -46,7 +46,12 @@ TEST(Result, basic)
         EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
     }
+}
 
+TEST(Result, copy)
+{
+    CategoryRegistry reg;
+    auto cat = reg.register_category("1", "title", "icon", "{}");
     // copy ctor
     {
         Result result(cat);
@@ -147,7 +152,7 @@ TEST(Result, serialize)
     EXPECT_EQ("a title", var["title"].get_string());
     EXPECT_EQ("an icon", var["art"].get_string());
     EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
-    EXPECT_EQ("1", var["cat_id"].get_string());
+    EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
 }
 
 // test exceptions when converting to VariantMap
@@ -177,11 +182,14 @@ TEST(Result, deserialize)
     vm["dnd_uri"] = "http://canonical.com";
     vm["title"] = "a title";
     vm["art"] = "an icon";
-    vm["cat_id"] = "2";
     vm["foo"] = "bar"; // custom attribute
+
+    VariantMap intvm;
+    intvm["cat_id"] = "2";
 
     VariantMap outer;
     outer["attrs"] = vm;
+    outer["internal"] = intvm;
 
     CategoryRegistry reg;
     auto cat = reg.register_category("1", "title", "icon", "{}");
@@ -194,7 +202,7 @@ TEST(Result, deserialize)
     EXPECT_EQ("an icon", var["art"].get_string());
     EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
     EXPECT_EQ("bar", var["foo"].get_string());
-    EXPECT_EQ("1", var["cat_id"].get_string());
+    EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
 }
 
 TEST(Result, store)

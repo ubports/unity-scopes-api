@@ -23,7 +23,6 @@
 #include <memory>
 #include <unordered_set>
 #include <scopes/Variant.h>
-#include <scopes/Category.h>
 
 namespace unity
 {
@@ -42,12 +41,12 @@ namespace internal
 class ResultItemImpl
 {
 public:
-    explicit ResultItemImpl(Category::SCPtr category);
     ResultItemImpl();
-    ResultItemImpl(Category::SCPtr category, VariantMap const& variant_map);
     ResultItemImpl(VariantMap const& variant_map);
     ResultItemImpl(ResultItemImpl const& other);
     ResultItemImpl& operator=(ResultItemImpl const& other);
+
+    virtual ~ResultItemImpl();
 
     void store(ResultItem const& other);
     bool has_stored_result() const;
@@ -63,9 +62,11 @@ public:
     std::string title() const;
     std::string art() const;
     std::string dnd_uri() const;
-    Category::SCPtr category() const;
 
     VariantMap serialize() const;
+
+protected:
+    virtual void serialize_internal(VariantMap& var) const;
 
 private:
     void deserialize(VariantMap const& var);
@@ -78,7 +79,6 @@ private:
     std::string dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
     std::shared_ptr<VariantMap> stored_result_;
-    Category::SCPtr category_;
 };
 
 } // namespace internal

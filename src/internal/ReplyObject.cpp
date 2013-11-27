@@ -103,17 +103,15 @@ void ReplyObject::push(VariantMap const& result) noexcept
         if (it != result.end())
         {
             auto result_var = it->second.get_dict();
-            auto cat_id = result_var["cat_id"].get_string();
-            auto cat = cat_registry_->lookup_category(cat_id);
-            if (cat == nullptr)
+            try
+            {
+                Result result(result_var, *cat_registry_);
+                receiver_base_->push(std::move(result));
+            }
+            catch (unity::Exception const& e)
             {
                 // TODO: this is an internal error; log error
                 finished(ReceiverBase::Error);
-            }
-            else
-            {
-                Result result(cat, result_var);
-                receiver_base_->push(std::move(result));
             }
         }
     }
