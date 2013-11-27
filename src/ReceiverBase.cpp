@@ -42,7 +42,7 @@ ReceiverBase::~ReceiverBase() noexcept
 {
 }
 
-void ReceiverBase::push(Category::SCPtr category)
+void ReceiverBase::push(Category::SCPtr)
 {
 }
 

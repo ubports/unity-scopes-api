@@ -38,7 +38,7 @@ class QueryObject;
 class ReplyImpl;
 }
 
-class ResultItem;
+class Result;
 
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
@@ -76,7 +76,7 @@ public:
     A false return value is due to either finished() having been called earlier,
     or the client that sent the query having cancelled that query.
     */
-    bool push(ResultItem const& result) const;
+    bool push(Result const& result) const;
 
     /**
     \brief Informs the source of a query that the query results are complete.

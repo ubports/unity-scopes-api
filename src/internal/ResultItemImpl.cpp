@@ -36,6 +36,10 @@ namespace internal
 
 const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri", "cat_id"};
 
+ResultItemImpl::ResultItemImpl()
+{
+}
+
 ResultItemImpl::ResultItemImpl(Category::SCPtr category)
     : category_(category)
 {
@@ -194,7 +198,7 @@ VariantMap ResultItemImpl::serialize() const
     var["art"] = art_;
     var["dnd_uri"] = dnd_uri_;
 
-    if (category_) // category may be missing for result received in activation/preview handlers
+    if (category_) // category may be missing for ResultItem instance received in activation/preview handlers
     {
         var["cat_id"] = category_->id();
     }

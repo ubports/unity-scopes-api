@@ -21,8 +21,7 @@
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ResultItemImpl.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
@@ -90,7 +89,7 @@ Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
     return cat_registry_->lookup_category(id);
 }
 
-bool ReplyImpl::push(unity::api::scopes::ResultItem const& result)
+bool ReplyImpl::push(unity::api::scopes::Result const& result)
 {
     // If this is an aggregator scope, it may be pushing result items obtained
     // from ReplyObject without registering a category first.

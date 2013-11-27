@@ -20,7 +20,6 @@
 #define UNITY_API_SCOPES_RESULTITEM_H
 
 #include <scopes/Variant.h>
-#include <scopes/Category.h>
 #include <string>
 #include <memory>
 
@@ -33,9 +32,11 @@ namespace api
 namespace scopes
 {
 
+class Result;
+
 namespace internal
 {
-    class ResultItemImpl;
+class ResultItemImpl;
 }
 
 /**
@@ -43,21 +44,9 @@ namespace internal
    returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
    calling Reply::push.
 */
-
 class UNITY_API ResultItem
 {
 public:
-
-    /**
-       \brief Creates a ResultItem instance assigned to given category, with all base attributes initially empty.
-     */
-    explicit ResultItem(Category::SCPtr category);
-
-    /**
-       \brief Creates a ResultItem instance assigned to given category and using values of all base attributes from a variant_map dictionary.
-    */
-    ResultItem(Category::SCPtr category, const VariantMap &variant_map);
-
     /**
        \brief Creates a ResultItem that is a copy of another ResultItem.
     */
@@ -88,14 +77,6 @@ public:
     std::string dnd_uri() const;
 
     /**
-      \brief Return category of this result.
-      Get category instance this result belongs to. Note that category will be undefined in activation and preview
-      handlers, in which case this method will return nullptr.
-      \return category instance or nullptr
-     */
-    Category::SCPtr category() const;
-
-    /**
        \brief Returns a dictionary of all attributes of this ResultItem instance.
        \return dictionary of all base attributes and custom attributes set with add_metadata call.
     */
@@ -103,10 +84,12 @@ public:
 
 private:
     explicit ResultItem(const VariantMap &variant_map);
+    ResultItem(internal::ResultItemImpl* impl);
 
     std::shared_ptr<internal::ResultItemImpl> p;
 
     friend class internal::ResultItemImpl;
+    friend class Result;
 };
 
 } // namespace scopes

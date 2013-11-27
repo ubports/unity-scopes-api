@@ -18,7 +18,7 @@
 
 #include <scopes/Registry.h>
 #include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -43,7 +43,7 @@ public:
         cout << "received category: id=" << category->id() << endl;
     }
 
-    virtual void push(ResultItem result) override
+    virtual void push(Result result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try

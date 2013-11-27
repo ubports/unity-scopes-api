@@ -37,7 +37,7 @@ namespace api
 namespace scopes
 {
 
-class ResultItem;
+class Result;
 
 namespace internal
 {
@@ -60,7 +60,7 @@ public:
     void register_category(Category::SCPtr category);
     Category::SCPtr lookup_category(std::string const& id) const;
 
-    bool push(unity::api::scopes::ResultItem const& result);
+    bool push(unity::api::scopes::Result const& result);
     void finished();
     void finished(unity::api::scopes::ReceiverBase::Reason reason);
 

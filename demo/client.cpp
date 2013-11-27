@@ -20,7 +20,7 @@
 #include <scopes/Registry.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -41,7 +41,7 @@ public:
             category->renderer_template() << endl;
     }
 
-    virtual void push(ResultItem result) override
+    virtual void push(Result result) override
     {
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }

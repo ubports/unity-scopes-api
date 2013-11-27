@@ -19,7 +19,7 @@
 #include <scopes/RegistryProxyFwd.h>
 #include <scopes/Reply.h>
 #include <scopes/Category.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <scopes/ScopeBase.h>
 
 #include <algorithm>
@@ -203,7 +203,7 @@ public:
                 auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
                 for (int i = 1; i < 5; ++i)
                 {
-                    ResultItem result(cat);
+                    Result result(cat);
                     result.set_uri("uri");
                     result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
                     result.set_art("icon");

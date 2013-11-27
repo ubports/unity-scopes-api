@@ -17,11 +17,10 @@
  */
 
 #include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/ResultItemImpl.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -113,8 +112,8 @@ void ReplyObject::push(VariantMap const& result) noexcept
             }
             else
             {
-                ResultItem result_item(cat, result_var);
-                receiver_base_->push(std::move(result_item));
+                Result result(cat, result_var);
+                receiver_base_->push(std::move(result));
             }
         }
     }

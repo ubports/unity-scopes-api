@@ -43,6 +43,7 @@ class ResultItemImpl
 {
 public:
     explicit ResultItemImpl(Category::SCPtr category);
+    ResultItemImpl();
     ResultItemImpl(Category::SCPtr category, VariantMap const& variant_map);
     ResultItemImpl(VariantMap const& variant_map);
     ResultItemImpl(ResultItemImpl const& other);
