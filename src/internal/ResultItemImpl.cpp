@@ -36,12 +36,8 @@ namespace internal
 const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri", "cat_id"};
 
 ResultItemImpl::ResultItemImpl(Category::SCPtr category)
-    : category_(category)
 {
-    if (category_ == nullptr)
-    {
-        throw InvalidArgumentException("ResultItemImpl(): null category");
-    }
+    set_category(category);
 }
 
 ResultItemImpl::ResultItemImpl(Category::SCPtr category, const VariantMap& variant_map)
@@ -68,6 +64,15 @@ void ResultItemImpl::set_art(std::string const& image)
 void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
 {
     dnd_uri_ = dnd_uri;
+}
+
+void ResultItemImpl::set_category(Category::SCPtr category)
+{
+    if (category == nullptr)
+    {
+        throw InvalidArgumentException("Category must not be null");
+    }
+    category_ = category;
 }
 
 void ResultItemImpl::add_metadata(std::string const& key, Variant const& value)

@@ -82,6 +82,11 @@ void ResultItem::set_dnd_uri(std::string const& dnd_uri)
     p->set_dnd_uri(dnd_uri);
 }
 
+void ResultItem::set_category(Category::SCPtr category)
+{
+    p->set_category(category);
+}
+
 void ResultItem::add_metadata(std::string const& key, Variant const& value)
 {
     p->add_metadata(key, value);
