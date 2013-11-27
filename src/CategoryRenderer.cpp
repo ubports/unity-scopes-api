@@ -30,11 +30,8 @@ namespace scopes
 
 //! @cond
 
-const std::string CategoryRenderer::DEFAULT = "{\"template\":{\"renderer\":\"grid\",\"overlay-mode\":null},"
-    "\"components\":{\"title\":\"title\",\"art\": \"art\" }}";
-
-const std::string CategoryRenderer::MUSIC_GRID = "{\"template\":{\"renderer\":\"grid\",\"overlay-mode\":null},"
-    "\"components\":{\"title\":\"title\",\"subtitle\":\"subtitle\",\"art\":\"art\"}}";
+constexpr const char* CategoryRenderer::DEFAULT;
+constexpr const char* CategoryRenderer::MUSIC_GRID;
 
 CategoryRenderer::CategoryRenderer(std::string const& json_text)
     : p(new internal::CategoryRendererImpl(json_text))

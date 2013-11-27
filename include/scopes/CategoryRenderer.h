@@ -44,6 +44,18 @@ class UNITY_API CategoryRenderer
 {
 public:
     /**
+      \brief A default template for generic use.
+     */
+    constexpr static const char* DEFAULT = R"({"template":{"renderer":"grid","overlay-mode":null},)"
+        R"("components":{"title":"title","art":"art"}})";
+
+    /**
+      \brief A template suitable for displaying music results.
+     */
+    constexpr static const char* MUSIC_GRID = R"({"template":{"renderer":"grid","overlay-mode":null},)"
+        R"("components":{"title":"title","subtitle":"subtitle","art":"art"}})";
+
+    /**
      \brief Creates CategoryRenderer from a JSON data.
      */
     explicit CategoryRenderer(std::string const& json_text = DEFAULT);
@@ -64,16 +76,6 @@ public:
      \return renderer template (JSON)
      */
     std::string data() const;
-
-    /**
-      \brief A default template for generic use.
-     */
-    static const std::string DEFAULT;
-
-    /**
-      \brief A template suitable for displaying music results.
-     */
-    static const std::string MUSIC_GRID;
 
 private:
     std::shared_ptr<internal::CategoryRendererImpl> p;
