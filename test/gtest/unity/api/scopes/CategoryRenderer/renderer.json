@@ -1,0 +1,11 @@
+{
+  "template" : {
+     "renderer": "grid",
+     "overlay-mode": null
+  },
+  "components": {
+     "title": "title",
+     "subtitle": "subtitle",
+     "art": "art"
+  }
+}

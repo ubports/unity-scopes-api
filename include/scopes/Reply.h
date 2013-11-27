@@ -22,6 +22,7 @@
 #include <scopes/ObjectProxy.h>
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
+#include <scopes/CategoryRenderer.h>
 
 namespace unity
 {
@@ -53,7 +54,8 @@ public:
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
     \return Category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template =
+            CategoryRenderer());
 
     /**
     \brief Register an existing category instance and send it to the source of the query.

@@ -37,27 +37,19 @@ namespace internal
 ResultImpl::ResultImpl(ResultImpl const& other)
     : ResultItemImpl(other)
 {
-    category_ = other.category_;
+    set_category(other.category_);
 }
 
 ResultImpl::ResultImpl(Category::SCPtr category)
-    : ResultItemImpl(),
-    category_(category)
+    : ResultItemImpl()
 {
-    if (category_ == nullptr)
-    {
-        throw InvalidArgumentException("ResultItem: null category");
-    }
+    set_category(category);
 }
 
 ResultImpl::ResultImpl(Category::SCPtr category, const VariantMap& variant_map)
-    : ResultItemImpl(variant_map),
-    category_(category)
+    : ResultItemImpl(variant_map)
 {
-    if (category_ == nullptr)
-    {
-        throw InvalidArgumentException("ResultItem: null category");
-    }
+    set_category(category);
 }
 
 ResultImpl::ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg)
@@ -81,6 +73,15 @@ ResultImpl::ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry
 Category::SCPtr ResultImpl::category() const
 {
     return category_;
+}
+
+void ResultImpl::set_category(Category::SCPtr category)
+{
+    if (category == nullptr)
+    {
+        throw InvalidArgumentException("Category must not be null");
+    }
+    category_ = category;
 }
 
 void ResultImpl::serialize_internal(VariantMap& var) const

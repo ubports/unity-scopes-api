@@ -20,6 +20,7 @@
 #include <scopes/Reply.h>
 #include <scopes/Category.h>
 #include <scopes/Result.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/ScopeBase.h>
 
 #include <algorithm>
@@ -190,6 +191,8 @@ public:
 
     virtual void run() override
     {
+        CategoryRenderer rdr;
+
         // What run() does is up to the scope. For example, we could set up and run an event loop here.
         // It's OK for run() to be empty and return immediately, or to take as long it likes to complete.
         // The only obligation is that, if the scopes run time calls stop(), run() must tidy up and return
@@ -200,7 +203,7 @@ public:
             ReplyProxy reply_proxy;
             if (queue_.get(query, reply_proxy) && !done_.load())
             {
-                auto cat = reply_proxy->register_category("cat1", "Category 1", "", "{}");
+                auto cat = reply_proxy->register_category("cat1", "Category 1", "", rdr);
                 for (int i = 1; i < 5; ++i)
                 {
                     Result result(cat);

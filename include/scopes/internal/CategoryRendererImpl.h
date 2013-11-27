@@ -16,13 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULTIMPL_H
-#define UNITY_API_SCOPES_RESULTIMPL_H
+#ifndef UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
+#define UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
 
+#include <scopes/CategoryRenderer.h>
+#include <unity/SymbolExport.h>
 #include <string>
-#include <memory>
-#include <scopes/internal/ResultItemImpl.h>
-#include <scopes/Category.h>
 
 namespace unity
 {
@@ -36,22 +35,16 @@ namespace scopes
 namespace internal
 {
 
-class ResultImpl : public ResultItemImpl
+class UNITY_API CategoryRendererImpl
 {
 public:
-    explicit ResultImpl(Category::SCPtr category);
-    ResultImpl(ResultImpl const& other);
-    ResultImpl(Category::SCPtr category, VariantMap const& variant_map);
-    ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg);
+    CategoryRendererImpl(std::string const& json_text);
+    static CategoryRenderer from_file(std::string const& path);
 
-    void set_category(Category::SCPtr category);
-    Category::SCPtr category() const;
-
-protected:
-    void serialize_internal(VariantMap& var) const override;
+    std::string data() const;
 
 private:
-    Category::SCPtr category_;
+    std::string data_;
 };
 
 } // namespace internal
@@ -61,6 +54,5 @@ private:
 } // namespace api
 
 } // namespace unity
-
 
 #endif

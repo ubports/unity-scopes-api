@@ -38,7 +38,7 @@ CategoryImpl::CategoryImpl(VariantMap const& variant_map)
     deserialize(variant_map);
 }
 
-CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
     : id_(id),
       title_(title),
       icon_(icon),
@@ -66,7 +66,7 @@ std::string const& CategoryImpl::icon() const
     return icon_;
 }
 
-std::string const& CategoryImpl::renderer_template() const
+CategoryRenderer const& CategoryImpl::renderer_template() const
 {
     return renderer_template_;
 }
@@ -77,7 +77,7 @@ VariantMap CategoryImpl::serialize() const
     var["id"] = id_;
     var["title"] = title_;
     var["icon"] = icon_;
-    var["renderer_template"] = renderer_template_;
+    var["renderer_template"] = renderer_template_.data();
     return var;
 }
 
@@ -105,7 +105,7 @@ void CategoryImpl::deserialize(VariantMap const& variant_map)
     it = variant_map.find("renderer_template");
     if (it != variant_map.end())
     {
-        renderer_template_ = it->second.get_string();
+        renderer_template_ = CategoryRenderer(it->second.get_string()); // can throw if json is invalid
     }
 }
 

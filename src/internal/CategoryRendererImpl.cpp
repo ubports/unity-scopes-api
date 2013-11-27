@@ -16,13 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULTIMPL_H
-#define UNITY_API_SCOPES_RESULTIMPL_H
-
-#include <string>
-#include <memory>
-#include <scopes/internal/ResultItemImpl.h>
-#include <scopes/Category.h>
+#include <scopes/internal/CategoryRendererImpl.h>
+#include <scopes/CategoryRenderer.h>
+#include <unity/util/FileIO.h>
 
 namespace unity
 {
@@ -34,25 +30,29 @@ namespace scopes
 {
 
 namespace internal
+
 {
 
-class ResultImpl : public ResultItemImpl
+//! @cond
+
+CategoryRendererImpl::CategoryRendererImpl(std::string const& json_text)
+    : data_(json_text)
 {
-public:
-    explicit ResultImpl(Category::SCPtr category);
-    ResultImpl(ResultImpl const& other);
-    ResultImpl(Category::SCPtr category, VariantMap const& variant_map);
-    ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg);
+    //TODO: json validation
+}
 
-    void set_category(Category::SCPtr category);
-    Category::SCPtr category() const;
+CategoryRenderer CategoryRendererImpl::from_file(std::string const& path)
+{
+    const std::string contents = unity::util::read_text_file(path);
+    return CategoryRenderer(contents);
+}
 
-protected:
-    void serialize_internal(VariantMap& var) const override;
+std::string CategoryRendererImpl::data() const
+{
+    return data_;
+}
 
-private:
-    Category::SCPtr category_;
-};
+//! @endcond
 
 } // namespace internal
 
@@ -61,6 +61,3 @@ private:
 } // namespace api
 
 } // namespace unity
-
-
-#endif

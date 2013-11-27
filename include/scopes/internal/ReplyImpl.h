@@ -38,6 +38,7 @@ namespace scopes
 {
 
 class Result;
+class CategoryRenderer;
 
 namespace internal
 {
@@ -56,7 +57,7 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
     virtual ~ReplyImpl() noexcept;
 
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     void register_category(Category::SCPtr category);
     Category::SCPtr lookup_category(std::string const& id) const;
 

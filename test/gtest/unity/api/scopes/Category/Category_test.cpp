@@ -28,27 +28,47 @@ using namespace unity;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
-TEST(CategoryRegistry, basic)
+TEST(Category, basic)
 {
     CategoryRegistry reg;
-    {
-        CategoryRenderer rdr;
-        EXPECT_EQ(nullptr, reg.lookup_category("a"));
-        auto cat = reg.register_category("a", "title", "icon", rdr);
-        EXPECT_TRUE(cat != nullptr);
-
-        auto cat1 = reg.lookup_category("a");
-        EXPECT_TRUE(cat1 != nullptr);
-        EXPECT_TRUE(cat == cat1);
-    }
- }
-
-TEST(CategoryRegistry, exceptions)
-{
-    CategoryRegistry reg;
-    CategoryRenderer rdr;
+    CategoryRenderer rdr("{\"a\":1}");
 
     auto cat = reg.register_category("a", "title", "icon", rdr);
-    EXPECT_THROW(reg.register_category("a", "title1", "icon1", rdr), InvalidArgumentException);
-    EXPECT_THROW(reg.register_category(cat), InvalidArgumentException);
+
+    EXPECT_TRUE(cat != nullptr);
+    EXPECT_EQ("a", cat->id());
+    EXPECT_EQ("title", cat->title());
+    EXPECT_EQ("icon", cat->icon());
+    EXPECT_EQ("{\"a\":1}", cat->renderer_template().data());
+}
+
+TEST(Category, serialize)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr("{\"a\":1}");
+    {
+        auto cat = reg.register_category("a", "title", "icon", rdr);
+        auto vm = cat->serialize();
+        EXPECT_EQ("a", vm["id"].get_string());
+        EXPECT_EQ("title", vm["title"].get_string());
+        EXPECT_EQ("icon", vm["icon"].get_string());
+        EXPECT_EQ("{\"a\":1}", vm["renderer_template"].get_string());
+    }
+}
+
+TEST(Category, deserialize)
+{
+    VariantMap vm;
+    vm["id"] = "b";
+    vm["title"] = "title";
+    vm["icon"] = "icon";
+    vm["renderer_template"] = "{\"a\":1}";
+
+    CategoryRegistry reg;
+    auto cat = reg.register_category(vm);
+    EXPECT_TRUE(cat != nullptr);
+    EXPECT_EQ("b", cat->id());
+    EXPECT_EQ("title", cat->title());
+    EXPECT_EQ("icon", cat->icon());
+    EXPECT_EQ("{\"a\":1}", cat->renderer_template().data());
 }

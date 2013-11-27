@@ -18,6 +18,7 @@
 
 #include <scopes/Result.h>
 #include <scopes/Category.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -29,7 +30,9 @@ using namespace unity::api::scopes::internal;
 TEST(Result, basic)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat2 = reg.register_category("2", "title", "icon", rdr);
 
     {
         Result result(cat);
@@ -51,7 +54,8 @@ TEST(Result, basic)
 TEST(Result, copy)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     // copy ctor
     {
         Result result(cat);
@@ -133,7 +137,8 @@ TEST(Result, copy)
 TEST(Result, serialize)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
 
     Result result(cat);
     result.set_uri("http://ubuntu.com");
@@ -159,7 +164,8 @@ TEST(Result, serialize)
 TEST(Result, serialize_excp)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     Result result(cat);
 
     // throw until all required attributes are non-empty
@@ -172,6 +178,26 @@ TEST(Result, serialize_excp)
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_dnd_uri("http://canonical.com");
     EXPECT_NO_THROW(result.serialize());
+}
+
+// test exceptions with null category
+TEST(ResultItem, exceptions)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    Category::SCPtr null_cat;
+
+    bool excp = false;
+    try
+    {
+        Result r(null_cat);
+    }
+    catch (const unity::InvalidArgumentException& e)
+    {
+        excp = true;
+    }
+    EXPECT_TRUE(excp);
 }
 
 // test conversion from VariantMap
@@ -192,7 +218,8 @@ TEST(Result, deserialize)
     outer["internal"] = intvm;
 
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     Result result(cat, outer);
 
     auto outer_var = result.serialize();
@@ -207,10 +234,11 @@ TEST(Result, deserialize)
 
 TEST(Result, store)
 {
+    CategoryRenderer rdr;
     CategoryRegistry input_reg;
     CategoryRegistry output_reg;
-    auto incat = input_reg.register_category("1", "title", "icon", "{}");
-    auto outcat = output_reg.register_category("2", "title", "icon", "{}");
+    auto incat = input_reg.register_category("1", "title", "icon", rdr);
+    auto outcat = output_reg.register_category("2", "title", "icon", rdr);
 
     Result outresult(outcat);
     outresult.set_uri("uri1");
