@@ -1,0 +1,98 @@
+/*
+ * Copyright (C) 2013 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ */
+
+#include <scopes/internal/ResultImpl.h>
+#include <scopes/internal/CategoryRegistry.h>
+#include <unity/UnityExceptions.h>
+#include <scopes/Category.h>
+#include <sstream>
+
+namespace unity
+{
+
+namespace api
+{
+
+namespace scopes
+{
+
+namespace internal
+{
+
+ResultImpl::ResultImpl(ResultImpl const& other)
+    : ResultItemImpl(other)
+{
+    category_ = other.category_;
+}
+
+ResultImpl::ResultImpl(Category::SCPtr category)
+    : ResultItemImpl(),
+    category_(category)
+{
+    if (category_ == nullptr)
+    {
+        throw InvalidArgumentException("ResultItem: null category");
+    }
+}
+
+ResultImpl::ResultImpl(Category::SCPtr category, const VariantMap& variant_map)
+    : ResultItemImpl(variant_map),
+    category_(category)
+{
+    if (category_ == nullptr)
+    {
+        throw InvalidArgumentException("ResultItem: null category");
+    }
+}
+
+ResultImpl::ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg)
+    : ResultItemImpl(variant_map)
+{
+    auto it = variant_map.find("internal");
+    if (it == variant_map.end())
+    {
+        throw InvalidArgumentException("Invalid variant, missing 'internal'");
+    }
+    auto cat_id = it->second.get_dict()["cat_id"].get_string();
+    auto cat = reg.lookup_category(cat_id);
+    if (cat == nullptr)
+    {
+        std::ostringstream s;
+        s << "Category '" << cat_id << "' not found in the registry";
+        throw InvalidArgumentException(s.str());
+    }
+}
+
+Category::SCPtr ResultImpl::category() const
+{
+    return category_;
+}
+
+void ResultImpl::serialize_internal(VariantMap& var) const
+{
+    ResultItemImpl::serialize_internal(var);
+    var["cat_id"] = category_->id();
+}
+
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace api
+
+} // namespace unity
