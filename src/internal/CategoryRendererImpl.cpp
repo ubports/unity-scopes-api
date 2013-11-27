@@ -18,8 +18,7 @@
 
 #include <scopes/internal/CategoryRendererImpl.h>
 #include <scopes/CategoryRenderer.h>
-#include <fstream>
-#include <streambuf>
+#include <unity/util/FileIO.h>
 
 namespace unity
 {
@@ -44,10 +43,7 @@ CategoryRendererImpl::CategoryRendererImpl(std::string const& json_text)
 
 CategoryRenderer CategoryRendererImpl::from_file(std::string const& path)
 {
-    std::ifstream file;
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    file.open(path);
-    std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    const std::string contents = unity::util::read_text_file(path);
     return CategoryRenderer(contents);
 }
 
