@@ -19,14 +19,19 @@ This document describes data structures that are serialized and exchanged by
 middleware.
 -----------------------------------------------------------------------------
 
-ResultItem (returned by variant_map()):
+Result (returned by variant_map()):
 =======================================
- 'uri' : string
- 'title' : string
- 'icon' : string
- 'dnd_uri' : string
- 'cat_id' : string
- + any custom key-value attribute added by scope author.
+'attrs' : {
+    'uri' : string
+    'title' : string
+    'icon' : string
+    'dnd_uri' : string
+    + any custom key-value attribute added by scope author.
+},
+'internal' : {
+    'cat_id' : string
+    'result' : dict (serialized Result), optional
+}
 
 Category (returned by variant_map()):
 =====================================
