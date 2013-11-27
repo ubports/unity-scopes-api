@@ -67,7 +67,7 @@ public:
     Category::SCPtr category() const;
 
 private:
-    Result(const VariantMap &variant_map, internal::CategoryRegistry const& reg);
+    Result(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
     internal::ResultImpl* fwd() const;
 
     friend class internal::ReplyObject;

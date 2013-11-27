@@ -105,7 +105,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
             auto result_var = it->second.get_dict();
             try
             {
-                Result result(result_var, *cat_registry_);
+                Result result(*cat_registry_, result_var);
                 receiver_base_->push(std::move(result));
             }
             catch (unity::Exception const& e)

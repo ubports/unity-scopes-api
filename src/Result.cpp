@@ -41,8 +41,8 @@ Result::Result(Category::SCPtr category, const VariantMap &variant_map)
 {
 }
 
-Result::Result(const VariantMap &variant_map, internal::CategoryRegistry const& reg)
-    : ResultItem(new internal::ResultImpl(variant_map, reg))
+Result::Result(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
+    : ResultItem(new internal::ResultImpl(reg, variant_map))
 {
 }
 

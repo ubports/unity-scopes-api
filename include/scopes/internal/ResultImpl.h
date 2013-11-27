@@ -42,7 +42,7 @@ public:
     explicit ResultImpl(Category::SCPtr category);
     ResultImpl(ResultImpl const& other);
     ResultImpl(Category::SCPtr category, VariantMap const& variant_map);
-    ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg);
+    ResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
 
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;

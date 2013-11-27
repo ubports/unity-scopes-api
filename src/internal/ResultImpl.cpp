@@ -52,7 +52,7 @@ ResultImpl::ResultImpl(Category::SCPtr category, const VariantMap& variant_map)
     set_category(category);
 }
 
-ResultImpl::ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry const& reg)
+ResultImpl::ResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
     : ResultItemImpl(variant_map)
 {
     auto it = variant_map.find("internal");
@@ -61,8 +61,8 @@ ResultImpl::ResultImpl(const VariantMap &variant_map, internal::CategoryRegistry
         throw InvalidArgumentException("Invalid variant, missing 'internal'");
     }
     auto cat_id = it->second.get_dict()["cat_id"].get_string();
-    auto cat = reg.lookup_category(cat_id);
-    if (cat == nullptr)
+    category_ = reg.lookup_category(cat_id);
+    if (category_ == nullptr)
     {
         std::ostringstream s;
         s << "Category '" << cat_id << "' not found in the registry";
