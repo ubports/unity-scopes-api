@@ -108,7 +108,7 @@ string ScopeConfig::search_hint() const
 {
     if (!search_hint_)
     {
-        throw NotFoundException("Key not set", search_hint_str);
+        throw NotFoundException("Hint not set", search_hint_str);
     }
     return *search_hint_;
 }

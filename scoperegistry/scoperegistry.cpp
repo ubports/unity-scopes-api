@@ -164,7 +164,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             ScopeConfig sc(pair.second);
-            mi->set_scope_name(sc.localized_name());
+            mi->set_scope_name(pair.first);
             mi->set_art(sc.art());
             mi->set_localized_name(sc.localized_name());
             mi->set_description(sc.description());
@@ -177,7 +177,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
             }
             try
             {
-                mi->set_hot_key(sc.search_hint());
+                mi->set_hot_key(sc.hot_key());
             }
             catch (NotFoundException const&)
             {

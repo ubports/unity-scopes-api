@@ -2,3 +2,5 @@
 Art = scope-A.Art
 LocalizedName = scope-A.LocalizedName
 Description = scope-A.Description
+SearchHint = scope-A.SearchHint
+HotKey = scope-A.HotKey

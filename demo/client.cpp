@@ -16,12 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <scopes/CategoryRenderer.h>
 #include <scopes/QueryCtrl.h>
 #include <scopes/Registry.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/ResultItem.h>
-#include <scopes/CategoryRenderer.h>
+#include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -92,14 +93,36 @@ int main(int argc, char* argv[])
 
         RegistryProxy r = rt->registry();
         auto meta = r->find(scope_name);
+        cout << "Scope metadata:   " << endl;
+        cout << "\tscope_name:     " << meta.scope_name() << endl;
+        cout << "\tart:            " << meta.art() << endl;
+        cout << "\tlocalized_name: " << meta.localized_name() << endl;
+        cout << "\tdescription:    " << meta.description() << endl;
+        string tmp;
+        try
+        {
+            tmp = meta.search_hint();
+            cout << "\tsearch_hint:    " << meta.search_hint() << endl;
+        }
+        catch (NotFoundException const& e)
+        {
+        }
+        try
+        {
+            tmp = meta.hot_key();
+            cout << "\thot_key:        " << meta.hot_key() << endl;
+        }
+        catch (NotFoundException const& e)
+        {
+        }
         shared_ptr<Receiver> reply(new Receiver);
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
         auto ctrl = meta.proxy()->create_query(search_string, vm, reply);     // Returns (almost) immediately
-        cerr << "client: created query" << endl;
+        cout << "client: created query" << endl;
         reply->wait_until_finished();
-        cerr << "client: wait returned" << endl;
+        cout << "client: wait returned" << endl;
     }
 
     catch (unity::Exception const& e)
