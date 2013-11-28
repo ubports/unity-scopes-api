@@ -21,6 +21,7 @@
 #include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/ResultItem.h>
+#include <scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -38,7 +39,7 @@ public:
     virtual void push(Category::SCPtr category) override
     {
         cout << "received category: id=" << category->id() << " title=" << category->title() << " icon=" << category->icon() << " template=" <<
-            category->renderer_template() << endl;
+            category->renderer_template().data() << endl;
     }
 
     virtual void push(ResultItem result) override

@@ -18,6 +18,7 @@
 
 #include <scopes/Reply.h>
 #include <scopes/ResultItem.h>
+#include <scopes/CategoryRenderer.h>
 
 #include <scopes/internal/ReplyImpl.h>
 
@@ -41,7 +42,7 @@ Reply::~Reply() noexcept
 {
 }
 
-Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, std::string const& renderer_template)
+Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
 {
     return fwd()->register_category(id, title, icon, renderer_template);
 }

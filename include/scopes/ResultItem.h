@@ -76,6 +76,7 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
+    void set_category(Category::SCPtr category);
     void add_metadata(std::string const& key, Variant const& value);
 
     std::string uri() const;

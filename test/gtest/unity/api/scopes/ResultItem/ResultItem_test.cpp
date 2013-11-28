@@ -18,6 +18,7 @@
 
 #include <scopes/ResultItem.h>
 #include <scopes/Category.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -29,7 +30,9 @@ using namespace unity::api::scopes::internal;
 TEST(ResultItem, basic)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat2 = reg.register_category("2", "title", "icon", rdr);
 
     {
         ResultItem result(cat);
@@ -45,6 +48,9 @@ TEST(ResultItem, basic)
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
         EXPECT_EQ("bar", result.serialize()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
+
+        result.set_category(cat2);
+        EXPECT_EQ("2", result.category()->id());
     }
 
     // copy ctor
@@ -126,7 +132,8 @@ TEST(ResultItem, basic)
 TEST(ResultItem, serialize)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
 
     ResultItem result(cat);
     result.set_uri("http://ubuntu.com");
@@ -151,7 +158,8 @@ TEST(ResultItem, serialize)
 TEST(ResultItem, serialize_excp)
 {
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     ResultItem result(cat);
 
     // throw until all required attributes are non-empty
@@ -166,6 +174,29 @@ TEST(ResultItem, serialize_excp)
     EXPECT_NO_THROW(result.serialize());
 }
 
+// test exceptions with null category
+TEST(ResultItem, exceptions)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    Category::SCPtr null_cat;
+
+    bool excp = false;
+    try
+    {
+        ResultItem r(null_cat);
+    }
+    catch (const unity::InvalidArgumentException& e)
+    {
+        excp = true;
+    }
+    EXPECT_TRUE(excp);
+
+    ResultItem result(cat);
+    EXPECT_THROW(result.set_category(null_cat), unity::InvalidArgumentException);
+}
+
 // test conversion from VariantMap
 TEST(ResultItem, deserialize)
 {
@@ -178,7 +209,8 @@ TEST(ResultItem, deserialize)
     vm["foo"] = "bar"; // custom attribute
 
     CategoryRegistry reg;
-    auto cat = reg.register_category("1", "title", "icon", "{}");
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
     ResultItem result(cat, vm);
 
     auto var = result.serialize();

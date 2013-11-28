@@ -1,4 +1,4 @@
-Source: unity-scopes
+Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
@@ -18,12 +18,12 @@ Build-Depends: debhelper (>= 9),
                lttng-tools,
 Standards-Version: 3.9.4
 Section: libs
-Homepage: https://launchpad.net/unity-api
+Homepage: https://launchpad.net/unity-scopes-api
 # if you don't have have commit access to this branch but would like to upload
 # directly to Ubuntu, don't worry: your changes will be merged back into the
 # upstream branch
-Vcs-Bzr: lp:unity-scopes
-Vcs-Browser: https://code.launchpad.net/unity-scopes
+Vcs-Bzr: lp:unity-scopes-api
+Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 
 Package: libunity-scopes0
 Architecture: any

@@ -34,6 +34,8 @@ namespace api
 namespace scopes
 {
 
+class CategoryRenderer;
+
 namespace internal
 {
 
@@ -57,7 +59,7 @@ public:
     \brief Creates category from supplied parameters. Throws if category with same id exists.
     \return category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, std::string const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template);
 
     /**
     \brief Finds category instance with give id.

@@ -16,39 +16,29 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/CategoryRegistry.h>
+#include <scope-api-testconfig.h>
 #include <scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/Variant.h>
-
+#include <fstream>
 #include <gtest/gtest.h>
 
-using namespace std;
-using namespace unity;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
-TEST(CategoryRegistry, basic)
+TEST(CategoryRenderer, basic)
 {
-    CategoryRegistry reg;
-    {
-        CategoryRenderer rdr;
-        EXPECT_EQ(nullptr, reg.lookup_category("a"));
-        auto cat = reg.register_category("a", "title", "icon", rdr);
-        EXPECT_TRUE(cat != nullptr);
-
-        auto cat1 = reg.lookup_category("a");
-        EXPECT_TRUE(cat1 != nullptr);
-        EXPECT_TRUE(cat == cat1);
-    }
- }
-
-TEST(CategoryRegistry, exceptions)
-{
-    CategoryRegistry reg;
     CategoryRenderer rdr;
+    EXPECT_TRUE(rdr.data().size() > 0);
+    EXPECT_EQ(DEFAULT_RENDERER, rdr.data());
+}
 
-    auto cat = reg.register_category("a", "title", "icon", rdr);
-    EXPECT_THROW(reg.register_category("a", "title1", "icon1", rdr), InvalidArgumentException);
-    EXPECT_THROW(reg.register_category(cat), InvalidArgumentException);
+TEST(CategoryRenderer, from_file)
+{
+    const std::string input_file(TEST_BUILD_ROOT "/gtest/unity/api/scopes/CategoryRenderer/renderer.json");
+
+    EXPECT_THROW(CategoryRenderer::from_file("/non-existing-file"), unity::FileException);
+    EXPECT_NO_THROW(CategoryRenderer::from_file(input_file));
+
+    auto rdr = CategoryRenderer::from_file(input_file);
+    EXPECT_TRUE(rdr.data().size() > 0);
 }
