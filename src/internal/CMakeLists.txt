@@ -10,7 +10,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactoryConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQueryCtrl.cpp

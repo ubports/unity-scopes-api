@@ -42,8 +42,9 @@ ReceiverBase::~ReceiverBase() noexcept
 {
 }
 
-void ReceiverBase::push(Category::SCPtr category)
+void ReceiverBase::push(Category::SCPtr /* category */)
 {
+    // Intentionally empty: "do nothing" default implementation.
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,

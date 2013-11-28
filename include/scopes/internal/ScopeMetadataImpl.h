@@ -40,7 +40,7 @@ class ScopeMetadataImpl
 {
 public:
     ScopeMetadataImpl(MiddlewareBase* mw);
-    ScopeMetadataImpl(VariantMap const& variant_map);
+    ScopeMetadataImpl(VariantMap const& variant_map, MiddlewareBase* mw);
     ScopeMetadataImpl(ScopeMetadataImpl const&);
     ScopeMetadataImpl(ScopeMetadataImpl&&) = default;
     ScopeMetadataImpl& operator=(ScopeMetadataImpl const&);

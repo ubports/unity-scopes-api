@@ -136,8 +136,6 @@ public:
 
     virtual void stop() override {}
 
-    virtual void run() override {}
-
     virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));

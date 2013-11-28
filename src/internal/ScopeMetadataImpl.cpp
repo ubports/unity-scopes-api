@@ -43,7 +43,8 @@ ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
 {
 }
 
-ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map)
+ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw) :
+    mw_(mw)
 {
     deserialize(variant_map);
 }
@@ -73,6 +74,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         art_ = rhs.art_;
         proxy_ = rhs.proxy_;
         localized_name_ = rhs.localized_name_;
+        description_ = rhs.description_;
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
         hot_key_.reset(rhs.hot_key_ ? new string(*rhs.hot_key_) : nullptr);
     }
@@ -213,7 +215,7 @@ VariantMap::const_iterator find_or_throw(VariantMap const& var, std::string cons
     auto it = var.find(name);
     if (it == var.end())
     {
-        throw InvalidArgumentException("ScopeMetadata::deserialize() required attribute '" + name + "' is missing");
+        throw InvalidArgumentException("ScopeMetadata::deserialize(): required attribute '" + name + "' is missing");
     }
     return it;
 }

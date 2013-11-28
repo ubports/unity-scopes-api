@@ -56,8 +56,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
-        string factory_configfile = config.factory_configfile();
-        middleware_factory_.reset(new MiddlewareFactory(factory_configfile, this));
+        middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
         assert(!registry_identity_.empty());

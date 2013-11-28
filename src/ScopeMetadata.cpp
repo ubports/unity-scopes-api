@@ -19,6 +19,8 @@
 #include <scopes/ScopeMetadata.h>
 #include <scopes/internal/ScopeMetadataImpl.h>
 
+#include <cassert>
+
 using namespace std;
 
 namespace unity
@@ -32,9 +34,18 @@ namespace scopes
 
 //! @cond
 
-ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> p) :
-    p(move(p))
+ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
+    p(move(impl))
 {
+    // The only way to create a ScopeMetadata instance is to first intialize
+    // a ScopeMetadataImpl, fill it in, and then call this constructor.
+    // We check here that all mandatory fields are present. If not
+    // we have an internal logic error.
+    assert(!p->scope_name().empty());
+    assert(!p->art().empty());
+    assert(p->proxy());
+    assert(!p->localized_name().empty());
+    assert(!p->description().empty());
 }
 
 ScopeMetadata::ScopeMetadata(ScopeMetadata const& other) :

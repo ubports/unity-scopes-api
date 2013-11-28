@@ -29,7 +29,6 @@ using namespace unity::api::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
-try{
     RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope");
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
@@ -60,11 +59,6 @@ try{
         EXPECT_EQ("unity::LogicException: factory(): Cannot obtain factory for already destroyed run time",
                   e.to_string());
     }
-}
-catch(unity::Exception const& e)
-{
-    cout << e.to_string() << endl;
-}
 }
 
 TEST(RuntimeImpl, error)

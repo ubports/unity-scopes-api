@@ -222,7 +222,7 @@ TEST(RegistryI, exceptions)
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        ro->add("", move(make_meta("", proxy, middleware)));
+        ro->add("", move(make_meta("blah", proxy, middleware)));
         FAIL();
     }
     catch (InvalidArgumentException const& e)
