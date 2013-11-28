@@ -29,18 +29,10 @@ using namespace unity::api::scopes::internal::zmq_middleware;
 
 TEST(ZmqMiddleware, basic)
 {
-try
-{
     ZmqMiddleware im("testscope",
                      TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
     im.start();
     sleep(1);
     im.stop();
-}
-catch (unity::Exception const& e)
-{
-    cerr << e.to_string() << endl;
-    FAIL();
-}
 }
