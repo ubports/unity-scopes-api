@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("dash");
+        Runtime::UPtr rt = Runtime::create("");
 
         RegistryProxy r = rt->registry();
         auto meta = r->find(scope_name);
