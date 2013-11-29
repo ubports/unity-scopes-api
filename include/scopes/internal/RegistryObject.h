@@ -47,7 +47,7 @@ public:
     virtual ~RegistryObject() noexcept;
 
     // Remote operation implementations
-    ScopeMetadata find(std::string const& scope_name);
+    ScopeMetadata get_metadata(std::string const& scope_name);
 
     MetadataMap list();
 

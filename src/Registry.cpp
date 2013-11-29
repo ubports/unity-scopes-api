@@ -42,9 +42,9 @@ Registry::~Registry() noexcept
 
 //! @endcond
 
-ScopeMetadata Registry::find(std::string const& scope_name) const
+ScopeMetadata Registry::get_metadata(std::string const& scope_name) const
 {
-    return fwd()->find(scope_name);
+    return fwd()->get_metadata(scope_name);
 }
 
 MetadataMap Registry::list() const

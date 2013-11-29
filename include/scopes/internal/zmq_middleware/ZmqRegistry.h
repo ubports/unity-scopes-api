@@ -48,7 +48,7 @@ public:
     virtual ~ZmqRegistry() noexcept;
 
     // Remote operations.
-    virtual ScopeMetadata find(std::string const& scope_name) override;
+    virtual ScopeMetadata get_metadata(std::string const& scope_name) override;
     virtual MetadataMap list() override;
 };
 

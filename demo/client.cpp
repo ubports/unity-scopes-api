@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
         Runtime::UPtr rt = Runtime::create("dash");
 
         RegistryProxy r = rt->registry();
-        auto meta = r->find(scope_name);
+        auto meta = r->get_metadata(scope_name);
         cout << "Scope metadata:   " << endl;
         cout << "\tscope_name:     " << meta.scope_name() << endl;
         cout << "\tart:            " << meta.art() << endl;

@@ -58,9 +58,9 @@ public:
 
     /**
     \brief Returns the metadata for the scope with the given name.
-    @return The metadata for the scope. If no scope with the given name exists, find() throws NotFoundException.
+    @return The metadata for the scope. If no scope with the given name exists, get_metadata() throws NotFoundException.
     */
-    ScopeMetadata find(std::string const& scope_name) const;
+    ScopeMetadata get_metadata(std::string const& scope_name) const;
 
     /**
     \brief Returns a map containing the metadata for all scopes.

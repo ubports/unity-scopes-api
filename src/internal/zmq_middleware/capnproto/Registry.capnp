@@ -29,20 +29,20 @@ using Proxy = import "Proxy.capnp";
 #
 # Operations:
 #
-# ValueDict find(string name) throws NotFoundException;
-# sequence<ScopeDict> list();
+# ValueDict get_metadata(string name) throws NotFoundException;
+# map<string, ScopeMetadata> list();
 
 struct NotFoundException
 {
     name @0 : Text;
 }
 
-struct FindRequest
+struct GetMetadataRequest
 {
     name @0 : Text;
 }
 
-struct FindResponse
+struct GetMetadataResponse
 {
     response : union
     {
