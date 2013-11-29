@@ -47,12 +47,12 @@ ScopeMetadata Registry::find(std::string const& scope_name) const
     return fwd()->find(scope_name);
 }
 
-ScopeMap Registry::list() const
+MetadataMap Registry::list() const
 {
     return fwd()->list();
 }
 
-ScopeMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
+MetadataMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
 {
     return fwd()->list_if(predicate);
 }

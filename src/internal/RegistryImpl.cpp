@@ -50,15 +50,15 @@ ScopeMetadata RegistryImpl::find(std::string const& scope_name)
     return fwd()->find(scope_name);
 }
 
-ScopeMap RegistryImpl::list()
+MetadataMap RegistryImpl::list()
 {
     return fwd()->list();
 }
 
-ScopeMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)
+MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)
 {
     auto scope_map = list();
-    ScopeMap matching_entries;
+    MetadataMap matching_entries;
     for (auto& pair : scope_map)
     {
         if (predicate(pair.second))

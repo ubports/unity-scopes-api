@@ -61,7 +61,7 @@ ScopeMetadata RegistryObject::find(std::string const& scope_name)
     return it->second;
 }
 
-ScopeMap RegistryObject::list()
+MetadataMap RegistryObject::list()
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return scopes_;

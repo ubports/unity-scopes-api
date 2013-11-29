@@ -49,13 +49,13 @@ public:
     // Remote operation implementations
     ScopeMetadata find(std::string const& scope_name);
 
-    ScopeMap list();
+    MetadataMap list();
 
     bool add(std::string const& scope_name, ScopeMetadata const scope);
     bool remove(std::string const& scope_name);
 
 private:
-    mutable ScopeMap scopes_;
+    mutable MetadataMap scopes_;
     mutable std::mutex mutex_;
 };
 

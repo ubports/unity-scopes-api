@@ -113,7 +113,7 @@ ScopeMetadata ZmqRegistry::find(std::string const& scope_name)
     }
 }
 
-ScopeMap ZmqRegistry::list()
+MetadataMap ZmqRegistry::list()
 {
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
@@ -128,7 +128,7 @@ ScopeMap ZmqRegistry::list()
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
     auto list = list_response.getReturnValue();
-    ScopeMap sm;
+    MetadataMap sm;
     for (size_t i = 0; i < list.size(); ++i)
     {
         VariantMap m = to_variant_map(list[i]);
