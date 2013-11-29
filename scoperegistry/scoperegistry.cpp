@@ -239,12 +239,8 @@ int
 main(int argc, char* argv[])
 {
     prog_name = basename(argv[0]);
-    if (argc != 2)
-    {
-        cerr << "usage: " << prog_name << " configfile" << endl;
-        return 2;
-    }
-    char const* const config_file = argv[1];
+
+    char const* const config_file = argc > 1 ? argv[1] : "";
 
     int exit_status = 1;
 

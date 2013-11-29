@@ -26,6 +26,8 @@
 
 #include <cassert>
 
+#include <config.h>
+
 using namespace std;
 using namespace unity::api::scopes;
 
@@ -50,10 +52,12 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         throw InvalidArgumentException("Cannot instantiate a run time with an empty scope name");
     }
 
+    string config_file(configfile.empty() ? DEFAULT_RUNTIME : configfile);
+
     try
     {
         // Create the middleware factory and get the registry identity and config filename.
-        RuntimeConfig config(configfile);
+        RuntimeConfig config(config_file);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));
@@ -75,7 +79,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + configfile);
+        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + config_file);
     }
 }
 
