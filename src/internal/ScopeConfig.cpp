@@ -39,8 +39,9 @@ namespace
 {
     const string overrideable_str = "Override";
     const string scope_name_str = "LocalizedName";
-    const string art_str = "Art";
     const string description_str = "Description";
+    const string art_str = "Art";
+    const string icon_str = "Icon";
     const string search_hint_str = "SearchHint";
     const string hot_key_str = "HotKey";
 }
@@ -56,12 +57,27 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         overrideable_ = false;
     }
-    art_ = parser()->get_string(SCOPE_CONFIG_GROUP, art_str);
     localized_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_name_str);
     description_ = parser()->get_string(SCOPE_CONFIG_GROUP, description_str);
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
     // from the "explicitly set to empty string" case.
+    try
+    {
+        string art = parser()->get_string(SCOPE_CONFIG_GROUP, art_str);
+        art_.reset(new string(art));
+    }
+    catch (LogicException const&)
+    {
+    }
+    try
+    {
+        string icon = parser()->get_string(SCOPE_CONFIG_GROUP, icon_str);
+        icon_.reset(new string(icon));
+    }
+    catch (LogicException const&)
+    {
+    }
     try
     {
         string hint = parser()->get_string(SCOPE_CONFIG_GROUP, search_hint_str);
@@ -89,11 +105,6 @@ bool ScopeConfig::overrideable() const
     return overrideable_;
 }
 
-string ScopeConfig::art() const
-{
-    return art_;
-}
-
 string ScopeConfig::localized_name() const
 {
     return localized_name_;
@@ -102,6 +113,24 @@ string ScopeConfig::localized_name() const
 string ScopeConfig::description() const
 {
     return description_;
+}
+
+string ScopeConfig::art() const
+{
+    if (!art_)
+    {
+        throw NotFoundException("Art not set", art_str);
+    }
+    return *art_;
+}
+
+string ScopeConfig::icon() const
+{
+    if (!icon_)
+    {
+        throw NotFoundException("Icon not set", icon_str);
+    }
+    return *icon_;
 }
 
 string ScopeConfig::search_hint() const

@@ -1,6 +1,7 @@
 [ScopeConfig]
-Art = scope-A.Art
 LocalizedName = scope-A.LocalizedName
 Description = scope-A.Description
+Art = scope-A.Art
+Icon = scope-A.Icon
 SearchHint = scope-A.SearchHint
 HotKey = scope-A.HotKey
