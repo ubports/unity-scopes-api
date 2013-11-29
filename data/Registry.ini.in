@@ -2,7 +2,7 @@
 Middleware = Zmq
 Zmq.Endpoint = ipc:///tmp/Registry
 Zmq.EndpointDir = /tmp
-Zmq.ConfigFile = @CMAKE_INSTALL_PREFIX@/@DEFAULT_CONFIG_DIR@/Zmq.ini
-Scope.InstallDir = @CMAKE_INSTALL_PREFIX@/@DEFAULT_CONFIG_DIR@/scopes
-Scope.GroupConfigDir = @CMAKE_INSTALL_PREFIX@/@DEFAULT_CONFIG_DIR@/scope-groups
+Zmq.ConfigFile = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini
+Scope.InstallDir = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_DATADIR@/scopes
+Scope.GroupConfigDir = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_DATADIR@/scope-groups
 Scoperunner.Path = @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/scoperunner/scoperunner

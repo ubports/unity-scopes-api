@@ -13,12 +13,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Michal Hruby <michal.hruby@canonical.com>
  */
 
 #ifndef SCOPES_CONFIG_H
 #define SCOPES_CONFIG_H
 
-#define DEFAULT_RUNTIME "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@/unity/Runtime.ini"
+#define DEFAULT_RUNTIME "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini"
 
 #endif
