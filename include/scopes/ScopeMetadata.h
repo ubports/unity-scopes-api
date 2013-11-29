@@ -38,6 +38,8 @@ class ScopeMetadataImpl;
 class UNITY_API ScopeMetadata final
 {
 public:
+    UNITY_DEFINES_PTRS(ScopeMetadata);
+
     ScopeMetadata(ScopeMetadata const& other);
     ScopeMetadata(ScopeMetadata&&);
     ~ScopeMetadata();
