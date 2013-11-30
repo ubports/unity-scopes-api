@@ -49,7 +49,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, VariantMap> ScopeMap;
+dictionary<string, VariantMap> MetadataMap;
 
 exception NotFoundException
 {
@@ -58,7 +58,7 @@ exception NotFoundException
 
 interface Registry
 {
-    Scope* find(string name) throws NotFoundException;
+    Scope* get_metadata(string name) throws NotFoundException;
     ScopeMap list();
 };
 
@@ -67,7 +67,7 @@ interface Registry
 using namespace std::placeholders;
 
 RegistryI::RegistryI(RegistryObject::SPtr const& ro) :
-    ServantBase(ro, { { "find", bind(&RegistryI::find_, this, _1, _2, _3) },
+    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
                       { "list", bind(&RegistryI::list_, this, _1, _2, _3) } })
 
 {
@@ -77,26 +77,26 @@ RegistryI::~RegistryI() noexcept
 {
 }
 
-void RegistryI::find_(Current const&,
+void RegistryI::get_metadata_(Current const&,
                       capnp::ObjectPointer::Reader& in_params,
                       capnproto::Response::Builder& r)
 {
-    auto req = in_params.getAs<capnproto::Registry::FindRequest>();
+    auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
     string name = req.getName().cStr();
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
     try
     {
-        auto meta = delegate->find(name);
+        auto meta = delegate->get_metadata(name);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
-        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
-        auto dict = find_response.initReturnValue();
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
+        auto dict = get_metadata_response.initReturnValue();
         to_value_dict(meta.serialize(), dict);
     }
     catch (NotFoundException const& e)
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
-        find_response.initNotFoundException().setName(e.name().c_str());
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
+        get_metadata_response.initNotFoundException().setName(e.name().c_str());
     }
 }
 

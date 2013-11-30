@@ -38,6 +38,8 @@ class ScopeMetadataImpl;
 class UNITY_API ScopeMetadata final
 {
 public:
+    UNITY_DEFINES_PTRS(ScopeMetadata);
+
     ScopeMetadata(ScopeMetadata const& other);
     ScopeMetadata(ScopeMetadata&&);
     ~ScopeMetadata();
@@ -46,10 +48,11 @@ public:
     ScopeMetadata& operator=(ScopeMetadata&&);
 
     std::string scope_name() const;
-    std::string art() const;
     ScopeProxy proxy() const;
     std::string localized_name() const; // localized
     std::string description() const;    // localized
+    std::string art() const;            // optional
+    std::string icon() const;           // optional
     std::string search_hint() const;    // localized, optional
     std::string hot_key() const;        // localized, optional
 

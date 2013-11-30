@@ -42,7 +42,6 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     // We check here that all mandatory fields are present. If not
     // we have an internal logic error.
     assert(!p->scope_name().empty());
-    assert(!p->art().empty());
     assert(p->proxy());
     assert(!p->localized_name().empty());
     assert(!p->description().empty());
@@ -75,11 +74,6 @@ string ScopeMetadata::scope_name() const
     return p->scope_name();
 }
 
-string ScopeMetadata::art() const
-{
-    return p->art();
-}
-
 ScopeProxy ScopeMetadata::proxy() const
 {
     return p->proxy();
@@ -93,6 +87,16 @@ string ScopeMetadata::localized_name() const
 string ScopeMetadata::description() const
 {
     return p->description();
+}
+
+string ScopeMetadata::art() const
+{
+    return p->art();
+}
+
+string ScopeMetadata::icon() const
+{
+    return p->icon();
 }
 
 string ScopeMetadata::search_hint() const

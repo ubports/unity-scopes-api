@@ -53,7 +53,7 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
     return ScopeMetadataImpl::create(move(mi));
 }
 
-TEST(RegistryI, find)
+TEST(RegistryI, get_metadata)
 {
     try
     {
@@ -73,7 +73,7 @@ TEST(RegistryI, find)
         EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", p, middleware))));
 
         auto r = runtime->registry();
-        auto scope = r->find("scope1");
+        auto scope = r->get_metadata("scope1");
         EXPECT_EQ("scope1", scope.scope_name());
     }
     catch (unity::Exception const& e)
@@ -198,18 +198,18 @@ TEST(RegistryI, exceptions)
 
     try
     {
-        r->find("fred");
+        r->get_metadata("fred");
         FAIL();
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::find(): no such scope (name = fred)",
+        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
                   e.to_string());
     }
 
     try
     {
-        r->find("");
+        r->get_metadata("");
         FAIL();
     }
     catch (MiddlewareException const& e)

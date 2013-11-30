@@ -43,7 +43,7 @@ RegistryObject::~RegistryObject() noexcept
 {
 }
 
-ScopeMetadata RegistryObject::find(std::string const& scope_name)
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -56,12 +56,12 @@ ScopeMetadata RegistryObject::find(std::string const& scope_name)
     auto const& it = scopes_.find(scope_name);
     if (it == scopes_.end())
     {
-        throw NotFoundException("Registry::find(): no such scope",  scope_name);
+        throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
     }
     return it->second;
 }
 
-ScopeMap RegistryObject::list()
+MetadataMap RegistryObject::list()
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return scopes_;

@@ -32,20 +32,21 @@ Category (returned by serialize()):
 =====================================
  'id' : string
  'title' : string
- 'art' : string
+ 'icon' : string
  'renderer_template' : string
 
-ScopeMetaData (returned by serialize()):
+ScopeMetadata (returned by serialize()):
 =====================================
- 'scope_name' : string
- 'art' : string
- 'proxy' : dictionary
-    'identity' : string
-    'endpoint' : string
+ 'scope_name'     : string
+ 'proxy'          : dictionary
+    'identity'    : string
+    'endpoint'    : string
  'localized_name' : string
- 'description' : string
- 'search_hint' : string, optional
- 'hot_key' : string, optional
+ 'description'    : string
+ 'art'            : string, optional
+ 'icon'           : string, optional
+ 'search_hint'    : string, optional
+ 'hot_key'        : string, optional
 
 PushRequest (capnproto structure)
 =================================

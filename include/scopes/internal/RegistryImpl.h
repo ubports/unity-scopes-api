@@ -43,9 +43,9 @@ public:
     RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
     ~RegistryImpl() noexcept;
 
-    ScopeMetadata find(std::string const& scope_name);
-    ScopeMap list();
-    ScopeMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
+    ScopeMetadata get_metadata(std::string const& scope_name);
+    MetadataMap list();
+    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
 
     static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
 
