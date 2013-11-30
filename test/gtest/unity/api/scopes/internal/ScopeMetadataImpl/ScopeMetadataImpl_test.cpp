@@ -231,6 +231,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     try
     {
         mi.serialize();
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -242,6 +243,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     {
         mi.set_scope_name("scope_name");
         mi.serialize();
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -254,6 +256,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
         auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
         mi.set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
         mi.serialize();
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -265,6 +268,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     {
         mi.set_localized_name("localized_name");
         mi.serialize();
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -283,6 +287,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -296,6 +301,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -310,6 +316,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -323,6 +330,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -336,6 +344,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
@@ -349,6 +358,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     {
         ScopeMetadataImpl mi(m, &mw);
         mi.deserialize(m);
+        FAIL();
     }
     catch (InvalidArgumentException const&e)
     {
