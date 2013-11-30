@@ -33,8 +33,8 @@ namespace scopes
 
 //! @cond
 
-Runtime::Runtime(string const& scope_name, string const& configfile) :
-    p(internal::RuntimeImpl::create(scope_name, configfile))
+Runtime::Runtime(string const& configfile) :
+    p(internal::RuntimeImpl::create("", configfile))
 {
 }
 
@@ -44,9 +44,9 @@ Runtime::~Runtime() noexcept
 
 //! @endcond
 
-Runtime::UPtr Runtime::create(string const& scope_name, string const& configfile)
+Runtime::UPtr Runtime::create(string const& configfile)
 {
-    return UPtr(new Runtime(scope_name, configfile));
+    return UPtr(new Runtime(configfile));
 }
 
 void Runtime::destroy()

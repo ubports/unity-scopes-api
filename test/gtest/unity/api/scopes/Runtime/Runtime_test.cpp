@@ -25,7 +25,7 @@ using namespace unity::api::scopes;
 
 TEST(Runtime, basic)
 {
-    Runtime::UPtr rt = Runtime::create("testscope");
+    Runtime::UPtr rt = Runtime::create();
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
 }
