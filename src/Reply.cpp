@@ -17,7 +17,7 @@
  */
 
 #include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <scopes/internal/ReplyImpl.h>

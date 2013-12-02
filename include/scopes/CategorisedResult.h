@@ -16,10 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULT_H
-#define UNITY_API_SCOPES_RESULT_H
+#ifndef UNITY_API_SCOPES_CATEGORISEDRESULT_H
+#define UNITY_API_SCOPES_CATEGORISEDRESULT_H
 
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <scopes/Category.h>
 
 namespace unity
@@ -38,10 +38,10 @@ namespace internal
 }
 
 /**
-\brief Result is a ResultItem plus a category it belongs to.
+\brief CategorisedResult is a Result plus a category it belongs to.
 */
 
-class UNITY_API CategorisedResult: public ResultItem
+class UNITY_API CategorisedResult: public Result
 {
 public:
     /**

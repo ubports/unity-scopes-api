@@ -35,25 +35,25 @@ namespace internal
 {
 
 CategorisedResultImpl::CategorisedResultImpl(CategorisedResultImpl const& other)
-    : ResultItemImpl(other)
+    : ResultImpl(other)
 {
     set_category(other.category_);
 }
 
 CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category)
-    : ResultItemImpl()
+    : ResultImpl()
 {
     set_category(category);
 }
 
 CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category, const VariantMap& variant_map)
-    : ResultItemImpl(variant_map)
+    : ResultImpl(variant_map)
 {
     set_category(category);
 }
 
 CategorisedResultImpl::CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
-    : ResultItemImpl(variant_map)
+    : ResultImpl(variant_map)
 {
     auto it = variant_map.find("internal");
     if (it == variant_map.end())
@@ -86,7 +86,7 @@ void CategorisedResultImpl::set_category(Category::SCPtr category)
 
 void CategorisedResultImpl::serialize_internal(VariantMap& var) const
 {
-    ResultItemImpl::serialize_internal(var);
+    ResultImpl::serialize_internal(var);
     var["cat_id"] = category_->id();
 }
 

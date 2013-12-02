@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/ResultItemImpl.h>
+#include <scopes/internal/ResultImpl.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/ResultItem.h>
+#include <scopes/Result.h>
 #include <sstream>
 
 namespace unity
@@ -33,18 +33,18 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultItemImpl::standard_attrs = {"uri", "title", "art", "dnd_uri"};
+const std::unordered_set<std::string> ResultImpl::standard_attrs = {"uri", "title", "art", "dnd_uri"};
 
-ResultItemImpl::ResultItemImpl()
+ResultImpl::ResultImpl()
 {
 }
 
-ResultItemImpl::ResultItemImpl(VariantMap const& variant_map)
+ResultImpl::ResultImpl(VariantMap const& variant_map)
 {
     deserialize(variant_map);
 }
 
-ResultItemImpl::ResultItemImpl(ResultItemImpl const& other)
+ResultImpl::ResultImpl(ResultImpl const& other)
     : uri_(other.uri_),
     title_(other.title_),
     art_(other.art_),
@@ -60,7 +60,7 @@ ResultItemImpl::ResultItemImpl(ResultItemImpl const& other)
     }
 }
 
-ResultItemImpl& ResultItemImpl::operator=(ResultItemImpl const& other)
+ResultImpl& ResultImpl::operator=(ResultImpl const& other)
 {
     if (this != &other)
     {
@@ -80,54 +80,54 @@ ResultItemImpl& ResultItemImpl::operator=(ResultItemImpl const& other)
     return *this;
 }
 
-ResultItemImpl::~ResultItemImpl()
+ResultImpl::~ResultImpl()
 {
 }
 
-void ResultItemImpl::store(ResultItem const& other)
+void ResultImpl::store(Result const& other)
 {
     if (this == other.p.get())
     {
-        throw InvalidArgumentException("ResultItem:: cannot store self");
+        throw InvalidArgumentException("Result:: cannot store self");
     }
     stored_result_.reset(new VariantMap(other.serialize()));
 }
 
-bool ResultItemImpl::has_stored_result() const
+bool ResultImpl::has_stored_result() const
 {
     return stored_result_ != nullptr;
 }
 
-ResultItem ResultItemImpl::retrieve() const
+Result ResultImpl::retrieve() const
 {
     if (stored_result_ == nullptr)
     {
-        throw InvalidArgumentException("ResultItem: no result has been stored");
+        throw InvalidArgumentException("Result: no result has been stored");
     }
-    return ResultItem(*stored_result_);
+    return Result(*stored_result_);
 }
 
-void ResultItemImpl::set_uri(std::string const& uri)
+void ResultImpl::set_uri(std::string const& uri)
 {
     uri_ = uri;
 }
 
-void ResultItemImpl::set_title(std::string const& title)
+void ResultImpl::set_title(std::string const& title)
 {
     title_ = title;
 }
 
-void ResultItemImpl::set_art(std::string const& image)
+void ResultImpl::set_art(std::string const& image)
 {
     art_ = image;
 }
 
-void ResultItemImpl::set_dnd_uri(std::string const& dnd_uri)
+void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 {
     dnd_uri_ = dnd_uri;
 }
 
-void ResultItemImpl::add_metadata(std::string const& key, Variant const& value)
+void ResultImpl::add_metadata(std::string const& key, Variant const& value)
 {
     if (!metadata_)
     {
@@ -136,27 +136,27 @@ void ResultItemImpl::add_metadata(std::string const& key, Variant const& value)
     (*metadata_)[key] = value;
 }
 
-std::string ResultItemImpl::uri() const
+std::string ResultImpl::uri() const
 {
     return uri_;
 }
 
-std::string ResultItemImpl::title() const
+std::string ResultImpl::title() const
 {
     return title_;
 }
 
-std::string ResultItemImpl::art() const
+std::string ResultImpl::art() const
 {
     return art_;
 }
 
-std::string ResultItemImpl::dnd_uri() const
+std::string ResultImpl::dnd_uri() const
 {
     return dnd_uri_;
 }
 
-void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& value)
+void ResultImpl::throw_on_empty(std::string const& name, std::string const& value)
 {
     if (value.empty())
     {
@@ -166,7 +166,7 @@ void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& 
     }
 }
 
-void ResultItemImpl::serialize_internal(VariantMap& var) const
+void ResultImpl::serialize_internal(VariantMap& var) const
 {
     if (stored_result_)
     {
@@ -174,7 +174,7 @@ void ResultItemImpl::serialize_internal(VariantMap& var) const
     }
 }
 
-VariantMap ResultItemImpl::serialize() const
+VariantMap ResultImpl::serialize() const
 {
     throw_on_empty("uri", uri_);
     throw_on_empty("title", title_);
@@ -211,7 +211,7 @@ VariantMap ResultItemImpl::serialize() const
     return outer;
 }
 
-void ResultItemImpl::deserialize(VariantMap const& var)
+void ResultImpl::deserialize(VariantMap const& var)
 {
     // check for ["internal"]["result"] dict which holds stored result.
     auto it = var.find("internal");

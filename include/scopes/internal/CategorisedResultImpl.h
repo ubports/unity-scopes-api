@@ -21,7 +21,7 @@
 
 #include <string>
 #include <memory>
-#include <scopes/internal/ResultItemImpl.h>
+#include <scopes/internal/ResultImpl.h>
 #include <scopes/Category.h>
 
 namespace unity
@@ -36,7 +36,7 @@ namespace scopes
 namespace internal
 {
 
-class CategorisedResultImpl : public ResultItemImpl
+class CategorisedResultImpl : public ResultImpl
 {
 public:
     explicit CategorisedResultImpl(Category::SCPtr category);

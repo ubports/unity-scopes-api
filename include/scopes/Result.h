@@ -16,13 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULTITEMIMPL_H
-#define UNITY_API_SCOPES_RESULTITEMIMPL_H
+#ifndef UNITY_API_SCOPES_RESULT_H
+#define UNITY_API_SCOPES_RESULT_H
 
+#include <scopes/Variant.h>
 #include <string>
 #include <memory>
-#include <unordered_set>
-#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -33,24 +32,38 @@ namespace api
 namespace scopes
 {
 
-class ResultItem;
+class CategorisedResult;
 
 namespace internal
 {
+class ResultImpl;
+}
 
-class ResultItemImpl
+/**
+   \brief Result encapsulates the basic attributes of any result
+   returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
+   calling Reply::push.
+*/
+class UNITY_API Result
 {
 public:
-    ResultItemImpl();
-    ResultItemImpl(VariantMap const& variant_map);
-    ResultItemImpl(ResultItemImpl const& other);
-    ResultItemImpl& operator=(ResultItemImpl const& other);
+    /**
+       \brief Creates a Result that is a copy of another Result.
+    */
+    Result(Result const& other);
 
-    virtual ~ResultItemImpl();
+    /**
+       \brief Destructor.
+    */
+    virtual ~Result();
 
-    void store(ResultItem const& other);
+    Result& operator=(Result const& other);
+    Result(Result&&);
+    Result& operator=(Result&&);
+
+    void store(Result const& other);
     bool has_stored_result() const;
-    ResultItem retrieve() const;
+    Result retrieve() const;
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
@@ -63,31 +76,26 @@ public:
     std::string art() const;
     std::string dnd_uri() const;
 
+    /**
+       \brief Returns a dictionary of all attributes of this Result instance.
+       \return dictionary of all base attributes and custom attributes set with add_metadata call.
+    */
     VariantMap serialize() const;
 
-protected:
-    virtual void serialize_internal(VariantMap& var) const;
-
 private:
-    void deserialize(VariantMap const& var);
-    static void throw_on_empty(std::string const& name, std::string const& value);
-    static const std::unordered_set<std::string> standard_attrs;
+    explicit Result(const VariantMap &variant_map);
+    Result(internal::ResultImpl* impl);
 
-    std::string uri_;
-    std::string title_;
-    std::string art_;
-    std::string dnd_uri_;
-    std::shared_ptr<VariantMap> metadata_;
-    std::shared_ptr<VariantMap> stored_result_;
+    std::shared_ptr<internal::ResultImpl> p;
+
+    friend class internal::ResultImpl;
+    friend class CategorisedResult;
 };
-
-} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
 
 #endif

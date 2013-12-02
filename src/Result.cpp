@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/ResultItem.h>
-#include <scopes/internal/ResultItemImpl.h>
+#include <scopes/Result.h>
+#include <scopes/internal/ResultImpl.h>
 
 namespace unity
 {
@@ -30,99 +30,99 @@ namespace scopes
 
 //! @cond
 
-ResultItem::ResultItem(internal::ResultItemImpl* impl)
+Result::Result(internal::ResultImpl* impl)
     : p(impl)
 {
 }
 
-ResultItem::ResultItem(const VariantMap &variant_map)
-    : p(new internal::ResultItemImpl(variant_map))
+Result::Result(const VariantMap &variant_map)
+    : p(new internal::ResultImpl(variant_map))
 {
 }
 
-ResultItem::ResultItem(ResultItem const& other)
-    : p(new internal::ResultItemImpl(*(other.p)))
+Result::Result(Result const& other)
+    : p(new internal::ResultImpl(*(other.p)))
 {
 }
 
-ResultItem::~ResultItem()
+Result::~Result()
 {
 }
 
-ResultItem& ResultItem::operator=(ResultItem const& other)
+Result& Result::operator=(Result const& other)
 {
     if (this != &other)
     {
-        p = std::make_shared<internal::ResultItemImpl>(*(other.p));
+        p = std::make_shared<internal::ResultImpl>(*(other.p));
     }
     return *this;
 }
 
-ResultItem::ResultItem(ResultItem&&) = default;
+Result::Result(Result&&) = default;
 
-ResultItem& ResultItem::operator=(ResultItem&&) = default;
+Result& Result::operator=(Result&&) = default;
 
-void ResultItem::store(ResultItem const& other)
+void Result::store(Result const& other)
 {
     p->store(other);
 }
 
-bool ResultItem::has_stored_result() const
+bool Result::has_stored_result() const
 {
     return p->has_stored_result();
 }
 
-ResultItem ResultItem::retrieve() const
+Result Result::retrieve() const
 {
     return p->retrieve();
 }
 
-void ResultItem::set_uri(std::string const& uri)
+void Result::set_uri(std::string const& uri)
 {
     p->set_uri(uri);
 }
 
-void ResultItem::set_title(std::string const& title)
+void Result::set_title(std::string const& title)
 {
     p->set_title(title);
 }
 
-void ResultItem::set_art(std::string const& image)
+void Result::set_art(std::string const& image)
 {
     p->set_art(image);
 }
 
-void ResultItem::set_dnd_uri(std::string const& dnd_uri)
+void Result::set_dnd_uri(std::string const& dnd_uri)
 {
     p->set_dnd_uri(dnd_uri);
 }
 
-void ResultItem::add_metadata(std::string const& key, Variant const& value)
+void Result::add_metadata(std::string const& key, Variant const& value)
 {
     p->add_metadata(key, value);
 }
 
-std::string ResultItem::uri() const
+std::string Result::uri() const
 {
     return p->uri();
 }
 
-std::string ResultItem::title() const
+std::string Result::title() const
 {
     return p->title();
 }
 
-std::string ResultItem::art() const
+std::string Result::art() const
 {
     return p->art();
 }
 
-std::string ResultItem::dnd_uri() const
+std::string Result::dnd_uri() const
 {
     return p->dnd_uri();
 }
 
-VariantMap ResultItem::serialize() const
+VariantMap Result::serialize() const
 {
     return p->serialize();
 }

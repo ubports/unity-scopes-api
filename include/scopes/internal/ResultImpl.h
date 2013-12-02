@@ -16,12 +16,13 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULTITEM_H
-#define UNITY_API_SCOPES_RESULTITEM_H
+#ifndef UNITY_API_SCOPES_RESULTITEMIMPL_H
+#define UNITY_API_SCOPES_RESULTITEMIMPL_H
 
-#include <scopes/Variant.h>
 #include <string>
 #include <memory>
+#include <unordered_set>
+#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -32,38 +33,24 @@ namespace api
 namespace scopes
 {
 
-class CategorisedResult;
+class Result;
 
 namespace internal
 {
-class ResultItemImpl;
-}
 
-/**
-   \brief ResultItem encapsulates the basic attributes of any result
-   returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
-   calling Reply::push.
-*/
-class UNITY_API ResultItem
+class ResultImpl
 {
 public:
-    /**
-       \brief Creates a ResultItem that is a copy of another ResultItem.
-    */
-    ResultItem(ResultItem const& other);
+    ResultImpl();
+    ResultImpl(VariantMap const& variant_map);
+    ResultImpl(ResultImpl const& other);
+    ResultImpl& operator=(ResultImpl const& other);
 
-    /**
-       \brief Destructor.
-    */
-    virtual ~ResultItem();
+    virtual ~ResultImpl();
 
-    ResultItem& operator=(ResultItem const& other);
-    ResultItem(ResultItem&&);
-    ResultItem& operator=(ResultItem&&);
-
-    void store(ResultItem const& other);
+    void store(Result const& other);
     bool has_stored_result() const;
-    ResultItem retrieve() const;
+    Result retrieve() const;
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
@@ -76,26 +63,31 @@ public:
     std::string art() const;
     std::string dnd_uri() const;
 
-    /**
-       \brief Returns a dictionary of all attributes of this ResultItem instance.
-       \return dictionary of all base attributes and custom attributes set with add_metadata call.
-    */
     VariantMap serialize() const;
 
+protected:
+    virtual void serialize_internal(VariantMap& var) const;
+
 private:
-    explicit ResultItem(const VariantMap &variant_map);
-    ResultItem(internal::ResultItemImpl* impl);
+    void deserialize(VariantMap const& var);
+    static void throw_on_empty(std::string const& name, std::string const& value);
+    static const std::unordered_set<std::string> standard_attrs;
 
-    std::shared_ptr<internal::ResultItemImpl> p;
-
-    friend class internal::ResultItemImpl;
-    friend class CategorisedResult;
+    std::string uri_;
+    std::string title_;
+    std::string art_;
+    std::string dnd_uri_;
+    std::shared_ptr<VariantMap> metadata_;
+    std::shared_ptr<VariantMap> stored_result_;
 };
+
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
 
 #endif

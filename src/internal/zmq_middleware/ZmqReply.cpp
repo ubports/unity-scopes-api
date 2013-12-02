@@ -20,9 +20,6 @@
 #include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <internal/zmq_middleware/capnproto/Reply.capnp.h>
 
-#include <scopes/ResultItem.h>
-#include <scopes/internal/ResultItemImpl.h>
-
 using namespace std;
 
 namespace unity

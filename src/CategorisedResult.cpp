@@ -32,17 +32,17 @@ namespace scopes
 //! @cond
 
 CategorisedResult::CategorisedResult(Category::SCPtr category)
-    : ResultItem(new internal::CategorisedResultImpl(category))
+    : Result(new internal::CategorisedResultImpl(category))
 {
 }
 
 CategorisedResult::CategorisedResult(Category::SCPtr category, const VariantMap &variant_map)
-    : ResultItem(new internal::CategorisedResultImpl(category, variant_map))
+    : Result(new internal::CategorisedResultImpl(category, variant_map))
 {
 }
 
 CategorisedResult::CategorisedResult(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
-    : ResultItem(new internal::CategorisedResultImpl(reg, variant_map))
+    : Result(new internal::CategorisedResultImpl(reg, variant_map))
 {
 }
 
@@ -50,7 +50,7 @@ CategorisedResult::CategorisedResult(CategorisedResult&&) = default;
 CategorisedResult& CategorisedResult::operator=(CategorisedResult&&) = default;
 
 CategorisedResult::CategorisedResult(CategorisedResult const& other)
-    : ResultItem(new internal::CategorisedResultImpl(*(other.fwd())))
+    : Result(new internal::CategorisedResultImpl(*(other.fwd())))
 {
 }
 

@@ -29,7 +29,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ResultItemImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
