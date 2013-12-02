@@ -35,7 +35,7 @@ namespace api
 namespace scopes
 {
 
-class Result;
+class CategorisedResult;
 
 /**
 \brief Abstract base class to receive the results of a query.
@@ -62,7 +62,7 @@ public:
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
     */
-    virtual void push(Result result) = 0;
+    virtual void push(CategorisedResult result) = 0;
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().

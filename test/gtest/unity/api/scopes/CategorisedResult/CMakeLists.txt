@@ -1,0 +1,4 @@
+add_executable(CategorisedResult_test CategorisedResult_test.cpp)
+target_link_libraries(CategorisedResult_test ${TESTLIBS})
+
+add_test(CategorisedResult CategorisedResult_test)

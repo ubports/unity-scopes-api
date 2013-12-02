@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Result.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/Category.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
@@ -26,8 +26,8 @@
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
-// basic test of ResultIem setters and getters
-TEST(Result, basic)
+// basic test of CategorisedResultIem setters and getters
+TEST(CategorisedResult, basic)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
@@ -35,7 +35,7 @@ TEST(Result, basic)
     auto cat2 = reg.register_category("2", "title", "icon", rdr);
 
     {
-        Result result(cat);
+        CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
         result.set_title("a title");
         result.set_art("an icon");
@@ -51,21 +51,21 @@ TEST(Result, basic)
     }
 }
 
-TEST(Result, copy)
+TEST(CategorisedResult, copy)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
     // copy ctor
     {
-        Result result(cat);
+        CategorisedResult result(cat);
         result.set_uri("uri a");
         result.set_title("title a");
         result.set_art("icon a");
         result.set_dnd_uri("dnd_uri a");
         result.add_metadata("common", Variant("o"));
 
-        Result copy(result);
+        CategorisedResult copy(result);
 
         copy.set_uri("uri b");
         copy.set_title("title b");
@@ -102,12 +102,12 @@ TEST(Result, copy)
 
     // assignment copy
     {
-        Result result(cat);
+        CategorisedResult result(cat);
         result.set_uri("uri a");
         result.set_title("title a");
         result.set_art("icon a");
         result.set_dnd_uri("dnd_uri a");
-        Result copy = result;
+        CategorisedResult copy = result;
 
         copy.set_uri("uri b");
         copy.set_title("title b");
@@ -134,13 +134,13 @@ TEST(Result, copy)
 }
 
 // test conversion to VariantMap
-TEST(Result, serialize)
+TEST(CategorisedResult, serialize)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
 
-    Result result(cat);
+    CategorisedResult result(cat);
     result.set_uri("http://ubuntu.com");
     result.set_title("a title");
     result.set_art("an icon");
@@ -161,12 +161,12 @@ TEST(Result, serialize)
 }
 
 // test exceptions when converting to VariantMap
-TEST(Result, serialize_excp)
+TEST(CategorisedResult, serialize_excp)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
-    Result result(cat);
+    CategorisedResult result(cat);
 
     // throw until all required attributes are non-empty
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
@@ -181,7 +181,7 @@ TEST(Result, serialize_excp)
 }
 
 // test exceptions with null category
-TEST(ResultItem, exceptions)
+TEST(CategorisedResultItem, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
@@ -191,7 +191,7 @@ TEST(ResultItem, exceptions)
     bool excp = false;
     try
     {
-        Result r(null_cat);
+        CategorisedResult r(null_cat);
     }
     catch (const unity::InvalidArgumentException& e)
     {
@@ -201,7 +201,7 @@ TEST(ResultItem, exceptions)
 }
 
 // test conversion from VariantMap
-TEST(Result, deserialize)
+TEST(CategorisedResult, deserialize)
 {
     VariantMap vm;
     vm["uri"] = "http://ubuntu.com";
@@ -220,7 +220,7 @@ TEST(Result, deserialize)
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
-    Result result(cat, outer);
+    CategorisedResult result(cat, outer);
 
     auto outer_var = result.serialize();
     auto var = outer_var["attrs"].get_dict();
@@ -232,7 +232,7 @@ TEST(Result, deserialize)
     EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
 }
 
-TEST(Result, store)
+TEST(CategorisedResult, store)
 {
     CategoryRenderer rdr;
     CategoryRegistry input_reg;
@@ -240,7 +240,7 @@ TEST(Result, store)
     auto incat = input_reg.register_category("1", "title", "icon", rdr);
     auto outcat = output_reg.register_category("2", "title", "icon", rdr);
 
-    Result outresult(outcat);
+    CategorisedResult outresult(outcat);
     outresult.set_uri("uri1");
     outresult.set_title("title1");
     outresult.set_art("icon1");
@@ -250,7 +250,7 @@ TEST(Result, store)
     EXPECT_FALSE(outresult.has_stored_result());
 
     {
-        Result inresult(incat);
+        CategorisedResult inresult(incat);
         inresult.set_uri("uri1");
         inresult.set_title("title1");
         inresult.set_art("icon1");

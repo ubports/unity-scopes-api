@@ -33,7 +33,7 @@ namespace scopes
 
 namespace internal
 {
-    class ResultImpl;
+    class CategorisedResultImpl;
     class ReplyObject;
 }
 
@@ -41,23 +41,23 @@ namespace internal
 \brief Result is a ResultItem plus a category it belongs to.
 */
 
-class UNITY_API Result : public ResultItem
+class UNITY_API CategorisedResult: public ResultItem
 {
 public:
     /**
      \brief Creates a Result instance assigned to given category, with all base attributes initially empty.
      */
-    explicit Result(Category::SCPtr category);
+    explicit CategorisedResult(Category::SCPtr category);
 
     /**
        \brief Creates a Result instance assigned to given category and using values of all base attributes from a variant_map dictionary.
     */
-    Result(Category::SCPtr category, const VariantMap &variant_map);
+    CategorisedResult(Category::SCPtr category, const VariantMap &variant_map);
 
-    Result(Result const& other);
-    Result& operator=(Result const& other);
-    Result(Result&&);
-    Result& operator=(Result&&);
+    CategorisedResult(CategorisedResult const& other);
+    CategorisedResult& operator=(CategorisedResult const& other);
+    CategorisedResult(CategorisedResult&&);
+    CategorisedResult& operator=(CategorisedResult&&);
 
     /**
      \brief Return category of this result.
@@ -67,8 +67,8 @@ public:
     Category::SCPtr category() const;
 
 private:
-    Result(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
-    internal::ResultImpl* fwd() const;
+    CategorisedResult(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
+    internal::CategorisedResultImpl* fwd() const;
 
     friend class internal::ReplyObject;
 };

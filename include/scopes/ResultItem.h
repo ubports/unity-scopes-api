@@ -32,7 +32,7 @@ namespace api
 namespace scopes
 {
 
-class Result;
+class CategorisedResult;
 
 namespace internal
 {
@@ -89,7 +89,7 @@ private:
     std::shared_ptr<internal::ResultItemImpl> p;
 
     friend class internal::ResultItemImpl;
-    friend class Result;
+    friend class CategorisedResult;
 };
 
 } // namespace scopes

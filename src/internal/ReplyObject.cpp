@@ -20,7 +20,7 @@
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
-#include <scopes/Result.h>
+#include <scopes/CategorisedResult.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -105,7 +105,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
             auto result_var = it->second.get_dict();
             try
             {
-                Result result(*cat_registry_, result_var);
+                CategorisedResult result(*cat_registry_, result_var);
                 receiver_base_->push(std::move(result));
             }
             catch (unity::Exception const& e)

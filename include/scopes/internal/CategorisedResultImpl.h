@@ -36,13 +36,13 @@ namespace scopes
 namespace internal
 {
 
-class ResultImpl : public ResultItemImpl
+class CategorisedResultImpl : public ResultItemImpl
 {
 public:
-    explicit ResultImpl(Category::SCPtr category);
-    ResultImpl(ResultImpl const& other);
-    ResultImpl(Category::SCPtr category, VariantMap const& variant_map);
-    ResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
+    explicit CategorisedResultImpl(Category::SCPtr category);
+    CategorisedResultImpl(CategorisedResultImpl const& other);
+    CategorisedResultImpl(Category::SCPtr category, VariantMap const& variant_map);
+    CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
 
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;

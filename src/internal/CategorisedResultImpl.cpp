@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/ResultImpl.h>
+#include <scopes/internal/CategorisedResultImpl.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
@@ -34,25 +34,25 @@ namespace scopes
 namespace internal
 {
 
-ResultImpl::ResultImpl(ResultImpl const& other)
+CategorisedResultImpl::CategorisedResultImpl(CategorisedResultImpl const& other)
     : ResultItemImpl(other)
 {
     set_category(other.category_);
 }
 
-ResultImpl::ResultImpl(Category::SCPtr category)
+CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category)
     : ResultItemImpl()
 {
     set_category(category);
 }
 
-ResultImpl::ResultImpl(Category::SCPtr category, const VariantMap& variant_map)
+CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category, const VariantMap& variant_map)
     : ResultItemImpl(variant_map)
 {
     set_category(category);
 }
 
-ResultImpl::ResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
+CategorisedResultImpl::CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
     : ResultItemImpl(variant_map)
 {
     auto it = variant_map.find("internal");
@@ -70,12 +70,12 @@ ResultImpl::ResultImpl(internal::CategoryRegistry const& reg, const VariantMap &
     }
 }
 
-Category::SCPtr ResultImpl::category() const
+Category::SCPtr CategorisedResultImpl::category() const
 {
     return category_;
 }
 
-void ResultImpl::set_category(Category::SCPtr category)
+void CategorisedResultImpl::set_category(Category::SCPtr category)
 {
     if (category == nullptr)
     {
@@ -84,7 +84,7 @@ void ResultImpl::set_category(Category::SCPtr category)
     category_ = category;
 }
 
-void ResultImpl::serialize_internal(VariantMap& var) const
+void CategorisedResultImpl::serialize_internal(VariantMap& var) const
 {
     ResultItemImpl::serialize_internal(var);
     var["cat_id"] = category_->id();
