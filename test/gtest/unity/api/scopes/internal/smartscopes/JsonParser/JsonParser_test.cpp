@@ -17,3 +17,27 @@
  */
 
 #include <gtest/gtest.h>
+#include <scopes/internal/smartscopes/JsonCppParser.h>
+
+#include <memory>
+
+using namespace testing;
+using namespace unity::api::scopes::internal::smartscopes;
+
+namespace
+{
+
+class JsonParserTest : public Test
+{
+public:
+  JsonParserTest() : json_parser_( new JsonCppParser() ) {}
+
+protected:
+  std::unique_ptr< JsonParserInterface > json_parser_;
+};
+
+TEST_F(JsonParserTest, basic)
+{
+}
+
+} // namespace

@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <JsonCppParser.h>
+#include <scopes/internal/smartscopes/JsonCppParser.h>
 #include <sstream>
 
 using namespace unity::api::scopes::internal::smartscopes;

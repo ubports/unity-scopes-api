@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPPARSER_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPPARSER_H
 
-#include <JsonParserInterface.h>
+#include <scopes/internal/smartscopes/JsonParserInterface.h>
 
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>

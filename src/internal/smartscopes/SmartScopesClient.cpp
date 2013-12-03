@@ -16,6 +16,6 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <SmartScopesClient.h>
+#include <scopes/internal/smartscopes/SmartScopesClient.h>
 
 using namespace unity::api::scopes::internal::smartscopes;

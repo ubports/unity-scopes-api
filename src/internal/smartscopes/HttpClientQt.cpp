@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <HttpClientQt.h>
+#include <scopes/internal/smartscopes/HttpClientQt.h>
 
 #include <QUrl>
 #include <QNetworkRequest>

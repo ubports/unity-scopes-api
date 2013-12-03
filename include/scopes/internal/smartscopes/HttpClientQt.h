@@ -19,7 +19,7 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
 
-#include <HttpClientInterface.h>
+#include <scopes/internal/smartscopes/HttpClientInterface.h>
 
 #include <QNetworkAccessManager>
 #include <QObject>

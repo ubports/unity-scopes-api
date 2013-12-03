@@ -141,6 +141,7 @@ set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    smartscopes
     zmqpp
     zmq
     capnp
