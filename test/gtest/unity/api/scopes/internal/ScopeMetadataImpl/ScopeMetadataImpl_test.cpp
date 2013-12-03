@@ -42,7 +42,7 @@ TEST(ScopeMetadataImpl, basic)
     mi->set_scope_name("scope_name");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
     mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
-    mi->set_localized_name("localized_name");
+    mi->set_display_name("display_name");
     mi->set_description("description");
 
     // Keep a copy for tests below
@@ -53,7 +53,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("scope_name", m.scope_name());
     EXPECT_EQ("identity", m.proxy()->identity());
     EXPECT_EQ("endpoint", m.proxy()->endpoint());
-    EXPECT_EQ("localized_name", m.localized_name());
+    EXPECT_EQ("display_name", m.display_name());
     EXPECT_EQ("description", m.description());
 
     // Check that optional fields that are not set throw
@@ -101,7 +101,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("scope_name", mi2->scope_name());
     EXPECT_EQ("identity", mi2->proxy()->identity());
     EXPECT_EQ("endpoint", mi2->proxy()->endpoint());
-    EXPECT_EQ("localized_name", mi2->localized_name());
+    EXPECT_EQ("display_name", mi2->display_name());
     EXPECT_EQ("description", mi2->description());
 
     // Set optional fields on copy.
@@ -123,7 +123,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_scope_name("tmp scope_name");
     mw_proxy = mw.create_scope_proxy("tmp identity", "tmp endpoint");
     ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
-    ti->set_localized_name("tmp localized_name");
+    ti->set_display_name("tmp display_name");
     ti->set_description("tmp description");
     ti->set_art("tmp art");
     ti->set_icon("tmp icon");
@@ -136,7 +136,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp scope_name", ci.scope_name());
     EXPECT_EQ("tmp identity", ci.proxy()->identity());
     EXPECT_EQ("tmp endpoint", ci.proxy()->endpoint());
-    EXPECT_EQ("tmp localized_name", ci.localized_name());
+    EXPECT_EQ("tmp display_name", ci.display_name());
     EXPECT_EQ("tmp description", ci.description());
     EXPECT_EQ("tmp art", ci.art());
     EXPECT_EQ("tmp icon", ci.icon());
@@ -149,7 +149,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp scope_name", m.scope_name());
     EXPECT_EQ("tmp identity", m.proxy()->identity());
     EXPECT_EQ("tmp endpoint", m.proxy()->endpoint());
-    EXPECT_EQ("tmp localized_name", m.localized_name());
+    EXPECT_EQ("tmp display_name", m.display_name());
     EXPECT_EQ("tmp description", m.description());
     EXPECT_EQ("tmp art", m.art());
     EXPECT_EQ("tmp icon", m.icon());
@@ -161,7 +161,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp scope_name", tmp.scope_name());
     EXPECT_EQ("tmp identity", tmp.proxy()->identity());
     EXPECT_EQ("tmp endpoint", tmp.proxy()->endpoint());
-    EXPECT_EQ("tmp localized_name", tmp.localized_name());
+    EXPECT_EQ("tmp display_name", tmp.display_name());
     EXPECT_EQ("tmp description", tmp.description());
     EXPECT_EQ("tmp art", tmp.art());
     EXPECT_EQ("tmp icon", tmp.icon());
@@ -173,7 +173,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp scope_name", tmp2.scope_name());
     EXPECT_EQ("tmp identity", tmp2.proxy()->identity());
     EXPECT_EQ("tmp endpoint", tmp2.proxy()->endpoint());
-    EXPECT_EQ("tmp localized_name", tmp2.localized_name());
+    EXPECT_EQ("tmp display_name", tmp2.display_name());
     EXPECT_EQ("tmp description", tmp2.description());
     EXPECT_EQ("tmp art", tmp2.art());
     EXPECT_EQ("tmp icon", tmp2.icon());
@@ -190,7 +190,7 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_scope_name("scope_name");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
     mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
-    mi->set_localized_name("localized_name");
+    mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_art("art");
     mi->set_icon("icon");
@@ -202,7 +202,7 @@ TEST(ScopeMetadataImpl, serialize)
     auto var = m.serialize();
     EXPECT_EQ(8, var.size());
     EXPECT_EQ("scope_name", var["scope_name"].get_string());
-    EXPECT_EQ("localized_name", var["localized_name"].get_string());
+    EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
     EXPECT_EQ("art", var["art"].get_string());
     EXPECT_EQ("icon", var["icon"].get_string());
@@ -214,7 +214,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("scope_name", c.scope_name());
     EXPECT_EQ("identity", c.proxy()->identity());
     EXPECT_EQ("endpoint", c.proxy()->endpoint());
-    EXPECT_EQ("localized_name", c.localized_name());
+    EXPECT_EQ("display_name", c.display_name());
     EXPECT_EQ("description", c.description());
     EXPECT_EQ("art", c.art());
     EXPECT_EQ("icon", c.icon());
@@ -260,13 +260,13 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'localized_name' is empty",
+        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'display_name' is empty",
                    e.to_string());
     }
 
     try
     {
-        mi.set_localized_name("localized_name");
+        mi.set_display_name("display_name");
         mi.serialize();
         FAIL();
     }
@@ -349,11 +349,11 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     catch (InvalidArgumentException const&e)
     {
         EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
-                  "'localized_name' is missing",
+                  "'display_name' is missing",
                    e.to_string());
     }
 
-    m["localized_name"] = "localized_name";
+    m["display_name"] = "display_name";
     try
     {
         ScopeMetadataImpl mi(m, &mw);
@@ -379,7 +379,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_EQ("scope_name", mi.scope_name());
     EXPECT_EQ("identity", mi.proxy()->identity());
     EXPECT_EQ("endpoint", mi.proxy()->endpoint());
-    EXPECT_EQ("localized_name", mi.localized_name());
+    EXPECT_EQ("display_name", mi.display_name());
     EXPECT_EQ("description", mi.description());
     EXPECT_EQ("art", mi.art());
     EXPECT_EQ("icon", mi.icon());

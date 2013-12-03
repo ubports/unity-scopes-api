@@ -37,16 +37,16 @@ Category (returned by serialize()):
 
 ScopeMetadata (returned by serialize()):
 =====================================
- 'scope_name'     : string
- 'proxy'          : dictionary
-    'identity'    : string
-    'endpoint'    : string
- 'localized_name' : string
- 'description'    : string
- 'art'            : string, optional
- 'icon'           : string, optional
- 'search_hint'    : string, optional
- 'hot_key'        : string, optional
+ 'scope_name'   : string
+ 'proxy'        : dictionary
+    'identity'  : string
+    'endpoint'  : string
+ 'display_name' : string
+ 'description'  : string
+ 'art'          : string, optional
+ 'icon'         : string, optional
+ 'search_hint'  : string, optional
+ 'hot_key'      : string, optional
 
 PushRequest (capnproto structure)
 =================================

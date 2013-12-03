@@ -48,7 +48,7 @@ public:
 
     std::string scope_name() const;
     ScopeProxy proxy() const;
-    std::string localized_name() const; // localized
+    std::string display_name() const; // localized
     std::string description() const;    // localized
     std::string art() const;            // optional
     std::string icon() const;           // optional
@@ -57,7 +57,7 @@ public:
 
     void set_scope_name(std::string const& scope_name);
     void set_proxy(ScopeProxy const& proxy);
-    void set_localized_name(std::string const& localized_name);
+    void set_display_name(std::string const& display_name);
     void set_description(std::string const& description);
     void set_art(std::string const& art);
     void set_icon(std::string const& icon);
@@ -74,7 +74,7 @@ private:
     MiddlewareBase* mw_;
     std::string scope_name_;
     ScopeProxy proxy_;
-    std::string localized_name_;
+    std::string display_name_;
     std::string description_;
     std::unique_ptr<std::string> art_;          // Optional, hence a pointer
     std::unique_ptr<std::string> icon_;         // Optional, hence a pointer

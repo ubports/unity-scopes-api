@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
         auto meta = r->get_metadata(scope_name);
         cout << "Scope metadata:   " << endl;
         cout << "\tscope_name:     " << meta.scope_name() << endl;
-        cout << "\tlocalized_name: " << meta.localized_name() << endl;
+        cout << "\tdisplay_name:   " << meta.display_name() << endl;
         cout << "\tdescription:    " << meta.description() << endl;
         string tmp;
         try

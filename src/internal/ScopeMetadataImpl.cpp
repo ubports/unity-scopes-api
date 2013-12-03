@@ -52,7 +52,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBa
 ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     scope_name_(other.scope_name_),
     proxy_(other.proxy_),
-    localized_name_(other.localized_name_),
+    display_name_(other.display_name_),
     description_(other.description_)
 {
     if (other.art_)
@@ -79,7 +79,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
     {
         scope_name_ = rhs.scope_name_;
         proxy_ = rhs.proxy_;
-        localized_name_ = rhs.localized_name_;
+        display_name_ = rhs.display_name_;
         description_ = rhs.description_;
         art_.reset(rhs.art_ ? new string(*rhs.art_) : nullptr);
         icon_.reset(rhs.icon_ ? new string(*rhs.icon_) : nullptr);
@@ -99,9 +99,9 @@ ScopeProxy ScopeMetadataImpl::proxy() const
     return proxy_;
 }
 
-std::string ScopeMetadataImpl::localized_name() const
+std::string ScopeMetadataImpl::display_name() const
 {
-    return localized_name_;
+    return display_name_;
 }
 
 std::string ScopeMetadataImpl::description() const
@@ -155,9 +155,9 @@ void ScopeMetadataImpl::set_proxy(ScopeProxy const& proxy)
     proxy_ = proxy;
 }
 
-void ScopeMetadataImpl::set_localized_name(std::string const& localized_name)
+void ScopeMetadataImpl::set_display_name(std::string const& display_name)
 {
-    localized_name_ = localized_name;
+    display_name_ = display_name;
 }
 
 void ScopeMetadataImpl::set_description(std::string const& description)
@@ -205,7 +205,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     {
         throw InvalidArgumentException("ScopeMetadataImpl::serialize(): required attribute 'proxy' is null");
     }
-    throw_on_empty("localized_name", localized_name_);
+    throw_on_empty("display_name", display_name_);
     throw_on_empty("description", description_);
 
     VariantMap var;
@@ -214,7 +214,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     proxy["identity"] = proxy_->identity();
     proxy["endpoint"] = proxy_->endpoint();
     var["proxy"] = proxy;
-    var["localized_name"] = localized_name_;
+    var["display_name"] = display_name_;
     var["description"] = description_;
 
     // Optional fields
@@ -278,8 +278,8 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     auto mw_proxy = mw_->create_scope_proxy(identity, endpoint);
     proxy_ = ScopeImpl::create(mw_proxy, mw_->runtime());
 
-    it = find_or_throw(var, "localized_name");
-    localized_name_ = it->second.get_string();
+    it = find_or_throw(var, "display_name");
+    display_name_ = it->second.get_string();
 
     it = find_or_throw(var, "description");
     description_ = it->second.get_string();

@@ -38,7 +38,7 @@ namespace internal
 namespace
 {
     const string overrideable_str = "Override";
-    const string scope_name_str = "LocalizedName";
+    const string scope_name_str = "DisplayName";
     const string description_str = "Description";
     const string art_str = "Art";
     const string icon_str = "Icon";
@@ -57,11 +57,12 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         overrideable_ = false;
     }
-    localized_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_name_str);
+    display_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_name_str);
     description_ = parser()->get_string(SCOPE_CONFIG_GROUP, description_str);
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
-    // from the "explicitly set to empty string" case.
+    // from the "explicitly set to empty string" case. parser()->get_string throws LogicException if
+    // the key is not present, so we ignore the exception for optional values.
     try
     {
         string art = parser()->get_string(SCOPE_CONFIG_GROUP, art_str);
@@ -105,9 +106,9 @@ bool ScopeConfig::overrideable() const
     return overrideable_;
 }
 
-string ScopeConfig::localized_name() const
+string ScopeConfig::display_name() const
 {
-    return localized_name_;
+    return display_name_;
 }
 
 string ScopeConfig::description() const

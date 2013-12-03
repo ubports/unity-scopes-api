@@ -42,7 +42,7 @@ public:
     ~ScopeConfig() noexcept;
 
     bool overrideable() const;      // Optional, returns false if not present
-    std::string localized_name() const;
+    std::string display_name() const;
     std::string description() const;
     std::string art() const;             // Optional, throws NotFoundException if not present
     std::string icon() const;            // Optional, throws NotFoundException if not present
@@ -51,7 +51,7 @@ public:
 
 private:
     bool overrideable_;
-    std::string localized_name_;
+    std::string display_name_;
     std::string description_;
     std::unique_ptr<std::string> art_;
     std::unique_ptr<std::string> icon_;

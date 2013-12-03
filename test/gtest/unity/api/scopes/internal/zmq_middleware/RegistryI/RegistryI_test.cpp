@@ -44,7 +44,7 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
     mi->set_scope_name(name);
     mi->set_art("art " + name);
-    mi->set_localized_name("local name " + name);
+    mi->set_display_name("display name " + name);
     mi->set_description("description " + name);
     mi->set_search_hint("search hint " + name);
     mi->set_hot_key("hot key " + name);
