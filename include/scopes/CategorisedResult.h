@@ -45,12 +45,12 @@ class UNITY_API CategorisedResult: public Result
 {
 public:
     /**
-     \brief Creates a Result instance assigned to given category, with all base attributes initially empty.
+     \brief Creates a CategorisedResult instance assigned to given category, with all base attributes initially empty.
      */
     explicit CategorisedResult(Category::SCPtr category);
 
     /**
-       \brief Creates a Result instance assigned to given category and using values of all base attributes from a variant_map dictionary.
+       \brief Creates a CategorisedResult instance assigned to given category and using values of all base attributes from a variant_map dictionary.
     */
     CategorisedResult(Category::SCPtr category, const VariantMap &variant_map);
 
