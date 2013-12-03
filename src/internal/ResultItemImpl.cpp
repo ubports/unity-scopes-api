@@ -19,7 +19,6 @@
 #include <scopes/internal/ResultItemImpl.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Category.h>
-#include <sstream>
 
 namespace unity
 {
@@ -113,9 +112,7 @@ void ResultItemImpl::throw_on_empty(std::string const& name, std::string const& 
 {
     if (value.empty())
     {
-        std::ostringstream s;
-        s << "Required attribute " << name << " is empty";
-        throw InvalidArgumentException(s.str());
+        throw InvalidArgumentException("ResultItem: invalid empty attribute: " + name);
     }
 }
 
@@ -139,9 +136,8 @@ VariantMap ResultItemImpl::serialize() const
         {
             if (var.find(kv.first) != var.end())
             {
-                std::ostringstream s;
-                s << "Can't overwrite internal attribute: " << kv.first;
-                throw InvalidArgumentException(s.str());
+                throw InvalidArgumentException("ResultItemImpl::serialize(): Can't overwrite internal attribute: "
+                                               + kv.first);
             }
             var[kv.first] = kv.second;
         }

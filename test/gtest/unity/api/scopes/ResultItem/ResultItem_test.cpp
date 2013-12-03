@@ -116,6 +116,15 @@ TEST(ResultItem, basic)
         EXPECT_EQ("dnd_uri b", copy.dnd_uri());
         EXPECT_EQ("xyz", copy.serialize()["foo"].get_string());
         EXPECT_EQ("1", copy.category()->id());
+
+        ResultItem copy2(cat);
+        copy2 = copy;
+        EXPECT_EQ("uri b", copy2.uri());
+        EXPECT_EQ("title b", copy2.title());
+        EXPECT_EQ("icon b", copy2.art());
+        EXPECT_EQ("dnd_uri b", copy2.dnd_uri());
+        EXPECT_EQ("xyz", copy2.serialize()["foo"].get_string());
+        EXPECT_EQ("1", copy2.category()->id());
     }
 }
 

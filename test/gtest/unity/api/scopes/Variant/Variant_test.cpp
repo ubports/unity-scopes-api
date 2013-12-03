@@ -106,6 +106,9 @@ TEST(Variant, basic)
         v = 99;
         EXPECT_EQ(99, v.get_int());
 
+        v = 10.5f;
+        EXPECT_TRUE(v.get_double() - 10.5f < 0.00001f);
+
         v = false;
         EXPECT_FALSE(v.get_bool());
 

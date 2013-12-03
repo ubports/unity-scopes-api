@@ -58,11 +58,6 @@ public:
     /// @endcond
 
     /**
-    \brief The default configuration file (relative to the current directory) if none is passed to create().
-    */
-    static constexpr char const* DFLT_CONFIGFILE = "Runtime.ini";
-
-    /**
     \brief Instantiates the scopes run time for the scope with the given name and (optional) configuration file.
 
     The life time of the run time is under control of the caller. Letting the returned `unique_ptr` go out
@@ -71,8 +66,13 @@ public:
     You _must not_ create a Runtime instance until after `main()` is entered, and you _must_ destroy it
     before leaving `main()` (either by explicitly calling destroy(), or by letting the returned
     `unique_ptr` go out of scope). Failure to do so causes undefined behavior.
+
+    \param configfile The path name of the configuration file to use.
+
+    If configfile is the empty string, a default configuration is used.
     */
-    static UPtr create(std::string const& scope_name, std::string const& configfile = DFLT_CONFIGFILE);
+    // TODO: Update above to state what the default configuration is exactly
+    static UPtr create(std::string const& scope_name, std::string const& configfile = "");
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.

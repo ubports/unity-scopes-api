@@ -19,21 +19,34 @@ This document describes data structures that are serialized and exchanged by
 middleware.
 -----------------------------------------------------------------------------
 
-ResultItem (returned by variant_map()):
+ResultItem (returned by serialize()):
 =======================================
  'uri' : string
  'title' : string
- 'icon' : string
+ 'art' : string
  'dnd_uri' : string
  'cat_id' : string
  + any custom key-value attribute added by scope author.
 
-Category (returned by variant_map()):
+Category (returned by serialize()):
 =====================================
  'id' : string
  'title' : string
  'icon' : string
  'renderer_template' : string
+
+ScopeMetadata (returned by serialize()):
+=====================================
+ 'scope_name'   : string
+ 'proxy'        : dictionary
+    'identity'  : string
+    'endpoint'  : string
+ 'display_name' : string
+ 'description'  : string
+ 'art'          : string, optional
+ 'icon'         : string, optional
+ 'search_hint'  : string, optional
+ 'hot_key'      : string, optional
 
 PushRequest (capnproto structure)
 =================================

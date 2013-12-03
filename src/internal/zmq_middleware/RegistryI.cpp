@@ -21,6 +21,7 @@
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/RegistryObject.h>
 #include <scopes/ScopeExceptions.h>
@@ -48,7 +49,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, Scope*> ScopeDictMap;
+dictionary<string, VariantMap> MetadataMap;
 
 exception NotFoundException
 {
@@ -57,8 +58,8 @@ exception NotFoundException
 
 interface Registry
 {
-    Scope* find(string name) throws NotFoundException;
-    ScopeDict list();
+    Scope* get_metadata(string name) throws NotFoundException;
+    ScopeMap list();
 };
 
 */
@@ -66,7 +67,7 @@ interface Registry
 using namespace std::placeholders;
 
 RegistryI::RegistryI(RegistryObject::SPtr const& ro) :
-    ServantBase(ro, { { "find", bind(&RegistryI::find_, this, _1, _2, _3) },
+    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
                       { "list", bind(&RegistryI::list_, this, _1, _2, _3) } })
 
 {
@@ -76,28 +77,26 @@ RegistryI::~RegistryI() noexcept
 {
 }
 
-void RegistryI::find_(Current const&,
+void RegistryI::get_metadata_(Current const&,
                       capnp::ObjectPointer::Reader& in_params,
                       capnproto::Response::Builder& r)
 {
-    auto req = in_params.getAs<capnproto::Registry::FindRequest>();
+    auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
     string name = req.getName().cStr();
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
     try
     {
-        auto proxy = dynamic_pointer_cast<ZmqObjectProxy>(delegate->find(name));
-        assert(proxy);
+        auto meta = delegate->get_metadata(name);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
-        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
-        auto p = find_response.initReturnValue();
-        p.setEndpoint(proxy->endpoint().c_str());
-        p.setIdentity(proxy->identity().c_str());
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
+        auto dict = get_metadata_response.initReturnValue();
+        to_value_dict(meta.serialize(), dict);
     }
     catch (NotFoundException const& e)
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto find_response = r.initPayload().getAs<capnproto::Registry::FindResponse>().initResponse();
-        find_response.initNotFoundException().setName(e.name().c_str());
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
+        get_metadata_response.initNotFoundException().setName(e.name().c_str());
     }
 }
 
@@ -106,18 +105,14 @@ void RegistryI::list_(Current const&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
-    auto scope_map = delegate->list();
+    auto metadata_map = delegate->list();
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue();
-    auto list = rv.initPairs(scope_map.size());
+    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue(metadata_map.size());
     int i = 0;
-    for (auto const& pair : scope_map)
+    for (auto& pair : metadata_map)
     {
-        list[i].setName(pair.first.c_str());
-        auto p = list[i].initScopeProxy();
-        auto sp = dynamic_pointer_cast<ZmqScope>(pair.second);
-        p.setEndpoint(sp->endpoint().c_str());
-        p.setIdentity(sp->identity().c_str());
+        auto dict = rv[i];
+        to_value_dict(pair.second.serialize(), dict);
         ++i;
     }
 }

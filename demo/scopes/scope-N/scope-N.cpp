@@ -62,7 +62,6 @@ public:
     }
 
     virtual void stop() override {}
-    virtual void run() override {}
 
     virtual QueryBase::UPtr create_query(string const&, VariantMap const&) override
     {

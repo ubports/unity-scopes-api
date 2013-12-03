@@ -31,8 +31,6 @@ namespace api
 namespace scopes
 {
 
-constexpr char const* Runtime::DFLT_CONFIGFILE;
-
 //! @cond
 
 Runtime::Runtime(string const& scope_name, string const& configfile) :

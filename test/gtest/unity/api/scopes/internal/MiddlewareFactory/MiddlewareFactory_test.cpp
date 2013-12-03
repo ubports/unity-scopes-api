@@ -27,10 +27,10 @@ using namespace unity::api::scopes::internal;
 
 TEST(MiddlewareFactory, basic)
 {
-    MiddlewareFactory f("Factory.ini", (RuntimeImpl*)0x1);
-    EXPECT_EQ(nullptr, f.find("nosuchscope", "Ice"));
+    MiddlewareFactory f((RuntimeImpl*)0x1);
+    EXPECT_EQ(nullptr, f.find("nosuchscope", "Zmq"));
     MiddlewareBase::SPtr not_found;
-    MiddlewareBase::SPtr mw = f.find("testscope", "Ice");
+    MiddlewareBase::SPtr mw = f.find("testscope", "Zmq");
     EXPECT_EQ(not_found, mw);
     mw = f.find("testscope", "NoSuchMiddleware");
     EXPECT_EQ(not_found, mw);
@@ -40,29 +40,12 @@ TEST(MiddlewareFactory, BadKind)
 {
     try
     {
-        MiddlewareFactory f("Factory.ini", (RuntimeImpl*)0x1);
-        f.create("somescope", "NoSuchMiddleware", "Ice.Config");
+        MiddlewareFactory f((RuntimeImpl*)0x1);
+        f.create("somescope", "NoSuchMiddleware", "Zmq.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
         EXPECT_EQ("unity::api::scopes::ConfigException: Invalid middleware kind: NoSuchMiddleware", e.to_string());
-    }
-}
-
-TEST(MiddlewareFactory, BadIniFile)
-{
-    try
-    {
-        MiddlewareFactory f("NoSuchFile.ini", (RuntimeImpl*)0x1);
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_EQ("unity::api::scopes::ConfigException: cannot instantiate MiddlewareFactory: "
-                  "config file: NoSuchFile.ini:\n"
-                  "    unity::FileException: Could not load ini file NoSuchFile.ini: "
-                  "No such file or directory (errno = 4)",
-                  e.to_string());
     }
 }

@@ -1,3 +1,0 @@
-[MiddlewareFactory]
-Zmq.ConfigFile = Zmq.ini
-REST.ConfigFile = REST.ini

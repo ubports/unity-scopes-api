@@ -44,7 +44,7 @@ class MiddlewareFactory final : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(MiddlewareFactory);
 
-    MiddlewareFactory(std::string const& configfile, RuntimeImpl* runtime);
+    MiddlewareFactory(RuntimeImpl* runtime);
     ~MiddlewareFactory() noexcept;
 
     // Returns the middleware with the given name and kind. If that middleware hasn't been created yet,
