@@ -29,7 +29,7 @@ using namespace unity::api::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
-    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope");
+    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope", "Runtime.ini");
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
     EXPECT_TRUE(rt->factory());
