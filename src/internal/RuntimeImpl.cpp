@@ -26,7 +26,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 using namespace unity::api::scopes;
@@ -52,8 +51,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         UniqueID id;
         scope_name_ = "c-" + id.gen();
     }
-cerr << "scope_name: " << scope_name_ << endl;
-cerr << "config_file: " << configfile << endl;
 
     try
     {
