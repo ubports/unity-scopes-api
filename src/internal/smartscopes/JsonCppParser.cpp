@@ -23,7 +23,10 @@ using namespace unity::api::scopes::internal::smartscopes;
 
 JsonCppParser::JsonCppParser( std::string json_string )
 {
-  read_json( json_string );
+  if( !json_string.empty() )
+  {
+    read_json( json_string );
+  }
 }
 
 JsonCppParser::~JsonCppParser()
@@ -62,22 +65,29 @@ bool JsonCppParser::write_json( std::string& json_string )
 
 bool JsonCppParser::get_value( const std::vector< std::string >& value_path, std::string& value )
 {
-  Json::Value value_node = get_value_path( value_path );
+  const Json::Value& value_node = get_value_path( value_path );
 
   if( !value_node || value_node.isArray() || value_node.isObject() )
   {
+    value = "";
     return false;
   }
 
-  std::string value_str = writer_.write( value_node );
-  value = value_str.substr( 0, value_str.size() - 1 );
+  value = writer_.write( value_node );
+  value = value.substr( 0, value.size() - 1 );
+
+  if( value_node.isString() )
+  {
+    value = value.substr( 1, value.size() - 2 );
+  }
   return true;
 }
 
 bool JsonCppParser::get_array( const std::vector< std::string >& array_path, std::vector< std::string >& array )
 {
-  Json::Value array_node = get_value_path( array_path );
+  const Json::Value& array_node = get_value_path( array_path );
 
+  array.clear();
   if( !array_node || !array_node.isArray() )
   {
     return false;
@@ -86,7 +96,15 @@ bool JsonCppParser::get_array( const std::vector< std::string >& array_path, std
   for( const Json::Value& value_node : array_node )
   {
     std::string value_str = writer_.write( value_node );
-    array.push_back( value_str.substr( 0, value_str.size() - 1 ) );
+
+    if( value_node.isString() )
+    {
+      array.push_back( value_str.substr( 1, value_str.size() - 3 ) );
+    }
+    else
+    {
+      array.push_back( value_str.substr( 0, value_str.size() - 1 ) );
+    }
   }
 
   return true;
@@ -94,7 +112,7 @@ bool JsonCppParser::get_array( const std::vector< std::string >& array_path, std
 
 bool JsonCppParser::set_value( const std::vector< std::string >& value_path, const std::string& value )
 {
-  Json::Value value_node = set_value_path( value_path );
+  Json::Value& value_node = set_value_path( value_path );
 
   value_node = value;
   return true;
@@ -102,7 +120,7 @@ bool JsonCppParser::set_value( const std::vector< std::string >& value_path, con
 
 bool JsonCppParser::set_array( const std::vector< std::string >& array_path, const std::vector< std::string >& array )
 {
-  Json::Value array_node = set_value_path( array_path );
+  Json::Value& array_node = set_value_path( array_path );
 
   array_node.clear();
   for( const std::string& value : array )
@@ -113,28 +131,24 @@ bool JsonCppParser::set_array( const std::vector< std::string >& array_path, con
   return true;
 }
 
-Json::Value JsonCppParser::get_value_path( const std::vector< std::string >& value_path )
+const Json::Value& JsonCppParser::get_value_path( const std::vector< std::string >& value_path )
 {
-  Json::Value value_node;
+  const Json::Value* value_node = &root_;
   for( const std::string& node : value_path )
   {
-    value_node = value_node.get( node, nullptr );
-    if( !value_node )
-    {
-      break;
-    }
+    value_node = &(*value_node)[node];
   }
 
-  return value_node;
+  return *value_node;
 }
 
-Json::Value JsonCppParser::set_value_path( const std::vector< std::string >& value_path )
+Json::Value& JsonCppParser::set_value_path( const std::vector< std::string >& value_path )
 {
-  Json::Value value_node;
+  Json::Value* value_node = &root_;
   for( const std::string& node : value_path )
   {
-    value_node = value_node[node];
+    value_node = &(*value_node)[node];
   }
 
-  return value_node;
+  return *value_node;
 }

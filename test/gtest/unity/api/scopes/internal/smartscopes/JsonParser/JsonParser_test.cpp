@@ -16,9 +16,9 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <gtest/gtest.h>
 #include <scopes/internal/smartscopes/JsonCppParser.h>
 
+#include <gtest/gtest.h>
 #include <memory>
 
 using namespace testing;
@@ -38,6 +38,52 @@ protected:
 
 TEST_F(JsonParserTest, basic)
 {
+  std::string json_string = R"({
+    "firstName": "John",
+    "age": 25,
+    "human": true,
+    "address": {
+        "city": "New York"
+    },
+    "phoneNumbers": [
+        "1234",
+        "5678"
+    ]
+  })";
+
+  std::string value;
+  std::vector< std::string > array;
+
+  EXPECT_TRUE( json_parser_->read_json( json_string ) );
+
+  EXPECT_TRUE( json_parser_->get_value( {"firstName"}, value ) );
+  EXPECT_EQ( "John", value );
+
+  EXPECT_FALSE( json_parser_->get_value( {"lastName"}, value ) );
+  EXPECT_EQ( "", value );
+  EXPECT_TRUE( json_parser_->set_value( {"lastName"}, "Smith" ) );
+  EXPECT_TRUE( json_parser_->get_value( {"lastName"}, value ) );
+  EXPECT_EQ( "Smith", value );
+
+  EXPECT_TRUE( json_parser_->get_value( {"age"}, value ) );
+  EXPECT_EQ( "25", value );
+
+  EXPECT_TRUE( json_parser_->get_value( {"human"}, value ) );
+  EXPECT_EQ( "true", value );
+
+  EXPECT_TRUE( json_parser_->get_value( {"address","city"}, value ) );
+  EXPECT_EQ( "New York", value );
+
+  EXPECT_TRUE( json_parser_->get_array( {"phoneNumbers"}, array ) );
+  EXPECT_EQ( "1234", array[0] );
+  EXPECT_EQ( "5678", array[1] );
+
+  array.push_back( "9101112" );
+  EXPECT_TRUE( json_parser_->set_array( {"phoneNumbers"}, array ) );
+  EXPECT_TRUE( json_parser_->get_array( {"phoneNumbers"}, array ) );
+  EXPECT_EQ( "1234", array[0] );
+  EXPECT_EQ( "5678", array[1] );
+  EXPECT_EQ( "9101112", array[2] );
 }
 
 } // namespace

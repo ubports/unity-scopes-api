@@ -57,8 +57,8 @@ public:
   bool set_array( const std::vector< std::string >& array_path, const std::vector< std::string >& array ) override;
 
 private:
-  Json::Value get_value_path( const std::vector< std::string >& value_path );
-  Json::Value set_value_path( const std::vector< std::string >& value_path );
+  const Json::Value& get_value_path( const std::vector< std::string >& value_path );
+  Json::Value& set_value_path( const std::vector< std::string >& value_path );
 
 private:
   Json::Value root_;
