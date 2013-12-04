@@ -88,7 +88,7 @@ include_directories(
 # which explicitly exports a symbol if UNITY_DLL_EXPORTS is defined.
 add_definitions(-DUNITY_DLL_EXPORTS)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
 # TODO: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
 # base class from a static library without an unresolved dependency. But, without static linking, we can't
@@ -118,6 +118,7 @@ else()
 endif()
 
 if (Werror)
+    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 
@@ -126,6 +127,9 @@ option(IPC_MONITORING "Enable IPC traffic monitoring")
 if(IPC_MONITORING)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_IPC_MONITOR")
 endif()
+
+set(SCOPES_DEFAULT_DATADIR ${CMAKE_INSTALL_DATADIR}/unity)
+set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)

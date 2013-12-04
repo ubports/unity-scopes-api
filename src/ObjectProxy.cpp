@@ -20,6 +20,8 @@
 
 #include <scopes/internal/ObjectProxyImpl.h>
 
+using namespace std;
+
 namespace unity
 {
 
@@ -49,6 +51,16 @@ ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
 
 ObjectProxy::~ObjectProxy() noexcept
 {
+}
+
+string ObjectProxy::identity() const
+{
+    return p->identity();
+}
+
+string ObjectProxy::endpoint() const
+{
+    return p->endpoint();
 }
 
 internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept

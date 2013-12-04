@@ -21,10 +21,13 @@
 #include <scopes/internal/RegistryConfig.h>
 #include <scopes/internal/RegistryImpl.h>
 #include <scopes/internal/RuntimeConfig.h>
+#include <scopes/internal/UniqueID.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
+
+#include <config.h>
 
 using namespace std;
 using namespace unity::api::scopes;
@@ -47,22 +50,24 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
 {
     if (scope_name.empty())
     {
-        throw InvalidArgumentException("Cannot instantiate a run time with an empty scope name");
+        UniqueID id;
+        scope_name_ = "c-" + id.gen();
     }
+
+    string config_file(configfile.empty() ? DEFAULT_RUNTIME : configfile);
 
     try
     {
         // Create the middleware factory and get the registry identity and config filename.
-        RuntimeConfig config(configfile);
+        RuntimeConfig config(config_file);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
-        string factory_configfile = config.factory_configfile();
-        middleware_factory_.reset(new MiddlewareFactory(factory_configfile, this));
+        middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
         assert(!registry_identity_.empty());
 
-        middleware_ = middleware_factory_->create(scope_name, default_middleware, middleware_configfile);
+        middleware_ = middleware_factory_->create(scope_name_, default_middleware, middleware_configfile);
         middleware_->start();
 
         // Create the registry proxy.
@@ -76,7 +81,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + configfile);
+        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + config_file);
     }
 }
 

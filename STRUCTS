@@ -19,7 +19,7 @@ This document describes data structures that are serialized and exchanged by
 middleware.
 -----------------------------------------------------------------------------
 
-Result (returned by variant_map()):
+CategorisedResult (returned by serialize()):
 =======================================
 'attrs' : {
     'uri' : string
@@ -30,16 +30,29 @@ Result (returned by variant_map()):
 },
 'internal' : {
     'cat_id' : string
-    'result' : dict (serialized Result), optional
+    'result' : dictionary (serialized Result), optional
 }
 
-Category (returned by variant_map()):
+Category (returned by serialize()):
 =====================================
  'id' : string
  'title' : string
  'icon' : string
  'renderer_template' : string
 
+ScopeMetadata (returned by serialize()):
+=====================================
+ 'scope_name'   : string
+ 'proxy'        : dictionary
+    'identity'  : string
+    'endpoint'  : string
+ 'display_name' : string
+ 'description'  : string
+ 'art'          : string, optional
+ 'icon'         : string, optional
+ 'search_hint'  : string, optional
+ 'hot_key'      : string, optional
+
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" key and serialized Category / ResultItem respectively.
+ result : ValueDict with "category" and/or "result" key and serialized Category / CategorisedResult respectively.

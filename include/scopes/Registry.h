@@ -21,7 +21,7 @@
 
 #include <scopes/ObjectProxy.h>
 #include <scopes/RegistryProxyFwd.h>
-#include <scopes/Scope.h>
+#include <scopes/ScopeMetadata.h>
 
 #include <map>
 
@@ -40,9 +40,9 @@ class RegistryImpl;
 }
 
 /**
-\brief Map for scope name and proxy pairs.
+\brief Map for scope name and metadata pairs.
 */
-typedef std::map<std::string, ScopeProxy> ScopeMap;
+typedef std::map<std::string, ScopeMetadata> MetadataMap;
 
 /**
 \brief RegistryProxy provides access to the available scopes.
@@ -57,15 +57,22 @@ public:
     /// @endcond
 
     /**
-    \brief Returns a ScopeProxy for the scope with the given name.
-    @return If no scope with the given name exists, find() throws NotFoundException.
+    \brief Returns the metadata for the scope with the given name.
+    @return The metadata for the scope. If no scope with the given name exists, get_metadata() throws NotFoundException.
     */
-    ScopeProxy find(std::string const& scope_name) const;
+    ScopeMetadata get_metadata(std::string const& scope_name) const;
 
     /**
-    \brief Returns a map containing the name/proxy pairs for all available scopes.
+    \brief Returns a map containing the metadata for all scopes.
     */
-    ScopeMap list() const;
+    MetadataMap list() const;
+
+    /**
+    \brief Returns a map containing only those scopes for which predicate returns true.
+    \param predicate a function object the must return true for each metadata item to be include in the map.
+    \return The metadata items for which the predicate returned true.
+    */
+    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const;
 
 protected:
     Registry(internal::RegistryImpl* impl);          // Instantiated only by RegistryImpl

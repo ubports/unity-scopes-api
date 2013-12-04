@@ -27,7 +27,7 @@ using namespace unity::api::scopes::internal;
 
 TEST(RuntimeConfig, basic)
 {
-    RuntimeConfig c;
+    RuntimeConfig c("");
     EXPECT_EQ("Registry", c.registry_identity());
     EXPECT_EQ("Registry.ini", c.registry_configfile());
     EXPECT_EQ("Zmq", c.default_middleware());

@@ -40,6 +40,7 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes0 (= ${binary:Version}),
+         libunity-api-dev,
          ${misc:Depends},
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)

@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
+using namespace std;
 using namespace unity::api::scopes::internal;
 using namespace unity::api::scopes::internal::zmq_middleware;
 
