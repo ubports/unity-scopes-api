@@ -6,3 +6,6 @@ add_executable(Runtime_test Runtime_test.cpp)
 target_link_libraries(Runtime_test ${TESTLIBS})
 
 add_test(Runtime Runtime_test)
+
+add_executable(Runtime_TestScope scope.cpp)
+target_link_libraries(Runtime_TestScope ${TESTLIBS})
