@@ -83,6 +83,7 @@ TEST(PlacementHint, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
+    auto nullcat = std::shared_ptr<Category>();
     auto cat = reg.register_category("cat1", "A Category", "icon", rdr);
     {
         auto p = PlacementHint::search_bar_area();
@@ -91,5 +92,25 @@ TEST(PlacementHint, exceptions)
     {
         auto p = PlacementHint::annotation_area();
         EXPECT_THROW(p.category(), unity::LogicException);
+    }
+    {
+        try
+        {
+            auto p = PlacementHint::category_area(nullcat);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+        }
+    }
+    {
+        try
+        {
+            auto p = PlacementHint::results_area(nullcat);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+        }
     }
 }

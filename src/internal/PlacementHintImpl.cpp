@@ -40,6 +40,10 @@ PlacementHintImpl::PlacementHintImpl(PlacementHint::Placement placement, Categor
     : placement_(placement),
       category_(category)
 {
+    if (category_ == nullptr)
+    {
+        throw unity::InvalidArgumentException("PlacementHint: category cannot be null");
+    }
 }
 
 PlacementHint::Placement PlacementHintImpl::placement() const
