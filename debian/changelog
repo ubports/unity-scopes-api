@@ -1,8 +1,32 @@
-unity-scopes-api (0.1.1+14.04.20131129-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.1.1+14.04.20131204-0ubuntu1) trusty; urgency=low
 
+  [ Michal Hruby ]
   * Prepare for PPA release
+  * Added upstart job for the scope registry.
 
- -- Michal Hruby <michal.hruby@canonical.com>  Fri, 29 Nov 2013 12:45:10 +0000
+  [ Pawel Stolowski ]
+  * Added CategoryRenderer class that encapsulates a json string with
+    actual category template.
+
+  [ Jussi Pakkanen ]
+  * Make the option for -Werror apply to plain C too.
+
+  [ Michi Henning ]
+  * Added scope metadata to config and registry. Optional fields that
+    are not set throw on an attempt to access them. This allows us to
+    distinguish "not set all" from "set to default value". Simplified
+    configuration. Factory.ini no longer exists. Client can now run
+    without Runtime.ini, but still needs Registry.ini and Zmq.ini. (It
+    looks for those in the current directory.) Will fix this next.
+    Various minor clean-up in tests and doc comments.
+  * Made it optional for client to specify a name, so multiple clients
+    can run concurrently without stepping on each other. Removed no-
+    longer-needed source file I should have removed in previous commit.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 78
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 04 Dec 2013 17:37:08 +0000
 
 unity-scopes-api (0.1+14.04.20131127-0ubuntu1) trusty; urgency=low
 
