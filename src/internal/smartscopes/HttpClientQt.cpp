@@ -17,53 +17,73 @@
  */
 
 #include <scopes/internal/smartscopes/HttpClientQt.h>
+#include <scopes/internal/smartscopes/HttpClientQtThread.h>
 
+#include <QCoreApplication>
+#include <QEventLoop>
 #include <QUrl>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
 using namespace unity::api::scopes::internal::smartscopes;
 
-using promise_ptr = std::shared_ptr< std::promise< std::string > >;
-Q_DECLARE_METATYPE( promise_ptr )
+Q_DECLARE_METATYPE( PromisePtr )
 
 HttpClientQt::HttpClientQt()
+    : promise_( std::make_shared< std::promise< std::string > >() )
 {
-  connect( &network_manager_, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parse_network_response( QNetworkReply* ) ) );
+  if( !QCoreApplication::instance() )
+  {
+    int argc = 0;
+    app_ = new QCoreApplication( argc, nullptr );
+  }
 }
 
 HttpClientQt::~HttpClientQt()
 {
+  if( get_thread_ )
+  {
+    get_thread_->join();
+  }
 
+  delete app_;
 }
 
 std::future< std::string > HttpClientQt::get( std::string request_url )
 {
-  QUrl url( request_url.c_str() );
-  QNetworkRequest q_request( url );
-  QNetworkReply* current_reply = network_manager_.get( q_request );
-
-  auto promise = std::make_shared< std::promise< std::string > >();
-  current_reply->setProperty( "promise", QVariant::fromValue( promise ) );
-
-  return promise->get_future();
-}
-
-void HttpClientQt::parse_network_response( QNetworkReply *reply )
-{
-  QVariant q_promise = reply->property( "promise" );
-  auto promise = q_promise.value< promise_ptr >();
-
-  if( reply->error() != QNetworkReply::NoError )
+  if( get_thread_ )
   {
-    // communication error
-    promise->set_value( "" );
-    return;
+    get_thread_->join();
   }
 
-  // read string from reply
-  QString reply_string( reply->readAll() );
-  promise->set_value( reply_string.toStdString() );
+  get_thread_ = std::unique_ptr < std::thread > ( new std::thread( [&request_url, this]()
+  {
+    QUrl url( request_url.c_str() );
+
+    auto thread = new HttpClientQtThread(url);
+    QEventLoop loop;
+    QObject::connect(thread, SIGNAL(finished()), &loop, SLOT(quit()));
+    thread->start();
+    loop.exec();
+    thread->wait();
+
+    QNetworkReply* reply = thread->getReply();
+    thread->deleteLater();
+
+    if( !reply || reply->error() != QNetworkReply::NoError )
+    {
+      // communication error
+      promise_->set_value( "" );
+    }
+
+    QString reply_string( reply->readAll() );
+    promise_->set_value( reply_string.toStdString() );
+  } ) );
+
+  return promise_->get_future();
 }
 
-#include "HttpClientQt.moc"
+std::string HttpClientQt::to_html_escaped( const std::string& string )
+{
+  return QString( string.c_str() ).toHtmlEscaped().toStdString();
+}

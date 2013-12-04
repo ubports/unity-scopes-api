@@ -19,3 +19,15 @@
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
 using namespace unity::api::scopes::internal::smartscopes;
+
+SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser )
+    : http_client_( http_client ),
+      json_parser_( json_parser )
+{
+
+}
+
+std::vector< RemoteScope > SmartScopesClient::list_scopes()
+{
+
+}

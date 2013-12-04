@@ -21,10 +21,9 @@
 
 #include <scopes/internal/smartscopes/HttpClientInterface.h>
 
-#include <QNetworkAccessManager>
-#include <QObject>
+class QCoreApplication;
 
-class QNetworkReply;
+using PromisePtr = std::shared_ptr< std::promise< std::string > >;
 
 namespace unity
 {
@@ -41,22 +40,19 @@ namespace internal
 namespace smartscopes
 {
 
-class HttpClientQt : public QObject,
-                     public HttpClientInterface
+class HttpClientQt : public HttpClientInterface
 {
-Q_OBJECT
-
 public:
   HttpClientQt();
   ~HttpClientQt();
 
   std::future< std::string > get( std::string request_url ) override;
-
-private Q_SLOTS:
-  void parse_network_response( QNetworkReply *reply );
+  std::string to_html_escaped( const std::string& string ) override;
 
 private:
-  QNetworkAccessManager network_manager_;
+  QCoreApplication* app_ = nullptr;
+  std::unique_ptr< std::thread > get_thread_ = nullptr;
+  PromisePtr promise_ = nullptr;
 };
 
 } // namespace smartscopes

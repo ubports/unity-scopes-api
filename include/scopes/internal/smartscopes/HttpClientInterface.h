@@ -19,6 +19,8 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
 
+#include <unity/util/DefinesPtrs.h>
+
 #include <future>
 
 namespace unity
@@ -39,10 +41,14 @@ namespace smartscopes
 class HttpClientInterface
 {
 public:
+  UNITY_DEFINES_PTRS(HttpClientInterface);
+
   HttpClientInterface() = default;
   virtual ~HttpClientInterface() = default;
 
   virtual std::future< std::string > get( std::string request_url ) = 0;
+
+  virtual std::string to_html_escaped( const std::string& string ) = 0;
 };
 
 } // namespace smartscopes

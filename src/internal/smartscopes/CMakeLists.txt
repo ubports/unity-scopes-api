@@ -1,14 +1,17 @@
-find_package(Qt5Core REQUIRED)
-include_directories(${Qt5Core_INCLUDE_DIRS})
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+find_package(Qt5Core REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
 
 add_library(
     smartscopes
 
     HttpClientQt.cpp
     JsonCppParser.cpp
+
+    ${CMAKE_SOURCE_DIR}/include/scopes/internal/smartscopes/HttpClientQtThread.h
+    HttpClientQtThread.cpp
 
     SmartScopesClient.cpp
 )

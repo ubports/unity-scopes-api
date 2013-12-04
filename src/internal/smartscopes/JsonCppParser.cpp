@@ -136,7 +136,7 @@ const Json::Value& JsonCppParser::get_value_path( const std::vector< std::string
   const Json::Value* value_node = &root_;
   for( const std::string& node : value_path )
   {
-    value_node = &(*value_node)[node];
+    value_node = &( *value_node )[node];
   }
 
   return *value_node;
@@ -147,7 +147,7 @@ Json::Value& JsonCppParser::set_value_path( const std::vector< std::string >& va
   Json::Value* value_node = &root_;
   for( const std::string& node : value_path )
   {
-    value_node = &(*value_node)[node];
+    value_node = &( *value_node )[node];
   }
 
   return *value_node;

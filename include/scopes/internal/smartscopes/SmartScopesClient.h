@@ -19,6 +19,13 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
 
+#include <scopes/internal/smartscopes/HttpClientInterface.h>
+#include <scopes/internal/smartscopes/JsonParserInterface.h>
+
+#include <string>
+#include <vector>
+#include <memory>
+
 namespace unity
 {
 
@@ -34,9 +41,22 @@ namespace internal
 namespace smartscopes
 {
 
+struct RemoteScope
+{
+  std::string search_url;
+  bool invisible = false;
+};
+
 class SmartScopesClient
 {
 public:
+  SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser );
+
+  std::vector< RemoteScope > list_scopes();
+
+private:
+  HttpClientInterface::SPtr http_client_;
+  JsonParserInterface::SPtr json_parser_;
 };
 
 } // namespace smartscopes

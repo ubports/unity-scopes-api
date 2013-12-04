@@ -19,6 +19,8 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
 
+#include <unity/util/DefinesPtrs.h>
+
 #include <string>
 #include <vector>
 
@@ -40,6 +42,8 @@ namespace smartscopes
 class JsonParserInterface
 {
 public:
+  UNITY_DEFINES_PTRS(JsonParserInterface);
+
   JsonParserInterface() = default;
   virtual ~JsonParserInterface() = default;
 

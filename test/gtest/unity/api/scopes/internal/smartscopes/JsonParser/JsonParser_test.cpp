@@ -36,7 +36,7 @@ protected:
   std::unique_ptr< JsonParserInterface > json_parser_;
 };
 
-TEST_F(JsonParserTest, basic)
+TEST_F( JsonParserTest, basic )
 {
   std::string json_string = R"({
     "firstName": "John",
