@@ -34,6 +34,8 @@ namespace api
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace internal
 {
 class RuntimeImpl;
@@ -90,6 +92,13 @@ public:
     scopes.
     */
     RegistryProxy registry() const;
+
+    /**
+    \brief Run a scope without going through the scope runner.
+
+    This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
+    */
+    void run_scope(ScopeBase *const scope_base);
 
     /**
     \brief Destroys a Runtime instance.
