@@ -33,7 +33,7 @@ public:
   JsonParserTest() : json_parser_( new JsonCppParser() ) {}
 
 protected:
-  std::unique_ptr< JsonParserInterface > json_parser_;
+  JsonParserInterface::SPtr json_parser_;
 };
 
 TEST_F( JsonParserTest, basic )

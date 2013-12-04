@@ -18,16 +18,24 @@
 
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
+#include <future>
+
 using namespace unity::api::scopes::internal::smartscopes;
 
-SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser )
+SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser,
+    const std::string& url, int port )
     : http_client_( http_client ),
-      json_parser_( json_parser )
+      json_parser_( json_parser ),
+      url_( url ),
+      port_( port )
 {
 
 }
 
-std::vector< RemoteScope > SmartScopesClient::list_scopes()
+std::vector< RemoteScope > SmartScopesClient::get_remote_scopes()
 {
+  std::future< std::string > r = http_client_->get( url_, port_ );
+  r.wait();
 
+  return std::vector< RemoteScope >();
 }

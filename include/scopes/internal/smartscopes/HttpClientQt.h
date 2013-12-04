@@ -46,7 +46,7 @@ public:
   HttpClientQt();
   ~HttpClientQt();
 
-  std::future< std::string > get( std::string request_url ) override;
+  std::future< std::string > get( const std::string& request_url, int port = 80 ) override;
   std::string to_html_escaped( const std::string& string ) override;
 
 private:

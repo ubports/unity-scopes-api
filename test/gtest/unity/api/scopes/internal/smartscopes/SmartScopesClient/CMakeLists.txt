@@ -3,19 +3,21 @@ include_directories(
 )
 
 add_executable(
-  SmartScopesClient_test
+    SmartScopesClient_test
 
-  SmartScopesClient_test.cpp
+    SmartScopesClient_test.cpp
 )
 
 target_link_libraries(
-  SmartScopesClient_test
+    SmartScopesClient_test
 
-  ${TESTLIBS}
+    ${TESTLIBS}
 )
 
 add_test(
-  SmartScopesClient
+    SmartScopesClient
 
-  SmartScopesClient_test
+    SmartScopesClient_test
 )
+
+file(COPY FakeSss.py DESTINATION ./)

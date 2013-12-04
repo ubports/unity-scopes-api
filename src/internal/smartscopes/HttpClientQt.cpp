@@ -25,12 +25,13 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
+#include <iostream>
+
 using namespace unity::api::scopes::internal::smartscopes;
 
 Q_DECLARE_METATYPE( PromisePtr )
 
 HttpClientQt::HttpClientQt()
-    : promise_( std::make_shared< std::promise< std::string > >() )
 {
   if( !QCoreApplication::instance() )
   {
@@ -49,16 +50,19 @@ HttpClientQt::~HttpClientQt()
   delete app_;
 }
 
-std::future< std::string > HttpClientQt::get( std::string request_url )
+std::future< std::string > HttpClientQt::get( const std::string& request_url, int port )
 {
   if( get_thread_ )
   {
     get_thread_->join();
   }
 
-  get_thread_ = std::unique_ptr < std::thread > ( new std::thread( [&request_url, this]()
+  promise_ = std::make_shared< std::promise< std::string > >();
+
+  get_thread_ = std::unique_ptr < std::thread > ( new std::thread( [&request_url, port, this]()
   {
     QUrl url( request_url.c_str() );
+    url.setPort( port );
 
     auto thread = new HttpClientQtThread(url);
     QEventLoop loop;
@@ -73,11 +77,14 @@ std::future< std::string > HttpClientQt::get( std::string request_url )
     if( !reply || reply->error() != QNetworkReply::NoError )
     {
       // communication error
+      std::cout << reply->errorString().toStdString();
       promise_->set_value( "" );
     }
-
-    QString reply_string( reply->readAll() );
-    promise_->set_value( reply_string.toStdString() );
+    else
+    {
+      QString reply_string( reply->readAll() );
+      promise_->set_value( reply_string.toStdString() );
+    }
   } ) );
 
   return promise_->get_future();

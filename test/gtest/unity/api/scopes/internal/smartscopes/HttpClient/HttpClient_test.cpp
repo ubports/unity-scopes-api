@@ -27,6 +27,8 @@ using namespace unity::api::scopes::internal::smartscopes;
 namespace
 {
 
+const std::string test_url = "https://productsearch.ubuntu.com/smartscopes/v1/search?query=hello";
+
 class HttpClientTest : public Test
 {
 public:
@@ -35,19 +37,22 @@ public:
       http_client2_( new HttpClientQt() ) {}
 
 protected:
-  std::unique_ptr< HttpClientInterface > http_client_;
-  std::unique_ptr< HttpClientInterface > http_client2_;
+  HttpClientInterface::SPtr http_client_;
+  HttpClientInterface::SPtr http_client2_;
 };
 
 TEST_F( HttpClientTest, basic )
 {
-  std::future< std::string > r = http_client_->get( "https://productsearch.ubuntu.com/smartscopes/v1/search?query=hello" );
-  std::future< std::string > r2 = http_client2_->get( "https://productsearch.ubuntu.com/smartscopes/v1/search?query=hello" );
-
+  std::future< std::string > r = http_client_->get( test_url );
   r.wait();
-  r2.wait();
-  std::string reply_string = r.get();
 
+  r = http_client_->get( test_url );
+  r.wait();
+
+  r = http_client2_->get( test_url );
+  r.wait();
+
+  std::string reply_string = r.get();
   std::cout << reply_string;
 }
 

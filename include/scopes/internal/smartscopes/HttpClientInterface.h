@@ -46,7 +46,7 @@ public:
   HttpClientInterface() = default;
   virtual ~HttpClientInterface() = default;
 
-  virtual std::future< std::string > get( std::string request_url ) = 0;
+  virtual std::future< std::string > get( const std::string& request_url, int port = 80 ) = 0;
 
   virtual std::string to_html_escaped( const std::string& string ) = 0;
 };

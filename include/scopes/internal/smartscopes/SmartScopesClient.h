@@ -50,13 +50,20 @@ struct RemoteScope
 class SmartScopesClient
 {
 public:
-  SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser );
+  UNITY_DEFINES_PTRS(SmartScopesClient);
 
-  std::vector< RemoteScope > list_scopes();
+  SmartScopesClient( HttpClientInterface::SPtr http_client,
+      JsonParserInterface::SPtr json_parser,
+      const std::string& url = "https://ROOT/remote-scopes",
+      int port = 80 );
+
+  std::vector< RemoteScope > get_remote_scopes();
 
 private:
   HttpClientInterface::SPtr http_client_;
   JsonParserInterface::SPtr json_parser_;
+  std::string url_;
+  int port_;
 };
 
 } // namespace smartscopes
