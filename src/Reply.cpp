@@ -18,6 +18,7 @@
 
 #include <scopes/Reply.h>
 #include <scopes/CategorisedResult.h>
+#include <scopes/AnnotationObjectBase.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <scopes/internal/ReplyImpl.h>
@@ -58,6 +59,11 @@ Category::SCPtr Reply::lookup_category(std::string const& id) const
 }
 
 bool Reply::push(CategorisedResult const& result) const
+{
+    return fwd()->push(result);
+}
+
+bool Reply::push(AnnotationObjectBase const& result) const
 {
     return fwd()->push(result);
 }

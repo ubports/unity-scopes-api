@@ -3,12 +3,14 @@ add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationObjectBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/HyperlinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactoryConfig.cpp
@@ -21,6 +23,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
@@ -31,6 +34,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlacementHintImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
