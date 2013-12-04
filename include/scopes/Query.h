@@ -49,6 +49,9 @@ public:
     Query& operator=(Query const& other);
     Query& operator=(Query&&);
 
+    bool operator==(Query const& other) const;
+    bool operator!=(Query const& other) const;
+
     void set_department_id(std::string const& dep_id);
     void set_query_string(std::string const& query_str);
     void set_filter_state(FilterState const& filter_state);

@@ -1,5 +1,6 @@
 add_subdirectory(internal)
 add_subdirectory(Runtime)
+add_subdirectory(Hyperlink)
 add_subdirectory(ScopeBase)
 add_subdirectory(ScopeExceptions)
 add_subdirectory(Category)

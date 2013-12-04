@@ -49,6 +49,7 @@ VariantMap AnnotationObjectBaseImpl::serialize() const
     vm["type"] = type_string();
     vm["placement"] = placement_hint_.serialize();
     serialize(vm);
+    return vm;
 }
 
 } // namespace internal

@@ -46,6 +46,7 @@ public:
     QueryImpl(QueryImpl&&) = default;
     QueryImpl& operator=(QueryImpl const& other) = default;
     QueryImpl& operator=(QueryImpl&&) = default;
+    bool operator==(QueryImpl const& other) const;
 
     void set_department_id(std::string const& dep_id);
     void set_query_string(std::string const& query_str);

@@ -49,6 +49,17 @@ QueryImpl::QueryImpl(std::string const& scope_name, std::string const& query_str
 {
 }
 
+bool QueryImpl::operator==(QueryImpl const& other) const
+{
+    if (scope_name_ == other.scope_name_ &&
+        query_string_ == other.query_string_ &&
+        department_id_ == other.department_id_)
+    {
+        return true;
+    }
+    return false;
+}
+
 void QueryImpl::set_department_id(std::string const& dep_id)
 {
     department_id_ = dep_id;

@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <scopes/Category.h>
+#include <scopes/PlacementHint.h>
 #include <unity/SymbolExport.h>
 
 namespace unity
@@ -38,20 +39,14 @@ namespace internal
 class UNITY_API PlacementHintImpl
 {
 public:
-    enum Placement
-    {
-        SearchBarArea,
-        AnnotationArea,
-        ResultsArea,
-        CategoryArea
-    };
-
-    PlacementHintImpl(Placement placement);
-    PlacementHintImpl(Placement placement, Category::SCPtr category);
+    PlacementHintImpl(PlacementHint::Placement placement);
+    PlacementHintImpl(PlacementHint::Placement placement, Category::SCPtr category);
+    PlacementHint::Placement placement() const;
+    Category::SCPtr category() const;
     VariantMap serialize() const;
 
 private:
-    Placement placement_;
+    PlacementHint::Placement placement_;
     Category::SCPtr category_;
 };
 

@@ -35,24 +35,34 @@ PlacementHint::PlacementHint(internal::PlacementHintImpl *pimpl)
 
 PlacementHint PlacementHint::search_bar_area()
 {
-    return PlacementHint(new internal::PlacementHintImpl(internal::PlacementHintImpl::Placement::SearchBarArea));
+    return PlacementHint(new internal::PlacementHintImpl(Placement::SearchBarArea));
 }
 
 PlacementHint PlacementHint::annotation_area()
 {
-    return PlacementHint(new internal::PlacementHintImpl(internal::PlacementHintImpl::Placement::AnnotationArea));
+    return PlacementHint(new internal::PlacementHintImpl(Placement::AnnotationArea));
 }
 
 PlacementHint PlacementHint::results_area(Category::SCPtr category)
 {
-    return PlacementHint(new internal::PlacementHintImpl(internal::PlacementHintImpl::Placement::ResultsArea, category));
+    return PlacementHint(new internal::PlacementHintImpl(Placement::ResultsArea, category));
 }
 
 PlacementHint PlacementHint::category_area(Category::SCPtr category)
 {
-    return PlacementHint(new internal::PlacementHintImpl(internal::PlacementHintImpl::Placement::CategoryArea, category));
+    return PlacementHint(new internal::PlacementHintImpl(Placement::CategoryArea, category));
 }
     
+PlacementHint::Placement PlacementHint::placement() const
+{
+    return p->placement();
+}
+    
+Category::SCPtr PlacementHint::category() const
+{
+    return p->category();
+}
+
 VariantMap PlacementHint::serialize() const
 {
     return p->serialize();

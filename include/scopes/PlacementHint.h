@@ -41,11 +41,21 @@ class PlacementHintImpl;
 class UNITY_API PlacementHint final
 {
 public:
+    enum Placement
+    {
+        SearchBarArea,
+        AnnotationArea,
+        ResultsArea,
+        CategoryArea
+    };
+
     PlacementHint() = delete;
     static PlacementHint search_bar_area();
     static PlacementHint annotation_area();
     static PlacementHint results_area(Category::SCPtr category);
     static PlacementHint category_area(Category::SCPtr category);
+    Placement placement() const;
+    Category::SCPtr category() const;
     VariantMap serialize() const;
 
 private:
