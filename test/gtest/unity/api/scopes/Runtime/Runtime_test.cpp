@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+* Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -17,6 +17,7 @@
  */
 
 #include <scopes/Runtime.h>
+#include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
@@ -25,7 +26,7 @@ using namespace unity::api::scopes;
 
 TEST(Runtime, basic)
 {
-    Runtime::UPtr rt = Runtime::create("testscope", "Runtime.ini");
+    Runtime::UPtr rt = Runtime::create("Runtime.ini");
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
 }

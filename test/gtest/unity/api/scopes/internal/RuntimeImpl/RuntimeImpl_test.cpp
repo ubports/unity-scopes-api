@@ -74,14 +74,4 @@ TEST(RuntimeImpl, error)
                   "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
                   e.to_string());
     }
-
-    try
-    {
-        RuntimeImpl::UPtr rt = RuntimeImpl::create("");
-    }
-    catch (InvalidArgumentException const& e)
-    {
-        EXPECT_EQ("unity::InvalidArgumentException: Cannot instantiate a run time with an empty scope name",
-                  e.to_string());
-    }
 }
