@@ -5,5 +5,6 @@ start on started dbus
 stop on desktop-end
 
 respawn
+respawn limit 10 60
 
 exec @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/scoperegistry/scoperegistry
