@@ -2,3 +2,4 @@ usr/lib/*/libunity-scopes.so.*
 usr/lib/*/scoperegistry/*
 usr/lib/*/scoperunner/*
 usr/share/unity/*/*.ini
+usr/share/upstart/sessions/*.conf

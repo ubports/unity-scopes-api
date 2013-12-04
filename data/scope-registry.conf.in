@@ -1,0 +1,9 @@
+description "Scope registry"
+author "Michal Hruby <michal.hruby@canonical.com>"
+
+start on started dbus
+stop on desktop-end
+
+respawn
+
+exec @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/scoperegistry/scoperegistry
