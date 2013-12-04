@@ -17,7 +17,7 @@
  */
 
 #include <scopes/ScopeBase.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/Category.h>
 #include <scopes/Reply.h>
@@ -193,7 +193,7 @@ public:
             }
             for (int i = 1; i < 4; ++i)
             {
-                ResultItem result(cat);
+                CategorisedResult result(cat);
                 result.set_uri("uri");
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
                 result.set_art("icon");

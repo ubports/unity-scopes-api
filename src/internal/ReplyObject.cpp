@@ -17,11 +17,10 @@
  */
 
 #include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/ResultItemImpl.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -104,17 +103,15 @@ void ReplyObject::push(VariantMap const& result) noexcept
         if (it != result.end())
         {
             auto result_var = it->second.get_dict();
-            auto cat_id = result_var["cat_id"].get_string();
-            auto cat = cat_registry_->lookup_category(cat_id);
-            if (cat == nullptr)
+            try
+            {
+                CategorisedResult result(*cat_registry_, result_var);
+                receiver_base_->push(std::move(result));
+            }
+            catch (unity::Exception const& e)
             {
                 // TODO: this is an internal error; log error
                 finished(ReceiverBase::Error);
-            }
-            else
-            {
-                ResultItem result_item(cat, result_var);
-                receiver_base_->push(std::move(result_item));
             }
         }
     }

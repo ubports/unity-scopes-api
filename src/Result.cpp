@@ -1,0 +1,136 @@
+/*
+ * Copyright (C) 2013 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ */
+
+#include <scopes/Result.h>
+#include <scopes/internal/ResultImpl.h>
+
+namespace unity
+{
+
+namespace api
+{
+
+namespace scopes
+{
+
+//! @cond
+
+Result::Result(internal::ResultImpl* impl)
+    : p(impl)
+{
+}
+
+Result::Result(const VariantMap &variant_map)
+    : p(new internal::ResultImpl(variant_map))
+{
+}
+
+Result::Result(Result const& other)
+    : p(new internal::ResultImpl(*(other.p)))
+{
+}
+
+Result::~Result()
+{
+}
+
+Result& Result::operator=(Result const& other)
+{
+    if (this != &other)
+    {
+        p = std::make_shared<internal::ResultImpl>(*(other.p));
+    }
+    return *this;
+}
+
+Result::Result(Result&&) = default;
+
+Result& Result::operator=(Result&&) = default;
+
+void Result::store(Result const& other)
+{
+    p->store(other);
+}
+
+bool Result::has_stored_result() const
+{
+    return p->has_stored_result();
+}
+
+Result Result::retrieve() const
+{
+    return p->retrieve();
+}
+
+void Result::set_uri(std::string const& uri)
+{
+    p->set_uri(uri);
+}
+
+void Result::set_title(std::string const& title)
+{
+    p->set_title(title);
+}
+
+void Result::set_art(std::string const& image)
+{
+    p->set_art(image);
+}
+
+void Result::set_dnd_uri(std::string const& dnd_uri)
+{
+    p->set_dnd_uri(dnd_uri);
+}
+
+void Result::add_metadata(std::string const& key, Variant const& value)
+{
+    p->add_metadata(key, value);
+}
+
+std::string Result::uri() const
+{
+    return p->uri();
+}
+
+std::string Result::title() const
+{
+    return p->title();
+}
+
+std::string Result::art() const
+{
+    return p->art();
+}
+
+std::string Result::dnd_uri() const
+{
+    return p->dnd_uri();
+}
+
+VariantMap Result::serialize() const
+{
+    return p->serialize();
+}
+
+//! @endcond
+
+} // namespace scopes
+
+} // namespace api
+
+} // namespace unity

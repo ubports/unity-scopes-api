@@ -19,7 +19,7 @@
 #include <scopes/ScopeBase.h>
 #include <scopes/Reply.h>
 #include <scopes/Category.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <iostream>
@@ -51,7 +51,7 @@ public:
     {
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
-        ResultItem res(cat);
+        CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title("scope-A: result 1 for query \"" + query_ + "\"");
         res.set_art("icon");
