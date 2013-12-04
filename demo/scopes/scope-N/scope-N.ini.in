@@ -1,3 +1,3 @@
 [ScopeConfig]
-LocalizedName = scope-N.LocalizedName
+DisplayName = scope-N.DisplayName
 Description = scope-N.Description

@@ -29,7 +29,7 @@ using namespace unity::api::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
-    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope");
+    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope", "Runtime.ini");
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
     EXPECT_TRUE(rt->factory());
@@ -72,16 +72,6 @@ TEST(RuntimeImpl, error)
         EXPECT_EQ("unity::api::scopes::ConfigException: Cannot instantiate run time for testscope, "
                   "config file: NoSuchFile.ini:\n"
                   "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
-                  e.to_string());
-    }
-
-    try
-    {
-        RuntimeImpl::UPtr rt = RuntimeImpl::create("");
-    }
-    catch (InvalidArgumentException const& e)
-    {
-        EXPECT_EQ("unity::InvalidArgumentException: Cannot instantiate a run time with an empty scope name",
                   e.to_string());
     }
 }

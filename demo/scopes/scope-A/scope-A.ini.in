@@ -1,5 +1,5 @@
 [ScopeConfig]
-LocalizedName = scope-A.LocalizedName
+DisplayName = scope-A.DisplayName
 Description = scope-A.Description
 Art = scope-A.Art
 Icon = scope-A.Icon

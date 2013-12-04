@@ -43,7 +43,7 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     // we have an internal logic error.
     assert(!p->scope_name().empty());
     assert(p->proxy());
-    assert(!p->localized_name().empty());
+    assert(!p->display_name().empty());
     assert(!p->description().empty());
 }
 
@@ -79,9 +79,9 @@ ScopeProxy ScopeMetadata::proxy() const
     return p->proxy();
 }
 
-string ScopeMetadata::localized_name() const
+string ScopeMetadata::display_name() const
 {
-    return p->localized_name();
+    return p->display_name();
 }
 
 string ScopeMetadata::description() const

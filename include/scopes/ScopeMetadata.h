@@ -49,7 +49,7 @@ public:
 
     std::string scope_name() const;
     ScopeProxy proxy() const;
-    std::string localized_name() const; // localized
+    std::string display_name() const; // localized
     std::string description() const;    // localized
     std::string art() const;            // optional
     std::string icon() const;           // optional

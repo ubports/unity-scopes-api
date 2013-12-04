@@ -67,7 +67,7 @@ MetadataMap RegistryObject::list()
     return scopes_;
 }
 
-bool RegistryObject::add(std::string const& scope_name, ScopeMetadata metadata)
+bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
 {
     if (scope_name.empty())
     {
@@ -78,12 +78,12 @@ bool RegistryObject::add(std::string const& scope_name, ScopeMetadata metadata)
 
     lock_guard<decltype(mutex_)> lock(mutex_);
 
-    auto const& pair = scopes_.insert(make_pair(scope_name, move(metadata)));
+    auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
     if (!pair.second)
     {
         // Replace already existing entry with this one
         scopes_.erase(pair.first);
-        scopes_.insert(make_pair(scope_name, move(metadata)));
+        scopes_.insert(make_pair(scope_name, metadata));
         return false;
     }
     return true;

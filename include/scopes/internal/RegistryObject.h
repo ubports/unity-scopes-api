@@ -51,7 +51,7 @@ public:
 
     MetadataMap list();
 
-    bool add(std::string const& scope_name, ScopeMetadata const scope);
+    bool add(std::string const& scope_name, ScopeMetadata const& scope);
     bool remove(std::string const& scope_name);
 
 private:

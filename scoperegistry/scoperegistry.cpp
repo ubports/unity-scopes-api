@@ -165,7 +165,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             ScopeConfig sc(pair.second);
             mi->set_scope_name(pair.first);
-            mi->set_localized_name(sc.localized_name());
+            mi->set_display_name(sc.display_name());
             mi->set_description(sc.description());
             try
             {
@@ -252,12 +252,8 @@ int
 main(int argc, char* argv[])
 {
     prog_name = basename(argv[0]);
-    if (argc != 2)
-    {
-        cerr << "usage: " << prog_name << " configfile" << endl;
-        return 2;
-    }
-    char const* const config_file = argv[1];
+
+    char const* const config_file = argc > 1 ? argv[1] : "";
 
     int exit_status = 1;
 
