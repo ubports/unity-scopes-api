@@ -77,7 +77,7 @@ VariantMap PlacementHintImpl::serialize() const
             assert(false);
             break;
     }
-    
+
     VariantMap vm;
     vm["area"] = pstr;
     if (category_)

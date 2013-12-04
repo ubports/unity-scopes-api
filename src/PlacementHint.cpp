@@ -52,12 +52,12 @@ PlacementHint PlacementHint::category_area(Category::SCPtr category)
 {
     return PlacementHint(new internal::PlacementHintImpl(Placement::CategoryArea, category));
 }
-    
+
 PlacementHint::Placement PlacementHint::placement() const
 {
     return p->placement();
 }
-    
+
 Category::SCPtr PlacementHint::category() const
 {
     return p->category();

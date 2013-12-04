@@ -42,7 +42,7 @@ PlacementHint AnnotationObjectBaseImpl::placement_hint() const
 {
     return placement_hint_;
 }
-    
+
 VariantMap AnnotationObjectBaseImpl::serialize() const
 {
     VariantMap vm;
@@ -59,5 +59,3 @@ VariantMap AnnotationObjectBaseImpl::serialize() const
 } // namespace api
 
 } // namespace unity
-
-

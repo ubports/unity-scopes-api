@@ -56,12 +56,12 @@ Query& Query::operator=(Query const& other)
 }
 
 Query& Query::operator=(Query&&) = default;
-    
+
 bool Query::operator==(Query const& other) const
 {
     return *p == *(other.p);
 }
-    
+
 bool Query::operator!=(Query const& other) const
 {
     return !(this->operator==(other));
