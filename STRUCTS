@@ -24,7 +24,7 @@ CategorisedResult (returned by serialize()):
 'attrs' : {
     'uri' : string
     'title' : string
-    'icon' : string
+    'art' : string
     'dnd_uri' : string
     + any custom key-value attribute added by scope author.
 },
