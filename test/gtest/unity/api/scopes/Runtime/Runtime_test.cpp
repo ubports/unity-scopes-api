@@ -16,7 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <scopes/Runtime.h>
+#include <scopes/internal/RuntimeImpl.h>
 
 #include <gtest/gtest.h>
 
@@ -28,4 +33,25 @@ TEST(Runtime, basic)
     Runtime::UPtr rt = Runtime::create("testscope", "Runtime.ini");
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
+}
+
+TEST(Runtime, run_scope)
+{
+    // Spawn the test scope
+    const char *const argv[] = {"./Runtime_TestScope", "Runtime.ini", NULL};
+    pid_t pid;
+    switch (pid = fork()) {
+    case -1:
+        FAIL();
+    case 0: // child
+        execv(argv[0], (char *const *)argv);
+        FAIL();
+    }
+
+    // Parent
+    auto rt = internal::RuntimeImpl::create("dash", "Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    auto proxy = mw->create_scope_proxy("TestScope");
+
+    kill(pid, SIGTERM);
 }
