@@ -39,6 +39,9 @@ class HyperlinkImpl;
 class AnnotationImpl;
 }
 
+/**
+ * \brief Represents a hyperlink (a label and canned Query)
+ */
 class UNITY_API Hyperlink final
 {
 public:
@@ -46,10 +49,21 @@ public:
     UNITY_DEFINES_PTRS(Hyperlink);
     /// @endcond
 
+    /**
+     * \brief Returns label of this Hyperlink instance.
+     * \return a label
+     */
     std::string label() const;
+
+    /**
+     * \brief Returns a canned Query instance.
+     * \return a canned Query
+     */
     Query query() const;
 
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 private:
     Hyperlink(std::string const& label, Query const& query);
     std::shared_ptr<internal::HyperlinkImpl> p;

@@ -20,6 +20,7 @@
 #define UNITY_API_SCOPES_QUERY_H
 
 #include <unity/SymbolExport.h>
+#include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
 #include <scopes/FilterState.h>
@@ -47,6 +48,10 @@ class QueryImpl;
 class UNITY_API Query final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(Query);
+    /// @endcond
+
     /**
      * \brief Creates a query for given scope with empty query string.
      */

@@ -20,7 +20,6 @@
 #define UNITY_API_SCOPES_ANNOTATION_H
 
 #include <unity/SymbolExport.h>
-#include <unity/util/DefinesPtrs.h>
 #include <scopes/Variant.h>
 #include <scopes/Query.h>
 #include <scopes/Hyperlink.h>

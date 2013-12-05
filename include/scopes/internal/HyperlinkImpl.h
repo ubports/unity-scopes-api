@@ -46,7 +46,7 @@ public:
 
 private:
     std::string label_;
-    std::shared_ptr<Query> query_;
+    Query::SCPtr query_;
 };
 
 } // namespace internal
