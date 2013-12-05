@@ -97,8 +97,11 @@ public:
     \brief Run a scope without going through the scope runner.
 
     This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
+
+    \param scope_name The name of the scope
+    \param scope_base The scope implementation
     */
-    void run_scope(ScopeBase *const scope_base);
+    void run_scope(std::string const& scope_name, ScopeBase *const scope_base);
 
     /**
     \brief Destroys a Runtime instance.

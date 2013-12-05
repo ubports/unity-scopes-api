@@ -62,11 +62,11 @@ RegistryProxy Runtime::registry() const
     return p->registry();
 }
 
-void Runtime::run_scope(ScopeBase *const scope_base)
+void Runtime::run_scope(string const& scope_name, ScopeBase *const scope_base)
 {
-    auto mw = p->factory()->create(p->scope_name(), "Zmq", "Zmq.Config");
+    auto mw = p->factory()->create(scope_name, "Zmq", "Zmq.Config");
 
-    scope_base->start(p->scope_name(), p->registry());
+    scope_base->start(scope_name, p->registry());
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
 
