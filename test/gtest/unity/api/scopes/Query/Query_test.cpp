@@ -42,6 +42,32 @@ TEST(Query, basic)
     }
 }
 
+TEST(Query, copy)
+{
+    {
+        Query a("scope-A", "foo", "dep1");
+        Query b(a);
+
+        EXPECT_EQ(a, b);
+        a.set_query_string("bar");
+        a.set_department_id("dep2");
+
+        EXPECT_EQ("foo", b.query_string());
+        EXPECT_EQ("dep1", b.department_id());
+    }
+    {
+        Query a("scope-A", "foo", "dep1");
+        Query b = a;
+
+        EXPECT_EQ(a, b);
+        a.set_query_string("bar");
+        a.set_department_id("dep2");
+
+        EXPECT_EQ("foo", b.query_string());
+        EXPECT_EQ("dep1", b.department_id());
+    }
+}
+
 TEST(Query, comparison)
 {
     {
