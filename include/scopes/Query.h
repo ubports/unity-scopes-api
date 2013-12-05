@@ -44,6 +44,7 @@ class UNITY_API Query final
 public:
     Query(std::string const& scope_name);
     Query(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
+    Query(VariantMap const& variant);
     Query(Query const &other);
     Query(Query&&);
     Query& operator=(Query const& other);

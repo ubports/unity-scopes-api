@@ -38,7 +38,7 @@ QueryImpl::QueryImpl(std::string const& scope_name)
 {
     if (scope_name_.empty())
     {
-        throw InvalidArgumentException("Query: Scope name is empty");
+        throw InvalidArgumentException("Query(): scope name cannot be empty");
     }
 }
 
@@ -47,6 +47,32 @@ QueryImpl::QueryImpl(std::string const& scope_name, std::string const& query_str
       query_string_(query_str),
       department_id_(department_id)
 {
+}
+
+QueryImpl::QueryImpl(VariantMap const& variant)
+{
+    auto it = variant.find("scope");
+    if (it == variant.end())
+    {
+        throw InvalidArgumentException("Query(): scope name not set");
+    }
+    scope_name_ = it->second.get_string();
+    if (scope_name_.empty())
+    {
+        throw InvalidArgumentException("Query(): scope name cannot be empty");
+    }
+
+    it = variant.find("department_id");
+    if (it != variant.end())
+    {
+        department_id_ = it->second.get_string();
+    }
+
+    it = variant.find("query_string");
+    if (it != variant.end())
+    {
+        query_string_ = it->second.get_string();
+    }
 }
 
 bool QueryImpl::operator==(QueryImpl const& other) const

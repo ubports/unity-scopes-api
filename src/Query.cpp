@@ -39,6 +39,11 @@ Query::Query(std::string const& scope_name, std::string const& query_str, std::s
 {
 }
 
+Query::Query(VariantMap const& variant)
+    : p(new internal::QueryImpl(variant))
+{
+}
+
 Query::Query(Query const &other)
     : p(new internal::QueryImpl(*(other.p)))
 {

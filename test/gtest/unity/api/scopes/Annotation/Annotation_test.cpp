@@ -109,6 +109,21 @@ TEST(Annotation, emblemHyperlink)
     }
 }
 
+TEST(Annotation, emblemHyperlink_exceptions)
+{
+    {
+        Query query("scope-A", "foo", "dep1");
+
+        Annotation annotation(Annotation::AnnotationType::EmblemHyperlink);
+        annotation.set_icon("icon");
+        annotation.add_hyperlink("Link1", query);
+
+        EXPECT_THROW(annotation.set_label("Label"), unity::InvalidArgumentException);
+        EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
+        EXPECT_EQ(1, annotation.num_of_hyperlinks());
+    }
+}
+
 TEST(Annotation, card)
 {
     {
@@ -126,16 +141,36 @@ TEST(Annotation, card)
     }
 }
 
+TEST(Annotation, card_exceptions)
+{
+    {
+        Query query("scope-A", "foo", "dep1");
+
+        Annotation annotation(Annotation::AnnotationType::Card);
+        annotation.set_icon("icon");
+        annotation.add_hyperlink("Link1", query);
+
+        EXPECT_THROW(annotation.set_label("Label"), unity::InvalidArgumentException);
+        EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
+        EXPECT_EQ(1, annotation.num_of_hyperlinks());
+    }
+}
+
 TEST(Annotation, serialize)
 {
     {
         Query query("scope-A", "foo", "dep1");
-        /*Hyperlink link(query, PlacementHint::search_bar_area());
+        Annotation annotation(Annotation::AnnotationType::Hyperlink);
+        annotation.add_hyperlink("Link1", query);
 
-        auto vm = link.serialize();
+        auto vm = annotation.serialize();
         EXPECT_EQ("hyperlink", vm["type"].get_string());
-        EXPECT_EQ("searchbar", vm["placement"].get_dict()["area"].get_string());
-        auto q = link.canned_query();
-        EXPECT_EQ(q, query);*/
+        EXPECT_TRUE(vm.find("label") == vm.end());
+        EXPECT_TRUE(vm.find("icon") == vm.end());
+        auto links = vm["hyperlinks"].get_array();
+        EXPECT_EQ(1, links.size());
+        auto linkvm = links[0].get_dict();
+        EXPECT_EQ("Link1", linkvm["label"].get_string());
+        auto qvm = linkvm["query"]; //TODO query deserialize
     }
 }

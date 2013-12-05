@@ -97,7 +97,55 @@ TEST(Query, serialize)
     EXPECT_EQ("foo", var["query_string"].get_string());
 }
 
+TEST(Query, deserialize)
+{
+    {
+        VariantMap vm;
+        vm["scope"] = "scope-A";
+        vm["query_string"] = "foo";
+        vm["department_id"] = "dep1";
+
+        Query q(vm);
+        EXPECT_EQ("scope-A", q.scope_name());
+        EXPECT_EQ("foo", q.query_string());
+        EXPECT_EQ("dep1", q.department_id());
+    }
+}
+
 TEST(Query, exceptions)
 {
     EXPECT_THROW(Query(""), unity::InvalidArgumentException);
+    {
+        VariantMap vm;
+        try
+        {
+            // missing 'scope'
+            Query q(vm);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+        }
+
+        vm["scope"] = "";
+        try
+        {
+            // empty 'scope' not allowed
+            Query q(vm);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+        }
+
+        vm["scope"] = "scope-A";
+        try
+        {
+            Query q(vm);
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            FAIL();
+        }
+    }
 }

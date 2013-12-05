@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_ANNOTATIONOBJECTBASE_H
-#define UNITY_API_SCOPES_ANNOTATIONOBJECTBASE_H
+#ifndef UNITY_API_SCOPES_ANNOTATION_H
+#define UNITY_API_SCOPES_ANNOTATION_H
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
@@ -114,6 +114,12 @@ public:
      * \brief Returns number of hyperlinks assigned to this annotation.
      */
     unsigned int num_of_hyperlinks() const;
+
+    /**
+     * \brief Returns a hyperlink assigned to given position of this annotation. Throws InvalidArgumentException
+     * on invalid index.
+     * \returns hyperlink at given position
+     */
     Hyperlink::SCPtr hyperlink(unsigned int index) const;
 
     /**
