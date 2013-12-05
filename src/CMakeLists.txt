@@ -3,14 +3,14 @@ set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationObjectBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Annotation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Hyperlink.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlacementHint.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp

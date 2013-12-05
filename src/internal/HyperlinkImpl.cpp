@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2013 Canonical Ltd
+/* Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -30,25 +29,28 @@ namespace scopes
 namespace internal
 {
 
-HyperlinkImpl::HyperlinkImpl(Query const& query, PlacementHint const &placement)
-    : AnnotationObjectBaseImpl(placement),
-      query_(query)
+HyperlinkImpl::HyperlinkImpl(std::string const& label, Query const& query)
+    : label_(label),
+      query_(std::make_shared<Query>(query))
 {
 }
 
-Query HyperlinkImpl::canned_query() const
+std::string HyperlinkImpl::label() const
 {
-    return query_;
+    return label_;
 }
 
-void HyperlinkImpl::serialize(VariantMap& vm) const
+Query HyperlinkImpl::query() const
 {
-    vm["query"] = query_.serialize();
+    return *query_;
 }
 
-const char* HyperlinkImpl::type_string() const
+VariantMap HyperlinkImpl::serialize() const
 {
-    return "hyperlink";
+    VariantMap vm;
+    vm["label"] = label_;
+    vm["query"] = query_->serialize();
+    return vm;
 }
 
 } // namespace internal

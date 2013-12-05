@@ -1,4 +1,5 @@
-/* Copyright (C) 2013 Canonical Ltd
+/*
+ * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -15,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/AnnotationObjectBaseImpl.h>
+#include <scopes/FilterState.h>
 
 namespace unity
 {
@@ -26,33 +27,13 @@ namespace api
 namespace scopes
 {
 
-namespace internal
-{
-
-AnnotationObjectBaseImpl::AnnotationObjectBaseImpl(PlacementHint const& placement)
-    : placement_hint_(placement)
+void FilterState::store(FilterBase const& filter, Variant const& value)
 {
 }
 
-AnnotationObjectBaseImpl::~AnnotationObjectBaseImpl()
+Variant FilterState::get(FilterBase const& filter) const
 {
 }
-
-PlacementHint AnnotationObjectBaseImpl::placement_hint() const
-{
-    return placement_hint_;
-}
-
-VariantMap AnnotationObjectBaseImpl::serialize() const
-{
-    VariantMap vm;
-    vm["type"] = type_string();
-    vm["placement"] = placement_hint_.serialize();
-    serialize(vm);
-    return vm;
-}
-
-} // namespace internal
 
 } // namespace scopes
 

@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+
 #include <scopes/Hyperlink.h>
-#include <scopes/PlacementHint.h>
 #include <scopes/internal/HyperlinkImpl.h>
 
 namespace unity
@@ -29,19 +29,24 @@ namespace api
 namespace scopes
 {
 
-Hyperlink::Hyperlink(Query const& query, PlacementHint const &placement)
-    : AnnotationObjectBase(new internal::HyperlinkImpl(query, placement))
+Hyperlink::Hyperlink(std::string const& label, Query const& query)
+    : p(new internal::HyperlinkImpl(label, query))
 {
 }
 
-Query Hyperlink::canned_query() const
+std::string Hyperlink::label() const
 {
-    return fwd()->canned_query();
+    return p->label();
 }
 
-internal::HyperlinkImpl* Hyperlink::fwd() const
+Query Hyperlink::query() const
 {
-    return dynamic_cast<internal::HyperlinkImpl*>(p.get());
+    return p->query();
+}
+
+VariantMap Hyperlink::serialize() const
+{
+    return p->serialize();
 }
 
 } // namespace scopes

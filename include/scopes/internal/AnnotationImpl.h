@@ -16,13 +16,16 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ANNOTATIONOBJECTBASEIMPL_H
-#define UNITY_INTERNAL_ANNOTATIONOBJECTBASEIMPL_H
+#ifndef UNITY_INTERNAL_ANNOTATIONIMPL_H
+#define UNITY_INTERNAL_ANNOTATIONIMPL_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/PlacementHint.h>
 #include <scopes/Query.h>
 #include <scopes/Variant.h>
+#include <scopes/Annotation.h>
+#include <scopes/Hyperlink.h>
+#include <scopes/Category.h>
+#include <vector>
 
 namespace unity
 {
@@ -36,21 +39,30 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API AnnotationObjectBaseImpl
+class UNITY_API AnnotationImpl
 {
 public:
-    AnnotationObjectBaseImpl(PlacementHint const& placement);
-    virtual ~AnnotationObjectBaseImpl();
-    PlacementHint placement_hint() const;
-    virtual Query canned_query() const = 0;
-    virtual const char* type_string() const = 0;
+    AnnotationImpl(Annotation::AnnotationType annotation_type);
+    virtual ~AnnotationImpl();
+
+    void set_label(std::string const& label);
+    void set_icon(std::string const& icon);
+    void add_hyperlink(std::string const& label, Query const& query);
+    void set_category(Category::SCPtr category);
+    Category::SCPtr category() const;
+    std::string label() const;
+    std::string icon() const;
+    unsigned int num_of_hyperlinks() const;
+    Hyperlink::SCPtr hyperlink(unsigned int index) const;
+    Annotation::AnnotationType annotation_type() const;
     VariantMap serialize() const;
 
-protected:
-    virtual void serialize(VariantMap&) const = 0;
-
 private:
-    PlacementHint placement_hint_;
+    Annotation::AnnotationType annotation_type_;
+    std::string label_;
+    std::string icon_;
+    Category::SCPtr category_;
+    std::vector<Hyperlink::SCPtr> hyperlinks_;
 };
 
 } // namespace internal

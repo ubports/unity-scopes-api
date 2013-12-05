@@ -20,6 +20,7 @@
 #define UNITY_API_SCOPES_FILTERSTATE_H
 
 #include <unity/SymbolExport.h>
+#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -30,9 +31,13 @@ namespace api
 namespace scopes
 {
 
+class FilterBase;
+
 class UNITY_API FilterState final
 {
 public:
+    void store(FilterBase const& filter, Variant const& value);
+    Variant get(FilterBase const& filter) const;
 };
 
 } // namespace scopes

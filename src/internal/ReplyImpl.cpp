@@ -22,7 +22,7 @@
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/CategorisedResult.h>
-#include <scopes/AnnotationObjectBase.h>
+#include <scopes/Annotation.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
@@ -115,7 +115,7 @@ bool ReplyImpl::push(Category::SCPtr category)
     return push(var);
 }
 
-bool ReplyImpl::push(unity::api::scopes::AnnotationObjectBase const& result)
+bool ReplyImpl::push(unity::api::scopes::Annotation const& annotation)
 {
     //TODO
     return true;

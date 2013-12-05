@@ -19,8 +19,10 @@
 #ifndef UNITY_API_SCOPES_HYPERLINK_H
 #define UNITY_API_SCOPES_HYPERLINK_H
 
-#include <scopes/AnnotationObjectBase.h>
+#include <unity/SymbolExport.h>
+#include <unity/util/DefinesPtrs.h>
 #include <scopes/Query.h>
+#include <memory>
 
 namespace unity
 {
@@ -31,21 +33,28 @@ namespace api
 namespace scopes
 {
 
-class PlacementHint;
-
 namespace internal
 {
 class HyperlinkImpl;
+class AnnotationImpl;
 }
 
-class UNITY_API Hyperlink : public AnnotationObjectBase
+class UNITY_API Hyperlink final
 {
 public:
-    Hyperlink(Query const& query, PlacementHint const &placement);
-    Query canned_query() const override;
+    /// @cond
+    UNITY_DEFINES_PTRS(Hyperlink);
+    /// @endcond
 
+    std::string label() const;
+    Query query() const;
+
+    VariantMap serialize() const;
 private:
-    internal::HyperlinkImpl* fwd() const;
+    Hyperlink(std::string const& label, Query const& query);
+    std::shared_ptr<internal::HyperlinkImpl> p;
+
+    friend class internal::AnnotationImpl;
 };
 
 } // namespace scopes

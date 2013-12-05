@@ -3,7 +3,7 @@ add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationObjectBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
@@ -34,7 +34,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlacementHintImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp

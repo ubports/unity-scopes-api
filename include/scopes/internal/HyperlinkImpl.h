@@ -19,7 +19,10 @@
 #ifndef UNITY_INTERNAL_HYPERLINKIMPL_H
 #define UNITY_INTERNAL_HYPERLINKIMPL_H
 
-#include <scopes/internal/AnnotationObjectBaseImpl.h>
+#include <unity/SymbolExport.h>
+#include <string>
+#include <memory>
+#include <scopes/Query.h>
 
 namespace unity
 {
@@ -33,16 +36,17 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API HyperlinkImpl : public AnnotationObjectBaseImpl
+class UNITY_API HyperlinkImpl
 {
 public:
-    HyperlinkImpl(Query const& query, PlacementHint const &placement);
-    Query canned_query() const override;
-    void serialize(VariantMap& vm) const override;
-    const char* type_string() const override;
+    HyperlinkImpl(std::string const& label, Query const& query);
+    std::string label() const;
+    Query query() const;
+    VariantMap serialize() const;
 
 private:
-    const Query query_;
+    std::string label_;
+    std::shared_ptr<Query> query_;
 };
 
 } // namespace internal
