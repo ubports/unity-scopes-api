@@ -13,19 +13,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Michal Hruby <michal.hruby@canonical.com>
  */
 
-#include <scopes/internal/MiddlewareFactoryConfig.h>
+#ifndef SCOPES_CONFIG_H
+#define SCOPES_CONFIG_H
 
-#include <gtest/gtest.h>
+#define DEFAULT_RUNTIME "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini"
 
-using namespace std;
-using namespace unity::api::scopes::internal;
-
-TEST(MiddlewareFactoryConfig, basic)
-{
-    MiddlewareFactoryConfig c("Factory.ini");
-    EXPECT_EQ("Zmq.ini", c.zmq_configfile());
-    EXPECT_EQ("REST.ini", c.rest_configfile());
-}
+#endif

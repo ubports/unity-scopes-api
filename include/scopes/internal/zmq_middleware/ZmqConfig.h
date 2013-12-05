@@ -21,8 +21,6 @@
 
 #include <scopes/internal/ConfigBase.h>
 
-#include <mutex>
-
 namespace unity
 {
 
@@ -48,8 +46,7 @@ public:
 
 private:
     std::string public_dir_;
-    mutable std::string private_dir_;
-    mutable std::mutex mutex_;
+    std::string private_dir_;
 };
 
 } // namespace internal

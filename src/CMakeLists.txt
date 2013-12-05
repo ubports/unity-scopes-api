@@ -21,6 +21,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeExceptions.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Version.cpp
 )

@@ -26,7 +26,7 @@
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
-// basic test of CategorisedResultIem setters and getters
+// basic test of CategorisedResult setters and getters
 TEST(CategorisedResult, basic)
 {
     CategoryRegistry reg;
@@ -130,6 +130,15 @@ TEST(CategorisedResult, copy)
         EXPECT_EQ("dnd_uri b", copy.dnd_uri());
         EXPECT_EQ("xyz", copy.serialize()["attrs"].get_dict()["foo"].get_string());
         EXPECT_EQ("1", copy.category()->id());
+
+        CategorisedResult copy2(cat);
+        copy2 = copy;
+        EXPECT_EQ("uri b", copy2.uri());
+        EXPECT_EQ("title b", copy2.title());
+        EXPECT_EQ("icon b", copy2.art());
+        EXPECT_EQ("dnd_uri b", copy2.dnd_uri());
+        EXPECT_EQ("xyz", copy2.serialize()["attrs"].get_dict()["foo"].get_string());
+        EXPECT_EQ("1", copy2.category()->id());
     }
 }
 
@@ -181,7 +190,7 @@ TEST(CategorisedResult, serialize_excp)
 }
 
 // test exceptions with null category
-TEST(CategorisedResultItem, exceptions)
+TEST(CategorisedResult, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;

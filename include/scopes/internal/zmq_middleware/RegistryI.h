@@ -51,7 +51,7 @@ public:
     virtual ~RegistryI() noexcept;
 
 private:
-    virtual void find_(Current const& current,
+    virtual void get_metadata_(Current const& current,
                        capnp::ObjectPointer::Reader& in_params,
                        capnproto::Response::Builder& r);
 

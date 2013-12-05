@@ -43,7 +43,7 @@ class RuntimeImpl final : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(RuntimeImpl);
 
-    static UPtr create(std::string const& scope_name, std::string const& configfile = Runtime::DFLT_CONFIGFILE);
+    static UPtr create(std::string const& scope_name, std::string const& configfile = "");
     void destroy();
 
     std::string scope_name() const;

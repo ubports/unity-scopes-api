@@ -43,10 +43,16 @@ namespace
 ZmqConfig::ZmqConfig(string const& configfile) :
     ConfigBase(configfile)
 {
-    public_dir_ = get_string(ZMQ_CONFIG_GROUP, public_dir_str);
-
-    // Private directory is not needed by all processes. It is retrieved
-    // on demand during adapter creation.
+    if (configfile.empty())
+    {
+        public_dir_ = "/tmp";
+        private_dir_ = "/tmp";
+    }
+    else
+    {
+        public_dir_ = get_string(ZMQ_CONFIG_GROUP, public_dir_str);
+        private_dir_ = get_string(ZMQ_CONFIG_GROUP, private_dir_str);
+    }
 }
 
 ZmqConfig::~ZmqConfig() noexcept
@@ -60,11 +66,6 @@ string ZmqConfig::public_dir() const
 
 string ZmqConfig::private_dir() const
 {
-    lock_guard<mutex> lock(mutex_);
-    if (private_dir_.empty())    // Initialize first time only
-    {
-        private_dir_ = get_string(ZMQ_CONFIG_GROUP, private_dir_str);
-    }
     return private_dir_;
 }
 

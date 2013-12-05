@@ -39,7 +39,7 @@ class RuntimeConfig : public ConfigBase
 public:
     static const char* RUNTIME_CONFIG_GROUP;
 
-    RuntimeConfig(std::string const& configfile = Runtime::DFLT_CONFIGFILE);
+    RuntimeConfig(std::string const& configfile);
     ~RuntimeConfig() noexcept;
 
     std::string registry_identity() const;

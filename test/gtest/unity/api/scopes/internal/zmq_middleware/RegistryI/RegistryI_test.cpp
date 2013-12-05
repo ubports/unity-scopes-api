@@ -20,6 +20,8 @@
 
 #include <scopes/internal/RegistryConfig.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/ScopeMetadataImpl.h>
+#include <scopes/internal/ScopeImpl.h>
 #include <scopes/internal/UniqueID.h>
 #include <internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <scopes/ScopeExceptions.h>
@@ -37,33 +39,48 @@ using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 using namespace unity::api::scopes::internal::zmq_middleware;
 
-TEST(RegistryI, find)
+ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
-try
-{
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "Registry", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
-
-    string identity = runtime->registry_identity();
-    RegistryConfig c(identity, runtime->registry_configfile());
-    string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
-    string mw_configfile = c.mw_configfile();
-
-    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    RegistryObject::SPtr ro(make_shared<RegistryObject>());
-    auto registry = middleware->add_registry_object(identity, ro);
-    auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", proxy));
-
-    auto r = runtime->registry();
-    auto scope = r->find("scope1");
-    EXPECT_TRUE(scope.get());
+    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+    mi->set_scope_name(name);
+    mi->set_art("art " + name);
+    mi->set_display_name("display name " + name);
+    mi->set_description("description " + name);
+    mi->set_search_hint("search hint " + name);
+    mi->set_hot_key("hot key " + name);
+    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime());
+    mi->set_proxy(p);
+    return ScopeMetadataImpl::create(move(mi));
 }
-catch(unity::Exception const& e)
+
+TEST(RegistryI, get_metadata)
 {
-    cout << e.to_string() << endl;
-}
+    try
+    {
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create(
+            "Registry", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+
+        string identity = runtime->registry_identity();
+        RegistryConfig c(identity, runtime->registry_configfile());
+        string mw_kind = c.mw_kind();
+        string mw_endpoint = c.endpoint();
+        string mw_configfile = c.mw_configfile();
+
+        MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+        RegistryObject::SPtr ro(make_shared<RegistryObject>());
+        auto registry = middleware->add_registry_object(identity, ro);
+        auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
+        EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", p, middleware))));
+
+        auto r = runtime->registry();
+        auto scope = r->get_metadata("scope1");
+        EXPECT_EQ("scope1", scope.scope_name());
+    }
+    catch (unity::Exception const& e)
+    {
+        cerr << e.to_string() << endl;
+        FAIL();
+    }
 }
 
 TEST(RegistryI, list)
@@ -86,7 +103,7 @@ TEST(RegistryI, list)
     EXPECT_TRUE(scopes.empty());
 
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", proxy));
+    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
@@ -96,14 +113,14 @@ TEST(RegistryI, list)
     EXPECT_EQ(0, scopes.size());
 
     set<string> ids;
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        EXPECT_TRUE(ro->add(long_id, proxy));
+        EXPECT_TRUE(ro->add(long_id, move(make_meta(long_id, proxy, middleware))));
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(1000, scopes.size());
+    EXPECT_EQ(10, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);
@@ -132,11 +149,11 @@ TEST(RegistryI, add_remove)
     EXPECT_TRUE(scopes.empty());
 
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", proxy));
+    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
-    EXPECT_FALSE(ro->add("scope1", proxy));
+    EXPECT_FALSE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
 
     EXPECT_TRUE(ro->remove("scope1"));
     scopes = r->list();
@@ -144,14 +161,14 @@ TEST(RegistryI, add_remove)
     EXPECT_FALSE(ro->remove("scope1"));
 
     set<string> ids;
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        ro->add(long_id, proxy);
+        ro->add(long_id, move(make_meta(long_id, proxy, middleware)));
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(1000, scopes.size());
+    EXPECT_EQ(10, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);
@@ -175,24 +192,24 @@ TEST(RegistryI, exceptions)
     RegistryObject::SPtr ro(make_shared<RegistryObject>());
     auto registry = middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    ro->add("scope1", proxy);
+    ro->add("scope1", move(make_meta("scope1", proxy, middleware)));
 
     auto r = runtime->registry();
 
     try
     {
-        r->find("fred");
+        r->get_metadata("fred");
         FAIL();
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::find(): no such scope (name = fred)",
+        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
                   e.to_string());
     }
 
     try
     {
-        r->find("");
+        r->get_metadata("");
         FAIL();
     }
     catch (MiddlewareException const& e)
@@ -205,7 +222,7 @@ TEST(RegistryI, exceptions)
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        ro->add("", proxy);
+        ro->add("", move(make_meta("blah", proxy, middleware)));
         FAIL();
     }
     catch (InvalidArgumentException const& e)

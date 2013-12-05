@@ -22,31 +22,31 @@ using Cxx = import "/capnp/c++.capnp";
 
 $Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto::Registry");
 
-using ScopeDict = import "ScopeDict.capnp";
+using ValueDict = import "ValueDict.capnp";
 using Proxy = import "Proxy.capnp";
 
 # Registry interface
 #
 # Operations:
 #
-# Proxy find(string name) throws NotFoundException;
-# ScopeDict list();
+# ValueDict get_metadata(string name) throws NotFoundException;
+# map<string, ScopeMetadata> list();
 
 struct NotFoundException
 {
     name @0 : Text;
 }
 
-struct FindRequest
+struct GetMetadataRequest
 {
     name @0 : Text;
 }
 
-struct FindResponse
+struct GetMetadataResponse
 {
     response : union
     {
-        returnValue         @0 : Proxy.Proxy;
+        returnValue         @0 : ValueDict.ValueDict;
         notFoundException   @1 : NotFoundException;
     }
 }
@@ -57,5 +57,5 @@ struct ListRequest
 
 struct ListResponse
 {
-    returnValue @0 : ScopeDict.ScopeDict;
+    returnValue @0 : List(ValueDict.ValueDict);
 }

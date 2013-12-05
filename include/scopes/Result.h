@@ -78,7 +78,7 @@ public:
 
     /**
        \brief Returns a dictionary of all attributes of this Result instance.
-       \return dictionary of all base attributes and custom attributes set with add_metadata call.
+       \return Dictionary of all base attributes and custom attributes set with add_metadata call.
     */
     VariantMap serialize() const;
 
