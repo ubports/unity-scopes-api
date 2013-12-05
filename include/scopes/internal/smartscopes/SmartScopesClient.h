@@ -22,6 +22,8 @@
 #include <scopes/internal/smartscopes/HttpClientInterface.h>
 #include <scopes/internal/smartscopes/JsonParserInterface.h>
 
+#include <scopes/ResultItem.h>
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -48,13 +50,6 @@ struct RemoteScope
   bool invisible = false;
 };
 
-struct SmartScopeResult
-{
-/*{"category": {"renderer_template": "({\"template\":{\"renderer\":\"grid\",", "id": "cat1", "title": "Category 1"}}
-{"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}
-*/
-};
-
 class SmartScopesClient
 {
 public:
@@ -66,6 +61,12 @@ public:
       int port = 80 );
 
   std::vector< RemoteScope > get_remote_scopes();
+
+  std::future< std::vector< ResultItem > > search( const std::string& query,
+      const std::string& session_id, const std::string& query_id,
+      const std::string& platform, const std::string& locale = "",
+      const std::string& country = "", const std::string& latitude = "",
+      const std::string& longitude = "", const std::string& limit = "" );
 
 private:
   HttpClientInterface::SPtr http_client_;

@@ -45,7 +45,7 @@ public:
 
 public Q_SLOTS:
   void cancel();
-  void queryDone( QNetworkReply *reply );
+  void queryDone( QNetworkReply* reply );
 
 private:
   QUrl m_url;

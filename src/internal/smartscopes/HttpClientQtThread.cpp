@@ -66,7 +66,7 @@ QNetworkReply* HttpClientQtThread::getReply() const
   return m_reply;
 }
 
-void HttpClientQtThread::queryDone( QNetworkReply* )
+void HttpClientQtThread::queryDone( QNetworkReply* reply )
 {
   quit();
 }

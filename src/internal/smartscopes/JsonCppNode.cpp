@@ -30,7 +30,7 @@ JsonCppNode::JsonCppNode( std::string json_string )
 }
 
 JsonCppNode::JsonCppNode( const Json::Value& root )
-  : root_( root )
+    : root_( root )
 {
 }
 
@@ -110,7 +110,7 @@ bool JsonCppNode::get_node( const std::vector< std::string >& node_path, JsonNod
     return false;
   }
 
-  node = std::make_shared< JsonCppNode >( value_node );
+  node = std::make_shared < JsonCppNode > ( value_node );
   return true;
 }
 
@@ -123,7 +123,7 @@ bool JsonCppNode::get_node( int node_index, JsonNodeInterface::SPtr& node )
     return false;
   }
 
-  node = std::make_shared< JsonCppNode >( value_node );
+  node = std::make_shared < JsonCppNode > ( value_node );
   return true;
 }
 

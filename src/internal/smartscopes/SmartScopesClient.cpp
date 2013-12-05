@@ -22,6 +22,7 @@
 #include <iostream>
 #include <algorithm>
 
+using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
@@ -36,41 +37,13 @@ SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, Jso
 
 std::vector< RemoteScope > SmartScopesClient::get_remote_scopes()
 {
+  std::string response_str;
   std::future< std::string > response = http_client_->get( url_ + "/smartscopes/v2/remote-scopes", port_ );
   response.wait();
 
   try
   {
-    std::string response_str = response.get();
-    if( !json_node_->read_json( response_str ) )
-    {
-      std::cout << "failed to parse json response from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
-      return std::vector< RemoteScope >();
-    }
-
-    std::vector< RemoteScope > remote_scopes;
-    JsonNodeInterface::SPtr scope_node;
-    RemoteScope scope;
-    std::string value;
-
-    for( int i = 0; i < json_node_->size(); ++i )
-    {
-      json_node_->get_node( i, scope_node );
-
-      scope_node->get_value( {"name"}, value );
-      scope.name = value;
-
-      scope_node->get_value( {"search_url"}, value );
-      scope.search_url = value;
-
-      scope_node->get_value( {"invisible"}, value );
-      std::transform( value.begin(), value.end(), value.begin(), ::toupper );
-      scope.invisible = value == "TRUE";
-
-      remote_scopes.push_back( scope );
-    }
-
-    return remote_scopes;
+    response_str = response.get();
   }
   catch( std::exception e )
   {
@@ -78,4 +51,43 @@ std::vector< RemoteScope > SmartScopesClient::get_remote_scopes()
     std::cout << "error:" << e.what() << std::endl;
     return std::vector< RemoteScope >();
   }
+
+  if( !json_node_->read_json( response_str ) )
+  {
+    std::cout << "failed to parse json response from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
+    return std::vector< RemoteScope >();
+  }
+
+  std::vector< RemoteScope > remote_scopes;
+  JsonNodeInterface::SPtr scope_node;
+  RemoteScope scope;
+  std::string value;
+
+  for( int i = 0; i < json_node_->size(); ++i )
+  {
+    json_node_->get_node( i, scope_node );
+
+    scope_node->get_value( { "name" }, value );
+    scope.name = value;
+
+    scope_node->get_value( { "search_url" }, value );
+    scope.search_url = value;
+
+    scope_node->get_value( { "invisible" }, value );
+    std::transform( value.begin(), value.end(), value.begin(), ::toupper );
+    scope.invisible = value == "TRUE";
+
+    remote_scopes.push_back( scope );
+  }
+
+  return remote_scopes;
+}
+
+std::future< std::vector< ResultItem > > SmartScopesClient::search( const std::string& query,
+    const std::string& session_id, const std::string& query_id,
+    const std::string& platform, const std::string& locale,
+    const std::string& country, const std::string& latitude,
+    const std::string& longitude, const std::string& limit )
+{
+
 }

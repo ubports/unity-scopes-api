@@ -34,11 +34,11 @@ class SmartScopesClientTest : public Test
 {
 public:
   SmartScopesClientTest()
-    : http_client_( new HttpClientQt() ),
-      json_node_( new JsonCppNode() ),
-      ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
+      : http_client_( new HttpClientQt() ),
+        json_node_( new JsonCppNode() ),
+        ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
   {
-    system("killall -q FakeSss.py");
+    system( "killall -q FakeSss.py" );
   }
 
 protected:
@@ -49,7 +49,7 @@ protected:
 
 TEST_F( SmartScopesClientTest, remote_scopes )
 {
-  system("./FakeSss.py &");
+  system( "./FakeSss.py &" );
   std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
   std::vector< RemoteScope > scopes = ssc_.get_remote_scopes();
@@ -64,15 +64,15 @@ TEST_F( SmartScopesClientTest, remote_scopes )
   EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url );
   EXPECT_EQ( true, scopes[1].invisible );
 
-  system("killall -q FakeSss.py");
+  system( "killall -q FakeSss.py" );
 }
 
 TEST_F( SmartScopesClientTest, search )
 {
-  system("./FakeSss.py &");
+  system( "./FakeSss.py &" );
   std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
-  system("killall -q FakeSss.py");
+  system( "killall -q FakeSss.py" );
 }
 
 } // namespace
