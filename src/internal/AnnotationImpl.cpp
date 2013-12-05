@@ -156,7 +156,7 @@ VariantMap AnnotationImpl::serialize() const
 
     if (category_)
     {
-        vm["category"] = category_->id();
+        vm["cat_id"] = category_->id();
     }
     if (!label_.empty())
     {
