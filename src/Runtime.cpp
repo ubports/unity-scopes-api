@@ -64,7 +64,7 @@ RegistryProxy Runtime::registry() const
 
 void Runtime::run_scope(string const& scope_name, ScopeBase *const scope_base)
 {
-    auto mw = p->factory()->create(scope_name, "Zmq", "Zmq.Config");
+    auto mw = p->factory()->create(scope_name, "Zmq", "Zmq.ini");
 
     scope_base->start(scope_name, p->registry());
     // Ensure the scope gets stopped.

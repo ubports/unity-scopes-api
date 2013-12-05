@@ -16,15 +16,30 @@
  * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
+#include <iostream>
+
 #include <scopes/Runtime.h>
 #include <scopes/ScopeBase.h>
+#include <unity/UnityExceptions.h>
 
+using namespace std;
 using namespace unity::api::scopes;
+
+class TestQuery : public QueryBase
+{
+public:
+    virtual void cancelled() override
+    {
+    }
+    virtual void run(ReplyProxy const&) override
+    {
+    }
+};
 
 class TestScope : public ScopeBase
 {
 public:
-    virtual int start(std::string const&, RegistryProxy const &) override
+    virtual int start(string const&, RegistryProxy const &) override
     {
         return VERSION;
     }
@@ -37,15 +52,20 @@ public:
     {
     }
 
-    virtual QueryBase::UPtr create_query(std::string const &, VariantMap const &) override
+    virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override
     {
-        return nullptr;
+        QueryBase::UPtr query(new TestQuery());
+        return query;
     }
 };
 
 int main(int, char **argv) {
     auto rt = Runtime::create(argv[1]);
     TestScope scope;
-    rt->run_scope("TestScope", &scope);
+    try {
+        rt->run_scope("TestScope", &scope);
+    } catch (unity::Exception const &e) {
+        cerr << e.to_string() << std::endl;
+    }
     return 0;
 }
