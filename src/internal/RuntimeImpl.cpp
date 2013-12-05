@@ -21,6 +21,7 @@
 #include <scopes/internal/RegistryConfig.h>
 #include <scopes/internal/RegistryImpl.h>
 #include <scopes/internal/RuntimeConfig.h>
+#include <scopes/internal/UniqueID.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -49,7 +50,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
 {
     if (scope_name.empty())
     {
-        throw InvalidArgumentException("Cannot instantiate a run time with an empty scope name");
+        UniqueID id;
+        scope_name_ = "c-" + id.gen();
     }
 
     string config_file(configfile.empty() ? DEFAULT_RUNTIME : configfile);
@@ -65,7 +67,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         registry_identity_ = config.registry_identity();
         assert(!registry_identity_.empty());
 
-        middleware_ = middleware_factory_->create(scope_name, default_middleware, middleware_configfile);
+        middleware_ = middleware_factory_->create(scope_name_, default_middleware, middleware_configfile);
         middleware_->start();
 
         // Create the registry proxy.

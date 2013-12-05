@@ -19,14 +19,19 @@ This document describes data structures that are serialized and exchanged by
 middleware.
 -----------------------------------------------------------------------------
 
-ResultItem (returned by serialize()):
+CategorisedResult (returned by serialize()):
 =======================================
- 'uri' : string
- 'title' : string
- 'art' : string
- 'dnd_uri' : string
- 'cat_id' : string
- + any custom key-value attribute added by scope author.
+'attrs' : {
+    'uri' : string
+    'title' : string
+    'art' : string
+    'dnd_uri' : string
+    + any custom key-value attribute added by scope author.
+},
+'internal' : {
+    'cat_id' : string
+    'result' : dictionary (serialized Result), optional
+}
 
 Category (returned by serialize()):
 =====================================
@@ -50,4 +55,4 @@ ScopeMetadata (returned by serialize()):
 
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" key and serialized Category / ResultItem respectively.
+ result : ValueDict with "category" and/or "result" key and serialized Category / CategorisedResult respectively.

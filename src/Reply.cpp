@@ -17,7 +17,7 @@
  */
 
 #include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <scopes/internal/ReplyImpl.h>
@@ -57,7 +57,7 @@ Category::SCPtr Reply::lookup_category(std::string const& id) const
     return fwd()->lookup_category(id);
 }
 
-bool Reply::push(ResultItem const& result) const
+bool Reply::push(CategorisedResult const& result) const
 {
     return fwd()->push(result);
 }

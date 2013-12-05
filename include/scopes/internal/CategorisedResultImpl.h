@@ -13,12 +13,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/MiddlewareFactoryConfig.h>
+#ifndef UNITY_API_SCOPES_RESULTIMPL_H
+#define UNITY_API_SCOPES_RESULTIMPL_H
 
-using namespace std;
+#include <string>
+#include <memory>
+#include <scopes/internal/ResultImpl.h>
+#include <scopes/Category.h>
 
 namespace unity
 {
@@ -32,26 +36,24 @@ namespace scopes
 namespace internal
 {
 
-const char* MiddlewareFactoryConfig::MIDDLEWARE_FACTORY_CONFIG_GROUP = "MiddlewareFactory";
-
-MiddlewareFactoryConfig::MiddlewareFactoryConfig(string const& configfile) :
-    ConfigBase(configfile)
+class CategorisedResultImpl : public ResultImpl
 {
-}
+public:
+    explicit CategorisedResultImpl(Category::SCPtr category);
+    CategorisedResultImpl(CategorisedResultImpl const& other);
+    CategorisedResultImpl(Category::SCPtr category, VariantMap const& variant_map);
+    CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
 
-MiddlewareFactoryConfig::~MiddlewareFactoryConfig() noexcept
-{
-}
+    void set_category(Category::SCPtr category);
+    Category::SCPtr category() const;
 
-string MiddlewareFactoryConfig::zmq_configfile() const
-{
-    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "Zmq.ConfigFile");
-}
+protected:
+    void serialize_internal(VariantMap& var) const override;
 
-string MiddlewareFactoryConfig::rest_configfile() const
-{
-    return get_string(MIDDLEWARE_FACTORY_CONFIG_GROUP, "REST.ConfigFile");
-}
+private:
+    Category::SCPtr category_;
+};
+
 } // namespace internal
 
 } // namespace scopes
@@ -59,3 +61,6 @@ string MiddlewareFactoryConfig::rest_configfile() const
 } // namespace api
 
 } // namespace unity
+
+
+#endif

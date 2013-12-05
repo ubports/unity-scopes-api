@@ -44,7 +44,7 @@ public:
 };
 
 int main(int, char **argv) {
-    auto rt = Runtime::create("TestScope", argv[1]);
+    auto rt = Runtime::create(argv[1]);
     TestScope scope;
     rt->run_scope(&scope);
     return 0;

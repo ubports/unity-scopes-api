@@ -60,7 +60,7 @@ public:
     /// @endcond
 
     /**
-    \brief Instantiates the scopes run time for the scope with the given name and (optional) configuration file.
+    \brief Instantiates the scopes run time for a client with the given (optional) configuration file.
 
     The life time of the run time is under control of the caller. Letting the returned `unique_ptr` go out
     of scope shuts down the run time.
@@ -74,7 +74,7 @@ public:
     If configfile is the empty string, a default configuration is used.
     */
     // TODO: Update above to state what the default configuration is exactly
-    static UPtr create(std::string const& scope_name, std::string const& configfile = "");
+    static UPtr create(std::string const& configfile = "");
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
@@ -109,7 +109,7 @@ public:
     ~Runtime() noexcept;
 
 private:
-    Runtime(std::string const& scope_name, std::string const& configfile); // Instantiation only via create()
+    Runtime(std::string const& configfile); // Instantiation only via create()
 
     std::unique_ptr<internal::RuntimeImpl> p;
 };
