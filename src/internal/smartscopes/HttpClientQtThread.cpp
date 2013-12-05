@@ -22,7 +22,7 @@
 #include <QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QMutexLocker>
-#include <QDebug>
+#include <QTimer>
 
 HttpClientQtThread::HttpClientQtThread( const QUrl &url, const HttpHeadersList& headers )
     : QThread(),
@@ -44,7 +44,6 @@ HttpClientQtThread::~HttpClientQtThread()
 
 void HttpClientQtThread::run()
 {
-  qDebug( ) << "Remote request:" << m_url;
   QMutexLocker lock( &m_mutex ); // m_reply has to be locked till processing ends
 
   m_manager = new QNetworkAccessManager();
@@ -56,6 +55,9 @@ void HttpClientQtThread::run()
 
   connect( m_manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryDone(QNetworkReply *)) );
   m_reply = m_manager->get( request );
+
+  QTimer timeout;
+  timeout.singleShot( 2000, this, SLOT( cancel() ) );
 
   QThread::exec(); // enter event loop
 }
@@ -75,7 +77,6 @@ void HttpClientQtThread::cancel()
 {
   if( m_reply )
   {
-    qDebug( ) << "Search request canceled:" << m_url;
     m_reply->abort();
     quit();
   }

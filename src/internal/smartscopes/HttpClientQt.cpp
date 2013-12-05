@@ -77,8 +77,8 @@ std::future< std::string > HttpClientQt::get( const std::string& request_url, in
     if( !reply || reply->error() != QNetworkReply::NoError )
     {
       // communication error
-      std::cout << reply->errorString().toStdString();
-      promise_->set_value( "" );
+      std::runtime_error e( reply->errorString().toStdString() );
+      promise_->set_exception( make_exception_ptr( e ) );
     }
     else
     {

@@ -19,3 +19,6 @@ add_test(
 
   HttpClient_test
 )
+
+configure_file(GoodServer.py GoodServer.py)
+configure_file(BadServer.py BadServer.py)
