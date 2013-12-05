@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 #include <scopes/Annotation.h>
 #include <scopes/PlacementHint.h>
+#include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::api::scopes;
@@ -171,6 +172,25 @@ TEST(Annotation, serialize)
         EXPECT_EQ(1, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
-        auto qvm = linkvm["query"]; //TODO query deserialize
+        Query qout(linkvm["query"].get_dict());
+        EXPECT_EQ("scope-A", qout.scope_name());
+        EXPECT_EQ("foo", qout.query_string());
+        EXPECT_EQ("dep1", qout.department_id());
+    }
+}
+
+TEST(Annotation, copy)
+{
+    {
+        Query query("scope-A", "foo", "dep1");
+        Annotation annotation(Annotation::AnnotationType::GroupedHyperlink);
+        annotation.set_label("Group");
+        annotation.add_hyperlink("Link1", query);
+        Annotation copy(annotation);
+
+        EXPECT_EQ("Group", copy.label());
+        EXPECT_EQ(Annotation::AnnotationType::GroupedHyperlink, copy.annotation_type());
+        annotation.add_hyperlink("Link2", query);
+        EXPECT_EQ(1, copy.num_of_hyperlinks());
     }
 }

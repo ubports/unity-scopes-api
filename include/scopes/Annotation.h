@@ -64,6 +64,11 @@ public:
     Annotation(AnnotationType atype);
 
     /// @cond
+    Annotation(Annotation const &other);
+    Annotation(Annotation&&);
+    Annotation& operator=(Annotation const& other);
+    Annotation& operator=(Annotation&&);
+
     virtual ~Annotation();
     /// @endcond
 

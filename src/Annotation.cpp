@@ -35,6 +35,24 @@ Annotation::Annotation(AnnotationType atype)
 {
 }
 
+Annotation::Annotation(Annotation const &other)
+    : p(new internal::AnnotationImpl(*(other.p)))
+{
+}
+
+Annotation::Annotation(Annotation&&) = default;
+
+Annotation& Annotation::operator=(Annotation const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::AnnotationImpl(*(other.p)));
+    }
+    return *this;
+}
+
+Annotation& Annotation::operator=(Annotation&&) = default;
+
 Annotation::~Annotation()
 {
 }
