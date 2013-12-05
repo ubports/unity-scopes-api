@@ -17,6 +17,7 @@
  */
 
 #include <scopes/FilterState.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -29,10 +30,14 @@ namespace scopes
 
 void FilterState::store(FilterBase const& filter, Variant const& value)
 {
+    // TODO
+    throw LogicException("Not implemented");
 }
 
 Variant FilterState::get(FilterBase const& filter) const
 {
+    // TODO
+    throw LogicException("Not implemented");
 }
 
 } // namespace scopes
