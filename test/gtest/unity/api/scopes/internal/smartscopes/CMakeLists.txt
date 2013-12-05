@@ -1,3 +1,3 @@
 add_subdirectory(HttpClient)
-add_subdirectory(JsonParser)
+add_subdirectory(JsonNode)
 add_subdirectory(SmartScopesClient)

@@ -17,7 +17,7 @@
  */
 
 #include <scopes/internal/smartscopes/HttpClientQt.h>
-#include <scopes/internal/smartscopes/JsonCppParser.h>
+#include <scopes/internal/smartscopes/JsonCppNode.h>
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <gtest/gtest.h>
@@ -34,12 +34,12 @@ class SmartScopesClientTest : public Test
 public:
   SmartScopesClientTest()
     : http_client_( new HttpClientQt() ),
-      json_parser_( new JsonCppParser() ),
-      ssc_( http_client_, json_parser_, "http://127.0.0.1/", 9009 ) {}
+      json_node_( new JsonCppNode() ),
+      ssc_( http_client_, json_node_, "http://127.0.0.1/", 9009 ) {}
 
 protected:
   HttpClientInterface::SPtr http_client_;
-  JsonParserInterface::SPtr json_parser_;
+  JsonNodeInterface::SPtr json_node_;
   SmartScopesClient ssc_;
 };
 

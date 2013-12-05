@@ -39,24 +39,30 @@ namespace internal
 namespace smartscopes
 {
 
-class JsonParserInterface
+class JsonNodeInterface
 {
 public:
-  UNITY_DEFINES_PTRS(JsonParserInterface);
+  UNITY_DEFINES_PTRS(JsonNodeInterface);
 
-  JsonParserInterface() = default;
-  virtual ~JsonParserInterface() = default;
+  JsonNodeInterface() = default;
+  virtual ~JsonNodeInterface() = default;
 
   virtual void clear_json() = 0;
 
   virtual bool read_json( const std::string& json_string ) = 0;
   virtual bool write_json( std::string& json_string ) = 0;
 
+  virtual int size() = 0;
+
   virtual bool get_value( const std::vector< std::string >& value_path, std::string& value ) = 0;
-  virtual bool get_array( const std::vector< std::string >& array_path, std::vector< std::string >& array ) = 0;
+  virtual bool get_value( int value_index, std::string& value ) = 0;
+  virtual bool get_node( const std::vector< std::string >& node_path, JsonNodeInterface::SPtr& node ) = 0;
+  virtual bool get_node( int node_path, JsonNodeInterface::SPtr& node ) = 0;
 
   virtual bool set_value( const std::vector< std::string >& value_path, const std::string& value ) = 0;
-  virtual bool set_array( const std::vector< std::string >& array_path, const std::vector< std::string >& array ) = 0;
+  virtual bool set_value( int value_index, const std::string& value ) = 0;
+  virtual bool set_node( const std::vector< std::string >& node_path, const JsonNodeInterface::SPtr& node ) = 0;
+  virtual bool set_node( int node_path, const JsonNodeInterface::SPtr& node ) = 0;
 };
 
 } // namespace smartscopes

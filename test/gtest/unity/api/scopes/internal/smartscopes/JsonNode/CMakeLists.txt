@@ -3,19 +3,19 @@ include_directories(
 )
 
 add_executable(
-  JsonParser_test
+  JsonNode_test
 
-  JsonParser_test.cpp
+  JsonNode_test.cpp
 )
 
 target_link_libraries(
-  JsonParser_test
+  JsonNode_test
 
   ${TESTLIBS}
 )
 
 add_test(
-  JsonParser
+  JsonNode
 
-  JsonParser_test
+  JsonNode_test
 )

@@ -8,7 +8,7 @@ add_library(
     smartscopes
 
     HttpClientQt.cpp
-    JsonCppParser.cpp
+    JsonCppNode.cpp
 
     ${CMAKE_SOURCE_DIR}/include/scopes/internal/smartscopes/HttpClientQtThread.h
     HttpClientQtThread.cpp

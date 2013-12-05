@@ -22,10 +22,10 @@
 
 using namespace unity::api::scopes::internal::smartscopes;
 
-SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonParserInterface::SPtr json_parser,
+SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
     const std::string& url, int port )
     : http_client_( http_client ),
-      json_parser_( json_parser ),
+      json_node_( json_node ),
       url_( url ),
       port_( port )
 {

@@ -53,7 +53,7 @@ public:
   UNITY_DEFINES_PTRS(SmartScopesClient);
 
   SmartScopesClient( HttpClientInterface::SPtr http_client,
-      JsonParserInterface::SPtr json_parser,
+      JsonNodeInterface::SPtr json_node,
       const std::string& url = "https://ROOT/remote-scopes",
       int port = 80 );
 
@@ -61,7 +61,7 @@ public:
 
 private:
   HttpClientInterface::SPtr http_client_;
-  JsonParserInterface::SPtr json_parser_;
+  JsonNodeInterface::SPtr json_node_;
   std::string url_;
   int port_;
 };
