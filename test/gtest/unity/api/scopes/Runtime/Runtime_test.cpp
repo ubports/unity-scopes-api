@@ -20,8 +20,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <scopes/CategorisedResult.h>
+#include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/MWScope.h>
+#include <scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -35,6 +39,17 @@ TEST(Runtime, basic)
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
 }
+
+class Receiver : public ReceiverBase
+{
+public:
+    virtual void push(CategorisedResult) override
+    {
+    }
+    virtual void finished(ReceiverBase::Reason) override
+    {
+    }
+};
 
 TEST(Runtime, run_scope)
 {
@@ -50,9 +65,21 @@ TEST(Runtime, run_scope)
     }
 
     // Parent
-    auto rt = internal::RuntimeImpl::create("dash", "Runtime.ini");
+    try{
+
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get());
+
+    VariantMap hints;
+    auto receiver = make_shared<Receiver>();
+    auto ctrl = scope->create_query("test", hints, receiver);
+
+    } catch (unity::Exception const &e) {
+        cerr << e.to_string() << std::endl;
+        throw;
+    }
 
     kill(pid, SIGTERM);
 }

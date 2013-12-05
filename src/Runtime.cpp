@@ -36,8 +36,8 @@ namespace scopes
 
 //! @cond
 
-Runtime::Runtime(string const& configfile) :
-    p(internal::RuntimeImpl::create("", configfile))
+Runtime::Runtime(string const& scope_name, string const& configfile) :
+    p(internal::RuntimeImpl::create(scope_name, configfile))
 {
 }
 
@@ -49,8 +49,14 @@ Runtime::~Runtime() noexcept
 
 Runtime::UPtr Runtime::create(string const& configfile)
 {
-    return UPtr(new Runtime(configfile));
+    return UPtr(new Runtime("", configfile));
 }
+
+Runtime::UPtr Runtime::create_scope_runtime(string const& scope_name, string const& configfile)
+{
+    return UPtr(new Runtime(scope_name, configfile));
+}
+
 
 void Runtime::destroy()
 {
@@ -62,11 +68,11 @@ RegistryProxy Runtime::registry() const
     return p->registry();
 }
 
-void Runtime::run_scope(string const& scope_name, ScopeBase *const scope_base)
+void Runtime::run_scope(ScopeBase *const scope_base)
 {
-    auto mw = p->factory()->create(scope_name, "Zmq", "Zmq.ini");
+    auto mw = p->factory()->create(p->scope_name(), "Zmq", "Zmq.ini");
 
-    scope_base->start(scope_name, p->registry());
+    scope_base->start(p->scope_name(), p->registry());
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
 

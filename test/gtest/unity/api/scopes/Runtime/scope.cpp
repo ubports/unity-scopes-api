@@ -54,18 +54,18 @@ public:
 
     virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override
     {
-        QueryBase::UPtr query(new TestQuery());
-        return query;
+        return QueryBase::UPtr(new TestQuery());
     }
 };
 
 int main(int, char **argv) {
-    auto rt = Runtime::create(argv[1]);
+    auto rt = Runtime::create_scope_runtime("TestScope", argv[1]);
     TestScope scope;
     try {
-        rt->run_scope("TestScope", &scope);
+        rt->run_scope(&scope);
     } catch (unity::Exception const &e) {
         cerr << e.to_string() << std::endl;
+        throw;
     }
     return 0;
 }
