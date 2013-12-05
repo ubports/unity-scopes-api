@@ -36,15 +36,50 @@ protected:
   JsonNodeInterface::SPtr root_node_;
 };
 
-TEST_F( JsonNodeTest, basic )
+TEST_F( JsonNodeTest, flat_values )
 {
   std::string json_string = R"({
     "firstName": "John",
     "age": 25,
-    "human": true,
-    "address": {
-        "city": "New York"
-    },
+    "human": true
+  })";
+
+  std::string value;
+  JsonNodeInterface::SPtr node;
+
+  // parse json
+
+  EXPECT_TRUE( root_node_->read_json( json_string ) );
+  EXPECT_EQ( 3, root_node_->size() );
+
+  // get root value
+
+  EXPECT_TRUE( root_node_->get_value( {"firstName"}, value ) );
+  EXPECT_EQ( "John", value );
+
+  EXPECT_TRUE( root_node_->get_value( {"age"}, value ) );
+  EXPECT_EQ( "25", value );
+
+  EXPECT_TRUE( root_node_->get_value( {"human"}, value ) );
+  EXPECT_EQ( "true", value );
+
+  // try get invalid value
+
+  EXPECT_FALSE( root_node_->get_value( {"lastName"}, value ) );
+  EXPECT_EQ( "", value );
+
+  // add new root value
+
+  EXPECT_TRUE( root_node_->set_value( {"lastName"}, "Smith" ) );
+  EXPECT_EQ( 4, root_node_->size() );
+
+  EXPECT_TRUE( root_node_->get_value( {"lastName"}, value ) );
+  EXPECT_EQ( "Smith", value );
+}
+
+TEST_F( JsonNodeTest, array_values )
+{
+  std::string json_string = R"({
     "phoneNumbers": [
         "1234",
         "5678"
@@ -57,36 +92,7 @@ TEST_F( JsonNodeTest, basic )
   // parse json
 
   EXPECT_TRUE( root_node_->read_json( json_string ) );
-  EXPECT_EQ( 5, root_node_->size() );
-
-  // get root value
-
-  EXPECT_TRUE( root_node_->get_value( {"firstName"}, value ) );
-  EXPECT_EQ( "John", value );
-
-  // try get invalid value
-
-  EXPECT_FALSE( root_node_->get_value( {"lastName"}, value ) );
-  EXPECT_EQ( "", value );
-
-  // add new root value
-
-  EXPECT_TRUE( root_node_->set_value( {"lastName"}, "Smith" ) );
-  EXPECT_EQ( 6, root_node_->size() );
-
-  EXPECT_TRUE( root_node_->get_value( {"lastName"}, value ) );
-  EXPECT_EQ( "Smith", value );
-
-  // get other root values
-
-  EXPECT_TRUE( root_node_->get_value( {"age"}, value ) );
-  EXPECT_EQ( "25", value );
-
-  EXPECT_TRUE( root_node_->get_value( {"human"}, value ) );
-  EXPECT_EQ( "true", value );
-
-  EXPECT_TRUE( root_node_->get_value( {"address","city"}, value ) );
-  EXPECT_EQ( "New York", value );
+  EXPECT_EQ( 1, root_node_->size() );
 
   // get array values
 
@@ -113,9 +119,12 @@ TEST_F( JsonNodeTest, basic )
   EXPECT_EQ( "9101112", value );
 }
 
-TEST_F( JsonNodeTest, nested )
+TEST_F( JsonNodeTest, nested_values )
 {
   std::string json_string = R"({
+    "address": {
+          "city": "New York"
+      },
     "phoneNumbers": [
       {
         "type": "home",
@@ -134,9 +143,14 @@ TEST_F( JsonNodeTest, nested )
   // parse json
 
   EXPECT_TRUE( root_node_->read_json( json_string ) );
-  EXPECT_EQ( 1, root_node_->size() );
+  EXPECT_EQ( 2, root_node_->size() );
 
-  // get array values
+  // get nested value
+
+  EXPECT_TRUE( root_node_->get_value( {"address","city"}, value ) );
+  EXPECT_EQ( "New York", value );
+
+  // get nested array values
 
   EXPECT_TRUE( root_node_->get_node( {"phoneNumbers"}, node ) );
   EXPECT_EQ( 2, node->size() );

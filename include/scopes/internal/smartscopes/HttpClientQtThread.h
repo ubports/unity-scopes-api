@@ -50,7 +50,6 @@ public Q_SLOTS:
 private:
   QUrl m_url;
   HttpHeadersList m_headers;
-  mutable QMutex m_mutex;
   QNetworkReply *m_reply;
   QNetworkAccessManager *m_manager;
 };

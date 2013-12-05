@@ -43,8 +43,16 @@ namespace smartscopes
 
 struct RemoteScope
 {
+  std::string name;
   std::string search_url;
   bool invisible = false;
+};
+
+struct SmartScopeResult
+{
+/*{"category": {"renderer_template": "({\"template\":{\"renderer\":\"grid\",", "id": "cat1", "title": "Category 1"}}
+{"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}
+*/
 };
 
 class SmartScopesClient
@@ -54,7 +62,7 @@ public:
 
   SmartScopesClient( HttpClientInterface::SPtr http_client,
       JsonNodeInterface::SPtr json_node,
-      const std::string& url = "https://ROOT/remote-scopes",
+      const std::string& url = "https://productsearch.ubuntu.com",
       int port = 80 );
 
   std::vector< RemoteScope > get_remote_scopes();

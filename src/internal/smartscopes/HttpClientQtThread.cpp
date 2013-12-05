@@ -44,16 +44,15 @@ HttpClientQtThread::~HttpClientQtThread()
 
 void HttpClientQtThread::run()
 {
-  QMutexLocker lock( &m_mutex ); // m_reply has to be locked till processing ends
-
   m_manager = new QNetworkAccessManager();
+
   QNetworkRequest request( m_url );
   for( auto it = m_headers.begin(); it != m_headers.end(); it++ )
   {
     request.setRawHeader( ( *it ).first, ( *it ).second );
   }
 
-  connect( m_manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryDone(QNetworkReply *)) );
+  connect( m_manager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
   m_reply = m_manager->get( request );
 
   QTimer timeout;
@@ -64,11 +63,10 @@ void HttpClientQtThread::run()
 
 QNetworkReply* HttpClientQtThread::getReply() const
 {
-  QMutexLocker lock( &m_mutex );
   return m_reply;
 }
 
-void HttpClientQtThread::queryDone( QNetworkReply* /* reply */)
+void HttpClientQtThread::queryDone( QNetworkReply* )
 {
   quit();
 }

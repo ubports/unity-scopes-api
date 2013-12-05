@@ -20,4 +20,4 @@ add_test(
     SmartScopesClient_test
 )
 
-file(COPY FakeSss.py DESTINATION ./)
+configure_file(FakeSss.py FakeSss.py)
