@@ -42,17 +42,20 @@ class AnnotationImpl;
 }
 
 /**
- * \brief Handles a scope query hyperlink(s) that can be executed by user and result in a new search query.
+ * \brief Handles a scope query hyperlink(s) that result in a new search query when clicked by user.
  */
 class UNITY_API Annotation final
 {
 public:
+    /**
+     * \brief Enumeration of supported Annotation types
+     */
     enum AnnotationType
     {
-        Hyperlink,
-        GroupedHyperlink,
-        EmblemHyperlink,
-        Card
+        Hyperlink, //!< A simple hyperlink with just a label
+        GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
+        EmblemHyperlink, //!< A hyperlink with a label and an icon
+        Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
     };
 
     /**
@@ -60,7 +63,10 @@ public:
      * supported or required by that annotation.
      */
     Annotation(AnnotationType atype);
+
+    /// @cond
     virtual ~Annotation();
+    /// @endcond
 
     /**
      * \brief Sets a label for an annotation of AnnotationType::GroupedHyperlink type.
@@ -126,7 +132,10 @@ public:
      * \brief Returns the type of this annotation.
      */
     AnnotationType annotation_type() const;
+
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 private:
     std::shared_ptr<internal::AnnotationImpl> p;
