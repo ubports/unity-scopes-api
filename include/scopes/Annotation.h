@@ -62,7 +62,7 @@ public:
      * \brief Creates annotation of given type. AnnotationType imposes attributes that are
      * supported or required by that annotation.
      */
-    Annotation(AnnotationType atype);
+    explicit Annotation(AnnotationType atype);
 
     /// @cond
     Annotation(Annotation const &other);

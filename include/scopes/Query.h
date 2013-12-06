@@ -55,7 +55,7 @@ public:
     /**
      * \brief Creates a query for given scope with empty query string.
      */
-    Query(std::string const& scope_name);
+    explicit Query(std::string const& scope_name);
 
     /**
      * \brief Creates a query for given scope with specific query string and in given department.
@@ -65,7 +65,7 @@ public:
     /**
      * \brief Restores a Query object from a variant created by Query::serialize().
      */
-    Query(VariantMap const& variant);
+    explicit Query(VariantMap const& variant);
 
     /// @cond
     Query(Query const &other);

@@ -43,7 +43,7 @@ class CategoryRegistry;
 class UNITY_API AnnotationImpl
 {
 public:
-    AnnotationImpl(Annotation::AnnotationType annotation_type);
+    explicit AnnotationImpl(Annotation::AnnotationType annotation_type);
     AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
     virtual ~AnnotationImpl();
 

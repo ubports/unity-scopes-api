@@ -42,9 +42,9 @@ namespace internal
 class QueryImpl
 {
 public:
-    QueryImpl(std::string const& scope_name);
+    explicit QueryImpl(std::string const& scope_name);
     QueryImpl(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
-    QueryImpl(VariantMap const& variant);
+    explicit QueryImpl(VariantMap const& variant);
     QueryImpl(QueryImpl const &other) = default;
     QueryImpl(QueryImpl&&) = default;
     QueryImpl& operator=(QueryImpl const& other) = default;
