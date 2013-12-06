@@ -107,7 +107,10 @@ void ZmqMiddleware::start()
         {
             // TODO: get directory from config
             // TODO: get pool size from config
-            invokers_.reset(new ThreadPool(1));
+            {
+                lock_guard<mutex> lock(data_mutex_);
+                invokers_.reset(new ThreadPool(1));
+            }
             state_ = Started;
             state_changed_.notify_all();
             break;
@@ -138,7 +141,11 @@ void ZmqMiddleware::stop()
         }
         case Started:
         {
-            invokers_.reset();          // No more outgoing invocations
+            {
+                lock_guard<mutex> lock(data_mutex_);
+                // No more outgoing invocations
+                invokers_.reset();
+            }
             for (auto& pair : am_)
             {
                 pair.second->shutdown();
@@ -335,10 +342,19 @@ zmqpp::context* ZmqMiddleware::context() const noexcept
     return const_cast<zmqpp::context*>(&context_);
 }
 
-ThreadPool* ZmqMiddleware::invoke_pool() const noexcept
+ThreadPool* ZmqMiddleware::invoke_pool()
 {
-    lock_guard<mutex> lock(mutex_);
-    assert(invokers_);
+    lock(state_mutex_, data_mutex_);
+    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
+    if (state_ == Starting)
+    {
+        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
+    }
+    if (state_ == Stopped)
+    {
+        throw MiddlewareException("Cannot invoke operations while middleware is stopped");
+    }
     return invokers_.get();
 }
 
@@ -360,7 +376,7 @@ bool has_suffix(string const& s, string const& suffix)
 
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir)
 {
-    lock_guard<mutex> lock(mutex_);
+    lock_guard<mutex> lock(data_mutex_);
 
     auto it = am_.find(name);
     if (it != am_.end())

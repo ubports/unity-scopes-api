@@ -74,7 +74,7 @@ public:
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) override;
 
     zmqpp::context* context() const noexcept;
-    ThreadPool* invoke_pool() const noexcept;
+    ThreadPool* invoke_pool();
 
 private:
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
@@ -90,14 +90,14 @@ private:
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
     std::unique_ptr<ThreadPool> invokers_;
-    mutable std::mutex mutex_;
+    mutable std::mutex data_mutex_;             // Protects am_ and invokers_
 
     UniqueID unique_id_;
 
     enum State { Stopped, Starting, Started };
     State state_;
     std::condition_variable state_changed_;
-    std::mutex state_mutex_;
+    mutable std::mutex state_mutex_;            // Protects state_
 
     ZmqConfig config_;
 };
