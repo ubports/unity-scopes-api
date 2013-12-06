@@ -16,11 +16,11 @@
  * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
-#include <iostream>
-
+#include <scopes/Category.h>
+#include <scopes/CategorisedResult.h>
+#include <scopes/Reply.h>
 #include <scopes/Runtime.h>
 #include <scopes/ScopeBase.h>
-#include <unity/UnityExceptions.h>
 
 using namespace std;
 using namespace unity::api::scopes;
@@ -31,8 +31,15 @@ public:
     virtual void cancelled() override
     {
     }
-    virtual void run(ReplyProxy const&) override
+    virtual void run(ReplyProxy const& reply) override
     {
+        auto cat = reply->register_category("cat1", "Category 1", "");
+        CategorisedResult res(cat);
+        res.set_uri("uri");
+        res.set_title("title");
+        res.set_art("art");
+        res.set_dnd_uri("dnd_uri");
+        reply->push(res);
     }
 };
 
@@ -61,11 +68,6 @@ public:
 int main(int, char **argv) {
     auto rt = Runtime::create_scope_runtime("TestScope", argv[1]);
     TestScope scope;
-    try {
-        rt->run_scope(&scope);
-    } catch (unity::Exception const &e) {
-        cerr << e.to_string() << std::endl;
-        throw;
-    }
+    rt->run_scope(&scope);
     return 0;
 }

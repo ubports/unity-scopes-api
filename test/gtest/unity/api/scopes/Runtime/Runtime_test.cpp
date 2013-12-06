@@ -20,6 +20,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <mutex>
+
 #include <scopes/CategorisedResult.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Runtime.h>
@@ -43,12 +45,33 @@ TEST(Runtime, basic)
 class Receiver : public ReceiverBase
 {
 public:
-    virtual void push(CategorisedResult) override
+    virtual void push(CategorisedResult result) override
     {
+        EXPECT_EQ("uri", result.uri());
+        EXPECT_EQ("title", result.title());
+        EXPECT_EQ("art", result.art());
+        EXPECT_EQ("dnd_uri", result.dnd_uri());
+        count_++;
     }
-    virtual void finished(ReceiverBase::Reason) override
+    virtual void finished(ReceiverBase::Reason reason) override
     {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(1, count_);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
     }
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+    int count_;
 };
 
 TEST(Runtime, run_scope)
@@ -64,22 +87,17 @@ TEST(Runtime, run_scope)
         FAIL();
     }
 
-    // Parent
-    try{
-
+    // Parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get());
 
     VariantMap hints;
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->create_query("test", hints, receiver);
-
-    } catch (unity::Exception const &e) {
-        cerr << e.to_string() << std::endl;
-        throw;
-    }
+    receiver->wait_until_finished();
 
     kill(pid, SIGTERM);
 }
