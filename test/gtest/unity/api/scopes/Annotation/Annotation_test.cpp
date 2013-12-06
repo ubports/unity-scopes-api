@@ -18,7 +18,6 @@
 
 #include <gtest/gtest.h>
 #include <scopes/Annotation.h>
-#include <scopes/PlacementHint.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <scopes/internal/AnnotationImpl.h>

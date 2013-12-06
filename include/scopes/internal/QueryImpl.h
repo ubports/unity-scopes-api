@@ -57,6 +57,7 @@ public:
     std::string scope_name() const;
     std::string department_id() const;
     std::string query_string() const;
+    FilterState filter_state() const;
     VariantMap serialize() const;
     std::string to_string() const;
     static Query from_string();

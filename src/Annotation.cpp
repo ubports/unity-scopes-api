@@ -17,7 +17,6 @@
  */
 
 #include <scopes/Annotation.h>
-#include <scopes/PlacementHint.h>
 #include <scopes/internal/AnnotationImpl.h>
 
 namespace unity

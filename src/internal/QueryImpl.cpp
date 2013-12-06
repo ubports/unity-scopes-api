@@ -116,6 +116,11 @@ std::string QueryImpl::query_string() const
     return query_string_;
 }
 
+FilterState QueryImpl::filter_state() const
+{
+    return filter_state_;
+}
+
 VariantMap QueryImpl::serialize() const
 {
     VariantMap vm;
