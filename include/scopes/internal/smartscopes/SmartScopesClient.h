@@ -22,8 +22,6 @@
 #include <scopes/internal/smartscopes/HttpClientInterface.h>
 #include <scopes/internal/smartscopes/JsonParserInterface.h>
 
-#include <scopes/ResultItem.h>
-
 #include <string>
 #include <vector>
 #include <memory>

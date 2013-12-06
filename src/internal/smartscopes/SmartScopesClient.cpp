@@ -18,9 +18,10 @@
 
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
+#include <algorithm>
 #include <future>
 #include <iostream>
-#include <algorithm>
+#include <map>
 
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
