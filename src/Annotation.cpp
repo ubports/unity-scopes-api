@@ -17,6 +17,7 @@
  */
 
 #include <scopes/Annotation.h>
+#include <scopes/Query.h>
 #include <scopes/internal/AnnotationImpl.h>
 
 namespace unity

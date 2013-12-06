@@ -23,6 +23,7 @@
 #include <unity/util/DefinesPtrs.h>
 #include <scopes/Query.h>
 #include <scopes/Variant.h>
+#include <string>
 #include <memory>
 
 namespace unity

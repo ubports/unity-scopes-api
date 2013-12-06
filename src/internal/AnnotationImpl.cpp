@@ -17,6 +17,7 @@
 
 #include <scopes/internal/AnnotationImpl.h>
 #include <scopes/internal/CategoryRegistry.h>
+#include <scopes/Hyperlink.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 #include <cassert>

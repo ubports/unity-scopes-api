@@ -21,7 +21,6 @@
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
-#include <scopes/Query.h>
 #include <scopes/Hyperlink.h>
 #include <scopes/Category.h>
 #include <memory>
@@ -34,6 +33,7 @@ namespace api
 
 namespace scopes
 {
+class Query;
 
 namespace internal
 {
