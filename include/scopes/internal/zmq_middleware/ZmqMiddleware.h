@@ -85,18 +85,19 @@ private:
                       std::shared_ptr<ServantBase> const& servant);
 
     std::string server_name_;
+    zmqpp::context context_;
 
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
-
     std::unique_ptr<ThreadPool> invokers_;
     mutable std::mutex mutex_;
-    zmqpp::context context_;
+
     UniqueID unique_id_;
 
     enum State { Stopped, Starting, Started };
     State state_;
     std::condition_variable state_changed_;
+    std::mutex state_mutex_;
 
     ZmqConfig config_;
 };
