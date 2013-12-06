@@ -18,7 +18,7 @@
 
 #include <scopes/Registry.h>
 #include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
@@ -44,7 +44,7 @@ public:
         cout << "received category: id=" << category->id() << endl;
     }
 
-    virtual void push(ResultItem result) override
+    virtual void push(CategorisedResult result) override
     {
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try
@@ -128,15 +128,15 @@ public:
         scope_name_ = scope_name;
 
         // Lock up scopes C and D in the registry and remember their proxies.
-        scope_c_ = registry->find("scope-C");
-        scope_d_ = registry->find("scope-D");
+        auto meta_c = registry->get_metadata("scope-C");
+        scope_c_ = meta_c.proxy();
+        auto meta_d = registry->get_metadata("scope-D");
+        scope_d_ = meta_d.proxy();
 
         return VERSION;
     }
 
     virtual void stop() override {}
-
-    virtual void run() override {}
 
     virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
     {

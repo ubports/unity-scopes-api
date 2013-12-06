@@ -1,2 +1,0 @@
-[MiddlewareFactory]
-Zmq.Configfile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini

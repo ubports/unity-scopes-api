@@ -18,7 +18,7 @@
 
 #include <scopes/ScopeBase.h>
 #include <scopes/Reply.h>
-#include <scopes/ResultItem.h>
+#include <scopes/CategorisedResult.h>
 #include <scopes/Category.h>
 #include <scopes/CategoryRenderer.h>
 
@@ -57,7 +57,7 @@ public:
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
         auto cat = reply->register_category("cat1", "Category 1", "", renderer_);
-        ResultItem result(cat);
+        CategorisedResult result(cat);
         result.set_title("scope-slow: result 1 for query \"" + query_ + "\"");
         reply->push(result);
         cout << "scope-slow: query \"" << query_ << "\" complete" << endl;
@@ -77,7 +77,6 @@ public:
     }
 
     virtual void stop() override {}
-    virtual void run() override {}
 
     virtual QueryBase::UPtr create_query(string const& q, VariantMap const& hints) override
     {

@@ -19,9 +19,11 @@
 #include <scopes/internal/zmq_middleware/ZmqRegistry.h>
 
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/ScopeImpl.h>
+#include <scopes/internal/ScopeMetadataImpl.h>
 #include <scopes/ScopeExceptions.h>
 
 #include <capnp/message.h>
@@ -47,7 +49,7 @@ namespace zmq_middleware
 
 interface Scope;
 
-dictionary<string, Scope*> ScopeDictMap;
+dictionary<string, ScopeMetadata> MetadataMap;
 
 exception NotFoundException
 {
@@ -56,7 +58,7 @@ exception NotFoundException
 
 interface Registry
 {
-    Scope* find(string name) throws NotFoundException;
+    ScopeMetadata get_metadata(string name) throws NotFoundException;
     ScopeDict list();
 };
 
@@ -73,11 +75,11 @@ ZmqRegistry::~ZmqRegistry() noexcept
 {
 }
 
-ScopeProxy ZmqRegistry::find(std::string const& scope_name)
+ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
 {
     capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "find");
-    auto in_params = request.initInParams().getAs<capnproto::Registry::FindRequest>();
+    auto request = make_request_(request_builder, "get_metadata");
+    auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
     in_params.setName(scope_name.c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
@@ -88,28 +90,30 @@ ScopeProxy ZmqRegistry::find(std::string const& scope_name)
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto find_response = response.getPayload().getAs<capnproto::Registry::FindResponse>().getResponse();
-    switch (find_response.which())
+    auto get_metadata_response = response.getPayload().getAs<capnproto::Registry::GetMetadataResponse>().getResponse();
+    switch (get_metadata_response.which())
     {
-        case capnproto::Registry::FindResponse::Response::RETURN_VALUE:
+        case capnproto::Registry::GetMetadataResponse::Response::RETURN_VALUE:
         {
-            auto proxy = find_response.getReturnValue();
-            ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-            return ScopeImpl::create(p, mw_base()->runtime());
+            auto md = get_metadata_response.getReturnValue();
+            VariantMap m = to_variant_map(md);
+            unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
+            smdi->deserialize(m);
+            return ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
         }
-        case capnproto::Registry::FindResponse::Response::NOT_FOUND_EXCEPTION:
+        case capnproto::Registry::GetMetadataResponse::Response::NOT_FOUND_EXCEPTION:
         {
-            auto ex = find_response.getNotFoundException();
-            throw NotFoundException("Registry::find(): no such scope", ex.getName().cStr());
+            auto ex = get_metadata_response.getNotFoundException();
+            throw NotFoundException("Registry::get_metadata(): no such scope", ex.getName().cStr());
         }
         default:
         {
-            throw MiddlewareException("Registry::find(): unknown user exception");
+            throw MiddlewareException("Registry::get_metadata(): unknown user exception");
         }
     }
 }
 
-ScopeMap ZmqRegistry::list()
+MetadataMap ZmqRegistry::list()
 {
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
@@ -123,13 +127,16 @@ ScopeMap ZmqRegistry::list()
     throw_if_runtime_exception(response);
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
-    auto pairs = list_response.getReturnValue().getPairs();
-    ScopeMap sm;
-    for (size_t i = 0; i < pairs.size(); ++i)
+    auto list = list_response.getReturnValue();
+    MetadataMap sm;
+    for (size_t i = 0; i < list.size(); ++i)
     {
-        auto proxy = pairs[i].getScopeProxy();
-        ZmqScopeProxy p(new ZmqScope(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-        sm[pairs[i].getName().cStr()] = ScopeImpl::create(p, mw_base()->runtime());
+        VariantMap m = to_variant_map(list[i]);
+        string scope_name = m["scope_name"].get_string();
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
+        smdi->deserialize(m);
+        ScopeMetadata d(ScopeMetadataImpl::create(move(smdi)));
+        sm.emplace(make_pair(move(scope_name), move(d)));
     }
     return sm;
 }

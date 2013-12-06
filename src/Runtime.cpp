@@ -31,8 +31,6 @@ namespace api
 namespace scopes
 {
 
-constexpr char const* Runtime::DFLT_CONFIGFILE;
-
 //! @cond
 
 Runtime::Runtime(string const& scope_name, string const& configfile) :
@@ -46,10 +44,16 @@ Runtime::~Runtime() noexcept
 
 //! @endcond
 
-Runtime::UPtr Runtime::create(string const& scope_name, string const& configfile)
+Runtime::UPtr Runtime::create(string const& configfile)
+{
+    return UPtr(new Runtime("", configfile));
+}
+
+Runtime::UPtr Runtime::create_scope_runtime(string const& scope_name, string const& configfile)
 {
     return UPtr(new Runtime(scope_name, configfile));
 }
+
 
 void Runtime::destroy()
 {
@@ -59,6 +63,11 @@ void Runtime::destroy()
 RegistryProxy Runtime::registry() const
 {
     return p->registry();
+}
+
+void Runtime::run_scope(ScopeBase *const scope_base)
+{
+    p->run_scope(scope_base);
 }
 
 } // namespace scopes

@@ -43,7 +43,7 @@ RegistryObject::~RegistryObject() noexcept
 {
 }
 
-MWScopeProxy RegistryObject::find(std::string const& scope_name)
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -56,33 +56,34 @@ MWScopeProxy RegistryObject::find(std::string const& scope_name)
     auto const& it = scopes_.find(scope_name);
     if (it == scopes_.end())
     {
-        throw NotFoundException("Registry::find(): no such scope",  scope_name);
+        throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
     }
     return it->second;
 }
 
-RegistryObject::MWScopeMap RegistryObject::list()
+MetadataMap RegistryObject::list()
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return scopes_;
 }
 
-bool RegistryObject::add(std::string const& scope_name, MWScopeProxy const& scope)
+bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
 {
-    // TODO: also check for names containing a slash, because that won't work if we use
-    //       the name for a socket in the file system.
     if (scope_name.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
     }
+    // TODO: check for names containing a slash, because that won't work if we use
+    //       the name for a socket in the file system.
 
     lock_guard<decltype(mutex_)> lock(mutex_);
 
-    auto const& pair = scopes_.insert(make_pair(scope_name, scope));
+    auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
     if (!pair.second)
     {
+        // Replace already existing entry with this one
         scopes_.erase(pair.first);
-        scopes_.insert(make_pair(scope_name, scope));
+        scopes_.insert(make_pair(scope_name, metadata));
         return false;
     }
     return true;

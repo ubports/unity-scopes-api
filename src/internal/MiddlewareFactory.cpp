@@ -18,8 +18,6 @@
 
 #include <scopes/internal/MiddlewareFactory.h>
 
-// #include <scopes/internal/ice_middleware/IceMiddleware.h>
-#include <scopes/internal/MiddlewareFactoryConfig.h>
 #include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <scopes/ScopeExceptions.h>
 
@@ -40,19 +38,10 @@ namespace scopes
 namespace internal
 {
 
-MiddlewareFactory::MiddlewareFactory(string const& configfile, RuntimeImpl* runtime) :
+MiddlewareFactory::MiddlewareFactory(RuntimeImpl* runtime) :
     runtime_(runtime)
 {
     assert(runtime);
-
-    try
-    {
-        MiddlewareFactoryConfig config(configfile);
-    }
-    catch (unity::Exception const& e)
-    {
-        throw ConfigException("cannot instantiate MiddlewareFactory: config file: " + configfile);
-    }
 }
 
 MiddlewareFactory::~MiddlewareFactory() noexcept

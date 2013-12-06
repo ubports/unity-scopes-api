@@ -45,14 +45,28 @@ RegistryImpl::~RegistryImpl() noexcept
 {
 }
 
-ScopeProxy RegistryImpl::find(std::string const& scope_name)
+ScopeMetadata RegistryImpl::get_metadata(std::string const& scope_name)
 {
-    return fwd()->find(scope_name);
+    return fwd()->get_metadata(scope_name);
 }
 
-ScopeMap RegistryImpl::list()
+MetadataMap RegistryImpl::list()
 {
     return fwd()->list();
+}
+
+MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)
+{
+    auto scope_map = list();
+    MetadataMap matching_entries;
+    for (auto& pair : scope_map)
+    {
+        if (predicate(pair.second))
+        {
+            matching_entries.emplace(pair);
+        }
+    }
+    return matching_entries;
 }
 
 RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)

@@ -44,6 +44,16 @@ namespace zmq_middleware
 
 #define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
 
+ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+    MWObjectProxy(mw_base),
+    endpoint_(endpoint),
+    identity_(identity),
+    type_(Unknown)
+{
+    assert(!endpoint.empty());
+    assert(!identity.empty());
+}
+
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, RequestType t) :
     MWObjectProxy(mw_base),
     endpoint_(endpoint),
@@ -52,6 +62,7 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, s
 {
     assert(!endpoint.empty());
     assert(!identity.empty());
+    assert(t != Unknown);
 }
 
 ZmqObjectProxy::~ZmqObjectProxy() noexcept

@@ -22,7 +22,6 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/IniParser.h>
 
-#include <sstream>
 
 using namespace std;
 
@@ -38,24 +37,30 @@ namespace scopes
 namespace internal
 {
 
+// If configfile is the empty string, we create a default instance that returns "Zmq" for the middleware
+// and throws for the other methods.
+
 ConfigBase::ConfigBase(string const& configfile) :
-    parser_(make_shared<util::IniParser>(configfile.c_str())),
     configfile_(configfile)
 {
+    if (!configfile.empty())
+    {
+        parser_ = make_shared<util::IniParser>(configfile.c_str());
+    }
 }
 
 ConfigBase::~ConfigBase() noexcept
 {
 }
 
-shared_ptr<util::IniParser> ConfigBase::parser() const noexcept
+util::IniParser::SPtr ConfigBase::parser() const noexcept
 {
-    return parser_;
+    return p();
 }
 
 string ConfigBase::get_string(string const& group, string const& key) const
 {
-    string val = parser_->get_string(group, key);
+    string val = p()->get_string(group, key);
     if (val.empty())
     {
         throw_ex("Illegal empty value for " + key);
@@ -67,7 +72,7 @@ string ConfigBase::get_optional_string(string const& group, string const& key) c
 {
     try
     {
-        return parser_->get_string(group, key);
+        return p()->get_string(group, key);
     }
     catch (unity::LogicException const&)
     {
@@ -77,6 +82,10 @@ string ConfigBase::get_optional_string(string const& group, string const& key) c
 
 string ConfigBase::get_middleware(string const& group, string const& key) const
 {
+    if (!parser_)
+    {
+        return "Zmq";
+    }
     string val = get_string(group, key);
     if (val != "Zmq" && val != "REST")
     {
@@ -88,9 +97,17 @@ string ConfigBase::get_middleware(string const& group, string const& key) const
 
 void ConfigBase::throw_ex(string const& reason) const
 {
-    ostringstream s;
-    s << "\"" << configfile_ << "\": " << reason;
-    throw ConfigException(s.str());
+    string s = "\"" + configfile_ + "\": " + reason;
+    throw ConfigException(s);
+}
+
+util::IniParser::SPtr ConfigBase::p() const
+{
+    if (!parser_)
+    {
+        throw LogicException("ConfigBase: no parser available with default config");
+    }
+    return parser_;
 }
 
 } // namespace internal

@@ -49,6 +49,16 @@ Proxy ObjectProxyImpl::create(MWProxy const&)
     return make_shared<ObjectProxy>();
 }
 
+string ObjectProxyImpl::identity() const
+{
+    return mw_proxy_->identity();
+}
+
+string ObjectProxyImpl::endpoint() const
+{
+    return mw_proxy_->endpoint();
+}
+
 MWProxy ObjectProxyImpl::proxy() const
 {
     return mw_proxy_;

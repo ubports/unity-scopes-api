@@ -1,1 +1,3 @@
 [ScopeConfig]
+DisplayName = scope-N.DisplayName
+Description = scope-N.Description

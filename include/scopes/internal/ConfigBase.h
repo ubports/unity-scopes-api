@@ -41,6 +41,7 @@ namespace internal
 class ConfigBase
 {
 public:
+    ConfigBase();
     ConfigBase(std::string const& configfile);
     virtual ~ConfigBase() noexcept;
 
@@ -53,6 +54,7 @@ public:
     virtual void throw_ex(::std::string const& reason) const;
 
 private:
+    unity::util::IniParser::SPtr p() const;
     unity::util::IniParser::SPtr parser_;
     std::string configfile_;
 };

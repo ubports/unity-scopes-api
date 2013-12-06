@@ -12,7 +12,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactoryConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQueryCtrl.cpp
@@ -30,14 +29,18 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ResultItemImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
+
+configure_file(config.h.in ${CMAKE_BINARY_DIR}/include/config.h @ONLY)

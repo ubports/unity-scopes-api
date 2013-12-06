@@ -13,13 +13,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MIDDLEWAREFACTORYCONFIG_H
-#define UNITY_API_SCOPES_INTERNAL_MIDDLEWAREFACTORYCONFIG_H
+#ifndef UNITY_API_SCOPES_RESULTIMPL_H
+#define UNITY_API_SCOPES_RESULTIMPL_H
 
-#include <scopes/internal/ConfigBase.h>
+#include <string>
+#include <memory>
+#include <scopes/internal/ResultImpl.h>
+#include <scopes/Category.h>
 
 namespace unity
 {
@@ -33,20 +36,22 @@ namespace scopes
 namespace internal
 {
 
-class MiddlewareFactoryConfig : public ConfigBase
+class CategorisedResultImpl : public ResultImpl
 {
 public:
-    static const char* MIDDLEWARE_FACTORY_CONFIG_GROUP;
+    explicit CategorisedResultImpl(Category::SCPtr category);
+    CategorisedResultImpl(CategorisedResultImpl const& other);
+    CategorisedResultImpl(Category::SCPtr category, VariantMap const& variant_map);
+    CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
 
-    MiddlewareFactoryConfig(std::string const& configfile);
-    ~MiddlewareFactoryConfig() noexcept;
+    void set_category(Category::SCPtr category);
+    Category::SCPtr category() const;
 
-    std::string zmq_configfile() const;
-    std::string rest_configfile() const;
+protected:
+    void serialize_internal(VariantMap& var) const override;
 
 private:
-    std::string zmq_configfile_;
-    std::string rest_configfile_;
+    Category::SCPtr category_;
 };
 
 } // namespace internal
@@ -56,5 +61,6 @@ private:
 } // namespace api
 
 } // namespace unity
+
 
 #endif
