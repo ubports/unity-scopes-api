@@ -34,6 +34,8 @@ namespace api
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace internal
 {
 class RuntimeImpl;
@@ -74,6 +76,8 @@ public:
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
 
+    static UPtr create_scope_runtime(std::string const& scope_name, std::string const& configfile = "");
+
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
 
@@ -92,6 +96,15 @@ public:
     RegistryProxy registry() const;
 
     /**
+    \brief Run a scope without going through the scope runner.
+
+    This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
+
+    \param scope_base The scope implementation
+    */
+    void run_scope(ScopeBase *const scope_base);
+
+    /**
     \brief Destroys a Runtime instance.
 
     The destructor implicitly calls destroy() if the application code does not explicitly destroy the instance.
@@ -100,7 +113,7 @@ public:
     ~Runtime() noexcept;
 
 private:
-    Runtime(std::string const& configfile); // Instantiation only via create()
+    Runtime(std::string const& scope_name, std::string const& configfile); // Instantiation only via create()
 
     std::unique_ptr<internal::RuntimeImpl> p;
 };
