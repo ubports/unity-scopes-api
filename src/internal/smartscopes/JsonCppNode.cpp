@@ -89,6 +89,11 @@ bool JsonCppNode::get_value( const std::vector< std::string >& value_path, std::
 
 bool JsonCppNode::get_value( int value_index, std::string& value )
 {
+  if( root_.type() != Json::arrayValue )
+  {
+    return false;
+  }
+
   const Json::Value& value_node = root_[value_index];
 
   if( !value_node || value_node.isArray() || value_node.isObject() )
@@ -116,6 +121,11 @@ bool JsonCppNode::get_node( const std::vector< std::string >& node_path, JsonNod
 
 bool JsonCppNode::get_node( int node_index, JsonNodeInterface::SPtr& node )
 {
+  if( root_.type() != Json::arrayValue )
+  {
+    return false;
+  }
+
   const Json::Value& value_node = root_[node_index];
 
   if( !value_node || ( !value_node.isArray() && !value_node.isObject() ) )

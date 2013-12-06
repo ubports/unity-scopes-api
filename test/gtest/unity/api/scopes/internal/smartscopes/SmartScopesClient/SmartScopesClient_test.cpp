@@ -25,6 +25,7 @@
 #include <thread>
 
 using namespace testing;
+using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 namespace
@@ -71,6 +72,29 @@ TEST_F( SmartScopesClientTest, search )
 {
   system( "./FakeSss.py &" );
   std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+
+  ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
+  std::vector< SearchResult > results = ssc_.get_search_results();
+
+  EXPECT_EQ( 2, results.size() );
+
+  EXPECT_EQ( "URI", results[0].uri );
+  EXPECT_EQ( "Stuff", results[0].title );
+  EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/amazon.png", results[0].art );
+  EXPECT_EQ( "", results[0].dnd_uri );
+  EXPECT_EQ( "cat1", results[0].category->id );
+  EXPECT_EQ( "Category 1", results[0].category->title );
+  EXPECT_EQ( "", results[0].category->icon );
+  EXPECT_EQ( "", results[0].category->renderer_template );
+
+  EXPECT_EQ( "URI2", results[1].uri );
+  EXPECT_EQ( "Things", results[1].title );
+  EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/google.png", results[1].art );
+  EXPECT_EQ( "", results[1].dnd_uri );
+  EXPECT_EQ( "cat1", results[1].category->id );
+  EXPECT_EQ( "Category 1", results[0].category->title );
+  EXPECT_EQ( "", results[1].category->icon );
+  EXPECT_EQ( "", results[1].category->renderer_template );
 
   system( "killall -q FakeSss.py" );
 }

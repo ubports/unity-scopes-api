@@ -1,3 +1,5 @@
+add_subdirectory(remotescope)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
