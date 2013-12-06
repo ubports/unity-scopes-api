@@ -84,7 +84,7 @@ void Query::set_query_string(std::string const& query_str)
 
 void Query::set_filter_state(FilterState const& filter_state)
 {
-    //TODO
+    p->set_filter_state(filter_state);
 }
 
 std::string Query::scope_name() const
@@ -104,8 +104,7 @@ std::string Query::query_string() const
 
 FilterState Query::filter_state() const
 {
-    //TODO
-    return FilterState();
+    return p->filter_state();
 }
 
 VariantMap Query::serialize() const

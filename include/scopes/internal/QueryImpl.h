@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
+#include <scopes/FilterState.h>
 #include <string>
 
 namespace unity
@@ -33,6 +34,7 @@ namespace scopes
 {
 
 class Query;
+class FilterState;
 
 namespace internal
 {
@@ -51,6 +53,7 @@ public:
 
     void set_department_id(std::string const& dep_id);
     void set_query_string(std::string const& query_str);
+    void set_filter_state(FilterState const& filter_state);
     std::string scope_name() const;
     std::string department_id() const;
     std::string query_string() const;
@@ -62,6 +65,7 @@ private:
     std::string scope_name_;
     std::string query_string_;
     std::string department_id_;
+    FilterState filter_state_;
 };
 
 } // namespace internal

@@ -96,6 +96,11 @@ void QueryImpl::set_query_string(std::string const& query_str)
     query_string_ = query_str;
 }
 
+void QueryImpl::set_filter_state(FilterState const& filter_state)
+{
+    filter_state_ = filter_state;
+}
+
 std::string QueryImpl::scope_name() const
 {
     return scope_name_;
