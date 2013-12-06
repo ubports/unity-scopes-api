@@ -19,7 +19,9 @@
 #include <gtest/gtest.h>
 #include <scopes/Annotation.h>
 #include <scopes/PlacementHint.h>
+#include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
+#include <scopes/internal/AnnotationImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::api::scopes;
@@ -176,6 +178,149 @@ TEST(Annotation, serialize)
         EXPECT_EQ("scope-A", qout.scope_name());
         EXPECT_EQ("foo", qout.query_string());
         EXPECT_EQ("dep1", qout.department_id());
+    }
+}
+
+TEST(Annotation, deserialize)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    Query query("scope-A", "foo", "dep1");
+    {
+        Annotation annotation(Annotation::AnnotationType::Hyperlink);
+        annotation.add_hyperlink("Link1", query);
+        auto var = annotation.serialize();
+        AnnotationImpl impl(reg, var);
+    }
+    {
+        Annotation annotation(Annotation::AnnotationType::GroupedHyperlink);
+        annotation.set_label("Foo");
+        annotation.add_hyperlink("Link1", query);
+        auto var = annotation.serialize();
+        AnnotationImpl impl(reg, var);
+    }
+    {
+        Annotation annotation(Annotation::AnnotationType::EmblemHyperlink);
+        annotation.set_icon("Icon");
+        annotation.add_hyperlink("Link1", query);
+        auto var = annotation.serialize();
+        AnnotationImpl impl(reg, var);
+    }
+    {
+        Annotation annotation(Annotation::AnnotationType::Card);
+        annotation.set_icon("Icon");
+        annotation.set_category(cat);
+        annotation.add_hyperlink("Link1", query);
+        auto var = annotation.serialize();
+        AnnotationImpl impl(reg, var);
+    }
+}
+
+TEST(Annotation, deserialize_exceptions)
+{
+    {
+        CategoryRegistry reg;
+        CategoryRenderer rdr;
+        Query query("scope-A", "foo", "dep1");
+        auto cat = reg.register_category("1", "title", "icon", rdr);
+        {
+            VariantMap var;
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "hyperlink";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "groupedhyperlink";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "emblemhyperlink";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "card";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {
+            VariantMap var;
+            var["type"] = "card";
+            var["icon"] = "Icon";
+            var["cat_id"] = "unknowncat";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {   // deserialize with unknown category
+            Annotation annotation(Annotation::AnnotationType::Card);
+            annotation.set_icon("Icon");
+            annotation.set_category(cat);
+            annotation.add_hyperlink("Link1", query);
+            auto var = annotation.serialize();
+            var["cat_id"] = "2";
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
+        {   // deserialize with empty hyperlinks array
+            Annotation annotation(Annotation::AnnotationType::Hyperlink);
+            annotation.add_hyperlink("Link1", query);
+            auto var = annotation.serialize();
+            var["hyperlinks"] = VariantArray();
+            try
+            {
+                AnnotationImpl impl(reg, var);
+                FAIL();
+            }
+            catch (unity::InvalidArgumentException const& e) {}
+        }
     }
 }
 

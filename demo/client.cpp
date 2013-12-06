@@ -49,6 +49,15 @@ public:
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }
 
+    virtual void push(Annotation annotation) override
+    {
+        cout << "received annotation of type " << annotation.annotation_type() << " with " << annotation.num_of_hyperlinks() << " hyperlink(s):" << endl;
+        for (unsigned int i = 0; i<annotation.num_of_hyperlinks(); i++)
+        {
+            cout << "  " << annotation.hyperlink(i)->query().to_string() << endl;
+        }
+    }
+
     virtual void finished(ReceiverBase::Reason reason) override
     {
         cout << "query complete, status: " << to_string(reason) << endl;

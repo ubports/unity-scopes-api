@@ -21,6 +21,8 @@
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
+#include <scopes/Query.h>
+#include <scopes/Annotation.h>
 
 #include <iostream>
 
@@ -57,6 +59,12 @@ public:
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
+
+        Query q("scope-A", query_, "");
+        Annotation annotation(Annotation::AnnotationType::Hyperlink);
+        annotation.add_hyperlink("More...", q);
+        reply->push(annotation);
+
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;
     }
 

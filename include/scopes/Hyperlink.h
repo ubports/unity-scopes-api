@@ -22,6 +22,7 @@
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <scopes/Query.h>
+#include <scopes/Variant.h>
 #include <memory>
 
 namespace unity
@@ -66,6 +67,7 @@ public:
     /// @endcond
 private:
     Hyperlink(std::string const& label, Query const& query);
+    Hyperlink(VariantMap const& variant_map);
     std::shared_ptr<internal::HyperlinkImpl> p;
 
     friend class internal::AnnotationImpl;

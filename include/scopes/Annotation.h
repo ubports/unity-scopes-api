@@ -38,6 +38,7 @@ namespace scopes
 namespace internal
 {
 class AnnotationImpl;
+class ReplyObject;
 }
 
 /**
@@ -142,7 +143,10 @@ public:
     /// @endcond
 
 private:
+    Annotation(internal::AnnotationImpl* impl);
     std::shared_ptr<internal::AnnotationImpl> p;
+
+    friend class internal::ReplyObject;
 };
 
 } // namespace scopes

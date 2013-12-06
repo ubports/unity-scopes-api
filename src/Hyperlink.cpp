@@ -34,6 +34,11 @@ Hyperlink::Hyperlink(std::string const& label, Query const& query)
 {
 }
 
+Hyperlink::Hyperlink(VariantMap const& variant_map)
+    : p(new internal::HyperlinkImpl(variant_map))
+{
+}
+
 std::string Hyperlink::label() const
 {
     return p->label();

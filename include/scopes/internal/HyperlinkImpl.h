@@ -23,6 +23,7 @@
 #include <string>
 #include <memory>
 #include <scopes/Query.h>
+#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -40,6 +41,7 @@ class UNITY_API HyperlinkImpl
 {
 public:
     HyperlinkImpl(std::string const& label, Query const& query);
+    HyperlinkImpl(VariantMap const& variant_map);
     std::string label() const;
     Query query() const;
     VariantMap serialize() const;

@@ -18,6 +18,7 @@
 
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/AnnotationImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
@@ -97,6 +98,22 @@ void ReplyObject::push(VariantMap const& result) noexcept
         {
             auto cat = cat_registry_->register_category(it->second.get_dict());
             receiver_base_->push(cat);
+        }
+
+        it = result.find("annotation");
+        if (it != result.end())
+        {
+            auto result_var = it->second.get_dict();
+            try
+            {
+                Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+                receiver_base_->push(std::move(annotation));
+            }
+            catch (unity::Exception const& e)
+            {
+                // TODO: this is an internal error; log error
+                finished(ReceiverBase::Error);
+            }
         }
 
         it = result.find("result");

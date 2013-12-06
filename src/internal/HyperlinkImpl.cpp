@@ -16,6 +16,7 @@
  */
 
 #include <scopes/internal/HyperlinkImpl.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -33,6 +34,24 @@ HyperlinkImpl::HyperlinkImpl(std::string const& label, Query const& query)
     : label_(label),
       query_(std::make_shared<Query>(query))
 {
+}
+
+HyperlinkImpl::HyperlinkImpl(VariantMap const& variant_map)
+{
+    auto it = variant_map.find("label");
+    if (it == variant_map.end())
+    {
+        throw InvalidArgumentException("Invalid variant, 'label' is missing");
+    }
+    label_ = it->second.get_string();
+
+    it = variant_map.find("query");
+    if (it == variant_map.end())
+    {
+        throw InvalidArgumentException("Invalid variant, 'query' is missing");
+    }
+
+    query_.reset(new Query(it->second.get_dict()));
 }
 
 std::string HyperlinkImpl::label() const

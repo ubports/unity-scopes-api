@@ -16,7 +16,6 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-
 #include <scopes/Annotation.h>
 #include <scopes/PlacementHint.h>
 #include <scopes/internal/AnnotationImpl.h>
@@ -37,6 +36,11 @@ Annotation::Annotation(AnnotationType atype)
 
 Annotation::Annotation(Annotation const &other)
     : p(new internal::AnnotationImpl(*(other.p)))
+{
+}
+
+Annotation::Annotation(internal::AnnotationImpl* impl)
+    : p(impl)
 {
 }
 

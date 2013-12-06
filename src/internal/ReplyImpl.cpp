@@ -117,8 +117,9 @@ bool ReplyImpl::push(Category::SCPtr category)
 
 bool ReplyImpl::push(unity::api::scopes::Annotation const& annotation)
 {
-    //TODO
-    return true;
+    VariantMap var;
+    var["annotation"] = annotation.serialize();
+    return push(var);
 }
 
 bool ReplyImpl::push(VariantMap const& variant_map)

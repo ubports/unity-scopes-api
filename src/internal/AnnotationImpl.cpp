@@ -16,7 +16,9 @@
  */
 
 #include <scopes/internal/AnnotationImpl.h>
+#include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
+#include <sstream>
 #include <cassert>
 
 namespace unity
@@ -34,6 +36,69 @@ namespace internal
 AnnotationImpl::AnnotationImpl(Annotation::AnnotationType annotation_type)
     : annotation_type_(annotation_type)
 {
+}
+
+AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
+{
+    auto it = variant_map.find("type");
+    if (it == variant_map.end())
+    {
+        throw InvalidArgumentException("Annotation(): Invalid variant, missing 'type'");
+    }
+    auto typestr = it->second.get_string();
+    if (typestr == "hyperlink")
+    {
+        annotation_type_ = Annotation::AnnotationType::Hyperlink;
+    }
+    else if (typestr == "groupedhyperlink")
+    {
+        annotation_type_ = Annotation::AnnotationType::GroupedHyperlink;
+    }
+    else if (typestr == "emblemhyperlink")
+    {
+        annotation_type_ = Annotation::AnnotationType::EmblemHyperlink;
+    }
+    else if (typestr == "card")
+    {
+        annotation_type_ = Annotation::AnnotationType::Card;
+    }
+
+    it = variant_map.find("label");
+    if (it != variant_map.end())
+    {
+        set_label(it->second.get_string());
+    }
+
+    it = variant_map.find("icon");
+    if (it != variant_map.end())
+    {
+        set_icon(it->second.get_string());
+    }
+
+    it = variant_map.find("cat_id");
+    if (it != variant_map.end())
+    {
+        auto cat_id = it->second.get_string();
+        category_ = reg.lookup_category(cat_id);
+        if (category_ == nullptr)
+        {
+            std::ostringstream s;
+            s << "Annotation(): Category '" << cat_id << "' not found in the registry";
+            throw InvalidArgumentException(s.str());
+        }
+    }
+
+    it = variant_map.find("hyperlinks");
+    if (it != variant_map.end())
+    {
+        auto hyperlinks_var = it->second.get_array();
+        for (const auto h: hyperlinks_var)
+        {
+            hyperlinks_.push_back(std::shared_ptr<Hyperlink>(new Hyperlink(h.get_dict())));
+        }
+    }
+
+    throw_if_inconsistent();
 }
 
 AnnotationImpl::~AnnotationImpl()
@@ -116,12 +181,48 @@ Annotation::AnnotationType AnnotationImpl::annotation_type() const
     return annotation_type_;
 }
 
-VariantMap AnnotationImpl::serialize() const
+void AnnotationImpl::throw_if_inconsistent() const
 {
     if (hyperlinks_.size() == 0)
     {
-        throw InvalidArgumentException("Annotation::serialize(): no hyperlinks");
+        throw InvalidArgumentException("No hyperlinks present");
     }
+
+    switch (annotation_type_)
+    {
+        case Annotation::AnnotationType::Hyperlink:
+            // nothing to verify
+            break;
+        case Annotation::AnnotationType::GroupedHyperlink:
+            if (label_.empty())
+            {
+                throw InvalidArgumentException("Label must not be empty for GroupedHyperlink annotation");
+            }
+            break;
+        case Annotation::AnnotationType::EmblemHyperlink:
+            if (icon_.empty())
+            {
+                throw InvalidArgumentException("Icon must not be empty for EmblemHyperlink annotation");
+            }
+            break;
+        case Annotation::AnnotationType::Card:
+            if (category_ == nullptr)
+            {
+                throw InvalidArgumentException("Category must be set for Card annotation");
+            }
+            if (icon_.empty())
+            {
+                throw InvalidArgumentException("Icon must not be empty for Card annotation");
+            }
+            break;
+        default:
+            throw InvalidArgumentException("Unknown annotation type");
+    }
+}
+
+VariantMap AnnotationImpl::serialize() const
+{
+    throw_if_inconsistent();
 
     VariantMap vm;
     switch (annotation_type_)
@@ -131,23 +232,11 @@ VariantMap AnnotationImpl::serialize() const
             break;
         case Annotation::AnnotationType::GroupedHyperlink:
             vm["type"] = "groupedhyperlink";
-            if (label_.empty())
-            {
-                throw InvalidArgumentException("Annotation::serialize(): label must not be empty for GroupedHyperlink");
-            }
             break;
         case Annotation::AnnotationType::EmblemHyperlink:
-            if (icon_.empty())
-            {
-                throw InvalidArgumentException("Annotation::serialize(): icon must not be empty for EmblemHyperlink");
-            }
             vm["type"] = "emblemhyperlink";
             break;
         case Annotation::AnnotationType::Card:
-            if (icon_.empty())
-            {
-                throw InvalidArgumentException("Annotation::serialize(): icon must not be empty for Card");
-            }
             vm["type"] = "card";
             break;
         default:

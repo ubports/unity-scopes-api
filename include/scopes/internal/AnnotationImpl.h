@@ -38,11 +38,13 @@ namespace scopes
 
 namespace internal
 {
+class CategoryRegistry;
 
 class UNITY_API AnnotationImpl
 {
 public:
     AnnotationImpl(Annotation::AnnotationType annotation_type);
+    AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
     virtual ~AnnotationImpl();
 
     void set_label(std::string const& label);
@@ -58,6 +60,7 @@ public:
     VariantMap serialize() const;
 
 private:
+    void throw_if_inconsistent() const;
     Annotation::AnnotationType annotation_type_;
     std::string label_;
     std::string icon_;
