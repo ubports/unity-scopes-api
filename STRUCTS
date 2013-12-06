@@ -74,4 +74,5 @@ Annotation (returned by serialize())
 
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" key and serialized Category / CategorisedResult respectively.
+ result : ValueDict with "category" and/or "result" or "annotation" key and
+  serialized Category / CategorisedResult / Annotation respectively.
