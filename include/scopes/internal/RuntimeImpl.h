@@ -54,6 +54,7 @@ public:
     std::string registry_endpointdir() const;
     std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
+    void run_scope(ScopeBase *const scope_base);
 
     ~RuntimeImpl() noexcept;
 
