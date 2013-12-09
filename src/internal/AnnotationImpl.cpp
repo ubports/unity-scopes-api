@@ -54,10 +54,6 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
     {
         annotation_type_ = AnnotationType::GroupedHyperlink;
     }
-    else if (typestr == "emblemhyperlink")
-    {
-        annotation_type_ = AnnotationType::EmblemHyperlink;
-    }
     else if (typestr == "card")
     {
         annotation_type_ = AnnotationType::Card;
@@ -116,10 +112,10 @@ void AnnotationImpl::set_label(std::string const& label)
 
 void AnnotationImpl::set_icon(std::string const& icon)
 {
-    if (annotation_type_ != AnnotationType::EmblemHyperlink &&
+    if (annotation_type_ != AnnotationType::Hyperlink &&
         annotation_type_ != AnnotationType::Card)
     {
-        throw InvalidArgumentException("Annotation::set_icon(): icon is allowed in EmblemHyperlink only");
+        throw InvalidArgumentException("Annotation::set_icon(): icon is allowed in Hyperlink and Card annotations only");
     }
     icon_ = icon;
 }
@@ -154,10 +150,10 @@ std::string AnnotationImpl::label() const
 
 std::string AnnotationImpl::icon() const
 {
-    if (annotation_type_ != AnnotationType::EmblemHyperlink &&
+    if (annotation_type_ != AnnotationType::Hyperlink &&
         annotation_type_ != AnnotationType::Card)
     {
-        throw InvalidArgumentException("Annotation::icon(): icon is allowed in EmblemHyperlink Card annotations only");
+        throw InvalidArgumentException("Annotation::icon(): icon is allowed in Hyperlink Card annotations only");
     }
     return icon_;
 }
@@ -199,12 +195,6 @@ void AnnotationImpl::throw_if_inconsistent() const
                 throw InvalidArgumentException("Label must not be empty for GroupedHyperlink annotation");
             }
             break;
-        case AnnotationType::EmblemHyperlink:
-            if (icon_.empty())
-            {
-                throw InvalidArgumentException("Icon must not be empty for EmblemHyperlink annotation");
-            }
-            break;
         case AnnotationType::Card:
             if (category_ == nullptr)
             {
@@ -232,9 +222,6 @@ VariantMap AnnotationImpl::serialize() const
             break;
         case AnnotationType::GroupedHyperlink:
             vm["type"] = "groupedhyperlink";
-            break;
-        case AnnotationType::EmblemHyperlink:
-            vm["type"] = "emblemhyperlink";
             break;
         case AnnotationType::Card:
             vm["type"] = "card";

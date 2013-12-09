@@ -46,9 +46,8 @@ class ReplyObject;
  */
 enum AnnotationType
 {
-    Hyperlink, //!< A simple hyperlink with just a label
+    Hyperlink, //!< A simple hyperlink with just a label and/or an icon
     GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
-    EmblemHyperlink, //!< A hyperlink with a label and an icon
     Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
 };
 
@@ -80,15 +79,15 @@ public:
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation of AnnotationType::EmblemHyperlink or
+     * \brief Sets an icon for an annotation of AnnotationType::Hyperlink or
      * AnnotationType::Card type. Throws InvalidArgumentException for other annotation types.
      */
     void set_icon(std::string const& icon);
 
     /**
      * \brief Adds a hyperlink to the annotation. There needs to be exactly one hyperlink
-     * added for the annotations of type AnnotationType::Hyperlink, AnnotationType::EmblemHyperlink
-     * and AnnotationType::Card and at least one for AnnotationType::GroupedHyperlink. This method
+     * added for the annotations of type AnnotationType::Hyperlink and AnnotationType::Card
+     * and at least one for AnnotationType::GroupedHyperlink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
     void add_hyperlink(std::string const& label, Query const& query);
@@ -115,7 +114,7 @@ public:
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This is only valid for AnnotationType::EmblemHyperlink and
+     * \brief Returns icon assigned to this annotation. This is only valid for AnnotationType::Hyperlink and
      * AnnotationType::Card and throws InvalidArgumentException for other annotation types.
      * \return icon associated with this annotation
      */
