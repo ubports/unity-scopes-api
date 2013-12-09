@@ -43,7 +43,7 @@ class CategoryRegistry;
 class UNITY_API AnnotationImpl
 {
 public:
-    explicit AnnotationImpl(scopes::AnnotationType annotation_type);
+    explicit AnnotationImpl(Annotation::Type annotation_type);
     AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
     virtual ~AnnotationImpl();
 
@@ -55,12 +55,12 @@ public:
     std::string label() const;
     std::string icon() const;
     std::list<Link::SCPtr> links() const;
-    scopes::AnnotationType annotation_type() const;
+    Annotation::Type annotation_type() const;
     VariantMap serialize() const;
 
 private:
     void throw_if_inconsistent() const;
-    scopes::AnnotationType annotation_type_;
+    Annotation::Type annotation_type_;
     std::string label_;
     std::string icon_;
     Category::SCPtr category_;

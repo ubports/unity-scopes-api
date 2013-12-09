@@ -29,7 +29,7 @@ namespace api
 namespace scopes
 {
 
-Annotation::Annotation(AnnotationType atype)
+Annotation::Annotation(Type atype)
     : p(new internal::AnnotationImpl(atype))
 {
 }
@@ -106,7 +106,7 @@ std::list<Link::SCPtr> Annotation::links() const
     return p->links();
 }
 
-AnnotationType Annotation::annotation_type() const
+Annotation::Type Annotation::annotation_type() const
 {
     return p->annotation_type();
 }

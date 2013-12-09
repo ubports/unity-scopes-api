@@ -31,7 +31,7 @@ TEST(Annotation, hyperlink)
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::Hyperlink);
+        Annotation annotation(Annotation::Type::Hyperlink);
         annotation.add_hyperlink("Link1", query);
 
         EXPECT_EQ(1, annotation.links().size());
@@ -47,7 +47,7 @@ TEST(Annotation, emblemHyperlink)
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::Hyperlink);
+        Annotation annotation(Annotation::Type::Hyperlink);
         annotation.set_icon("icon");
         annotation.add_hyperlink("Link1", query);
 
@@ -64,7 +64,7 @@ TEST(Annotation, hyperlink_exceptions)
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::Hyperlink);
+        Annotation annotation(Annotation::Type::Hyperlink);
         annotation.add_hyperlink("Link1", query);
         EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
         EXPECT_EQ(1, annotation.links().size());
@@ -80,7 +80,7 @@ TEST(Annotation, groupedHyperlink)
         Query query1("scope-A", "foo", "dep1");
         Query query2("scope-B", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedHyperlink);
         annotation.set_label("Group");
         annotation.add_hyperlink("Link1", query1);
         annotation.add_hyperlink("Link2", query2);
@@ -102,7 +102,7 @@ TEST(Annotation, groupedHyperlink_exceptions)
         Query query1("scope-A", "foo", "dep1");
         Query query2("scope-B", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedHyperlink);
         annotation.set_label("Group");
         annotation.add_hyperlink("Link1", query1);
         annotation.add_hyperlink("Link2", query2);
@@ -117,7 +117,7 @@ TEST(Annotation, card)
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::Card);
+        Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("icon");
         annotation.add_hyperlink("Link1", query);
 
@@ -134,7 +134,7 @@ TEST(Annotation, card_exceptions)
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(AnnotationType::Card);
+        Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("icon");
         annotation.add_hyperlink("Link1", query);
 
@@ -149,7 +149,7 @@ TEST(Annotation, serialize)
 {
     {
         Query query("scope-A", "foo", "dep1");
-        Annotation annotation(AnnotationType::Hyperlink);
+        Annotation annotation(Annotation::Type::Hyperlink);
         annotation.add_hyperlink("Link1", query);
 
         auto vm = annotation.serialize();
@@ -174,21 +174,21 @@ TEST(Annotation, deserialize)
     auto cat = reg.register_category("1", "title", "icon", rdr);
     Query query("scope-A", "foo", "dep1");
     {
-        Annotation annotation(AnnotationType::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedHyperlink);
         annotation.set_label("Foo");
         annotation.add_hyperlink("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(reg, var);
     }
     {
-        Annotation annotation(AnnotationType::Hyperlink);
+        Annotation annotation(Annotation::Type::Hyperlink);
         annotation.set_icon("Icon");
         annotation.add_hyperlink("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(reg, var);
     }
     {
-        Annotation annotation(AnnotationType::Card);
+        Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("Icon");
         annotation.set_category(cat);
         annotation.add_hyperlink("Link1", query);
@@ -266,7 +266,7 @@ TEST(Annotation, deserialize_exceptions)
             catch (unity::InvalidArgumentException const& e) {}
         }
         {   // deserialize with unknown category
-            Annotation annotation(AnnotationType::Card);
+            Annotation annotation(Annotation::Type::Card);
             annotation.set_icon("Icon");
             annotation.set_category(cat);
             annotation.add_hyperlink("Link1", query);
@@ -280,7 +280,7 @@ TEST(Annotation, deserialize_exceptions)
             catch (unity::InvalidArgumentException const& e) {}
         }
         {   // deserialize with empty links array
-            Annotation annotation(AnnotationType::Hyperlink);
+            Annotation annotation(Annotation::Type::Hyperlink);
             annotation.add_hyperlink("Link1", query);
             auto var = annotation.serialize();
             var["links"] = VariantArray();
@@ -298,13 +298,13 @@ TEST(Annotation, copy)
 {
     {
         Query query("scope-A", "foo", "dep1");
-        Annotation annotation(AnnotationType::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedHyperlink);
         annotation.set_label("Group");
         annotation.add_hyperlink("Link1", query);
         Annotation copy(annotation);
 
         EXPECT_EQ("Group", copy.label());
-        EXPECT_EQ(AnnotationType::GroupedHyperlink, copy.annotation_type());
+        EXPECT_EQ(Annotation::Type::GroupedHyperlink, copy.annotation_type());
         annotation.add_hyperlink("Link2", query);
         EXPECT_EQ(1, copy.links().size());
     }

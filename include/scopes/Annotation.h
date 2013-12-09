@@ -43,26 +43,26 @@ class ReplyObject;
 }
 
 /**
- * \brief Enumeration of supported Annotation types
- */
-enum AnnotationType
-{
-    Hyperlink, //!< A simple hyperlink with just a label and/or an icon
-    GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
-    Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
-};
-
-/**
  * \brief Handles a scope query hyperlink(s) that result in a new search query when clicked by user.
  */
 class UNITY_API Annotation final
 {
 public:
+    /**
+     * \brief Enumeration of supported Annotation types
+     */
+    enum Type
+    {
+        Hyperlink, //!< A simple hyperlink with just a label and/or an icon
+        GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
+        Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
+    };
+
    /**
-     * \brief Creates annotation of given type. AnnotationType imposes attributes that are
+     * \brief Creates annotation of given type. The Type imposes attributes that are
      * supported or required by that annotation.
      */
-    explicit Annotation(AnnotationType atype);
+    explicit Annotation(Type atype);
 
     /// @cond
     Annotation(Annotation const &other);
@@ -74,27 +74,27 @@ public:
     /// @endcond
 
     /**
-     * \brief Sets a label for an annotation. This currently makes sense for AnnotationType::GroupedHyperlink only.
+     * \brief Sets a label for an annotation. This currently makes sense for Type::GroupedHyperlink only.
      */
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation. This currently makes sense for AnnotationType::Hyperlink or
+     * \brief Sets an icon for an annotation. This currently makes sense for Type::Hyperlink or
      * AnnotationType::Card types only.
      */
     void set_icon(std::string const& icon);
 
     /**
      * \brief Adds a hyperlink to the annotation. There needs to be exactly one hyperlink
-     * added for the annotations of type AnnotationType::Hyperlink and AnnotationType::Card
-     * and at least one for AnnotationType::GroupedHyperlink. This method
+     * added for the annotations of type Type::Hyperlink and Type::Card
+     * and at least one for Type::GroupedHyperlink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
     void add_hyperlink(std::string const& label, Query const& query);
 
     /**
-     * \brief Assigns this annotation to a category. Depending on the AnnotationType set, it
-     * get be displayed among results of that category (for AnnotationType::Card) or
+     * \brief Assigns this annotation to a category. Depending on the Type set, it
+     * get be displayed among results of that category (for Type::Card) or
      * below it (for remaing annotation types).
      */
     void set_category(Category::SCPtr category);
@@ -107,14 +107,14 @@ public:
     Category::SCPtr category() const;
 
     /**
-     * \brief Returns label assigned to this annotation. This currently makes sense for AnnotationType::GroupedHyperlink only.
+     * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedHyperlink only.
      * \return label associated with this annotation
      */
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This currently only makes sense for AnnotationType::Hyperlink and
-     * AnnotationType::Card.
+     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Hyperlink and
+     * Type::Card.
      * \return icon associated with this annotation
      */
     std::string icon() const;
@@ -128,7 +128,7 @@ public:
     /**
      * \brief Returns the type of this annotation.
      */
-    AnnotationType annotation_type() const;
+    Type annotation_type() const;
 
     /// @cond
     VariantMap serialize() const;
