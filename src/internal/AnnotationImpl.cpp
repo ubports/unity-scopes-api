@@ -164,13 +164,9 @@ unsigned int AnnotationImpl::num_of_hyperlinks() const
     return hyperlinks_.size();
 }
 
-Link::SCPtr AnnotationImpl::hyperlink(unsigned int index) const
+std::list<Link::SCPtr> AnnotationImpl::hyperlinks() const
 {
-    if (index >= hyperlinks_.size())
-    {
-        throw InvalidArgumentException("Annotation::get_hyperlink(): invalid hyperlink index");
-    }
-    return hyperlinks_[index];
+    return hyperlinks_;
 }
 
 AnnotationType AnnotationImpl::annotation_type() const

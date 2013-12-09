@@ -106,9 +106,10 @@ unsigned int Annotation::num_of_hyperlinks() const
     return p->num_of_hyperlinks();
 }
 
-Link::SCPtr Annotation::hyperlink(unsigned int index) const
+
+std::list<Link::SCPtr> Annotation::hyperlinks() const
 {
-    return p->hyperlink(index);
+    return p->hyperlinks();
 }
 
 AnnotationType Annotation::annotation_type() const

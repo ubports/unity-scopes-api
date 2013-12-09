@@ -25,7 +25,7 @@
 #include <scopes/Annotation.h>
 #include <scopes/Link.h>
 #include <scopes/Category.h>
-#include <vector>
+#include <list>
 
 namespace unity
 {
@@ -55,7 +55,7 @@ public:
     std::string label() const;
     std::string icon() const;
     unsigned int num_of_hyperlinks() const;
-    Link::SCPtr hyperlink(unsigned int index) const;
+    std::list<Link::SCPtr> hyperlinks() const;
     scopes::AnnotationType annotation_type() const;
     VariantMap serialize() const;
 
@@ -65,7 +65,7 @@ private:
     std::string label_;
     std::string icon_;
     Category::SCPtr category_;
-    std::vector<Link::SCPtr> hyperlinks_;
+    std::list<Link::SCPtr> hyperlinks_;
 };
 
 } // namespace internal

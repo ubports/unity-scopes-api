@@ -23,6 +23,7 @@
 #include <scopes/Variant.h>
 #include <scopes/Link.h>
 #include <scopes/Category.h>
+#include <list>
 #include <memory>
 
 namespace unity
@@ -124,11 +125,10 @@ public:
     unsigned int num_of_hyperlinks() const;
 
     /**
-     * \brief Returns a hyperlink assigned to given position of this annotation. Throws InvalidArgumentException
-     * on invalid index.
+     * \brief Returns all hyperlinks assigned to given position of this annotation.
      * \returns hyperlink at given position
      */
-    Link::SCPtr hyperlink(unsigned int index) const;
+    std::list<Link::SCPtr> hyperlinks() const;
 
     /**
      * \brief Returns the type of this annotation.

@@ -35,7 +35,7 @@ TEST(Annotation, hyperlink)
         annotation.add_hyperlink("Link1", query);
 
         EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlink(0);
+        auto link = annotation.hyperlinks().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
@@ -53,7 +53,7 @@ TEST(Annotation, emblemHyperlink)
 
         EXPECT_EQ("icon", annotation.icon());
         EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlink(0);
+        auto link = annotation.hyperlinks().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
@@ -87,8 +87,8 @@ TEST(Annotation, groupedHyperlink)
 
         EXPECT_EQ("Group", annotation.label());
         EXPECT_EQ(2, annotation.num_of_hyperlinks());
-        auto link1 = annotation.hyperlink(0);
-        auto link2 = annotation.hyperlink(1);
+        auto link1 = annotation.hyperlinks().front();
+        auto link2 = annotation.hyperlinks().back();
         EXPECT_EQ("Link1", link1->label());
         EXPECT_EQ(query1, link1->query());
         EXPECT_EQ("Link2", link2->label());
@@ -123,7 +123,7 @@ TEST(Annotation, card)
 
         EXPECT_EQ("icon", annotation.icon());
         EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlink(0);
+        auto link = annotation.hyperlinks().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
