@@ -68,8 +68,9 @@ TEST(Annotation, hyperlink_exceptions)
         annotation.add_hyperlink("Link1", query);
         EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
         EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        EXPECT_THROW(annotation.set_label("label"), unity::InvalidArgumentException);
-        EXPECT_THROW(annotation.label(), unity::InvalidArgumentException);
+        EXPECT_NO_THROW(annotation.set_label("label"));
+        // no design case for hyperlink with a label (makes sense for a group only), but we shouldn't throw
+        EXPECT_NO_THROW(annotation.label());
     }
 }
 
@@ -105,8 +106,9 @@ TEST(Annotation, groupedHyperlink_exceptions)
         annotation.set_label("Group");
         annotation.add_hyperlink("Link1", query1);
         annotation.add_hyperlink("Link2", query2);
-        EXPECT_THROW(annotation.set_icon("icon"), unity::InvalidArgumentException);
-        EXPECT_THROW(annotation.icon(), unity::InvalidArgumentException);
+        // no design case for hyperlink group with an icon, but we shouldn't throw
+        EXPECT_NO_THROW(annotation.set_icon("icon"));
+        EXPECT_NO_THROW(annotation.icon());
     }
 }
 
@@ -136,7 +138,8 @@ TEST(Annotation, card_exceptions)
         annotation.set_icon("icon");
         annotation.add_hyperlink("Link1", query);
 
-        EXPECT_THROW(annotation.set_label("Label"), unity::InvalidArgumentException);
+        // label currently makes sense for group only, but we shouldn't throw
+        EXPECT_NO_THROW(annotation.set_label("Label"));
         EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
         EXPECT_EQ(1, annotation.num_of_hyperlinks());
     }

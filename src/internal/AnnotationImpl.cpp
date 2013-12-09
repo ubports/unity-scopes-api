@@ -19,6 +19,7 @@
 #include <scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
+#include <iostream>
 #include <cassert>
 
 namespace unity
@@ -105,7 +106,7 @@ void AnnotationImpl::set_label(std::string const& label)
 {
     if (annotation_type_ != AnnotationType::GroupedHyperlink)
     {
-        throw InvalidArgumentException("Annotation::set_label(): label is allowed in GroupedHyperlink only");
+        std::cerr << "Annotation::set_label(): label is allowed in GroupedHyperlink only" << std::endl;
     }
     label_ = label;
 }
@@ -115,7 +116,7 @@ void AnnotationImpl::set_icon(std::string const& icon)
     if (annotation_type_ != AnnotationType::Hyperlink &&
         annotation_type_ != AnnotationType::Card)
     {
-        throw InvalidArgumentException("Annotation::set_icon(): icon is allowed in Hyperlink and Card annotations only");
+        std::cerr << "Annotation::set_icon(): icon is allowed in Hyperlink and Card annotations only" << std::endl;
     }
     icon_ = icon;
 }
@@ -143,7 +144,7 @@ std::string AnnotationImpl::label() const
 {
     if (annotation_type_ != AnnotationType::GroupedHyperlink)
     {
-        throw InvalidArgumentException("Annotation::label(): label is allowed in GroupedHyperlink only");
+        std::cerr << "Annotation::label(): label is allowed in GroupedHyperlink only" << std::endl;
     }
     return label_;
 }
@@ -153,7 +154,7 @@ std::string AnnotationImpl::icon() const
     if (annotation_type_ != AnnotationType::Hyperlink &&
         annotation_type_ != AnnotationType::Card)
     {
-        throw InvalidArgumentException("Annotation::icon(): icon is allowed in Hyperlink Card annotations only");
+        std::cerr << "Annotation::icon(): icon is allowed in Hyperlink Card annotations only" << std::endl;
     }
     return icon_;
 }

@@ -73,14 +73,13 @@ public:
     /// @endcond
 
     /**
-     * \brief Sets a label for an annotation of AnnotationType::GroupedHyperlink type.
-     * Throws InvalidArgumentException for other annotation types.
+     * \brief Sets a label for an annotation. This currently makes sense for AnnotationType::GroupedHyperlink only.
      */
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation of AnnotationType::Hyperlink or
-     * AnnotationType::Card type. Throws InvalidArgumentException for other annotation types.
+     * \brief Sets an icon for an annotation. This currently makes sense for AnnotationType::Hyperlink or
+     * AnnotationType::Card types only.
      */
     void set_icon(std::string const& icon);
 
@@ -107,15 +106,14 @@ public:
     Category::SCPtr category() const;
 
     /**
-     * \brief Returns label assigned to this annotation. This is only valid for AnnotationType::GroupedHyperlink
-     * and throws InvalidArgumentException for other annotation types.
+     * \brief Returns label assigned to this annotation. This currently makes sense for AnnotationType::GroupedHyperlink only.
      * \return label associated with this annotation
      */
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This is only valid for AnnotationType::Hyperlink and
-     * AnnotationType::Card and throws InvalidArgumentException for other annotation types.
+     * \brief Returns icon assigned to this annotation. This currently only makes sense for AnnotationType::Hyperlink and
+     * AnnotationType::Card.
      * \return icon associated with this annotation
      */
     std::string icon() const;
