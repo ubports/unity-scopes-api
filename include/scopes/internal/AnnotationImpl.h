@@ -54,8 +54,7 @@ public:
     Category::SCPtr category() const;
     std::string label() const;
     std::string icon() const;
-    unsigned int num_of_hyperlinks() const;
-    std::list<Link::SCPtr> hyperlinks() const;
+    std::list<Link::SCPtr> links() const;
     scopes::AnnotationType annotation_type() const;
     VariantMap serialize() const;
 
@@ -65,7 +64,7 @@ private:
     std::string label_;
     std::string icon_;
     Category::SCPtr category_;
-    std::list<Link::SCPtr> hyperlinks_;
+    std::list<Link::SCPtr> links_;
 };
 
 } // namespace internal

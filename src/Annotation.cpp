@@ -101,15 +101,9 @@ std::string Annotation::icon() const
     return p->icon();
 }
 
-unsigned int Annotation::num_of_hyperlinks() const
+std::list<Link::SCPtr> Annotation::links() const
 {
-    return p->num_of_hyperlinks();
-}
-
-
-std::list<Link::SCPtr> Annotation::hyperlinks() const
-{
-    return p->hyperlinks();
+    return p->links();
 }
 
 AnnotationType Annotation::annotation_type() const

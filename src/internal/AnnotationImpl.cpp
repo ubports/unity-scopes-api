@@ -85,13 +85,13 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
         }
     }
 
-    it = variant_map.find("hyperlinks");
+    it = variant_map.find("links");
     if (it != variant_map.end())
     {
         auto hyperlinks_var = it->second.get_array();
         for (const auto h: hyperlinks_var)
         {
-            hyperlinks_.push_back(std::shared_ptr<Link>(new Link(h.get_dict())));
+            links_.push_back(std::shared_ptr<Link>(new Link(h.get_dict())));
         }
     }
 
@@ -123,11 +123,11 @@ void AnnotationImpl::set_icon(std::string const& icon)
 
 void AnnotationImpl::add_hyperlink(std::string const& label, Query const& query)
 {
-    if (annotation_type_ != AnnotationType::GroupedHyperlink && hyperlinks_.size() > 0)
+    if (annotation_type_ != AnnotationType::GroupedHyperlink && links_.size() > 0)
     {
         throw InvalidArgumentException("Annotation::add_hyperlink(): multiple hyperlinks are supported by GroupedHyperlink only");
     }
-    hyperlinks_.push_back(std::shared_ptr<Link>(new Link(label, query)));
+    links_.push_back(std::shared_ptr<Link>(new Link(label, query)));
 }
 
 void AnnotationImpl::set_category(Category::SCPtr category)
@@ -159,14 +159,9 @@ std::string AnnotationImpl::icon() const
     return icon_;
 }
 
-unsigned int AnnotationImpl::num_of_hyperlinks() const
+std::list<Link::SCPtr> AnnotationImpl::links() const
 {
-    return hyperlinks_.size();
-}
-
-std::list<Link::SCPtr> AnnotationImpl::hyperlinks() const
-{
-    return hyperlinks_;
+    return links_;
 }
 
 AnnotationType AnnotationImpl::annotation_type() const
@@ -176,9 +171,9 @@ AnnotationType AnnotationImpl::annotation_type() const
 
 void AnnotationImpl::throw_if_inconsistent() const
 {
-    if (hyperlinks_.size() == 0)
+    if (links_.size() == 0)
     {
-        throw InvalidArgumentException("No hyperlinks present");
+        throw InvalidArgumentException("No links present");
     }
 
     switch (annotation_type_)
@@ -241,11 +236,11 @@ VariantMap AnnotationImpl::serialize() const
     }
 
     VariantArray links_var;
-    for (auto link: hyperlinks_)
+    for (auto link: links_)
     {
         links_var.push_back(Variant(link->serialize()));
     }
-    vm["hyperlinks"] = links_var;
+    vm["links"] = links_var;
     return vm;
 }
 

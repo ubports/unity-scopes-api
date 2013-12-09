@@ -34,8 +34,8 @@ TEST(Annotation, hyperlink)
         Annotation annotation(AnnotationType::Hyperlink);
         annotation.add_hyperlink("Link1", query);
 
-        EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlinks().front();
+        EXPECT_EQ(1, annotation.links().size());
+        auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
@@ -52,8 +52,8 @@ TEST(Annotation, emblemHyperlink)
         annotation.add_hyperlink("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
-        EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlinks().front();
+        EXPECT_EQ(1, annotation.links().size());
+        auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
@@ -67,7 +67,7 @@ TEST(Annotation, hyperlink_exceptions)
         Annotation annotation(AnnotationType::Hyperlink);
         annotation.add_hyperlink("Link1", query);
         EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
-        EXPECT_EQ(1, annotation.num_of_hyperlinks());
+        EXPECT_EQ(1, annotation.links().size());
         EXPECT_NO_THROW(annotation.set_label("label"));
         // no design case for hyperlink with a label (makes sense for a group only), but we shouldn't throw
         EXPECT_NO_THROW(annotation.label());
@@ -86,9 +86,9 @@ TEST(Annotation, groupedHyperlink)
         annotation.add_hyperlink("Link2", query2);
 
         EXPECT_EQ("Group", annotation.label());
-        EXPECT_EQ(2, annotation.num_of_hyperlinks());
-        auto link1 = annotation.hyperlinks().front();
-        auto link2 = annotation.hyperlinks().back();
+        EXPECT_EQ(2, annotation.links().size());
+        auto link1 = annotation.links().front();
+        auto link2 = annotation.links().back();
         EXPECT_EQ("Link1", link1->label());
         EXPECT_EQ(query1, link1->query());
         EXPECT_EQ("Link2", link2->label());
@@ -122,8 +122,8 @@ TEST(Annotation, card)
         annotation.add_hyperlink("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
-        EXPECT_EQ(1, annotation.num_of_hyperlinks());
-        auto link = annotation.hyperlinks().front();
+        EXPECT_EQ(1, annotation.links().size());
+        auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query, link->query());
     }
@@ -141,7 +141,7 @@ TEST(Annotation, card_exceptions)
         // label currently makes sense for group only, but we shouldn't throw
         EXPECT_NO_THROW(annotation.set_label("Label"));
         EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
-        EXPECT_EQ(1, annotation.num_of_hyperlinks());
+        EXPECT_EQ(1, annotation.links().size());
     }
 }
 
@@ -156,7 +156,7 @@ TEST(Annotation, serialize)
         EXPECT_EQ("hyperlink", vm["type"].get_string());
         EXPECT_TRUE(vm.find("label") == vm.end());
         EXPECT_TRUE(vm.find("icon") == vm.end());
-        auto links = vm["hyperlinks"].get_array();
+        auto links = vm["links"].get_array();
         EXPECT_EQ(1, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
@@ -279,11 +279,11 @@ TEST(Annotation, deserialize_exceptions)
             }
             catch (unity::InvalidArgumentException const& e) {}
         }
-        {   // deserialize with empty hyperlinks array
+        {   // deserialize with empty links array
             Annotation annotation(AnnotationType::Hyperlink);
             annotation.add_hyperlink("Link1", query);
             auto var = annotation.serialize();
-            var["hyperlinks"] = VariantArray();
+            var["links"] = VariantArray();
             try
             {
                 AnnotationImpl impl(reg, var);
@@ -306,6 +306,6 @@ TEST(Annotation, copy)
         EXPECT_EQ("Group", copy.label());
         EXPECT_EQ(AnnotationType::GroupedHyperlink, copy.annotation_type());
         annotation.add_hyperlink("Link2", query);
-        EXPECT_EQ(1, copy.num_of_hyperlinks());
+        EXPECT_EQ(1, copy.links().size());
     }
 }

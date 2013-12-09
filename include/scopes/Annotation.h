@@ -120,15 +120,10 @@ public:
     std::string icon() const;
 
     /**
-     * \brief Returns number of hyperlinks assigned to this annotation.
-     */
-    unsigned int num_of_hyperlinks() const;
-
-    /**
      * \brief Returns all hyperlinks assigned to given position of this annotation.
      * \returns hyperlink at given position
      */
-    std::list<Link::SCPtr> hyperlinks() const;
+    std::list<Link::SCPtr> links() const;
 
     /**
      * \brief Returns the type of this annotation.
