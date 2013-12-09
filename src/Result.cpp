@@ -122,6 +122,16 @@ std::string Result::dnd_uri() const
     return p->dnd_uri();
 }
 
+bool Result::has_metadata(std::string const& key) const
+{
+    return p->has_metadata(key);
+}
+
+Variant const& Result::metadata(std::string const& key) const
+{
+    return p->metadata(key);
+}
+
 VariantMap Result::serialize() const
 {
     return p->serialize();

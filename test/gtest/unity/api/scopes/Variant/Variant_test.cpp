@@ -30,8 +30,7 @@ TEST(Variant, basic)
 {
     {
         Variant v;
-        EXPECT_EQ(Variant::Type::Int, v.which());
-        v.get_int();
+        EXPECT_EQ(Variant::Type::Null, v.which());
         // No exception here means that v was initialized to an int with unknown value.
     }
 

@@ -63,7 +63,7 @@ public:
     /**@name Constructors and destructor
     */
     /**
-    \brief The default constructor creates a Variant instance containing an integer of undefined value.
+    \brief The default constructor creates a Variant instance containing a null.
     */
     Variant() noexcept;  // Makes an int variant
 
