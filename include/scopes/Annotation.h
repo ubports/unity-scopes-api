@@ -43,7 +43,7 @@ class ReplyObject;
 }
 
 /**
- * \brief Handles a scope query hyperlink(s) that result in a new search query when clicked by user.
+ * \brief Handles a scope query link(s) that result in a new search query when clicked by user.
  */
 class UNITY_API Annotation final
 {
@@ -53,9 +53,9 @@ public:
      */
     enum Type
     {
-        Hyperlink, //!< A simple hyperlink with just a label and/or an icon
-        GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
-        Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
+        Link, //!< A simple link with just a label and/or an icon
+        GroupedLink, //!< A group of links, with a label for the group name and labels for all links inside it
+        Card //!< A link that has a label and icon and is meant to be displayed within a category (with results)
     };
 
    /**
@@ -74,23 +74,23 @@ public:
     /// @endcond
 
     /**
-     * \brief Sets a label for an annotation. This currently makes sense for Type::GroupedHyperlink only.
+     * \brief Sets a label for an annotation. This currently makes sense for Type::GroupedLink only.
      */
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation. This currently makes sense for Type::Hyperlink or
+     * \brief Sets an icon for an annotation. This currently makes sense for Type::Link or
      * AnnotationType::Card types only.
      */
     void set_icon(std::string const& icon);
 
     /**
-     * \brief Adds a hyperlink to the annotation. There needs to be exactly one hyperlink
-     * added for the annotations of type Type::Hyperlink and Type::Card
-     * and at least one for Type::GroupedHyperlink. This method
+     * \brief Adds a link to the annotation. There needs to be exactly one link
+     * added for the annotations of type Type::Link and Type::Card
+     * and at least one for Type::GroupedLink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
-    void add_hyperlink(std::string const& label, Query const& query);
+    void add_link(std::string const& label, Query const& query);
 
     /**
      * \brief Assigns this annotation to a category. Depending on the Type set, it
@@ -107,21 +107,21 @@ public:
     Category::SCPtr category() const;
 
     /**
-     * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedHyperlink only.
+     * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedLink only.
      * \return label associated with this annotation
      */
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Hyperlink and
+     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Link and
      * Type::Card.
      * \return icon associated with this annotation
      */
     std::string icon() const;
 
     /**
-     * \brief Returns all hyperlinks assigned to given position of this annotation.
-     * \returns hyperlink at given position
+     * \brief Returns all links assigned to given position of this annotation.
+     * \returns link at given position
      */
     std::list<Link::SCPtr> links() const;
 

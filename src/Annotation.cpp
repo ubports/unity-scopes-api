@@ -76,9 +76,9 @@ void Annotation::set_icon(std::string const& icon)
     p->set_icon(icon);
 }
 
-void Annotation::add_hyperlink(std::string const& label, Query const& query)
+void Annotation::add_link(std::string const& label, Query const& query)
 {
-    p->add_hyperlink(label, query);
+    p->add_link(label, query);
 }
 
 void Annotation::set_category(Category::SCPtr category)

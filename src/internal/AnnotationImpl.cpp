@@ -47,13 +47,13 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
         throw InvalidArgumentException("Annotation(): Invalid variant, missing 'type'");
     }
     auto typestr = it->second.get_string();
-    if (typestr == "hyperlink")
+    if (typestr == "link")
     {
-        annotation_type_ = Annotation::Type::Hyperlink;
+        annotation_type_ = Annotation::Type::Link;
     }
-    else if (typestr == "groupedhyperlink")
+    else if (typestr == "groupedlink")
     {
-        annotation_type_ = Annotation::Type::GroupedHyperlink;
+        annotation_type_ = Annotation::Type::GroupedLink;
     }
     else if (typestr == "card")
     {
@@ -88,8 +88,8 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
     it = variant_map.find("links");
     if (it != variant_map.end())
     {
-        auto hyperlinks_var = it->second.get_array();
-        for (const auto h: hyperlinks_var)
+        auto links_var = it->second.get_array();
+        for (const auto h: links_var)
         {
             links_.push_back(std::shared_ptr<Link>(new Link(h.get_dict())));
         }
@@ -104,28 +104,28 @@ AnnotationImpl::~AnnotationImpl()
 
 void AnnotationImpl::set_label(std::string const& label)
 {
-    if (annotation_type_ != Annotation::Type::GroupedHyperlink)
+    if (annotation_type_ != Annotation::Type::GroupedLink)
     {
-        std::cerr << "Annotation::set_label(): label is allowed in GroupedHyperlink only" << std::endl;
+        std::cerr << "Annotation::set_label(): label is allowed in GroupedLink only" << std::endl;
     }
     label_ = label;
 }
 
 void AnnotationImpl::set_icon(std::string const& icon)
 {
-    if (annotation_type_ != Annotation::Type::Hyperlink &&
+    if (annotation_type_ != Annotation::Type::Link &&
         annotation_type_ != Annotation::Type::Card)
     {
-        std::cerr << "Annotation::set_icon(): icon is allowed in Hyperlink and Card annotations only" << std::endl;
+        std::cerr << "Annotation::set_icon(): icon is allowed in Link and Card annotations only" << std::endl;
     }
     icon_ = icon;
 }
 
-void AnnotationImpl::add_hyperlink(std::string const& label, Query const& query)
+void AnnotationImpl::add_link(std::string const& label, Query const& query)
 {
-    if (annotation_type_ != Annotation::Type::GroupedHyperlink && links_.size() > 0)
+    if (annotation_type_ != Annotation::Type::GroupedLink && links_.size() > 0)
     {
-        throw InvalidArgumentException("Annotation::add_hyperlink(): multiple hyperlinks are supported by GroupedHyperlink only");
+        throw InvalidArgumentException("Annotation::add_link(): multiple links are supported by GroupedLink only");
     }
     links_.push_back(std::shared_ptr<Link>(new Link(label, query)));
 }
@@ -142,19 +142,19 @@ Category::SCPtr AnnotationImpl::category() const
 
 std::string AnnotationImpl::label() const
 {
-    if (annotation_type_ != Annotation::Type::GroupedHyperlink)
+    if (annotation_type_ != Annotation::Type::GroupedLink)
     {
-        std::cerr << "Annotation::label(): label is allowed in GroupedHyperlink only" << std::endl;
+        std::cerr << "Annotation::label(): label is allowed in GroupedLink only" << std::endl;
     }
     return label_;
 }
 
 std::string AnnotationImpl::icon() const
 {
-    if (annotation_type_ != Annotation::Type::Hyperlink &&
+    if (annotation_type_ != Annotation::Type::Link &&
         annotation_type_ != Annotation::Type::Card)
     {
-        std::cerr << "Annotation::icon(): icon is allowed in Hyperlink and Card annotations only" << std::endl;
+        std::cerr << "Annotation::icon(): icon is allowed in Link and Card annotations only" << std::endl;
     }
     return icon_;
 }
@@ -178,13 +178,13 @@ void AnnotationImpl::throw_if_inconsistent() const
 
     switch (annotation_type_)
     {
-        case Annotation::Type::Hyperlink:
+        case Annotation::Type::Link:
             // nothing to verify
             break;
-        case Annotation::Type::GroupedHyperlink:
+        case Annotation::Type::GroupedLink:
             if (label_.empty())
             {
-                throw InvalidArgumentException("Label must not be empty for GroupedHyperlink annotation");
+                throw InvalidArgumentException("Label must not be empty for GroupedLink annotation");
             }
             break;
         case Annotation::Type::Card:
@@ -209,11 +209,11 @@ VariantMap AnnotationImpl::serialize() const
     VariantMap vm;
     switch (annotation_type_)
     {
-        case Annotation::Type::Hyperlink:
-            vm["type"] = "hyperlink";
+        case Annotation::Type::Link:
+            vm["type"] = "link";
             break;
-        case Annotation::Type::GroupedHyperlink:
-            vm["type"] = "groupedhyperlink";
+        case Annotation::Type::GroupedLink:
+            vm["type"] = "groupedlink";
             break;
         case Annotation::Type::Card:
             vm["type"] = "card";

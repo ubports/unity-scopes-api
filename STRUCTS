@@ -59,8 +59,8 @@ Query (returned by serialize())
  'query_string'  : string
  'department_id' : string
  
-Hyperlink (returned by serialize())
-===================================
+Link (returned by serialize())
+==============================
  'label'      : string
  'query'      : Query
  
@@ -70,7 +70,7 @@ Annotation (returned by serialize())
  'label'      : string, optional
  'icon'       : string, optional
  'cat_id'     : string, optional
- 'hyperlinks' : array of Hyperlinks
+ 'links'      : array of Links
 
 PushRequest (capnproto structure)
 =================================

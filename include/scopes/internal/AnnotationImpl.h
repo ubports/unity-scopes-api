@@ -49,7 +49,7 @@ public:
 
     void set_label(std::string const& label);
     void set_icon(std::string const& icon);
-    void add_hyperlink(std::string const& label, Query const& query);
+    void add_link(std::string const& label, Query const& query);
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;
     std::string label() const;

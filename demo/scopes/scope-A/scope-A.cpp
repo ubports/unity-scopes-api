@@ -61,8 +61,8 @@ public:
         reply->push(res);
 
         Query q("scope-A", query_, "");
-        Annotation annotation(Annotation::Type::Hyperlink);
-        annotation.add_hyperlink("More...", q);
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("More...", q);
         reply->push(annotation);
 
         cout << "scope-A: query \"" << query_ << "\" complete" << endl;

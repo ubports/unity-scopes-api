@@ -26,13 +26,13 @@
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
 
-TEST(Annotation, hyperlink)
+TEST(Annotation, link)
 {
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(Annotation::Type::Hyperlink);
-        annotation.add_hyperlink("Link1", query);
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("Link1", query);
 
         EXPECT_EQ(1, annotation.links().size());
         auto link = annotation.links().front();
@@ -41,15 +41,15 @@ TEST(Annotation, hyperlink)
     }
 }
 
-// emblem hyperlink is a regular hyperlink + an icon
-TEST(Annotation, emblemHyperlink)
+// emblem link is a regular link + an icon
+TEST(Annotation, emblemLink)
 {
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(Annotation::Type::Hyperlink);
+        Annotation annotation(Annotation::Type::Link);
         annotation.set_icon("icon");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
         EXPECT_EQ(1, annotation.links().size());
@@ -59,31 +59,31 @@ TEST(Annotation, emblemHyperlink)
     }
 }
 
-TEST(Annotation, hyperlink_exceptions)
+TEST(Annotation, link_exceptions)
 {
     {
         Query query("scope-A", "foo", "dep1");
 
-        Annotation annotation(Annotation::Type::Hyperlink);
-        annotation.add_hyperlink("Link1", query);
-        EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("Link1", query);
+        EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
         EXPECT_EQ(1, annotation.links().size());
         EXPECT_NO_THROW(annotation.set_label("label"));
-        // no design case for hyperlink with a label (makes sense for a group only), but we shouldn't throw
+        // no design case for link with a label (makes sense for a group only), but we shouldn't throw
         EXPECT_NO_THROW(annotation.label());
     }
 }
 
-TEST(Annotation, groupedHyperlink)
+TEST(Annotation, groupedLink)
 {
     {
         Query query1("scope-A", "foo", "dep1");
         Query query2("scope-B", "foo", "dep1");
 
-        Annotation annotation(Annotation::Type::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
-        annotation.add_hyperlink("Link1", query1);
-        annotation.add_hyperlink("Link2", query2);
+        annotation.add_link("Link1", query1);
+        annotation.add_link("Link2", query2);
 
         EXPECT_EQ("Group", annotation.label());
         EXPECT_EQ(2, annotation.links().size());
@@ -96,17 +96,17 @@ TEST(Annotation, groupedHyperlink)
     }
 }
 
-TEST(Annotation, groupedHyperlink_exceptions)
+TEST(Annotation, groupedLink_exceptions)
 {
     {
         Query query1("scope-A", "foo", "dep1");
         Query query2("scope-B", "foo", "dep1");
 
-        Annotation annotation(Annotation::Type::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
-        annotation.add_hyperlink("Link1", query1);
-        annotation.add_hyperlink("Link2", query2);
-        // no design case for hyperlink group with an icon, but we shouldn't throw
+        annotation.add_link("Link1", query1);
+        annotation.add_link("Link2", query2);
+        // no design case for link group with an icon, but we shouldn't throw
         EXPECT_NO_THROW(annotation.set_icon("icon"));
         EXPECT_NO_THROW(annotation.icon());
     }
@@ -119,7 +119,7 @@ TEST(Annotation, card)
 
         Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("icon");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
         EXPECT_EQ(1, annotation.links().size());
@@ -136,11 +136,11 @@ TEST(Annotation, card_exceptions)
 
         Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("icon");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
 
         // label currently makes sense for group only, but we shouldn't throw
         EXPECT_NO_THROW(annotation.set_label("Label"));
-        EXPECT_THROW(annotation.add_hyperlink("Link2", query), unity::InvalidArgumentException); // only one hyperlink allowed
+        EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
         EXPECT_EQ(1, annotation.links().size());
     }
 }
@@ -149,11 +149,11 @@ TEST(Annotation, serialize)
 {
     {
         Query query("scope-A", "foo", "dep1");
-        Annotation annotation(Annotation::Type::Hyperlink);
-        annotation.add_hyperlink("Link1", query);
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("Link1", query);
 
         auto vm = annotation.serialize();
-        EXPECT_EQ("hyperlink", vm["type"].get_string());
+        EXPECT_EQ("link", vm["type"].get_string());
         EXPECT_TRUE(vm.find("label") == vm.end());
         EXPECT_TRUE(vm.find("icon") == vm.end());
         auto links = vm["links"].get_array();
@@ -174,16 +174,16 @@ TEST(Annotation, deserialize)
     auto cat = reg.register_category("1", "title", "icon", rdr);
     Query query("scope-A", "foo", "dep1");
     {
-        Annotation annotation(Annotation::Type::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Foo");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(reg, var);
     }
     {
-        Annotation annotation(Annotation::Type::Hyperlink);
+        Annotation annotation(Annotation::Type::Link);
         annotation.set_icon("Icon");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(reg, var);
     }
@@ -191,7 +191,7 @@ TEST(Annotation, deserialize)
         Annotation annotation(Annotation::Type::Card);
         annotation.set_icon("Icon");
         annotation.set_category(cat);
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(reg, var);
     }
@@ -225,7 +225,7 @@ TEST(Annotation, deserialize_exceptions)
         }
         {
             VariantMap var;
-            var["type"] = "hyperlink";
+            var["type"] = "link";
             try
             {
                 AnnotationImpl impl(reg, var);
@@ -235,7 +235,7 @@ TEST(Annotation, deserialize_exceptions)
         }
         {
             VariantMap var;
-            var["type"] = "groupedhyperlink";
+            var["type"] = "groupedlink";
             try
             {
                 AnnotationImpl impl(reg, var);
@@ -269,7 +269,7 @@ TEST(Annotation, deserialize_exceptions)
             Annotation annotation(Annotation::Type::Card);
             annotation.set_icon("Icon");
             annotation.set_category(cat);
-            annotation.add_hyperlink("Link1", query);
+            annotation.add_link("Link1", query);
             auto var = annotation.serialize();
             var["cat_id"] = "2";
             try
@@ -280,8 +280,8 @@ TEST(Annotation, deserialize_exceptions)
             catch (unity::InvalidArgumentException const& e) {}
         }
         {   // deserialize with empty links array
-            Annotation annotation(Annotation::Type::Hyperlink);
-            annotation.add_hyperlink("Link1", query);
+            Annotation annotation(Annotation::Type::Link);
+            annotation.add_link("Link1", query);
             auto var = annotation.serialize();
             var["links"] = VariantArray();
             try
@@ -298,14 +298,14 @@ TEST(Annotation, copy)
 {
     {
         Query query("scope-A", "foo", "dep1");
-        Annotation annotation(Annotation::Type::GroupedHyperlink);
+        Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
-        annotation.add_hyperlink("Link1", query);
+        annotation.add_link("Link1", query);
         Annotation copy(annotation);
 
         EXPECT_EQ("Group", copy.label());
-        EXPECT_EQ(Annotation::Type::GroupedHyperlink, copy.annotation_type());
-        annotation.add_hyperlink("Link2", query);
+        EXPECT_EQ(Annotation::Type::GroupedLink, copy.annotation_type());
+        annotation.add_link("Link2", query);
         EXPECT_EQ(1, copy.links().size());
     }
 }

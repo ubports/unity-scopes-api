@@ -52,7 +52,7 @@ public:
     virtual void push(Annotation annotation) override
     {
         auto links = annotation.links();
-        cout << "received annotation of type " << annotation.annotation_type() << " with " << links.size() << " hyperlink(s):" << endl;
+        cout << "received annotation of type " << annotation.annotation_type() << " with " << links.size() << " link(s):" << endl;
         for (auto link: links)
         {
             cout << "  " << link->query().to_string() << endl;
