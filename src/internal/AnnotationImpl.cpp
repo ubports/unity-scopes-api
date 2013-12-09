@@ -154,7 +154,7 @@ std::string AnnotationImpl::icon() const
     if (annotation_type_ != AnnotationType::Hyperlink &&
         annotation_type_ != AnnotationType::Card)
     {
-        std::cerr << "Annotation::icon(): icon is allowed in Hyperlink Card annotations only" << std::endl;
+        std::cerr << "Annotation::icon(): icon is allowed in Hyperlink and Card annotations only" << std::endl;
     }
     return icon_;
 }
