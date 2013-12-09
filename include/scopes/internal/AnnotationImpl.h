@@ -23,7 +23,7 @@
 #include <scopes/Query.h>
 #include <scopes/Variant.h>
 #include <scopes/Annotation.h>
-#include <scopes/Hyperlink.h>
+#include <scopes/Link.h>
 #include <scopes/Category.h>
 #include <vector>
 
@@ -43,7 +43,7 @@ class CategoryRegistry;
 class UNITY_API AnnotationImpl
 {
 public:
-    explicit AnnotationImpl(Annotation::AnnotationType annotation_type);
+    explicit AnnotationImpl(scopes::AnnotationType annotation_type);
     AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
     virtual ~AnnotationImpl();
 
@@ -55,17 +55,17 @@ public:
     std::string label() const;
     std::string icon() const;
     unsigned int num_of_hyperlinks() const;
-    Hyperlink::SCPtr hyperlink(unsigned int index) const;
-    Annotation::AnnotationType annotation_type() const;
+    Link::SCPtr hyperlink(unsigned int index) const;
+    scopes::AnnotationType annotation_type() const;
     VariantMap serialize() const;
 
 private:
     void throw_if_inconsistent() const;
-    Annotation::AnnotationType annotation_type_;
+    scopes::AnnotationType annotation_type_;
     std::string label_;
     std::string icon_;
     Category::SCPtr category_;
-    std::vector<Hyperlink::SCPtr> hyperlinks_;
+    std::vector<Link::SCPtr> hyperlinks_;
 };
 
 } // namespace internal

@@ -15,7 +15,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/HyperlinkImpl.h>
+#include <scopes/internal/LinkImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -30,13 +30,13 @@ namespace scopes
 namespace internal
 {
 
-HyperlinkImpl::HyperlinkImpl(std::string const& label, Query const& query)
+LinkImpl::LinkImpl(std::string const& label, Query const& query)
     : label_(label),
       query_(std::make_shared<Query>(query))
 {
 }
 
-HyperlinkImpl::HyperlinkImpl(VariantMap const& variant_map)
+LinkImpl::LinkImpl(VariantMap const& variant_map)
 {
     auto it = variant_map.find("label");
     if (it == variant_map.end())
@@ -54,17 +54,17 @@ HyperlinkImpl::HyperlinkImpl(VariantMap const& variant_map)
     query_.reset(new Query(it->second.get_dict()));
 }
 
-std::string HyperlinkImpl::label() const
+std::string LinkImpl::label() const
 {
     return label_;
 }
 
-Query HyperlinkImpl::query() const
+Query LinkImpl::query() const
 {
     return *query_;
 }
 
-VariantMap HyperlinkImpl::serialize() const
+VariantMap LinkImpl::serialize() const
 {
     VariantMap vm;
     vm["label"] = label_;

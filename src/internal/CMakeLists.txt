@@ -10,7 +10,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/HyperlinkImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp

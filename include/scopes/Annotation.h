@@ -21,7 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
-#include <scopes/Hyperlink.h>
+#include <scopes/Link.h>
 #include <scopes/Category.h>
 #include <memory>
 
@@ -42,23 +42,23 @@ class ReplyObject;
 }
 
 /**
+ * \brief Enumeration of supported Annotation types
+ */
+enum AnnotationType
+{
+    Hyperlink, //!< A simple hyperlink with just a label
+    GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
+    EmblemHyperlink, //!< A hyperlink with a label and an icon
+    Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
+};
+
+/**
  * \brief Handles a scope query hyperlink(s) that result in a new search query when clicked by user.
  */
 class UNITY_API Annotation final
 {
 public:
-    /**
-     * \brief Enumeration of supported Annotation types
-     */
-    enum AnnotationType
-    {
-        Hyperlink, //!< A simple hyperlink with just a label
-        GroupedHyperlink, //!< A group of hyperlinks, with a label for the group name and labels for all links inside it
-        EmblemHyperlink, //!< A hyperlink with a label and an icon
-        Card //!< A hyperlink that has a label and icon and is meant to be displayed within a category (with results)
-    };
-
-    /**
+   /**
      * \brief Creates annotation of given type. AnnotationType imposes attributes that are
      * supported or required by that annotation.
      */
@@ -131,7 +131,7 @@ public:
      * on invalid index.
      * \returns hyperlink at given position
      */
-    Hyperlink::SCPtr hyperlink(unsigned int index) const;
+    Link::SCPtr hyperlink(unsigned int index) const;
 
     /**
      * \brief Returns the type of this annotation.

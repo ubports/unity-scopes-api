@@ -61,7 +61,7 @@ public:
         reply->push(res);
 
         Query q("scope-A", query_, "");
-        Annotation annotation(Annotation::AnnotationType::Hyperlink);
+        Annotation annotation(AnnotationType::Hyperlink);
         annotation.add_hyperlink("More...", q);
         reply->push(annotation);
 

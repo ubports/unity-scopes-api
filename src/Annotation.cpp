@@ -106,12 +106,12 @@ unsigned int Annotation::num_of_hyperlinks() const
     return p->num_of_hyperlinks();
 }
 
-Hyperlink::SCPtr Annotation::hyperlink(unsigned int index) const
+Link::SCPtr Annotation::hyperlink(unsigned int index) const
 {
     return p->hyperlink(index);
 }
 
-Annotation::AnnotationType Annotation::annotation_type() const
+AnnotationType Annotation::annotation_type() const
 {
     return p->annotation_type();
 }

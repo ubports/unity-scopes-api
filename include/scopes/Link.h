@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_HYPERLINK_H
-#define UNITY_API_SCOPES_HYPERLINK_H
+#ifndef UNITY_API_SCOPES_LINK_H
+#define UNITY_API_SCOPES_LINK_H
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
@@ -37,22 +37,22 @@ namespace scopes
 
 namespace internal
 {
-class HyperlinkImpl;
+class LinkImpl;
 class AnnotationImpl;
 }
 
 /**
  * \brief Represents a hyperlink (a label and canned Query)
  */
-class UNITY_API Hyperlink final
+class UNITY_API Link final
 {
 public:
     /// @cond
-    UNITY_DEFINES_PTRS(Hyperlink);
+    UNITY_DEFINES_PTRS(Link);
     /// @endcond
 
     /**
-     * \brief Returns label of this Hyperlink instance.
+     * \brief Returns label of this Link instance.
      * \return a label
      */
     std::string label() const;
@@ -67,9 +67,9 @@ public:
     VariantMap serialize() const;
     /// @endcond
 private:
-    Hyperlink(std::string const& label, Query const& query);
-    Hyperlink(VariantMap const& variant_map);
-    std::shared_ptr<internal::HyperlinkImpl> p;
+    Link(std::string const& label, Query const& query);
+    Link(VariantMap const& variant_map);
+    std::shared_ptr<internal::LinkImpl> p;
 
     friend class internal::AnnotationImpl;
 };

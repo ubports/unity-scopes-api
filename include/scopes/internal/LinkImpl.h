@@ -16,9 +16,14 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#ifndef UNITY_INTERNAL_HYPERLINKIMPL_H
+#define UNITY_INTERNAL_HYPERLINKIMPL_H
 
-#include <scopes/Hyperlink.h>
-#include <scopes/internal/HyperlinkImpl.h>
+#include <unity/SymbolExport.h>
+#include <string>
+#include <memory>
+#include <scopes/Query.h>
+#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -29,33 +34,29 @@ namespace api
 namespace scopes
 {
 
-Hyperlink::Hyperlink(std::string const& label, Query const& query)
-    : p(new internal::HyperlinkImpl(label, query))
+namespace internal
 {
-}
 
-Hyperlink::Hyperlink(VariantMap const& variant_map)
-    : p(new internal::HyperlinkImpl(variant_map))
+class UNITY_API LinkImpl
 {
-}
+public:
+    LinkImpl(std::string const& label, Query const& query);
+    LinkImpl(VariantMap const& variant_map);
+    std::string label() const;
+    Query query() const;
+    VariantMap serialize() const;
 
-std::string Hyperlink::label() const
-{
-    return p->label();
-}
+private:
+    std::string label_;
+    Query::SCPtr query_;
+};
 
-Query Hyperlink::query() const
-{
-    return p->query();
-}
-
-VariantMap Hyperlink::serialize() const
-{
-    return p->serialize();
-}
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
+#endif

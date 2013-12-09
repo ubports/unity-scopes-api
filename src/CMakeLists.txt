@@ -7,7 +7,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Hyperlink.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
