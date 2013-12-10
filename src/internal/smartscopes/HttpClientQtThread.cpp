@@ -24,7 +24,7 @@
 #include <QMutexLocker>
 #include <QTimer>
 
-HttpClientQtThread::HttpClientQtThread( const QUrl &url, const HttpHeadersList& headers )
+HttpClientQtThread::HttpClientQtThread( const QUrl& url, const HttpHeadersList& headers )
     : QThread(),
       m_url( url ),
       m_headers( headers ),
@@ -35,47 +35,51 @@ HttpClientQtThread::HttpClientQtThread( const QUrl &url, const HttpHeadersList& 
 
 HttpClientQtThread::~HttpClientQtThread()
 {
-  if( m_manager )
-    m_manager->deleteLater();
+    if ( m_manager )
+    {
+        m_manager->deleteLater();
+    }
 
-  if( m_reply )
-    m_reply->deleteLater();
+    if ( m_reply )
+    {
+        m_reply->deleteLater();
+    }
 }
 
 void HttpClientQtThread::run()
 {
-  m_manager = new QNetworkAccessManager();
+    m_manager = new QNetworkAccessManager();
 
-  QNetworkRequest request( m_url );
-  for( auto it = m_headers.begin(); it != m_headers.end(); it++ )
-  {
-    request.setRawHeader( ( *it ).first, ( *it ).second );
-  }
+    QNetworkRequest request( m_url );
+    for ( auto it = m_headers.begin(); it != m_headers.end(); it++ )
+    {
+        request.setRawHeader( ( *it ).first, ( *it ).second );
+    }
 
-  connect( m_manager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
-  m_reply = m_manager->get( request );
+    connect( m_manager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
+    m_reply = m_manager->get( request );
 
-  QTimer timeout;
-  timeout.singleShot( 2000, this, SLOT( cancel() ) );
+    QTimer timeout;
+    timeout.singleShot( 2000, this, SLOT( cancel() ) );
 
-  QThread::exec(); // enter event loop
+    QThread::exec(); // enter event loop
 }
 
 QNetworkReply* HttpClientQtThread::getReply() const
 {
-  return m_reply;
+    return m_reply;
 }
 
 void HttpClientQtThread::queryDone( QNetworkReply* reply )
 {
-  quit();
+    quit();
 }
 
 void HttpClientQtThread::cancel()
 {
-  if( m_reply )
-  {
-    m_reply->abort();
-    quit();
-  }
+    if ( m_reply )
+    {
+        m_reply->abort();
+        quit();
+    }
 }

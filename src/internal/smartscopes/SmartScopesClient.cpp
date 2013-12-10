@@ -27,7 +27,7 @@ using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client,
-    JsonNodeInterface::SPtr json_node, const std::string& url, int port )
+                                      JsonNodeInterface::SPtr json_node, const std::string& url, int port )
     : http_client_( http_client ),
       json_node_( json_node ),
       url_( url ),
@@ -36,176 +36,176 @@ SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client,
 
 }
 
-std::vector< RemoteScope > SmartScopesClient::get_remote_scopes()
+std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 {
-  std::string response_str;
-  std::future< std::string > response = http_client_->get( url_ + "/smartscopes/v2/remote-scopes", port_ );
-  response.wait();
+    std::string response_str;
+    std::future<std::string> response = http_client_->get( url_ + "/smartscopes/v2/remote-scopes", port_ );
+    response.wait();
 
-  try
-  {
-    response_str = response.get();
-  }
-  catch( std::exception e )
-  {
-    std::cout << "failed to retrieve remote scopes from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
-    std::cout << "error:" << e.what() << std::endl;
-    return std::vector< RemoteScope >();
-  }
+    try
+    {
+        response_str = response.get();
+    }
+    catch ( std::exception e )
+    {
+        std::cout << "failed to retrieve remote scopes from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
+        std::cout << "error:" << e.what() << std::endl;
+        return std::vector<RemoteScope>();
+    }
 
-  json_node_mutex_.lock();
+    json_node_mutex_.lock();
 
-  if( !json_node_->read_json( response_str ) )
-  {
-    std::cout << "failed to parse json response from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
-    return std::vector< RemoteScope >();
-  }
+    if ( !json_node_->read_json( response_str ) )
+    {
+        std::cout << "failed to parse json response from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
+        return std::vector<RemoteScope>();
+    }
 
-  std::vector< RemoteScope > remote_scopes;
-  JsonNodeInterface::SPtr scope_node;
-  RemoteScope scope;
-  std::string value;
+    std::vector<RemoteScope> remote_scopes;
+    JsonNodeInterface::SPtr scope_node;
+    RemoteScope scope;
+    std::string value;
 
-  for( int i = 0; i < json_node_->size(); ++i )
-  {
-    json_node_->get_node( i, scope_node );
+    for ( int i = 0; i < json_node_->size(); ++i )
+    {
+        json_node_->get_node( i, scope_node );
 
-    scope_node->get_value( { "name" }, value );
-    scope.name = value;
+        scope_node->get_value( { "name" }, value );
+        scope.name = value;
 
-    scope_node->get_value( { "search_url" }, value );
-    scope.search_url = value;
+        scope_node->get_value( { "search_url" }, value );
+        scope.search_url = value;
 
-    scope_node->get_value( { "invisible" }, value );
-    std::transform( value.begin(), value.end(), value.begin(), ::toupper );
-    scope.invisible = value == "TRUE";
+        scope_node->get_value( { "invisible" }, value );
+        std::transform( value.begin(), value.end(), value.begin(), ::toupper );
+        scope.invisible = value == "TRUE";
 
-    remote_scopes.push_back( scope );
-  }
+        remote_scopes.push_back( scope );
+    }
 
-  json_node_mutex_.unlock();
+    json_node_mutex_.unlock();
 
-  return remote_scopes;
+    return remote_scopes;
 }
 
 void SmartScopesClient::search( const std::string& scope_resourse, const std::string& query,
-    const std::string& session_id, int query_id, const std::string& platform,
-    const std::string& locale, const std::string& country,
-    const std::string& latitude, const std::string& longitude,
-    const std::string& limit )
+                                const std::string& session_id, int query_id, const std::string& platform,
+                                const std::string& locale, const std::string& country,
+                                const std::string& latitude, const std::string& longitude,
+                                const std::string& limit )
 {
-  //search_results_.wait();
+    //search_results_.wait();
 
-  search_uri_ = url_ + scope_resourse + "?";
+    search_uri_ = url_ + scope_resourse + "?";
 
-  // mandatory parameters
+    // mandatory parameters
 
-  search_uri_ += "query=\"" + http_client_->to_html_escaped( query ) + "\"";
-  search_uri_ += "&session_id=\"" + session_id + "\"";
-  search_uri_ += "&query_id=" + std::to_string( query_id );
-  search_uri_ += "&platform=\"" + platform + "\"";
+    search_uri_ += "query=\"" + http_client_->to_html_escaped( query ) + "\"";
+    search_uri_ += "&session_id=\"" + session_id + "\"";
+    search_uri_ += "&query_id=" + std::to_string( query_id );
+    search_uri_ += "&platform=\"" + platform + "\"";
 
-  // optional parameters
+    // optional parameters
 
-  search_uri_ += locale.empty() ? "" : "&locale=\"" + locale + "\"";
-  search_uri_ += country.empty() ? "" : "&country=\"" + country + "\"";
-  search_uri_ += latitude.empty() ? "" : "&latitude=\"" + latitude + "\"";
-  search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
-  search_uri_ += limit.empty() ? "" : "&limit=\"" + limit + "\"";
+    search_uri_ += locale.empty() ? "" : "&locale=\"" + locale + "\"";
+    search_uri_ += country.empty() ? "" : "&country=\"" + country + "\"";
+    search_uri_ += latitude.empty() ? "" : "&latitude=\"" + latitude + "\"";
+    search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
+    search_uri_ += limit.empty() ? "" : "&limit=\"" + limit + "\"";
 
-  search_results_ = http_client_->get( search_uri_, port_ );
+    search_results_ = http_client_->get( search_uri_, port_ );
 }
 
-std::vector< SearchResult > SmartScopesClient::get_search_results()
+std::vector<SearchResult> SmartScopesClient::get_search_results()
 {
-  std::string response_str;
-  search_results_.wait();
+    std::string response_str;
+    search_results_.wait();
 
-  try
-  {
-    response_str = search_results_.get();
-  }
-  catch( std::exception e )
-  {
-    std::cout << "failed to retrieve search results from uri: " << search_uri_ << std::endl;
-    std::cout << "error:" << e.what() << std::endl;
-    return std::vector< SearchResult >();
-  }
-
-  std::vector< SearchResult > results;
-  std::map< std::string, std::shared_ptr< SearchCategory > > categories;
-
-  std::vector< std::string > jsons = extract_json_stream( response_str );
-
-  json_node_mutex_.lock();
-
-  for( std::string& json : jsons )
-  {
-    if( !json_node_->read_json( json ) )
+    try
     {
-      break;
+        response_str = search_results_.get();
+    }
+    catch ( std::exception e )
+    {
+        std::cout << "failed to retrieve search results from uri: " << search_uri_ << std::endl;
+        std::cout << "error:" << e.what() << std::endl;
+        return std::vector<SearchResult>();
     }
 
-    JsonNodeInterface::SPtr result_node;
-    std::string value;
+    std::vector<SearchResult> results;
+    std::map<std::string, std::shared_ptr<SearchCategory>> categories;
 
-    if( json_node_->get_node( {"category"}, result_node ) )
+    std::vector<std::string> jsons = extract_json_stream( response_str );
+
+    json_node_mutex_.lock();
+
+    for ( std::string& json : jsons )
     {
-      auto category = std::make_shared< SearchCategory >();
+        if ( !json_node_->read_json( json ) )
+        {
+            break;
+        }
 
-      result_node->get_value( {"icon"}, value );
-      category->icon = value;
-      result_node->get_value( {"id"}, value );
-      category->id = value;
-      result_node->get_value( {"renderer_template"}, value );
-      category->renderer_template = value;
-      result_node->get_value( {"title"}, value );
-      category->title = value;
-      categories[ category->id ] = category;
+        JsonNodeInterface::SPtr result_node;
+        std::string value;
+
+        if ( json_node_->get_node( {"category"}, result_node ) )
+        {
+            auto category = std::make_shared<SearchCategory>();
+
+            result_node->get_value( {"icon"}, value );
+            category->icon = value;
+            result_node->get_value( {"id"}, value );
+            category->id = value;
+            result_node->get_value( {"renderer_template"}, value );
+            category->renderer_template = value;
+            result_node->get_value( {"title"}, value );
+            category->title = value;
+            categories[ category->id ] = category;
+        }
+        else if ( json_node_->get_node( {"result"}, result_node ) )
+        {
+            SearchResult result;
+
+            result_node->get_value( {"art"}, value );
+            result.art = value;
+            result_node->get_value( {"cat_id"}, value );
+            result.category = categories[value];
+            result_node->get_value( {"dnd_uri"}, value );
+            result.dnd_uri = value;
+            result_node->get_value( {"title"}, value );
+            result.title = value;
+            result_node->get_value( {"uri"}, value );
+            result.uri = value;
+
+            results.push_back( result );
+        }
     }
-    else if( json_node_->get_node( {"result"}, result_node ) )
-    {
-      SearchResult result;
 
-      result_node->get_value( {"art"}, value );
-      result.art = value;
-      result_node->get_value( {"cat_id"}, value );
-      result.category = categories[value];
-      result_node->get_value( {"dnd_uri"}, value );
-      result.dnd_uri = value;
-      result_node->get_value( {"title"}, value );
-      result.title = value;
-      result_node->get_value( {"uri"}, value );
-      result.uri = value;
+    json_node_mutex_.unlock();
 
-      results.push_back( result );
-    }
-  }
-
-  json_node_mutex_.unlock();
-
-  return results;
+    return results;
 }
 
-std::vector< std::string > SmartScopesClient::extract_json_stream( const std::string& json_stream )
+std::vector<std::string> SmartScopesClient::extract_json_stream( const std::string& json_stream )
 {
-  std::vector< std::string > jsons;
+    std::vector<std::string> jsons;
 
-  uint start_pos = 0;
-  int end_pos = 0;
+    uint start_pos = 0;
+    int end_pos = 0;
 
-  while( start_pos < json_stream.size() )
-  {
-    end_pos = json_stream.find( "\r\n", start_pos );
-    if( end_pos == -1 )
+    while ( start_pos < json_stream.size() )
     {
-      end_pos = json_stream.size();
+        end_pos = json_stream.find( "\r\n", start_pos );
+        if ( end_pos == -1 )
+        {
+            end_pos = json_stream.size();
+        }
+
+        std::string sub_json_str = json_stream.substr( start_pos, end_pos - start_pos );
+        jsons.push_back( sub_json_str );
+        start_pos = end_pos + 2;
     }
 
-    std::string sub_json_str = json_stream.substr( start_pos, end_pos - start_pos );
-    jsons.push_back( sub_json_str );
-    start_pos = end_pos + 2;
-  }
-
-  return jsons;
+    return jsons;
 }

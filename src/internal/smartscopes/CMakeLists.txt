@@ -6,8 +6,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
+find_path(JSONCPP_INCLUDE_DIR json/json.h
+          PATH_SUFFIXES include/jsoncpp jsoncpp)
+include_directories(${JSONCPP_INCLUDE_DIR})
+
 find_library(JSONCPP_LIBRARY REQUIRED jsoncpp)
-include_directories(${JSONCPP_INCLUDE_DIRS})
 
 add_library(
     smartscopes

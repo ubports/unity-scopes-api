@@ -24,6 +24,8 @@
 #include <memory>
 #include <thread>
 
+#include <signal.h>
+
 using namespace testing;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
@@ -34,69 +36,85 @@ namespace
 class SmartScopesClientTest : public Test
 {
 public:
-  SmartScopesClientTest()
-      : http_client_( new HttpClientQt() ),
-        json_node_( new JsonCppNode() ),
-        ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
-  {
-    system( "killall -q FakeSss.py" );
-  }
+    SmartScopesClientTest()
+        : http_client_( new HttpClientQt() ),
+          json_node_( new JsonCppNode() ),
+          ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
+    {
+        system( "killall -q FakeSss.py" );
+    }
+
+    void run_server()
+    {
+        const char* const argv[] = {FAKE_SSS_PATH, "", NULL};
+        pid_ = fork();
+        execv(argv[0], (char *const*)argv);
+    }
+
+    void kill_server()
+    {
+        kill( pid_, SIGKILL );
+    }
 
 protected:
-  HttpClientInterface::SPtr http_client_;
-  JsonNodeInterface::SPtr json_node_;
-  SmartScopesClient ssc_;
+    HttpClientInterface::SPtr http_client_;
+    JsonNodeInterface::SPtr json_node_;
+    SmartScopesClient ssc_;
+
+    pid_t pid_;
 };
 
 TEST_F( SmartScopesClientTest, remote_scopes )
 {
-  system( "./FakeSss.py &" );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    system( "./FakeSss.py &" );
 
-  std::vector< RemoteScope > scopes = ssc_.get_remote_scopes();
+    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
-  ASSERT_EQ( 2, scopes.size() );
+    std::vector<RemoteScope> scopes = ssc_.get_remote_scopes();
 
-  EXPECT_EQ( "Dummy Demo Scope", scopes[0].name );
-  EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo", scopes[0].search_url );
-  EXPECT_EQ( false, scopes[0].invisible );
+    ASSERT_EQ( 2, scopes.size() );
 
-  EXPECT_EQ( "Dummy Demo Scope 2", scopes[1].name );
-  EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url );
-  EXPECT_EQ( true, scopes[1].invisible );
+    EXPECT_EQ( "Dummy Demo Scope", scopes[0].name );
+    EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo", scopes[0].search_url );
+    EXPECT_EQ( false, scopes[0].invisible );
 
-  system( "killall -q FakeSss.py" );
+    EXPECT_EQ( "Dummy Demo Scope 2", scopes[1].name );
+    EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url );
+    EXPECT_EQ( true, scopes[1].invisible );
+
+    system( "killall -q FakeSss.py" );
 }
 
 TEST_F( SmartScopesClientTest, search )
 {
-  system( "./FakeSss.py &" );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    system( "./FakeSss.py &" );
 
-  ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
-  std::vector< SearchResult > results = ssc_.get_search_results();
+    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
-  EXPECT_EQ( 2, results.size() );
+    ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
+    std::vector<SearchResult> results = ssc_.get_search_results();
 
-  EXPECT_EQ( "URI", results[0].uri );
-  EXPECT_EQ( "Stuff", results[0].title );
-  EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/amazon.png", results[0].art );
-  EXPECT_EQ( "", results[0].dnd_uri );
-  EXPECT_EQ( "cat1", results[0].category->id );
-  EXPECT_EQ( "Category 1", results[0].category->title );
-  EXPECT_EQ( "", results[0].category->icon );
-  EXPECT_EQ( "", results[0].category->renderer_template );
+    EXPECT_EQ( 2, results.size() );
 
-  EXPECT_EQ( "URI2", results[1].uri );
-  EXPECT_EQ( "Things", results[1].title );
-  EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/google.png", results[1].art );
-  EXPECT_EQ( "", results[1].dnd_uri );
-  EXPECT_EQ( "cat1", results[1].category->id );
-  EXPECT_EQ( "Category 1", results[0].category->title );
-  EXPECT_EQ( "", results[1].category->icon );
-  EXPECT_EQ( "", results[1].category->renderer_template );
+    EXPECT_EQ( "URI", results[0].uri );
+    EXPECT_EQ( "Stuff", results[0].title );
+    EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/amazon.png", results[0].art );
+    EXPECT_EQ( "", results[0].dnd_uri );
+    EXPECT_EQ( "cat1", results[0].category->id );
+    EXPECT_EQ( "Category 1", results[0].category->title );
+    EXPECT_EQ( "", results[0].category->icon );
+    EXPECT_EQ( "", results[0].category->renderer_template );
 
-  system( "killall -q FakeSss.py" );
+    EXPECT_EQ( "URI2", results[1].uri );
+    EXPECT_EQ( "Things", results[1].title );
+    EXPECT_EQ( "https://productsearch.ubuntu.com/imgs/google.png", results[1].art );
+    EXPECT_EQ( "", results[1].dnd_uri );
+    EXPECT_EQ( "cat1", results[1].category->id );
+    EXPECT_EQ( "Category 1", results[0].category->title );
+    EXPECT_EQ( "", results[1].category->icon );
+    EXPECT_EQ( "", results[1].category->renderer_template );
+
+    system( "killall -q FakeSss.py" );
 }
 
 } // namespace

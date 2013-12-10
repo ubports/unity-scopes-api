@@ -23,7 +23,7 @@
 
 class QCoreApplication;
 
-using PromisePtr = std::shared_ptr< std::promise< std::string > >;
+using PromisePtr = std::shared_ptr<std::promise<std::string>>;
 
 namespace unity
 {
@@ -43,16 +43,16 @@ namespace smartscopes
 class HttpClientQt : public HttpClientInterface
 {
 public:
-  HttpClientQt();
-  ~HttpClientQt();
+    HttpClientQt();
+    ~HttpClientQt();
 
-  std::future< std::string > get( const std::string& request_url, int port = 80 ) override;
-  std::string to_html_escaped( const std::string& string ) override;
+    std::future<std::string> get( const std::string& request_url, int port = 80 ) override;
+    std::string to_html_escaped( const std::string& string ) override;
 
 private:
-  QCoreApplication* app_ = nullptr;
-  std::unique_ptr< std::thread > get_thread_ = nullptr;
-  PromisePtr promise_ = nullptr;
+    QCoreApplication* app_ = nullptr;
+    std::unique_ptr<std::thread> get_thread_ = nullptr;
+    PromisePtr promise_ = nullptr;
 };
 
 } // namespace smartscopes

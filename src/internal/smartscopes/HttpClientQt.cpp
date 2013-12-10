@@ -33,64 +33,64 @@ Q_DECLARE_METATYPE( PromisePtr )
 
 HttpClientQt::HttpClientQt()
 {
-  if( !QCoreApplication::instance() )
-  {
-    int argc = 0;
-    app_ = new QCoreApplication( argc, nullptr );
-  }
+    if ( !QCoreApplication::instance() )
+    {
+        int argc = 0;
+        app_ = new QCoreApplication( argc, nullptr );
+    }
 }
 
 HttpClientQt::~HttpClientQt()
 {
-  if( get_thread_ )
-  {
-    get_thread_->join();
-  }
+    if ( get_thread_ )
+    {
+        get_thread_->join();
+    }
 
-  delete app_;
+    delete app_;
 }
 
-std::future< std::string > HttpClientQt::get( const std::string& request_url, int port )
+std::future<std::string> HttpClientQt::get( const std::string& request_url, int port )
 {
-  if( get_thread_ )
-  {
-    get_thread_->join();
-  }
-
-  promise_ = std::make_shared< std::promise< std::string > >();
-
-  get_thread_ = std::unique_ptr < std::thread > ( new std::thread( [&request_url, port, this]()
-  {
-    QUrl url( request_url.c_str() );
-    url.setPort( port );
-
-    auto thread = new HttpClientQtThread(url);
-    QEventLoop loop;
-    QObject::connect(thread, SIGNAL(finished()), &loop, SLOT(quit()));
-    thread->start();
-    loop.exec();
-    thread->wait();
-
-    QNetworkReply* reply = thread->getReply();
-    thread->deleteLater();
-
-    if( !reply || reply->error() != QNetworkReply::NoError )
+    if ( get_thread_ )
     {
-      // communication error
-      std::runtime_error e( reply->errorString().toStdString() );
-      promise_->set_exception( make_exception_ptr( e ) );
+        get_thread_->join();
     }
-    else
-    {
-      QString reply_string( reply->readAll() );
-      promise_->set_value( reply_string.toStdString() );
-    }
-  } ) );
 
-  return promise_->get_future();
+    promise_ = std::make_shared<std::promise<std::string>>();
+
+    get_thread_ = std::unique_ptr <std::thread> ( new std::thread( [&request_url, port, this]()
+    {
+        QUrl url( request_url.c_str() );
+        url.setPort( port );
+
+        auto thread = new HttpClientQtThread(url);
+        QEventLoop loop;
+        QObject::connect(thread, SIGNAL(finished()), &loop, SLOT(quit()));
+        thread->start();
+        loop.exec();
+        thread->wait();
+
+        QNetworkReply* reply = thread->getReply();
+        thread->deleteLater();
+
+        if ( !reply || reply->error() != QNetworkReply::NoError )
+        {
+            // communication error
+            std::runtime_error e( reply->errorString().toStdString() );
+            promise_->set_exception( make_exception_ptr( e ) );
+        }
+        else
+        {
+            QString reply_string( reply->readAll() );
+            promise_->set_value( reply_string.toStdString() );
+        }
+    } ) );
+
+    return promise_->get_future();
 }
 
 std::string HttpClientQt::to_html_escaped( const std::string& string )
 {
-  return QString( string.c_str() ).toHtmlEscaped().toStdString();
+    return QString( string.c_str() ).toHtmlEscaped().toStdString();
 }

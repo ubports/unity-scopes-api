@@ -29,29 +29,29 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
-typedef QPair< QByteArray, QByteArray > HttpHeader;
-typedef QList< HttpHeader > HttpHeadersList;
+typedef QPair<QByteArray, QByteArray> HttpHeader;
+typedef QList<HttpHeader> HttpHeadersList;
 
 class Q_DECL_EXPORT HttpClientQtThread : public QThread
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-  HttpClientQtThread( const QUrl &url, const HttpHeadersList& = HttpHeadersList() );
-  virtual ~HttpClientQtThread();
+    HttpClientQtThread( const QUrl& url, const HttpHeadersList& = HttpHeadersList() );
+    virtual ~HttpClientQtThread();
 
-  void run();
-  QNetworkReply* getReply() const;
+    void run();
+    QNetworkReply* getReply() const;
 
 public Q_SLOTS:
-  void cancel();
-  void queryDone( QNetworkReply* reply );
+    void cancel();
+    void queryDone( QNetworkReply* reply );
 
 private:
-  QUrl m_url;
-  HttpHeadersList m_headers;
-  QNetworkReply *m_reply;
-  QNetworkAccessManager *m_manager;
+    QUrl m_url;
+    HttpHeadersList m_headers;
+    QNetworkReply* m_reply;
+    QNetworkAccessManager* m_manager;
 };
 
 #endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
