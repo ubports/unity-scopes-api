@@ -19,12 +19,10 @@
 #ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 
+#include <unity/util/NonCopyable.h>
+
 #include <QThread>
 #include <QUrl>
-#include <QList>
-#include <QPair>
-#include <QByteArray>
-#include <QMutex>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -32,20 +30,20 @@ class QNetworkAccessManager;
 typedef QPair<QByteArray, QByteArray> HttpHeader;
 typedef QList<HttpHeader> HttpHeadersList;
 
-class Q_DECL_EXPORT HttpClientQtThread : public QThread
+class Q_DECL_EXPORT HttpClientQtThread : public QThread, private unity::util::NonCopyable
 {
     Q_OBJECT
 
 public:
     HttpClientQtThread( const QUrl& url, const HttpHeadersList& = HttpHeadersList() );
-    virtual ~HttpClientQtThread();
+    ~HttpClientQtThread();
 
     void run();
     QNetworkReply* getReply() const;
 
 public Q_SLOTS:
     void cancel();
-    void queryDone( QNetworkReply* reply );
+    void queryDone( QNetworkReply* );
 
 private:
     QUrl m_url;

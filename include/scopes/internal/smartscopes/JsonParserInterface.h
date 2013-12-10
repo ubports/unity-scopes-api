@@ -20,6 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
 
 #include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
 
 #include <string>
 #include <vector>
@@ -39,7 +40,7 @@ namespace internal
 namespace smartscopes
 {
 
-class JsonNodeInterface
+class JsonNodeInterface : private util::NonCopyable
 {
 public:
     UNITY_DEFINES_PTRS(JsonNodeInterface);

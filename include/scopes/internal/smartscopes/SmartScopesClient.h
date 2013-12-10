@@ -22,6 +22,8 @@
 #include <scopes/internal/smartscopes/HttpClientInterface.h>
 #include <scopes/internal/smartscopes/JsonParserInterface.h>
 
+#include <unity/util/NonCopyable.h>
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -66,7 +68,7 @@ struct SearchResult
     std::shared_ptr<SearchCategory> category;
 };
 
-class SmartScopesClient
+class SmartScopesClient : private util::NonCopyable
 {
 public:
     UNITY_DEFINES_PTRS(SmartScopesClient);
@@ -75,6 +77,8 @@ public:
                        JsonNodeInterface::SPtr json_node,
                        const std::string& url = "https://productsearch.ubuntu.com",
                        int port = 80 );
+
+    virtual ~SmartScopesClient();
 
     std::vector<RemoteScope> get_remote_scopes();
 

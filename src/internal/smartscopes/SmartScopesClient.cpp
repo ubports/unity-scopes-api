@@ -36,6 +36,11 @@ SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client,
 
 }
 
+SmartScopesClient::~SmartScopesClient()
+{
+
+}
+
 std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 {
     std::string response_str;

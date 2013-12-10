@@ -20,6 +20,7 @@
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
 
 #include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
 
 #include <future>
 
@@ -38,7 +39,7 @@ namespace internal
 namespace smartscopes
 {
 
-class HttpClientInterface
+class HttpClientInterface : private util::NonCopyable
 {
 public:
     UNITY_DEFINES_PTRS(HttpClientInterface);

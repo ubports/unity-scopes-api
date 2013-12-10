@@ -20,8 +20,7 @@
 
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QMutexLocker>
+#include <QNetworkReply>
 #include <QTimer>
 
 HttpClientQtThread::HttpClientQtThread( const QUrl& url, const HttpHeadersList& headers )
@@ -70,7 +69,7 @@ QNetworkReply* HttpClientQtThread::getReply() const
     return m_reply;
 }
 
-void HttpClientQtThread::queryDone( QNetworkReply* reply )
+void HttpClientQtThread::queryDone( QNetworkReply* )
 {
     quit();
 }
