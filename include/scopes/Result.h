@@ -75,6 +75,8 @@ public:
     std::string title() const;
     std::string art() const;
     std::string dnd_uri() const;
+    bool has_metadata(std::string const& key) const;
+    Variant const& metadata(std::string const& key) const;
 
     /**
        \brief Returns a dictionary of all attributes of this Result instance.

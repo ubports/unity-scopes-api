@@ -46,6 +46,9 @@ TEST(CategorisedResult, basic)
         EXPECT_EQ("a title", result.title());
         EXPECT_EQ("an icon", result.art());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_FALSE(result.has_metadata("nonexisting"));
+        EXPECT_TRUE(result.has_metadata("foo"));
+        EXPECT_EQ("bar", result.metadata("foo").get_string());
         EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
     }
@@ -189,24 +192,28 @@ TEST(CategorisedResult, serialize_excp)
     EXPECT_NO_THROW(result.serialize());
 }
 
-// test exceptions with null category
 TEST(CategorisedResult, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
     Category::SCPtr null_cat;
-
-    bool excp = false;
-    try
     {
-        CategorisedResult r(null_cat);
+        try
+        {
+            CategorisedResult r(null_cat);
+            FAIL();
+        }
+        catch (const unity::InvalidArgumentException& e) {}
     }
-    catch (const unity::InvalidArgumentException& e)
     {
-        excp = true;
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
+        result.set_title("a title");
+        result.set_art("an icon");
+        result.set_dnd_uri("http://canonical.com");
+        EXPECT_THROW(result.metadata("foo"), unity::InvalidArgumentException);
     }
-    EXPECT_TRUE(excp);
 }
 
 // test conversion from VariantMap
