@@ -23,17 +23,32 @@
 #include <iostream>
 #include <map>
 
+static const std::string c_base_url = "https://productsearch.ubuntu.com";
+static const std::string c_remote_scopes_resourse = "/smartscopes/v2/remote-scopes";
+
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client,
-                                      JsonNodeInterface::SPtr json_node, const std::string& url, int port )
+                                      JsonNodeInterface::SPtr json_node,
+                                      const std::string& url, int port )
     : http_client_( http_client ),
       json_node_( json_node ),
       url_( url ),
       port_( port )
 {
-
+    if ( url_.empty() )
+    {
+        const char* base_url_env = ::getenv( "SMART_SCOPES_SERVER" );
+        if ( base_url_env == 0 )
+        {
+            url_ = c_base_url;
+        }
+        else
+        {
+            url_ = base_url_env;
+        }
+    }
 }
 
 SmartScopesClient::~SmartScopesClient()
@@ -44,7 +59,7 @@ SmartScopesClient::~SmartScopesClient()
 std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 {
     std::string response_str;
-    std::future<std::string> response = http_client_->get( url_ + "/smartscopes/v2/remote-scopes", port_ );
+    std::future<std::string> response = http_client_->get( url_ + c_remote_scopes_resourse, port_ );
     response.wait();
 
     try
@@ -53,7 +68,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
     catch ( std::exception& e )
     {
-        std::cout << "failed to retrieve remote scopes from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
+        std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resourse << std::endl;
         std::cout << "error:" << e.what() << std::endl;
         return std::vector<RemoteScope>();
     }
@@ -62,7 +77,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 
     if ( !json_node_->read_json( response_str ) )
     {
-        std::cout << "failed to parse json response from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
+        std::cout << "failed to parse json response from uri: " << url_ << c_remote_scopes_resourse << std::endl;
         return std::vector<RemoteScope>();
     }
 

@@ -39,6 +39,11 @@ public:
     {
     }
 
+    ~HttpClientTest()
+    {
+        kill_server();
+    }
+
     void run_server( const std::string& server_path, const std::string& arg = "0" )
     {
         const char* const argv[] = {server_path.c_str(), arg.c_str(), NULL};

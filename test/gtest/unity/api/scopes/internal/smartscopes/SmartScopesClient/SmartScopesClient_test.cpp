@@ -41,6 +41,11 @@ public:
     {
     }
 
+    ~SmartScopesClientTest()
+    {
+        kill_server();
+    }
+
     void run_server()
     {
         const char* const argv[] = {FAKE_SSS_PATH, "", NULL};

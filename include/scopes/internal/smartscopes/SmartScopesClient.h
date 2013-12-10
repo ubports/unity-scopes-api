@@ -75,7 +75,7 @@ public:
 
     SmartScopesClient( HttpClientInterface::SPtr http_client,
                        JsonNodeInterface::SPtr json_node,
-                       const std::string& url = "https://productsearch.ubuntu.com",
+                       const std::string& url = "" /*detect url*/,
                        int port = 80 );
 
     virtual ~SmartScopesClient();
