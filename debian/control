@@ -16,6 +16,8 @@ Build-Depends: debhelper (>= 9),
                libzmqpp-dev,
                liblttng-ust-dev,
                lttng-tools,
+               qtbase5-dev,
+               libjsoncpp-dev,
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
