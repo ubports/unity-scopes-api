@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
-#define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
+#ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
+#define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -53,7 +53,7 @@ public:
     virtual bool read_json( const std::string& json_string ) = 0;
     virtual bool write_json( std::string& json_string ) = 0;
 
-    virtual int size() = 0;
+    virtual int size() const = 0;
 
     virtual bool get_value( const std::vector<std::string>& value_path, std::string& value ) = 0;
     virtual bool get_value( int value_index, std::string& value ) = 0;
@@ -76,4 +76,4 @@ public:
 
 } // namespace unity
 
-#endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONPARSERINTERFACE_H
+#endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H

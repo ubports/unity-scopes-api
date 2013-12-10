@@ -68,7 +68,7 @@ bool JsonCppNode::write_json( std::string& json_string )
     return true;
 }
 
-int JsonCppNode::size()
+int JsonCppNode::size() const
 {
     return root_.size();
 }

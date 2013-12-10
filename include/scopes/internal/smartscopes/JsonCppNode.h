@@ -16,10 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPPARSER_H
-#define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPPARSER_H
+#ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
 
-#include <scopes/internal/smartscopes/JsonParserInterface.h>
+#include <scopes/internal/smartscopes/JsonNodeInterface.h>
 
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>
@@ -51,7 +51,7 @@ public:
     bool read_json( const std::string& json_string ) override;
     bool write_json( std::string& json_string ) override;
 
-    int size() override;
+    int size() const override;
 
     bool get_value( const std::vector<std::string>& value_path, std::string& value ) override;
     bool get_value( int value_index, std::string& value ) override;
@@ -85,4 +85,4 @@ private:
 
 } // namespace unity
 
-#endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPPARSER_H
+#endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
