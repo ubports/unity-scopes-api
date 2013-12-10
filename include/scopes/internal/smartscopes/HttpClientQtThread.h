@@ -35,7 +35,7 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread, private unity::util::No
     Q_OBJECT
 
 public:
-    HttpClientQtThread( const QUrl& url, const HttpHeadersList& = HttpHeadersList() );
+    explicit HttpClientQtThread( const QUrl& url, const HttpHeadersList& = HttpHeadersList() );
     ~HttpClientQtThread();
 
     void run();

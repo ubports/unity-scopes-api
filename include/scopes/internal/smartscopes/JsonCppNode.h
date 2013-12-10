@@ -42,8 +42,8 @@ namespace smartscopes
 class JsonCppNode : public JsonNodeInterface
 {
 public:
-    JsonCppNode( std::string json_string = "" );
-    JsonCppNode( const Json::Value& root );
+    explicit JsonCppNode( std::string json_string = "" );
+    explicit JsonCppNode( const Json::Value& root );
     ~JsonCppNode();
 
     void clear_json() override;

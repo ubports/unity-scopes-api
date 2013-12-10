@@ -32,7 +32,7 @@ using namespace unity::api::scopes;
 class MyQuery : public QueryBase
 {
 public:
-    MyQuery(string const& query) :
+    explicit MyQuery(string const& query) :
         query_(query)
     {
     }
