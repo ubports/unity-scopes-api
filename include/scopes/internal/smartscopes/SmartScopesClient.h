@@ -83,10 +83,10 @@ public:
     std::vector<RemoteScope> get_remote_scopes();
 
     void search( const std::string& scope_resourse, const std::string& query,
-                 const std::string& session_id, int query_id, const std::string& platform,
+                 const std::string& session_id, uint query_id, const std::string& platform,
                  const std::string& locale = "", const std::string& country = "",
                  const std::string& latitude = "", const std::string& longitude = "",
-                 const std::string& limit = "" );
+                 const uint limit = 0 );
 
     std::vector<SearchResult> get_search_results();
 

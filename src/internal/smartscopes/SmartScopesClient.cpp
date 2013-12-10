@@ -94,10 +94,10 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 }
 
 void SmartScopesClient::search( const std::string& scope_resourse, const std::string& query,
-                                const std::string& session_id, int query_id, const std::string& platform,
+                                const std::string& session_id, uint query_id, const std::string& platform,
                                 const std::string& locale, const std::string& country,
                                 const std::string& latitude, const std::string& longitude,
-                                const std::string& limit )
+                                uint limit )
 {
     //search_results_.wait();
 
@@ -116,7 +116,7 @@ void SmartScopesClient::search( const std::string& scope_resourse, const std::st
     search_uri_ += country.empty() ? "" : "&country=\"" + country + "\"";
     search_uri_ += latitude.empty() ? "" : "&latitude=\"" + latitude + "\"";
     search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
-    search_uri_ += limit.empty() ? "" : "&limit=\"" + limit + "\"";
+    search_uri_ += limit == 0 ? "" : "&limit=\"" + std::to_string( limit ) + "\"";
 
     search_results_ = http_client_->get( search_uri_, port_ );
 }
