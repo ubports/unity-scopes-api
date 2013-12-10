@@ -21,7 +21,7 @@
 
 using namespace unity::api::scopes::internal::smartscopes;
 
-JsonCppNode::JsonCppNode( std::string json_string )
+JsonCppNode::JsonCppNode( const std::string& json_string )
 {
     if ( !json_string.empty() )
     {

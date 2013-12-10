@@ -42,7 +42,7 @@ namespace smartscopes
 class JsonCppNode : public JsonNodeInterface
 {
 public:
-    explicit JsonCppNode( std::string json_string = "" );
+    explicit JsonCppNode( const std::string& json_string = "" );
     explicit JsonCppNode( const Json::Value& root );
     ~JsonCppNode();
 
