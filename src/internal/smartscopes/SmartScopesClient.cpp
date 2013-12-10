@@ -120,7 +120,7 @@ void SmartScopesClient::search( const std::string& scope_resourse, const std::st
 
     // mandatory parameters
 
-    search_uri_ += "query=\"" + http_client_->to_html_escaped( query ) + "\"";
+    search_uri_ += "query=\"" + http_client_->to_percent_encoding( query ) + "\"";
     search_uri_ += "&session_id=\"" + session_id + "\"";
     search_uri_ += "&query_id=" + std::to_string( query_id );
     search_uri_ += "&platform=\"" + platform + "\"";

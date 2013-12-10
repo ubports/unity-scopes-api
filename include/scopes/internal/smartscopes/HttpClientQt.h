@@ -47,7 +47,7 @@ public:
     ~HttpClientQt();
 
     std::future<std::string> get( const std::string& request_url, int port = 80 ) override;
-    std::string to_html_escaped( const std::string& string ) override;
+    std::string to_percent_encoding( const std::string& string ) override;
 
 private:
     QCoreApplication* app_ = nullptr;

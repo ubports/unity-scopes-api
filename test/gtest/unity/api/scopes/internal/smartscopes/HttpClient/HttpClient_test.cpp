@@ -135,4 +135,10 @@ TEST_F( HttpClientTest, slow_server )
     kill_server();
 }
 
+TEST_F( HttpClientTest, percent_encoding )
+{
+  std::string encoded_str = http_client_->to_percent_encoding( " \"%<>\\^`{|}!*'();:@&=+$,/?#[]" );
+  EXPECT_EQ( "%20%22%25%3C%3E%5C%5E%60%7B%7C%7D%21%2A%27%28%29%3B%3A%40%26%3D%2B%24%2C%2F%3F%23%5B%5D", encoded_str );
+}
+
 } // namespace

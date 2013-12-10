@@ -90,7 +90,7 @@ std::future<std::string> HttpClientQt::get( const std::string& request_url, int 
     return promise_->get_future();
 }
 
-std::string HttpClientQt::to_html_escaped( const std::string& string )
+std::string HttpClientQt::to_percent_encoding( const std::string& string )
 {
-    return QString( string.c_str() ).toHtmlEscaped().toStdString();
+    return QUrl::toPercentEncoding( string.c_str() ).constData();
 }
