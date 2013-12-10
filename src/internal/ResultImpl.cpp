@@ -156,6 +156,30 @@ std::string ResultImpl::dnd_uri() const
     return dnd_uri_;
 }
 
+bool ResultImpl::has_metadata(std::string const& key) const
+{
+    if (metadata_ != nullptr)
+    {
+        return metadata_->find(key) != metadata_->end();
+    }
+    return false;
+}
+
+Variant const& ResultImpl::metadata(std::string const& key) const
+{
+    if (metadata_ != nullptr)
+    {
+        auto const& it = metadata_->find(key);
+        if (it != metadata_->end())
+        {
+            return it->second;
+        }
+    }
+    std::ostringstream s;
+    s << "Result::metadata(): requested key " << key << " doesn't exist";
+    throw InvalidArgumentException(s.str());
+}
+
 void ResultImpl::throw_on_empty(std::string const& name, std::string const& value)
 {
     if (value.empty())

@@ -57,7 +57,7 @@ struct VariantImpl
 } // namespace internal
 
 Variant::Variant() noexcept
-    : p(new internal::VariantImpl)
+    : p(new internal::VariantImpl { internal::NullVariant() })
 {
 }
 
