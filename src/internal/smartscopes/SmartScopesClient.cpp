@@ -51,7 +51,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     {
         response_str = response.get();
     }
-    catch ( std::exception e )
+    catch ( std::exception& e )
     {
         std::cout << "failed to retrieve remote scopes from uri: " << url_ << "/smartscopes/v2/remote-scopes" << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -130,7 +130,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
     {
         response_str = search_results_.get();
     }
-    catch ( std::exception e )
+    catch ( std::exception& e )
     {
         std::cout << "failed to retrieve search results from uri: " << search_uri_ << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -197,11 +197,10 @@ std::vector<std::string> SmartScopesClient::extract_json_stream( const std::stri
     std::vector<std::string> jsons;
 
     uint start_pos = 0;
-    int end_pos = 0;
 
     while ( start_pos < json_stream.size() )
     {
-        end_pos = json_stream.find( "\r\n", start_pos );
+        int end_pos = json_stream.find( "\r\n", start_pos );
         if ( end_pos == -1 )
         {
             end_pos = json_stream.size();
