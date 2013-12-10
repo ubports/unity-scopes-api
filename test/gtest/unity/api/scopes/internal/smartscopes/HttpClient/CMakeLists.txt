@@ -2,6 +2,9 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_definitions(-DGOOD_SERVER_PATH="${CMAKE_SOURCE_DIR}/test/gtest/unity/api/scopes/internal/smartscopes/HttpClient/GoodServer.py")
+add_definitions(-DBAD_SERVER_PATH="${CMAKE_SOURCE_DIR}/test/gtest/unity/api/scopes/internal/smartscopes/HttpClient/BadServer.py")
+
 add_executable(
     HttpClient_test
 
@@ -19,6 +22,3 @@ add_test(
 
     HttpClient_test
 )
-
-configure_file(GoodServer.py GoodServer.py)
-configure_file(BadServer.py BadServer.py)

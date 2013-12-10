@@ -24,8 +24,6 @@
 #include <memory>
 #include <thread>
 
-#include <signal.h>
-
 using namespace testing;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
@@ -41,14 +39,20 @@ public:
           json_node_( new JsonCppNode() ),
           ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
     {
-        system( "killall -q FakeSss.py" );
     }
 
     void run_server()
     {
         const char* const argv[] = {FAKE_SSS_PATH, "", NULL};
-        pid_ = fork();
-        execv(argv[0], (char *const*)argv);
+
+        switch (pid_ = fork())
+        {
+            case -1:
+                FAIL();
+            case 0: // child
+                execv(argv[0], (char *const*)argv);
+                FAIL();
+        }
     }
 
     void kill_server()
@@ -66,7 +70,7 @@ protected:
 
 TEST_F( SmartScopesClientTest, remote_scopes )
 {
-    system( "./FakeSss.py &" );
+    run_server();
 
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
@@ -82,19 +86,19 @@ TEST_F( SmartScopesClientTest, remote_scopes )
     EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url );
     EXPECT_EQ( true, scopes[1].invisible );
 
-    system( "killall -q FakeSss.py" );
+    kill_server();
 }
 
 TEST_F( SmartScopesClientTest, search )
 {
-    system( "./FakeSss.py &" );
+    run_server();
 
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
     std::vector<SearchResult> results = ssc_.get_search_results();
 
-    EXPECT_EQ( 2, results.size() );
+    ASSERT_EQ( 2, results.size() );
 
     EXPECT_EQ( "URI", results[0].uri );
     EXPECT_EQ( "Stuff", results[0].title );
@@ -114,7 +118,7 @@ TEST_F( SmartScopesClientTest, search )
     EXPECT_EQ( "", results[1].category->icon );
     EXPECT_EQ( "", results[1].category->renderer_template );
 
-    system( "killall -q FakeSss.py" );
+    kill_server();
 }
 
 } // namespace

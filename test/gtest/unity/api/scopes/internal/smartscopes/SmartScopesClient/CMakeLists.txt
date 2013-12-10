@@ -21,5 +21,3 @@ add_test(
 
     SmartScopesClient_test
 )
-
-configure_file(FakeSss.py FakeSss.py)

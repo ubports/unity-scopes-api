@@ -37,12 +37,30 @@ public:
     HttpClientTest()
         : http_client_( new HttpClientQt() )
     {
-        system( "killall -q BadServer.py" );
-        system( "killall -q GoodServer.py" );
+    }
+
+    void run_server( const std::string& server_path, const std::string& arg = "0" )
+    {
+        const char* const argv[] = {server_path.c_str(), arg.c_str(), NULL};
+
+        switch (pid_ = fork())
+        {
+            case -1:
+                FAIL();
+            case 0: // child
+                execv(argv[0], (char *const*)argv);
+                FAIL();
+        }
+    }
+
+    void kill_server()
+    {
+        kill( pid_, SIGKILL );
     }
 
 protected:
     HttpClientInterface::SPtr http_client_;
+    pid_t pid_;
 };
 
 TEST_F( HttpClientTest, bad_server )
@@ -56,7 +74,7 @@ TEST_F( HttpClientTest, bad_server )
 
     // bad server
 
-    system( "./BadServer.py &" );
+    run_server( BAD_SERVER_PATH );
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     response = http_client_->get( test_url, test_port );
@@ -64,14 +82,14 @@ TEST_F( HttpClientTest, bad_server )
 
     EXPECT_THROW( response.get(), std::runtime_error );
 
-    system( "killall -q BadServer.py" );
+    kill_server();
 }
 
 TEST_F( HttpClientTest, good_server )
 {
     // responds immediately
 
-    system( "./GoodServer.py 0 &" );
+    run_server( GOOD_SERVER_PATH );
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     std::future<std::string> response = http_client_->get( test_url, test_port );
@@ -81,11 +99,11 @@ TEST_F( HttpClientTest, good_server )
     EXPECT_NO_THROW( response_str = response.get() );
     EXPECT_EQ( "Hello there", response_str );
 
-    system( "killall -q GoodServer.py" );
+    kill_server();
 
     // responds in 1 second
 
-    system( "./GoodServer.py 1 &" );
+    run_server( GOOD_SERVER_PATH, "1" );
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     response = http_client_->get( test_url, test_port );
@@ -94,14 +112,14 @@ TEST_F( HttpClientTest, good_server )
     EXPECT_NO_THROW( response_str = response.get() );
     EXPECT_EQ( "Hello there", response_str );
 
-    system( "killall -q GoodServer.py" );
+    kill_server();
 }
 
 TEST_F( HttpClientTest, slow_server )
 {
     // responds in 5 seconds
 
-    system( "./GoodServer.py 5 &" );
+    run_server( GOOD_SERVER_PATH, "5" );
     std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
 
     std::future<std::string> response = http_client_->get( test_url, test_port );
@@ -109,7 +127,7 @@ TEST_F( HttpClientTest, slow_server )
 
     EXPECT_THROW( response.get(), std::runtime_error );
 
-    system( "killall -q GoodServer.py" );
+    kill_server();
 }
 
 } // namespace
