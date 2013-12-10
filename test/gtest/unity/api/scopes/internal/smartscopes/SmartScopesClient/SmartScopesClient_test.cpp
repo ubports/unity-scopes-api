@@ -41,43 +41,44 @@ public:
     {
     }
 
-    ~SmartScopesClientTest()
+    class server_raii
     {
-        kill_server();
-    }
-
-    void run_server()
-    {
-        const char* const argv[] = {FAKE_SSS_PATH, "", NULL};
-
-        switch (pid_ = fork())
+    public:
+        server_raii()
         {
-            case -1:
-                FAIL();
-            case 0: // child
-                execv(argv[0], (char *const*)argv);
-                FAIL();
-        }
-    }
+            const char* const argv[] = {FAKE_SSS_PATH, "", NULL};
 
-    void kill_server()
-    {
-        kill( pid_, SIGKILL );
-    }
+            switch (pid_ = fork())
+            {
+                case -1:
+                    throw std::exception();
+                case 0: // child
+                    execv(argv[0], (char *const*)argv);
+                    throw std::exception();
+            }
+
+            std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+        }
+
+        ~server_raii()
+        {
+            kill( pid_, SIGTERM );
+            std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+        }
+
+    private:
+        pid_t pid_ = -1;
+    };
 
 protected:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient ssc_;
-
-    pid_t pid_;
 };
 
 TEST_F( SmartScopesClientTest, remote_scopes )
 {
-    run_server();
-
-    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    server_raii server;
 
     std::vector<RemoteScope> scopes = ssc_.get_remote_scopes();
 
@@ -90,15 +91,11 @@ TEST_F( SmartScopesClientTest, remote_scopes )
     EXPECT_EQ( "Dummy Demo Scope 2", scopes[1].name );
     EXPECT_EQ( "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url );
     EXPECT_EQ( true, scopes[1].invisible );
-
-    kill_server();
 }
 
 TEST_F( SmartScopesClientTest, search )
 {
-    run_server();
-
-    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
+    server_raii server;
 
     ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
     std::vector<SearchResult> results = ssc_.get_search_results();
@@ -122,8 +119,6 @@ TEST_F( SmartScopesClientTest, search )
     EXPECT_EQ( "Category 1", results[0].category->title );
     EXPECT_EQ( "", results[1].category->icon );
     EXPECT_EQ( "", results[1].category->renderer_template );
-
-    kill_server();
 }
 
 } // namespace

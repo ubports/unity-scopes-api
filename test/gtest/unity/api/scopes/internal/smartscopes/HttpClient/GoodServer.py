@@ -32,5 +32,5 @@ def response(environ, start_response):
 
 response_body = 'Hello there'
 
-httpd = make_server('127.0.0.1', 9009, response)
+httpd = make_server('127.0.0.1', 9008, response)
 httpd.handle_request()

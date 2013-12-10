@@ -40,7 +40,7 @@ SmartScopesClient::SmartScopesClient( HttpClientInterface::SPtr http_client,
     if ( url_.empty() )
     {
         const char* base_url_env = ::getenv( "SMART_SCOPES_SERVER" );
-        if ( base_url_env == 0 )
+        if ( base_url_env == nullptr )
         {
             url_ = c_base_url;
         }
