@@ -151,25 +151,40 @@ TEST(CategorisedResult, serialize)
     CategoryRegistry reg;
     CategoryRenderer rdr;
     auto cat = reg.register_category("1", "title", "icon", rdr);
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
+        result.set_title("a title");
+        result.set_art("an icon");
+        result.set_dnd_uri("http://canonical.com");
 
-    CategorisedResult result(cat);
-    result.set_uri("http://ubuntu.com");
-    result.set_title("a title");
-    result.set_art("an icon");
-    result.set_dnd_uri("http://canonical.com");
+        EXPECT_EQ("http://ubuntu.com", result.uri());
+        EXPECT_EQ("a title", result.title());
+        EXPECT_EQ("an icon", result.art());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
 
-    EXPECT_EQ("http://ubuntu.com", result.uri());
-    EXPECT_EQ("a title", result.title());
-    EXPECT_EQ("an icon", result.art());
-    EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        auto outer_var = result.serialize();
+        auto var = outer_var["attrs"].get_dict();
+        EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
+        EXPECT_EQ("a title", var["title"].get_string());
+        EXPECT_EQ("an icon", var["art"].get_string());
+        EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
+        EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
+    }
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
+        result.set_dnd_uri("http://canonical.com");
 
-    auto outer_var = result.serialize();
-    auto var = outer_var["attrs"].get_dict();
-    EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
-    EXPECT_EQ("a title", var["title"].get_string());
-    EXPECT_EQ("an icon", var["art"].get_string());
-    EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
-    EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
+        auto outer_var = result.serialize();
+        auto var = outer_var["attrs"].get_dict();
+        EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
+        EXPECT_TRUE(var.find("title") == var.end());
+        EXPECT_TRUE(var.find("art") == var.end());
+        EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
+        EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
+    }
+
 }
 
 // test exceptions when converting to VariantMap
@@ -180,13 +195,9 @@ TEST(CategorisedResult, serialize_excp)
     auto cat = reg.register_category("1", "title", "icon", rdr);
     CategorisedResult result(cat);
 
-    // throw until all required attributes are non-empty
+    // throw until mandatory attributes (uri, dnd_uri) are non-empty
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_uri("http://ubuntu.com");
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_title("a title");
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_art("an icon");
     EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
     result.set_dnd_uri("http://canonical.com");
     EXPECT_NO_THROW(result.serialize());
@@ -219,33 +230,59 @@ TEST(CategorisedResult, exceptions)
 // test conversion from VariantMap
 TEST(CategorisedResult, deserialize)
 {
-    VariantMap vm;
-    vm["uri"] = "http://ubuntu.com";
-    vm["dnd_uri"] = "http://canonical.com";
-    vm["title"] = "a title";
-    vm["art"] = "an icon";
-    vm["foo"] = "bar"; // custom attribute
+    {
+        VariantMap vm;
+        vm["uri"] = "http://ubuntu.com";
+        vm["dnd_uri"] = "http://canonical.com";
+        vm["title"] = "a title";
+        vm["art"] = "an icon";
+        vm["foo"] = "bar"; // custom attribute
 
-    VariantMap intvm;
-    intvm["cat_id"] = "2";
+        VariantMap intvm;
+        intvm["cat_id"] = "2";
 
-    VariantMap outer;
-    outer["attrs"] = vm;
-    outer["internal"] = intvm;
+        VariantMap outer;
+        outer["attrs"] = vm;
+        outer["internal"] = intvm;
 
-    CategoryRegistry reg;
-    CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
-    CategorisedResult result(cat, outer);
+        CategoryRegistry reg;
+        CategoryRenderer rdr;
+        auto cat = reg.register_category("1", "title", "icon", rdr);
+        CategorisedResult result(cat, outer);
 
-    auto outer_var = result.serialize();
-    auto var = outer_var["attrs"].get_dict();
-    EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
-    EXPECT_EQ("a title", var["title"].get_string());
-    EXPECT_EQ("an icon", var["art"].get_string());
-    EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
-    EXPECT_EQ("bar", var["foo"].get_string());
-    EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
+        auto outer_var = result.serialize();
+        auto var = outer_var["attrs"].get_dict();
+        EXPECT_EQ("http://ubuntu.com", var["uri"].get_string());
+        EXPECT_EQ("a title", var["title"].get_string());
+        EXPECT_EQ("an icon", var["art"].get_string());
+        EXPECT_EQ("http://canonical.com", var["dnd_uri"].get_string());
+        EXPECT_EQ("bar", var["foo"].get_string());
+        EXPECT_EQ("1", outer_var["internal"].get_dict()["cat_id"].get_string());
+    }
+    {
+        VariantMap vm;
+        vm["uri"] = "http://ubuntu.com";
+        vm["dnd_uri"] = "http://canonical.com";
+        vm["foo"] = "bar"; // custom attribute
+
+        VariantMap intvm;
+        intvm["cat_id"] = "2";
+
+        VariantMap outer;
+        outer["attrs"] = vm;
+        outer["internal"] = intvm;
+
+        CategoryRegistry reg;
+        CategoryRenderer rdr;
+        auto cat = reg.register_category("1", "title", "icon", rdr);
+        CategorisedResult result(cat, outer);
+
+        EXPECT_EQ("http://ubuntu.com", result.uri());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_EQ("", result.title());
+        EXPECT_EQ("", result.art());
+        EXPECT_EQ("bar", result.metadata("foo").get_string());
+    }
 }
 
 TEST(CategorisedResult, store)

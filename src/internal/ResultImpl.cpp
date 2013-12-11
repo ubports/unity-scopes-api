@@ -184,7 +184,7 @@ void ResultImpl::throw_on_empty(std::string const& name, std::string const& valu
 {
     if (value.empty())
     {
-        throw InvalidArgumentException("ResultItem: invalid empty attribute: " + name);
+        throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
 }
 
@@ -199,15 +199,19 @@ void ResultImpl::serialize_internal(VariantMap& var) const
 VariantMap ResultImpl::serialize() const
 {
     throw_on_empty("uri", uri_);
-    throw_on_empty("title", title_);
-    throw_on_empty("art", art_);
     throw_on_empty("dnd_uri", dnd_uri_);
 
     VariantMap var;
     var["uri"] = uri_;
-    var["title"] = title_;
-    var["art"] = art_;
     var["dnd_uri"] = dnd_uri_;
+    if (!title_.empty())
+    {
+        var["title"] = title_;
+    }
+    if (!art_.empty())
+    {
+        var["art"] = art_;
+    }
 
     if (metadata_)
     {
@@ -261,28 +265,27 @@ void ResultImpl::deserialize(VariantMap const& var)
     uri_ = it->second.get_string();
 
     it = attrs.find("title");
-    if (it == attrs.end())
-        throw InvalidArgumentException("Missing 'title'");
-    title_ = it->second.get_string();
+    if (it != attrs.end())
+    {
+        title_ = it->second.get_string();
+    }
 
     it = attrs.find("art");
-    if (it == attrs.end())
-        throw InvalidArgumentException("Missing 'art'");
-    art_ = it->second.get_string();
+    if (it != attrs.end())
+    {
+        art_ = it->second.get_string();
+    }
 
     it = attrs.find("dnd_uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'dnd_uri'");
     dnd_uri_ = it->second.get_string();
 
-    if (attrs.size() > standard_attrs.size())
+    for (auto const& kv: attrs)
     {
-        for (auto const& kv: attrs)
+        if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
         {
-            if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
-            {
-                add_metadata(kv.first, kv.second);
-            }
+            add_metadata(kv.first, kv.second);
         }
     }
 }
