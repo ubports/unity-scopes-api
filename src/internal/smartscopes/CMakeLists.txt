@@ -35,5 +35,6 @@ qt5_use_modules(
 target_link_libraries(
     smartscopes
 
+    ${UNITY_API_LDFLAGS}
     ${JSONCPP_LIBRARY}
 )

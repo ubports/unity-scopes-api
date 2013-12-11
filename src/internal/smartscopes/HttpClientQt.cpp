@@ -18,6 +18,7 @@
 
 #include <scopes/internal/smartscopes/HttpClientQt.h>
 #include <scopes/internal/smartscopes/HttpClientQtThread.h>
+#include <unity/UnityExceptions.h>
 
 #include <QCoreApplication>
 #include <QEventLoop>
@@ -77,7 +78,7 @@ std::future<std::string> HttpClientQt::get( const std::string& request_url, int 
         if ( !reply || reply->error() != QNetworkReply::NoError )
         {
             // communication error
-            std::runtime_error e( reply->errorString().toStdString() );
+            unity::ResourceException e( reply->errorString().toStdString() );
             promise_->set_exception( make_exception_ptr( e ) );
         }
         else

@@ -19,6 +19,7 @@
 #include <scopes/internal/smartscopes/JsonCppNode.h>
 #include <sstream>
 
+using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 JsonCppNode::JsonCppNode( const std::string& json_string )
@@ -73,9 +74,9 @@ int JsonCppNode::size() const
     return root_.size();
 }
 
-bool JsonCppNode::get_value( const std::vector<std::string>& value_path, std::string& value )
+bool JsonCppNode::get_value( const std::string& value_name, std::string& value )
 {
-    const Json::Value& value_node = get_value_path( value_path );
+    const Json::Value& value_node = root_[value_name];
 
     if ( !value_node || value_node.isArray() || value_node.isObject() )
     {
@@ -106,9 +107,9 @@ bool JsonCppNode::get_value( int value_index, std::string& value )
     return true;
 }
 
-bool JsonCppNode::get_node( const std::vector<std::string>& node_path, JsonNodeInterface::SPtr& node )
+bool JsonCppNode::get_node( const std::string& node_name, JsonNodeInterface::SPtr& node )
 {
-    const Json::Value& value_node = get_value_path( node_path );
+    const Json::Value& value_node = root_[node_name];
 
     if ( !value_node || ( !value_node.isArray() && !value_node.isObject() ) )
     {
@@ -137,9 +138,9 @@ bool JsonCppNode::get_node( int node_index, JsonNodeInterface::SPtr& node )
     return true;
 }
 
-bool JsonCppNode::set_value( const std::vector<std::string>& value_path, const std::string& value )
+bool JsonCppNode::set_value( const std::string& value_name, const std::string& value )
 {
-    Json::Value& value_node = set_value_path( value_path );
+    Json::Value& value_node = root_[value_name];
 
     value_node = value;
     return true;
@@ -153,9 +154,9 @@ bool JsonCppNode::set_value( int value_index, const std::string& value )
     return true;
 }
 
-bool JsonCppNode::set_node( const std::vector<std::string>& node_path, const JsonNodeInterface::SPtr& node )
+bool JsonCppNode::set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node )
 {
-    Json::Value& value_node = set_value_path( node_path );
+    Json::Value& value_node = root_[node_name];
 
     value_node = static_cast<JsonCppNode*>( node.get() )->root_;
     return true;
@@ -167,28 +168,6 @@ bool JsonCppNode::set_node( int node_index, const JsonNodeInterface::SPtr& node 
 
     value_node = static_cast<JsonCppNode*>( node.get() )->root_;
     return true;
-}
-
-const Json::Value& JsonCppNode::get_value_path( const std::vector<std::string>& value_path )
-{
-    const Json::Value* value_node = &root_;
-    for ( const std::string& node : value_path )
-    {
-        value_node = &( *value_node )[node];
-    }
-
-    return *value_node;
-}
-
-Json::Value& JsonCppNode::set_value_path( const std::vector<std::string>& value_path )
-{
-    Json::Value* value_node = &root_;
-    for ( const std::string& node : value_path )
-    {
-        value_node = &( *value_node )[node];
-    }
-
-    return *value_node;
 }
 
 std::string JsonCppNode::node_to_string( const Json::Value& node )

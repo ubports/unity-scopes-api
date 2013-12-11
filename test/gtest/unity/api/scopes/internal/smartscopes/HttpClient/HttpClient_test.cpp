@@ -17,6 +17,7 @@
  */
 
 #include <scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -49,10 +50,10 @@ public:
             switch (pid_ = fork())
             {
                 case -1:
-                    throw std::exception();
+                    throw unity::ResourceException("Failed to fork process");
                 case 0: // child
                     execv(argv[0], (char *const*)argv);
-                    throw std::exception();
+                    throw unity::ResourceException("Failed to fork process");
             }
 
             std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
@@ -79,7 +80,7 @@ TEST_F( HttpClientTest, no_server )
     std::future<std::string> response = http_client_->get( test_url, test_port );
     response.wait();
 
-    EXPECT_THROW( response.get(), std::runtime_error );
+    EXPECT_THROW( response.get(), unity::Exception );
 }
 
 TEST_F( HttpClientTest, bad_server )
@@ -91,7 +92,7 @@ TEST_F( HttpClientTest, bad_server )
     std::future<std::string> response = http_client_->get( test_url, test_port );
     response.wait();
 
-    EXPECT_THROW( response.get(), std::runtime_error );
+    EXPECT_THROW( response.get(), unity::Exception );
 }
 
 TEST_F( HttpClientTest, good_server )
@@ -131,7 +132,7 @@ TEST_F( HttpClientTest, slow_server )
     std::future<std::string> response = http_client_->get( test_url, test_port );
     response.wait();
 
-    EXPECT_THROW( response.get(), std::runtime_error );
+    EXPECT_THROW( response.get(), unity::Exception );
 }
 
 TEST_F( HttpClientTest, percent_encoding )

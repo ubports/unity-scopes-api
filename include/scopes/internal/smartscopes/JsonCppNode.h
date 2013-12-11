@@ -53,20 +53,17 @@ public:
 
     int size() const override;
 
-    bool get_value( const std::vector<std::string>& value_path, std::string& value ) override;
+    bool get_value( const std::string& value_name, std::string& value ) override;
     bool get_value( int value_index, std::string& value ) override;
-    bool get_node( const std::vector<std::string>& node_path, JsonNodeInterface::SPtr& node ) override;
+    bool get_node( const std::string& node_name, JsonNodeInterface::SPtr& node ) override;
     bool get_node( int node_index, JsonNodeInterface::SPtr& node ) override;
 
-    bool set_value( const std::vector<std::string>& value_path, const std::string& value ) override;
+    bool set_value( const std::string& value_name, const std::string& value ) override;
     bool set_value( int value_index, const std::string& value ) override;
-    bool set_node( const std::vector<std::string>& node_path, const JsonNodeInterface::SPtr& node ) override;
+    bool set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node ) override;
     bool set_node( int node_index, const JsonNodeInterface::SPtr& node ) override;
 
 private:
-    const Json::Value& get_value_path( const std::vector<std::string>& value_path );
-    Json::Value& set_value_path( const std::vector<std::string>& value_path );
-
     std::string node_to_string( const Json::Value& node );
 
 private:

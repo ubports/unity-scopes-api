@@ -17,6 +17,7 @@
  */
 
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/UnityExceptions.h>
 
 #include <algorithm>
 #include <future>
@@ -66,7 +67,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     {
         response_str = response.get();
     }
-    catch ( std::exception& e )
+    catch ( unity::Exception& e )
     {
         std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resourse << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -90,13 +91,13 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     {
         json_node_->get_node( i, scope_node );
 
-        scope_node->get_value( { "name" }, value );
+        scope_node->get_value( "name", value );
         scope.name = value;
 
-        scope_node->get_value( { "search_url" }, value );
+        scope_node->get_value( "search_url", value );
         scope.search_url = value;
 
-        scope_node->get_value( { "invisible" }, value );
+        scope_node->get_value( "invisible", value );
         std::transform( value.begin(), value.end(), value.begin(), ::toupper );
         scope.invisible = value == "TRUE";
 
@@ -145,7 +146,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
     {
         response_str = search_results_.get();
     }
-    catch ( std::exception& e )
+    catch ( unity::Exception& e )
     {
         std::cout << "failed to retrieve search results from uri: " << search_uri_ << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -169,33 +170,33 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
         JsonNodeInterface::SPtr result_node;
         std::string value;
 
-        if ( json_node_->get_node( {"category"}, result_node ) )
+        if ( json_node_->get_node( "category", result_node ) )
         {
             auto category = std::make_shared<SearchCategory>();
 
-            result_node->get_value( {"icon"}, value );
+            result_node->get_value( "icon", value );
             category->icon = value;
-            result_node->get_value( {"id"}, value );
+            result_node->get_value( "id", value );
             category->id = value;
-            result_node->get_value( {"renderer_template"}, value );
+            result_node->get_value( "renderer_template", value );
             category->renderer_template = value;
-            result_node->get_value( {"title"}, value );
+            result_node->get_value( "title", value );
             category->title = value;
             categories[ category->id ] = category;
         }
-        else if ( json_node_->get_node( {"result"}, result_node ) )
+        else if ( json_node_->get_node( "result", result_node ) )
         {
             SearchResult result;
 
-            result_node->get_value( {"art"}, value );
+            result_node->get_value( "art", value );
             result.art = value;
-            result_node->get_value( {"cat_id"}, value );
+            result_node->get_value( "cat_id", value );
             result.category = categories[value];
-            result_node->get_value( {"dnd_uri"}, value );
+            result_node->get_value( "dnd_uri", value );
             result.dnd_uri = value;
-            result_node->get_value( {"title"}, value );
+            result_node->get_value( "title", value );
             result.title = value;
-            result_node->get_value( {"uri"}, value );
+            result_node->get_value( "uri", value );
             result.uri = value;
 
             results.push_back( result );

@@ -55,15 +55,15 @@ public:
 
     virtual int size() const = 0;
 
-    virtual bool get_value( const std::vector<std::string>& value_path, std::string& value ) = 0;
+    virtual bool get_value( const std::string& value_name, std::string& value ) = 0;
     virtual bool get_value( int value_index, std::string& value ) = 0;
-    virtual bool get_node( const std::vector<std::string>& node_path, JsonNodeInterface::SPtr& node ) = 0;
-    virtual bool get_node( int node_path, JsonNodeInterface::SPtr& node ) = 0;
+    virtual bool get_node( const std::string& node_name, JsonNodeInterface::SPtr& node ) = 0;
+    virtual bool get_node( int node_index, JsonNodeInterface::SPtr& node ) = 0;
 
-    virtual bool set_value( const std::vector<std::string>& value_path, const std::string& value ) = 0;
+    virtual bool set_value( const std::string& value_name, const std::string& value ) = 0;
     virtual bool set_value( int value_index, const std::string& value ) = 0;
-    virtual bool set_node( const std::vector<std::string>& node_path, const JsonNodeInterface::SPtr& node ) = 0;
-    virtual bool set_node( int node_path, const JsonNodeInterface::SPtr& node ) = 0;
+    virtual bool set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node ) = 0;
+    virtual bool set_node( int node_index, const JsonNodeInterface::SPtr& node ) = 0;
 };
 
 } // namespace smartscopes
