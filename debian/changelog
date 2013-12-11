@@ -1,12 +1,28 @@
-unity-scopes-api (0.1.3-0ubuntu2) UNRELEASED; urgency=low
+unity-scopes-api (0.1.3+14.04.20131211-0ubuntu1) trusty; urgency=low
 
   [ Michal Hruby ]
   * Bump version because of the ResultItem rename.
 
   [ Pawel Stolowski ]
   * Added Result::metadata() getter. Create null Variant with default ctor.
+  * Introduced a base Result class which carries base result attributes
+    and CategorisedResult class that carries Result + a category and
+    replaces existing ResultItem class. Provide methods to store a
+    Result inside a Result. Changed the internal structure of serialized
+    Result to use "attrs" and "internal" dicts inside the outer dict.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Mon, 09 Dec 2013 19:15:03 +0100
+  [ Michi Henning ]
+  * This fixes a race condition that could cause the thread pool
+    accessor on the middleware to return nullptr.
+
+  [ James Henstridge ]
+  * Add a simple API to launch a scope without going through the dlopen
+    based scope runner for the benefit of language bindings.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 84
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 11 Dec 2013 10:49:54 +0000
 
 unity-scopes-api (0.1.1+14.04.20131204-0ubuntu1) trusty; urgency=low
 
