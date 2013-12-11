@@ -45,25 +45,31 @@ class JsonNodeInterface : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(JsonNodeInterface);
 
+    enum NodeType
+    {
+        Null, Array, Object, String, Int, UInt, Real, Bool
+    };
+
     JsonNodeInterface() = default;
     virtual ~JsonNodeInterface() = default;
 
-    virtual void clear_json() = 0;
-
-    virtual bool read_json( const std::string& json_string ) = 0;
-    virtual bool write_json( std::string& json_string ) = 0;
+    virtual void clear() = 0;
+    virtual void read_json( const std::string& json_string ) = 0;
 
     virtual int size() const = 0;
+    virtual NodeType type() const = 0;
 
-    virtual bool get_value( const std::string& value_name, std::string& value ) = 0;
-    virtual bool get_value( int value_index, std::string& value ) = 0;
-    virtual bool get_node( const std::string& node_name, JsonNodeInterface::SPtr& node ) = 0;
-    virtual bool get_node( int node_index, JsonNodeInterface::SPtr& node ) = 0;
+    virtual std::string as_string() const = 0;
+    virtual int as_int() const = 0;
+    virtual uint as_uint() const = 0;
+    virtual float as_float() const = 0;
+    virtual double as_double() const = 0;
+    virtual bool as_bool() const = 0;
 
-    virtual bool set_value( const std::string& value_name, const std::string& value ) = 0;
-    virtual bool set_value( int value_index, const std::string& value ) = 0;
-    virtual bool set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node ) = 0;
-    virtual bool set_node( int node_index, const JsonNodeInterface::SPtr& node ) = 0;
+    virtual bool has_node( const std::string& node_name ) const = 0;
+    virtual bool has_node( uint node_index ) const = 0;
+    virtual JsonNodeInterface::SPtr get_node( const std::string& node_name ) const = 0;
+    virtual JsonNodeInterface::SPtr get_node( uint node_index ) const = 0;
 };
 
 } // namespace smartscopes

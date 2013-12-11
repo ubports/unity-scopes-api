@@ -46,25 +46,23 @@ public:
     explicit JsonCppNode( const Json::Value& root );
     ~JsonCppNode();
 
-    void clear_json() override;
-
-    bool read_json( const std::string& json_string ) override;
-    bool write_json( std::string& json_string ) override;
+    void clear() override;
+    void read_json( const std::string& json_string ) override;
 
     int size() const override;
+    NodeType type() const override;
 
-    bool get_value( const std::string& value_name, std::string& value ) override;
-    bool get_value( int value_index, std::string& value ) override;
-    bool get_node( const std::string& node_name, JsonNodeInterface::SPtr& node ) override;
-    bool get_node( int node_index, JsonNodeInterface::SPtr& node ) override;
+    std::string as_string() const override;
+    int as_int() const override;
+    uint as_uint() const override;
+    float as_float() const override;
+    double as_double() const override;
+    bool as_bool() const override;
 
-    bool set_value( const std::string& value_name, const std::string& value ) override;
-    bool set_value( int value_index, const std::string& value ) override;
-    bool set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node ) override;
-    bool set_node( int node_index, const JsonNodeInterface::SPtr& node ) override;
-
-private:
-    std::string node_to_string( const Json::Value& node );
+    bool has_node( const std::string& node_name ) const override;
+    bool has_node( uint node_index ) const override;
+    JsonNodeInterface::SPtr get_node( const std::string& node_name ) const override;
+    JsonNodeInterface::SPtr get_node( uint node_index ) const override;
 
 private:
     Json::Value root_;

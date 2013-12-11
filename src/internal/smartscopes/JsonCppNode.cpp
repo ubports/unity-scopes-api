@@ -17,7 +17,7 @@
  */
 
 #include <scopes/internal/smartscopes/JsonCppNode.h>
-#include <sstream>
+#include <unity/UnityExceptions.h>
 
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
@@ -40,33 +40,19 @@ JsonCppNode::~JsonCppNode()
 
 }
 
-void JsonCppNode::clear_json()
+void JsonCppNode::clear()
 {
     root_.clear();
 }
 
-bool JsonCppNode::read_json( const std::string& json_string )
+void JsonCppNode::read_json( const std::string& json_string )
 {
-    clear_json();
+    clear();
 
     if ( !reader_.parse( json_string, root_ ) )
     {
-        std::cout << "Failed to parse configuration\n" << reader_.getFormattedErrorMessages();
-        return false;
+        throw unity::ResourceException("Failed to parse json string: " + reader_.getFormattedErrorMessages() );
     }
-
-    return true;
-}
-
-bool JsonCppNode::write_json( std::string& json_string )
-{
-    if ( root_.empty() )
-    {
-        return false;
-    }
-
-    json_string = writer_.write( root_ );
-    return true;
 }
 
 int JsonCppNode::size() const
@@ -74,111 +60,131 @@ int JsonCppNode::size() const
     return root_.size();
 }
 
-bool JsonCppNode::get_value( const std::string& value_name, std::string& value )
+JsonNodeInterface::NodeType JsonCppNode::type() const
 {
-    const Json::Value& value_node = root_[value_name];
-
-    if ( !value_node || value_node.isArray() || value_node.isObject() )
+    switch ( root_.type() )
     {
-        value = "";
+        case Json::nullValue:
+            return Null;
+        case Json::arrayValue:
+            return Array;
+        case Json::objectValue:
+            return Object;
+        case Json::stringValue:
+            return String;
+        case Json::intValue:
+            return Int;
+        case Json::uintValue:
+            return UInt;
+        case Json::realValue:
+            return Real;
+        case Json::booleanValue:
+            return Bool;
+    }
+
+    return Null;
+}
+
+std::string JsonCppNode::as_string() const
+{
+    if ( !root_.isConvertibleTo( Json::stringValue ) )
+    {
+        throw unity::LogicException("Node does not contain a string value");
+    }
+
+    return root_.asString();
+}
+
+int JsonCppNode::as_int() const
+{
+    if ( !root_.isConvertibleTo( Json::intValue ) )
+    {
+        throw unity::LogicException("Node does not contain an int value");
+    }
+
+    return root_.asInt();
+}
+
+uint JsonCppNode::as_uint() const
+{
+    if ( !root_.isConvertibleTo( Json::uintValue ) )
+    {
+        throw unity::LogicException("Node does not contain a uint value");
+    }
+
+    return root_.asUInt();
+}
+
+float JsonCppNode::as_float() const
+{
+    if ( !root_.isConvertibleTo( Json::realValue ) )
+    {
+        throw unity::LogicException("Node does not contain a float value");
+    }
+
+    return root_.asFloat();
+}
+
+double JsonCppNode::as_double() const
+{
+    if ( !root_.isConvertibleTo( Json::realValue ) )
+    {
+        throw unity::LogicException("Node does not contain a double value");
+    }
+
+    return root_.asDouble();
+}
+
+bool JsonCppNode::as_bool() const
+{
+    if ( !root_.isConvertibleTo( Json::booleanValue ) )
+    {
+        throw unity::LogicException("Node does not contain a bool value");
+    }
+
+    return root_.asBool();
+}
+
+bool JsonCppNode::has_node( const std::string& node_name ) const
+{
+    return root_.isMember( node_name );
+}
+
+bool JsonCppNode::has_node( uint node_index ) const
+{
+    if ( root_.type() != Json::arrayValue || node_index >= root_.size() )
+    {
         return false;
     }
 
-    value = node_to_string( value_node );
     return true;
 }
 
-bool JsonCppNode::get_value( int value_index, std::string& value )
-{
-    if ( root_.type() != Json::arrayValue )
-    {
-        return false;
-    }
-
-    const Json::Value& value_node = root_[value_index];
-
-    if ( !value_node || value_node.isArray() || value_node.isObject() )
-    {
-        value = "";
-        return false;
-    }
-
-    value = node_to_string( value_node );
-    return true;
-}
-
-bool JsonCppNode::get_node( const std::string& node_name, JsonNodeInterface::SPtr& node )
+JsonNodeInterface::SPtr JsonCppNode::get_node( const std::string& node_name ) const
 {
     const Json::Value& value_node = root_[node_name];
 
-    if ( !value_node || ( !value_node.isArray() && !value_node.isObject() ) )
+    if ( !value_node )
     {
-        return false;
+        throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
-    node = std::make_shared <JsonCppNode> ( value_node );
-    return true;
+    return std::make_shared <JsonCppNode> ( value_node );
 }
 
-bool JsonCppNode::get_node( int node_index, JsonNodeInterface::SPtr& node )
+JsonNodeInterface::SPtr JsonCppNode::get_node( uint node_index ) const
 {
     if ( root_.type() != Json::arrayValue )
     {
-        return false;
+        throw unity::LogicException("Root node is not an array");
     }
 
     const Json::Value& value_node = root_[node_index];
 
-    if ( !value_node || ( !value_node.isArray() && !value_node.isObject() ) )
+    if ( !value_node )
     {
-        return false;
+        throw unity::LogicException("Node " + std::to_string( node_index ) + " does not exist");
     }
 
-    node = std::make_shared <JsonCppNode> ( value_node );
-    return true;
-}
-
-bool JsonCppNode::set_value( const std::string& value_name, const std::string& value )
-{
-    Json::Value& value_node = root_[value_name];
-
-    value_node = value;
-    return true;
-}
-
-bool JsonCppNode::set_value( int value_index, const std::string& value )
-{
-    Json::Value& value_node = root_[value_index];
-
-    value_node = value;
-    return true;
-}
-
-bool JsonCppNode::set_node( const std::string& node_name, const JsonNodeInterface::SPtr& node )
-{
-    Json::Value& value_node = root_[node_name];
-
-    value_node = static_cast<JsonCppNode*>( node.get() )->root_;
-    return true;
-}
-
-bool JsonCppNode::set_node( int node_index, const JsonNodeInterface::SPtr& node )
-{
-    Json::Value& value_node = root_[node_index];
-
-    value_node = static_cast<JsonCppNode*>( node.get() )->root_;
-    return true;
-}
-
-std::string JsonCppNode::node_to_string( const Json::Value& node )
-{
-    std::string value = writer_.write( node );
-
-    value = value.substr( 0, value.size() - 1 );
-    if ( node.isString() )
-    {
-        value = value.substr( 1, value.size() - 2 );
-    }
-
-    return value;
+    return std::make_shared <JsonCppNode> ( value_node );
 }
