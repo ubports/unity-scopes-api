@@ -61,7 +61,7 @@ public:
 
         ~server_raii()
         {
-            kill( pid_, SIGTERM );
+            kill( pid_, SIGKILL );
             std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
         }
 
