@@ -184,7 +184,7 @@ void ResultImpl::throw_on_empty(std::string const& name, std::string const& valu
 {
     if (value.empty())
     {
-        throw InvalidArgumentException("ResultItem: invalid empty attribute: " + name);
+        throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
 }
 
