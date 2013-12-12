@@ -125,7 +125,7 @@ endif()
 option(IPC_MONITORING "Enable IPC traffic monitoring")
 
 if(IPC_MONITORING)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_IPC_MONITOR")
+    add_definitions(-DENABLE_IPC_MONITOR)
 endif()
 
 set(SCOPES_DEFAULT_DATADIR ${CMAKE_INSTALL_DATADIR}/unity)
