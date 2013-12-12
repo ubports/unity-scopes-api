@@ -51,7 +51,7 @@ void JsonCppNode::read_json( const std::string& json_string )
 
     if ( !reader_.parse( json_string, root_ ) )
     {
-        throw unity::ResourceException("Failed to parse json string: " + reader_.getFormattedErrorMessages() );
+        throw unity::ResourceException( "Failed to parse json string: " + reader_.getFormattedErrorMessages() );
     }
 }
 
@@ -89,7 +89,7 @@ std::string JsonCppNode::as_string() const
 {
     if ( !root_.isConvertibleTo( Json::stringValue ) )
     {
-        throw unity::LogicException("Node does not contain a string value");
+        throw unity::LogicException( "Node does not contain a string value" );
     }
 
     return root_.asString();
@@ -99,7 +99,7 @@ int JsonCppNode::as_int() const
 {
     if ( !root_.isConvertibleTo( Json::intValue ) )
     {
-        throw unity::LogicException("Node does not contain an int value");
+        throw unity::LogicException( "Node does not contain an int value" );
     }
 
     return root_.asInt();
@@ -109,7 +109,7 @@ uint JsonCppNode::as_uint() const
 {
     if ( !root_.isConvertibleTo( Json::uintValue ) )
     {
-        throw unity::LogicException("Node does not contain a uint value");
+        throw unity::LogicException( "Node does not contain a uint value" );
     }
 
     return root_.asUInt();
@@ -119,7 +119,7 @@ float JsonCppNode::as_float() const
 {
     if ( !root_.isConvertibleTo( Json::realValue ) )
     {
-        throw unity::LogicException("Node does not contain a float value");
+        throw unity::LogicException( "Node does not contain a float value" );
     }
 
     return root_.asFloat();
@@ -129,7 +129,7 @@ double JsonCppNode::as_double() const
 {
     if ( !root_.isConvertibleTo( Json::realValue ) )
     {
-        throw unity::LogicException("Node does not contain a double value");
+        throw unity::LogicException( "Node does not contain a double value" );
     }
 
     return root_.asDouble();
@@ -139,7 +139,7 @@ bool JsonCppNode::as_bool() const
 {
     if ( !root_.isConvertibleTo( Json::booleanValue ) )
     {
-        throw unity::LogicException("Node does not contain a bool value");
+        throw unity::LogicException( "Node does not contain a bool value" );
     }
 
     return root_.asBool();
@@ -166,7 +166,7 @@ JsonNodeInterface::SPtr JsonCppNode::get_node( const std::string& node_name ) co
 
     if ( !value_node )
     {
-        throw unity::LogicException("Node " + node_name + " does not exist");
+        throw unity::LogicException( "Node " + node_name + " does not exist" );
     }
 
     return std::make_shared <JsonCppNode> ( value_node );
@@ -176,14 +176,14 @@ JsonNodeInterface::SPtr JsonCppNode::get_node( uint node_index ) const
 {
     if ( root_.type() != Json::arrayValue )
     {
-        throw unity::LogicException("Root node is not an array");
+        throw unity::LogicException( "Root node is not an array" );
     }
 
     const Json::Value& value_node = root_[node_index];
 
     if ( !value_node )
     {
-        throw unity::LogicException("Node " + std::to_string( node_index ) + " does not exist");
+        throw unity::LogicException( "Node " + std::to_string( node_index ) + " does not exist" );
     }
 
     return std::make_shared <JsonCppNode> ( value_node );

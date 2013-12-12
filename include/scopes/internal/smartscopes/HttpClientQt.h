@@ -20,10 +20,10 @@
 #define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
 
 #include <scopes/internal/smartscopes/HttpClientInterface.h>
+#include <map>
 
 class QCoreApplication;
-
-using PromisePtr = std::shared_ptr<std::promise<std::string>>;
+class HttpClientQtThread;
 
 namespace unity
 {
@@ -43,16 +43,34 @@ namespace smartscopes
 class HttpClientQt : public HttpClientInterface
 {
 public:
-    HttpClientQt();
+    HttpClientQt( uint max_sessions );
     ~HttpClientQt();
 
-    std::future<std::string> get( const std::string& request_url, int port = 80 ) override;
+    std::future<std::string> get( const std::string& request_url, const std::string& session_id = "", int port = 80 ) override;
     std::string to_percent_encoding( const std::string& string ) override;
 
 private:
-    QCoreApplication* app_ = nullptr;
-    std::unique_ptr<std::thread> get_thread_ = nullptr;
-    PromisePtr promise_ = nullptr;
+    class HttpSession
+    {
+    public:
+        HttpSession( const std::string& request_url, int port );
+
+        std::future<std::string> get_future();
+
+        void cancel_session();
+        void wait_for_session();
+
+    private:
+        std::shared_ptr<std::promise<std::string>> promise_;
+        std::unique_ptr<HttpClientQtThread> get_qthread_;
+        std::unique_ptr<std::thread> get_thread_;
+    };
+
+private:
+    std::map<std::string, std::shared_ptr<HttpSession>> sessions_;
+    uint max_sessions_;
+
+    QCoreApplication* app_;
 };
 
 } // namespace smartscopes

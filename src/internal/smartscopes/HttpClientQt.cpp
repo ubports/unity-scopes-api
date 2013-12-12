@@ -30,9 +30,11 @@
 
 using namespace unity::api::scopes::internal::smartscopes;
 
-Q_DECLARE_METATYPE( PromisePtr )
+//-- HttpClientQt
 
-HttpClientQt::HttpClientQt()
+HttpClientQt::HttpClientQt( uint max_sessions )
+    : max_sessions_( max_sessions > 0 ? max_sessions : 1 ),
+      app_( nullptr )
 {
     if ( !QCoreApplication::instance() )
     {
@@ -43,37 +45,69 @@ HttpClientQt::HttpClientQt()
 
 HttpClientQt::~HttpClientQt()
 {
-    if ( get_thread_ )
+    for ( auto it = begin( sessions_ ); it != end( sessions_ ); it++ )
     {
-        get_thread_->join();
+        it->second->cancel_session();
     }
 
     delete app_;
 }
 
-std::future<std::string> HttpClientQt::get( const std::string& request_url, int port )
+std::future<std::string> HttpClientQt::get( const std::string& request_url, const std::string& session_id, int port )
 {
-    if ( get_thread_ )
+    // if session_id already in map, cancel it
+    auto it = sessions_.find( session_id );
+    if (it != sessions_.end())
     {
-        get_thread_->join();
+        it->second->cancel_session();
+        sessions_.erase( it );
+    }
+    // if session_id not in map, wait for next available slot
+    else
+    {
+        while ( sessions_.size() >= max_sessions_ )
+        {
+            it = sessions_.begin();
+            it->second->wait_for_session();
+            sessions_.erase( it );
+        }
     }
 
+    // start new session
+    auto session = std::make_shared<HttpSession>( request_url, port );
+    sessions_[ session_id ] = session;
+
+    return session->get_future();
+}
+
+std::string HttpClientQt::to_percent_encoding( const std::string& string )
+{
+    return QUrl::toPercentEncoding( string.c_str() ).constData();
+}
+
+//-- HttpClientQt::HttpSession
+
+HttpClientQt::HttpSession::HttpSession( const std::string& request_url, int port )
+    : promise_( nullptr ),
+      get_qthread_( nullptr ),
+      get_thread_( nullptr )
+{
     promise_ = std::make_shared<std::promise<std::string>>();
 
-    get_thread_ = std::unique_ptr <std::thread> ( new std::thread( [&request_url, port, this]()
+    get_thread_ = std::unique_ptr<std::thread>( new std::thread( [this, request_url, port]()
     {
         QUrl url( request_url.c_str() );
         url.setPort( port );
+        get_qthread_ = std::unique_ptr<HttpClientQtThread>( new HttpClientQtThread( url ) );
 
-        auto thread = new HttpClientQtThread(url);
         QEventLoop loop;
-        QObject::connect(thread, SIGNAL(finished()), &loop, SLOT(quit()));
-        thread->start();
-        loop.exec();
-        thread->wait();
+        QObject::connect( get_qthread_.get(), SIGNAL( finished() ), &loop, SLOT( quit() ) );
 
-        QNetworkReply* reply = thread->getReply();
-        thread->deleteLater();
+        get_qthread_->start();
+        loop.exec();
+        get_qthread_->wait();
+
+        QNetworkReply* reply = get_qthread_->getReply();
 
         if ( !reply || reply->error() != QNetworkReply::NoError )
         {
@@ -87,11 +121,27 @@ std::future<std::string> HttpClientQt::get( const std::string& request_url, int 
             promise_->set_value( reply_string.toStdString() );
         }
     } ) );
+}
 
+std::future<std::string> HttpClientQt::HttpSession::get_future()
+{
     return promise_->get_future();
 }
 
-std::string HttpClientQt::to_percent_encoding( const std::string& string )
+void HttpClientQt::HttpSession::cancel_session()
 {
-    return QUrl::toPercentEncoding( string.c_str() ).constData();
+    if ( get_qthread_ )
+    {
+        get_qthread_->cancel();
+    }
+
+    wait_for_session();
+}
+
+void HttpClientQt::HttpSession::wait_for_session()
+{
+    if ( get_thread_ )
+    {
+        get_thread_->join();
+    }
 }

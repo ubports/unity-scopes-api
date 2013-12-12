@@ -43,4 +43,4 @@ search_response = '\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
 httpd = make_server('', 9009, response)
-httpd.handle_request()
+httpd.serve_forever()

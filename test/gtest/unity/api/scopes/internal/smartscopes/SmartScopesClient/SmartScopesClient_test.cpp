@@ -35,7 +35,7 @@ class SmartScopesClientTest : public Test
 {
 public:
     SmartScopesClientTest()
-        : http_client_( new HttpClientQt() ),
+        : http_client_( new HttpClientQt( 2 ) ),
           json_node_( new JsonCppNode() ),
           ssc_( http_client_, json_node_, "http://127.0.0.1", 9009 )
     {
@@ -46,14 +46,14 @@ public:
     public:
         server_raii()
         {
-            const char* const argv[] = {FAKE_SSS_PATH, "", NULL};
+            const char* const argv[] = { FAKE_SSS_PATH, "", NULL };
 
-            switch (pid_ = fork())
+            switch ( pid_ = fork() )
             {
                 case -1:
                     throw std::exception();
                 case 0: // child
-                    execv(argv[0], (char *const*)argv);
+                    execv( argv[0], ( char * const* ) argv );
                     throw std::exception();
             }
 

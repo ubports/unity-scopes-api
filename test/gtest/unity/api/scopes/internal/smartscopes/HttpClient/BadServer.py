@@ -28,4 +28,4 @@ def response(environ, start_response):
     return ""
 
 httpd = make_server('127.0.0.1', 9008, response)
-httpd.handle_request()
+httpd.serve_forever()

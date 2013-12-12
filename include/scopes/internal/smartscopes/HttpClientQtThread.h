@@ -30,7 +30,8 @@ class QNetworkAccessManager;
 typedef QPair<QByteArray, QByteArray> HttpHeader;
 typedef QList<HttpHeader> HttpHeadersList;
 
-class Q_DECL_EXPORT HttpClientQtThread : public QThread, private unity::util::NonCopyable
+class Q_DECL_EXPORT HttpClientQtThread : public QThread,
+    private unity::util::NonCopyable
 {
     Q_OBJECT
 

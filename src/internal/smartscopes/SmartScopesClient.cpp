@@ -62,12 +62,12 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     try
     {
         std::string response_str;
-        std::future<std::string> response = http_client_->get( url_ + c_remote_scopes_resourse, port_ );
+        std::future<std::string> response = http_client_->get( url_ + c_remote_scopes_resourse, "", port_ );
         response.wait();
 
         response_str = response.get();
 
-        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        std::lock_guard <std::mutex> lock( json_node_mutex_ );
 
         json_node_->read_json( response_str );
 
@@ -101,8 +101,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 void SmartScopesClient::search( const std::string& scope_resourse, const std::string& query,
                                 const std::string& session_id, uint query_id, const std::string& platform,
                                 const std::string& locale, const std::string& country,
-                                const std::string& latitude, const std::string& longitude,
-                                uint limit )
+                                const std::string& latitude, const std::string& longitude, uint limit )
 {
     //search_results_.wait();
 
@@ -123,7 +122,7 @@ void SmartScopesClient::search( const std::string& scope_resourse, const std::st
     search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
     search_uri_ += limit == 0 ? "" : "&limit=\"" + std::to_string( limit ) + "\"";
 
-    search_results_ = http_client_->get( search_uri_, port_ );
+    search_results_ = http_client_->get( search_uri_, "", port_ );
 }
 
 std::vector<SearchResult> SmartScopesClient::get_search_results()
@@ -140,7 +139,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
 
         std::vector<std::string> jsons = extract_json_stream( response_str );
 
-        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        std::lock_guard <std::mutex> lock( json_node_mutex_ );
 
         for ( std::string& json : jsons )
         {
@@ -162,7 +161,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
                                               node->get_node( "renderer_template" )->as_string() : "";
                 category->title = node->has_node( "title" ) ?
                                   node->get_node( "title" )->as_string() : "";
-                categories[ category->id ] = category;
+                categories[category->id] = category;
             }
             else if ( json_node_->has_node( "result" ) )
             {

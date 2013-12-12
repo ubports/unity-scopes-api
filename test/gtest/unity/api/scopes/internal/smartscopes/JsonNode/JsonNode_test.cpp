@@ -42,11 +42,12 @@ protected:
 
 TEST_F( JsonNodeTest, flat_values )
 {
-    std::string json_string = R"({
-                              "firstName": "John",
-                              "age": 25,
-                              "human": true
-                          })";
+    std::string json_string =
+        R"({
+        "firstName": "John",
+        "age": 25,
+        "human": true
+    })";
 
     std::string value_str;
     int value_int;
@@ -76,12 +77,13 @@ TEST_F( JsonNodeTest, flat_values )
 
 TEST_F( JsonNodeTest, array_values )
 {
-    std::string json_string = R"({
-                              "phoneNumbers": [
-                              "1234",
-                              "5678"
-                              ]
-                          })";
+    std::string json_string =
+        R"({
+        "phoneNumbers": [
+        "1234",
+        "5678"
+        ]
+    })";
 
     std::string value;
     JsonNodeInterface::SPtr node;
