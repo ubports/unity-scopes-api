@@ -55,7 +55,6 @@ public:
     std::string as_string() const override;
     int as_int() const override;
     uint as_uint() const override;
-    float as_float() const override;
     double as_double() const override;
     bool as_bool() const override;
 

@@ -115,16 +115,6 @@ uint JsonCppNode::as_uint() const
     return root_.asUInt();
 }
 
-float JsonCppNode::as_float() const
-{
-    if ( !root_.isConvertibleTo( Json::realValue ) )
-    {
-        throw unity::LogicException( "Node does not contain a float value" );
-    }
-
-    return root_.asFloat();
-}
-
 double JsonCppNode::as_double() const
 {
     if ( !root_.isConvertibleTo( Json::realValue ) )

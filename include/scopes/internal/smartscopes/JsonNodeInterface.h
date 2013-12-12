@@ -62,7 +62,6 @@ public:
     virtual std::string as_string() const = 0;
     virtual int as_int() const = 0;
     virtual uint as_uint() const = 0;
-    virtual float as_float() const = 0;
     virtual double as_double() const = 0;
     virtual bool as_bool() const = 0;
 
