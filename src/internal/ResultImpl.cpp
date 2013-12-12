@@ -170,37 +170,25 @@ Variant const& ResultImpl::operator[](std::string const& key) const
 
 std::string ResultImpl::uri() const
 {
-    if (uri_.which() != Variant::Type::String)
-    {
-        return "";
-    }
+    throw_on_non_string("uri", uri_.which());
     return uri_.get_string();
 }
 
 std::string ResultImpl::title() const
 {
-    if (title_.which() != Variant::Type::String)
-    {
-        return "";
-    }
+    throw_on_non_string("title", title_.which());
     return title_.get_string();
 }
 
 std::string ResultImpl::art() const
 {
-    if (art_.which() != Variant::Type::String)
-    {
-        return "";
-    }
+    throw_on_non_string("art", art_.which());
     return art_.get_string();
 }
 
 std::string ResultImpl::dnd_uri() const
 {
-    if (dnd_uri_.which() != Variant::Type::String)
-    {
-        return "";
-    }
+    throw_on_non_string("dnd_uri", dnd_uri_.which());
     return dnd_uri_.get_string();
 }
 
@@ -228,9 +216,18 @@ Variant const& ResultImpl::metadata(std::string const& key) const
     throw InvalidArgumentException(s.str());
 }
 
+void ResultImpl::throw_on_non_string(std::string const& name, Variant::Type vtype)
+{
+    if (vtype != Variant::Type::String)
+    {
+        throw InvalidArgumentException("ResultItem: wrong type of attribute: " + name);
+    }
+}
+
 void ResultImpl::throw_on_empty(std::string const& name, Variant const& value)
 {
-    if (value.which() != Variant::Type::String || value.get_string().empty())
+    throw_on_non_string(name, value.which());
+    if (value.get_string().empty())
     {
         throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
@@ -252,11 +249,11 @@ VariantMap ResultImpl::serialize() const
     VariantMap var;
     var["uri"] = uri_;
     var["dnd_uri"] = dnd_uri_;
-    if (title_.which() == Variant::Type::String && !title_.get_string().empty())
+    if (title_.which() != Variant::Type::Null)
     {
         var["title"] = title_;
     }
-    if (art_.which() == Variant::Type::String && !art_.get_string().empty())
+    if (art_.which() != Variant::Type::Null)
     {
         var["art"] = art_;
     }
@@ -310,24 +307,24 @@ void ResultImpl::deserialize(VariantMap const& var)
     it = attrs.find("uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'uri'");
-    uri_ = it->second.get_string();
+    uri_ = it->second;
 
     it = attrs.find("title");
     if (it != attrs.end())
     {
-        title_ = it->second.get_string();
+        title_ = it->second;
     }
 
     it = attrs.find("art");
     if (it != attrs.end())
     {
-        art_ = it->second.get_string();
+        art_ = it->second;
     }
 
     it = attrs.find("dnd_uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'dnd_uri'");
-    dnd_uri_ = it->second.get_string();
+    dnd_uri_ = it->second;
 
     for (auto const& kv: attrs)
     {
