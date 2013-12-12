@@ -109,7 +109,13 @@ HttpClientQt::HttpSession::HttpSession( const std::string& request_url, int port
 
         QNetworkReply* reply = get_qthread_->getReply();
 
-        if ( !reply || reply->error() != QNetworkReply::NoError )
+        if ( !reply )
+        {
+            // communication error
+            unity::ResourceException e( "No reply from " + request_url + ":" + std::to_string( port ) );
+            promise_->set_exception( make_exception_ptr( e ) );
+        }
+        else if ( reply->error() != QNetworkReply::NoError )
         {
             // communication error
             unity::ResourceException e( reply->errorString().toStdString() );

@@ -47,10 +47,10 @@ public Q_SLOTS:
     void queryDone( QNetworkReply* );
 
 private:
-    QUrl m_url;
-    HttpHeadersList m_headers;
-    QNetworkReply* m_reply;
-    QNetworkAccessManager* m_manager;
+    QUrl url_;
+    HttpHeadersList headers_;
+    QNetworkReply* reply_;
+    QNetworkAccessManager* manager_;
 };
 
 #endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H

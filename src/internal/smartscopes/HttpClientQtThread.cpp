@@ -25,38 +25,30 @@
 
 HttpClientQtThread::HttpClientQtThread( const QUrl& url, const HttpHeadersList& headers )
     : QThread(),
-      m_url( url ),
-      m_headers( headers ),
-      m_reply( nullptr ),
-      m_manager( nullptr )
+      url_( url ),
+      headers_( headers ),
+      reply_( nullptr ),
+      manager_( nullptr )
 {
 }
 
 HttpClientQtThread::~HttpClientQtThread()
 {
-    if ( m_manager )
-    {
-        m_manager->deleteLater();
-    }
-
-    if ( m_reply )
-    {
-        m_reply->deleteLater();
-    }
+    cancel();
 }
 
 void HttpClientQtThread::run()
 {
-    m_manager = new QNetworkAccessManager();
+    manager_ = new QNetworkAccessManager();
 
-    QNetworkRequest request( m_url );
-    for ( auto it = m_headers.begin(); it != m_headers.end(); it++ )
+    QNetworkRequest request( url_ );
+    for ( auto it = headers_.begin(); it != headers_.end(); it++ )
     {
         request.setRawHeader( ( *it ).first, ( *it ).second );
     }
 
-    connect( m_manager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
-    m_reply = m_manager->get( request );
+    connect( manager_, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
+    reply_ = manager_->get( request );
 
     QTimer timeout;
     timeout.singleShot( 2000, this, SLOT( cancel() ) );
@@ -66,7 +58,7 @@ void HttpClientQtThread::run()
 
 QNetworkReply* HttpClientQtThread::getReply() const
 {
-    return m_reply;
+    return reply_;
 }
 
 void HttpClientQtThread::queryDone( QNetworkReply* )
@@ -76,9 +68,18 @@ void HttpClientQtThread::queryDone( QNetworkReply* )
 
 void HttpClientQtThread::cancel()
 {
-    if ( m_reply )
+    if ( reply_ )
     {
-        m_reply->abort();
-        quit();
+        reply_->abort();
+        delete reply_;
+        reply_ = nullptr;
     }
+
+    if ( manager_ )
+    {
+        delete manager_;
+        manager_ = nullptr;
+    }
+
+    quit();
 }

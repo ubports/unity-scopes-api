@@ -29,7 +29,7 @@ using namespace unity::api::scopes::internal::smartscopes;
 namespace
 {
 
-const std::string test_url = "http://127.0.0.1";
+const std::string test_url = "http://127.0.0.1/" + std::to_string( getpid() ) + "?0";
 int test_port = 9008;
 
 class HttpClientTest : public Test
@@ -38,14 +38,37 @@ public:
     HttpClientTest()
         : http_client_( new HttpClientQt( 2 ) )
     {
+        wait_for_server();
+    }
+
+    void wait_for_server()
+    {
+        bool waiting = true;
+        while ( waiting )
+        {
+            std::future<std::string> response = http_client_->get( test_url, "", test_port );
+            response.wait();
+            try
+            {
+                if ( response.get() != "Incorrect server" )
+                {
+                    waiting = false;
+                }
+                else
+                {
+                    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+                }
+            }
+            catch ( unity::Exception& e ) {}
+        }
     }
 
     class server_raii
     {
     public:
-        server_raii( const std::string& server_path, const std::string& arg = "0" )
+        server_raii()
         {
-            const char* const argv[] = { server_path.c_str(), arg.c_str(), NULL };
+            const char* const argv[] = { FAKE_SERVER_PATH, std::to_string( getpid() ).c_str(), NULL };
 
             switch ( pid_ = fork() )
             {
@@ -56,13 +79,12 @@ public:
                     throw unity::ResourceException( "Failed to fork process" );
             }
 
-            std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+            std::this_thread::sleep_for( std::chrono::milliseconds( 500 ) );
         }
 
         ~server_raii()
         {
             kill( pid_, SIGKILL );
-            std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
         }
 
     private:
@@ -71,13 +93,13 @@ public:
 
 protected:
     HttpClientInterface::SPtr http_client_;
+    server_raii server;
 };
 
 TEST_F( HttpClientTest, no_server )
 {
     // no server
-
-    std::future<std::string> response = http_client_->get( test_url, "", test_port );
+    std::future<std::string> response = http_client_->get( test_url, "", 0 );
     response.wait();
 
     EXPECT_THROW( response.get(), unity::Exception );
@@ -86,10 +108,7 @@ TEST_F( HttpClientTest, no_server )
 TEST_F( HttpClientTest, bad_server )
 {
     // bad server
-
-    server_raii server( BAD_SERVER_PATH );
-
-    std::future<std::string> response = http_client_->get( test_url, "", test_port );
+    std::future<std::string> response = http_client_->get( test_url + "x", "", test_port );
     response.wait();
 
     EXPECT_THROW( response.get(), unity::Exception );
@@ -98,9 +117,6 @@ TEST_F( HttpClientTest, bad_server )
 TEST_F( HttpClientTest, good_server )
 {
     // responds immediately
-
-    server_raii server( GOOD_SERVER_PATH );
-
     std::future<std::string> response = http_client_->get( test_url, "", test_port );
     response.wait();
 
@@ -112,10 +128,7 @@ TEST_F( HttpClientTest, good_server )
 TEST_F( HttpClientTest, ok_server )
 {
     // responds in 1 second
-
-    server_raii server( GOOD_SERVER_PATH, "1" );
-
-    std::future<std::string> response = http_client_->get( test_url, "", test_port );
+    std::future<std::string> response = http_client_->get( test_url + "1", "", test_port );
     response.wait();
 
     std::string response_str;
@@ -126,10 +139,7 @@ TEST_F( HttpClientTest, ok_server )
 TEST_F( HttpClientTest, slow_server )
 {
     // responds in 5 seconds
-
-    server_raii server( GOOD_SERVER_PATH, "5" );
-
-    std::future<std::string> response = http_client_->get( test_url, "", test_port );
+    std::future<std::string> response = http_client_->get( test_url + "5", "", test_port );
     response.wait();
 
     EXPECT_THROW( response.get(), unity::Exception );
@@ -137,8 +147,6 @@ TEST_F( HttpClientTest, slow_server )
 
 TEST_F( HttpClientTest, multiple_sessions )
 {
-    server_raii server( GOOD_SERVER_PATH );
-
     std::future<std::string> response1 = http_client_->get( test_url, "1", test_port );
     std::future<std::string> response2 = http_client_->get( test_url, "2", test_port );
     std::future<std::string> response3 = http_client_->get( test_url, "3", test_port );

@@ -42,5 +42,12 @@ search_response = '\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
-httpd = make_server('', 9009, response)
+serving = False
+while serving == False:
+    try:
+        httpd = make_server('127.0.0.1', 9009, response)
+        serving = True
+    except:
+        serving = False
+
 httpd.serve_forever()

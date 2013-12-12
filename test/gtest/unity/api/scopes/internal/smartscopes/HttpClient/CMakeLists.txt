@@ -2,8 +2,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_definitions(-DGOOD_SERVER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/GoodServer.py")
-add_definitions(-DBAD_SERVER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/BadServer.py")
+add_definitions(-DFAKE_SERVER_PATH="${CMAKE_CURRENT_SOURCE_DIR}/FakeServer.py")
 
 add_executable(
     HttpClient_test
