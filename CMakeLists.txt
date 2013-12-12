@@ -142,15 +142,41 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # Static version for testing
 set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
+find_library(ZMQPPLIB zmqpp)
+if(NOT ZMQPPLIB)
+  message(FATAL_ERROR "Zmqpp lib not found.")
+endif()
+
+find_library(ZMQLIB zmq)
+if(NOT ZMQLIB)
+  message(FATAL_ERROR "Zmq lib found.")
+endif()
+
+find_library(CAPNPLIB capnp)
+if(NOT CAPNPLIB)
+  message(FATAL_ERROR "Cap'n Proto lib not found.")
+endif()
+
+find_library(KJLIB kj)
+if(NOT KJLIB)
+  message(FATAL_ERROR "Kj lib not found.")
+endif()
+
+find_library(DLLIB dl)
+if(NOT DLLIB)
+  message(FATAL_ERROR "Dl lib not found.")
+endif()
+
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
-    zmqpp
-    zmq
-    capnp
-    kj
+    ${ZMQPPLIB}
+    ${ZMQLIB}
+    ${CAPNPLIB}
+    ${KJLIB}
     pthread
-    dl
+    ${DLLIB}
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
