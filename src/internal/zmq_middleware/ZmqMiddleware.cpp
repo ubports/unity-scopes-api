@@ -82,7 +82,7 @@ ZmqMiddleware::~ZmqMiddleware() noexcept
         stop();
         wait_for_shutdown();
     }
-    catch (zmqpp::exception const& e)
+    catch (std::exception const& e)
     {
         // TODO: log exception
     }
@@ -94,7 +94,7 @@ ZmqMiddleware::~ZmqMiddleware() noexcept
 
 void ZmqMiddleware::start()
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
 
     switch (state_)
     {
@@ -107,7 +107,10 @@ void ZmqMiddleware::start()
         {
             // TODO: get directory from config
             // TODO: get pool size from config
-            invokers_.reset(new ThreadPool(1));
+            {
+                lock_guard<mutex> lock(data_mutex_);
+                invokers_.reset(new ThreadPool(1));
+            }
             state_ = Started;
             state_changed_.notify_all();
             break;
@@ -121,7 +124,7 @@ void ZmqMiddleware::start()
 
 void ZmqMiddleware::stop()
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
     switch (state_)
     {
         case Stopped:
@@ -138,7 +141,11 @@ void ZmqMiddleware::stop()
         }
         case Started:
         {
-            invokers_.reset();          // No more outgoing invocations
+            {
+                lock_guard<mutex> lock(data_mutex_);
+                // No more outgoing invocations
+                invokers_.reset();
+            }
             for (auto& pair : am_)
             {
                 pair.second->shutdown();
@@ -160,7 +167,7 @@ void ZmqMiddleware::stop()
 
 void ZmqMiddleware::wait_for_shutdown()
 {
-    unique_lock<mutex> lock(mutex_);
+    unique_lock<mutex> lock(state_mutex_);
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
@@ -331,11 +338,23 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
 
 zmqpp::context* ZmqMiddleware::context() const noexcept
 {
+    // No lock here. context_ is initialized before any threads are created.
     return const_cast<zmqpp::context*>(&context_);
 }
 
-ThreadPool* ZmqMiddleware::invoke_pool() const noexcept
+ThreadPool* ZmqMiddleware::invoke_pool()
 {
+    lock(state_mutex_, data_mutex_);
+    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
+    if (state_ == Starting)
+    {
+        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
+    }
+    if (state_ == Stopped)
+    {
+        throw MiddlewareException("Cannot invoke operations while middleware is stopped");
+    }
     return invokers_.get();
 }
 
@@ -357,7 +376,7 @@ bool has_suffix(string const& s, string const& suffix)
 
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir)
 {
-    lock_guard<mutex> lock(mutex_);
+    lock_guard<mutex> lock(data_mutex_);
 
     auto it = am_.find(name);
     if (it != am_.end())
@@ -421,7 +440,7 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
     string id = identity.empty() ? unique_id_.gen() : identity;
 
 #if 0 // TODO: is this necessary? Needs to match what happens in stop()
-    lock_guard<mutex> lock(mutex_);
+    lock_guard<mutex> lock(state_mutex_);
     if (!adapter)
     {
         throw LogicException("Cannot add object to stopped middleware");
