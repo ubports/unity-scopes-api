@@ -57,11 +57,13 @@ public:
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
     void add_metadata(std::string const& key, Variant const& value);
+    Variant& operator[](std::string const& key);
+    Variant const& operator[](std::string const& key) const;
 
-    std::string uri() const;
+    std::string uri() const noexcept;
     std::string title() const;
     std::string art() const;
-    std::string dnd_uri() const;
+    std::string dnd_uri() const noexcept;
     bool has_metadata(std::string const& key) const;
     Variant const& metadata(std::string const& key) const;
 
@@ -72,13 +74,14 @@ protected:
 
 private:
     void deserialize(VariantMap const& var);
-    static void throw_on_empty(std::string const& name, std::string const& value);
+    static void throw_on_non_string(std::string const& name, Variant::Type vtype);
+    static void throw_on_empty(std::string const& name, Variant const& value);
     static const std::unordered_set<std::string> standard_attrs;
 
-    std::string uri_;
-    std::string title_;
-    std::string art_;
-    std::string dnd_uri_;
+    Variant uri_;
+    Variant title_;
+    Variant art_;
+    Variant dnd_uri_;
     std::shared_ptr<VariantMap> metadata_;
     std::shared_ptr<VariantMap> stored_result_;
 };

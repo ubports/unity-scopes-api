@@ -54,6 +54,52 @@ TEST(CategorisedResult, basic)
     }
 }
 
+// test for [] operator
+TEST(CategorisedResult, indexop)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    {
+        CategorisedResult result(cat);
+        result["uri"] = Variant("http://ubuntu.com");
+        result["title"] = Variant("a title");
+        result["art"] = "an icon";
+        result["dnd_uri"] = "http://canonical.com";
+        result["foo"] = Variant("bar");
+
+        // referencing non-existing attribute creates it
+        EXPECT_NO_THROW(result["nonexisting"]);
+        EXPECT_TRUE(result.has_metadata("nonexisting"));
+        EXPECT_EQ(Variant::Type::Null, result["nonexisting"].which());
+
+        EXPECT_EQ("http://ubuntu.com", result.uri());
+        EXPECT_EQ("http://ubuntu.com", result["uri"].get_string());
+        EXPECT_EQ("a title", result.title());
+        EXPECT_EQ("a title", result["title"].get_string());
+        EXPECT_EQ("an icon", result.art());
+        EXPECT_EQ("an icon", result["art"].get_string());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_EQ("http://canonical.com", result["dnd_uri"].get_string());
+        EXPECT_TRUE(result.has_metadata("foo"));
+        EXPECT_EQ("bar", result.metadata("foo").get_string());
+        EXPECT_EQ("bar", result["foo"].get_string());
+        EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
+        EXPECT_EQ("1", result.category()->id());
+    }
+    {
+        CategorisedResult result(cat);
+        result["uri"] = Variant("http://ubuntu.com");
+
+        // force const operator[]
+        const CategorisedResult result2 = result;
+        EXPECT_EQ("http://ubuntu.com", result2["uri"].get_string());
+        // referencing non-existing attribute of const result object throws
+        EXPECT_THROW(result2["nonexisting"], unity::InvalidArgumentException);
+        EXPECT_FALSE(result2.has_metadata("nonexisting"));
+    }
+}
+
 TEST(CategorisedResult, copy)
 {
     CategoryRegistry reg;
@@ -279,8 +325,8 @@ TEST(CategorisedResult, deserialize)
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
-        EXPECT_EQ("", result.title());
-        EXPECT_EQ("", result.art());
+        EXPECT_THROW(result.title(), unity::LogicException);
+        EXPECT_THROW(result.art(), unity::LogicException);
         EXPECT_EQ("bar", result.metadata("foo").get_string());
     }
 }
