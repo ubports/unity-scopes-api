@@ -142,14 +142,14 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # Static version for testing
 set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
-find_library(ZMQPPLIB zmqpp)
-if(NOT ZMQPPLIB)
-  message(FATAL_ERROR "Zmqpp lib not found.")
-endif()
-
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
   message(FATAL_ERROR "Zmq lib found.")
+endif()
+
+find_library(ZMQPPLIB zmqpp)
+if(NOT ZMQPPLIB)
+  message(FATAL_ERROR "Zmqpp lib not found.")
 endif()
 
 find_library(CAPNPLIB capnp)
