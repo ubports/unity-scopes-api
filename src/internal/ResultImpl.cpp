@@ -136,24 +136,72 @@ void ResultImpl::add_metadata(std::string const& key, Variant const& value)
     (*metadata_)[key] = value;
 }
 
+Variant& ResultImpl::operator[](std::string const& key)
+{
+    if (key == "uri")
+        return uri_;
+    if (key == "dnd_uri")
+        return dnd_uri_;
+    if (key == "title")
+        return title_;
+    if (key == "art")
+        return art_;
+
+    if (!metadata_)
+    {
+        metadata_.reset(new VariantMap());
+    }
+    return (*metadata_)[key];
+}
+
+Variant const& ResultImpl::operator[](std::string const& key) const
+{
+    if (key == "uri")
+        return uri_;
+    if (key == "dnd_uri")
+        return dnd_uri_;
+    if (key == "title")
+        return title_;
+    if (key == "art")
+        return art_;
+
+    return metadata(key);
+}
+
 std::string ResultImpl::uri() const
 {
-    return uri_;
+    if (uri_.which() == Variant::Type::Null)
+    {
+        return "";
+    }
+    return uri_.get_string();
 }
 
 std::string ResultImpl::title() const
 {
-    return title_;
+    if (title_.which() == Variant::Type::Null)
+    {
+        return "";
+    }
+    return title_.get_string();
 }
 
 std::string ResultImpl::art() const
 {
-    return art_;
+    if (art_.which() == Variant::Type::Null)
+    {
+        return "";
+    }
+    return art_.get_string();
 }
 
 std::string ResultImpl::dnd_uri() const
 {
-    return dnd_uri_;
+    if (dnd_uri_.which() == Variant::Type::Null)
+    {
+        return "";
+    }
+    return dnd_uri_.get_string();
 }
 
 bool ResultImpl::has_metadata(std::string const& key) const
@@ -180,9 +228,9 @@ Variant const& ResultImpl::metadata(std::string const& key) const
     throw InvalidArgumentException(s.str());
 }
 
-void ResultImpl::throw_on_empty(std::string const& name, std::string const& value)
+void ResultImpl::throw_on_empty(std::string const& name, Variant const& value)
 {
-    if (value.empty())
+    if (value.which() == Variant::Type::Null || value.get_string().empty())
     {
         throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
@@ -204,11 +252,11 @@ VariantMap ResultImpl::serialize() const
     VariantMap var;
     var["uri"] = uri_;
     var["dnd_uri"] = dnd_uri_;
-    if (!title_.empty())
+    if (title_.which() == Variant::Type::String && !title_.get_string().empty())
     {
         var["title"] = title_;
     }
-    if (!art_.empty())
+    if (art_.which() == Variant::Type::String && !art_.get_string().empty())
     {
         var["art"] = art_;
     }

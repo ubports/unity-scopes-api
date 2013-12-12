@@ -71,6 +71,23 @@ public:
     void set_dnd_uri(std::string const& dnd_uri);
     void add_metadata(std::string const& key, Variant const& value);
 
+    /**
+       \brief Returns reference of a Result attribute.
+       This method can be used to read or initialize both standard ("uri", "title", "art", "dnd_uri")
+       and custom metadata attributes. Referencing a non-existing attribute automatically creates
+       it with a default value of Variant::Type::Null.
+       \return reference of an attribute
+     */
+    Variant& operator[](std::string const& key);
+
+    /**
+       \brief Returns const reference of a Result attribute.
+       This method can be used for read-only access to both standard ("uri", "title", "art", "dnd_uri")
+       and custom metadata attributes. Referencing a non-existing attribute throws unity::InvalidArgumentException.
+       \return const reference of an existing attribute
+     */
+    Variant const& operator[](std::string const& key) const;
+
     std::string uri() const;
     std::string title() const;
     std::string art() const;
