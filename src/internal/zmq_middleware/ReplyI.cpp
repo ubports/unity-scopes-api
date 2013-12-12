@@ -100,7 +100,8 @@ void ReplyI::finished_(Current const&,
         }
         default:
         {
-            assert(false); // LCOV_EXCL_LINE
+            assert(false);                // LCOV_EXCL_LINE
+            reason = ReceiverBase::Error; // LCOV_EXCL_LINE
         }
     }
     delegate->finished(reason);
