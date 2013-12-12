@@ -26,6 +26,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <memory>
 #include <mutex>
 
@@ -82,13 +83,13 @@ public:
 
     std::vector<RemoteScope> get_remote_scopes();
 
-    void search( const std::string& scope_resourse, const std::string& query,
+    void search( const std::string& search_url, const std::string& query,
                  const std::string& session_id, uint query_id, const std::string& platform,
                  const std::string& locale = "", const std::string& country = "",
                  const std::string& latitude = "", const std::string& longitude = "",
                  const uint limit = 0 );
 
-    std::vector<SearchResult> get_search_results();
+    std::vector<SearchResult> get_search_results( const std::string& session_id );
 
 private:
     std::vector<std::string> extract_json_stream( const std::string& json_stream );
@@ -102,7 +103,7 @@ private:
     int port_;
 
     std::string search_uri_;
-    std::future<std::string> search_results_;
+    std::map<std::string, std::future<std::string>> search_results_;
 };
 
 } // namespace smartscopes

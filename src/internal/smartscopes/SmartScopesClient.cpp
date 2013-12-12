@@ -98,14 +98,14 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
 }
 
-void SmartScopesClient::search( const std::string& scope_resourse, const std::string& query,
+void SmartScopesClient::search( const std::string& search_url, const std::string& query,
                                 const std::string& session_id, uint query_id, const std::string& platform,
                                 const std::string& locale, const std::string& country,
                                 const std::string& latitude, const std::string& longitude, uint limit )
 {
     //search_results_.wait();
 
-    search_uri_ = url_ + scope_resourse + "?";
+    search_uri_ = search_url + "?";
 
     // mandatory parameters
 
@@ -122,17 +122,24 @@ void SmartScopesClient::search( const std::string& scope_resourse, const std::st
     search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
     search_uri_ += limit == 0 ? "" : "&limit=\"" + std::to_string( limit ) + "\"";
 
-    search_results_ = http_client_->get( search_uri_, "", port_ );
+    search_results_[session_id] = http_client_->get( search_uri_, session_id, port_ );
 }
 
-std::vector<SearchResult> SmartScopesClient::get_search_results()
+std::vector<SearchResult> SmartScopesClient::get_search_results( const std::string& session_id )
 {
     try
     {
-        std::string response_str;
-        search_results_.wait();
+        auto it = search_results_.find( session_id );
+        if (it == search_results_.end())
+        {
+            throw unity::LogicException( "No search for session " + session_id + " was started" );
+        }
 
-        response_str = search_results_.get();
+        std::string response_str;
+        search_results_[session_id].wait();
+
+        response_str = search_results_[session_id].get();
+        search_results_.erase( it );
 
         std::vector<SearchResult> results;
         std::map<std::string, std::shared_ptr<SearchCategory>> categories;
@@ -187,7 +194,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results()
     }
     catch ( unity::Exception& e )
     {
-        std::cout << "failed to retrieve search results from uri: " << search_uri_ << std::endl;
+        std::cout << "failed to retrieve search results for session: " << session_id << std::endl;
         std::cout << "error:" << e.what() << std::endl;
         return std::vector<SearchResult>();
     }

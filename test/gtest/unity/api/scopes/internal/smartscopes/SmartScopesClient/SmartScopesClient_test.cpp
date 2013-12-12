@@ -97,8 +97,8 @@ TEST_F( SmartScopesClientTest, search )
 {
     server_raii server;
 
-    ssc_.search( "/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
-    std::vector<SearchResult> results = ssc_.get_search_results();
+    ssc_.search( "http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "" );
+    std::vector<SearchResult> results = ssc_.get_search_results( "1234" );
 
     ASSERT_EQ( 2, results.size() );
 
