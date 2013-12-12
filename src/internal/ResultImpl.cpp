@@ -170,7 +170,7 @@ Variant const& ResultImpl::operator[](std::string const& key) const
 
 std::string ResultImpl::uri() const
 {
-    if (uri_.which() == Variant::Type::Null)
+    if (uri_.which() != Variant::Type::String)
     {
         return "";
     }
@@ -179,7 +179,7 @@ std::string ResultImpl::uri() const
 
 std::string ResultImpl::title() const
 {
-    if (title_.which() == Variant::Type::Null)
+    if (title_.which() != Variant::Type::String)
     {
         return "";
     }
@@ -188,7 +188,7 @@ std::string ResultImpl::title() const
 
 std::string ResultImpl::art() const
 {
-    if (art_.which() == Variant::Type::Null)
+    if (art_.which() != Variant::Type::String)
     {
         return "";
     }
@@ -197,7 +197,7 @@ std::string ResultImpl::art() const
 
 std::string ResultImpl::dnd_uri() const
 {
-    if (dnd_uri_.which() == Variant::Type::Null)
+    if (dnd_uri_.which() != Variant::Type::String)
     {
         return "";
     }
@@ -230,7 +230,7 @@ Variant const& ResultImpl::metadata(std::string const& key) const
 
 void ResultImpl::throw_on_empty(std::string const& name, Variant const& value)
 {
-    if (value.which() == Variant::Type::Null || value.get_string().empty())
+    if (value.which() != Variant::Type::String || value.get_string().empty())
     {
         throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
