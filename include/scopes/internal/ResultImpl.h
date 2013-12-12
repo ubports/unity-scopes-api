@@ -60,10 +60,10 @@ public:
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
 
-    std::string uri() const;
+    std::string uri() const noexcept;
     std::string title() const;
     std::string art() const;
-    std::string dnd_uri() const;
+    std::string dnd_uri() const noexcept;
     bool has_metadata(std::string const& key) const;
     Variant const& metadata(std::string const& key) const;
 

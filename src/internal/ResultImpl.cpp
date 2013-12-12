@@ -168,28 +168,32 @@ Variant const& ResultImpl::operator[](std::string const& key) const
     return metadata(key);
 }
 
-std::string ResultImpl::uri() const
+std::string ResultImpl::uri() const noexcept
 {
-    throw_on_non_string("uri", uri_.which());
-    return uri_.get_string();
+    if (uri_.which() == Variant::Type::String)
+    {
+        return uri_.get_string();
+    }
+    return "";
 }
 
 std::string ResultImpl::title() const
 {
-    throw_on_non_string("title", title_.which());
     return title_.get_string();
 }
 
 std::string ResultImpl::art() const
 {
-    throw_on_non_string("art", art_.which());
     return art_.get_string();
 }
 
-std::string ResultImpl::dnd_uri() const
+std::string ResultImpl::dnd_uri() const noexcept
 {
-    throw_on_non_string("dnd_uri", dnd_uri_.which());
-    return dnd_uri_.get_string();
+    if (uri_.which() == Variant::Type::String)
+    {
+        return dnd_uri_.get_string();
+    }
+    return "";
 }
 
 bool ResultImpl::has_metadata(std::string const& key) const

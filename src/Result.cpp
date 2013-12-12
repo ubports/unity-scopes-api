@@ -113,7 +113,7 @@ Variant const& Result::operator[](std::string const& key) const
     return (*(std::const_pointer_cast<internal::ResultImpl const>(p)))[key];
 }
 
-std::string Result::uri() const
+std::string Result::uri() const noexcept
 {
     return p->uri();
 }
@@ -128,7 +128,7 @@ std::string Result::art() const
     return p->art();
 }
 
-std::string Result::dnd_uri() const
+std::string Result::dnd_uri() const noexcept
 {
     return p->dnd_uri();
 }
