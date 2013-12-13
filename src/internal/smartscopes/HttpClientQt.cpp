@@ -96,12 +96,12 @@ HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
 
     get_thread_ = std::unique_ptr <std::thread> (new std::thread([this, request_url, port]()
     {
-        QUrl url( request_url.c_str() );
-        url.setPort( port );
-        get_qthread_ = std::unique_ptr<HttpClientQtThread>( new HttpClientQtThread( url ) );
+        QUrl url(request_url.c_str());
+        url.setPort(port);
+        get_qthread_ = std::unique_ptr <HttpClientQtThread> (new HttpClientQtThread(url));
 
         QEventLoop loop;
-        QObject::connect( get_qthread_.get(), SIGNAL( finished() ), &loop, SLOT( quit() ) );
+        QObject::connect(get_qthread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));
 
         get_qthread_->start();
         loop.exec();
@@ -109,22 +109,22 @@ HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
 
         QNetworkReply* reply = get_qthread_->getReply();
 
-        if ( !reply )
+        if (!reply)
         {
             // communication error
-            unity::ResourceException e( "No reply from " + request_url + ":" + std::to_string( port ) );
-            promise_->set_exception( make_exception_ptr( e ) );
+            unity::ResourceException e("No reply from " + request_url + ":" + std::to_string(port));
+            promise_->set_exception(make_exception_ptr(e));
         }
-        else if ( reply->error() != QNetworkReply::NoError )
+        else if (reply->error() != QNetworkReply::NoError)
         {
             // communication error
-            unity::ResourceException e( reply->errorString().toStdString() );
-            promise_->set_exception( make_exception_ptr( e ) );
+            unity::ResourceException e(reply->errorString().toStdString());
+            promise_->set_exception(make_exception_ptr(e));
         }
         else
         {
-            QString reply_string( reply->readAll() );
-            promise_->set_value( reply_string.toStdString() );
+            QString reply_string(reply->readAll());
+            promise_->set_value(reply_string.toStdString());
         }
     }));
 }
