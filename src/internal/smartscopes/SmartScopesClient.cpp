@@ -44,7 +44,7 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
         if (!base_url_env.empty())
         {
             uint64_t found = base_url_env.find_last_of(':');
-            if( found != std::string::npos && found > 5 )
+            if ( found != std::string::npos && found > 5 )
             {
                 url_ = base_url_env.substr(0, found);
                 port_ = std::stoi( base_url_env.substr(found + 1) );
@@ -123,16 +123,26 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
 
     // optional parameters
 
-    if( !locale.empty() )
+    if ( !locale.empty() )
+    {
         search_uri << "&locale=\"" << locale << "\"";
-    if( !country.empty() )
+    }
+    if ( !country.empty() )
+    {
         search_uri << "&country=\"" << country << "\"";
-    if( !latitude.empty() )
+    }
+    if ( !latitude.empty() )
+    {
         search_uri << "&latitude=\"" << latitude << "\"";
-    if( !longitude.empty() )
+    }
+    if ( !longitude.empty() )
+    {
         search_uri << "&longitude=\"" << longitude << "\"";
-    if( limit != 0 )
+    }
+    if ( limit != 0 )
+    {
         search_uri << "&limit=" << std::to_string(limit);
+    }
 
     cancel_search(session_id);
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
