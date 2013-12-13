@@ -48,7 +48,9 @@ TEST(Query, copy)
         Query a("scope-A", "foo", "dep1");
         Query b(a);
 
-        EXPECT_EQ(a, b);
+        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.department_id(), b.department_id());
+        EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
         a.set_department_id("dep2");
 
@@ -59,40 +61,14 @@ TEST(Query, copy)
         Query a("scope-A", "foo", "dep1");
         Query b = a;
 
-        EXPECT_EQ(a, b);
+        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.department_id(), b.department_id());
+        EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
         a.set_department_id("dep2");
 
         EXPECT_EQ("foo", b.query_string());
         EXPECT_EQ("dep1", b.department_id());
-    }
-}
-
-TEST(Query, comparison)
-{
-    {
-        Query a("scope-A", "foo", "dep1");
-        Query b("scope-A", "foo", "dep2");
-        EXPECT_FALSE(a == b);
-        EXPECT_TRUE(a != b);
-    }
-    {
-        Query a("scope-A", "foo", "dep1");
-        Query b("scope-A", "bar", "dep1");
-        EXPECT_FALSE(a == b);
-        EXPECT_TRUE(a != b);
-    }
-    {
-        Query a("scope-A", "foo", "dep1");
-        Query b("scope-B", "foo", "dep1");
-        EXPECT_FALSE(a == b);
-        EXPECT_TRUE(a != b);
-    }
-    {
-        Query a("scope-A", "foo", "dep1");
-        Query b("scope-A", "foo", "dep1");
-        EXPECT_TRUE(a == b);
-        EXPECT_FALSE(a != b);
     }
 }
 

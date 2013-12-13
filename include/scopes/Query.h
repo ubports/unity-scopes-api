@@ -72,9 +72,6 @@ public:
     Query(Query&&);
     Query& operator=(Query const& other);
     Query& operator=(Query&&);
-
-    bool operator==(Query const& other) const;
-    bool operator!=(Query const& other) const;
     /// @endcond
 
     /**

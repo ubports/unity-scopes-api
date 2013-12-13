@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <scopes/Annotation.h>
+#include <scopes/Query.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
 #include <scopes/internal/AnnotationImpl.h>
@@ -37,7 +38,9 @@ TEST(Annotation, link)
         EXPECT_EQ(1, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query, link->query());
+        EXPECT_EQ(query.scope_name(), link->query().scope_name());
+        EXPECT_EQ(query.department_id(), link->query().department_id());
+        EXPECT_EQ(query.query_string(), link->query().query_string());
     }
 }
 
@@ -55,7 +58,9 @@ TEST(Annotation, emblemLink)
         EXPECT_EQ(1, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query, link->query());
+        EXPECT_EQ(query.scope_name(), link->query().scope_name());
+        EXPECT_EQ(query.department_id(), link->query().department_id());
+        EXPECT_EQ(query.query_string(), link->query().query_string());
     }
 }
 
@@ -90,9 +95,13 @@ TEST(Annotation, groupedLink)
         auto link1 = annotation.links().front();
         auto link2 = annotation.links().back();
         EXPECT_EQ("Link1", link1->label());
-        EXPECT_EQ(query1, link1->query());
+        EXPECT_EQ(query1.scope_name(), link1->query().scope_name());
+        EXPECT_EQ(query1.department_id(), link1->query().department_id());
+        EXPECT_EQ(query1.query_string(), link1->query().query_string());
         EXPECT_EQ("Link2", link2->label());
-        EXPECT_EQ(query2, link2->query());
+        EXPECT_EQ(query2.scope_name(), link2->query().scope_name());
+        EXPECT_EQ(query2.department_id(), link2->query().department_id());
+        EXPECT_EQ(query2.query_string(), link2->query().query_string());
     }
 }
 
@@ -125,7 +134,9 @@ TEST(Annotation, card)
         EXPECT_EQ(1, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query, link->query());
+        EXPECT_EQ(query.scope_name(), link->query().scope_name());
+        EXPECT_EQ(query.department_id(), link->query().department_id());
+        EXPECT_EQ(query.query_string(), link->query().query_string());
     }
 }
 

@@ -62,16 +62,6 @@ Query& Query::operator=(Query const& other)
 
 Query& Query::operator=(Query&&) = default;
 
-bool Query::operator==(Query const& other) const
-{
-    return *p == *(other.p);
-}
-
-bool Query::operator!=(Query const& other) const
-{
-    return !(this->operator==(other));
-}
-
 void Query::set_department_id(std::string const& dep_id)
 {
     p->set_department_id(dep_id);
