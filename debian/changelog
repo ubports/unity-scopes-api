@@ -1,6 +1,8 @@
-unity-scopes-api (0.1.4-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.1.5-0ubuntu1) UNRELEASED; urgency=low
 
   * Added support for [] operator to the Result class.
+  * Remove factory_configfile() API as well as the need to define it in
+    the configuration files.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Thu, 12 Dec 2013 13:09:41 +0100
 
