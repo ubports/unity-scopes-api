@@ -26,9 +26,6 @@ using namespace unity::api::scopes::internal;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -53,7 +50,5 @@ MiddlewareBase* MWObjectProxy::mw_base() const noexcept
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

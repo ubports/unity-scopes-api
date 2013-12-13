@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -110,7 +107,5 @@ void ZmqReply::finished(ReceiverBase::Reason reason)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

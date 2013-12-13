@@ -29,9 +29,6 @@ using namespace unity;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -319,7 +316,5 @@ ScopeMetadata ScopeMetadataImpl::create(unique_ptr<ScopeMetadataImpl> impl)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

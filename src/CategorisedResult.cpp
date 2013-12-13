@@ -23,9 +23,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -76,7 +73,5 @@ internal::CategorisedResultImpl* CategorisedResult::fwd() const
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

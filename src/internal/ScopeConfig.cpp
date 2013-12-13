@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -155,7 +152,5 @@ string ScopeConfig::hot_key() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

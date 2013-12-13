@@ -23,9 +23,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -53,7 +50,5 @@ internal::ScopeImpl* Scope::fwd() const
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

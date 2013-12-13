@@ -22,9 +22,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -112,7 +109,5 @@ void CategoryImpl::deserialize(VariantMap const& variant_map)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

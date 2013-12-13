@@ -27,9 +27,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -271,7 +268,5 @@ void swap(Variant& lhs, Variant& rhs) noexcept
 // @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

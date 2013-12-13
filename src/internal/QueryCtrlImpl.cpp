@@ -32,9 +32,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -86,7 +83,5 @@ MWQueryCtrlProxy QueryCtrlImpl::fwd() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

@@ -30,9 +30,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -101,7 +98,5 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

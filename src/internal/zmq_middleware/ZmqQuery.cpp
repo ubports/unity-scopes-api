@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -77,7 +74,5 @@ void ZmqQuery::run(MWReplyProxy const& reply)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

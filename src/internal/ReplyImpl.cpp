@@ -35,9 +35,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -171,7 +168,5 @@ MWReplyProxy ReplyImpl::fwd() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

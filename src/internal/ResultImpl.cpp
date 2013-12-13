@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -342,7 +339,5 @@ void ResultImpl::deserialize(VariantMap const& var)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

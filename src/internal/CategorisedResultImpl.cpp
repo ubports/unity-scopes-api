@@ -25,9 +25,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -93,7 +90,5 @@ void CategorisedResultImpl::serialize_internal(VariantMap& var) const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

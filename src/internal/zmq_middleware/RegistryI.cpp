@@ -33,9 +33,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -122,7 +119,5 @@ void RegistryI::list_(Current const&,
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

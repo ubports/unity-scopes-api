@@ -23,12 +23,9 @@
 #include <cassert>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -82,7 +79,5 @@ void QueryCtrlObject::set_query(QueryObject::SPtr const& qo)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

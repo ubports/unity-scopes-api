@@ -20,7 +20,7 @@
 
 using Cxx = import "/capnp/c++.capnp";
 
-$Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto::QueryCtrl");
+$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::QueryCtrl");
 
 # The separate QueryCtrl object solely exists so we can cancel a query
 # without the risk of blocking. The QueryCtrl::cancel() method is on the -ctrl

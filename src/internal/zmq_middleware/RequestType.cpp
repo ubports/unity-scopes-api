@@ -23,9 +23,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -45,7 +42,5 @@ string to_string(RequestType t)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

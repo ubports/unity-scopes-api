@@ -37,9 +37,6 @@ using namespace unity::api::scopes::internal;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -148,7 +145,5 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

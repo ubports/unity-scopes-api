@@ -22,9 +22,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -53,7 +50,5 @@ std::string CategoryRenderer::data() const
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

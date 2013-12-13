@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -62,7 +59,5 @@ void ZmqSender::send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segment
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

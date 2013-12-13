@@ -40,9 +40,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -464,7 +461,5 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

@@ -36,9 +36,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -566,7 +563,5 @@ void ObjectAdapter::worker_thread()
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

@@ -21,9 +21,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -52,7 +49,5 @@ void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexce
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

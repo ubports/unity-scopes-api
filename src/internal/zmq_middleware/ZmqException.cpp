@@ -30,9 +30,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -146,7 +143,5 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

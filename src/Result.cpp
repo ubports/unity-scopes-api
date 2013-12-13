@@ -22,9 +22,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -151,7 +148,5 @@ VariantMap Result::serialize() const
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

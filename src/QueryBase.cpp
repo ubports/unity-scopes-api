@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -55,7 +52,5 @@ void QueryBase::cancel()
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

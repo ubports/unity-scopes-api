@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -66,7 +63,5 @@ char const* to_string(ReceiverBase::Reason reason)
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

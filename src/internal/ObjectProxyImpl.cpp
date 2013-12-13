@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -67,7 +64,5 @@ MWProxy ObjectProxyImpl::proxy() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

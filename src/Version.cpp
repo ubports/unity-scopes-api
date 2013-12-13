@@ -21,9 +21,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -49,7 +46,5 @@ version_string()
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

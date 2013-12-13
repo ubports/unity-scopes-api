@@ -32,12 +32,9 @@
 #include <config.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -201,7 +198,5 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

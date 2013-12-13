@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -71,7 +68,5 @@ void Runtime::run_scope(ScopeBase *const scope_base)
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

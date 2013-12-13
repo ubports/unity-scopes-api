@@ -20,7 +20,7 @@
 
 using Cxx = import "/capnp/c++.capnp";
 
-$Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto");
+$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 
 # Proxy definition. A proxy is a pair of <endpoint, identity>. The endpoint must include
 # the protocol, which controls how to interpret the remainder of the string. For example:

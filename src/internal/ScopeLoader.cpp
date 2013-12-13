@@ -25,13 +25,10 @@
 #include <cassert>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -480,7 +477,5 @@ void ScopeLoader::notify_app_thread_started()
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

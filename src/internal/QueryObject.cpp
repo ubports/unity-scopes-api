@@ -30,12 +30,9 @@
 #include <cassert>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -153,7 +150,5 @@ void QueryObject::set_self(SPtr const& self)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

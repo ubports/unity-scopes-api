@@ -28,9 +28,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -78,7 +75,5 @@ void QueryI::run_(Current const& current,
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

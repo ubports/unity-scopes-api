@@ -28,9 +28,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -113,7 +110,5 @@ util::IniParser::SPtr ConfigBase::p() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

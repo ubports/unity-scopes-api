@@ -23,9 +23,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -72,7 +69,5 @@ Category::SCPtr CategoryRegistry::lookup_category(std::string const& id) const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

@@ -24,12 +24,9 @@
 #include <sstream>
 
 using namespace std;
-using namespace unity::api::scopes::internal::reaper_private;
+using namespace unity::scopes::internal::reaper_private;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -297,7 +294,5 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

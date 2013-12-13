@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -117,7 +114,5 @@ VariantMap ScopeMetadata::serialize() const
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

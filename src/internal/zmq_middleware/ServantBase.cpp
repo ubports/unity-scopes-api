@@ -29,9 +29,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -108,7 +105,5 @@ shared_ptr<AbstractObject> ServantBase::del() const noexcept
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

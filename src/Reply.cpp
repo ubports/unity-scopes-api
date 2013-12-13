@@ -25,9 +25,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -75,7 +72,5 @@ internal::ReplyImpl* Reply::fwd() const
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

@@ -26,9 +26,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -105,7 +102,5 @@ bool RegistryObject::remove(std::string const& scope_name)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

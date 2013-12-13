@@ -23,9 +23,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -63,7 +60,5 @@ internal::RegistryImpl* Registry::fwd() const
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

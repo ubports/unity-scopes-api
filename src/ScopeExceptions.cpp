@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -134,7 +131,5 @@ string NotFoundException::name() const
 }
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

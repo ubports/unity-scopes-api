@@ -20,7 +20,7 @@
 
 using Cxx = import "/capnp/c++.capnp";
 
-$Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto");
+$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 
 struct NullVal
 {

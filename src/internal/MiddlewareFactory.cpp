@@ -24,12 +24,9 @@
 #include <cassert>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -120,7 +117,5 @@ MiddlewareFactory::Kind MiddlewareFactory::to_kind(string const& kind)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

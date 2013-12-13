@@ -20,7 +20,7 @@
 
 using Cxx = import "/capnp/c++.capnp";
 
-$Cxx.namespace("unity::api::scopes::internal::zmq_middleware::capnproto::Query");
+$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::Query");
 
 using Proxy = import "Proxy.capnp";
 

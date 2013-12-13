@@ -27,9 +27,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -89,7 +86,5 @@ void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket 
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

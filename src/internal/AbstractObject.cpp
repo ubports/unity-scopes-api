@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -63,7 +60,5 @@ void AbstractObject::disconnect() noexcept
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

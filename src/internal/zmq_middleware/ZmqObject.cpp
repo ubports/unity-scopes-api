@@ -30,9 +30,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -141,7 +138,5 @@ unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_param
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

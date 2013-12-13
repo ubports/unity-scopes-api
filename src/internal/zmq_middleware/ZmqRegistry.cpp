@@ -33,9 +33,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -146,7 +143,5 @@ MetadataMap ZmqRegistry::list()
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

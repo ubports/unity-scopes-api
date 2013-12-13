@@ -25,9 +25,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -71,7 +68,5 @@ internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
 //! @endcond
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

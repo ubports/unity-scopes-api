@@ -27,9 +27,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -101,7 +98,5 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity

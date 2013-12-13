@@ -28,9 +28,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -73,7 +70,5 @@ void QueryBaseImpl::cancel()
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
