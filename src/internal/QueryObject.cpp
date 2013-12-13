@@ -26,6 +26,7 @@
 #include <scopes/Reply.h>
 #include <unity/Exception.h>
 
+#include <iostream>
 #include <cassert>
 
 using namespace std;
@@ -95,12 +96,14 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
         pushable_ = false;
         reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
+        cerr << "An error occurred in ScopeBase::run(): " << e.to_string() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
+        cerr << "An unknown error occurred in ScopeBase::run()" << endl;
     }
 }
 
