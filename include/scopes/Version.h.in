@@ -51,12 +51,6 @@ namespace unity
 {
 
 /**
-\brief Top-level namespace for public functionality of the Unity API.
-*/
-namespace api
-{
-
-/**
 \brief Top-level namespace for public functionality of the Unity scopes API.
 */
 namespace scopes
@@ -123,8 +117,6 @@ const char* version_string();    // Returns "major.minor.micro"
 // TODO: Add methods to report compiler version and compiler flags
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

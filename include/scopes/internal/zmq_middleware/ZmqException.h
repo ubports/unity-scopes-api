@@ -29,9 +29,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -66,8 +63,6 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& reader);
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

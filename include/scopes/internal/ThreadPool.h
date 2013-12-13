@@ -28,9 +28,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -75,8 +72,6 @@ std::future<typename std::result_of<F()>::type> ThreadPool::submit(F f)
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

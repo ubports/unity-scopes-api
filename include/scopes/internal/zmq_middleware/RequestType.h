@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -45,8 +42,6 @@ std::string to_string(RequestType);
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

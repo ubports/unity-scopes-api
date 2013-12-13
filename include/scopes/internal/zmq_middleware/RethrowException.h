@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -45,8 +42,6 @@ void rethrow_zmq_ex(zmqpp::exception const& e);
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

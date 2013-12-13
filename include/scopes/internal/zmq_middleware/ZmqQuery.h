@@ -26,9 +26,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -52,8 +49,6 @@ public:
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

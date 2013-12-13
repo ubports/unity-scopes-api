@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -34,8 +31,6 @@ class Scope;
 typedef std::shared_ptr<Scope> ScopeProxy;
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

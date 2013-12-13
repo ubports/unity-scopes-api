@@ -25,9 +25,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -53,8 +50,6 @@ VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r);
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -39,8 +36,6 @@ typedef std::shared_ptr<MWQuery> MWQueryProxy;
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

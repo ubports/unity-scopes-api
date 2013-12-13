@@ -31,9 +31,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -163,8 +160,6 @@ size_t ThreadSafeQueue<T>::size() const noexcept
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

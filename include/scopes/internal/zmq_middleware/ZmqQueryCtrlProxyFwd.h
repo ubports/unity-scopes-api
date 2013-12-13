@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -44,8 +41,6 @@ typedef std::shared_ptr<ZmqQueryCtrl> ZmqQueryCtrlProxy;
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

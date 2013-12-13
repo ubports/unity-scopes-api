@@ -29,9 +29,6 @@ namespace util
 class IniParser;
 }
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -62,8 +59,6 @@ private:
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

@@ -29,9 +29,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -102,8 +99,6 @@ protected:
 char const* to_string(ReceiverBase::Reason reason);
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

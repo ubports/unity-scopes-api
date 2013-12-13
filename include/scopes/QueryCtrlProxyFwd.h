@@ -24,9 +24,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -34,8 +31,6 @@ class QueryCtrl;
 typedef std::shared_ptr<QueryCtrl> QueryCtrlProxy;
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

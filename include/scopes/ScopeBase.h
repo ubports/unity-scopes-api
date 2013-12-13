@@ -56,9 +56,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -241,8 +238,6 @@ typedef decltype(&UNITY_API_SCOPE_CREATE_FUNCTION) CreateFunction;
 typedef decltype(&UNITY_API_SCOPE_DESTROY_FUNCTION) DestroyFunction;
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

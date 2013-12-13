@@ -26,9 +26,6 @@
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -36,8 +33,6 @@ class Registry;
 typedef std::shared_ptr<Registry> RegistryProxy;
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 
