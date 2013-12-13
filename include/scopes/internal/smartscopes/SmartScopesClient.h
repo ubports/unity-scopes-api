@@ -102,7 +102,6 @@ private:
     std::string url_;
     uint port_;
 
-    std::string search_uri_;
     std::map<std::string, std::future<std::string>> search_results_;
 };
 

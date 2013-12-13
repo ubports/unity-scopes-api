@@ -23,6 +23,7 @@
 #include <future>
 #include <iostream>
 #include <map>
+#include <sstream>
 
 static const std::string c_base_url = "https://productsearch.ubuntu.com";
 static const std::string c_remote_scopes_resourse = "/smartscopes/v2/remote-scopes";
@@ -110,26 +111,30 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
                                uint query_id, const std::string& platform, const std::string& locale, const std::string& country,
                                const std::string& latitude, const std::string& longitude, uint limit)
 {
-    //search_results_.wait();
-
-    search_uri_ = search_url + "?";
+    std::ostringstream search_uri;
+    search_uri << search_url << "?";
 
     // mandatory parameters
 
-    search_uri_ += "query=\"" + http_client_->to_percent_encoding(query) + "\"";
-    search_uri_ += "&session_id=\"" + session_id + "\"";
-    search_uri_ += "&query_id=" + std::to_string(query_id);
-    search_uri_ += "&platform=\"" + platform + "\"";
+    search_uri << "query=\"" << http_client_->to_percent_encoding(query) << "\"";
+    search_uri << "&session_id=\"" << session_id << "\"";
+    search_uri << "&query_id=" << std::to_string(query_id);
+    search_uri << "&platform=\"" << platform << "\"";
 
     // optional parameters
 
-    search_uri_ += locale.empty() ? "" : "&locale=\"" + locale + "\"";
-    search_uri_ += country.empty() ? "" : "&country=\"" + country + "\"";
-    search_uri_ += latitude.empty() ? "" : "&latitude=\"" + latitude + "\"";
-    search_uri_ += longitude.empty() ? "" : "&longitude=\"" + longitude + "\"";
-    search_uri_ += limit == 0 ? "" : "&limit=\"" + std::to_string(limit) + "\"";
+    if( !locale.empty() )
+        search_uri << "&locale=\"" << locale << "\"";
+    if( !country.empty() )
+        search_uri << "&country=\"" << country << "\"";
+    if( !latitude.empty() )
+        search_uri << "&latitude=\"" << latitude << "\"";
+    if( !longitude.empty() )
+        search_uri << "&longitude=\"" << longitude << "\"";
+    if( limit != 0 )
+        search_uri << "&limit=" << std::to_string(limit);
 
-    search_results_[session_id] = http_client_->get(search_uri_, session_id, port_);
+    search_results_[session_id] = http_client_->get(search_uri.str(), session_id, port_);
 }
 
 std::vector<SearchResult> SmartScopesClient::get_search_results(const std::string& session_id)
