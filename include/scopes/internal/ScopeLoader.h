@@ -61,22 +61,22 @@ public:
     std::string libpath() const noexcept;
 
     // Returns the actual implementation provided by the scope.
-    unity::api::scopes::ScopeBase* scope_base() const;
+    unity::scopes::ScopeBase* scope_base() const;
 
     ~ScopeLoader() noexcept;
 
 private:
     ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);
-    void run_scope(unity::api::scopes::CreateFunction create_func, unity::api::scopes::DestroyFunction destroy_func);
+    void run_scope(unity::scopes::CreateFunction create_func, unity::scopes::DestroyFunction destroy_func);
     void handle_thread_exception();
 
-    void run_application(unity::api::scopes::ScopeBase* scope);
+    void run_application(unity::scopes::ScopeBase* scope);
     void notify_app_thread_started();
 
     std::string scope_name_;
-    unity::api::scopes::ScopeBase* scope_base_;
-    unity::api::scopes::internal::DynamicLoader::UPtr dyn_loader_;
-    unity::api::scopes::RegistryProxy registry_;
+    unity::scopes::ScopeBase* scope_base_;
+    unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;
+    unity::scopes::RegistryProxy registry_;
     std::exception_ptr exception_;
 
     std::thread scope_thread_;

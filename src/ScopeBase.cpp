@@ -43,9 +43,9 @@ void ScopeBase::run()
 
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
-    v_major = unity::api::scopes::major_version();
-    v_minor = unity::api::scopes::minor_version();
-    v_micro = unity::api::scopes::micro_version();
+    v_major = unity::scopes::major_version();
+    v_minor = unity::scopes::minor_version();
+    v_micro = unity::scopes::micro_version();
 }
 
 } // namespace scopes

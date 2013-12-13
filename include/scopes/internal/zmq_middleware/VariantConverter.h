@@ -36,11 +36,11 @@ namespace zmq_middleware
 
 // Utility functions to convert to/from Variant and VariantMap.
 
-void to_value(Variant const& v, unity::api::scopes::internal::zmq_middleware::capnproto::Value::Builder& b);
-Variant to_variant(unity::api::scopes::internal::zmq_middleware::capnproto::Value::Reader const& r);
+void to_value(Variant const& v, unity::scopes::internal::zmq_middleware::capnproto::Value::Builder& b);
+Variant to_variant(unity::scopes::internal::zmq_middleware::capnproto::Value::Reader const& r);
 
-void to_value_dict(VariantMap const& vm, unity::api::scopes::internal::zmq_middleware::capnproto::ValueDict::Builder& b);
-VariantMap to_variant_map(unity::api::scopes::internal::zmq_middleware::capnproto::ValueDict::Reader const& r);
+void to_value_dict(VariantMap const& vm, unity::scopes::internal::zmq_middleware::capnproto::ValueDict::Builder& b);
+VariantMap to_variant_map(unity::scopes::internal::zmq_middleware::capnproto::ValueDict::Reader const& r);
 
 void to_value_array(VariantArray const& va, capnp::List<capnproto::Value>::Builder& b);
 VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r);

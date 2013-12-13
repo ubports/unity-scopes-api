@@ -23,7 +23,7 @@
 #include <scopes/ScopeBase.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 class TestQuery : public QueryBase
 {

@@ -87,7 +87,7 @@ Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
     return cat_registry_->lookup_category(id);
 }
 
-bool ReplyImpl::push(unity::api::scopes::CategorisedResult const& result)
+bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
     // If this is an aggregator scope, it may be pushing result items obtained
     // from ReplyObject without registering a category first.

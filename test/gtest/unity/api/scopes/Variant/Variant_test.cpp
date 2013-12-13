@@ -24,7 +24,7 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Variant, basic)
 {

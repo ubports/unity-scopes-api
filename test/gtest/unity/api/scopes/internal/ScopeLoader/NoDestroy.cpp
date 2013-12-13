@@ -27,7 +27,7 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
     UNITY_API_SCOPE_CREATE_FUNCTION()
     {

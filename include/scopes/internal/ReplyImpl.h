@@ -58,9 +58,9 @@ public:
     void register_category(Category::SCPtr category);
     Category::SCPtr lookup_category(std::string const& id) const;
 
-    bool push(unity::api::scopes::CategorisedResult const& result);
+    bool push(unity::scopes::CategorisedResult const& result);
     void finished();
-    void finished(unity::api::scopes::ReceiverBase::Reason reason);
+    void finished(unity::scopes::ReceiverBase::Reason reason);
 
     static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
 

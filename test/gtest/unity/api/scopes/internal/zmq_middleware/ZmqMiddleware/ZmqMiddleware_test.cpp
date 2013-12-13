@@ -22,8 +22,8 @@
 #include <scope-api-testconfig.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // Basic test.
 

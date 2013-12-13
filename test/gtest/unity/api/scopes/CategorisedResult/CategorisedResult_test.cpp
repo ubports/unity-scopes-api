@@ -23,8 +23,8 @@
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 // basic test of CategorisedResult setters and getters
 TEST(CategorisedResult, basic)

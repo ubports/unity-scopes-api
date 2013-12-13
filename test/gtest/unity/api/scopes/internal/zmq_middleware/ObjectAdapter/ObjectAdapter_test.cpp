@@ -34,9 +34,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // We use this to sleep in between adapter creation and shutdown. That's
 // necessary because zmq closes sockets asynchronously. Without the wait,

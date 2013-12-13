@@ -38,7 +38,7 @@ namespace zmq_middleware
 
 void rethrow_zmq_ex(zmqpp::exception const&)
 {
-    throw unity::api::scopes::MiddlewareException("zmqpp exception");
+    throw unity::scopes::MiddlewareException("zmqpp exception");
 }
 
 } // namespace ice_middleware

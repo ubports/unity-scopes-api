@@ -20,12 +20,12 @@
 
 #define EXPORT __attribute__ ((visibility("default")))
 
-class EXPORT MyScope : public unity::api::scopes::ScopeBase
+class EXPORT MyScope : public unity::scopes::ScopeBase
 {
 public:
     MyScope() {}
 
-    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override
+    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override
     {
         return VERSION;
     }
@@ -33,8 +33,8 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&,
-                                                             unity::api::scopes::VariantMap const&) override
+    virtual unity::scopes::QueryBase::UPtr create_query(std::string const&,
+            unity::scopes::VariantMap const&) override
     {
         return nullptr;
     }
@@ -44,7 +44,7 @@ protected:
 };
 
 EXPORT
-unity::api::scopes::ScopeBase*
+unity::scopes::ScopeBase*
 // cppcheck-suppress unusedFunction
 UNITY_API_SCOPE_CREATE_FUNCTION()
 {
@@ -54,7 +54,7 @@ UNITY_API_SCOPE_CREATE_FUNCTION()
 EXPORT
 void
 // cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
+UNITY_API_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
     delete scope;
 }

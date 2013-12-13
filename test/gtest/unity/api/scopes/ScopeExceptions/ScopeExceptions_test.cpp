@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(MiddlewareException, state)
 {

@@ -50,7 +50,7 @@ public:
     void run();
 
 private:
-    typedef ThreadSafeQueue<unity::api::scopes::internal::TaskWrapper> TaskQueue;
+    typedef ThreadSafeQueue<unity::scopes::internal::TaskWrapper> TaskQueue;
     std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
     std::mutex mutex_;

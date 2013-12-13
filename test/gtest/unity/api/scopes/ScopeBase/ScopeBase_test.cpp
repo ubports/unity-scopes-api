@@ -22,8 +22,8 @@
 #include <scope-api-testconfig.h>
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 namespace
 {
@@ -45,12 +45,12 @@ TEST(ScopeBase, basic)
     DynamicLoader::UPtr dl = DynamicLoader::create(scopelib);
 
     char const* create_sym = UNITY_API_SCOPE_CREATE_SYMSTR;
-    unity::api::scopes::CreateFunction create
-        = reinterpret_cast<unity::api::scopes::CreateFunction>(dl->find_function(create_sym));
+    unity::scopes::CreateFunction create
+        = reinterpret_cast<unity::scopes::CreateFunction>(dl->find_function(create_sym));
 
     char const* destroy_sym = UNITY_API_SCOPE_DESTROY_SYMSTR;
-    unity::api::scopes::DestroyFunction destroy
-        = reinterpret_cast<unity::api::scopes::DestroyFunction>(dl->find_function(destroy_sym));
+    unity::scopes::DestroyFunction destroy
+        = reinterpret_cast<unity::scopes::DestroyFunction>(dl->find_function(destroy_sym));
 
     ScopeBase* b = create();
     EXPECT_NE(nullptr, b);

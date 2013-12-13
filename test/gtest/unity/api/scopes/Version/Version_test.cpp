@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Version, basic)
 {

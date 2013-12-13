@@ -195,8 +195,6 @@ protected:
 
 } // namespace scopes
 
-} // namespace api
-
 } // namespace unity
 
 /**
@@ -208,7 +206,7 @@ destroy function is called by the scopes run time.
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
 */
-extern "C" unity::api::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION();
+extern "C" unity::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION();
 
 /**
 \brief The function called by the scopes run time to finalize the scope.
@@ -216,12 +214,9 @@ The passed pointer is the pointer that was returned by the create function.
 
 Exceptions thrown by the destroy function are ignored.
 */
-extern "C" void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase*);
+extern "C" void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase*);
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes

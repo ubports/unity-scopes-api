@@ -23,7 +23,7 @@
 #include <future>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 TEST(ThreadSafeQueue, basic)
 {

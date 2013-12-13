@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 TEST(ThreadPool, basic)
 {

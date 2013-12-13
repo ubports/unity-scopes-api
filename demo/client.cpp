@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 class Receiver : public ReceiverBase
 {

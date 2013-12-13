@@ -25,8 +25,8 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // This test checks conversions between Variant/VariantMap and Value/ValueDict (capnproto)
 // performed by VariantConverter utility functions (to_value, to_variant).
@@ -34,7 +34,7 @@ TEST(VariantConverter, basic)
 {
     // convert a Variant into capnproto Value
     ::capnp::MallocMessageBuilder message;
-    auto builder = message.initRoot<unity::api::scopes::internal::zmq_middleware::capnproto::Value>();
+    auto builder = message.initRoot<unity::scopes::internal::zmq_middleware::capnproto::Value>();
     {
         VariantMap m;
         VariantMap inner;
@@ -52,7 +52,7 @@ TEST(VariantConverter, basic)
     }
 
     // convert capnproto Value back to Variant
-    auto reader = message.getRoot<unity::api::scopes::internal::zmq_middleware::capnproto::Value>();
+    auto reader = message.getRoot<unity::scopes::internal::zmq_middleware::capnproto::Value>();
     EXPECT_EQ(capnproto::Value::Which::DICT_VAL, reader.which());
 
     auto resultVar = to_variant(reader);
