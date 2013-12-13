@@ -108,22 +108,21 @@ TEST_F( JsonNodeTest, array_values )
 
 TEST_F( JsonNodeTest, nested_values )
 {
-    std::string json_string =
-        R"({
-        "address": {
-        "city": "New York"
-    },
-        "phoneNumbers": [
-        {
-        "type": "home",
-        "number": "212 555-1234"
-    },
-        {
-        "type": "fax",
-        "number": "646 555-4567"
-    }
-        ]
-    })";
+    std::string json_string = R"({
+                              "address": {
+                              "city": "New York"
+                          },
+                              "phoneNumbers": [
+                              {
+                              "type": "home",
+                              "number": "212 555-1234"
+                          },
+                              {
+                              "type": "fax",
+                              "number": "646 555-4567"
+                          }
+                              ]
+                          })";
 
     std::string value;
     JsonNodeInterface::SPtr node;

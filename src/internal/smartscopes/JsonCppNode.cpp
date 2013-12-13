@@ -37,7 +37,6 @@ JsonCppNode::JsonCppNode(const Json::Value& root)
 
 JsonCppNode::~JsonCppNode()
 {
-
 }
 
 void JsonCppNode::clear()
@@ -47,11 +46,12 @@ void JsonCppNode::clear()
 
 void JsonCppNode::read_json(const std::string& json_string)
 {
+    Json::Reader reader;
     clear();
 
-    if (!reader_.parse(json_string, root_))
+    if (!reader.parse(json_string, root_))
     {
-        throw unity::ResourceException("Failed to parse json string: " + reader_.getFormattedErrorMessages());
+        throw unity::ResourceException("Failed to parse json string: " + reader.getFormattedErrorMessages());
     }
 }
 

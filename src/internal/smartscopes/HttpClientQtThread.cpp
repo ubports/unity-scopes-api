@@ -27,7 +27,7 @@ HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint no_reply_timeout, c
     : QThread(),
       url_(url),
       headers_(headers),
-      no_reply_timeout_( no_reply_timeout ),
+      no_reply_timeout_(no_reply_timeout),
       reply_(nullptr),
       manager_(nullptr)
 {

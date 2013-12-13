@@ -44,10 +44,10 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
         if (!base_url_env.empty())
         {
             uint64_t found = base_url_env.find_last_of(':');
-            if ( found != std::string::npos && found > 5 )
+            if (found != std::string::npos && found > 5)
             {
                 url_ = base_url_env.substr(0, found);
-                port_ = std::stoi( base_url_env.substr(found + 1) );
+                port_ = std::stoi(base_url_env.substr(found + 1));
             }
             else
             {
@@ -107,9 +107,11 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
 }
 
-void SmartScopesClient::search(const std::string& search_url, const std::string& query, const std::string& session_id,
-                               uint query_id, const std::string& platform, const std::string& locale, const std::string& country,
-                               const std::string& latitude, const std::string& longitude, uint limit)
+void SmartScopesClient::search(const std::string& search_url, const std::string& query,
+                               const std::string& session_id, uint query_id, const std::string& platform,
+                               const std::string& locale, const std::string& country,
+                               const std::string& latitude, const std::string& longitude,
+                               uint limit)
 {
     std::ostringstream search_uri;
     search_uri << search_url << "?";
@@ -123,23 +125,23 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
 
     // optional parameters
 
-    if ( !locale.empty() )
+    if (!locale.empty())
     {
         search_uri << "&locale=\"" << locale << "\"";
     }
-    if ( !country.empty() )
+    if (!country.empty())
     {
         search_uri << "&country=\"" << country << "\"";
     }
-    if ( !latitude.empty() )
+    if (!latitude.empty())
     {
         search_uri << "&latitude=\"" << latitude << "\"";
     }
-    if ( !longitude.empty() )
+    if (!longitude.empty())
     {
         search_uri << "&longitude=\"" << longitude << "\"";
     }
-    if ( limit != 0 )
+    if (limit != 0)
     {
         search_uri << "&limit=" << std::to_string(limit);
     }

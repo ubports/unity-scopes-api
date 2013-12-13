@@ -70,7 +70,7 @@ std::future<std::string> HttpClientQt::get(const std::string& request_url, int p
     return future;
 }
 
-void HttpClientQt::cancel_get( std::future<std::string>& future )
+void HttpClientQt::cancel_get(std::future<std::string>& future)
 {
     // if session_id already in map, cancel it
     auto it = sessions_.find(&future);

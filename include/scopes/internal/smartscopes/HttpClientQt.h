@@ -47,7 +47,7 @@ public:
     ~HttpClientQt();
 
     std::future<std::string> get(const std::string& request_url, int port = 80) override;
-    void cancel_get( std::future<std::string>& future ) override;
+    void cancel_get(std::future<std::string>& future) override;
 
     std::string to_percent_encoding(const std::string& string) override;
 

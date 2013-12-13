@@ -22,7 +22,6 @@
 #include <scopes/internal/smartscopes/JsonNodeInterface.h>
 
 #include <jsoncpp/json/reader.h>
-#include <jsoncpp/json/writer.h>
 
 namespace unity
 {
@@ -64,8 +63,6 @@ public:
 
 private:
     Json::Value root_;
-    Json::Reader reader_;
-    Json::FastWriter writer_;
 };
 
 } // namespace smartscopes
