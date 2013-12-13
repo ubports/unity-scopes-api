@@ -62,8 +62,8 @@ private:
 
     private:
         std::shared_ptr<std::promise<std::string>> promise_;
-        std::unique_ptr<HttpClientQtThread> get_qthread_;
         std::unique_ptr<std::thread> get_thread_;
+        std::unique_ptr<HttpClientQtThread> get_qthread_;
     };
 
 private:

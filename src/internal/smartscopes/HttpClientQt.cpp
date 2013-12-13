@@ -89,8 +89,8 @@ std::string HttpClientQt::to_percent_encoding(const std::string& string)
 
 HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
     : promise_(nullptr),
-      get_qthread_(nullptr),
-      get_thread_(nullptr)
+      get_thread_(nullptr),
+      get_qthread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
@@ -111,7 +111,7 @@ HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
 
         if (!reply)
         {
-            // communication error
+            // no reply
             unity::ResourceException e("No reply from " + request_url + ":" + std::to_string(port));
             promise_->set_exception(make_exception_ptr(e));
         }
@@ -136,18 +136,16 @@ std::future<std::string> HttpClientQt::HttpSession::get_future()
 
 void HttpClientQt::HttpSession::cancel_session()
 {
-    if (get_qthread_)
+    while (!get_qthread_)
     {
-        get_qthread_->cancel();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
+    get_qthread_->cancel();
     wait_for_session();
 }
 
 void HttpClientQt::HttpSession::wait_for_session()
 {
-    if (get_thread_)
-    {
-        get_thread_->join();
-    }
+    get_thread_->join();
 }
