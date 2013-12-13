@@ -23,10 +23,11 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-HttpClientQtThread::HttpClientQtThread(const QUrl& url, const HttpHeadersList& headers)
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint no_reply_timeout, const HttpHeadersList& headers)
     : QThread(),
       url_(url),
       headers_(headers),
+      no_reply_timeout_( no_reply_timeout ),
       reply_(nullptr),
       manager_(nullptr)
 {
@@ -51,7 +52,7 @@ void HttpClientQtThread::run()
     reply_ = manager_->get(request);
 
     QTimer timeout;
-    timeout.singleShot(2000, this, SLOT( cancel() ));
+    timeout.singleShot(no_reply_timeout_, this, SLOT( cancel() ));
 
     QThread::exec(); // enter event loop
 }

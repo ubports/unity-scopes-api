@@ -103,7 +103,6 @@ TEST_F( JsonNodeTest, array_values )
 
     // get invalid array value
 
-    EXPECT_FALSE(node->has_node(2));
     EXPECT_THROW(node->get_node(2), unity::Exception);
 }
 

@@ -66,7 +66,6 @@ public:
     virtual bool as_bool() const = 0;
 
     virtual bool has_node( const std::string& node_name ) const = 0;
-    virtual bool has_node( uint node_index ) const = 0;
     virtual JsonNodeInterface::SPtr get_node( const std::string& node_name ) const = 0;
     virtual JsonNodeInterface::SPtr get_node( uint node_index ) const = 0;
 };

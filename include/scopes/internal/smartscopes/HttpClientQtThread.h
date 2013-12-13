@@ -36,7 +36,7 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread,
     Q_OBJECT
 
 public:
-    explicit HttpClientQtThread(const QUrl& url, const HttpHeadersList& = HttpHeadersList());
+    explicit HttpClientQtThread(const QUrl& url, uint no_reply_timeout = 2000, const HttpHeadersList& = HttpHeadersList());
     ~HttpClientQtThread();
 
     void run();
@@ -49,6 +49,7 @@ public Q_SLOTS:
 private:
     QUrl url_;
     HttpHeadersList headers_;
+    uint no_reply_timeout_;
     QNetworkReply* reply_;
     QNetworkAccessManager* manager_;
 };

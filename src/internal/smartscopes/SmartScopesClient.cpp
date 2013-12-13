@@ -31,7 +31,7 @@ using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
-                                     const std::string& url, int port)
+                                     const std::string& url, uint port)
     : http_client_(http_client),
       json_node_(json_node),
       url_(url),
@@ -39,14 +39,23 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
 {
     if (url_.empty())
     {
-        const char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
-        if (base_url_env == nullptr)
+        std::string base_url_env = ::getenv("SMART_SCOPES_SERVER");
+        if (!base_url_env.empty())
         {
-            url_ = c_base_url;
+            uint64_t found = base_url_env.find_last_of(':');
+            if( found != std::string::npos && found > 5 )
+            {
+                url_ = base_url_env.substr(0, found);
+                port_ = std::stoi( base_url_env.substr(found + 1) );
+            }
+            else
+            {
+                url_ = base_url_env;
+            }
         }
         else
         {
-            url_ = base_url_env;
+            url_ = c_base_url;
         }
     }
 }

@@ -140,16 +140,6 @@ bool JsonCppNode::has_node(const std::string& node_name) const
     return root_.isMember(node_name);
 }
 
-bool JsonCppNode::has_node(uint node_index) const
-{
-    if (root_.type() != Json::arrayValue || node_index >= root_.size())
-    {
-        return false;
-    }
-
-    return true;
-}
-
 JsonNodeInterface::SPtr JsonCppNode::get_node(const std::string& node_name) const
 {
     const Json::Value& value_node = root_[node_name];
@@ -167,6 +157,10 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(uint node_index) const
     if (root_.type() != Json::arrayValue)
     {
         throw unity::LogicException("Root node is not an array");
+    }
+    else if (node_index >= root_.size())
+    {
+        throw unity::LogicException("Invalid array index");
     }
 
     const Json::Value& value_node = root_[node_index];

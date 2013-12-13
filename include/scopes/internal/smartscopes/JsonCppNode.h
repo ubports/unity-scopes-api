@@ -59,7 +59,6 @@ public:
     bool as_bool() const override;
 
     bool has_node(const std::string& node_name) const override;
-    bool has_node(uint node_index) const override;
     JsonNodeInterface::SPtr get_node(const std::string& node_name) const override;
     JsonNodeInterface::SPtr get_node(uint node_index) const override;
 

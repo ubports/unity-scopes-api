@@ -77,7 +77,7 @@ public:
     SmartScopesClient( HttpClientInterface::SPtr http_client,
                        JsonNodeInterface::SPtr json_node,
                        const std::string& url = "" /*detect url*/,
-                       int port = 80 );
+                       uint port = 80 );
 
     virtual ~SmartScopesClient();
 
@@ -100,7 +100,7 @@ private:
     std::mutex json_node_mutex_;
 
     std::string url_;
-    int port_;
+    uint port_;
 
     std::string search_uri_;
     std::map<std::string, std::future<std::string>> search_results_;

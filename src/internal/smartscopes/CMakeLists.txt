@@ -29,7 +29,6 @@ qt5_use_modules(
 
     Core
     Network
-    Widgets
 )
 
 target_link_libraries(
