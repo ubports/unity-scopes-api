@@ -31,7 +31,6 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ("Registry", c.registry_identity());
     EXPECT_EQ("Registry.ini", c.registry_configfile());
     EXPECT_EQ("Zmq", c.default_middleware());
-    EXPECT_EQ("Factory.ini", c.factory_configfile());
 }
 
 TEST(RuntimeConfig, RegistryIDEmpty)
@@ -102,20 +101,6 @@ TEST(RuntimeConfig, BadMiddleware)
     {
         EXPECT_EQ("unity::api::scopes::ConfigException: \"BadMW.ini\": Illegal value for Default.Middleware: "
                   "\"Foo\": legal values are \"Zmq\" and \"REST\"",
-                  e.to_string());
-    }
-}
-
-TEST(RuntimeConfig, FactoryFileEmpty)
-{
-    try
-    {
-        RuntimeConfig c("FacFileEmpty.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"FacFileEmpty.ini\": Illegal empty value for Factory.ConfigFile",
                   e.to_string());
     }
 }

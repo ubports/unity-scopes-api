@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create();
+        Runtime::UPtr rt = Runtime::create("Runtime.ini");
 
         RegistryProxy r = rt->registry();
         auto meta = r->get_metadata(scope_name);
