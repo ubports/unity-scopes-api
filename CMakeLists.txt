@@ -125,7 +125,7 @@ endif()
 option(IPC_MONITORING "Enable IPC traffic monitoring")
 
 if(IPC_MONITORING)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_IPC_MONITOR")
+    add_definitions(-DENABLE_IPC_MONITOR)
 endif()
 
 set(SCOPES_DEFAULT_DATADIR ${CMAKE_INSTALL_DATADIR}/unity)
@@ -134,7 +134,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 3)
+set(UNITY_SCOPES_MICRO 4)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -142,16 +142,42 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # Static version for testing
 set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
+find_library(ZMQLIB zmq)
+if(NOT ZMQLIB)
+  message(FATAL_ERROR "Zmq lib found.")
+endif()
+
+find_library(ZMQPPLIB zmqpp)
+if(NOT ZMQPPLIB)
+  message(FATAL_ERROR "Zmqpp lib not found.")
+endif()
+
+find_library(CAPNPLIB capnp)
+if(NOT CAPNPLIB)
+  message(FATAL_ERROR "Cap'n Proto lib not found.")
+endif()
+
+find_library(KJLIB kj)
+if(NOT KJLIB)
+  message(FATAL_ERROR "Kj lib not found.")
+endif()
+
+find_library(DLLIB dl)
+if(NOT DLLIB)
+  message(FATAL_ERROR "Dl lib not found.")
+endif()
+
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
-    smartscopes
-    zmqpp
-    zmq
-    capnp
-    kj
+    ${ZMQPPLIB}
+    ${ZMQLIB}
+    ${CAPNPLIB}
+    ${KJLIB}
+    ${DLLIB}
     pthread
-    dl
+    smartscopes
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes

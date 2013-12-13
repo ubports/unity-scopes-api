@@ -1,3 +1,9 @@
+unity-scopes-api (0.1.4-0ubuntu1) UNRELEASED; urgency=low
+
+  * Added support for [] operator to the Result class.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Thu, 12 Dec 2013 13:09:41 +0100
+
 unity-scopes-api (0.1.3+14.04.20131211-0ubuntu1) trusty; urgency=low
 
   [ Michal Hruby ]

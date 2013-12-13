@@ -102,7 +102,18 @@ void Result::add_metadata(std::string const& key, Variant const& value)
     p->add_metadata(key, value);
 }
 
-std::string Result::uri() const
+Variant& Result::operator[](std::string const& key)
+{
+    return (*p)[key];
+}
+
+Variant const& Result::operator[](std::string const& key) const
+{
+    // const_pointer_cast to force const [] operator of ResultImpl
+    return (*(std::const_pointer_cast<internal::ResultImpl const>(p)))[key];
+}
+
+std::string Result::uri() const noexcept
 {
     return p->uri();
 }
@@ -117,7 +128,7 @@ std::string Result::art() const
     return p->art();
 }
 
-std::string Result::dnd_uri() const
+std::string Result::dnd_uri() const noexcept
 {
     return p->dnd_uri();
 }
