@@ -24,6 +24,7 @@
 #include <unity/Exception.h>
 
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::api::scopes::internal;
@@ -108,16 +109,18 @@ void ReplyObject::push(VariantMap const& result) noexcept
                 CategorisedResult result(*cat_registry_, result_var);
                 receiver_base_->push(std::move(result));
             }
-            catch (unity::Exception const& e)
+            catch (std::exception const& e)
             {
                 // TODO: this is an internal error; log error
+                cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
                 finished(ReceiverBase::Error);
             }
         }
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         // TODO: log error
+        cerr << "ReplyObject::push(VariantMap): " << e.what() << endl;
         try
         {
             finished(ReceiverBase::Error);
@@ -129,6 +132,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     catch (...)
     {
         // TODO: log error
+        cerr << "ReplyObject::push(VariantMap): unknown exception" << endl;
         try
         {
             finished(ReceiverBase::Error);
@@ -169,12 +173,14 @@ void ReplyObject::finished(ReceiverBase::Reason r) noexcept
     {
         receiver_base_->finished(r);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
+        cerr << "ReplyObject::finished(): " << e.what() << endl;
         // TODO: log error
     }
     catch (...)
     {
+        cerr << "ReplyObject::finished(): unknown exception" << endl;
         // TODO: log error
     }
 }

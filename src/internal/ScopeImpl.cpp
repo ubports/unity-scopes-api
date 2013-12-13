@@ -25,6 +25,7 @@
 #include <unity/Exception.h>
 
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -70,9 +71,10 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         ctrl = fwd()->create_query(q, hints, rp);
         assert(ctrl);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         // TODO: log error
+        cerr << "create_query(): " << e.what() << endl;
         try
         {
             // TODO: if things go wrong, we need to make sure that the reply object
@@ -82,6 +84,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         }
         catch (...)
         {
+            cerr << "create_query(): unknown exception" << endl;
         }
         throw;
     }
