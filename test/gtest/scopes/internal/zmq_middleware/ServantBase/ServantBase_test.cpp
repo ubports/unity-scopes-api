@@ -93,7 +93,7 @@ private:
 
 TEST(ServantBase, success)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
                      (RuntimeImpl*)0x1);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
     Current current;
@@ -110,7 +110,7 @@ TEST(ServantBase, success)
 
 TEST(ServantBase, exceptions)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
                      (RuntimeImpl*)0x1);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
     Current current;
