@@ -46,7 +46,7 @@ public:
         bool waiting = true;
         while (waiting)
         {
-            std::future<std::string> response = http_client_->get(test_url, "", test_port);
+            std::future<std::string> response = http_client_->get(test_url, test_port);
             response.wait();
             try
             {
@@ -101,7 +101,7 @@ protected:
 TEST_F( HttpClientTest, no_server )
 {
     // no server
-    std::future<std::string> response = http_client_->get(test_url, "", 0);
+    std::future<std::string> response = http_client_->get(test_url, 0);
     response.wait();
 
     EXPECT_THROW(response.get(), unity::Exception);
@@ -110,7 +110,7 @@ TEST_F( HttpClientTest, no_server )
 TEST_F( HttpClientTest, bad_server )
 {
     // bad server
-    std::future<std::string> response = http_client_->get(test_url + "x", "", test_port);
+    std::future<std::string> response = http_client_->get(test_url + "x", test_port);
     response.wait();
 
     EXPECT_THROW(response.get(), unity::Exception);
@@ -119,7 +119,7 @@ TEST_F( HttpClientTest, bad_server )
 TEST_F( HttpClientTest, good_server )
 {
     // responds immediately
-    std::future<std::string> response = http_client_->get(test_url, "", test_port);
+    std::future<std::string> response = http_client_->get(test_url, test_port);
     response.wait();
 
     std::string response_str;
@@ -130,7 +130,7 @@ TEST_F( HttpClientTest, good_server )
 TEST_F( HttpClientTest, ok_server )
 {
     // responds in 1 second
-    std::future<std::string> response = http_client_->get(test_url + "1", "", test_port);
+    std::future<std::string> response = http_client_->get(test_url + "1", test_port);
     response.wait();
 
     std::string response_str;
@@ -141,7 +141,7 @@ TEST_F( HttpClientTest, ok_server )
 TEST_F( HttpClientTest, slow_server )
 {
     // responds in 5 seconds
-    std::future<std::string> response = http_client_->get(test_url + "5", "", test_port);
+    std::future<std::string> response = http_client_->get(test_url + "5", test_port);
     response.wait();
 
     EXPECT_THROW(response.get(), unity::Exception);
@@ -149,11 +149,11 @@ TEST_F( HttpClientTest, slow_server )
 
 TEST_F( HttpClientTest, multiple_sessions )
 {
-    std::future<std::string> response1 = http_client_->get(test_url, "1", test_port);
-    std::future<std::string> response2 = http_client_->get(test_url, "2", test_port);
-    std::future<std::string> response3 = http_client_->get(test_url, "3", test_port);
-    std::future<std::string> response4 = http_client_->get(test_url, "4", test_port);
-    std::future<std::string> response5 = http_client_->get(test_url, "5", test_port);
+    std::future<std::string> response1 = http_client_->get(test_url, test_port);
+    std::future<std::string> response2 = http_client_->get(test_url, test_port);
+    std::future<std::string> response3 = http_client_->get(test_url, test_port);
+    std::future<std::string> response4 = http_client_->get(test_url, test_port);
+    std::future<std::string> response5 = http_client_->get(test_url, test_port);
 
     response1.wait();
     response2.wait();
@@ -172,6 +172,15 @@ TEST_F( HttpClientTest, multiple_sessions )
     EXPECT_EQ("Hello there", response_str);
     EXPECT_NO_THROW(response_str = response5.get());
     EXPECT_EQ("Hello there", response_str);
+}
+
+TEST_F( HttpClientTest, cancel_get )
+{
+    std::future<std::string> response = http_client_->get(test_url + "1", test_port);
+    http_client_->cancel_get(response);
+    response.wait();
+
+    EXPECT_THROW(response.get(), unity::Exception);
 }
 
 TEST_F( HttpClientTest, percent_encoding )

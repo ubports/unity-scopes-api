@@ -46,7 +46,9 @@ public:
     HttpClientQt(uint max_sessions);
     ~HttpClientQt();
 
-    std::future<std::string> get(const std::string& request_url, const std::string& session_id = "", int port = 80) override;
+    std::future<std::string> get(const std::string& request_url, int port = 80) override;
+    void cancel_get( std::future<std::string>& future ) override;
+
     std::string to_percent_encoding(const std::string& string) override;
 
 private:
@@ -54,6 +56,7 @@ private:
     {
     public:
         HttpSession(const std::string& request_url, int port);
+        ~HttpSession();
 
         std::future<std::string> get_future();
 
@@ -67,7 +70,7 @@ private:
     };
 
 private:
-    std::map<std::string, std::shared_ptr<HttpSession>> sessions_;
+    std::map<std::future<std::string>*, std::shared_ptr<HttpSession>> sessions_;
     uint max_sessions_;
 
     QCoreApplication* app_;

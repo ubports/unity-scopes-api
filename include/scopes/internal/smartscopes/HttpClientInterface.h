@@ -47,7 +47,8 @@ public:
     HttpClientInterface() = default;
     virtual ~HttpClientInterface() = default;
 
-    virtual std::future<std::string> get( const std::string& request_url, const std::string& session_id = "", int port = 80 ) = 0;
+    virtual std::future<std::string> get(const std::string& request_url, int port = 80) = 0;
+    virtual void cancel_get( std::future<std::string>& future ) = 0;
 
     virtual std::string to_percent_encoding( const std::string& string ) = 0;
 };

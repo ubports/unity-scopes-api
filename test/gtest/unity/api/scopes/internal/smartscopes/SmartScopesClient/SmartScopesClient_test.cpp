@@ -123,4 +123,22 @@ TEST_F( SmartScopesClientTest, search )
     EXPECT_EQ("", results[1].category->renderer_template);
 }
 
+TEST_F( SmartScopesClientTest, consecutive_searches )
+{
+    server_raii server;
+
+    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+
+    std::vector<SearchResult> results = ssc_.get_search_results("1234");
+    EXPECT_EQ(2, results.size());
+
+    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "5678", 0, "");
+    ssc_.cancel_search("5678");
+
+    results = ssc_.get_search_results("5678");
+    EXPECT_EQ(0, results.size());
+}
+
 } // namespace

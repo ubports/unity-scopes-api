@@ -71,7 +71,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     try
     {
         std::string response_str;
-        std::future<std::string> response = http_client_->get(url_ + c_remote_scopes_resourse, "", port_);
+        std::future<std::string> response = http_client_->get(url_ + c_remote_scopes_resourse, port_);
         response.wait();
 
         response_str = response.get();
@@ -134,7 +134,18 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
     if( limit != 0 )
         search_uri << "&limit=" << std::to_string(limit);
 
-    search_results_[session_id] = http_client_->get(search_uri.str(), session_id, port_);
+    cancel_search(session_id);
+    search_results_[session_id] = http_client_->get(search_uri.str(), port_);
+}
+
+void SmartScopesClient::cancel_search(const std::string& session_id)
+{
+    auto it = search_results_.find(session_id);
+    if (it != search_results_.end())
+    {
+        http_client_->cancel_get(search_results_[session_id]);
+        search_results_.erase(it);
+    }
 }
 
 std::vector<SearchResult> SmartScopesClient::get_search_results(const std::string& session_id)

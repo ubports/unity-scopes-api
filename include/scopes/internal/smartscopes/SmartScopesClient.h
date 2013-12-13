@@ -89,6 +89,8 @@ public:
                  const std::string& latitude = "", const std::string& longitude = "",
                  const uint limit = 0 );
 
+    void cancel_search( const std::string& session_id );
+
     std::vector<SearchResult> get_search_results( const std::string& session_id );
 
 private:

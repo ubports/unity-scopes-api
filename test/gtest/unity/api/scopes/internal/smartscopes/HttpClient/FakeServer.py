@@ -32,8 +32,8 @@ def response(environ, start_response):
         else:
             status = '200 OK'
             response_headers = [('Content-Type', 'text/plain')]
-            start_response(status, response_headers)
             time.sleep(int(environ['QUERY_STRING']))
+            start_response(status, response_headers)
             return 'Hello there'
     else:
         status = '200 OK'

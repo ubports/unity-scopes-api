@@ -23,6 +23,7 @@
 
 #include <QThread>
 #include <QUrl>
+#include <mutex>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -40,7 +41,7 @@ public:
     ~HttpClientQtThread();
 
     void run();
-    QNetworkReply* getReply() const;
+    QNetworkReply* getReply();
 
 public Q_SLOTS:
     void cancel();
@@ -52,6 +53,7 @@ private:
     uint no_reply_timeout_;
     QNetworkReply* reply_;
     QNetworkAccessManager* manager_;
+    std::mutex reply_mutex_;
 };
 
 #endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H

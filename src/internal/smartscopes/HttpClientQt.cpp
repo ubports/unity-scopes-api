@@ -53,31 +53,32 @@ HttpClientQt::~HttpClientQt()
     delete app_;
 }
 
-std::future<std::string> HttpClientQt::get(const std::string& request_url, const std::string& session_id, int port)
+std::future<std::string> HttpClientQt::get(const std::string& request_url, int port)
+{
+    while (sessions_.size() >= max_sessions_)
+    {
+        auto it = sessions_.begin();
+        it->second->wait_for_session();
+        sessions_.erase(it);
+    }
+
+    // start new session
+    auto session = std::make_shared<HttpSession>(request_url, port);
+    auto future = session->get_future();
+    sessions_[&future] = session;
+
+    return future;
+}
+
+void HttpClientQt::cancel_get( std::future<std::string>& future )
 {
     // if session_id already in map, cancel it
-    auto it = sessions_.find(session_id);
+    auto it = sessions_.find(&future);
     if (it != sessions_.end())
     {
         it->second->cancel_session();
         sessions_.erase(it);
     }
-    // if session_id not in map, wait for next available slot
-    else
-    {
-        while (sessions_.size() >= max_sessions_)
-        {
-            it = sessions_.begin();
-            it->second->wait_for_session();
-            sessions_.erase(it);
-        }
-    }
-
-    // start new session
-    auto session = std::make_shared <HttpSession> (request_url, port);
-    sessions_[session_id] = session;
-
-    return session->get_future();
 }
 
 std::string HttpClientQt::to_percent_encoding(const std::string& string)
@@ -115,6 +116,12 @@ HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
             unity::ResourceException e("No reply from " + request_url + ":" + std::to_string(port));
             promise_->set_exception(make_exception_ptr(e));
         }
+        else if (!reply->isFinished())
+        {
+            // incomplete reply
+            unity::ResourceException e("Incomplete reply from " + request_url + ":" + std::to_string(port));
+            promise_->set_exception(make_exception_ptr(e));
+        }
         else if (reply->error() != QNetworkReply::NoError)
         {
             // communication error
@@ -127,6 +134,16 @@ HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
             promise_->set_value(reply_string.toStdString());
         }
     }));
+
+    while (!get_qthread_)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+HttpClientQt::HttpSession::~HttpSession()
+{
+    cancel_session();
 }
 
 std::future<std::string> HttpClientQt::HttpSession::get_future()
@@ -136,16 +153,15 @@ std::future<std::string> HttpClientQt::HttpSession::get_future()
 
 void HttpClientQt::HttpSession::cancel_session()
 {
-    while (!get_qthread_)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-
     get_qthread_->cancel();
+
     wait_for_session();
 }
 
 void HttpClientQt::HttpSession::wait_for_session()
 {
-    get_thread_->join();
+    if (get_thread_->joinable())
+    {
+        get_thread_->join();
+    }
 }
