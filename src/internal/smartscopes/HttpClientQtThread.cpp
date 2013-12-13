@@ -23,12 +23,12 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-HttpClientQtThread::HttpClientQtThread( const QUrl& url, const HttpHeadersList& headers )
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, const HttpHeadersList& headers)
     : QThread(),
-      url_( url ),
-      headers_( headers ),
-      reply_( nullptr ),
-      manager_( nullptr )
+      url_(url),
+      headers_(headers),
+      reply_(nullptr),
+      manager_(nullptr)
 {
 }
 
@@ -41,17 +41,17 @@ void HttpClientQtThread::run()
 {
     manager_ = new QNetworkAccessManager();
 
-    QNetworkRequest request( url_ );
-    for ( auto it = headers_.begin(); it != headers_.end(); it++ )
+    QNetworkRequest request(url_);
+    for (auto it = headers_.begin(); it != headers_.end(); it++)
     {
-        request.setRawHeader( ( *it ).first, ( *it ).second );
+        request.setRawHeader((*it).first, (*it).second);
     }
 
-    connect( manager_, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ) );
-    reply_ = manager_->get( request );
+    connect(manager_, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ));
+    reply_ = manager_->get(request);
 
     QTimer timeout;
-    timeout.singleShot( 2000, this, SLOT( cancel() ) );
+    timeout.singleShot(2000, this, SLOT( cancel() ));
 
     QThread::exec(); // enter event loop
 }
@@ -61,21 +61,21 @@ QNetworkReply* HttpClientQtThread::getReply() const
     return reply_;
 }
 
-void HttpClientQtThread::queryDone( QNetworkReply* )
+void HttpClientQtThread::queryDone(QNetworkReply*)
 {
     quit();
 }
 
 void HttpClientQtThread::cancel()
 {
-    if ( reply_ )
+    if (reply_)
     {
         reply_->abort();
         delete reply_;
         reply_ = nullptr;
     }
 
-    if ( manager_ )
+    if (manager_)
     {
         delete manager_;
         manager_ = nullptr;

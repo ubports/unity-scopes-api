@@ -32,7 +32,7 @@ class JsonNodeTest : public Test
 {
 public:
     JsonNodeTest()
-        : root_node_( new JsonCppNode() )
+        : root_node_(new JsonCppNode())
     {
     }
 
@@ -42,12 +42,11 @@ protected:
 
 TEST_F( JsonNodeTest, flat_values )
 {
-    std::string json_string =
-        R"({
-        "firstName": "John",
-        "age": 25,
-        "human": true
-    })";
+    std::string json_string = R"({
+                              "firstName": "John",
+                              "age": 25,
+                              "human": true
+                          })";
 
     std::string value_str;
     int value_int;
@@ -55,58 +54,57 @@ TEST_F( JsonNodeTest, flat_values )
 
     // parse json
 
-    EXPECT_NO_THROW( root_node_->read_json( json_string ) );
-    EXPECT_EQ( 3, root_node_->size() );
+    EXPECT_NO_THROW(root_node_->read_json(json_string));
+    EXPECT_EQ(3, root_node_->size());
 
     // get root value
 
-    EXPECT_NO_THROW( value_str = root_node_->get_node( "firstName" )->as_string() );
-    EXPECT_EQ( "John", value_str );
+    EXPECT_NO_THROW(value_str = root_node_->get_node("firstName")->as_string());
+    EXPECT_EQ("John", value_str);
 
-    EXPECT_NO_THROW( value_int = root_node_->get_node( "age" )->as_int() );
-    EXPECT_EQ( 25, value_int );
+    EXPECT_NO_THROW(value_int = root_node_->get_node("age")->as_int());
+    EXPECT_EQ(25, value_int);
 
-    EXPECT_NO_THROW( value_bool = root_node_->get_node( "human" )->as_bool() );
-    EXPECT_EQ( true, value_bool );
+    EXPECT_NO_THROW(value_bool = root_node_->get_node("human")->as_bool());
+    EXPECT_EQ(true, value_bool);
 
     // try get invalid value
 
-    EXPECT_FALSE( root_node_->has_node( "lastName" ) );
-    EXPECT_THROW( root_node_->get_node( "lastName" ), unity::Exception );
+    EXPECT_FALSE(root_node_->has_node("lastName"));
+    EXPECT_THROW(root_node_->get_node("lastName"), unity::Exception);
 }
 
 TEST_F( JsonNodeTest, array_values )
 {
-    std::string json_string =
-        R"({
-        "phoneNumbers": [
-        "1234",
-        "5678"
-        ]
-    })";
+    std::string json_string = R"({
+                              "phoneNumbers": [
+                              "1234",
+                              "5678"
+                              ]
+                          })";
 
     std::string value;
     JsonNodeInterface::SPtr node;
 
     // parse json
 
-    EXPECT_NO_THROW( root_node_->read_json( json_string ) );
-    EXPECT_EQ( 1, root_node_->size() );
+    EXPECT_NO_THROW(root_node_->read_json(json_string));
+    EXPECT_EQ(1, root_node_->size());
 
     // get array values
 
-    EXPECT_NO_THROW( node = root_node_->get_node( "phoneNumbers" ) );
-    EXPECT_EQ( 2, node->size() );
+    EXPECT_NO_THROW(node = root_node_->get_node("phoneNumbers"));
+    EXPECT_EQ(2, node->size());
 
-    EXPECT_NO_THROW( value = node->get_node( 0 )->as_string() );
-    EXPECT_EQ( "1234", value );
-    EXPECT_NO_THROW( value = node->get_node( 1 )->as_string() );
-    EXPECT_EQ( "5678", value );
+    EXPECT_NO_THROW(value = node->get_node(0)->as_string());
+    EXPECT_EQ("1234", value);
+    EXPECT_NO_THROW(value = node->get_node(1)->as_string());
+    EXPECT_EQ("5678", value);
 
     // get invalid array value
 
-    EXPECT_FALSE( node->has_node( 2 ) );
-    EXPECT_THROW( node->get_node( 2 ), unity::Exception );
+    EXPECT_FALSE(node->has_node(2));
+    EXPECT_THROW(node->get_node(2), unity::Exception);
 }
 
 TEST_F( JsonNodeTest, nested_values )
@@ -133,29 +131,29 @@ TEST_F( JsonNodeTest, nested_values )
 
     // parse json
 
-    EXPECT_NO_THROW( root_node_->read_json( json_string ) );
-    EXPECT_EQ( 2, root_node_->size() );
+    EXPECT_NO_THROW(root_node_->read_json(json_string));
+    EXPECT_EQ(2, root_node_->size());
 
     // get nested value
 
-    EXPECT_NO_THROW( node = root_node_->get_node( "address" ) );
-    EXPECT_EQ( 1, node->size() );
+    EXPECT_NO_THROW(node = root_node_->get_node("address"));
+    EXPECT_EQ(1, node->size());
 
-    EXPECT_NO_THROW( value = node->get_node( "city" )->as_string() );
-    EXPECT_EQ( "New York", value );
+    EXPECT_NO_THROW(value = node->get_node("city")->as_string());
+    EXPECT_EQ("New York", value);
 
     // get nested array values
 
-    EXPECT_NO_THROW( node = root_node_->get_node( "phoneNumbers" ) );
-    EXPECT_EQ( 2, node->size() );
+    EXPECT_NO_THROW(node = root_node_->get_node("phoneNumbers"));
+    EXPECT_EQ(2, node->size());
 
-    EXPECT_NO_THROW( node = node->get_node( 0 ) );
-    EXPECT_EQ( 2, node->size() );
+    EXPECT_NO_THROW(node = node->get_node(0));
+    EXPECT_EQ(2, node->size());
 
-    EXPECT_NO_THROW( value = node->get_node( "type" )->as_string() );
-    EXPECT_EQ( "home", value );
+    EXPECT_NO_THROW(value = node->get_node("type")->as_string());
+    EXPECT_EQ("home", value);
 
-    EXPECT_NO_THROW( value = node->get_node( "number" )->as_string() );
-    EXPECT_EQ( "212 555-1234", value );
+    EXPECT_NO_THROW(value = node->get_node("number")->as_string());
+    EXPECT_EQ("212 555-1234", value);
 }
 } // namespace

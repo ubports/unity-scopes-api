@@ -36,7 +36,7 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread,
     Q_OBJECT
 
 public:
-    explicit HttpClientQtThread( const QUrl& url, const HttpHeadersList& = HttpHeadersList() );
+    explicit HttpClientQtThread(const QUrl& url, const HttpHeadersList& = HttpHeadersList());
     ~HttpClientQtThread();
 
     void run();
@@ -44,7 +44,7 @@ public:
 
 public Q_SLOTS:
     void cancel();
-    void queryDone( QNetworkReply* );
+    void queryDone(QNetworkReply*);
 
 private:
     QUrl url_;

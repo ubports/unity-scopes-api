@@ -22,16 +22,16 @@
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
-JsonCppNode::JsonCppNode( const std::string& json_string )
+JsonCppNode::JsonCppNode(const std::string& json_string)
 {
-    if ( !json_string.empty() )
+    if (!json_string.empty())
     {
-        read_json( json_string );
+        read_json(json_string);
     }
 }
 
-JsonCppNode::JsonCppNode( const Json::Value& root )
-    : root_( root )
+JsonCppNode::JsonCppNode(const Json::Value& root)
+    : root_(root)
 {
 }
 
@@ -45,13 +45,13 @@ void JsonCppNode::clear()
     root_.clear();
 }
 
-void JsonCppNode::read_json( const std::string& json_string )
+void JsonCppNode::read_json(const std::string& json_string)
 {
     clear();
 
-    if ( !reader_.parse( json_string, root_ ) )
+    if (!reader_.parse(json_string, root_))
     {
-        throw unity::ResourceException( "Failed to parse json string: " + reader_.getFormattedErrorMessages() );
+        throw unity::ResourceException("Failed to parse json string: " + reader_.getFormattedErrorMessages());
     }
 }
 
@@ -62,7 +62,7 @@ int JsonCppNode::size() const
 
 JsonNodeInterface::NodeType JsonCppNode::type() const
 {
-    switch ( root_.type() )
+    switch (root_.type())
     {
         case Json::nullValue:
             return Null;
@@ -87,9 +87,9 @@ JsonNodeInterface::NodeType JsonCppNode::type() const
 
 std::string JsonCppNode::as_string() const
 {
-    if ( !root_.isConvertibleTo( Json::stringValue ) )
+    if (!root_.isConvertibleTo(Json::stringValue))
     {
-        throw unity::LogicException( "Node does not contain a string value" );
+        throw unity::LogicException("Node does not contain a string value");
     }
 
     return root_.asString();
@@ -97,9 +97,9 @@ std::string JsonCppNode::as_string() const
 
 int JsonCppNode::as_int() const
 {
-    if ( !root_.isConvertibleTo( Json::intValue ) )
+    if (!root_.isConvertibleTo(Json::intValue))
     {
-        throw unity::LogicException( "Node does not contain an int value" );
+        throw unity::LogicException("Node does not contain an int value");
     }
 
     return root_.asInt();
@@ -107,9 +107,9 @@ int JsonCppNode::as_int() const
 
 uint JsonCppNode::as_uint() const
 {
-    if ( !root_.isConvertibleTo( Json::uintValue ) )
+    if (!root_.isConvertibleTo(Json::uintValue))
     {
-        throw unity::LogicException( "Node does not contain a uint value" );
+        throw unity::LogicException("Node does not contain a uint value");
     }
 
     return root_.asUInt();
@@ -117,9 +117,9 @@ uint JsonCppNode::as_uint() const
 
 double JsonCppNode::as_double() const
 {
-    if ( !root_.isConvertibleTo( Json::realValue ) )
+    if (!root_.isConvertibleTo(Json::realValue))
     {
-        throw unity::LogicException( "Node does not contain a double value" );
+        throw unity::LogicException("Node does not contain a double value");
     }
 
     return root_.asDouble();
@@ -127,22 +127,22 @@ double JsonCppNode::as_double() const
 
 bool JsonCppNode::as_bool() const
 {
-    if ( !root_.isConvertibleTo( Json::booleanValue ) )
+    if (!root_.isConvertibleTo(Json::booleanValue))
     {
-        throw unity::LogicException( "Node does not contain a bool value" );
+        throw unity::LogicException("Node does not contain a bool value");
     }
 
     return root_.asBool();
 }
 
-bool JsonCppNode::has_node( const std::string& node_name ) const
+bool JsonCppNode::has_node(const std::string& node_name) const
 {
-    return root_.isMember( node_name );
+    return root_.isMember(node_name);
 }
 
-bool JsonCppNode::has_node( uint node_index ) const
+bool JsonCppNode::has_node(uint node_index) const
 {
-    if ( root_.type() != Json::arrayValue || node_index >= root_.size() )
+    if (root_.type() != Json::arrayValue || node_index >= root_.size())
     {
         return false;
     }
@@ -150,31 +150,31 @@ bool JsonCppNode::has_node( uint node_index ) const
     return true;
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node( const std::string& node_name ) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(const std::string& node_name) const
 {
     const Json::Value& value_node = root_[node_name];
 
-    if ( !value_node )
+    if (!value_node)
     {
-        throw unity::LogicException( "Node " + node_name + " does not exist" );
+        throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
-    return std::make_shared <JsonCppNode> ( value_node );
+    return std::make_shared <JsonCppNode> (value_node);
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node( uint node_index ) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(uint node_index) const
 {
-    if ( root_.type() != Json::arrayValue )
+    if (root_.type() != Json::arrayValue)
     {
-        throw unity::LogicException( "Root node is not an array" );
+        throw unity::LogicException("Root node is not an array");
     }
 
     const Json::Value& value_node = root_[node_index];
 
-    if ( !value_node )
+    if (!value_node)
     {
-        throw unity::LogicException( "Node " + std::to_string( node_index ) + " does not exist" );
+        throw unity::LogicException("Node " + std::to_string(node_index) + " does not exist");
     }
 
-    return std::make_shared <JsonCppNode> ( value_node );
+    return std::make_shared <JsonCppNode> (value_node);
 }

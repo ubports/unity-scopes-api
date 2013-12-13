@@ -32,8 +32,8 @@ using namespace unity::api::scopes;
 class MyQuery : public QueryBase
 {
 public:
-    explicit MyQuery(string const& query) :
-        query_(query)
+    explicit MyQuery(string const& query)
+        : query_(query)
     {
     }
 
@@ -70,8 +70,12 @@ public:
         return VERSION;
     }
 
-    virtual void stop() override {}
-    virtual void run() override {}
+    virtual void stop() override
+    {
+    }
+    virtual void run() override
+    {
+    }
 
     virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
     {

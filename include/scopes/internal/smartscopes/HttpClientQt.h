@@ -43,17 +43,17 @@ namespace smartscopes
 class HttpClientQt : public HttpClientInterface
 {
 public:
-    HttpClientQt( uint max_sessions );
+    HttpClientQt(uint max_sessions);
     ~HttpClientQt();
 
-    std::future<std::string> get( const std::string& request_url, const std::string& session_id = "", int port = 80 ) override;
-    std::string to_percent_encoding( const std::string& string ) override;
+    std::future<std::string> get(const std::string& request_url, const std::string& session_id = "", int port = 80) override;
+    std::string to_percent_encoding(const std::string& string) override;
 
 private:
     class HttpSession
     {
     public:
-        HttpSession( const std::string& request_url, int port );
+        HttpSession(const std::string& request_url, int port);
 
         std::future<std::string> get_future();
 
