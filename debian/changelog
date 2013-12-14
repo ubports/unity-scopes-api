@@ -1,3 +1,14 @@
+unity-scopes-api (0.1.4-0ubuntu2) UNRELEASED; urgency=low
+
+  [ Michal Hruby ]
+  * Bump version because of the ResultItem rename.
+
+  [ Pawel Stolowski ]
+  * Added API for annotations.
+  * Added Result::metadata() getter. Create null Variant with default ctor.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Mon, 09 Dec 2013 19:15:03 +0100
+
 unity-scopes-api (0.1.4-0ubuntu1) UNRELEASED; urgency=low
 
   * Added support for [] operator to the Result class.
