@@ -119,9 +119,10 @@ Variant to_variant(capnproto::Value::Reader const& r)
         }
         default:
         {
-            assert(false);  // LCOV_EXCL_LINE
+            assert(false);           // LCOV_EXCL_LINE
         }
     }
+    return Variant::null();  // LCOV_EXCL_LINE (stop compiler warning about not returning a value)
 }
 
 void to_value_dict(VariantMap const& vm, capnproto::ValueDict::Builder& b)
