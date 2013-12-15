@@ -140,6 +140,16 @@ bool JsonCppNode::has_node(const std::string& node_name) const
     return root_.isMember(node_name);
 }
 
+JsonNodeInterface::SPtr JsonCppNode::get_node() const
+{
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
+    return std::make_shared<JsonCppNode>(root_);
+}
+
 JsonNodeInterface::SPtr JsonCppNode::get_node(const std::string& node_name) const
 {
     const Json::Value& value_node = root_[node_name];
@@ -149,7 +159,7 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(const std::string& node_name) cons
         throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
-    return std::make_shared <JsonCppNode> (value_node);
+    return std::make_shared<JsonCppNode>(value_node);
 }
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(uint node_index) const

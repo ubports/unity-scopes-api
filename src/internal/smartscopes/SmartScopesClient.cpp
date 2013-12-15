@@ -76,23 +76,25 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 
         response_str = response.get();
 
-        std::lock_guard <std::mutex> lock(json_node_mutex_);
-
-        json_node_->read_json(response_str);
-
         std::vector<RemoteScope> remote_scopes;
-        JsonNodeInterface::SPtr node;
+        JsonNodeInterface::SPtr root_node;
+        JsonNodeInterface::SPtr child_node;
         RemoteScope scope;
 
-        for (int i = 0; i < json_node_->size(); ++i)
+        json_node_mutex_.lock();
+        json_node_->read_json(response_str);
+        root_node = json_node_->get_node();
+        json_node_mutex_.unlock();
+
+        for (int i = 0; i < root_node->size(); ++i)
         {
-            node = json_node_->get_node(i);
-            scope.name = node->has_node("name") ?
-                         node->get_node("name")->as_string() : "";
-            scope.search_url = node->has_node("search_url") ?
-                               node->get_node("search_url")->as_string() : "";
-            scope.invisible = node->has_node("invisible") ?
-                              node->get_node("invisible")->as_bool() : false;
+            child_node = root_node->get_node(i);
+            scope.name = child_node->has_node("name") ?
+                         child_node->get_node("name")->as_string() : "";
+            scope.search_url = child_node->has_node("search_url") ?
+                               child_node->get_node("search_url")->as_string() : "";
+            scope.invisible = child_node->has_node("invisible") ?
+                              child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);
         }
@@ -147,11 +149,15 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
     }
 
     cancel_search(session_id);
+
+    std::lock_guard<std::mutex> lock(search_results_mutex_);
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
 }
 
 void SmartScopesClient::cancel_search(const std::string& session_id)
 {
+    std::lock_guard<std::mutex> lock(search_results_mutex_);
+
     auto it = search_results_.find(session_id);
     if (it != search_results_.end())
     {
@@ -164,62 +170,72 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(const std::strin
 {
     try
     {
-        auto it = search_results_.find(session_id);
-        if (it == search_results_.end())
-        {
-            throw unity::LogicException("No search for session " + session_id + " was started");
-        }
-
         std::string response_str;
-        search_results_[session_id].wait();
 
-        response_str = search_results_[session_id].get();
-        search_results_.erase(it);
+        {
+            std::lock_guard<std::mutex> lock(search_results_mutex_);
+
+            auto it = search_results_.find(session_id);
+            if (it == search_results_.end())
+            {
+                throw unity::LogicException("No search for session " + session_id + " was started");
+            }
+
+            search_results_[session_id].wait();
+
+            response_str = search_results_[session_id].get();
+            search_results_.erase(it);
+        }
 
         std::vector<SearchResult> results;
         std::map<std::string, std::shared_ptr<SearchCategory>> categories;
 
         std::vector<std::string> jsons = extract_json_stream(response_str);
 
-        std::lock_guard <std::mutex> lock(json_node_mutex_);
-
         for (std::string& json : jsons)
         {
+            JsonNodeInterface::SPtr root_node;
+            JsonNodeInterface::SPtr child_node;
+
+            json_node_mutex_.lock();
             json_node_->read_json(json);
+            root_node = json_node_->get_node();
+            json_node_mutex_.unlock();
 
-            JsonNodeInterface::SPtr node;
-            std::string value;
-
-            if (json_node_->has_node("category"))
+            if (root_node->has_node("category"))
             {
-                node = json_node_->get_node("category");
+                child_node = root_node->get_node("category");
                 auto category = std::make_shared<SearchCategory>();
 
-                category->icon = node->has_node("icon") ?
-                                 node->get_node("icon")->as_string() : "";
-                category->id = node->has_node("id") ?
-                               node->get_node("id")->as_string() : "";
-                category->renderer_template = node->has_node("renderer_template") ?
-                                              node->get_node("renderer_template")->as_string() : "";
-                category->title = node->has_node("title") ?
-                                  node->get_node("title")->as_string() : "";
+                category->icon = child_node->has_node("icon") ?
+                                 child_node->get_node("icon")->as_string() : "";
+                category->id = child_node->has_node("id") ?
+                               child_node->get_node("id")->as_string() : "";
+                category->renderer_template = child_node->has_node("renderer_template") ?
+                                              child_node->get_node("renderer_template")->as_string() : "";
+                category->title = child_node->has_node("title") ?
+                                  child_node->get_node("title")->as_string() : "";
                 categories[category->id] = category;
             }
-            else if (json_node_->has_node("result"))
+            else if (root_node->has_node("result"))
             {
-                node = json_node_->get_node("result");
+                child_node = root_node->get_node("result");
                 SearchResult result;
 
-                result.art = node->has_node("art") ?
-                             node->get_node("art")->as_string() : "";
-                result.category = node->has_node("cat_id") ?
-                                  categories[node->get_node("cat_id")->as_string()] : nullptr;
-                result.dnd_uri = node->has_node("dnd_uri") ?
-                                 node->get_node("dnd_uri")->as_string() : "";
-                result.title = node->has_node("title") ?
-                               node->get_node("title")->as_string() : "";
-                result.uri = node->has_node("uri") ?
-                             node->get_node("uri")->as_string() : "";
+                result.art = child_node->has_node("art") ?
+                             child_node->get_node("art")->as_string() : "";
+                result.dnd_uri = child_node->has_node("dnd_uri") ?
+                                 child_node->get_node("dnd_uri")->as_string() : "";
+                result.title = child_node->has_node("title") ?
+                               child_node->get_node("title")->as_string() : "";
+                result.uri = child_node->has_node("uri") ?
+                             child_node->get_node("uri")->as_string() : "";
+
+                std::string category = child_node->has_node("cat_id") ?
+                                       child_node->get_node("cat_id")->as_string() : "";
+
+                result.category = categories.find(category) != categories.end() ?
+                                  categories[category] : nullptr;
 
                 results.push_back(result);
             }

@@ -99,12 +99,14 @@ private:
 private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-    std::mutex json_node_mutex_;
 
     std::string url_;
     uint port_;
 
     std::map<std::string, std::future<std::string>> search_results_;
+
+    std::mutex json_node_mutex_;
+    std::mutex search_results_mutex_;
 };
 
 } // namespace smartscopes
