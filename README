@@ -199,6 +199,139 @@ the principle of least surprise for the caller if a method is called on
 a not-yet-initialized instance.
 
 
+Code structure
+--------------------------------
+
+The code is arranged in three layers:
+
+- scopes (top level)
+
+This level contains everything that is part of the public API. No source file in this level includes
+any header from the internal namespace (or below the internal namespace).
+
+- internal
+
+This level contains the implementation logic for the scopes run time, independent of the particular middleware.
+
+- zmq_middleware
+
+This level contains the middleware-specific parts of the code. No internal header file (except for MiddlewareFactory)
+includes any header in zmq_middleware.
+
+
+Client invocation classes
+-------------------------
+
+Clients invoke remote operations via a proxy. The *Proxy types (such as ScopeProxy) are shared_ptrs to the
+corresponding proxy class (such as Proxy). Each proxy class provides a method that corresponds to a remote operation
+in the server.
+
+The proxy class stores a pimpl, which bridges the gap into the internal namespace. In the internal namespace, the
+actual proxy implementation is called *Impl, for example, ScopeImpl.
+
+The *Impl classes contain any additional methods and data members that might be needed by the run time during
+remote method invocation. In effect, they provide an interception point where we can do things behind the scenes
+during an invocation (such as sending metrics and transparently forwarding query cancellation.)
+
+Each *Impl class provides access to the actual middleware-specific proxy as a shared_ptr to a base class. The accessor
+for this proxy is called fwd() and returns an instance of MW*Proxy, for example, MWScopeProxy. This actually
+is a shared_ptr<MWScope>. In other words, the MWScopeProxy pointer does for our implementation what ScopeProxy does
+for our API clients: it shields our implementation from the specifics of the middleware that is in use.
+
+MWScope is an abstract base interface. It contains a pure virtual method for each remote operation. The signature
+of each method is the same as the signature of the corresponding method on the public proxy.
+
+The concrete implementation of the MWScope interface is provided by ZmqScope.h. ZmqScope.h provides the client-side
+implementation of each remote operation. The job of the implementation is to convert the middleware-independent
+input parameters into their middleware-specific counterparts, invoke the operation, wait for any return values, and
+convert the middleware-specific return values into their middleware-independent counterparts. For Zmq, the proxy
+implementation also drives the capnproto marshaling and unmarshaling.
+
+
+Server dispatch classes
+-----------------------
+
+On the server side, when a method invocation arrives over the wire, it ends up in an instance of
+ObjectAdapter. Each network endpoint has one adapter. The job of the adapter is to listen for incoming
+requests, map each request to the correct C++ target object, and invoke a callback that corresponds to the
+operation on that target object.
+
+The endpoint to which a request is sent by a client implicitly identifies which adapter handles the incoming request.
+Each request that arrives over the wire carries an object identity and an operation name. The adapter unmarshals
+this information and then looks for a C++ object (called a "servant") that was registered for that identity
+with the middleware to receive requests of a particular type. Each adapter can have multiple C++ servants,
+each of which handles requests for a particular identity. The different servants can implement objects of different
+types.
+
+Each adapter contains a table that maps the incoming identity to the corresponding servant. The key to the table
+is the identity, and the lookup value is a shared_ptr to the servant. The table is populated by the add_*_object()
+methods on MiddlewareBase.
+
+If the adapter cannot find a servant with an identity that matches the request, it marshals an exception back to the
+client. Otherwise, it dispatches the request.
+
+The concrete servants are of type *I, for example, ScopeI. (The "I" is short for Implementation.) The ScopeI class
+is the middleware-specific server-side equivalent of the ZmqScope client-side proxy. All servants derive from a
+base ServantBase. ServantBase provides a generic dispatch_() method. The job of dispatch_() is to check
+whether the servant can actually handle an incoming operation. For example, if the incoming operation name is "foo",
+but the servant does not provide a method called "foo", it sends an OperationNotExistException back to the client.
+Otherwise, dispatch_() calls the corresponding method on the servant and waits for the method to complete. The
+invocation to the servant is made in a try-catch block; if the servant throws an exception, dispatch_() takes
+care of returning an exception to the client.
+
+The concrete servant method called by dispatch_ (such as ScopeI::create_query) now unmarshals any in-parameters,
+translates them to the midleware-independent equivalents, forwards the invocation to the middleware-independent servant,
+and translates and marshals any return values or exceptions.
+
+Each servant class stores a pointer to a delegate. The delegate implementation lives in the internal namespace
+and does not know by which middleware it is called. The delegates are middleware-independent servants,
+called *Object, for example, ScopeObject. Each *Object class implements a method for the middleware-specific
+servant to call, with parameters that correspond to the operation that was invoked by the client. In other words,
+the *Object classes implement the server-side behavior of the operations that clients call, and the servant classes
+forward an incoming request to their corresponding *Object instance. This allows the middleware-independent
+part of run time to implement operations without having to include and middleware-specific header files.
+
+If you think of ScopeProxy as a pointer that can point at an object in a remote address space, then ScopeObject
+is the corresponding server-side target that implements the methods that the client can invoke on the proxy.
+
+
+Capnproto definitions
+---------------------
+
+The capnproto definitions live in zmq_middleware/capnproto and define what is marshaled over the wire. (As far as
+zmq is concerned, things that go over the wire are just opaque messages, that is, blobs of bytes. Zmq knows
+about message boundaries, but knows nothing about what's inside them.)
+
+Message.capnp defines the message headers.
+
+A request contains the request mode (oneway or twoway), the identity of the servant, the operation name, followed
+by the in-parameters as a blob (a capnproto Object).
+
+A response (sent only for twoway invocations) contains a status that indicates success, run-time exception, or
+user exception, plus any return values as a blob.
+
+Success means the invocation was successful, and the return values are inside the payload blob.
+If the invocation failed, it can be for a variety of reasons, some
+unexpected, some not. Unexpected reasons are things such as general failures during dispatch, failure to locate
+the identity for a servant or the operation within the servant, and any unexpected exceptions that the operation
+implementation might throw. Unexpeced errors are indicated as a runtimeException. At the moment, there are two
+special runtime exceptions (ObjectNotExist and OperationNotExist), which indicate failure to find a servant or
+the correct operation. All other error conditions (such as an operation implementation throwing 42), the
+client gets an UnknownUserException with an error string.
+
+Expected exceptions are exceptions that an operation is expected to produce. (Think of Java exception specifications.)
+For example, NotFoundException can be thrown by the Registry::get_metadata() method. To deal with these,
+the servant implementation (ZmqRegistry) calls get_metadata() on the delegate in a try-catch block that handles
+NotFoundException separately. If that exception is thrown, ZmqRegistry::get_metadata() populates the payload
+that is marshaled with the response with the exception details and sets the error status in the response accordingly.
+
+The renaming capnp definitions, such as Scope.capnp, each define the operations and parameters for the
+corresponding interface. There is a definition for each operation, <operation_name>Request, that lists all
+the in-parameters and, for twoway methods, and <operation_name>Response (for twoway operations), that contains
+a union of the return values and exceptions that the operation can raise. (Oneway operations do not marshal
+anything in the return direction and so do not have any Response definitions.)
+
+
 Loose ends
 ----------
 
