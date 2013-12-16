@@ -49,6 +49,16 @@ public:
         cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
     }
 
+    virtual void push(Annotation annotation) override
+    {
+        auto links = annotation.links();
+        cout << "received annotation of type " << annotation.annotation_type() << " with " << links.size() << " link(s):" << endl;
+        for (auto link: links)
+        {
+            cout << "  " << link->query().to_string() << endl;
+        }
+    }
+
     virtual void finished(ReceiverBase::Reason reason) override
     {
         cout << "query complete, status: " << to_string(reason) << endl;

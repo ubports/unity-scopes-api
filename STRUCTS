@@ -53,6 +53,26 @@ ScopeMetadata (returned by serialize()):
  'search_hint'  : string, optional
  'hot_key'      : string, optional
 
+Query (returned by serialize())
+===============================
+ 'scope'         : string
+ 'query_string'  : string
+ 'department_id' : string
+ 
+Link (returned by serialize())
+==============================
+ 'label'      : string
+ 'query'      : Query
+ 
+Annotation (returned by serialize())
+====================================
+ 'type'       : string
+ 'label'      : string, optional
+ 'icon'       : string, optional
+ 'cat_id'     : string, optional
+ 'links'      : array of Links
+
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" key and serialized Category / CategorisedResult respectively.
+ result : ValueDict with "category" and/or "result" or "annotation" key and
+  serialized Category / CategorisedResult / Annotation respectively.
