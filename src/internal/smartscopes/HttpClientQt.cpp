@@ -90,25 +90,24 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port)
     : promise_(nullptr),
-      get_thread_(nullptr),
-      get_qthread_(nullptr)
+      get_qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
-    get_thread_ = std::unique_ptr<std::thread> (new std::thread([this, request_url, port]()
+    get_thread_ = std::thread([this, request_url, port]()
     {
         QUrl url(request_url.c_str());
         url.setPort(port);
-        get_qthread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url));
+        get_qt_thread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url));
 
         QEventLoop loop;
-        QObject::connect(get_qthread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));
+        QObject::connect(get_qt_thread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));
 
-        get_qthread_->start();
+        get_qt_thread_->start();
         loop.exec();
-        get_qthread_->wait();
+        get_qt_thread_->wait();
 
-        QNetworkReply* reply = get_qthread_->getReply();
+        QNetworkReply* reply = get_qt_thread_->getReply();
 
         if (!reply)
         {
@@ -133,9 +132,9 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port)
             QString reply_string(reply->readAll());
             promise_->set_value(reply_string.toStdString());
         }
-    }));
+    });
 
-    while (!get_qthread_)
+    while (!get_qt_thread_)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -153,15 +152,15 @@ std::future<std::string> HttpClientQt::HttpSession::get_future()
 
 void HttpClientQt::HttpSession::cancel_session()
 {
-    get_qthread_->cancel();
+    get_qt_thread_->cancel();
 
     wait_for_session();
 }
 
 void HttpClientQt::HttpSession::wait_for_session()
 {
-    if (get_thread_->joinable())
+    if (get_thread_.joinable())
     {
-        get_thread_->join();
+        get_thread_.join();
     }
 }

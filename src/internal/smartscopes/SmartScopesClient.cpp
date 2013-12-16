@@ -24,9 +24,10 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <cstring>
 
 static const std::string c_base_url = "https://productsearch.ubuntu.com";
-static const std::string c_remote_scopes_resourse = "/smartscopes/v2/remote-scopes";
+static const std::string c_remote_scopes_resource = "/smartscopes/v2/remote-scopes";
 
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
@@ -61,8 +62,13 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
         std::string base_url_env = ::getenv("SMART_SCOPES_SERVER");
         if (!base_url_env.empty())
         {
+            // find the last occurrence of ':' in the url in order to extract the port number
+            // * ignore the colon after "http"/"https"
+
+            const size_t hier_pos = strlen("https");
+
             uint64_t found = base_url_env.find_last_of(':');
-            if (found != std::string::npos && found > 5)
+            if (found != std::string::npos && found > hier_pos)
             {
                 url_ = base_url_env.substr(0, found);
                 port_ = std::stoi(base_url_env.substr(found + 1));
@@ -89,7 +95,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     try
     {
         std::string response_str;
-        std::future<std::string> response = http_client_->get(url_ + c_remote_scopes_resourse, port_);
+        std::future<std::string> response = http_client_->get(url_ + c_remote_scopes_resource, port_);
         response.wait();
 
         response_str = response.get();
@@ -99,10 +105,11 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
         JsonNodeInterface::SPtr child_node;
         RemoteScope scope;
 
-        json_node_mutex_.lock();
-        json_node_->read_json(response_str);
-        root_node = json_node_->get_node();
-        json_node_mutex_.unlock();
+        {
+            std::lock_guard<std::mutex> lock(json_node_mutex_);
+            json_node_->read_json(response_str);
+            root_node = json_node_->get_node();
+        }
 
         for (int i = 0; i < root_node->size(); ++i)
         {
@@ -121,7 +128,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
     catch (unity::Exception& e)
     {
-        std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resourse << std::endl;
+        std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
         std::cout << "error:" << e.what() << std::endl;
         return std::vector<RemoteScope>();
     }
@@ -217,10 +224,11 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             JsonNodeInterface::SPtr root_node;
             JsonNodeInterface::SPtr child_node;
 
-            json_node_mutex_.lock();
-            json_node_->read_json(json);
-            root_node = json_node_->get_node();
-            json_node_mutex_.unlock();
+            {
+                std::lock_guard<std::mutex> lock(json_node_mutex_);
+                json_node_->read_json(json);
+                root_node = json_node_->get_node();
+            }
 
             if (root_node->has_node("category"))
             {
