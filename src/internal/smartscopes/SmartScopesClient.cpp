@@ -31,6 +31,24 @@ static const std::string c_remote_scopes_resourse = "/smartscopes/v2/remote-scop
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
+//-- SearchHandle
+
+SearchHandle::SearchHandle( SmartScopesClient::SPtr ssc, const std::string& session_id )
+    : ssc_( ssc ),
+      session_id_( session_id ) {}
+
+SearchHandle::~SearchHandle()
+{
+    ssc_->cancel_search( session_id_ );
+}
+
+std::vector<SearchResult> SearchHandle::get_search_results()
+{
+    return ssc_->get_search_results( session_id_ );
+}
+
+//-- SmartScopesClient
+
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
                                      const std::string& url, uint port)
     : http_client_(http_client),
@@ -109,11 +127,11 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
 }
 
-void SmartScopesClient::search(const std::string& search_url, const std::string& query,
-                               const std::string& session_id, uint query_id, const std::string& platform,
-                               const std::string& locale, const std::string& country,
-                               const std::string& latitude, const std::string& longitude,
-                               uint limit)
+SearchHandle::UPtr SmartScopesClient::search(const std::string& search_url, const std::string& query,
+                                             const std::string& session_id, uint query_id, const std::string& platform,
+                                             const std::string& locale, const std::string& country,
+                                             const std::string& latitude, const std::string& longitude,
+                                             uint limit)
 {
     std::ostringstream search_uri;
     search_uri << search_url << "?";
@@ -152,6 +170,8 @@ void SmartScopesClient::search(const std::string& search_url, const std::string&
 
     std::lock_guard<std::mutex> lock(search_results_mutex_);
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
+
+    return SearchHandle::UPtr( new SearchHandle( shared_from_this(), session_id ) );
 }
 
 void SmartScopesClient::cancel_search(const std::string& session_id)
@@ -178,7 +198,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(const std::strin
             auto it = search_results_.find(session_id);
             if (it == search_results_.end())
             {
-                throw unity::LogicException("No search for session " + session_id + " was started");
+                throw unity::LogicException("No search for session " + session_id + " is active");
             }
 
             search_results_[session_id].wait();

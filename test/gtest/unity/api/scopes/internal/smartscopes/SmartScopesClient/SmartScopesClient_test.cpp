@@ -37,7 +37,7 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(2)),
           json_node_(new JsonCppNode()),
-          ssc_(http_client_, json_node_, "http://127.0.0.1", 9009)
+          ssc_( new SmartScopesClient(http_client_, json_node_, "http://127.0.0.1", 9009))
     {
     }
 
@@ -73,14 +73,14 @@ public:
 protected:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-    SmartScopesClient ssc_;
+    SmartScopesClient::SPtr ssc_;
 };
 
 TEST_F( SmartScopesClientTest, remote_scopes )
 {
     server_raii server;
 
-    std::vector<RemoteScope> scopes = ssc_.get_remote_scopes();
+    std::vector<RemoteScope> scopes = ssc_->get_remote_scopes();
 
     ASSERT_EQ(2, scopes.size());
 
@@ -97,11 +97,9 @@ TEST_F( SmartScopesClientTest, search )
 {
     server_raii server;
 
-    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
 
-    std::vector<SearchResult> results = ssc_.get_search_results("5678");
-    EXPECT_EQ(0, results.size());
-    results = ssc_.get_search_results("1234");
+    std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
@@ -127,17 +125,13 @@ TEST_F( SmartScopesClientTest, consecutive_searches )
 {
     server_raii server;
 
-    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
-    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
-    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle1 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle2 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
 
-    std::vector<SearchResult> results = ssc_.get_search_results("1234");
+    std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());
 
-    ssc_.search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "5678", 0, "");
-    ssc_.cancel_search("5678");
-
-    results = ssc_.get_search_results("5678");
+    results = search_handle2->get_search_results();
     EXPECT_EQ(0, results.size());
 }
 

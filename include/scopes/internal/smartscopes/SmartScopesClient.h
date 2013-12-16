@@ -45,6 +45,8 @@ namespace internal
 namespace smartscopes
 {
 
+class SmartScopesClient;
+
 struct RemoteScope
 {
     std::string name;
@@ -69,7 +71,23 @@ struct SearchResult
     std::shared_ptr<SearchCategory> category;
 };
 
-class SmartScopesClient : private util::NonCopyable
+class SearchHandle : private util::NonCopyable
+{
+public:
+    UNITY_DEFINES_PTRS(SearchHandle);
+
+    SearchHandle( std::shared_ptr<SmartScopesClient> ssc, const std::string& session_id );
+    ~SearchHandle();
+
+    std::vector<SearchResult> get_search_results();
+
+public:
+    std::shared_ptr<SmartScopesClient> ssc_;
+    std::string session_id_;
+};
+
+class SmartScopesClient : private util::NonCopyable,
+                          public std::enable_shared_from_this<SmartScopesClient>
 {
 public:
     UNITY_DEFINES_PTRS(SmartScopesClient);
@@ -83,17 +101,17 @@ public:
 
     std::vector<RemoteScope> get_remote_scopes();
 
-    void search( const std::string& search_url, const std::string& query,
-                 const std::string& session_id, uint query_id, const std::string& platform,
-                 const std::string& locale = "", const std::string& country = "",
-                 const std::string& latitude = "", const std::string& longitude = "",
-                 const uint limit = 0 );
+    SearchHandle::UPtr search( const std::string& search_url, const std::string& query,
+                               const std::string& session_id, uint query_id, const std::string& platform,
+                               const std::string& locale = "", const std::string& country = "",
+                               const std::string& latitude = "", const std::string& longitude = "",
+                               const uint limit = 0 );
 
+private:
     void cancel_search( const std::string& session_id );
 
     std::vector<SearchResult> get_search_results( const std::string& session_id );
 
-private:
     std::vector<std::string> extract_json_stream( const std::string& json_stream );
 
 private:
@@ -107,6 +125,8 @@ private:
 
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;
+
+    friend class SearchHandle;
 };
 
 } // namespace smartscopes
