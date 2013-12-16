@@ -40,7 +40,6 @@ namespace
     const string registry_configfile_str = "Registry.ConfigFile";
     const string default_middleware_str = "Default.Middleware";
     const string default_middleware_configfile_str = "ConfigFile";
-    const string factory_configfile_str = "Factory.ConfigFile";
 }
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :
@@ -52,7 +51,6 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         registry_configfile_ = "Registry.ini";
         default_middleware_ = "Zmq";
         default_middleware_configfile_ = "";
-        factory_configfile_ = "Factory.ini";
     }
     else
     {
@@ -67,7 +65,6 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
         default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
                                                     default_middleware_ + "." + default_middleware_configfile_str);
-        factory_configfile_ = get_string(RUNTIME_CONFIG_GROUP, factory_configfile_str);
     }
 }
 
@@ -93,11 +90,6 @@ string RuntimeConfig::default_middleware() const
 string RuntimeConfig::default_middleware_configfile() const
 {
     return default_middleware_configfile_;
-}
-
-string RuntimeConfig::factory_configfile() const
-{
-    return factory_configfile_;
 }
 
 } // namespace internal

@@ -1,6 +1,5 @@
 configure_file(BadMW.ini.in BadMW.ini)
 configure_file(BadRegID.ini.in BadRegID.ini)
-configure_file(FacFileEmpty.ini.in FacFileEmpty.ini)
 configure_file(MWEmpty.ini.in MWEmpty.ini)
 configure_file(RegFileEmpty.ini.in RegFileEmpty.ini)
 configure_file(RegIDEmpty.ini.in RegIDEmpty.ini)

@@ -2,4 +2,3 @@
 Registry.Identity = Registry
 Registry.ConfigFile = Registry.ini
 Default.Middleware = Foo
-Factory.ConfigFile = Factory.ini
