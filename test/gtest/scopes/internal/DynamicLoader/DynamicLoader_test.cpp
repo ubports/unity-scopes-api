@@ -28,8 +28,8 @@ using namespace unity::api::scopes::internal;
 
 namespace
 {
-char const* goodlib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/DynamicLoader/libtestlib.so";
-char const* badlib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/DynamicLoader/libbadtestlib.so";
+char const* goodlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libtestlib.so";
+char const* badlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libbadtestlib.so";
 }
 
 // Basic test.

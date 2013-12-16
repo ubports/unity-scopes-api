@@ -35,7 +35,7 @@ using namespace unity::api::scopes::internal::zmq_middleware;
 
 TEST(ScopeMetadataImpl, basic)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeMetadataImpl/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
@@ -183,7 +183,7 @@ TEST(ScopeMetadataImpl, basic)
 
 TEST(ScopeMetadataImpl, serialize)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeMetadataImpl/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
@@ -224,7 +224,7 @@ TEST(ScopeMetadataImpl, serialize)
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeMetadataImpl/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
     ScopeMetadataImpl mi(&mw);
@@ -279,7 +279,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
 
 TEST(ScopeMetadataImpl, deserialize_exceptions)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeMetadataImpl/Zmq.ini",
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
     VariantMap m;

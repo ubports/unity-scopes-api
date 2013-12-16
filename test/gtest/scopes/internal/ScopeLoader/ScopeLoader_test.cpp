@@ -34,26 +34,26 @@ using namespace unity::api::scopes::internal;
 namespace
 {
 
-char const* scope_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libTestScope.so";
-char const* bad_version_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libBadVersion.so";
-char const* no_destroy_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libNoDestroy.so";
-char const* null_return_lib = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libNullReturn.so";
+char const* scope_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libTestScope.so";
+char const* bad_version_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libBadVersion.so";
+char const* no_destroy_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNoDestroy.so";
+char const* null_return_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNullReturn.so";
 char const* throw_unity_ex_from_run_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromRun.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnityExFromRun.so";
 char const* throw_unity_ex_from_start_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromStart.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnityExFromStart.so";
 char const* throw_unity_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnityExFromStop.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnityExFromStop.so";
 char const* throw_std_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowStdExFromStop.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowStdExFromStop.so";
 char const* throw_unknown_ex_from_start_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnknownExFromStart.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnknownExFromStart.so";
 char const* throw_unknown_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libThrowUnknownExFromStop.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnknownExFromStop.so";
 char const* scopeA
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libScopeA.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libScopeA.so";
 char const* scopeB
-    = TEST_BUILD_ROOT "/gtest/unity/api/scopes/internal/ScopeLoader/libScopeB.so";
+    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libScopeB.so";
 }
 
 // Function to sleep for specified number of milliseconds. We use this
