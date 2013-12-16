@@ -39,7 +39,7 @@ HttpClientQt::HttpClientQt(uint max_sessions)
     if (!QCoreApplication::instance())
     {
         int argc = 0;
-        app_ = new QCoreApplication(argc, nullptr);
+        app_ = std::unique_ptr<QCoreApplication> (new QCoreApplication(argc, nullptr));
     }
 }
 
@@ -49,8 +49,6 @@ HttpClientQt::~HttpClientQt()
     {
         it->second->cancel_session();
     }
-
-    delete app_;
 }
 
 std::future<std::string> HttpClientQt::get(std::string const& request_url, int port)
@@ -72,7 +70,7 @@ std::future<std::string> HttpClientQt::get(std::string const& request_url, int p
 
 void HttpClientQt::cancel_get(std::future<std::string>& future)
 {
-    // if session_id already in map, cancel it
+    // if session_id in map, cancel it
     auto it = sessions_.find(&future);
     if (it != sessions_.end())
     {

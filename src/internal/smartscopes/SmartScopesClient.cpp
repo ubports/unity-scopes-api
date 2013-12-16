@@ -114,10 +114,15 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
         for (int i = 0; i < root_node->size(); ++i)
         {
             child_node = root_node->get_node(i);
-            scope.name = child_node->has_node("name") ?
-                         child_node->get_node("name")->as_string() : "";
-            scope.search_url = child_node->has_node("search_url") ?
-                               child_node->get_node("search_url")->as_string() : "";
+
+            if (!child_node->has_node("name") || child_node->has_node("search_url"))
+            {
+              break;
+            }
+
+            scope.name = child_node->get_node("name")->as_string();
+            scope.search_url = child_node->get_node("search_url")->as_string();
+
             scope.invisible = child_node->has_node("invisible") ?
                               child_node->get_node("invisible")->as_bool() : false;
 

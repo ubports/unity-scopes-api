@@ -73,7 +73,7 @@ private:
     std::map<std::future<std::string>*, std::shared_ptr<HttpSession>> sessions_;
     uint max_sessions_;
 
-    QCoreApplication* app_;
+    std::unique_ptr<QCoreApplication> app_;
 };
 
 } // namespace smartscopes

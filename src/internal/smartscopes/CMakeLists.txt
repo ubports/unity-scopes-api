@@ -13,7 +13,7 @@ find_library(
 )
 
 add_library(
-    smartscopes
+    smartscopes SHARED
 
     HttpClientQt.cpp
     JsonCppNode.cpp
