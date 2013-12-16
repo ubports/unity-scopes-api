@@ -87,7 +87,7 @@ public:
 };
 
 class SmartScopesClient : private util::NonCopyable,
-                          public std::enable_shared_from_this<SmartScopesClient>
+    public std::enable_shared_from_this<SmartScopesClient>
 {
 public:
     UNITY_DEFINES_PTRS(SmartScopesClient);

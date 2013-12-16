@@ -37,7 +37,7 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(2)),
           json_node_(new JsonCppNode()),
-          ssc_( new SmartScopesClient(http_client_, json_node_, "http://127.0.0.1", 9009))
+          ssc_(new SmartScopesClient(http_client_, json_node_, "http://127.0.0.1", 9009))
     {
     }
 
@@ -76,7 +76,7 @@ protected:
     SmartScopesClient::SPtr ssc_;
 };
 
-TEST_F( SmartScopesClientTest, remote_scopes )
+TEST_F(SmartScopesClientTest, remote_scopes)
 {
     server_raii server;
 
@@ -93,7 +93,7 @@ TEST_F( SmartScopesClientTest, remote_scopes )
     EXPECT_EQ(true, scopes[1].invisible);
 }
 
-TEST_F( SmartScopesClientTest, search )
+TEST_F(SmartScopesClientTest, search)
 {
     server_raii server;
 
@@ -121,7 +121,7 @@ TEST_F( SmartScopesClientTest, search )
     EXPECT_EQ("", results[1].category->renderer_template);
 }
 
-TEST_F( SmartScopesClientTest, consecutive_searches )
+TEST_F(SmartScopesClientTest, consecutive_searches)
 {
     server_raii server;
 

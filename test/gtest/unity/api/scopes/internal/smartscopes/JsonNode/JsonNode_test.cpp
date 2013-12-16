@@ -40,7 +40,7 @@ protected:
     JsonNodeInterface::SPtr root_node_;
 };
 
-TEST_F( JsonNodeTest, flat_values )
+TEST_F(JsonNodeTest, flat_values)
 {
     std::string json_string = R"({
                               "firstName": "John",
@@ -74,7 +74,7 @@ TEST_F( JsonNodeTest, flat_values )
     EXPECT_THROW(root_node_->get_node("lastName"), unity::Exception);
 }
 
-TEST_F( JsonNodeTest, array_values )
+TEST_F(JsonNodeTest, array_values)
 {
     std::string json_string = R"({
                               "phoneNumbers": [
@@ -106,7 +106,7 @@ TEST_F( JsonNodeTest, array_values )
     EXPECT_THROW(node->get_node(2), unity::Exception);
 }
 
-TEST_F( JsonNodeTest, nested_values )
+TEST_F(JsonNodeTest, nested_values)
 {
     std::string json_string = R"({
                               "address": {

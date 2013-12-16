@@ -53,7 +53,7 @@ HttpClientQt::~HttpClientQt()
     delete app_;
 }
 
-std::future<std::string> HttpClientQt::get(const std::string& request_url, int port)
+std::future<std::string> HttpClientQt::get(std::string const& request_url, int port)
 {
     while (sessions_.size() >= max_sessions_)
     {
@@ -81,25 +81,25 @@ void HttpClientQt::cancel_get(std::future<std::string>& future)
     }
 }
 
-std::string HttpClientQt::to_percent_encoding(const std::string& string)
+std::string HttpClientQt::to_percent_encoding(std::string const& string)
 {
     return QUrl::toPercentEncoding(string.c_str()).constData();
 }
 
 //-- HttpClientQt::HttpSession
 
-HttpClientQt::HttpSession::HttpSession(const std::string& request_url, int port)
+HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port)
     : promise_(nullptr),
       get_thread_(nullptr),
       get_qthread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
-    get_thread_ = std::unique_ptr <std::thread> (new std::thread([this, request_url, port]()
+    get_thread_ = std::unique_ptr<std::thread> (new std::thread([this, request_url, port]()
     {
         QUrl url(request_url.c_str());
         url.setPort(port);
-        get_qthread_ = std::unique_ptr <HttpClientQtThread> (new HttpClientQtThread(url));
+        get_qthread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url));
 
         QEventLoop loop;
         QObject::connect(get_qthread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));

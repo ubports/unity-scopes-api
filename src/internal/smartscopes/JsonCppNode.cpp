@@ -22,7 +22,7 @@
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
 
-JsonCppNode::JsonCppNode(const std::string& json_string)
+JsonCppNode::JsonCppNode(std::string const& json_string)
 {
     if (!json_string.empty())
     {
@@ -44,7 +44,7 @@ void JsonCppNode::clear()
     root_.clear();
 }
 
-void JsonCppNode::read_json(const std::string& json_string)
+void JsonCppNode::read_json(std::string const& json_string)
 {
     Json::Reader reader;
     clear();
@@ -135,7 +135,7 @@ bool JsonCppNode::as_bool() const
     return root_.asBool();
 }
 
-bool JsonCppNode::has_node(const std::string& node_name) const
+bool JsonCppNode::has_node(std::string const& node_name) const
 {
     return root_.isMember(node_name);
 }
@@ -150,7 +150,7 @@ JsonNodeInterface::SPtr JsonCppNode::get_node() const
     return std::make_shared<JsonCppNode>(root_);
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node(const std::string& node_name) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
 {
     const Json::Value& value_node = root_[node_name];
 

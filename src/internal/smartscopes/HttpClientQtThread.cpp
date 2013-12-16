@@ -41,7 +41,7 @@ HttpClientQtThread::~HttpClientQtThread()
 void HttpClientQtThread::run()
 {
     {
-        std::lock_guard <std::mutex> lock(reply_mutex_);
+        std::lock_guard<std::mutex> lock(reply_mutex_);
 
         manager_ = new QNetworkAccessManager();
 
@@ -51,18 +51,18 @@ void HttpClientQtThread::run()
             request.setRawHeader((*it).first, (*it).second);
         }
 
-        connect(manager_, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( queryDone( QNetworkReply* ) ));
+        connect(manager_, SIGNAL(finished(QNetworkReply*)), this, SLOT(queryDone(QNetworkReply*)));
         reply_ = manager_->get(request);
     }
 
     QTimer timeout;
-    timeout.singleShot(no_reply_timeout_, this, SLOT( cancel() ));
+    timeout.singleShot(no_reply_timeout_, this, SLOT(cancel()));
     QThread::exec(); // enter event loop
 }
 
 QNetworkReply* HttpClientQtThread::getReply()
 {
-    std::lock_guard <std::mutex> lock(reply_mutex_);
+    std::lock_guard<std::mutex> lock(reply_mutex_);
     return reply_;
 }
 
@@ -73,7 +73,7 @@ void HttpClientQtThread::queryDone(QNetworkReply*)
 
 void HttpClientQtThread::cancel()
 {
-    std::lock_guard <std::mutex> lock(reply_mutex_);
+    std::lock_guard<std::mutex> lock(reply_mutex_);
 
     if (reply_)
     {
