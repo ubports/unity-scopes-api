@@ -20,6 +20,9 @@
 
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <signal.h>
+#include <cassert>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -35,6 +38,10 @@ namespace scopes
 namespace internal
 {
 
+static bool is_dead(pid_t pid)
+{
+    return kill(pid, 0) < 0 && errno == ESRCH;
+}
 /**
  * This does all the hard work. It is not thread safe. All calls to this
  * functionality come via RegistyObject, which takes care of locking.
@@ -43,8 +50,10 @@ namespace internal
 class RegistryObjectPrivate {
 private:
 
-    mutable MetadataMap scopes_;
+    MetadataMap scopes;
     std::map<std::string, pid_t> scope_processes;
+
+    int spawn_scope(std::string const& scope_name);
 
 public:
     RegistryObjectPrivate() {};
@@ -62,8 +71,8 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
     }
 
-    auto const& it = scopes_.find(scope_name);
-    if (it == scopes_.end())
+    auto const& it = scopes.find(scope_name);
+    if (it == scopes.end())
     {
         throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
     }
@@ -73,12 +82,37 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
 
 int RegistryObjectPrivate::get_scope(std::string const& scope_name)
 {
-    return 0;
+    auto search = scope_processes.find(scope_name);
+    if(search != scope_processes.end()) {
+        pid_t pid = search->second;
+        if(!is_dead(pid)) {
+            return 1;
+        }
+    }
+    return spawn_scope(scope_name);
+}
+
+int RegistryObjectPrivate::spawn_scope(std::string const& scope_name) {
+    if(scopes.find(scope_name) == scopes.end())
+        throw "FixmeLaterException";
+    auto process = scope_processes.find(scope_name);
+    if(process != scope_processes.end()) {
+        assert(is_dead(process->second));
+        int status;
+        waitpid(process->second, &status, 0);
+        if(status != 0) {
+            // FIXME, print log message.
+        }
+        scope_processes.erase(scope_name);
+    }
+    pid_t childpid = 52; // FIXME: Fork & exec here.
+    scope_processes[scope_name] = childpid;
+    return 3;
 }
 
 MetadataMap RegistryObjectPrivate::list()
 {
-    return scopes_;
+    return scopes;
 }
 
 bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata)
@@ -90,12 +124,12 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
     // TODO: check for names containing a slash, because that won't work if we use
     //       the name for a socket in the file system.
 
-    auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
+    auto const& pair = scopes.insert(make_pair(scope_name, metadata));
     if (!pair.second)
     {
         // Replace already existing entry with this one
-        scopes_.erase(pair.first);
-        scopes_.insert(make_pair(scope_name, metadata));
+        scopes.erase(pair.first);
+        scopes.insert(make_pair(scope_name, metadata));
         return false;
     }
     return true;
@@ -109,7 +143,7 @@ bool RegistryObjectPrivate::remove(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
-    return scopes_.erase(scope_name) == 1;
+    return scopes.erase(scope_name) == 1;
 }
 
 
