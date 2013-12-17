@@ -54,9 +54,11 @@ private:
     std::map<std::string, pid_t> scope_processes;
 
     int spawn_scope(std::string const& scope_name);
+    void shutdown();
 
 public:
     RegistryObjectPrivate() {};
+    ~RegistryObjectPrivate();
     ScopeMetadata get_metadata(std::string const& scope_name);
     int get_scope(std::string const& scope_name);
     MetadataMap list();
@@ -64,7 +66,29 @@ public:
     bool remove(std::string const& scope_name);
 };
 
-ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name) {
+RegistryObjectPrivate::~RegistryObjectPrivate()
+{
+    try {
+        shutdown();
+    } catch(...) {
+        // FIXME, write error log.
+    }
+}
+
+void RegistryObjectPrivate::shutdown()
+{
+    for(const auto &i : scope_processes) {
+        // Currently just shoot children dead.
+        // If we want to get fancy and give them a graceful
+        // warning, this is the place to do it.
+        kill(i.second, SIGKILL);
+        waitpid(i.second, nullptr, 0);
+    }
+    scope_processes.clear();
+}
+
+ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
+{
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
     {
@@ -92,7 +116,8 @@ int RegistryObjectPrivate::get_scope(std::string const& scope_name)
     return spawn_scope(scope_name);
 }
 
-int RegistryObjectPrivate::spawn_scope(std::string const& scope_name) {
+int RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
+{
     if(scopes.find(scope_name) == scopes.end())
         throw "FixmeLaterException";
     auto process = scope_processes.find(scope_name);
