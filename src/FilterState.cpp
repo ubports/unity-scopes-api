@@ -28,13 +28,13 @@ namespace api
 namespace scopes
 {
 
-void FilterState::store(FilterBase const& filter, Variant const& value)
+void FilterState::store(FilterBase const& /* filter */, Variant const& /* value */)
 {
     // TODO
     throw LogicException("Not implemented");
 }
 
-Variant FilterState::get(FilterBase const& filter) const
+Variant FilterState::get(FilterBase const& /* filter */) const
 {
     // TODO
     throw LogicException("Not implemented");
