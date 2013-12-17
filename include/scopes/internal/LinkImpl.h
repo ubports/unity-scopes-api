@@ -13,14 +13,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_RUNTIMECONFIG_H
-#define UNITY_API_SCOPES_INTERNAL_RUNTIMECONFIG_H
+#ifndef UNITY_INTERNAL_HYPERLINKIMPL_H
+#define UNITY_INTERNAL_HYPERLINKIMPL_H
 
-#include <scopes/internal/ConfigBase.h>
-#include <scopes/Runtime.h>
+#include <unity/SymbolExport.h>
+#include <string>
+#include <memory>
+#include <scopes/Query.h>
+#include <scopes/Variant.h>
 
 namespace unity
 {
@@ -34,24 +37,18 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeConfig : public ConfigBase
+class UNITY_API LinkImpl
 {
 public:
-    static const char* RUNTIME_CONFIG_GROUP;
-
-    RuntimeConfig(std::string const& configfile);
-    ~RuntimeConfig() noexcept;
-
-    std::string registry_identity() const;
-    std::string registry_configfile() const;
-    std::string default_middleware() const;
-    std::string default_middleware_configfile() const;
+    LinkImpl(std::string const& label, Query const& query);
+    LinkImpl(VariantMap const& variant_map);
+    std::string label() const;
+    Query query() const;
+    VariantMap serialize() const;
 
 private:
-    std::string registry_identity_;
-    std::string registry_configfile_;
-    std::string default_middleware_;
-    std::string default_middleware_configfile_;
+    std::string label_;
+    Query::SCPtr query_;
 };
 
 } // namespace internal

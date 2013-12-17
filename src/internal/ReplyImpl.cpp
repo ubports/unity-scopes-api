@@ -22,6 +22,7 @@
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/CategorisedResult.h>
+#include <scopes/Annotation.h>
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
@@ -111,6 +112,13 @@ bool ReplyImpl::push(Category::SCPtr category)
 {
     VariantMap var;
     var["category"] = category->serialize();
+    return push(var);
+}
+
+bool ReplyImpl::push(unity::api::scopes::Annotation const& annotation)
+{
+    VariantMap var;
+    var["annotation"] = annotation.serialize();
     return push(var);
 }
 

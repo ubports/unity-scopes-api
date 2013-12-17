@@ -3,7 +3,7 @@ set(LIBGTEST gtest)
 set(TESTLIBS ${TESTLIBS} ${LIBGTEST} boost_regex)
 
 add_subdirectory(libgtest)
-add_subdirectory(unity)
+add_subdirectory(scopes)
 
 set(TEST_SRC
 )

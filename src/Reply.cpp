@@ -18,6 +18,7 @@
 
 #include <scopes/Reply.h>
 #include <scopes/CategorisedResult.h>
+#include <scopes/Annotation.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <scopes/internal/ReplyImpl.h>
@@ -49,7 +50,7 @@ Category::SCPtr Reply::register_category(std::string const& id, std::string cons
 
 void Reply::register_category(Category::SCPtr category)
 {
-    return fwd()->register_category(category);
+    fwd()->register_category(category);
 }
 
 Category::SCPtr Reply::lookup_category(std::string const& id) const
@@ -60,6 +61,11 @@ Category::SCPtr Reply::lookup_category(std::string const& id) const
 bool Reply::push(CategorisedResult const& result) const
 {
     return fwd()->push(result);
+}
+
+bool Reply::push(Annotation const& annotation) const
+{
+    return fwd()->push(annotation);
 }
 
 void Reply::finished() const
