@@ -127,15 +127,6 @@ void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
     dnd_uri_ = dnd_uri;
 }
 
-void ResultImpl::add_metadata(std::string const& key, Variant const& value)
-{
-    if (!metadata_)
-    {
-        metadata_.reset(new VariantMap());
-    }
-    (*metadata_)[key] = value;
-}
-
 Variant& ResultImpl::operator[](std::string const& key)
 {
     if (key == "uri")
@@ -165,7 +156,7 @@ Variant const& ResultImpl::operator[](std::string const& key) const
     if (key == "art")
         return art_;
 
-    return metadata(key);
+    return value(key);
 }
 
 std::string ResultImpl::uri() const noexcept
@@ -196,7 +187,7 @@ std::string ResultImpl::dnd_uri() const noexcept
     return "";
 }
 
-bool ResultImpl::has_metadata(std::string const& key) const
+bool ResultImpl::contains(std::string const& key) const
 {
     if (metadata_ != nullptr)
     {
@@ -205,7 +196,7 @@ bool ResultImpl::has_metadata(std::string const& key) const
     return false;
 }
 
-Variant const& ResultImpl::metadata(std::string const& key) const
+Variant const& ResultImpl::value(std::string const& key) const
 {
     if (metadata_ != nullptr)
     {
@@ -334,7 +325,7 @@ void ResultImpl::deserialize(VariantMap const& var)
     {
         if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
         {
-            add_metadata(kv.first, kv.second);
+            this->operator[](kv.first) = kv.second;
         }
     }
 }

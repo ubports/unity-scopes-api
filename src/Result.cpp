@@ -97,11 +97,6 @@ void Result::set_dnd_uri(std::string const& dnd_uri)
     p->set_dnd_uri(dnd_uri);
 }
 
-void Result::add_metadata(std::string const& key, Variant const& value)
-{
-    p->add_metadata(key, value);
-}
-
 Variant& Result::operator[](std::string const& key)
 {
     return (*p)[key];
@@ -133,14 +128,14 @@ std::string Result::dnd_uri() const noexcept
     return p->dnd_uri();
 }
 
-bool Result::has_metadata(std::string const& key) const
+bool Result::contains(std::string const& key) const
 {
-    return p->has_metadata(key);
+    return p->contains(key);
 }
 
-Variant const& Result::metadata(std::string const& key) const
+Variant const& Result::value(std::string const& key) const
 {
-    return p->metadata(key);
+    return p->value(key);
 }
 
 VariantMap Result::serialize() const

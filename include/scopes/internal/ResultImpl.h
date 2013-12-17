@@ -56,7 +56,6 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
-    void add_metadata(std::string const& key, Variant const& value);
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
 
@@ -64,8 +63,8 @@ public:
     std::string title() const;
     std::string art() const;
     std::string dnd_uri() const noexcept;
-    bool has_metadata(std::string const& key) const;
-    Variant const& metadata(std::string const& key) const;
+    bool contains(std::string const& key) const;
+    Variant const& value(std::string const& key) const;
 
     VariantMap serialize() const;
 
