@@ -72,6 +72,8 @@ private:
 private:
     uint session_index_;
     std::map<uint, std::shared_ptr<HttpSession>> sessions_;
+    std::mutex sessions_mutex_;
+
     uint max_sessions_;
     uint no_reply_timeout_;
 

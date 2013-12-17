@@ -72,7 +72,6 @@ void HttpClientQtThread::cancel()
 
     if (reply_)
     {
-        reply_->abort();
         delete reply_;
         reply_ = nullptr;
     }

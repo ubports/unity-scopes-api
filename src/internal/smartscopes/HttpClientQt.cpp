@@ -47,14 +47,12 @@ HttpClientQt::HttpClientQt(uint max_sessions, uint no_reply_timeout)
 
 HttpClientQt::~HttpClientQt()
 {
-    for (auto it = begin(sessions_); it != end(sessions_); it++)
-    {
-        it->second->cancel_session();
-    }
 }
 
 HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, int port)
 {
+    std::lock_guard<std::mutex> lock(sessions_mutex_);
+
     while (sessions_.size() >= max_sessions_)
     {
         auto it = sessions_.begin();
@@ -71,6 +69,8 @@ HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, int p
 
 void HttpClientQt::cancel_get(const HttpResponseHandle::SPtr& session_handle)
 {
+    std::lock_guard<std::mutex> lock(sessions_mutex_);
+
     // if session_id in map, cancel it
     auto it = sessions_.find(session_handle->session_id());
     if (it != sessions_.end())
