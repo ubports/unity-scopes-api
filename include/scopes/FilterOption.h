@@ -36,7 +36,7 @@ namespace scopes
 namespace internal
 {
 class FilterOptionImpl;
-class OptionSelectorImpl;
+class OptionSelectorFilterImpl;
 }
 
 /**
@@ -57,7 +57,7 @@ private:
     FilterOption(std::string const& id, std::string const& label);
     std::shared_ptr<internal::FilterOptionImpl> p;
 
-    friend class internal::OptionSelectorImpl;
+    friend class internal::OptionSelectorFilterImpl;
 };
 
 } // namespace scopes

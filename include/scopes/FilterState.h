@@ -22,7 +22,6 @@
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
 #include <memory>
-#include <scopes/internal/FilterStateImpl.h>
 
 namespace unity
 {
@@ -35,6 +34,12 @@ namespace scopes
 
 class FilterBase;
 
+namespace internal
+{
+class FilterStateImpl;
+class FilterBaseImpl;
+}
+
 class UNITY_API FilterState final
 {
 public:
@@ -43,7 +48,7 @@ public:
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
-    bool has_filter(std::string const& id);
+    bool has_filter(std::string const& id) const;
     void reset(std::string const& id);
     void store(FilterBase const& filter, Variant const& value);
     Variant get(FilterBase const& filter) const;
@@ -51,7 +56,9 @@ public:
     void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
-    std::unique_ptr<internal::FilterStateImpl> p;
+    Variant get(std::string const& filter_id) const;
+    std::shared_ptr<internal::FilterStateImpl> p;
+    friend class internal::FilterBaseImpl;
 };
 
 } // namespace scopes

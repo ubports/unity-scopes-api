@@ -31,6 +31,7 @@ namespace api
 
 namespace scopes
 {
+class FilterState;
 
 namespace internal
 {
@@ -42,6 +43,7 @@ public:
     virtual ~FilterBaseImpl();
     std::string id() const;
     VariantMap serialize() const;
+    static Variant get(FilterState const& filter_state, std::string const& filter_id);
 
 private:
     std::string id_;

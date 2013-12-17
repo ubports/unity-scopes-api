@@ -41,8 +41,9 @@ public:
     ~FilterStateImpl() = default;
     FilterStateImpl(FilterStateImpl const& other) = default;
 
-    bool has_filter(std::string const& id);
+    bool has_filter(std::string const& id) const;
     void reset(std::string const& id);
+    Variant get(std::string const& filter_id);
 
     // store (filter_id, [...]) mapping; mapped value is a VariantArray of active option ids
     void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);

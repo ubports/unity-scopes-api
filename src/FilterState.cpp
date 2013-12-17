@@ -18,6 +18,7 @@
 
 #include <scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
+#include <scopes/internal/FilterStateImpl.h>
 
 namespace unity
 {
@@ -45,7 +46,7 @@ FilterState& FilterState::operator=(FilterState const& other)
 {
 }
 
-bool FilterState::has_filter(std::string const& id)
+bool FilterState::has_filter(std::string const& id) const
 {
     return p->has_filter(id);
 }
@@ -66,7 +67,12 @@ Variant FilterState::get(FilterBase const& filter) const
     // TODO
     throw LogicException("Not implemented");
 }
-    
+
+Variant FilterState::get(std::string const& filter_id) const
+{
+    return p->get(filter_id);
+}
+
 void FilterState::set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value)
 {
     p->set_option_selector_value(filter_id, option_id, value);

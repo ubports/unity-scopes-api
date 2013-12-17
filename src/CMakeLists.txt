@@ -17,7 +17,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelector.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReceiverBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp

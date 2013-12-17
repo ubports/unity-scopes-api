@@ -17,6 +17,7 @@
 */
 
 #include <scopes/internal/FilterStateImpl.h>
+#include <unity/UnityExceptions.h>
 #include <algorithm>
 
 namespace unity
@@ -31,7 +32,7 @@ namespace scopes
 namespace internal
 {
 
-bool FilterStateImpl::has_filter(std::string const& id)
+bool FilterStateImpl::has_filter(std::string const& id) const
 {
     return state_.find(id) != state_.end();
 }
@@ -39,6 +40,16 @@ bool FilterStateImpl::has_filter(std::string const& id)
 void FilterStateImpl::reset(std::string const& id)
 {
     state_.erase(id);
+}
+
+Variant FilterStateImpl::get(std::string const& filter_id)
+{
+    auto it = state_.find(filter_id);
+    if (it != state_.end())
+    {
+        return it->second;
+    }
+    throw InvalidArgumentException("Unknown fiter: " + filter_id);
 }
 
 void FilterStateImpl::set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value)

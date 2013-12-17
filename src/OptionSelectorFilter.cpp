@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <scopes/OptionSelector.h>
-#include <scopes/internal/OptionSelectorImpl.h>
+#include <scopes/OptionSelectorFilter.h>
+#include <scopes/internal/OptionSelectorFilterImpl.h>
 
 namespace unity
 {
@@ -28,44 +28,44 @@ namespace api
 namespace scopes
 {
 
-OptionSelector::OptionSelector(std::string const& id, std::string const& label, bool multi_select)
-    : FilterBase(new internal::OptionSelectorImpl(id, label, multi_select))
+OptionSelectorFilter::OptionSelectorFilter(std::string const& id, std::string const& label, bool multi_select)
+    : FilterBase(new internal::OptionSelectorFilterImpl(id, label, multi_select))
 {
 }
 
-std::string OptionSelector::label() const
+std::string OptionSelectorFilter::label() const
 {
     return fwd()->label();
 }
 
-bool OptionSelector::multi_select() const
+bool OptionSelectorFilter::multi_select() const
 {
     return fwd()->multi_select();
 }
 
-FilterOption::SCPtr OptionSelector::add_option(std::string const& id, std::string const& label)
+FilterOption::SCPtr OptionSelectorFilter::add_option(std::string const& id, std::string const& label)
 {
     return fwd()->add_option(id, label);
 }
 
-std::list<FilterOption::SCPtr> OptionSelector::options() const
+std::list<FilterOption::SCPtr> OptionSelectorFilter::options() const
 {
     return fwd()->options();
 }
 
-std::list<FilterOption::SCPtr> OptionSelector::active_options(FilterState const& filter_state) const
+std::set<FilterOption::SCPtr> OptionSelectorFilter::active_options(FilterState const& filter_state) const
 {
     return fwd()->active_options(filter_state);
 }
 
-void OptionSelector::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool state) const
+void OptionSelectorFilter::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool state) const
 {
     fwd()->update_state(filter_state, option, state);
 }
 
-internal::OptionSelectorImpl* OptionSelector::fwd() const
+internal::OptionSelectorFilterImpl* OptionSelectorFilter::fwd() const
 {
-    return dynamic_cast<internal::OptionSelectorImpl*>(p.get());
+    return dynamic_cast<internal::OptionSelectorFilterImpl*>(p.get());
 }
 
 } // namespace scopes

@@ -29,6 +29,7 @@ namespace scopes
 {
 
 FilterBase::FilterBase(internal::FilterBaseImpl *pimpl)
+    : p(pimpl)
 {
 }
 
