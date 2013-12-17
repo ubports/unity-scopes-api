@@ -21,7 +21,6 @@
 
 #include <string>
 #include <memory>
-#include <unordered_set>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -75,7 +74,6 @@ private:
     void deserialize(VariantMap const& var);
     static void throw_on_non_string(std::string const& name, Variant::Type vtype);
     static void throw_on_empty(std::string const& name, Variant const& value);
-    static const std::unordered_set<std::string> standard_attrs;
 
     Variant uri_;
     Variant title_;

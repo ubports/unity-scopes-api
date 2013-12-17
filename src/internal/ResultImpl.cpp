@@ -33,8 +33,6 @@ namespace scopes
 namespace internal
 {
 
-const std::unordered_set<std::string> ResultImpl::standard_attrs = {"uri", "title", "art", "dnd_uri"};
-
 ResultImpl::ResultImpl()
 {
 }
@@ -298,35 +296,17 @@ void ResultImpl::deserialize(VariantMap const& var)
     }
 
     const VariantMap attrs = it->second.get_dict();
-
     it = attrs.find("uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'uri'");
-    uri_ = it->second;
-
-    it = attrs.find("title");
-    if (it != attrs.end())
-    {
-        title_ = it->second;
-    }
-
-    it = attrs.find("art");
-    if (it != attrs.end())
-    {
-        art_ = it->second;
-    }
 
     it = attrs.find("dnd_uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'dnd_uri'");
-    dnd_uri_ = it->second;
 
     for (auto const& kv: attrs)
     {
-        if (standard_attrs.find(kv.first) == standard_attrs.end()) // skip standard attributes
-        {
-            this->operator[](kv.first) = kv.second;
-        }
+        this->operator[](kv.first) = kv.second;
     }
 }
 
