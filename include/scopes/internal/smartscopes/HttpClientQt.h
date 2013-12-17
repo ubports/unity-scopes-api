@@ -43,7 +43,7 @@ namespace smartscopes
 class HttpClientQt : public HttpClientInterface
 {
 public:
-    HttpClientQt(uint max_sessions, uint no_reply_timeout = 2000);
+    explicit HttpClientQt(uint max_sessions, uint no_reply_timeout = 2000);
     ~HttpClientQt();
 
     HttpResponseHandle::SPtr get(std::string const& request_url, int port = 80) override;

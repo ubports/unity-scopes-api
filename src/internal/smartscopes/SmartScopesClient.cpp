@@ -34,9 +34,9 @@ using namespace unity::api::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
-SearchHandle::SearchHandle(SmartScopesClient::SPtr ssc, std::string const& session_id)
-    : ssc_(ssc),
-      session_id_(session_id) {}
+SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
+    : session_id_(session_id),
+      ssc_(ssc) {}
 
 SearchHandle::~SearchHandle()
 {
@@ -183,7 +183,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& search_url, std:
     std::lock_guard<std::mutex> lock(search_results_mutex_);
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
 
-    return SearchHandle::UPtr(new SearchHandle(shared_from_this(), session_id));
+    return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
 }
 
 std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& session_id)

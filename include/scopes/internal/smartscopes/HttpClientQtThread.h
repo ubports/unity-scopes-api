@@ -34,7 +34,7 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread,
     Q_OBJECT
 
 public:
-    explicit HttpClientQtThread(const QUrl& url, uint timeout);
+    HttpClientQtThread(const QUrl& url, uint timeout);
     ~HttpClientQtThread();
 
     void run();

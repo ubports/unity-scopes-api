@@ -82,11 +82,11 @@ public:
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(std::shared_ptr<SmartScopesClient> ssc, std::string const& session_id);
+    SearchHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::shared_ptr<SmartScopesClient> ssc_;
     std::string session_id_;
+    std::shared_ptr<SmartScopesClient> ssc_;
 };
 
 class SmartScopesClient : private util::NonCopyable,
