@@ -97,7 +97,7 @@ std::set<FilterOption::SCPtr> OptionSelectorFilterImpl::active_options(FilterSta
     return opts;
 }
 
-void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool state) const
+void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const
 {
     auto const oid(option->id());
     auto it = std::find_if(options_.begin(), options_.end(), [oid](FilterOption::SCPtr const& opt) { return opt->id() == oid; });
@@ -105,8 +105,61 @@ void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOpt
     {
         throw unity::InvalidArgumentException("OptionSelector::update_state(): unknown filter option: " + oid);
     }
-    filter_state.set_option_selector_value(id(), option->id(), state);
+
+    VariantMap& state = FilterBaseImpl::get(filter_state);
+    // if this is single-selection filter, erase current state (only ensure only one option is active)
+    if (active && !multi_select_)
+    {
+        auto it = state.find(id());
+        if (it != state.end())
+        {
+            state.erase(it);
+        }
+    }
+    update_state(filter_state, id(), option->id(), active);
 }
+
+void OptionSelectorFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value)
+{
+    VariantMap& state = FilterBaseImpl::get(filter_state);
+    auto it = state.find(filter_id);
+    // do we have this filter already?
+    if (it == state.end())
+    {
+        if (value)
+        {
+            state[filter_id] = VariantArray({Variant(option_id)});
+        }
+        else
+        {
+            state[filter_id] = VariantArray(); // no option active
+        }
+    }
+    else // modify existing entry for this filter
+    {
+        VariantArray var = (it->second).get_array(); // may throw if this filter was used for different filter type
+
+        // do we have this option already?
+        auto opt_it = std::find_if(var.begin(), var.end(), [option_id](Variant const& v1) { return v1.get_string() == option_id; });
+        if (opt_it == var.end())
+        {
+            if (value)
+            {
+                var.push_back(Variant(option_id));
+            } // else - option not selected, nothing to do
+        }
+        else // option already stored in the state
+        {
+            if (!value) // remove if it's now unselected
+            {
+                var.erase(opt_it);
+            }
+        }
+        state[filter_id] = std::move(var);
+    }
+}
+
+
 
 } // namespace internal
 

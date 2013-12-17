@@ -18,6 +18,7 @@
 
 #include <scopes/internal/FilterBaseImpl.h>
 #include <scopes/FilterState.h>
+#include <scopes/internal/FilterStateImpl.h>
 
 namespace unity
 {
@@ -49,7 +50,12 @@ VariantMap FilterBaseImpl::serialize() const
 
 Variant FilterBaseImpl::get(FilterState const& filter_state, std::string const& filter_id)
 {
-    return filter_state.get(filter_id);
+    return filter_state.p->get(filter_id);
+}
+
+VariantMap& FilterBaseImpl::get(FilterState const& filter_state)
+{
+    return filter_state.p->get();
 }
 
 } // namespace internal

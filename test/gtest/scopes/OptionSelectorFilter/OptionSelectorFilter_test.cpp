@@ -38,13 +38,15 @@ TEST(OptionSelectorFilter, basic)
     EXPECT_EQ(2, opts.size());
     EXPECT_EQ("1", opts.front()->id());
     EXPECT_EQ("Option 1", opts.front()->label());
+    EXPECT_EQ("2", opts.back()->id());
+    EXPECT_EQ("Option 2", opts.back()->label());
 }
 
-TEST(OptionSelectorFilter, state_single_selection)
+TEST(OptionSelectorFilter, single_selection)
 {
     OptionSelectorFilter filter1("f1", "Options", false);
     auto option1 = filter1.add_option("1", "Option 1");
-    filter1.add_option("2", "Option 2");
+    auto option2 = filter1.add_option("2", "Option 2");
 
     FilterState fstate;
     EXPECT_FALSE(fstate.has_filter("f1"));
@@ -56,21 +58,28 @@ TEST(OptionSelectorFilter, state_single_selection)
     EXPECT_EQ(1, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
 
+    // enable option2, option1 get disabled
+    filter1.update_state(fstate, option2, true);
+    active = filter1.active_options(fstate);
+    EXPECT_EQ(1, active.size());
+    EXPECT_TRUE(active.find(option2) != active.end());
+
     // disable option1; filter state remains in the FilterState, just no options are selected
-    filter1.update_state(fstate, option1, false);
+    filter1.update_state(fstate, option2, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_EQ(0, filter1.active_options(fstate).size());
 }
 
-TEST(OptionSelectorFilter, state_multi_selection)
+TEST(OptionSelectorFilter, multi_selection)
 {
     OptionSelectorFilter filter1("f1", "Options", true);
     auto option1 = filter1.add_option("1", "Option 1");
     auto option2 = filter1.add_option("2", "Option 2");
+    filter1.add_option("3", "Option 3");
 
     FilterState fstate;
 
-    // enable option1
+    // enable option1 & option2
     filter1.update_state(fstate, option1, true);
     filter1.update_state(fstate, option2, true);
     EXPECT_TRUE(fstate.has_filter("f1"));

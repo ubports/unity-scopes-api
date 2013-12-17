@@ -44,6 +44,11 @@ FilterState& FilterState::operator=(FilterState &&) = default;
 
 FilterState& FilterState::operator=(FilterState const& other)
 {
+    if (this != &other)
+    {
+        p.reset(new internal::FilterStateImpl(*(other.p)));
+    }
+    return *this;
 }
 
 bool FilterState::has_filter(std::string const& id) const
@@ -51,31 +56,9 @@ bool FilterState::has_filter(std::string const& id) const
     return p->has_filter(id);
 }
 
-void FilterState::reset(std::string const& id)
+void FilterState::remove(std::string const& id)
 {
-    p->reset(id);
-}
-
-void FilterState::store(FilterBase const& filter, Variant const& value)
-{
-    // TODO
-    throw LogicException("Not implemented");
-}
-
-Variant FilterState::get(FilterBase const& filter) const
-{
-    // TODO
-    throw LogicException("Not implemented");
-}
-
-Variant FilterState::get(std::string const& filter_id) const
-{
-    return p->get(filter_id);
-}
-
-void FilterState::set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value)
-{
-    p->set_option_selector_value(filter_id, option_id, value);
+    p->remove(id);
 }
 
 } // namespace scopes

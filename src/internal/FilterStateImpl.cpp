@@ -37,12 +37,12 @@ bool FilterStateImpl::has_filter(std::string const& id) const
     return state_.find(id) != state_.end();
 }
 
-void FilterStateImpl::reset(std::string const& id)
+void FilterStateImpl::remove(std::string const& id)
 {
     state_.erase(id);
 }
 
-Variant FilterStateImpl::get(std::string const& filter_id)
+Variant FilterStateImpl::get(std::string const& filter_id) const
 {
     auto it = state_.find(filter_id);
     if (it != state_.end())
@@ -52,43 +52,9 @@ Variant FilterStateImpl::get(std::string const& filter_id)
     throw InvalidArgumentException("Unknown fiter: " + filter_id);
 }
 
-void FilterStateImpl::set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value)
+VariantMap& FilterStateImpl::get()
 {
-    auto it = state_.find(filter_id);
-    // do we have this filter already?
-    if (it == state_.end())
-    {
-        if (value)
-        {
-            state_[filter_id] = VariantArray({Variant(option_id)});
-        }
-        else
-        {
-            state_[filter_id] = VariantArray(); // no option active
-        }
-    }
-    else // modify existing entry for this filter
-    {
-        VariantArray var = (it->second).get_array(); // may throw if this filter if this id was used for different filter type
-
-        // do we have this option already?
-        auto opt_it = std::find_if(var.begin(), var.end(), [option_id](Variant const& v1) { return v1.get_string() == option_id; });
-        if (opt_it == var.end())
-        {
-            if (value)
-            {
-                var.push_back(Variant(option_id));
-            } // else - option not selected, nothing to do
-        }
-        else // option already stored in the state
-        {
-            if (!value) // remove if it's now unselected
-            {
-                var.erase(opt_it);
-            }
-        }
-        state_[filter_id] = std::move(var);
-    }
+    return state_;
 }
 
 } // namespace internal

@@ -58,9 +58,14 @@ std::set<FilterOption::SCPtr> OptionSelectorFilter::active_options(FilterState c
     return fwd()->active_options(filter_state);
 }
 
-void OptionSelectorFilter::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool state) const
+void OptionSelectorFilter::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const
 {
-    fwd()->update_state(filter_state, option, state);
+    fwd()->update_state(filter_state, option, active);
+}
+
+void OptionSelectorFilter::update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value)
+{
+    internal::OptionSelectorFilterImpl::update_state(filter_state, filter_id, option_id, value);
 }
 
 internal::OptionSelectorFilterImpl* OptionSelectorFilter::fwd() const

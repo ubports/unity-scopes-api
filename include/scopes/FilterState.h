@@ -49,14 +49,9 @@ public:
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
     bool has_filter(std::string const& id) const;
-    void reset(std::string const& id);
-    void store(FilterBase const& filter, Variant const& value);
-    Variant get(FilterBase const& filter) const;
-
-    void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);
+    void remove(std::string const& id);
 
 private:
-    Variant get(std::string const& filter_id) const;
     std::shared_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
 };

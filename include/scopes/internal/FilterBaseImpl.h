@@ -43,7 +43,10 @@ public:
     virtual ~FilterBaseImpl();
     std::string id() const;
     VariantMap serialize() const;
+
+protected:
     static Variant get(FilterState const& filter_state, std::string const& filter_id);
+    static VariantMap& get(FilterState const& filter_state);
 
 private:
     std::string id_;
