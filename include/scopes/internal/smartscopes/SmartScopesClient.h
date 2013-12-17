@@ -124,7 +124,7 @@ private:
     std::string url_;
     uint port_;
 
-    std::map<std::string, HttpSessionHandle::SPtr> search_results_;
+    std::map<std::string, HttpResponseHandle::SPtr> search_results_;
 
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;

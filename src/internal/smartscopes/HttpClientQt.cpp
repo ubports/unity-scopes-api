@@ -53,7 +53,7 @@ HttpClientQt::~HttpClientQt()
     }
 }
 
-HttpSessionHandle::SPtr HttpClientQt::get(std::string const& request_url, int port)
+HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, int port)
 {
     while (sessions_.size() >= max_sessions_)
     {
@@ -66,10 +66,10 @@ HttpSessionHandle::SPtr HttpClientQt::get(std::string const& request_url, int po
     auto session = std::make_shared<HttpSession>(request_url, port, no_reply_timeout_);
     sessions_[session_index_] = session;
 
-    return std::make_shared<HttpSessionHandle>(session_index_++, session->get_future());
+    return std::make_shared<HttpResponseHandle>(session_index_++, session->get_future());
 }
 
-void HttpClientQt::cancel_get(const HttpSessionHandle::SPtr& session_handle)
+void HttpClientQt::cancel_get(const HttpResponseHandle::SPtr& session_handle)
 {
     // if session_id in map, cancel it
     auto it = sessions_.find(session_handle->session_id());

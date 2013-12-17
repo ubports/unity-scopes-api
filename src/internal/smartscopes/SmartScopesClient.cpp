@@ -95,7 +95,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     try
     {
         std::string response_str;
-        HttpSessionHandle::SPtr response = http_client_->get(url_ + c_remote_scopes_resource, port_);
+        HttpResponseHandle::SPtr response = http_client_->get(url_ + c_remote_scopes_resource, port_);
         response->wait();
 
         response_str = response->get();

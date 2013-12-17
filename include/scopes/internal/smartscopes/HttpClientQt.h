@@ -46,8 +46,8 @@ public:
     HttpClientQt(uint max_sessions, uint no_reply_timeout = 2000);
     ~HttpClientQt();
 
-    HttpSessionHandle::SPtr get(std::string const& request_url, int port = 80) override;
-    void cancel_get(const HttpSessionHandle::SPtr& session_handle) override;
+    HttpResponseHandle::SPtr get(std::string const& request_url, int port = 80) override;
+    void cancel_get(const HttpResponseHandle::SPtr& session_handle) override;
 
     std::string to_percent_encoding(std::string const& string) override;
 

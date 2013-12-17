@@ -46,7 +46,7 @@ public:
         bool waiting = true;
         while (waiting)
         {
-            HttpSessionHandle::SPtr response = http_client_->get(test_url, test_port);
+            HttpResponseHandle::SPtr response = http_client_->get(test_url, test_port);
             response->wait();
             try
             {
@@ -102,7 +102,7 @@ protected:
 TEST_F(HttpClientTest, no_server)
 {
     // no server
-    HttpSessionHandle::SPtr response = http_client_->get(test_url, 0);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url, 0);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -111,7 +111,7 @@ TEST_F(HttpClientTest, no_server)
 TEST_F(HttpClientTest, bad_server)
 {
     // bad server
-    HttpSessionHandle::SPtr response = http_client_->get(test_url + "x", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "x", test_port);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -120,7 +120,7 @@ TEST_F(HttpClientTest, bad_server)
 TEST_F(HttpClientTest, good_server)
 {
     // responds immediately
-    HttpSessionHandle::SPtr response = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url, test_port);
     response->wait();
 
     std::string response_str;
@@ -131,7 +131,7 @@ TEST_F(HttpClientTest, good_server)
 TEST_F(HttpClientTest, ok_server)
 {
     // responds in 1 second
-    HttpSessionHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
     response->wait();
 
     std::string response_str;
@@ -142,7 +142,7 @@ TEST_F(HttpClientTest, ok_server)
 TEST_F(HttpClientTest, slow_server)
 {
     // responds in 5 seconds
-    HttpSessionHandle::SPtr response = http_client_->get(test_url + "5", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "5", test_port);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -150,11 +150,11 @@ TEST_F(HttpClientTest, slow_server)
 
 TEST_F(HttpClientTest, multiple_sessions)
 {
-    HttpSessionHandle::SPtr response1 = http_client_->get(test_url, test_port);
-    HttpSessionHandle::SPtr response2 = http_client_->get(test_url, test_port);
-    HttpSessionHandle::SPtr response3 = http_client_->get(test_url, test_port);
-    HttpSessionHandle::SPtr response4 = http_client_->get(test_url, test_port);
-    HttpSessionHandle::SPtr response5 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response1 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response2 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response3 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response4 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response5 = http_client_->get(test_url, test_port);
 
     response1->wait();
     response2->wait();
@@ -177,7 +177,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    HttpSessionHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
     http_client_->cancel_get(response);
     response->wait();
 

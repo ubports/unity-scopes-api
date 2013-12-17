@@ -39,12 +39,12 @@ namespace internal
 namespace smartscopes
 {
 
-class HttpSessionHandle : private util::NonCopyable
+class HttpResponseHandle : private util::NonCopyable
 {
 public:
-    UNITY_DEFINES_PTRS(HttpSessionHandle);
+    UNITY_DEFINES_PTRS(HttpResponseHandle);
 
-    HttpSessionHandle(uint session_id, std::shared_future<std::string> future)
+    HttpResponseHandle(uint session_id, std::shared_future<std::string> future)
         : session_id_(session_id),
           future_(future) {}
 
@@ -76,8 +76,8 @@ public:
     HttpClientInterface() = default;
     virtual ~HttpClientInterface() = default;
 
-    virtual HttpSessionHandle::SPtr get(std::string const& request_url, int port = 80) = 0;
-    virtual void cancel_get(const HttpSessionHandle::SPtr& session_handle) = 0;
+    virtual HttpResponseHandle::SPtr get(std::string const& request_url, int port = 80) = 0;
+    virtual void cancel_get(const HttpResponseHandle::SPtr& session_handle) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;
 };
