@@ -95,10 +95,10 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     try
     {
         std::string response_str;
-        std::future<std::string> response = http_client_->get(url_ + c_remote_scopes_resource, port_);
-        response.wait();
+        HttpSessionHandle::SPtr response = http_client_->get(url_ + c_remote_scopes_resource, port_);
+        response->wait();
 
-        response_str = response.get();
+        response_str = response->get();
 
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
@@ -115,9 +115,9 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
         {
             child_node = root_node->get_node(i);
 
-            if (!child_node->has_node("name") || child_node->has_node("search_url"))
+            if (!child_node->has_node("name") || !child_node->has_node("search_url"))
             {
-              break;
+                break;
             }
 
             scope.name = child_node->get_node("name")->as_string();
@@ -131,7 +131,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
 
         return remote_scopes;
     }
-    catch (unity::Exception& e)
+    catch (unity::Exception const& e)
     {
         std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -186,18 +186,6 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& search_url, std:
     return SearchHandle::UPtr(new SearchHandle(shared_from_this(), session_id));
 }
 
-void SmartScopesClient::cancel_search(std::string const& session_id)
-{
-    std::lock_guard<std::mutex> lock(search_results_mutex_);
-
-    auto it = search_results_.find(session_id);
-    if (it != search_results_.end())
-    {
-        http_client_->cancel_get(search_results_[session_id]);
-        search_results_.erase(it);
-    }
-}
-
 std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& session_id)
 {
     try
@@ -213,9 +201,9 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 throw unity::LogicException("No search for session " + session_id + " is active");
             }
 
-            search_results_[session_id].wait();
+            search_results_[session_id]->wait();
 
-            response_str = search_results_[session_id].get();
+            response_str = search_results_[session_id]->get();
             search_results_.erase(it);
         }
 
@@ -276,7 +264,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
 
         return results;
     }
-    catch (unity::Exception& e)
+    catch (unity::Exception const& e)
     {
         std::cout << "failed to retrieve search results for session: " << session_id << std::endl;
         std::cout << "error:" << e.what() << std::endl;
@@ -304,4 +292,16 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     }
 
     return jsons;
+}
+
+void SmartScopesClient::cancel_search(std::string const& session_id)
+{
+    std::lock_guard<std::mutex> lock(search_results_mutex_);
+
+    auto it = search_results_.find(session_id);
+    if (it != search_results_.end())
+    {
+        http_client_->cancel_get(search_results_[session_id]);
+        search_results_.erase(it);
+    }
 }

@@ -23,11 +23,10 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint no_reply_timeout, const HttpHeadersList& headers)
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
     : QThread(),
       url_(url),
-      headers_(headers),
-      no_reply_timeout_(no_reply_timeout),
+      timeout_(timeout),
       reply_(nullptr),
       manager_(nullptr)
 {
@@ -46,17 +45,13 @@ void HttpClientQtThread::run()
         manager_ = new QNetworkAccessManager();
 
         QNetworkRequest request(url_);
-        for (auto it = headers_.begin(); it != headers_.end(); it++)
-        {
-            request.setRawHeader((*it).first, (*it).second);
-        }
 
         connect(manager_, SIGNAL(finished(QNetworkReply*)), this, SLOT(queryDone(QNetworkReply*)));
         reply_ = manager_->get(request);
     }
 
     QTimer timeout;
-    timeout.singleShot(no_reply_timeout_, this, SLOT(cancel()));
+    timeout.singleShot(timeout_, this, SLOT(cancel()));
     QThread::exec(); // enter event loop
 }
 

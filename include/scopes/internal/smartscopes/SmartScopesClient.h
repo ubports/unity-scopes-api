@@ -76,12 +76,15 @@ class SearchHandle : private util::NonCopyable
 public:
     UNITY_DEFINES_PTRS(SearchHandle);
 
-    SearchHandle( std::shared_ptr<SmartScopesClient> ssc, const std::string& session_id );
     ~SearchHandle();
 
     std::vector<SearchResult> get_search_results();
 
-public:
+private:
+    friend class SmartScopesClient;
+    SearchHandle(std::shared_ptr<SmartScopesClient> ssc, std::string const& session_id);
+
+private:
     std::shared_ptr<SmartScopesClient> ssc_;
     std::string session_id_;
 };
@@ -92,27 +95,27 @@ class SmartScopesClient : private util::NonCopyable,
 public:
     UNITY_DEFINES_PTRS(SmartScopesClient);
 
-    SmartScopesClient( HttpClientInterface::SPtr http_client,
-                       JsonNodeInterface::SPtr json_node,
-                       const std::string& url = "" /*detect url*/,
-                       uint port = 80 );
+    SmartScopesClient(HttpClientInterface::SPtr http_client,
+                      JsonNodeInterface::SPtr json_node,
+                      std::string const& url = "" /*detect url*/,
+                      uint port = 80);
 
     virtual ~SmartScopesClient();
 
     std::vector<RemoteScope> get_remote_scopes();
 
-    SearchHandle::UPtr search( const std::string& search_url, const std::string& query,
-                               const std::string& session_id, uint query_id, const std::string& platform,
-                               const std::string& locale = "", const std::string& country = "",
-                               const std::string& latitude = "", const std::string& longitude = "",
-                               const uint limit = 0 );
+    SearchHandle::UPtr search(std::string const& search_url, std::string const& query,
+                              std::string const& session_id, uint query_id, std::string const& platform,
+                              std::string const& locale = "", std::string const& country = "",
+                              std::string const& latitude = "", std::string const& longitude = "",
+                              const uint limit = 0);
 
 private:
-    void cancel_search( const std::string& session_id );
+    friend class SearchHandle;
+    std::vector<SearchResult> get_search_results(std::string const& session_id);
+    void cancel_search(std::string const& session_id);
 
-    std::vector<SearchResult> get_search_results( const std::string& session_id );
-
-    std::vector<std::string> extract_json_stream( const std::string& json_stream );
+    std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
 private:
     HttpClientInterface::SPtr http_client_;
@@ -121,12 +124,10 @@ private:
     std::string url_;
     uint port_;
 
-    std::map<std::string, std::future<std::string>> search_results_;
+    std::map<std::string, HttpSessionHandle::SPtr> search_results_;
 
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;
-
-    friend class SearchHandle;
 };
 
 } // namespace smartscopes

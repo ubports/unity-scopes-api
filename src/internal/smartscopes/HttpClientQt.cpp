@@ -32,8 +32,10 @@ using namespace unity::api::scopes::internal::smartscopes;
 
 //-- HttpClientQt
 
-HttpClientQt::HttpClientQt(uint max_sessions)
-    : max_sessions_(max_sessions > 0 ? max_sessions : 1),
+HttpClientQt::HttpClientQt(uint max_sessions, uint no_reply_timeout)
+    : session_index_(0),
+      max_sessions_(max_sessions > 0 ? max_sessions : 1),
+      no_reply_timeout_(no_reply_timeout),
       app_(nullptr)
 {
     if (!QCoreApplication::instance())
@@ -51,7 +53,7 @@ HttpClientQt::~HttpClientQt()
     }
 }
 
-std::future<std::string> HttpClientQt::get(std::string const& request_url, int port)
+HttpSessionHandle::SPtr HttpClientQt::get(std::string const& request_url, int port)
 {
     while (sessions_.size() >= max_sessions_)
     {
@@ -61,17 +63,16 @@ std::future<std::string> HttpClientQt::get(std::string const& request_url, int p
     }
 
     // start new session
-    auto session = std::make_shared<HttpSession>(request_url, port);
-    auto future = session->get_future();
-    sessions_[&future] = session;
+    auto session = std::make_shared<HttpSession>(request_url, port, no_reply_timeout_);
+    sessions_[session_index_] = session;
 
-    return future;
+    return std::make_shared<HttpSessionHandle>(session_index_++, session->get_future());
 }
 
-void HttpClientQt::cancel_get(std::future<std::string>& future)
+void HttpClientQt::cancel_get(const HttpSessionHandle::SPtr& session_handle)
 {
     // if session_id in map, cancel it
-    auto it = sessions_.find(&future);
+    auto it = sessions_.find(session_handle->session_id());
     if (it != sessions_.end())
     {
         it->second->cancel_session();
@@ -86,17 +87,17 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 //-- HttpClientQt::HttpSession
 
-HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port)
+HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port, uint timeout)
     : promise_(nullptr),
       get_qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
-    get_thread_ = std::thread([this, request_url, port]()
+    get_thread_ = std::thread([this, request_url, port, timeout]()
     {
         QUrl url(request_url.c_str());
         url.setPort(port);
-        get_qt_thread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url));
+        get_qt_thread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url, timeout));
 
         QEventLoop loop;
         QObject::connect(get_qt_thread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));
@@ -111,19 +112,19 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port)
         {
             // no reply
             unity::ResourceException e("No reply from " + request_url + ":" + std::to_string(port));
-            promise_->set_exception(make_exception_ptr(e));
+            promise_->set_exception(e.self());
         }
         else if (!reply->isFinished())
         {
             // incomplete reply
             unity::ResourceException e("Incomplete reply from " + request_url + ":" + std::to_string(port));
-            promise_->set_exception(make_exception_ptr(e));
+            promise_->set_exception(e.self());
         }
         else if (reply->error() != QNetworkReply::NoError)
         {
             // communication error
             unity::ResourceException e(reply->errorString().toStdString());
-            promise_->set_exception(make_exception_ptr(e));
+            promise_->set_exception(e.self());
         }
         else
         {

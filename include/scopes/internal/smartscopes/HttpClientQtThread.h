@@ -28,16 +28,13 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
-typedef QPair<QByteArray, QByteArray> HttpHeader;
-typedef QList<HttpHeader> HttpHeadersList;
-
 class Q_DECL_EXPORT HttpClientQtThread : public QThread,
     private unity::util::NonCopyable
 {
     Q_OBJECT
 
 public:
-    explicit HttpClientQtThread(const QUrl& url, uint no_reply_timeout = 2000, const HttpHeadersList& = HttpHeadersList());
+    explicit HttpClientQtThread(const QUrl& url, uint timeout);
     ~HttpClientQtThread();
 
     void run();
@@ -49,8 +46,7 @@ public Q_SLOTS:
 
 private:
     QUrl url_;
-    HttpHeadersList headers_;
-    uint no_reply_timeout_;
+    uint timeout_;
     QNetworkReply* reply_;
     QNetworkAccessManager* manager_;
     std::mutex reply_mutex_;

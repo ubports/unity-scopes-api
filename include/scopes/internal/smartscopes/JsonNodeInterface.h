@@ -54,7 +54,7 @@ public:
     virtual ~JsonNodeInterface() = default;
 
     virtual void clear() = 0;
-    virtual void read_json( const std::string& json_string ) = 0;
+    virtual void read_json(std::string const& json_string) = 0;
 
     virtual int size() const = 0;
     virtual NodeType type() const = 0;
@@ -65,11 +65,11 @@ public:
     virtual double as_double() const = 0;
     virtual bool as_bool() const = 0;
 
-    virtual bool has_node( const std::string& node_name ) const = 0;
+    virtual bool has_node(std::string const& node_name) const = 0;
 
     virtual JsonNodeInterface::SPtr get_node() const = 0;
-    virtual JsonNodeInterface::SPtr get_node( const std::string& node_name ) const = 0;
-    virtual JsonNodeInterface::SPtr get_node( uint node_index ) const = 0;
+    virtual JsonNodeInterface::SPtr get_node(std::string const& node_name) const = 0;
+    virtual JsonNodeInterface::SPtr get_node(uint node_index) const = 0;
 };
 
 } // namespace smartscopes

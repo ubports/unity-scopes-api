@@ -36,7 +36,7 @@ class HttpClientTest : public Test
 {
 public:
     HttpClientTest()
-        : http_client_(new HttpClientQt(2))
+        : http_client_(new HttpClientQt(2,2000))
     {
         wait_for_server();
     }
@@ -46,11 +46,11 @@ public:
         bool waiting = true;
         while (waiting)
         {
-            std::future<std::string> response = http_client_->get(test_url, test_port);
-            response.wait();
+            HttpSessionHandle::SPtr response = http_client_->get(test_url, test_port);
+            response->wait();
             try
             {
-                if (response.get() != "Incorrect server")
+                if (response->get() != "Incorrect server")
                 {
                     waiting = false;
                 }
@@ -59,7 +59,7 @@ public:
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 }
             }
-            catch (unity::Exception& e)
+            catch (unity::Exception const& e)
             {
             }
         }
@@ -101,86 +101,86 @@ protected:
 TEST_F(HttpClientTest, no_server)
 {
     // no server
-    std::future<std::string> response = http_client_->get(test_url, 0);
-    response.wait();
+    HttpSessionHandle::SPtr response = http_client_->get(test_url, 0);
+    response->wait();
 
-    EXPECT_THROW(response.get(), unity::Exception);
+    EXPECT_THROW(response->get(), unity::Exception);
 }
 
 TEST_F(HttpClientTest, bad_server)
 {
     // bad server
-    std::future<std::string> response = http_client_->get(test_url + "x", test_port);
-    response.wait();
+    HttpSessionHandle::SPtr response = http_client_->get(test_url + "x", test_port);
+    response->wait();
 
-    EXPECT_THROW(response.get(), unity::Exception);
+    EXPECT_THROW(response->get(), unity::Exception);
 }
 
 TEST_F(HttpClientTest, good_server)
 {
     // responds immediately
-    std::future<std::string> response = http_client_->get(test_url, test_port);
-    response.wait();
+    HttpSessionHandle::SPtr response = http_client_->get(test_url, test_port);
+    response->wait();
 
     std::string response_str;
-    EXPECT_NO_THROW(response_str = response.get());
+    EXPECT_NO_THROW(response_str = response->get());
     EXPECT_EQ("Hello there", response_str);
 }
 
 TEST_F(HttpClientTest, ok_server)
 {
     // responds in 1 second
-    std::future<std::string> response = http_client_->get(test_url + "1", test_port);
-    response.wait();
+    HttpSessionHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    response->wait();
 
     std::string response_str;
-    EXPECT_NO_THROW(response_str = response.get());
+    EXPECT_NO_THROW(response_str = response->get());
     EXPECT_EQ("Hello there", response_str);
 }
 
 TEST_F(HttpClientTest, slow_server)
 {
     // responds in 5 seconds
-    std::future<std::string> response = http_client_->get(test_url + "5", test_port);
-    response.wait();
+    HttpSessionHandle::SPtr response = http_client_->get(test_url + "5", test_port);
+    response->wait();
 
-    EXPECT_THROW(response.get(), unity::Exception);
+    EXPECT_THROW(response->get(), unity::Exception);
 }
 
 TEST_F(HttpClientTest, multiple_sessions)
 {
-    std::future<std::string> response1 = http_client_->get(test_url, test_port);
-    std::future<std::string> response2 = http_client_->get(test_url, test_port);
-    std::future<std::string> response3 = http_client_->get(test_url, test_port);
-    std::future<std::string> response4 = http_client_->get(test_url, test_port);
-    std::future<std::string> response5 = http_client_->get(test_url, test_port);
+    HttpSessionHandle::SPtr response1 = http_client_->get(test_url, test_port);
+    HttpSessionHandle::SPtr response2 = http_client_->get(test_url, test_port);
+    HttpSessionHandle::SPtr response3 = http_client_->get(test_url, test_port);
+    HttpSessionHandle::SPtr response4 = http_client_->get(test_url, test_port);
+    HttpSessionHandle::SPtr response5 = http_client_->get(test_url, test_port);
 
-    response1.wait();
-    response2.wait();
-    response3.wait();
-    response4.wait();
-    response5.wait();
+    response1->wait();
+    response2->wait();
+    response3->wait();
+    response4->wait();
+    response5->wait();
 
     std::string response_str;
-    EXPECT_NO_THROW(response_str = response1.get());
+    EXPECT_NO_THROW(response_str = response1->get());
     EXPECT_EQ("Hello there", response_str);
-    EXPECT_NO_THROW(response_str = response2.get());
+    EXPECT_NO_THROW(response_str = response2->get());
     EXPECT_EQ("Hello there", response_str);
-    EXPECT_NO_THROW(response_str = response3.get());
+    EXPECT_NO_THROW(response_str = response3->get());
     EXPECT_EQ("Hello there", response_str);
-    EXPECT_NO_THROW(response_str = response4.get());
+    EXPECT_NO_THROW(response_str = response4->get());
     EXPECT_EQ("Hello there", response_str);
-    EXPECT_NO_THROW(response_str = response5.get());
+    EXPECT_NO_THROW(response_str = response5->get());
     EXPECT_EQ("Hello there", response_str);
 }
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    std::future<std::string> response = http_client_->get(test_url + "1", test_port);
+    HttpSessionHandle::SPtr response = http_client_->get(test_url + "1", test_port);
     http_client_->cancel_get(response);
-    response.wait();
+    response->wait();
 
-    EXPECT_THROW(response.get(), unity::Exception);
+    EXPECT_THROW(response->get(), unity::Exception);
 }
 
 TEST_F(HttpClientTest, percent_encoding)
