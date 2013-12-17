@@ -36,7 +36,7 @@ class HttpClientTest : public Test
 {
 public:
     HttpClientTest()
-        : http_client_(new HttpClientQt(2,2000))
+        : http_client_(new HttpClientQt(2,3000))
     {
         wait_for_server();
     }
@@ -131,7 +131,7 @@ TEST_F(HttpClientTest, good_server)
 TEST_F(HttpClientTest, ok_server)
 {
     // responds in 1 second
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "2", test_port);
     response->wait();
 
     std::string response_str;
@@ -177,7 +177,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "2", test_port);
     http_client_->cancel_get(response);
     response->wait();
 
