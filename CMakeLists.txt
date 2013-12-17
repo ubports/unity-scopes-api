@@ -54,8 +54,7 @@ endif()
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
-pkg_check_modules(UNITY_API libunity-api REQUIRED)
-
+pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 find_program(LTTNG_EXECUTABLE lttng)
