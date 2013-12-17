@@ -68,6 +68,11 @@ bool Reply::push(Annotation const& annotation) const
     return fwd()->push(annotation);
 }
 
+bool Reply::push(Filters const& filters, FilterState const& filter_state) const
+{
+    return fwd()->push(filters, filter_state);
+}
+
 void Reply::finished() const
 {
     return fwd()->finished();

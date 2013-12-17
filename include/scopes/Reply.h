@@ -23,6 +23,8 @@
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
 #include <scopes/CategoryRenderer.h>
+#include <scopes/FilterBase.h>
+#include <scopes/FilterState.h>
 
 namespace unity
 {
@@ -82,6 +84,8 @@ public:
     bool push(CategorisedResult const& result) const;
 
     bool push(Annotation const& annotation) const;
+
+    bool push(Filters const& filters, FilterState const& filter_state) const;
 
     /**
     \brief Informs the source of a query that the query results are complete.

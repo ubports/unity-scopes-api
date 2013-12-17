@@ -25,6 +25,7 @@
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
 #include <scopes/ReceiverBase.h>
+#include <scopes/FilterBase.h>
 
 #include <atomic>
 
@@ -64,6 +65,7 @@ public:
 
     bool push(unity::api::scopes::CategorisedResult const& result);
     bool push(unity::api::scopes::Annotation const& annotation);
+    bool push(unity::api::scopes::Filters const& filters, unity::api::scopes::FilterState const& filter_state);
     void finished();
     void finished(unity::api::scopes::ReceiverBase::Reason reason);
 

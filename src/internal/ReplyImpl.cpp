@@ -122,6 +122,19 @@ bool ReplyImpl::push(unity::api::scopes::Annotation const& annotation)
     return push(var);
 }
 
+bool ReplyImpl::push(unity::api::scopes::Filters const& filters, unity::api::scopes::FilterState const& filter_state)
+{
+    VariantMap var;
+    VariantArray filters_var;
+
+    for (auto const& f: filters)
+    {
+        filters_var.push_back(Variant(f.serialize()));
+    }
+    var["filters"] = filters_var;
+    return push(var);
+}
+
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
     if (!qo_->pushable())

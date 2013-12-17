@@ -22,6 +22,7 @@
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
 #include <memory>
+#include <list>
 
 namespace unity
 {
@@ -52,6 +53,8 @@ protected:
 
     std::shared_ptr<internal::FilterBaseImpl> p;
 };
+
+typedef std::list<FilterBase> Filters;
 
 } // namespace scopes
 
