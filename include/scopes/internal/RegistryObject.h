@@ -36,6 +36,8 @@ namespace scopes
 namespace internal
 {
 
+class RegistryObjectPrivate;
+
 // Maintains a map of <scope name, scope proxy> pairs.
 
 class RegistryObject final : public AbstractObject
@@ -50,12 +52,13 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_name);
 
     MetadataMap list();
+    int get_scope(std::string const& scope_name);
 
     bool add(std::string const& scope_name, ScopeMetadata const& scope);
     bool remove(std::string const& scope_name);
 
 private:
-    mutable MetadataMap scopes_;
+    RegistryObjectPrivate *p;
     mutable std::mutex mutex_;
 };
 

@@ -35,23 +35,32 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject()
-{
-}
+/**
+ * This does all the hard work. It is not thread safe. All calls to this
+ * functionality come via RegistyObject, which takes care of locking.
+ */
 
-RegistryObject::~RegistryObject() noexcept
-{
-}
+class RegistryObjectPrivate {
+private:
 
-ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
-{
+    mutable MetadataMap scopes_;
+    std::map<std::string, pid_t> scope_processes;
+
+public:
+    RegistryObjectPrivate() {};
+    ScopeMetadata get_metadata(std::string const& scope_name);
+    int get_scope(std::string const& scope_name);
+    MetadataMap list();
+    bool add(std::string const& scope_name, ScopeMetadata const& metadata);
+    bool remove(std::string const& scope_name);
+};
+
+ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name) {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
     }
-
-    lock_guard<decltype(mutex_)> lock(mutex_);
 
     auto const& it = scopes_.find(scope_name);
     if (it == scopes_.end())
@@ -59,15 +68,20 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
         throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
     }
     return it->second;
+
 }
 
-MetadataMap RegistryObject::list()
+int RegistryObjectPrivate::get_scope(std::string const& scope_name)
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    return 0;
+}
+
+MetadataMap RegistryObjectPrivate::list()
+{
     return scopes_;
 }
 
-bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
+bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata)
 {
     if (scope_name.empty())
     {
@@ -75,8 +89,6 @@ bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& met
     }
     // TODO: check for names containing a slash, because that won't work if we use
     //       the name for a socket in the file system.
-
-    lock_guard<decltype(mutex_)> lock(mutex_);
 
     auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
     if (!pair.second)
@@ -89,7 +101,7 @@ bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& met
     return true;
 }
 
-bool RegistryObject::remove(std::string const& scope_name)
+bool RegistryObjectPrivate::remove(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -97,9 +109,46 @@ bool RegistryObject::remove(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
-    lock_guard<decltype(mutex_)> lock(mutex_);
-
     return scopes_.erase(scope_name) == 1;
+}
+
+
+RegistryObject::RegistryObject() : p(new RegistryObjectPrivate())
+{
+}
+
+RegistryObject::~RegistryObject() noexcept
+{
+    delete p;
+}
+
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->get_metadata(scope_name);
+}
+
+int RegistryObject::get_scope(std::string const& scope_name) {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->get_scope(scope_name);
+}
+
+MetadataMap RegistryObject::list()
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->list();
+}
+
+bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->add(scope_name, metadata);
+}
+
+bool RegistryObject::remove(std::string const& scope_name)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->remove(scope_name);
 }
 
 } // namespace internal
