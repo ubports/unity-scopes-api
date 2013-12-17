@@ -51,6 +51,25 @@ bool OptionSelectorFilterImpl::multi_select() const
     return multi_select_;
 }
 
+void OptionSelectorFilterImpl::serialize(VariantMap& var) const
+{
+    VariantArray ops = VariantArray();
+    for (auto const& opt: options_)
+    {
+        VariantMap vm;
+        vm["id"] = opt->id();
+        vm["label"] = opt->label();
+        ops.push_back(Variant(vm));
+    }
+    var["options"] = ops;
+    var["multi_select"] = multi_select_;
+}
+
+std::string OptionSelectorFilterImpl::filter_type() const
+{
+    return "option_selector";
+}
+
 FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, std::string const& label)
 {
     auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));

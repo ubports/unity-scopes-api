@@ -46,6 +46,9 @@ std::string FilterBaseImpl::id() const
 
 VariantMap FilterBaseImpl::serialize() const
 {
+    VariantMap vm;
+    vm["id"] = id_;
+    serialize(vm);
 }
 
 Variant FilterBaseImpl::get(FilterState const& filter_state, std::string const& filter_id)

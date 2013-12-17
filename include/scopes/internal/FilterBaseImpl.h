@@ -45,6 +45,8 @@ public:
     VariantMap serialize() const;
 
 protected:
+    virtual void serialize(VariantMap& var) const = 0;
+    virtual std::string filter_type() const = 0;
     static Variant get(FilterState const& filter_state, std::string const& filter_id);
     static VariantMap& get(FilterState const& filter_state);
 

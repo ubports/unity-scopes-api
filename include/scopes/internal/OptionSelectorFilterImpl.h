@@ -51,6 +51,10 @@ public:
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
+protected:
+    void serialize(VariantMap& var) const override;
+    std::string filter_type() const override;
+
 private:
     std::string label_;
     bool multi_select_;
