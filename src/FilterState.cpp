@@ -28,6 +28,33 @@ namespace api
 namespace scopes
 {
 
+FilterState::FilterState()
+    : p(new internal::FilterStateImpl())
+{
+}
+
+FilterState::FilterState(FilterState const& other)
+    : p(new internal::FilterStateImpl(*(other.p)))
+{
+}
+
+FilterState::FilterState(FilterState &&) = default;
+FilterState& FilterState::operator=(FilterState &&) = default;
+
+FilterState& FilterState::operator=(FilterState const& other)
+{
+}
+
+bool FilterState::has_filter(std::string const& id)
+{
+    return p->has_filter(id);
+}
+
+void FilterState::reset(std::string const& id)
+{
+    p->reset(id);
+}
+
 void FilterState::store(FilterBase const& filter, Variant const& value)
 {
     // TODO
@@ -38,6 +65,11 @@ Variant FilterState::get(FilterBase const& filter) const
 {
     // TODO
     throw LogicException("Not implemented");
+}
+    
+void FilterState::set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value)
+{
+    p->set_option_selector_value(filter_id, option_id, value);
 }
 
 } // namespace scopes

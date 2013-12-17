@@ -16,13 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_FILTERSTATE_H
-#define UNITY_API_SCOPES_FILTERSTATE_H
+#ifndef UNITY_INTERNAL_FILTERSTATEIMPL_H
+#define UNITY_INTERNAL_FILTERSTATEIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
-#include <memory>
-#include <scopes/internal/FilterStateImpl.h>
+#include <string>
 
 namespace unity
 {
@@ -33,26 +31,27 @@ namespace api
 namespace scopes
 {
 
-class FilterBase;
+namespace internal
+{
 
-class UNITY_API FilterState final
+class FilterStateImpl final
 {
 public:
-    FilterState();
-    FilterState(FilterState const& other);
-    FilterState(FilterState &&);
-    FilterState& operator=(FilterState const& other);
-    FilterState& operator=(FilterState&& other);
+    FilterStateImpl() = default;
+    ~FilterStateImpl() = default;
+    FilterStateImpl(FilterStateImpl const& other) = default;
+
     bool has_filter(std::string const& id);
     void reset(std::string const& id);
-    void store(FilterBase const& filter, Variant const& value);
-    Variant get(FilterBase const& filter) const;
 
+    // store (filter_id, [...]) mapping; mapped value is a VariantArray of active option ids
     void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
-    std::unique_ptr<internal::FilterStateImpl> p;
+    VariantMap state_;
 };
+
+} // namespace internal
 
 } // namespace scopes
 

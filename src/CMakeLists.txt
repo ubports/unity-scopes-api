@@ -6,6 +6,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Annotation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
@@ -15,6 +17,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelector.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReceiverBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp

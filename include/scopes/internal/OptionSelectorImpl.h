@@ -16,13 +16,14 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_FILTERSTATE_H
-#define UNITY_API_SCOPES_FILTERSTATE_H
+#ifndef UNITY_INTERNAL_OPTIONSELECTORIMPL_H
+#define UNITY_INTERNAL_OPTIONSELECTORIMPL_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/Variant.h>
-#include <memory>
-#include <scopes/internal/FilterStateImpl.h>
+#include <scopes/internal/FilterBaseImpl.h>
+#include <scopes/FilterOption.h>
+#include <string>
+#include <list>
 
 namespace unity
 {
@@ -32,27 +33,29 @@ namespace api
 
 namespace scopes
 {
+class FilterState;
 
-class FilterBase;
+namespace internal
+{
 
-class UNITY_API FilterState final
+class UNITY_API OptionSelectorImpl : public FilterBaseImpl
 {
 public:
-    FilterState();
-    FilterState(FilterState const& other);
-    FilterState(FilterState &&);
-    FilterState& operator=(FilterState const& other);
-    FilterState& operator=(FilterState&& other);
-    bool has_filter(std::string const& id);
-    void reset(std::string const& id);
-    void store(FilterBase const& filter, Variant const& value);
-    Variant get(FilterBase const& filter) const;
-
-    void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);
+    OptionSelectorImpl(std::string const& id, std::string const& label, bool multi_select);
+    std::string label() const;
+    bool multi_select() const;
+    FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
+    std::list<FilterOption::SCPtr> options() const;
+    std::list<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
+    void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool state) const;
 
 private:
-    std::unique_ptr<internal::FilterStateImpl> p;
+    std::string label_;
+    bool multi_select_;
+    std::list<FilterOption::SCPtr> options_;
 };
+
+} // namespace internal
 
 } // namespace scopes
 

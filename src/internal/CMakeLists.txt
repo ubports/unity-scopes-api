@@ -10,6 +10,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
@@ -20,6 +23,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp

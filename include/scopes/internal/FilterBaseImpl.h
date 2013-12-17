@@ -16,13 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_FILTERSTATE_H
-#define UNITY_API_SCOPES_FILTERSTATE_H
+#ifndef UNITY_INTERNAL_FILTERBASEIMPL_H
+#define UNITY_INTERNAL_FILTERBASEIMPL_H
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
-#include <memory>
-#include <scopes/internal/FilterStateImpl.h>
+#include <string>
 
 namespace unity
 {
@@ -33,26 +32,22 @@ namespace api
 namespace scopes
 {
 
-class FilterBase;
+namespace internal
+{
 
-class UNITY_API FilterState final
+class UNITY_API FilterBaseImpl
 {
 public:
-    FilterState();
-    FilterState(FilterState const& other);
-    FilterState(FilterState &&);
-    FilterState& operator=(FilterState const& other);
-    FilterState& operator=(FilterState&& other);
-    bool has_filter(std::string const& id);
-    void reset(std::string const& id);
-    void store(FilterBase const& filter, Variant const& value);
-    Variant get(FilterBase const& filter) const;
-
-    void set_option_selector_value(std::string const& filter_id, std::string const& option_id, bool value);
+    FilterBaseImpl(std::string const& id);
+    virtual ~FilterBaseImpl();
+    std::string id() const;
+    VariantMap serialize() const;
 
 private:
-    std::unique_ptr<internal::FilterStateImpl> p;
+    std::string id_;
 };
+
+} // namespace internal
 
 } // namespace scopes
 
