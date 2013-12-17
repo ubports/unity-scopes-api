@@ -1,5 +1,0 @@
-[Runtime]
-Registry.Identity = Registry
-Registry.ConfigFile =
-Default.Middleware = Zmq
-Factory.ConfigFile = Factory.ini

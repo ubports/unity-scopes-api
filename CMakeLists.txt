@@ -134,7 +134,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 4)
+set(UNITY_SCOPES_MICRO 5)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -144,7 +144,7 @@ set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
-  message(FATAL_ERROR "Zmq lib found.")
+  message(FATAL_ERROR "Zmq lib not found.")
 endif()
 
 find_library(ZMQPPLIB zmqpp)

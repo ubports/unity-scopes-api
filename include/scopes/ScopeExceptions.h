@@ -30,11 +30,6 @@ namespace api
 namespace scopes
 {
 
-namespace internal
-{
-class MiddlewareExceptionImpl;
-}
-
 /**
 \brief Exception to indicate that something went wrong with the middleware layer.
 */
@@ -54,20 +49,10 @@ public:
     //! @endcond
 
     /**
-    \brief Returns the fully-qualified name of the exception.
-    */
-    virtual char const* what() const noexcept override;
-
-    /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
-
-namespace internal
-{
-class ConfigExceptionImpl;
-}
 
 /**
 \brief Exception to indicate that something went wrong with the contents of configuration files.
@@ -88,20 +73,10 @@ public:
     //! @endcond
 
     /**
-    \brief Returns the fully-qualified name of the exception.
-    */
-    virtual char const* what() const noexcept override;
-
-    /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
-
-namespace internal
-{
-class NotFoundExceptionImpl;
-}
 
 /**
 \brief Exception to indicate that an object wasn't found by a lookup function.
@@ -123,11 +98,6 @@ public:
     //! @endcond
 
     /**
-    \brief Returns the fully-qualified name of the exception.
-    */
-    virtual char const* what() const noexcept override;
-
-    /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
@@ -138,7 +108,7 @@ public:
     virtual std::string name() const;
 
 private:
-    std::shared_ptr<internal::NotFoundExceptionImpl> p;
+    std::string name_;
 };
 
 } // namespace scopes

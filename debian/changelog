@@ -1,3 +1,11 @@
+unity-scopes-api (0.1.5-0ubuntu1) UNRELEASED; urgency=low
+
+  * Added support for [] operator to the Result class.
+  * Remove factory_configfile() API as well as the need to define it in
+    the configuration files.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Thu, 12 Dec 2013 13:09:41 +0100
+
 unity-scopes-api (0.1.4-0ubuntu2) UNRELEASED; urgency=low
 
   [ Michal Hruby ]
@@ -8,12 +16,6 @@ unity-scopes-api (0.1.4-0ubuntu2) UNRELEASED; urgency=low
   * Added Result::metadata() getter. Create null Variant with default ctor.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Mon, 09 Dec 2013 19:15:03 +0100
-
-unity-scopes-api (0.1.4-0ubuntu1) UNRELEASED; urgency=low
-
-  * Added support for [] operator to the Result class.
-
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Thu, 12 Dec 2013 13:09:41 +0100
 
 unity-scopes-api (0.1.3+14.04.20131211-0ubuntu1) trusty; urgency=low
 
