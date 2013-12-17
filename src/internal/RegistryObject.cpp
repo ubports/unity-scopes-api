@@ -23,6 +23,7 @@
 #include <signal.h>
 #include <cassert>
 #include <sys/wait.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -47,7 +48,19 @@ static bool is_dead(pid_t pid)
  * functionality come via RegistyObject, which takes care of locking.
  */
 
-class RegistryObjectPrivate {
+class RegistryObjectPrivate final {
+public:
+    RegistryObjectPrivate(RegistryObjectPrivate const&) = delete;
+    RegistryObjectPrivate& operator=(RegistryObjectPrivate const&) = delete;
+
+    RegistryObjectPrivate() {};
+    ~RegistryObjectPrivate();
+    ScopeMetadata get_metadata(std::string const& scope_name);
+    int get_scope(std::string const& scope_name);
+    MetadataMap list();
+    bool add(std::string const& scope_name, ScopeMetadata const& metadata);
+    bool remove(std::string const& scope_name);
+
 private:
 
     MetadataMap scopes;
@@ -56,14 +69,6 @@ private:
     int spawn_scope(std::string const& scope_name);
     void shutdown();
 
-public:
-    RegistryObjectPrivate() {};
-    ~RegistryObjectPrivate();
-    ScopeMetadata get_metadata(std::string const& scope_name);
-    int get_scope(std::string const& scope_name);
-    MetadataMap list();
-    bool add(std::string const& scope_name, ScopeMetadata const& metadata);
-    bool remove(std::string const& scope_name);
 };
 
 RegistryObjectPrivate::~RegistryObjectPrivate()
@@ -119,7 +124,7 @@ int RegistryObjectPrivate::get_scope(std::string const& scope_name)
 int RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
 {
     if(scopes.find(scope_name) == scopes.end())
-        throw "FixmeLaterException";
+        throw NotFoundException("Tried to spawn an unknown scope.", scope_name);
     auto process = scope_processes.find(scope_name);
     if(process != scope_processes.end()) {
         assert(is_dead(process->second));
@@ -130,8 +135,23 @@ int RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         }
         scope_processes.erase(scope_name);
     }
-    pid_t childpid = 52; // FIXME: Fork & exec here.
-    scope_processes[scope_name] = childpid;
+
+    pid_t pid;
+    switch (pid = fork())
+    {
+        case -1:
+        {
+            throw SyscallException("cannot fork", errno);
+        }
+        case 0: // child
+        {
+            // Do we need to reset signal mask in the new process?
+            //execv(argv[0], const_cast<char* const*>(argv.get()));
+            throw SyscallException("cannot exec scoperunner", errno);
+        }
+    }
+
+    scope_processes[scope_name] = pid;
     return 3;
 }
 
