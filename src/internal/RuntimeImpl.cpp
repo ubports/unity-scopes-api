@@ -28,6 +28,7 @@
 
 #include <cassert>
 #include <future>
+#include <iostream> // TODO: remove this once logging is added
 
 #include <config.h>
 
@@ -93,12 +94,14 @@ RuntimeImpl::~RuntimeImpl() noexcept
     {
         destroy();
     }
-    catch (unity::Exception const& e) // LCOV_EXCL_LINE
+    catch (std::exception const& e) // LCOV_EXCL_LINE
     {
+        cerr << "~RuntimeImpl(): " << e.what() << endl;
         // TODO: log error
     }
     catch (...) // LCOV_EXCL_LINE
     {
+        cerr << "~RuntimeImpl(): unknown exception" << endl;
         // TODO: log error
     }
 }

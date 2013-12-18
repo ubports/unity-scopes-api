@@ -27,7 +27,7 @@ TEST(MiddlewareException, state)
 {
     {
         MiddlewareException e("some error");
-        EXPECT_STREQ("unity::api::scopes::MiddlewareException", e.what());
+        EXPECT_STREQ("unity::api::scopes::MiddlewareException: some error", e.what());
         EXPECT_THROW(rethrow_exception(e.self()), MiddlewareException);
         MiddlewareException e2("blah");
         e2 = e;
@@ -39,7 +39,7 @@ TEST(ConfigException, state)
 {
     {
         ConfigException e("some error");
-        EXPECT_STREQ("unity::api::scopes::ConfigException", e.what());
+        EXPECT_STREQ("unity::api::scopes::ConfigException: some error", e.what());
         EXPECT_THROW(rethrow_exception(e.self()), ConfigException);
         ConfigException e2("blah");
         e2 = e;
@@ -51,7 +51,7 @@ TEST(NotFoundException, state)
 {
     {
         NotFoundException e("some error", "name");
-        EXPECT_STREQ("unity::api::scopes::NotFoundException", e.what());
+        EXPECT_STREQ("unity::api::scopes::NotFoundException: some error (name = name)", e.what());
         EXPECT_EQ("name", e.name());
         EXPECT_THROW(rethrow_exception(e.self()), NotFoundException);
         NotFoundException e2("blah", "name");

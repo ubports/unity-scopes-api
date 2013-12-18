@@ -380,12 +380,6 @@ void ObjectAdapter::broker_thread()
             }
         }
     }
-    catch (unity::Exception const& e)
-    {
-        // TODO: log this
-        cerr << "OA broker thread exception: " << e.to_string() << endl;
-        return;
-    }
     catch (std::exception const& e)
     {
         // TODO: log this
@@ -540,12 +534,6 @@ void ObjectAdapter::worker_thread()
                 }
             }
         }
-    }
-    catch (unity::Exception const& e)
-    {
-        // TODO: log this
-        cerr << "OA worker thread exception: " << e.to_string() << endl;
-        return;
     }
     catch (std::exception const& e)
     {
