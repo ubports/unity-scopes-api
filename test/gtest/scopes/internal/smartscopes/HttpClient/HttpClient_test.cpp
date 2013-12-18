@@ -149,7 +149,7 @@ TEST_F(HttpClientTestQuick, ok_server)
 
 TEST_F(HttpClientTestQuick, slow_server)
 {
-    // responds in 5 seconds
+    // responds in 3 seconds
     HttpResponseHandle::SPtr response = http_client_->get(test_url + "3", test_port);
     response->wait();
 
