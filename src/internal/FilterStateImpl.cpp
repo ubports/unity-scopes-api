@@ -33,6 +33,11 @@ namespace scopes
 namespace internal
 {
 
+FilterStateImpl::FilterStateImpl(VariantMap const& var)
+    : state_(var)
+{
+}
+
 bool FilterStateImpl::has_filter(std::string const& id) const
 {
     return state_.find(id) != state_.end();
@@ -65,6 +70,7 @@ VariantMap FilterStateImpl::serialize() const
 
 FilterState FilterStateImpl::deserialize(VariantMap const& var)
 {
+    return FilterState(new FilterStateImpl(var));
 }
 
 } // namespace internal

@@ -53,8 +53,10 @@ public:
     void remove(std::string const& id);
 
 private:
+    FilterState(internal::FilterStateImpl *pimpl);
     std::shared_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
+    friend class internal::FilterStateImpl;
     friend class internal::ReplyImpl;
 };
 

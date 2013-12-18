@@ -100,11 +100,11 @@ void ReplyObject::push(VariantMap const& result) noexcept
         auto it = result.find("filters");
         if (it != result.end())
         {
-            Filters filters;
             auto filters_var = it->second.get_array();
             it = result.find("filter_state");
             if (it != result.end())
             {
+                Filters filters;
                 for (auto const& f: filters_var)
                 {
                     filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));

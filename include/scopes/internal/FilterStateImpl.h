@@ -39,6 +39,7 @@ class FilterStateImpl final
 {
 public:
     FilterStateImpl() = default;
+    FilterStateImpl(VariantMap const& var);
     ~FilterStateImpl() = default;
     FilterStateImpl(FilterStateImpl const& other) = default;
 
