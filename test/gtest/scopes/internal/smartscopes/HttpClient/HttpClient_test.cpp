@@ -35,7 +35,12 @@ int test_port = 9008;
 class HttpClientTest : public Test
 {
 public:
-    void init_server_client(uint no_reply_timeout = 20000)
+    HttpClientTest(uint no_reply_timeout = 20000)
+    {
+        init_server_client(no_reply_timeout);
+    }
+
+    void init_server_client(uint no_reply_timeout)
     {
         http_client_ = std::make_shared< HttpClientQt >(2, no_reply_timeout);
 
@@ -91,14 +96,19 @@ public:
     };
 
 protected:
-    HttpClientInterface::SPtr http_client_ = nullptr;
+    HttpClientInterface::SPtr http_client_;
     server_raii server;
+};
+
+class HttpClientTestQuick : public HttpClientTest
+{
+public:
+    HttpClientTestQuick()
+        : HttpClientTest(2000) {}
 };
 
 TEST_F(HttpClientTest, no_server)
 {
-    init_server_client();
-
     // no server
     HttpResponseHandle::SPtr response = http_client_->get(test_url, 0);
     response->wait();
@@ -108,8 +118,6 @@ TEST_F(HttpClientTest, no_server)
 
 TEST_F(HttpClientTest, bad_server)
 {
-    init_server_client();
-
     // bad server
     HttpResponseHandle::SPtr response = http_client_->get(test_url + "x", test_port);
     response->wait();
@@ -119,8 +127,6 @@ TEST_F(HttpClientTest, bad_server)
 
 TEST_F(HttpClientTest, good_server)
 {
-    init_server_client();
-
     // responds immediately
     HttpResponseHandle::SPtr response = http_client_->get(test_url, test_port);
     response->wait();
@@ -130,10 +136,8 @@ TEST_F(HttpClientTest, good_server)
     EXPECT_EQ("Hello there", response_str);
 }
 
-TEST_F(HttpClientTest, ok_server)
+TEST_F(HttpClientTestQuick, ok_server)
 {
-    init_server_client( 2000 );
-
     // responds in 1 second
     HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
     response->wait();
@@ -143,12 +147,10 @@ TEST_F(HttpClientTest, ok_server)
     EXPECT_EQ("Hello there", response_str);
 }
 
-TEST_F(HttpClientTest, slow_server)
+TEST_F(HttpClientTestQuick, slow_server)
 {
-    init_server_client( 1000 );
-
     // responds in 5 seconds
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "2", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "3", test_port);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -156,8 +158,6 @@ TEST_F(HttpClientTest, slow_server)
 
 TEST_F(HttpClientTest, multiple_sessions)
 {
-    init_server_client();
-
     HttpResponseHandle::SPtr response1 = http_client_->get(test_url, test_port);
     HttpResponseHandle::SPtr response2 = http_client_->get(test_url, test_port);
     HttpResponseHandle::SPtr response3 = http_client_->get(test_url, test_port);
@@ -185,8 +185,6 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    init_server_client();
-
     HttpResponseHandle::SPtr response = http_client_->get(test_url + "15", test_port);
     http_client_->cancel_get(response);
     response->wait();
@@ -196,8 +194,6 @@ TEST_F(HttpClientTest, cancel_get)
 
 TEST_F(HttpClientTest, percent_encoding)
 {
-    init_server_client();
-
     std::string encoded_str = http_client_->to_percent_encoding(" \"%<>\\^`{|}!*'();:@&=+$,/?#[]");
     EXPECT_EQ("%20%22%25%3C%3E%5C%5E%60%7B%7C%7D%21%2A%27%28%29%3B%3A%40%26%3D%2B%24%2C%2F%3F%23%5B%5D", encoded_str);
 }
