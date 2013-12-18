@@ -56,7 +56,7 @@ public:
     RegistryObjectPrivate() {};
     ~RegistryObjectPrivate();
     ScopeMetadata get_metadata(std::string const& scope_name);
-    int get_scope(std::string const& scope_name);
+    ScopeProxy get_scope(std::string const& scope_name);
     MetadataMap list();
     bool add(std::string const& scope_name, ScopeMetadata const& metadata);
     bool remove(std::string const& scope_name);
@@ -66,7 +66,7 @@ private:
     MetadataMap scopes;
     std::map<std::string, pid_t> scope_processes;
 
-    int spawn_scope(std::string const& scope_name);
+    void spawn_scope(std::string const& scope_name);
     void shutdown();
 
 };
@@ -109,19 +109,20 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
 
 }
 
-int RegistryObjectPrivate::get_scope(std::string const& scope_name)
+ScopeProxy RegistryObjectPrivate::get_scope(std::string const& scope_name)
 {
-    auto search = scope_processes.find(scope_name);
-    if(search != scope_processes.end()) {
-        pid_t pid = search->second;
-        if(!is_dead(pid)) {
-            return 1;
-        }
+    auto metadata = scopes.find(scope_name);
+    if(metadata == scopes.end()) {
+        throw NotFoundException("Tried to obtain unknown scope", scope_name);
     }
-    return spawn_scope(scope_name);
+    auto search = scope_processes.find(scope_name);
+    if(search == scope_processes.end() || is_dead(search->second)) {
+        spawn_scope(scope_name);
+    }
+    return metadata->second.proxy();
 }
 
-int RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
+void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
 {
     if(scopes.find(scope_name) == scopes.end())
         throw NotFoundException("Tried to spawn an unknown scope.", scope_name);
@@ -152,7 +153,6 @@ int RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
     }
 
     scope_processes[scope_name] = pid;
-    return 3;
 }
 
 MetadataMap RegistryObjectPrivate::list()
@@ -207,7 +207,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
     return p->get_metadata(scope_name);
 }
 
-int RegistryObject::get_scope(std::string const& scope_name) {
+ScopeProxy RegistryObject::get_scope(std::string const& scope_name) {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return p->get_scope(scope_name);
 }

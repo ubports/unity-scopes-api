@@ -21,7 +21,7 @@
 
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/Registry.h>
-
+#include <scopes/ScopeProxyFwd.h>
 #include <mutex>
 
 namespace unity
@@ -52,7 +52,7 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_name);
 
     MetadataMap list();
-    int get_scope(std::string const& scope_name);
+    ScopeProxy get_scope(std::string const& scope_name);
 
     bool add(std::string const& scope_name, ScopeMetadata const& scope);
     bool remove(std::string const& scope_name);
