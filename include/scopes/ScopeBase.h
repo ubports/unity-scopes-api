@@ -122,9 +122,11 @@ The scope implementation, if it does not return from run(), is expected to retur
 call to stop() in a timely manner.
 */
 
-class UNITY_API ScopeBase : private util::NonCopyable
+class UNITY_API ScopeBase
 {
 public:
+    NONCOPYABLE(ScopeBase)
+
     /// @cond
     virtual ~ScopeBase() noexcept;
     /// @endcond

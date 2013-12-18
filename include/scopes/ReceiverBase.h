@@ -50,9 +50,10 @@ Calls to push() and finished() are made by an arbitrary thread.
 // TODO: add doc for thread pool and concurrent calls to push()
 */
 
-class UNITY_API ReceiverBase : private util::NonCopyable
+class UNITY_API ReceiverBase
 {
 public:
+    NONCOPYABLE(ReceiverBase)
     /// @cond
     UNITY_DEFINES_PTRS(ReceiverBase);
 

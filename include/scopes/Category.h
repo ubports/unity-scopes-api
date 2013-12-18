@@ -47,9 +47,11 @@ namespace internal
    To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
-class UNITY_API Category : private util::NonCopyable
+class UNITY_API Category
 {
 public:
+    NONCOPYABLE(Category)
+
 /// @cond
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
