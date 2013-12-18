@@ -53,9 +53,11 @@ struct Current
     ObjectAdapter* adapter;
 };
 
-class ServantBase : private util::NonCopyable
+class ServantBase
 {
 public:
+    NONCOPYABLE(ServantBase)
+
     void safe_dispatch_(Current const& current,
                         capnp::ObjectPointer::Reader& in_params,
                         capnproto::Response::Builder& r) noexcept;
