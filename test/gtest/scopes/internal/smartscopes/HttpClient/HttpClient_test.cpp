@@ -35,14 +35,15 @@ int test_port = 9008;
 class HttpClientTest : public Test
 {
 public:
-    HttpClientTest()
-        : http_client_(new HttpClientQt(2,3000))
+    HttpClientTest(uint no_reply_timeout = 20000)
     {
-        wait_for_server();
+        init_server_client(no_reply_timeout);
     }
 
-    void wait_for_server()
+    void init_server_client(uint no_reply_timeout)
     {
+        http_client_ = std::make_shared< HttpClientQt >(2, no_reply_timeout);
+
         bool waiting = true;
         while (waiting)
         {
@@ -99,6 +100,13 @@ protected:
     server_raii server;
 };
 
+class HttpClientTestQuick : public HttpClientTest
+{
+public:
+    HttpClientTestQuick()
+        : HttpClientTest(2000) {}
+};
+
 TEST_F(HttpClientTest, no_server)
 {
     // no server
@@ -128,10 +136,10 @@ TEST_F(HttpClientTest, good_server)
     EXPECT_EQ("Hello there", response_str);
 }
 
-TEST_F(HttpClientTest, ok_server)
+TEST_F(HttpClientTestQuick, ok_server)
 {
     // responds in 1 second
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "2", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
     response->wait();
 
     std::string response_str;
@@ -139,10 +147,10 @@ TEST_F(HttpClientTest, ok_server)
     EXPECT_EQ("Hello there", response_str);
 }
 
-TEST_F(HttpClientTest, slow_server)
+TEST_F(HttpClientTestQuick, slow_server)
 {
-    // responds in 5 seconds
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "5", test_port);
+    // responds in 3 seconds
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "3", test_port);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -177,7 +185,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "2", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "15", test_port);
     http_client_->cancel_get(response);
     response->wait();
 
