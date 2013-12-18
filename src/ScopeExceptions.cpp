@@ -18,8 +18,6 @@
 
 #include <scopes/ScopeExceptions.h>
 
-#include <unity/ExceptionImplBase.h>
-
 using namespace std;
 
 namespace unity
@@ -32,7 +30,7 @@ namespace scopes
 {
 
 MiddlewareException::MiddlewareException(string const& reason) :
-    Exception(make_shared<unity::ExceptionImplBase>(this, reason))
+    Exception("unity::api::scopes::MiddlewareException", reason)
 {
 }
 
@@ -47,18 +45,13 @@ MiddlewareException::~MiddlewareException() noexcept = default;
 
 //! @endcond
 
-char const* MiddlewareException::what() const noexcept
-{
-    return "unity::api::scopes::MiddlewareException";
-}
-
 exception_ptr MiddlewareException::self() const
 {
     return make_exception_ptr(*this);
 }
 
 ConfigException::ConfigException(string const& reason) :
-    Exception(make_shared<unity::ExceptionImplBase>(this, reason))
+    Exception("unity::api::scopes::ConfigException", reason)
 {
 }
 
@@ -73,12 +66,6 @@ ConfigException::~ConfigException() noexcept = default;
 
 //! @endcond
 
-char const*
-ConfigException::what() const noexcept
-{
-    return "unity::api::scopes::ConfigException";
-}
-
 exception_ptr
 ConfigException::
 self() const
@@ -86,24 +73,10 @@ self() const
     return make_exception_ptr(*this);
 }
 
-namespace internal
-{
-
-class NotFoundExceptionImpl : public unity::ExceptionImplBase
-{
-public:
-    NotFoundExceptionImpl(NotFoundException const* owner, string const& reason, string const& name) :
-        ExceptionImplBase(owner, reason + " (name = " + name + ")"),
-        name_(name)
-    {
-    }
-    string name_;
-};
-
-} // namespace internal
-
 NotFoundException::NotFoundException(string const& reason, string const& name) :
-    Exception(make_shared<internal::NotFoundExceptionImpl>(this, reason, name))
+    Exception("unity::api::scopes::NotFoundException",
+              reason + (reason.empty() ? "" : " ") + "(name = " + name + ")"),
+    name_(name)
 {
 }
 
@@ -118,11 +91,6 @@ NotFoundException::~NotFoundException() noexcept = default;
 
 //! @endcond
 
-char const* NotFoundException::what() const noexcept
-{
-    return "unity::api::scopes::NotFoundException";
-}
-
 exception_ptr NotFoundException::self() const
 {
     return make_exception_ptr(*this);
@@ -130,7 +98,7 @@ exception_ptr NotFoundException::self() const
 
 string NotFoundException::name() const
 {
-    return dynamic_cast<const internal::NotFoundExceptionImpl*>(pimpl())->name_;
+    return name_;
 }
 
 } // namespace scopes
