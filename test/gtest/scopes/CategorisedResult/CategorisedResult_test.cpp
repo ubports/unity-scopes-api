@@ -240,12 +240,23 @@ TEST(CategorisedResult, serialize_excp)
     auto cat = reg.register_category("1", "title", "icon", rdr);
     CategorisedResult result(cat);
 
-    // throw until mandatory attributes (uri, dnd_uri) are non-empty
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_uri("http://ubuntu.com");
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_dnd_uri("http://canonical.com");
-    EXPECT_NO_THROW(result.serialize());
+    {
+        // throw until mandatory attributes (uri, dnd_uri) are non-empty
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result.set_uri("http://ubuntu.com");
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result.set_dnd_uri("http://canonical.com");
+        EXPECT_NO_THROW(result.serialize());
+    }
+    {
+        result["uri"] = Variant(0);
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result["uri"] = "http://ubuntu.com";
+        result["dnd_uri"] = Variant(0);
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result["dnd_uri"] = "http://ubuntu.com";
+        EXPECT_NO_THROW(result.serialize());
+    }
 }
 
 TEST(CategorisedResult, exceptions)
