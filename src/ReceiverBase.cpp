@@ -52,6 +52,11 @@ void ReceiverBase::push(Annotation /* annotation */)
     // Intentionally empty: "do nothing" default implementation.
 }
 
+void ReceiverBase::push(Filters const& /* filters */, FilterState const& /* filter_state */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
 // Possibly overkill, but safer than using the enum as the index into an array,
 // in case the enumeration is ever added to or the enumerators get re-ordered.
 

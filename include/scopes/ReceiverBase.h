@@ -23,6 +23,7 @@
 #include <unity/util/NonCopyable.h>
 #include <scopes/Category.h>
 #include <scopes/Annotation.h>
+#include <scopes/FilterBase.h>
 
 #include <string>
 
@@ -36,6 +37,7 @@ namespace scopes
 {
 
 class CategorisedResult;
+class FilterState;
 
 /**
 \brief Abstract base class to receive the results of a query.
@@ -79,6 +81,8 @@ public:
     If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
     */
     virtual void push(Category::SCPtr category);
+
+    virtual void push(Filters const& filters, FilterState const& filter_state);
 
     /**
     \brief Indicates the cause of a call to finished().
