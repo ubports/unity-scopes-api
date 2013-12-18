@@ -19,6 +19,7 @@
 #
 
 from wsgiref.simple_server import make_server
+import sys
 
 def response(environ, start_response):
     status = '200 OK'
@@ -45,7 +46,7 @@ search_response = '\
 serving = False
 while serving == False:
     try:
-        httpd = make_server('127.0.0.1', 9009, response)
+        httpd = make_server('127.0.0.1', int(sys.argv[1]), response)
         serving = True
     except:
         serving = False
