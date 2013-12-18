@@ -85,6 +85,10 @@ public:
 
     bool push(Annotation const& annotation) const;
 
+    /**
+    \brief Sends all filters and their state to the source of a query.
+    \return true if the filters were accepted, false otherwise.
+    */
     bool push(Filters const& filters, FilterState const& filter_state) const;
 
     /**

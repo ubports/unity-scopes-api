@@ -72,6 +72,28 @@ Annotation (returned by serialize())
  'cat_id'     : string, optional
  'links'      : array of Links
 
+FilterState (returned by serialize())
+=====================================
+  filter_id   : Variant (arbitrary, depends on filter type)
+
+FilterOption
+============
+ 'id'     : string
+ 'label'  : string
+
+OptionSelectorFilter
+====================
+ 'id'           : string
+ 'filter_type'  : "option_selector"
+ 'label'        : string
+ 'multi_select' : bool
+ 'options'      : array of FilterOption
+
+Filters + FilterState
+=====================
+ 'filter'       : array of filters (implementations of FilterBase)
+ 'filter_state' : FilterState
+
 PushRequest (capnproto structure)
 =================================
  result : ValueDict with "category" and/or "result" or "annotation" key and

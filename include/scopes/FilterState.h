@@ -41,6 +41,11 @@ class FilterBaseImpl;
 class ReplyImpl;
 }
 
+/**
+  \brief Captures state of multiple filters.
+  State can be examined by passing an instance of FilterState to
+  appropriate methods of filters (FilterBase implementations).
+  */
 class UNITY_API FilterState final
 {
 public:
@@ -49,7 +54,16 @@ public:
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
+
+    /**
+     \brief Check if state for given filter has been stored.
+     \return true if state for filter with id is present.
+     */
     bool has_filter(std::string const& id) const;
+
+    /**
+      \brief Removes state for specific filter.
+     */
     void remove(std::string const& id);
 
 private:

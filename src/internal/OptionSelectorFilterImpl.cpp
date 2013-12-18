@@ -20,6 +20,7 @@
 #include <scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
 #include <unordered_set>
+#include <sstream>
 #include <algorithm>
 
 namespace unity
@@ -44,6 +45,7 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
 OptionSelectorFilterImpl::OptionSelectorFilterImpl(VariantMap const& var)
     : FilterBaseImpl(var)
 {
+    deserialize(var);
 }
 
 std::string OptionSelectorFilterImpl::label() const
@@ -66,8 +68,42 @@ void OptionSelectorFilterImpl::serialize(VariantMap& var) const
         vm["label"] = opt->label();
         ops.push_back(Variant(vm));
     }
+    var["label"] = label_;
     var["options"] = ops;
     var["multi_select"] = multi_select_;
+}
+
+void OptionSelectorFilterImpl::throw_on_missing(VariantMap::const_iterator const& it, VariantMap::const_iterator const& endit, std::string const& name)
+{
+    if (it == endit)
+    {
+        throw LogicException("OptionSelectorFilter: missing " + name);
+    }
+}
+
+void OptionSelectorFilterImpl::deserialize(VariantMap const& var)
+{
+    auto it = var.find("label");
+    throw_on_missing(it, var.end(), "label");
+    label_ = it->second.get_string();
+
+    it = var.find("multi_select");
+    throw_on_missing(it, var.end(), "multi_select");
+    multi_select_ = it->second.get_bool();
+
+    it = var.find("options");
+    throw_on_missing(it, var.end(), "options");
+    auto const opts = it->second.get_array();
+    for (auto const& opt: opts)
+    {
+        auto const optvar = opt.get_dict();
+        it = optvar.find("id");
+        throw_on_missing(it, optvar.end(), "option id");
+        auto opt_id = it->second.get_string();
+        it = optvar.find("label");
+        throw_on_missing(it, optvar.end(), "option label");
+        add_option(opt_id, it->second.get_string());
+    }
 }
 
 std::string OptionSelectorFilterImpl::filter_type() const

@@ -54,9 +54,11 @@ public:
 
 protected:
     void serialize(VariantMap& var) const override;
+    void deserialize(VariantMap const& var);
     std::string filter_type() const override;
 
 private:
+    void throw_on_missing(VariantMap::const_iterator const& it, VariantMap::const_iterator const& endit, std::string const& name);
     std::string label_;
     bool multi_select_;
     std::list<FilterOption::SCPtr> options_;

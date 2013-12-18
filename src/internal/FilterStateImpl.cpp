@@ -62,7 +62,7 @@ VariantMap& FilterStateImpl::get()
 {
     return state_;
 }
-    
+
 VariantMap FilterStateImpl::serialize() const
 {
     return state_;

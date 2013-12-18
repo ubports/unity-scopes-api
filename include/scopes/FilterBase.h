@@ -39,11 +39,18 @@ class FilterBaseImpl;
 }
 
 /**
-\brief
+\brief Base class for all implementations of filters.
+All implementations of FilterBase define the "look" of
+filter in the UI and do not hold any state information.
+Actual state of a filters is kept by a FilterState object.
 */
 class UNITY_API FilterBase
 {
 public:
+    /**
+      \brief Get an identifier of this filter.
+      \return filter id
+      */
     std::string id() const;
     VariantMap serialize() const;
     virtual ~FilterBase();

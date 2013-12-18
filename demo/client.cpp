@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void push(Filters const& filters, FilterState const& filter_state) override
+    void push(Filters const& filters, FilterState const& /* filter_state */) override
     {
         cout << "received " << filters.size() << " filters" << endl;
         for (auto const& f: filters)
