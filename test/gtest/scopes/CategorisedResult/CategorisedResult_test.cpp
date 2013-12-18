@@ -45,6 +45,11 @@ TEST(CategorisedResult, basic)
         EXPECT_EQ("a title", result.title());
         EXPECT_EQ("an icon", result.art());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
+        EXPECT_EQ("http://ubuntu.com", result.value("uri").get_string());
+        EXPECT_EQ("a title", result.value("title").get_string());
+        EXPECT_EQ("an icon", result.value("art").get_string());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+
         EXPECT_EQ("1", result.category()->id());
     }
 }
@@ -78,6 +83,7 @@ TEST(CategorisedResult, indexop)
         EXPECT_EQ("http://canonical.com", result["dnd_uri"].get_string());
         EXPECT_TRUE(result.contains("foo"));
         EXPECT_EQ("bar", result["foo"].get_string());
+        EXPECT_EQ("bar", result.value("foo").get_string());
         EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
     }
@@ -255,6 +261,11 @@ TEST(CategorisedResult, exceptions)
             FAIL();
         }
         catch (const unity::InvalidArgumentException& e) {}
+    }
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
+        EXPECT_THROW(result.value("nonexisting"), unity::InvalidArgumentException);
     }
     {
         CategorisedResult result(cat);
