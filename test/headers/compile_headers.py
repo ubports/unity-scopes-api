@@ -81,7 +81,7 @@ def run_compiler(hdr, compiler, copts, verbose):
         if verbose:
             print(compiler + " -c " + src_name + " " + copts)
 
-        status = subprocess.call([compiler, "-c", src_name] + shlex.split(copts))
+        status = subprocess.call([compiler] + shlex.split(copts) + ["-c", src_name])
         if status != 0:
             message("cannot compile \"" + hdr + "\"") # Yes, write to stdout because this is expected output
 
