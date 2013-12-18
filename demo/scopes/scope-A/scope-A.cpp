@@ -23,6 +23,7 @@
 #include <scopes/CategoryRenderer.h>
 #include <scopes/Query.h>
 #include <scopes/Annotation.h>
+#include <scopes/OptionSelectorFilter.h>
 
 #include <iostream>
 
@@ -51,6 +52,14 @@ public:
 
     virtual void run(ReplyProxy const& reply) override
     {
+        Filters filters;
+        OptionSelectorFilter filter("f1", "Options");
+        filter.add_option("1", "Option 1");
+        filter.add_option("2", "Option 2");
+        filters.push_back(filter);
+        FilterState filter_state; // TODO: push real state from query obj
+        reply->push(filters, filter_state);
+
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
         CategorisedResult res(cat);

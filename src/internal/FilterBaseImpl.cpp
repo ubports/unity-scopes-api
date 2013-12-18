@@ -19,6 +19,8 @@
 #include <scopes/internal/FilterBaseImpl.h>
 #include <scopes/FilterState.h>
 #include <scopes/internal/FilterStateImpl.h>
+#include <scopes/OptionSelectorFilter.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -37,6 +39,16 @@ FilterBaseImpl::FilterBaseImpl(std::string const& id)
 {
 }
 
+FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
+{
+    auto it = var.find("id");
+    if (it == var.end())
+    {
+        throw unity::LogicException("FilterBase: missing 'id'");
+    }
+    id_ = it->second.get_string();
+}
+
 FilterBaseImpl::~FilterBaseImpl() = default;
 
 std::string FilterBaseImpl::id() const
@@ -48,7 +60,9 @@ VariantMap FilterBaseImpl::serialize() const
 {
     VariantMap vm;
     vm["id"] = id_;
+    vm["filter_type"] = filter_type();
     serialize(vm);
+    return vm;
 }
 
 Variant FilterBaseImpl::get(FilterState const& filter_state, std::string const& filter_id)
@@ -59,6 +73,22 @@ Variant FilterBaseImpl::get(FilterState const& filter_state, std::string const& 
 VariantMap& FilterBaseImpl::get(FilterState const& filter_state)
 {
     return filter_state.p->get();
+}
+
+FilterBase FilterBaseImpl::deserialize(VariantMap const& var)
+{
+    auto it = var.find("filter_type");
+    if (it != var.end())
+    {
+        auto ftype = it->second.get_string();
+        if (ftype == "option_selector")
+        {
+            OptionSelectorFilter filter(var);
+            return filter;
+        }
+        throw unity::LogicException("Unknown filter type: " + ftype);
+    }
+    throw unity::LogicException("FilterBase: Missing 'filter_type'");
 }
 
 } // namespace internal

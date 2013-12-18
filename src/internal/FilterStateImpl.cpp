@@ -18,6 +18,7 @@
 
 #include <scopes/internal/FilterStateImpl.h>
 #include <unity/UnityExceptions.h>
+#include <scopes/FilterState.h>
 #include <algorithm>
 
 namespace unity
@@ -55,6 +56,15 @@ Variant FilterStateImpl::get(std::string const& filter_id) const
 VariantMap& FilterStateImpl::get()
 {
     return state_;
+}
+    
+VariantMap FilterStateImpl::serialize() const
+{
+    return state_;
+}
+
+FilterState FilterStateImpl::deserialize(VariantMap const& var)
+{
 }
 
 } // namespace internal

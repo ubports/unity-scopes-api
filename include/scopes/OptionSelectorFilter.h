@@ -21,6 +21,7 @@
 
 #include <scopes/FilterBase.h>
 #include <scopes/FilterOption.h>
+#include <scopes/Variant.h>
 #include <string>
 #include <list>
 #include <set>
@@ -38,6 +39,7 @@ class FilterState;
 namespace internal
 {
 class OptionSelectorFilterImpl;
+class FilterBaseImpl;
 }
 
 /**
@@ -57,7 +59,9 @@ public:
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
+    OptionSelectorFilter(VariantMap const& var);
     internal::OptionSelectorFilterImpl* fwd() const;
+    friend class internal::FilterBaseImpl;
 };
 
 } // namespace scopes

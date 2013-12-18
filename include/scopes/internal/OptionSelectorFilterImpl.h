@@ -43,6 +43,7 @@ class UNITY_API OptionSelectorFilterImpl : public FilterBaseImpl
 {
 public:
     OptionSelectorFilterImpl(std::string const& id, std::string const& label, bool multi_select);
+    OptionSelectorFilterImpl(VariantMap const& var);
     std::string label() const;
     bool multi_select() const;
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);

@@ -59,6 +59,15 @@ public:
         }
     }
 
+    void push(Filters const& filters, FilterState const& filter_state) override
+    {
+        cout << "received " << filters.size() << " filters" << endl;
+        for (auto const& f: filters)
+        {
+            cout << " filter id=" << f.id() << endl;
+        }
+    }
+
     virtual void finished(ReceiverBase::Reason reason) override
     {
         cout << "query complete, status: " << to_string(reason) << endl;

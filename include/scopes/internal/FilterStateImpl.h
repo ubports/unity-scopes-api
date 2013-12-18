@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_FILTERSTATEIMPL_H
 
 #include <scopes/Variant.h>
+#include <scopes/FilterState.h>
 #include <string>
 
 namespace unity
@@ -45,6 +46,8 @@ public:
     void remove(std::string const& id);
     Variant get(std::string const& filter_id) const;
     VariantMap& get();
+    VariantMap serialize() const;
+    static FilterState deserialize(VariantMap const& var);
 
 private:
     VariantMap state_;

@@ -21,6 +21,7 @@
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/FilterStateImpl.h>
 #include <scopes/CategorisedResult.h>
 #include <scopes/Annotation.h>
 #include <scopes/ScopeExceptions.h>
@@ -132,6 +133,7 @@ bool ReplyImpl::push(unity::api::scopes::Filters const& filters, unity::api::sco
         filters_var.push_back(Variant(f.serialize()));
     }
     var["filters"] = filters_var;
+    var["filter_state"] = filter_state.p->serialize();
     return push(var);
 }
 

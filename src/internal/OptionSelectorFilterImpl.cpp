@@ -41,6 +41,11 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
 {
 }
 
+OptionSelectorFilterImpl::OptionSelectorFilterImpl(VariantMap const& var)
+    : FilterBaseImpl(var)
+{
+}
+
 std::string OptionSelectorFilterImpl::label() const
 {
     return label_;

@@ -33,6 +33,11 @@ OptionSelectorFilter::OptionSelectorFilter(std::string const& id, std::string co
 {
 }
 
+OptionSelectorFilter::OptionSelectorFilter(VariantMap const& var)
+    : FilterBase(new internal::OptionSelectorFilterImpl(var))
+{
+}
+
 std::string OptionSelectorFilter::label() const
 {
     return fwd()->label();

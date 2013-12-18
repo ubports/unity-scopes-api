@@ -38,6 +38,7 @@ namespace internal
 {
 class FilterStateImpl;
 class FilterBaseImpl;
+class ReplyImpl;
 }
 
 class UNITY_API FilterState final
@@ -54,6 +55,7 @@ public:
 private:
     std::shared_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
+    friend class internal::ReplyImpl;
 };
 
 } // namespace scopes

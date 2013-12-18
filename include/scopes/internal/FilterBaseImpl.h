@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
+#include <scopes/FilterBase.h>
 #include <string>
 
 namespace unity
@@ -40,9 +41,11 @@ class UNITY_API FilterBaseImpl
 {
 public:
     FilterBaseImpl(std::string const& id);
+    FilterBaseImpl(VariantMap const& var);
     virtual ~FilterBaseImpl();
     std::string id() const;
     VariantMap serialize() const;
+    static FilterBase deserialize(VariantMap const& var);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;

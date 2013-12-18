@@ -19,10 +19,13 @@
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/AnnotationImpl.h>
+#include <scopes/internal/FilterStateImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
-#include <unity/Exception.h>
+#include <scopes/FilterBase.h>
+#include <scopes/internal/FilterBaseImpl.h>
+#include <unity/UnityExceptions.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -94,7 +97,28 @@ void ReplyObject::push(VariantMap const& result) noexcept
     lock.unlock(); // Forward invocations to application outside synchronization
     try
     {
-        auto it = result.find("category");
+        auto it = result.find("filters");
+        if (it != result.end())
+        {
+            Filters filters;
+            auto filters_var = it->second.get_array();
+            it = result.find("filter_state");
+            if (it != result.end())
+            {
+                for (auto const& f: filters_var)
+                {
+                    filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
+                }
+                auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
+                receiver_base_->push(filters, filter_state);
+            }
+            else
+            {
+                throw unity::LogicException("ReplyObject::push(): filters present but missing filter_state data");
+            }
+        }
+
+        it = result.find("category");
         if (it != result.end())
         {
             auto cat = cat_registry_->register_category(it->second.get_dict());
