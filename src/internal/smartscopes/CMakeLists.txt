@@ -5,12 +5,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
+pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
-find_library(
-    JSONCPP_LIBRARY
-    NAMES jsoncpp
-    PATHS /usr/lib /usr/local/lib
-)
+include_directories(${JSONCPP_INCLUD_DIRS})
 
 add_library(
     smartscopes SHARED
@@ -35,5 +32,5 @@ target_link_libraries(
     smartscopes
 
     ${UNITY_API_LDFLAGS}
-    ${JSONCPP_LIBRARY}
+    ${JSONCPP_LDFLAGS}
 )
