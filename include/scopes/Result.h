@@ -88,8 +88,8 @@ public:
     Variant const& operator[](std::string const& key) const;
 
     std::string uri() const noexcept;
-    std::string title() const;
-    std::string art() const;
+    std::string title() const noexcept;
+    std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;

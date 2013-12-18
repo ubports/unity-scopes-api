@@ -113,12 +113,12 @@ std::string Result::uri() const noexcept
     return p->uri();
 }
 
-std::string Result::title() const
+std::string Result::title() const noexcept
 {
     return p->title();
 }
 
-std::string Result::art() const
+std::string Result::art() const noexcept
 {
     return p->art();
 }

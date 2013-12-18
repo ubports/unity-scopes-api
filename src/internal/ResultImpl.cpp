@@ -43,15 +43,8 @@ ResultImpl::ResultImpl(VariantMap const& variant_map)
 }
 
 ResultImpl::ResultImpl(ResultImpl const& other)
-    : uri_(other.uri_),
-    title_(other.title_),
-    art_(other.art_),
-    dnd_uri_(other.dnd_uri_)
+    : attrs_(other.attrs_)
 {
-    if (other.metadata_)
-    {
-        metadata_ = std::make_shared<VariantMap>(*(other.metadata_));
-    }
     if (other.stored_result_)
     {
         stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
@@ -62,24 +55,13 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
 {
     if (this != &other)
     {
-        uri_ = other.uri_;
-        title_ = other.title_;
-        art_ = other.art_;
-        dnd_uri_ = other.dnd_uri_;
-        if (other.metadata_)
-        {
-            metadata_ = std::make_shared<VariantMap>(*(other.metadata_));
-        }
+        attrs_ = other.attrs_;
         if (other.stored_result_)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
         }
     }
     return *this;
-}
-
-ResultImpl::~ResultImpl()
-{
 }
 
 void ResultImpl::store(Result const& other)
@@ -107,109 +89,92 @@ Result ResultImpl::retrieve() const
 
 void ResultImpl::set_uri(std::string const& uri)
 {
-    uri_ = uri;
+    attrs_["uri"] = uri;
 }
 
 void ResultImpl::set_title(std::string const& title)
 {
-    title_ = title;
+    attrs_["title"] = title;
 }
 
-void ResultImpl::set_art(std::string const& image)
+void ResultImpl::set_art(std::string const& art)
 {
-    art_ = image;
+    attrs_["art"] = art;
 }
 
 void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 {
-    dnd_uri_ = dnd_uri;
+    attrs_["dnd_uri"] = dnd_uri;
 }
 
 Variant& ResultImpl::operator[](std::string const& key)
 {
-    if (key == "uri")
-        return uri_;
-    if (key == "dnd_uri")
-        return dnd_uri_;
-    if (key == "title")
-        return title_;
-    if (key == "art")
-        return art_;
-
-    if (!metadata_)
-    {
-        metadata_.reset(new VariantMap());
-    }
-    return (*metadata_)[key];
+    return attrs_[key];
 }
 
 Variant const& ResultImpl::operator[](std::string const& key) const
 {
-    if (key == "uri")
-        return uri_;
-    if (key == "dnd_uri")
-        return dnd_uri_;
-    if (key == "title")
-        return title_;
-    if (key == "art")
-        return art_;
-
     return value(key);
 }
 
 std::string ResultImpl::uri() const noexcept
 {
-    if (uri_.which() == Variant::Type::String)
+    auto const it = attrs_.find("uri");
+    if (it != attrs_.end() && it->second.which() == Variant::Type::String)
     {
-        return uri_.get_string();
+        return it->second.get_string();
     }
     return "";
 }
 
-std::string ResultImpl::title() const
+std::string ResultImpl::title() const noexcept
 {
-    return title_.get_string();
+    auto const it = attrs_.find("title");
+    if (it != attrs_.end() && it->second.which() == Variant::Type::String)
+    {
+        return it->second.get_string();
+    }
+    return "";
 }
 
-std::string ResultImpl::art() const
+std::string ResultImpl::art() const noexcept
 {
-    return art_.get_string();
+    auto const it = attrs_.find("art");
+    if (it != attrs_.end() && it->second.which() == Variant::Type::String)
+    {
+        return it->second.get_string();
+    }
+    return "";
 }
 
 std::string ResultImpl::dnd_uri() const noexcept
 {
-    if (uri_.which() == Variant::Type::String)
+    auto const it = attrs_.find("dnd_uri");
+    if (it != attrs_.end() && it->second.which() == Variant::Type::String)
     {
-        return dnd_uri_.get_string();
+        return it->second.get_string();
     }
     return "";
 }
 
 bool ResultImpl::contains(std::string const& key) const
 {
-    if (metadata_ != nullptr)
-    {
-        return metadata_->find(key) != metadata_->end();
-    }
-    return false;
+    return attrs_.find(key) != attrs_.end();
 }
 
 Variant const& ResultImpl::value(std::string const& key) const
 {
-    if (metadata_ != nullptr)
+    auto const& it = attrs_.find(key);
+    if (it != attrs_.end())
     {
-        auto const& it = metadata_->find(key);
-        if (it != metadata_->end())
-        {
-            return it->second;
-        }
+        return it->second;
     }
     std::ostringstream s;
-    s << "Result::metadata(): requested key " << key << " doesn't exist";
+    s << "Result::value(): requested key " << key << " doesn't exist";
     throw InvalidArgumentException(s.str());
 }
 
-void ResultImpl::throw_on_non_string(std::string const& name, Variant::Type vtype)
+void ResultImpl::throw_on_non_string(std::string const& name, Variant::Type vtype) const
 {
     if (vtype != Variant::Type::String)
     {
@@ -217,13 +182,14 @@ void ResultImpl::throw_on_non_string(std::string const& name, Variant::Type vtyp
     }
 }
 
-void ResultImpl::throw_on_empty(std::string const& name, Variant const& value)
+void ResultImpl::throw_on_empty(std::string const& name) const
 {
-    throw_on_non_string(name, value.which());
-    if (value.get_string().empty())
+    auto const it = attrs_.find(name);
+    if (it == attrs_.end())
     {
         throw InvalidArgumentException("ResultItem: missing required attribute: " + name);
     }
+    throw_on_non_string(name, it->second.which());
 }
 
 void ResultImpl::serialize_internal(VariantMap& var) const
@@ -236,40 +202,15 @@ void ResultImpl::serialize_internal(VariantMap& var) const
 
 VariantMap ResultImpl::serialize() const
 {
-    throw_on_empty("uri", uri_);
-    throw_on_empty("dnd_uri", dnd_uri_);
-
-    VariantMap var;
-    var["uri"] = uri_;
-    var["dnd_uri"] = dnd_uri_;
-    if (title_.which() != Variant::Type::Null)
-    {
-        var["title"] = title_;
-    }
-    if (art_.which() != Variant::Type::Null)
-    {
-        var["art"] = art_;
-    }
-
-    if (metadata_)
-    {
-        for (auto const& kv: *metadata_)
-        {
-            if (var.find(kv.first) != var.end())
-            {
-                throw InvalidArgumentException("ResultItemImpl::serialize(): Can't overwrite internal attribute: "
-                                               + kv.first);
-            }
-            var[kv.first] = kv.second;
-        }
-    }
+    throw_on_empty("uri");
+    throw_on_empty("dnd_uri");
 
     VariantMap outer;
-    outer["attrs"] = var;
+    outer["attrs"] = Variant(attrs_);
 
     VariantMap intvar;
     serialize_internal(intvar);
-    outer["internal"] = intvar;
+    outer["internal"] = std::move(intvar);
 
     return outer;
 }

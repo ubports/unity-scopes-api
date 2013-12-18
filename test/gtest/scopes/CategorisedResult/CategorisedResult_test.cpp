@@ -317,8 +317,10 @@ TEST(CategorisedResult, deserialize)
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
-        EXPECT_THROW(result.title(), unity::LogicException);
-        EXPECT_THROW(result.art(), unity::LogicException);
+        EXPECT_EQ("", result.title());
+        EXPECT_EQ("", result.art());
+        EXPECT_FALSE(result.contains("title"));
+        EXPECT_FALSE(result.contains("art"));
         EXPECT_EQ("bar", result["foo"].get_string());
     }
 }

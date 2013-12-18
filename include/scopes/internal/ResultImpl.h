@@ -45,7 +45,7 @@ public:
     ResultImpl(ResultImpl const& other);
     ResultImpl& operator=(ResultImpl const& other);
 
-    virtual ~ResultImpl();
+    virtual ~ResultImpl() = default;
 
     void store(Result const& other);
     bool has_stored_result() const;
@@ -59,8 +59,8 @@ public:
     Variant const& operator[](std::string const& key) const;
 
     std::string uri() const noexcept;
-    std::string title() const;
-    std::string art() const;
+    std::string title() const noexcept;
+    std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;
@@ -72,14 +72,10 @@ protected:
 
 private:
     void deserialize(VariantMap const& var);
-    static void throw_on_non_string(std::string const& name, Variant::Type vtype);
-    static void throw_on_empty(std::string const& name, Variant const& value);
+    void throw_on_non_string(std::string const& name, Variant::Type vtype) const;
+    void throw_on_empty(std::string const& name) const;
 
-    Variant uri_;
-    Variant title_;
-    Variant art_;
-    Variant dnd_uri_;
-    std::shared_ptr<VariantMap> metadata_;
+    VariantMap attrs_;
     std::shared_ptr<VariantMap> stored_result_;
 };
 
