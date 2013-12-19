@@ -126,6 +126,12 @@ if (Werror)
     endif()
 endif()
 
+option(THREAD_SANITIZER "Build with -fsanitize=thread (for Clang only)" OFF)
+
+if (IS_CLANG AND THREAD_SANITIZER)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
+endif()
+
 option(IPC_MONITORING "Enable IPC traffic monitoring")
 
 if(IPC_MONITORING)
