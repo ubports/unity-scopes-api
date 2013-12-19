@@ -19,12 +19,15 @@
 #include <scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/UnityExceptions.h>
 
+#include "../RaiiServer.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <thread>
 
 using namespace testing;
 using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::api::test::scopes::internal::smartscopes;
 
 namespace
 {
@@ -35,62 +38,12 @@ class HttpClientTest : public Test
 {
 public:
     HttpClientTest(uint no_reply_timeout = 20000)
-        : http_client_(new HttpClientQt(2, no_reply_timeout)) {}
-
-    class server_raii
-    {
-    public:
-        server_raii()
-        {
-            int pipefd[2];
-            if (pipe(pipefd) < 0)
-            {
-                throw unity::ResourceException("Pipe creation failed");
-            }
-
-            switch (pid_ = fork())
-            {
-                case -1:
-                    throw unity::ResourceException("Failed to fork process");
-                case 0: // child
-                    close(STDOUT_FILENO);   // close stdout
-                    close(pipefd[0]);       // close read
-                    if (dup(pipefd[1]) < 0) // open write
-                    {
-                        throw unity::ResourceException("Write pipe duplication failed");
-                    }
-
-                    execl(FAKE_SERVER_PATH, "", NULL);
-                    throw unity::ResourceException("Failed to execute fake server script");
-                default: // parent
-                    close(STDIN_FILENO);    // close stdin
-                    close(pipefd[1]);       // close write
-                    if (dup(pipefd[0]) < 0) // open read
-                    {
-                        throw unity::ResourceException("Read pipe duplication failed");
-                    }
-
-                    char port_str[6];
-                    read(pipefd[0], port_str, 5);
-                    port_ = std::atoi(port_str);
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-        ~server_raii()
-        {
-            kill(pid_, SIGABRT);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-        pid_t pid_ = -1;
-        int port_ = 0;
-    };
+        : http_client_(new HttpClientQt(2, no_reply_timeout)),
+          server_(FAKE_SERVER_PATH) {}
 
 protected:
     HttpClientInterface::SPtr http_client_;
-    server_raii server_;
+    RaiiServer server_;
 };
 
 class HttpClientTestQuick : public HttpClientTest

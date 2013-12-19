@@ -22,6 +22,8 @@
 
 #include <unity/UnityExceptions.h>
 
+#include "../RaiiServer.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <thread>
@@ -29,6 +31,7 @@
 using namespace testing;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::api::test::scopes::internal::smartscopes;
 
 namespace
 {
@@ -38,67 +41,17 @@ class SmartScopesClientTest : public Test
 public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(2)),
-          json_node_(new JsonCppNode())
+          json_node_(new JsonCppNode()),
+          server_(FAKE_SSS_PATH)
     {
         ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", server_.port_);
     }
-
-    class server_raii
-    {
-    public:
-        server_raii()
-        {
-            int pipefd[2];
-            if (pipe(pipefd) < 0)
-            {
-                throw unity::ResourceException("Pipe creation failed");
-            }
-
-            switch (pid_ = fork())
-            {
-                case -1:
-                    throw unity::ResourceException("Failed to fork process");
-                case 0: // child
-                    close(STDOUT_FILENO);   // close stdout
-                    close(pipefd[0]);       // close read
-                    if (dup(pipefd[1]) < 0) // open write
-                    {
-                        throw unity::ResourceException("Write pipe duplication failed");
-                    }
-
-                    execl(FAKE_SSS_PATH, "", NULL);
-                    throw unity::ResourceException("Failed to execute fake server script");
-                default: // parent
-                    close(STDIN_FILENO);    // close stdin
-                    close(pipefd[1]);       // close write
-                    if (dup(pipefd[0]) < 0) // open read
-                    {
-                        throw unity::ResourceException("Read pipe duplication failed");
-                    }
-
-                    char port_str[6];
-                    read(pipefd[0], port_str, 5);
-                    port_ = std::atoi(port_str);
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-        ~server_raii()
-        {
-            kill(pid_, SIGABRT);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-        pid_t pid_ = -1;
-        int port_ = 0;
-    };
 
 protected:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient::SPtr ssc_;
-    server_raii server_;
+    RaiiServer server_;
 };
 
 TEST_F(SmartScopesClientTest, remote_scopes)
