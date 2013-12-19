@@ -12,6 +12,10 @@ find_library(
     PATHS /usr/lib /usr/local/lib
 )
 
+if(NOT JSONCPP_LIBRARY)
+  message(FATAL_ERROR "Jscon-cpp lib not found.")
+endif()
+
 add_library(
     smartscopes SHARED
 

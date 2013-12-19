@@ -48,58 +48,74 @@ static string strip_suffix(string const& s, string const& suffix)
     return s;
 }
 
-struct ScopeSetPrivate {
+struct ScopeSetPrivate
+{
     std::set<string> overridable_scopes;
     std::map<string, unique_ptr<ScopeConfig>> scopes;
 };
 
-ScopeSet::ScopeSet(const RegistryConfig &c) : p(new ScopeSetPrivate()){
+ScopeSet::ScopeSet(const RegistryConfig& c) : p(new ScopeSetPrivate())
+{
     string canonical_dir = c.scope_installdir();
     string oem_dir = c.oem_installdir();
     auto canonical_files = find_scope_config_files(canonical_dir, ".ini");
     auto oem_files = find_scope_config_files(oem_dir, ".ini");
-    for(const auto &path : canonical_files) {
+    for (const auto &path : canonical_files)
+    {
         unique_ptr<ScopeConfig> sc(new ScopeConfig(path));
         // basename() modifies its argument
         string file_name = basename(const_cast<char*>(string(path).c_str()));
         string scope_name = strip_suffix(file_name, ".ini");
-        if(sc->overrideable()) {
+        if (sc->overrideable())
+        {
             p->overridable_scopes.insert(path);
         }
         p->scopes[scope_name] = move(sc);
     }
-    for(const auto &path : oem_files) {
+    for (const auto &path : oem_files)
+    {
         unique_ptr<ScopeConfig> sc(new ScopeConfig(path));
         string file_name = basename(const_cast<char*>(string(path).c_str()));
         string scope_name = strip_suffix(file_name, ".ini");
-        if(p->scopes.find(scope_name) != p->scopes.end()) {
-            if(p->overridable_scopes.find(scope_name) != p->overridable_scopes.end()) {
+        if (p->scopes.find(scope_name) != p->scopes.end())
+        {
+            if (p->overridable_scopes.find(scope_name) != p->overridable_scopes.end())
+            {
                 p->scopes[scope_name] = move(sc);
-            } else {
+            }
+            else
+            {
                 // print error about trying to override a non-overridable scope.
             }
-        } else {
+        }
+        else
+        {
             p->scopes[scope_name] = move(sc);
         }
     }
     // Add click scope parsing here.
 }
 
-ScopeSet::~ScopeSet() {
+ScopeSet::~ScopeSet()
+{
     delete p;
 }
 
-std::vector<std::string> ScopeSet::list() const {
+std::vector<std::string> ScopeSet::list() const
+{
     vector<string> list;
-    for(auto &i : p->scopes) {
+    for (auto &i : p->scopes)
+    {
         list.push_back(i.first);
     }
     return list;
 }
 
 const unity::api::scopes::internal::ScopeConfig&
-ScopeSet::get(const std::string &name) {
-    if(p->scopes.find(name) == p->scopes.end()) {
+ScopeSet::get(const std::string& name)
+{
+    if (p->scopes.find(name) == p->scopes.end())
+    {
         throw NotFoundException("Scope does not exist", name);
     }
     return *p->scopes[name].get();

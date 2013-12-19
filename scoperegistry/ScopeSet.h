@@ -36,17 +36,17 @@ class ScopeSet final
 
 public:
 
-    ScopeSet(const ::unity::api::scopes::internal::RegistryConfig &c);
+    ScopeSet(const ::unity::api::scopes::internal::RegistryConfig& c);
     ~ScopeSet();
 
     ScopeSet(const ScopeSet&) = delete;
     ScopeSet& operator=(const ScopeSet&) = delete;
 
     std::vector<std::string> list() const;
-    const unity::api::scopes::internal::ScopeConfig& get(const std::string &name);
+    const unity::api::scopes::internal::ScopeConfig& get(const std::string& name);
 
 private:
-    ScopeSetPrivate *p;
+    ScopeSetPrivate* p;
 
 };
 
