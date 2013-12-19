@@ -222,6 +222,10 @@ includes any header in zmq_middleware.
 Client invocation classes
 -------------------------
 
+The call chain for an outgoing invocation is like this (using Scope as an example):
+
+ScopeProxy -> Scope -> ScopeImpl -> MWScopeProxy -> ZmqScope
+
 Clients invoke remote operations via a proxy. The *Proxy types (such as ScopeProxy) are shared_ptrs to the
 corresponding proxy class (such as Proxy). Each proxy class provides a method that corresponds to a remote operation
 in the server.
@@ -250,6 +254,10 @@ implementation also drives the capnproto marshaling and unmarshaling.
 
 Server dispatch classes
 -----------------------
+
+The call chain for an incoming invocation is like this (using Scope as an example):
+
+ObjectAdapter -> ScopeI -> ScopeObject
 
 On the server side, when a method invocation arrives over the wire, it ends up in an instance of
 ObjectAdapter. Each network endpoint has one adapter. The job of the adapter is to listen for incoming
@@ -280,7 +288,7 @@ invocation to the servant is made in a try-catch block; if the servant throws an
 care of returning an exception to the client.
 
 The concrete servant method called by dispatch_ (such as ScopeI::create_query) now unmarshals any in-parameters,
-translates them to the midleware-independent equivalents, forwards the invocation to the middleware-independent servant,
+translates them to the middleware-independent equivalents, forwards the invocation to the middleware-independent servant,
 and translates and marshals any return values or exceptions.
 
 Each servant class stores a pointer to a delegate. The delegate implementation lives in the internal namespace
@@ -314,7 +322,7 @@ Success means the invocation was successful, and the return values are inside th
 If the invocation failed, it can be for a variety of reasons, some
 unexpected, some not. Unexpected reasons are things such as general failures during dispatch, failure to locate
 the identity for a servant or the operation within the servant, and any unexpected exceptions that the operation
-implementation might throw. Unexpeced errors are indicated as a runtimeException. At the moment, there are two
+implementation might throw. Unexpected errors are indicated as a runtimeException. At the moment, there are two
 special runtime exceptions (ObjectNotExist and OperationNotExist), which indicate failure to find a servant or
 the correct operation. All other error conditions (such as an operation implementation throwing 42), the
 client gets an UnknownUserException with an error string.
