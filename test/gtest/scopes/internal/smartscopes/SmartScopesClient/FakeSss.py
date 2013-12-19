@@ -44,11 +44,15 @@ search_response = '\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
 serving = False
+port = 1024
 while serving == False:
     try:
-        httpd = make_server('127.0.0.1', int(sys.argv[1]), response)
+        httpd = make_server('127.0.0.1', port, response)
         serving = True
     except:
-        serving = False
+        port += 1
+
+print(str(port))
+sys.stdout.close()
 
 httpd.serve_forever()

@@ -39,28 +39,36 @@ public:
         : http_client_(new HttpClientQt(2)),
           json_node_(new JsonCppNode())
     {
-        std::random_device rd;
-        std::default_random_engine en(rd());
-        std::uniform_int_distribution<int> uniform_dist(1024, 65535);
-        int port = uniform_dist(en);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", port);
-        server_ = std::unique_ptr<server_raii>(new server_raii(port));
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", server_.port_);
     }
 
     class server_raii
     {
     public:
-        server_raii( int port )
+        server_raii()
         {
-            const char* const argv[] = { FAKE_SSS_PATH, std::to_string(port).c_str(), NULL };
+            int pipefd[2];
+            pipe(pipefd);
 
             switch (pid_ = fork())
             {
                 case -1:
                     throw std::exception();
                 case 0: // child
-                    execv(argv[0], (char * const*) argv);
+                    close(1);         // close stdout
+                    close(pipefd[0]); // close read
+                    dup(pipefd[1]);   // open write
+
+                    execl(FAKE_SSS_PATH, "", NULL);
                     throw std::exception();
+                default: // parent
+                    close(0);          // close stdin
+                    close(pipefd[1]);  // close write
+                    dup(pipefd[0]);    // open read
+
+                    char port_str[6];
+                    std::cin.getline(port_str, 5);
+                    port_ = std::atoi(port_str);
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -68,19 +76,19 @@ public:
 
         ~server_raii()
         {
-            kill(pid_, SIGKILL);
+            kill(pid_, SIGABRT);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
-    private:
         pid_t pid_ = -1;
+        int port_ = 0;
     };
 
 protected:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient::SPtr ssc_;
-    std::unique_ptr<server_raii> server_;
+    server_raii server_;
 };
 
 TEST_F(SmartScopesClientTest, remote_scopes)

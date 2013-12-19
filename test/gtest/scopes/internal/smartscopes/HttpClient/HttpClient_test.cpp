@@ -29,58 +29,41 @@ using namespace unity::api::scopes::internal::smartscopes;
 namespace
 {
 
-const std::string test_url = "http://127.0.0.1/" + std::to_string(getpid()) + "?0";
-int test_port = 9008;
+const std::string test_url = "http://127.0.0.1";
 
 class HttpClientTest : public Test
 {
 public:
     HttpClientTest(uint no_reply_timeout = 20000)
-    {
-        init_server_client(no_reply_timeout);
-    }
-
-    void init_server_client(uint no_reply_timeout)
-    {
-        http_client_ = std::make_shared< HttpClientQt >(2, no_reply_timeout);
-
-        bool waiting = true;
-        while (waiting)
-        {
-            HttpResponseHandle::SPtr response = http_client_->get(test_url, test_port);
-            response->wait();
-            try
-            {
-                if (response->get() != "Incorrect server")
-                {
-                    waiting = false;
-                }
-                else
-                {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                }
-            }
-            catch (unity::Exception const& e)
-            {
-              std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            }
-        }
-    }
+        : http_client_(new HttpClientQt(2, no_reply_timeout)) {}
 
     class server_raii
     {
     public:
         server_raii()
         {
-            const char* const argv[] = { FAKE_SERVER_PATH, std::to_string(getpid()).c_str(), NULL };
+            int pipefd[2];
+            pipe(pipefd);
 
             switch (pid_ = fork())
             {
                 case -1:
-                    throw unity::ResourceException("Failed to fork process");
+                    throw std::exception();
                 case 0: // child
-                    execv(argv[0], (char * const*) argv);
-                    throw unity::ResourceException("Failed to fork process");
+                    close(1);         // close stdout
+                    close(pipefd[0]); // close read
+                    dup(pipefd[1]);   // open write
+
+                    execl(FAKE_SERVER_PATH, "", NULL);
+                    throw std::exception();
+                default: // parent
+                    close(0);          // close stdin
+                    close(pipefd[1]);  // close write
+                    dup(pipefd[0]);    // open read
+
+                    char port_str[6];
+                    std::cin.getline(port_str, 5);
+                    port_ = std::atoi(port_str);
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -88,16 +71,17 @@ public:
 
         ~server_raii()
         {
-            kill(pid_, SIGKILL);
+            kill(pid_, SIGABRT);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
-    private:
         pid_t pid_ = -1;
+        int port_ = 0;
     };
 
 protected:
     HttpClientInterface::SPtr http_client_;
-    server_raii server;
+    server_raii server_;
 };
 
 class HttpClientTestQuick : public HttpClientTest
@@ -119,7 +103,7 @@ TEST_F(HttpClientTest, no_server)
 TEST_F(HttpClientTest, bad_server)
 {
     // bad server
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "x", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?x", server_.port_);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -128,7 +112,7 @@ TEST_F(HttpClientTest, bad_server)
 TEST_F(HttpClientTest, good_server)
 {
     // responds immediately
-    HttpResponseHandle::SPtr response = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url, server_.port_);
     response->wait();
 
     std::string response_str;
@@ -139,7 +123,7 @@ TEST_F(HttpClientTest, good_server)
 TEST_F(HttpClientTestQuick, ok_server)
 {
     // responds in 1 second
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "1", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?1", server_.port_);
     response->wait();
 
     std::string response_str;
@@ -150,7 +134,7 @@ TEST_F(HttpClientTestQuick, ok_server)
 TEST_F(HttpClientTestQuick, slow_server)
 {
     // responds in 3 seconds
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "3", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?3", server_.port_);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -158,11 +142,11 @@ TEST_F(HttpClientTestQuick, slow_server)
 
 TEST_F(HttpClientTest, multiple_sessions)
 {
-    HttpResponseHandle::SPtr response1 = http_client_->get(test_url, test_port);
-    HttpResponseHandle::SPtr response2 = http_client_->get(test_url, test_port);
-    HttpResponseHandle::SPtr response3 = http_client_->get(test_url, test_port);
-    HttpResponseHandle::SPtr response4 = http_client_->get(test_url, test_port);
-    HttpResponseHandle::SPtr response5 = http_client_->get(test_url, test_port);
+    HttpResponseHandle::SPtr response1 = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response2 = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response3 = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response4 = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response5 = http_client_->get(test_url, server_.port_);
 
     response1->wait();
     response2->wait();
@@ -185,7 +169,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "15", test_port);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?18", server_.port_);
     http_client_->cancel_get(response);
     response->wait();
 
