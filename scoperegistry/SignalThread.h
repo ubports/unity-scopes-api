@@ -30,9 +30,11 @@
 namespace scoperegistry
 {
 
-class SignalThread final : private unity::util::NonCopyable
+class SignalThread final
 {
 public:
+    NONCOPYABLE(SignalThread)
+
     SignalThread();
     ~SignalThread() noexcept;
 
