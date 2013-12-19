@@ -1,10 +1,16 @@
-unity-scopes-api (0.1.6-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.1.7-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Pawel Stolowski ]
   * Added support for [] operator to the Result class, other minor changes to Result API.
   * Remove factory_configfile() API as well as the need to define it in
     the configuration files.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 18 Dec 2013 10:11:37 +0100
+  [ michi ]
+  * Added ability for scope to push an exception (as an exception_ptr). On the client side,
+    the exception is delivered as the what() string (if the exception is a std::exception) and
+    as "unknown exception", otherwise.
+
+ -- michi <michi@djembefola>  Thu, 19 Dec 2013 11:32:56 +1000
 
 unity-scopes-api (0.1.4-0ubuntu2) UNRELEASED; urgency=low
 
