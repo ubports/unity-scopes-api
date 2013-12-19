@@ -66,15 +66,12 @@ public:
                 execl(server_path.c_str(), "", NULL);
                 throw unity::ResourceException("Failed to execute fake server script");
             default: // parent
-                close(STDIN_FILENO);    // close stdin
                 close(pipefd[1]);       // close write
-                if (dup(pipefd[0]) < 0) // open read
-                {
-                    throw unity::ResourceException("Read pipe duplication failed");
-                }
 
                 char port_str[10];
-                read(pipefd[0], port_str, sizeof(port_str));
+                read(pipefd[0], port_str, sizeof(port_str) - 1);
+                port_str[sizeof(port_str) - 1] = '\0';
+
                 port_ = std::atoi(port_str);
         }
 
