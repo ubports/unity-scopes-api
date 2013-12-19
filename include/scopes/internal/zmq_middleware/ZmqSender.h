@@ -40,9 +40,11 @@ namespace zmq_middleware
 
 // Simple message sender. Sends a Cap'n Proto segment list sending each segment as a zmq message part.
 
-class ZmqSender final : private util::NonCopyable
+class ZmqSender final
 {
 public:
+    NONCOPYABLE(ZmqSender)
+
     ZmqSender(zmqpp::socket& s);
 
     void send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments);

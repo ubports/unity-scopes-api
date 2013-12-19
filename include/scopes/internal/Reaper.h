@@ -75,9 +75,10 @@ class Reaper;
 // Letting a ReapItem go out of scope automatically calls destroy(), meaning that the item's callback
 // is *not* invoked when a ReapItem is destroyed.
 
-class ReapItem final : private util::NonCopyable
+class ReapItem final
 {
 public:
+    NONCOPYABLE(ReapItem)
     UNITY_DEFINES_PTRS(ReapItem);
 
     void refresh() noexcept; // Update time stamp on item to keep it alive. O(1) performance.
@@ -106,9 +107,10 @@ private:
 // It is safe to let a reaper go out of scope while there are still ReapItems for it. The methods
 // on the ReapItem do nothing if they are called after the reaper is gone.
 
-class Reaper final : public std::enable_shared_from_this<Reaper>, private util::NonCopyable
+class Reaper final : public std::enable_shared_from_this<Reaper>
 {
 public:
+    NONCOPYABLE(Reaper)
     UNITY_DEFINES_PTRS(Reaper);
 
     ~Reaper() noexcept;

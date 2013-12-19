@@ -43,14 +43,12 @@ public:
     std::string registry_configfile() const;
     std::string default_middleware() const;
     std::string default_middleware_configfile() const;
-    std::string factory_configfile() const;
 
 private:
     std::string registry_identity_;
     std::string registry_configfile_;
     std::string default_middleware_;
     std::string default_middleware_configfile_;
-    std::string factory_configfile_;
 };
 
 } // namespace internal

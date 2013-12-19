@@ -28,6 +28,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 #include <sstream>
 
 using namespace std;
@@ -115,7 +116,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 
         query_proxy->run(reply);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         try
         {
@@ -124,6 +125,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         catch (...)
         {
         }
+        cerr << "create_query(): " << e.what() << endl;
         // TODO: log error
         throw;
     }
@@ -136,6 +138,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         catch (...)
         {
         }
+        cerr << "create_query(): unknown exception" << endl;
         // TODO: log error
         throw;
     }

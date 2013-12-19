@@ -22,7 +22,7 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 #include <scopes/Category.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/Annotation.h>
 
 #include <string>
 
@@ -47,9 +47,10 @@ Calls to push() and finished() are made by an arbitrary thread.
 // TODO: add doc for thread pool and concurrent calls to push()
 */
 
-class UNITY_API ReceiverBase : private util::NonCopyable
+class UNITY_API ReceiverBase
 {
 public:
+    NONCOPYABLE(ReceiverBase)
     /// @cond
     UNITY_DEFINES_PTRS(ReceiverBase);
 
@@ -60,6 +61,12 @@ public:
     \brief Called once by the scopes run time for each result that is returned by a query().
     */
     virtual void push(CategorisedResult result) = 0;
+
+    /**
+    \brief Called once by the scopes run time for each annotation that is returned by a query().
+    The default implementation does nothing.
+    */
+    virtual void push(Annotation annotation);
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().

@@ -88,19 +88,19 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     {
         query_base_->run(reply_proxy);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         pushable_ = false;
         reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
-        cerr << "An error occurred in ScopeBase::run(): " << e.to_string() << endl;
+        cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         reply_->finished(ReceiverBase::Error);     // Oneway, can't block
         // TODO: log error
-        cerr << "An unknown error occurred in ScopeBase::run()" << endl;
+        cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }
 

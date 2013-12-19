@@ -1,14 +1,17 @@
 add_subdirectory(lttng)
+add_subdirectory(smartscopes)
 add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
@@ -20,6 +23,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp

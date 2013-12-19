@@ -21,7 +21,6 @@
 
 #include <string>
 #include <memory>
-#include <unordered_set>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -43,7 +42,7 @@ public:
     ResultImpl(ResultImpl const& other);
     ResultImpl& operator=(ResultImpl const& other);
 
-    virtual ~ResultImpl();
+    virtual ~ResultImpl() = default;
 
     void store(Result const& other);
     bool has_stored_result() const;
@@ -53,16 +52,15 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
-    void add_metadata(std::string const& key, Variant const& value);
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
 
     std::string uri() const noexcept;
-    std::string title() const;
-    std::string art() const;
+    std::string title() const noexcept;
+    std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
-    bool has_metadata(std::string const& key) const;
-    Variant const& metadata(std::string const& key) const;
+    bool contains(std::string const& key) const;
+    Variant const& value(std::string const& key) const;
 
     VariantMap serialize() const;
 
@@ -71,15 +69,10 @@ protected:
 
 private:
     void deserialize(VariantMap const& var);
-    static void throw_on_non_string(std::string const& name, Variant::Type vtype);
-    static void throw_on_empty(std::string const& name, Variant const& value);
-    static const std::unordered_set<std::string> standard_attrs;
+    void throw_on_non_string(std::string const& name, Variant::Type vtype) const;
+    void throw_on_empty(std::string const& name) const;
 
-    Variant uri_;
-    Variant title_;
-    Variant art_;
-    Variant dnd_uri_;
-    std::shared_ptr<VariantMap> metadata_;
+    VariantMap attrs_;
     std::shared_ptr<VariantMap> stored_result_;
 };
 

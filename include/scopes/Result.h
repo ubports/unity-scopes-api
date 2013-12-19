@@ -66,7 +66,6 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
-    void add_metadata(std::string const& key, Variant const& value);
 
     /**
        \brief Returns reference of a Result attribute.
@@ -86,11 +85,11 @@ public:
     Variant const& operator[](std::string const& key) const;
 
     std::string uri() const noexcept;
-    std::string title() const;
-    std::string art() const;
+    std::string title() const noexcept;
+    std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
-    bool has_metadata(std::string const& key) const;
-    Variant const& metadata(std::string const& key) const;
+    bool contains(std::string const& key) const;
+    Variant const& value(std::string const& key) const;
 
     /**
        \brief Returns a dictionary of all attributes of this Result instance.

@@ -47,9 +47,10 @@ class RuntimeImpl;
 // as pure virtual functions. This is used by the remainder of the code to do things to the middleware
 // without knowing which middleware it actually is.
 
-class MiddlewareBase : private util::NonCopyable
+class MiddlewareBase
 {
 public:
+    NONCOPYABLE(MiddlewareBase)
     UNITY_DEFINES_PTRS(MiddlewareBase);
 
     MiddlewareBase(RuntimeImpl* runtime);

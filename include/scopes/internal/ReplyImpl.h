@@ -36,6 +36,7 @@ namespace scopes
 
 class CategorisedResult;
 class CategoryRenderer;
+class Annotation;
 
 namespace internal
 {
@@ -59,6 +60,7 @@ public:
     Category::SCPtr lookup_category(std::string const& id) const;
 
     bool push(unity::scopes::CategorisedResult const& result);
+    bool push(unity::scopes::Annotation const& annotation);
     void finished();
     void finished(unity::scopes::ReceiverBase::Reason reason);
 

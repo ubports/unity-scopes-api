@@ -70,9 +70,11 @@ namespace internal
 //  int_func(5);
 //
 
-class UNITY_API DynamicLoader : private util::NonCopyable
+class UNITY_API DynamicLoader
 {
 public:
+    NONCOPYABLE(DynamicLoader)
+
     UNITY_DEFINES_PTRS(DynamicLoader);
 
     enum class Binding

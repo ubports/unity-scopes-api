@@ -49,9 +49,10 @@ The application must instantiate a Runtime object only after `main()` is entered
 before leaving `main()`; failure to do so results in undefined behavior.
 */
 
-class UNITY_API Runtime : private util::NonCopyable
+class UNITY_API Runtime
 {
 public:
+    NONCOPYABLE(Runtime)
     /// @cond
     UNITY_DEFINES_PTRS(Runtime);
     /// @endcond

@@ -35,9 +35,10 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeImpl final : private util::NonCopyable
+class RuntimeImpl final
 {
 public:
+    NONCOPYABLE(RuntimeImpl)
     UNITY_DEFINES_PTRS(RuntimeImpl);
 
     static UPtr create(std::string const& scope_name, std::string const& configfile = "");

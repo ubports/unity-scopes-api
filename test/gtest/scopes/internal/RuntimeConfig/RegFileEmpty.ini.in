@@ -1,0 +1,4 @@
+[Runtime]
+Registry.Identity = Registry
+Registry.ConfigFile =
+Default.Middleware = Zmq

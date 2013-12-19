@@ -54,8 +54,7 @@ endif()
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
-pkg_check_modules(UNITY_API libunity-api REQUIRED)
-
+pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 find_program(LTTNG_EXECUTABLE lttng)
@@ -104,22 +103,27 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")   # HACK
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
 
 # -fno-permissive causes warnings with clang, so we only enable it for gcc
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-permissive")
 endif()
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "release" OR "${CMAKE_BUILD_TYPE}" STREQUAL "relwithdebinfo")
+if ("${cmake_build_type_lower}" STREQUAL "release" OR "${cmake_build_type_lower}" STREQUAL "relwithdebinfo")
     option(Werror "Treat warnings as errors" ON)
 else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
 if (Werror)
-    set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+    if ("${cmake_build_type_lower}" STREQUAL "release" OR "${cmake_build_type_lower}" STREQUAL "relwithdebinfo")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=deprecated-declarations")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
+    endif()
 endif()
 
 option(IPC_MONITORING "Enable IPC traffic monitoring")
@@ -134,7 +138,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 4)
+set(UNITY_SCOPES_MICRO 6)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -144,7 +148,7 @@ set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
-  message(FATAL_ERROR "Zmq lib found.")
+  message(FATAL_ERROR "Zmq lib not found.")
 endif()
 
 find_library(ZMQPPLIB zmqpp)
@@ -175,8 +179,9 @@ set(OTHER_LIBS
     ${ZMQLIB}
     ${CAPNPLIB}
     ${KJLIB}
-    pthread
     ${DLLIB}
+    pthread
+    smartscopes
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
@@ -298,7 +303,7 @@ set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
 # Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
-  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} FILTER /usr/include ${CMAKE_SOURCE_DIR}/test/* ${CMAKE_BINARY_DIR}/*)
+  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes FILTER /usr/include ${CMAKE_SOURCE_DIR}/test/* ${CMAKE_BINARY_DIR}/*)
 endif()
 
 #

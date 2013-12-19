@@ -18,12 +18,14 @@
 
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/AnnotationImpl.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
 #include <unity/Exception.h>
 
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::scopes::internal;
@@ -96,6 +98,22 @@ void ReplyObject::push(VariantMap const& result) noexcept
             receiver_base_->push(cat);
         }
 
+        it = result.find("annotation");
+        if (it != result.end())
+        {
+            auto result_var = it->second.get_dict();
+            try
+            {
+                Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+                receiver_base_->push(std::move(annotation));
+            }
+            catch (unity::Exception const& e)
+            {
+                // TODO: this is an internal error; log error
+                finished(ReceiverBase::Error);
+            }
+        }
+
         it = result.find("result");
         if (it != result.end())
         {
@@ -105,16 +123,18 @@ void ReplyObject::push(VariantMap const& result) noexcept
                 CategorisedResult result(*cat_registry_, result_var);
                 receiver_base_->push(std::move(result));
             }
-            catch (unity::Exception const& e)
+            catch (std::exception const& e)
             {
                 // TODO: this is an internal error; log error
+                cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
                 finished(ReceiverBase::Error);
             }
         }
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         // TODO: log error
+        cerr << "ReplyObject::push(VariantMap): " << e.what() << endl;
         try
         {
             finished(ReceiverBase::Error);
@@ -126,6 +146,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     catch (...)
     {
         // TODO: log error
+        cerr << "ReplyObject::push(VariantMap): unknown exception" << endl;
         try
         {
             finished(ReceiverBase::Error);
@@ -166,12 +187,14 @@ void ReplyObject::finished(ReceiverBase::Reason r) noexcept
     {
         receiver_base_->finished(r);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
+        cerr << "ReplyObject::finished(): " << e.what() << endl;
         // TODO: log error
     }
     catch (...)
     {
+        cerr << "ReplyObject::finished(): unknown exception" << endl;
         // TODO: log error
     }
 }

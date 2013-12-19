@@ -47,9 +47,11 @@ namespace zmq_middleware
 class ServantBase;
 class ZmqMiddleware;
 
-class ObjectAdapter final : private util::NonCopyable
+class ObjectAdapter final
 {
 public:
+    NONCOPYABLE(ObjectAdapter)
+
     ObjectAdapter(ZmqMiddleware& mw,
                   std::string const& name,
                   std::string const& endpoint,

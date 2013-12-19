@@ -79,10 +79,6 @@ void ServantBase::safe_dispatch_(Current const& current,
         dispatch_(current, in_params, r);
         return;
     }
-    catch (unity::Exception const& e)
-    {
-        error = e.to_string();
-    }
     catch (std::exception const& e)
     {
         error = e.what();

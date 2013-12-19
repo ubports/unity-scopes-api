@@ -37,6 +37,7 @@ class ReplyImpl;
 }
 
 class CategorisedResult;
+class Annotation;
 
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
@@ -76,6 +77,8 @@ public:
     or the client that sent the query having cancelled that query.
     */
     bool push(CategorisedResult const& result) const;
+
+    bool push(Annotation const& annotation) const;
 
     /**
     \brief Informs the source of a query that the query results are complete.

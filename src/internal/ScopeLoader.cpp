@@ -23,6 +23,7 @@
 #include <unity/util/ResourcePtr.h>
 
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::scopes;
@@ -93,16 +94,14 @@ ScopeLoader::~ScopeLoader() noexcept
     {
         unload();
     }
-    catch (unity::Exception const& e)
-    {
-        // TODO: log error
-    }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
+        cerr << "~ScopeLoader(): " << e.what() << endl;
         // TODO: log error
     }
     catch (...) // LCOV_EXCL_LINE
     {
+        cerr << "~ScopeLoader(): unknown exception" << endl;
         // TODO: log error
     }
 }
