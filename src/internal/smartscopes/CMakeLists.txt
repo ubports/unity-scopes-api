@@ -7,7 +7,7 @@ find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
-include_directories(${JSONCPP_INCLUD_DIRS})
+include_directories(${JSONCPP_INCLUDE_DIRS})
 
 add_library(
     smartscopes SHARED
