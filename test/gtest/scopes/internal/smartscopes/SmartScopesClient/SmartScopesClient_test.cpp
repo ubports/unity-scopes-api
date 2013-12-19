@@ -22,7 +22,6 @@
 
 #include <gtest/gtest.h>
 #include <memory>
-#include <random>
 #include <thread>
 
 using namespace testing;
