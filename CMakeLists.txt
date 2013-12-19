@@ -129,7 +129,7 @@ endif()
 option(THREAD_SANITIZER "Build with -fsanitize=thread (for Clang only)" OFF)
 
 if (IS_CLANG AND THREAD_SANITIZER)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
 endif()
 
 option(IPC_MONITORING "Enable IPC traffic monitoring")
