@@ -20,6 +20,8 @@
 #include <scopes/internal/smartscopes/JsonCppNode.h>
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
+#include <unity/UnityExceptions.h>
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <thread>
@@ -47,26 +49,35 @@ public:
         server_raii()
         {
             int pipefd[2];
-            pipe(pipefd);
+            if (pipe(pipefd) < 0)
+            {
+                throw unity::ResourceException("Pipe creation failed");
+            }
 
             switch (pid_ = fork())
             {
                 case -1:
-                    throw std::exception();
+                    throw unity::ResourceException("Failed to fork process");
                 case 0: // child
-                    close(1);         // close stdout
-                    close(pipefd[0]); // close read
-                    dup(pipefd[1]);   // open write
+                    close(STDOUT_FILENO);   // close stdout
+                    close(pipefd[0]);       // close read
+                    if (dup(pipefd[1]) < 0) // open write
+                    {
+                        throw unity::ResourceException("Write pipe duplication failed");
+                    }
 
                     execl(FAKE_SSS_PATH, "", NULL);
-                    throw std::exception();
+                    throw unity::ResourceException("Failed to execute fake server script");
                 default: // parent
-                    close(0);          // close stdin
-                    close(pipefd[1]);  // close write
-                    dup(pipefd[0]);    // open read
+                    close(STDIN_FILENO);    // close stdin
+                    close(pipefd[1]);       // close write
+                    if (dup(pipefd[0]) < 0) // open read
+                    {
+                        throw unity::ResourceException("Read pipe duplication failed");
+                    }
 
                     char port_str[6];
-                    std::cin.getline(port_str, 5);
+                    read(pipefd[0], port_str, 5);
                     port_ = std::atoi(port_str);
             }
 

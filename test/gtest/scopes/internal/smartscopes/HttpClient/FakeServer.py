@@ -19,8 +19,8 @@
 #
 
 from wsgiref.simple_server import make_server
-import time
 import sys
+import time
 
 def response(environ, start_response):
     if environ['QUERY_STRING'] == 'x':
@@ -46,6 +46,6 @@ while serving == False:
         port += 1
 
 print(str(port))
-sys.stdout.close()
+sys.stdout.flush()
 
 httpd.serve_forever()

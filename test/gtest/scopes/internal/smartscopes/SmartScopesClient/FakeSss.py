@@ -53,6 +53,6 @@ while serving == False:
         port += 1
 
 print(str(port))
-sys.stdout.close()
+sys.stdout.flush()
 
 httpd.serve_forever()
