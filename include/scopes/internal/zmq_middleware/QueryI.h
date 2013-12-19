@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
 
 #include <scopes/internal/MWQuery.h>
 #include <scopes/internal/QueryObject.h>

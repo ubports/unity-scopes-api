@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
 
 #include <capnp/message.h>
 #include <internal/zmq_middleware/capnproto/Message.capnp.h>

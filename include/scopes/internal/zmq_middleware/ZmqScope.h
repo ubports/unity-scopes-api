@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
 
 #include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <scopes/internal/zmq_middleware/ZmqScopeProxyFwd.h>

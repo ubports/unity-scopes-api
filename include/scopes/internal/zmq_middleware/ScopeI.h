@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
 
 #include <scopes/internal/MWScope.h>
 #include <scopes/internal/ScopeObject.h>

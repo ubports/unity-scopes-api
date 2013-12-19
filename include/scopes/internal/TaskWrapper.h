@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_TASKWRAPPER_H
-#define UNITY_API_SCOPES_INTERNAL_TASKWRAPPER_H
+#ifndef UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
+#define UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
 
 #include <memory>
 

@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_CATEGORYREGISTRY_H
-#define UNITY_API_SCOPES_INTERNAL_CATEGORYREGISTRY_H
+#ifndef UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
+#define UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
 
 #include <scopes/Category.h>
 #include <scopes/Variant.h>

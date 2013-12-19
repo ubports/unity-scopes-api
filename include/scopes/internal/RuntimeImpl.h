@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_RUNTIMEIMPL_H
-#define UNITY_API_SCOPES_INTERNAL_RUNTIMEIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
+#define UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
 
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MiddlewareFactory.h>

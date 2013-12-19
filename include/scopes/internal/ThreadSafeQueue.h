@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_THREADSAFEQUEUE_H
-#define UNITY_API_SCOPES_INTERNAL_THREADSAFEQUEUE_H
+#ifndef UNITY_SCOPES_INTERNAL_THREADSAFEQUEUE_H
+#define UNITY_SCOPES_INTERNAL_THREADSAFEQUEUE_H
 
 #include <unity/util/NonCopyable.h>
 

@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
-#define UNITY_API_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
 
 #include <capnp/dynamic.h>
 #include <internal/zmq_middleware/capnproto/Message.capnp.h>

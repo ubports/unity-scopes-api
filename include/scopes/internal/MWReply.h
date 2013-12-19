@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MWREPLY_H
-#define UNITY_API_SCOPES_INTERNAL_MWREPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_MWREPLY_H
+#define UNITY_SCOPES_INTERNAL_MWREPLY_H
 
 #include <scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/MWReplyProxyFwd.h>

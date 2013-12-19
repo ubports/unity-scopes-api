@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_API_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/Registry.h>

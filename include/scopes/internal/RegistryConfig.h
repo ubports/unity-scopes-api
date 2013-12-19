@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYCONFIG_H
-#define UNITY_API_SCOPES_INTERNAL_REGISTRYCONFIG_H
+#ifndef UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
+#define UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
 
 #include <scopes/internal/ConfigBase.h>
 

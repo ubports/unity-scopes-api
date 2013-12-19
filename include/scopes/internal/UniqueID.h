@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_UNIQUEID_H
-#define UNITY_API_SCOPES_INTERNAL_UNIQUEID_H
+#ifndef UNITY_SCOPES_INTERNAL_UNIQUEID_H
+#define UNITY_SCOPES_INTERNAL_UNIQUEID_H
 
 #include <unity/util/NonCopyable.h>
 

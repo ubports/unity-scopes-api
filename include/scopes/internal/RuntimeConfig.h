@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_RUNTIMECONFIG_H
-#define UNITY_API_SCOPES_INTERNAL_RUNTIMECONFIG_H
+#ifndef UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
+#define UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
 
 #include <scopes/internal/ConfigBase.h>
 #include <scopes/Runtime.h>

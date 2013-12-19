@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
-#define UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
 
 #include <scopes/internal/smartscopes/JsonNodeInterface.h>
 
@@ -77,4 +77,4 @@ private:
 
 } // namespace unity
 
-#endif // UNITY_API_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H

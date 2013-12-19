@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
+#ifndef UNITY_REPLYS_INTERNAL_QUERYOBJECT_H
+#define UNITY_REPLYS_INTERNAL_QUERYOBJECT_H
 
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/MWReplyProxyFwd.h>

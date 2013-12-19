@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
-#define UNITY_API_SCOPES_CATEGORYRENDERERIMPL_H
+#ifndef UNITY_SCOPES_CATEGORYRENDERERIMPL_H
+#define UNITY_SCOPES_CATEGORYRENDERERIMPL_H
 
 #include <scopes/CategoryRenderer.h>
 #include <unity/SymbolExport.h>
