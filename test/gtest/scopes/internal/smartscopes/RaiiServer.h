@@ -73,8 +73,8 @@ public:
                     throw unity::ResourceException("Read pipe duplication failed");
                 }
 
-                char port_str[6];
-                read(pipefd[0], port_str, 5);
+                char port_str[10];
+                read(pipefd[0], port_str, sizeof(port_str));
                 port_ = std::atoi(port_str);
         }
 
