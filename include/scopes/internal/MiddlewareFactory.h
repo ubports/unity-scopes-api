@@ -39,9 +39,10 @@ class RuntimeImpl;
 //
 // This class is thread-safe.
 
-class MiddlewareFactory final : private util::NonCopyable
+class MiddlewareFactory final
 {
 public:
+    NONCOPYABLE(MiddlewareFactory)
     UNITY_DEFINES_PTRS(MiddlewareFactory);
 
     MiddlewareFactory(RuntimeImpl* runtime);
