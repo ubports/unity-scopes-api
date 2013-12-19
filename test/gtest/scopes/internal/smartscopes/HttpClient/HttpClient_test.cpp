@@ -72,7 +72,8 @@ public:
     public:
         server_raii()
         {
-            const char* const argv[] = { FAKE_SERVER_PATH, std::to_string(getpid()).c_str(), NULL };
+            std::string pidstr = std::to_string(getpid());
+            const char* const argv[] = { FAKE_SERVER_PATH, pidstr.c_str(), NULL };
 
             switch (pid_ = fork())
             {
