@@ -20,6 +20,10 @@
 #include <scopes/internal/smartscopes/JsonCppNode.h>
 #include <scopes/internal/smartscopes/SmartScopesClient.h>
 
+#include <unity/UnityExceptions.h>
+
+#include "../RaiiServer.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <thread>
@@ -27,6 +31,7 @@
 using namespace testing;
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::api::test::scopes::internal::smartscopes;
 
 namespace
 {
@@ -37,49 +42,20 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(2)),
           json_node_(new JsonCppNode()),
-          ssc_(new SmartScopesClient(http_client_, json_node_, "http://127.0.0.1", 9009))
+          server_(FAKE_SSS_PATH)
     {
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", server_.port_);
     }
-
-    class server_raii
-    {
-    public:
-        server_raii()
-        {
-            const char* const argv[] = { FAKE_SSS_PATH, "", NULL };
-
-            switch (pid_ = fork())
-            {
-                case -1:
-                    throw std::exception();
-                case 0: // child
-                    execv(argv[0], (char * const*) argv);
-                    throw std::exception();
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-        ~server_raii()
-        {
-            kill(pid_, SIGKILL);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-
-    private:
-        pid_t pid_ = -1;
-    };
 
 protected:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient::SPtr ssc_;
+    RaiiServer server_;
 };
 
 TEST_F(SmartScopesClientTest, remote_scopes)
 {
-    server_raii server;
-
     std::vector<RemoteScope> scopes = ssc_->get_remote_scopes();
 
     ASSERT_EQ(2, scopes.size());
@@ -95,8 +71,6 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
 TEST_F(SmartScopesClientTest, search)
 {
-    server_raii server;
-
     auto search_handle = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
@@ -123,8 +97,6 @@ TEST_F(SmartScopesClientTest, search)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    server_raii server;
-
     auto search_handle1 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
     auto search_handle2 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
 
