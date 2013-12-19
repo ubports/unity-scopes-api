@@ -70,6 +70,10 @@ public:
 
                 char port_str[10];
                 ssize_t bytes_read = read(pipefd[0], port_str, sizeof(port_str) - 1);
+                if(bytes_read < 0)
+                {
+                    throw unity::ResourceException("Failed to read from pipe");
+                }
                 port_str[bytes_read] = '\0';
 
                 port_ = std::atoi(port_str);
