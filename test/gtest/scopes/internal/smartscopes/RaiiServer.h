@@ -69,8 +69,8 @@ public:
                 close(pipefd[1]);       // close write
 
                 char port_str[10];
-                read(pipefd[0], port_str, sizeof(port_str) - 1);
-                port_str[sizeof(port_str) - 1] = '\0';
+                ssize_t bytes_read = read(pipefd[0], port_str, sizeof(port_str) - 1);
+                port_str[bytes_read] = '\0';
 
                 port_ = std::atoi(port_str);
         }
