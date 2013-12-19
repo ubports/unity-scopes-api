@@ -96,6 +96,11 @@ To run the static C++ checks:
 
     $ make cppcheck
 
+Thread sanitizer
+----------------
+
+For Clang, pass -DTHREAD_SANITIZER=ON to cmake to enable the thread sanitizer.
+
 Debugging IPC
 -------------
 
