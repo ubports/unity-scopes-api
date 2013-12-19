@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RUNTIME_H
-#define UNITY_API_SCOPES_RUNTIME_H
+#ifndef UNITY_SCOPES_RUNTIME_H
+#define UNITY_SCOPES_RUNTIME_H
 
 #include <scopes/RegistryProxyFwd.h>
 #include <unity/util/DefinesPtrs.h>

@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_RESULT_H
-#define UNITY_API_SCOPES_RESULT_H
+#ifndef UNITY_SCOPES_RESULT_H
+#define UNITY_SCOPES_RESULT_H
 
 #include <scopes/Variant.h>
 #include <string>

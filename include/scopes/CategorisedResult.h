@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORISEDRESULT_H
-#define UNITY_API_SCOPES_CATEGORISEDRESULT_H
+#ifndef UNITY_SCOPES_CATEGORISEDRESULT_H
+#define UNITY_SCOPES_CATEGORISEDRESULT_H
 
 #include <scopes/Result.h>
 #include <scopes/Category.h>

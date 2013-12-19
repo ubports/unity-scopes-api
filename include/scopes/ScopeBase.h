@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_SCOPEBASE_H
-#define UNITY_API_SCOPES_SCOPEBASE_H
+#ifndef UNITY_SCOPES_SCOPEBASE_H
+#define UNITY_SCOPES_SCOPEBASE_H
 
 #include <scopes/QueryBase.h>
 #include <scopes/RegistryProxyFwd.h>
@@ -26,32 +26,32 @@
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
 */
-#define UNITY_API_SCOPE_CREATE_FUNCTION unity_api_scope_create
+#define UNITY_SCOPE_CREATE_FUNCTION unity_scope_create
 
 /**
 \brief Expands to the identifier of the scope destroy function. @hideinitializer
 */
-#define UNITY_API_SCOPE_DESTROY_FUNCTION unity_api_scope_destroy
+#define UNITY_SCOPE_DESTROY_FUNCTION unity_scope_destroy
 
 // Convenience definitions for looking up the create and destroy functions in the symbol table
 // of a dynamically loaded scope.
-// UNITY_API_SCOPE_CREATE_SYMSTR and UNITY_API_SCOPE_DESTROY_SYMSTR expand to a string literal containing the name
+// UNITY_SCOPE_CREATE_SYMSTR and UNITY_SCOPE_DESTROY_SYMSTR expand to a string literal containing the name
 // of the create and destroy function, respectively.
 
 #ifndef DOXYGEN_SKIP
-#    define UNITY_API_SCOPE_STR(sym) #sym
-#    define UNITY_API_SCOPE_XSTR(sym) UNITY_API_SCOPE_STR(sym)
+#    define UNITY_SCOPE_STR(sym) #sym
+#    define UNITY_SCOPE_XSTR(sym) UNITY_SCOPE_STR(sym)
 #endif
 
 /**
 \brief Expands to the identifier of the scope create function as a string literal. @hideinitializer
 */
-#define UNITY_API_SCOPE_CREATE_SYMSTR UNITY_API_SCOPE_XSTR(UNITY_API_SCOPE_CREATE_FUNCTION)
+#define UNITY_SCOPE_CREATE_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_CREATE_FUNCTION)
 
 /**
 \brief Expands to the identifier of the scope destroy function as a string literal. @hideinitializer
 */
-#define UNITY_API_SCOPE_DESTROY_SYMSTR UNITY_API_SCOPE_XSTR(UNITY_API_SCOPE_DESTROY_FUNCTION)
+#define UNITY_SCOPE_DESTROY_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_DESTROY_FUNCTION)
 
 namespace unity
 {
@@ -92,18 +92,18 @@ there is no requirement that the derived class instance must be heap-allocated.)
 If the create function throws an exception, the destroy function will not be called. If the create function returns
 NULL, the destroy function _will_ be called with NULL as its argument.
 
-Rather than hard-coding the names of the functions, use the #UNITY_API_SCOPE_CREATE_FUNCTION and
-#UNITY_API_SCOPE_DESTROY_FUNCTION macros, for example:
+Rather than hard-coding the names of the functions, use the #UNITY_SCOPE_CREATE_FUNCTION and
+#UNITY_SCOPE_DESTROY_FUNCTION macros, for example:
 
 ~~~
 unity::api::scopes::ScopeBase*
-UNITY_API_SCOPE_CREATE_FUNCTION()
+UNITY_SCOPE_CREATE_FUNCTION()
 {
     return new MyScope; // Example only, heap-allocation is not mandatory
 }
 
 void
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
+UNITY_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
 {
     delete scope;       // Example only, heap-allocation is not mandatory
 }
@@ -208,7 +208,7 @@ destroy function is called by the scopes run time.
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
 */
-extern "C" unity::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION();
+extern "C" unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION();
 
 /**
 \brief The function called by the scopes run time to finalize the scope.
@@ -216,7 +216,7 @@ The passed pointer is the pointer that was returned by the create function.
 
 Exceptions thrown by the destroy function are ignored.
 */
-extern "C" void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase*);
+extern "C" void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase*);
 
 namespace unity
 {
@@ -227,12 +227,12 @@ namespace scopes
 /**
 \brief Convenience typedef for the create function pointer.
 */
-typedef decltype(&UNITY_API_SCOPE_CREATE_FUNCTION) CreateFunction;
+typedef decltype(&UNITY_SCOPE_CREATE_FUNCTION) CreateFunction;
 
 /**
 \brief Convenience typedef for the destroy function pointer.
 */
-typedef decltype(&UNITY_API_SCOPE_DESTROY_FUNCTION) DestroyFunction;
+typedef decltype(&UNITY_SCOPE_DESTROY_FUNCTION) DestroyFunction;
 
 } // namespace scopes
 

@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
+#ifndef UNITY_SCOPES_REPLYPROXY_H
+#define UNITY_SCOPES_REPLYPROXY_H
 
 #include <memory>
 

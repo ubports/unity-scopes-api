@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_OBJECTPROXY_H
-#define UNITY_API_SCOPES_OBJECTPROXY_H
+#ifndef UNITY_SCOPES_OBJECTPROXY_H
+#define UNITY_SCOPES_OBJECTPROXY_H
 
 #include <scopes/ObjectProxyFwd.h>
 #include <unity/SymbolExport.h>

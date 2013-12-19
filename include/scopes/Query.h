@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_QUERY_H
-#define UNITY_API_SCOPES_QUERY_H
+#ifndef UNITY_SCOPES_QUERY_H
+#define UNITY_SCOPES_QUERY_H
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>

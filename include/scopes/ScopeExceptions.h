@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_SCOPEEXCEPTIONS_H
-#define UNITY_API_SCOPES_SCOPEEXCEPTIONS_H
+#ifndef UNITY_SCOPES_SCOPEEXCEPTIONS_H
+#define UNITY_SCOPES_SCOPEEXCEPTIONS_H
 
 #include <unity/Exception.h>
 

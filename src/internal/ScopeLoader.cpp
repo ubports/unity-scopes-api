@@ -53,10 +53,10 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
 
     // Look for the scope create and destroy functions in the plug-in.
     CreateFunction create_func = reinterpret_cast<CreateFunction>(
-                                     dyn_loader_->find_function(UNITY_API_SCOPE_CREATE_SYMSTR)
+                                     dyn_loader_->find_function(UNITY_SCOPE_CREATE_SYMSTR)
                                  );
     DestroyFunction destroy_func = reinterpret_cast<DestroyFunction>(
-                                       dyn_loader_->find_function(UNITY_API_SCOPE_DESTROY_SYMSTR)
+                                       dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR)
                                    );
 
     // Make a new thread. The thread initializes the scope and then waits for commands to transition
@@ -288,7 +288,7 @@ void ScopeLoader::run_scope(CreateFunction create_func, DestroyFunction destroy_
             scope_state_ = ScopeState::Failed;
             exception_ = make_exception_ptr(
                              unity::ResourceException("Scope " + scope_name_ +
-                                                      " returned nullptr from " + UNITY_API_SCOPE_CREATE_SYMSTR));
+                                                      " returned nullptr from " + UNITY_SCOPE_CREATE_SYMSTR));
             state_changed_.notify_all();
             return;
         }

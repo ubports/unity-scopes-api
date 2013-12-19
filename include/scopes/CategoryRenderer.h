@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_CATEGORYRENDERER_H
-#define UNITY_API_SCOPES_CATEGORYRENDERER_H
+#ifndef UNITY_SCOPES_CATEGORYRENDERER_H
+#define UNITY_SCOPES_CATEGORYRENDERER_H
 
 #include <string>
 #include <memory>

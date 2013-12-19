@@ -16,21 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#if !defined(UNITY_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H) || defined(TRACEPOINT_HEADER_MULTI_READ)
-#define UNITY_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H
+#define TRACEPOINT_CREATE_PROBES
 
-#undef TRACEPOINT_PROVIDER
-#undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_PROVIDER unity_scopes_api
-#define TRACEPOINT_INCLUDE <scopes/internal/lttng/UnityScopesApi_tp.h>
-
-#include <scopes/internal/lttng/SimpleTracepoint.h>
-#include <stdint.h>
-
-SIMPLE_TRACEPOINT(
-  trace,
-  TRACE_DEBUG,
-  stp_integer(int, value)
-)
-
-#endif /* UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H */
+#include <scopes/internal/lttng/UnityScopes_tp.h>
+#include <lttng/tracepoint-event.h>

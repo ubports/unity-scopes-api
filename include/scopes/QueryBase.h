@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_QUERYBASE_H
-#define UNITY_API_SCOPES_QUERYBASE_H
+#ifndef UNITY_SCOPES_QUERYBASE_H
+#define UNITY_SCOPES_QUERYBASE_H
 
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ReplyProxyFwd.h>
