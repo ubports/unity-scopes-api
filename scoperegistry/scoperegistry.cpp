@@ -155,10 +155,10 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
 // and add an entry to the RegistryObject.
 
 void populate_registry(RegistryObject::SPtr const& registry,
-        map<string, string> const& all_scopes,
-        MiddlewareBase::SPtr const& mw,
-        string const& scoperunner_path,
-        string const& config_file)
+                       map<string, string> const& all_scopes,
+                       MiddlewareBase::SPtr const& mw,
+                       string const& scoperunner_path,
+                       string const& config_file)
 {
     for (auto pair : all_scopes)
     {

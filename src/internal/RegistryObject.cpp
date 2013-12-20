@@ -48,7 +48,8 @@ static bool is_dead(pid_t pid)
  * functionality come via RegistyObject, which takes care of locking.
  */
 
-class RegistryObjectPrivate final {
+class RegistryObjectPrivate final
+{
 public:
     RegistryObjectPrivate(RegistryObjectPrivate const&) = delete;
     RegistryObjectPrivate& operator=(RegistryObjectPrivate const&) = delete;
@@ -59,7 +60,7 @@ public:
     ScopeProxy get_scope(std::string const& scope_name);
     MetadataMap list();
     bool add(std::string const& scope_name, ScopeMetadata const& metadata,
-            std::vector<std::string> const& spawn_command);
+             std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
 
 private:
@@ -75,16 +76,20 @@ private:
 
 RegistryObjectPrivate::~RegistryObjectPrivate()
 {
-    try {
+    try
+    {
         shutdown();
-    } catch(...) {
+    }
+    catch (...)
+    {
         // FIXME, write error log.
     }
 }
 
 void RegistryObjectPrivate::shutdown()
 {
-    for(const auto &i : scope_processes) {
+    for (const auto &i : scope_processes)
+    {
         // Currently just shoot children dead.
         // If we want to get fancy and give them a graceful
         // warning, this is the place to do it.
@@ -115,11 +120,13 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
 ScopeProxy RegistryObjectPrivate::get_scope(std::string const& scope_name)
 {
     auto metadata = scopes.find(scope_name);
-    if(metadata == scopes.end()) {
+    if (metadata == scopes.end())
+    {
         throw NotFoundException("Tried to obtain unknown scope", scope_name);
     }
     auto search = scope_processes.find(scope_name);
-    if(search == scope_processes.end() || is_dead(search->second)) {
+    if (search == scope_processes.end() || is_dead(search->second))
+    {
         spawn_scope(scope_name);
     }
     return metadata->second.proxy();
@@ -127,14 +134,18 @@ ScopeProxy RegistryObjectPrivate::get_scope(std::string const& scope_name)
 
 void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
 {
-    if(scopes.find(scope_name) == scopes.end())
+    if (scopes.find(scope_name) == scopes.end())
+    {
         throw NotFoundException("Tried to spawn an unknown scope.", scope_name);
+    }
     auto process = scope_processes.find(scope_name);
-    if(process != scope_processes.end()) {
+    if (process != scope_processes.end())
+    {
         assert(is_dead(process->second));
         int status;
         waitpid(process->second, &status, 0);
-        if(status != 0) {
+        if (status != 0)
+        {
             // FIXME, print log message.
         }
         scope_processes.erase(scope_name);
@@ -149,7 +160,7 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         }
         case 0: // child
         {
-            const vector<string> &cmd = commands[scope_name];
+            const vector<string>& cmd = commands[scope_name];
             assert(cmd.size() == 3);
             // Includes room for final NULL element.
             unique_ptr<char const* []> argv(new char const*[4]);
@@ -171,7 +182,7 @@ MetadataMap RegistryObjectPrivate::list()
 }
 
 bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata,
-        std::vector<std::string> const& spawn_command)
+                                std::vector<std::string> const& spawn_command)
 {
     if (scope_name.empty())
     {
@@ -180,7 +191,8 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
     // TODO: check for names containing a slash, because that won't work if we use
     //       the name for a socket in the file system.
 
-    if(scopes.find(scope_name) != scopes.end()) {
+    if (scopes.find(scope_name) != scopes.end())
+    {
         scopes.erase(scope_name);
         commands.erase(scope_name);
     }
@@ -217,7 +229,8 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
     return p->get_metadata(scope_name);
 }
 
-ScopeProxy RegistryObject::get_scope(std::string const& scope_name) {
+ScopeProxy RegistryObject::get_scope(std::string const& scope_name)
+{
     lock_guard<decltype(mutex_)> lock(mutex_);
     return p->get_scope(scope_name);
 }
@@ -229,7 +242,7 @@ MetadataMap RegistryObject::list()
 }
 
 bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata,
-        std::vector<std::string> const& spawn_command)
+                         std::vector<std::string> const& spawn_command)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return p->add(scope_name, metadata, spawn_command);
