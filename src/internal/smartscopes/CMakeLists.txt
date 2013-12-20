@@ -15,7 +15,7 @@ add_library(
     HttpClientQt.cpp
     JsonCppNode.cpp
 
-    ${CMAKE_SOURCE_DIR}/include/scopes/internal/smartscopes/HttpClientQtThread.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/internal/smartscopes/HttpClientQtThread.h
     HttpClientQtThread.cpp
 
     SmartScopesClient.cpp
