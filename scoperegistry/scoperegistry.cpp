@@ -212,7 +212,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
         }
     }
 }
-
+// Not needed any more. Remove once registry spawner works.
 void run_scopes(SignalThread& sigthread,
                 string const& scoperunner_path,
                 string const& config_file,
@@ -262,9 +262,6 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
 
     int exit_status = 1;
-
-    // Run a separate thread to deal with SIGCHLD. This allows us to report when a scope process exits abnormally.
-    SignalThread signal_thread;
 
     try
     {
