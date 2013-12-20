@@ -21,6 +21,7 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 namespace unity
 {
@@ -78,14 +79,19 @@ public:
 
                 port_ = std::atoi(port_str);
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     ~RaiiServer()
     {
         kill(pid_, SIGABRT);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+        pid_t result = 0;
+        while(result == 0)
+        {
+            int status;
+            result = waitpid(pid_, &status, WNOHANG);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
 
     pid_t pid_ = -1;
