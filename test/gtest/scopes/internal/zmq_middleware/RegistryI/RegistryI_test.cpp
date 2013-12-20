@@ -57,6 +57,7 @@ TEST(RegistryI, get_metadata)
 {
     try
     {
+        vector<string> dummy_spawn_command;
         RuntimeImpl::UPtr runtime = RuntimeImpl::create(
             "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
@@ -70,7 +71,8 @@ TEST(RegistryI, get_metadata)
         RegistryObject::SPtr ro(make_shared<RegistryObject>());
         auto registry = middleware->add_registry_object(identity, ro);
         auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", p, middleware))));
+        EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", p, middleware)),
+                dummy_spawn_command));
 
         auto r = runtime->registry();
         auto scope = r->get_metadata("scope1");
@@ -102,8 +104,10 @@ TEST(RegistryI, list)
     auto scopes = r->list();
     EXPECT_TRUE(scopes.empty());
 
+    vector<string> dummy_spawn_command;
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
+    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+            dummy_spawn_command));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
@@ -116,7 +120,8 @@ TEST(RegistryI, list)
     for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        EXPECT_TRUE(ro->add(long_id, move(make_meta(long_id, proxy, middleware))));
+        EXPECT_TRUE(ro->add(long_id, move(make_meta(long_id, proxy, middleware)),
+                dummy_spawn_command));
         ids.insert(long_id);
     }
     scopes = r->list();
@@ -148,12 +153,15 @@ TEST(RegistryI, add_remove)
     auto scopes = r->list();
     EXPECT_TRUE(scopes.empty());
 
+    vector<string> dummy_spawn_command;
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
+    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+            dummy_spawn_command));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
-    EXPECT_FALSE(ro->add("scope1", move(make_meta("scope1", proxy, middleware))));
+    EXPECT_FALSE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+            dummy_spawn_command));
 
     EXPECT_TRUE(ro->remove("scope1"));
     scopes = r->list();
@@ -164,7 +172,8 @@ TEST(RegistryI, add_remove)
     for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        ro->add(long_id, move(make_meta(long_id, proxy, middleware)));
+        ro->add(long_id, move(make_meta(long_id, proxy, middleware)),
+                dummy_spawn_command);
         ids.insert(long_id);
     }
     scopes = r->list();
@@ -190,9 +199,10 @@ TEST(RegistryI, exceptions)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    vector<string> dummy_spawn_command;
     auto registry = middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    ro->add("scope1", move(make_meta("scope1", proxy, middleware)));
+    ro->add("scope1", move(make_meta("scope1", proxy, middleware)), dummy_spawn_command);
 
     auto r = runtime->registry();
 
@@ -222,7 +232,7 @@ TEST(RegistryI, exceptions)
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        ro->add("", move(make_meta("blah", proxy, middleware)));
+        ro->add("", move(make_meta("blah", proxy, middleware)), dummy_spawn_command);
         FAIL();
     }
     catch (InvalidArgumentException const& e)

@@ -183,7 +183,7 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
         scopes.erase(scope_name);
         commands.erase(scope_name);
     }
-    scopes[scope_name] = metadata;
+    scopes.insert(make_pair(scope_name, metadata));
     commands[scope_name] = spawn_command;
     return true;
 }
