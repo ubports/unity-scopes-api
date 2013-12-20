@@ -84,14 +84,8 @@ public:
     ~RaiiServer()
     {
         kill(pid_, SIGABRT);
-
-        pid_t result = 0;
-        while(result == 0)
-        {
-            int status;
-            result = waitpid(pid_, &status, WNOHANG);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        int status;
+        waitpid(pid_, &status, 0);
     }
 
     pid_t pid_ = -1;
