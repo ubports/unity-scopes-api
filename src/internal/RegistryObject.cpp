@@ -92,6 +92,7 @@ void RegistryObjectPrivate::shutdown()
         waitpid(i.second, nullptr, 0);
     }
     scope_processes.clear();
+    commands.clear();
 }
 
 ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
