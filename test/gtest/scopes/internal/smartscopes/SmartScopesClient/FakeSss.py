@@ -19,6 +19,7 @@
 #
 
 from wsgiref.simple_server import make_server
+import sys
 
 def response(environ, start_response):
     status = '200 OK'
@@ -43,11 +44,15 @@ search_response = '\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
 serving = False
+port = 1024
 while serving == False:
     try:
-        httpd = make_server('127.0.0.1', 9009, response)
+        httpd = make_server('127.0.0.1', port, response)
         serving = True
     except:
-        serving = False
+        port += 1
+
+print(str(port))
+sys.stdout.flush()
 
 httpd.serve_forever()

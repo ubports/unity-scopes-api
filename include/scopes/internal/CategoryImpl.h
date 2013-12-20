@@ -37,9 +37,11 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API CategoryImpl : private util::NonCopyable
+class UNITY_API CategoryImpl
 {
 public:
+    NONCOPYABLE(CategoryImpl)
+
     CategoryImpl(VariantMap const& variant_map);
     CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     std::string const& id() const;
