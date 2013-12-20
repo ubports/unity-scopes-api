@@ -139,6 +139,10 @@ public:
     // the total number of items).
     static SPtr create(int reap_interval, int expiry_interval, DestroyPolicy p = NoCallbackOnDestroy);
 
+    // Destroys the reaper and returns once any remaining items have been reaped (depending on the
+    // destroy policy). The destructor implicitly calls destroy().
+    void destroy();
+
     // Adds a new item to the reaper. The reaper calls cb once the item has not been refreshed for at
     // least expiry_interval seconds. O(1) performance.
     // The callback passed to add() must not block for any length of time. We have only one reaper
@@ -154,8 +158,9 @@ public:
 private:
     Reaper(int reap_interval, int expiry_interval, DestroyPolicy p);
     void set_self() noexcept;
+    void start();
 
-    void run();                             // Start function for reaper thread
+    void reap_func();                       // Start function for reaper thread
 
     void remove_zombies(reaper_private::Reaplist const&) noexcept;   // Invokes callbacks for expired entries
 
