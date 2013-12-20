@@ -54,7 +54,8 @@ public:
     MetadataMap list();
     ScopeProxy get_scope(std::string const& scope_name);
 
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
+    bool add(std::string const& scope_name, ScopeMetadata const& scope,
+            std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
 
 private:

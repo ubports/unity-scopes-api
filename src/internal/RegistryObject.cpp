@@ -58,13 +58,15 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_name);
     ScopeProxy get_scope(std::string const& scope_name);
     MetadataMap list();
-    bool add(std::string const& scope_name, ScopeMetadata const& metadata);
+    bool add(std::string const& scope_name, ScopeMetadata const& metadata,
+            std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
 
 private:
 
     MetadataMap scopes;
     std::map<std::string, pid_t> scope_processes;
+    std::map<std::string, std::vector<std::string>> commands;
 
     void spawn_scope(std::string const& scope_name);
     void shutdown();
@@ -146,12 +148,19 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         }
         case 0: // child
         {
-            // Do we need to reset signal mask in the new process?
-            //execv(argv[0], const_cast<char* const*>(argv.get()));
+            const vector<string> &cmd = commands[scope_name];
+            assert(cmd.size() == 3);
+            // Includes room for final NULL element.
+            unique_ptr<char const* []> argv(new char const*[4]);
+            argv[0] = cmd[0].c_str();
+            argv[1] = cmd[1].c_str();
+            argv[2] = cmd[2].c_str();
+            argv[3] = nullptr;
+            execv(argv[0], const_cast<char* const*>(argv.get()));
             throw SyscallException("cannot exec scoperunner", errno);
         }
     }
-
+    // FIXME print spawn info to log.
     scope_processes[scope_name] = pid;
 }
 
@@ -160,7 +169,8 @@ MetadataMap RegistryObjectPrivate::list()
     return scopes;
 }
 
-bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata)
+bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata,
+        std::vector<std::string> const& spawn_command)
 {
     if (scope_name.empty())
     {
@@ -169,14 +179,12 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
     // TODO: check for names containing a slash, because that won't work if we use
     //       the name for a socket in the file system.
 
-    auto const& pair = scopes.insert(make_pair(scope_name, metadata));
-    if (!pair.second)
-    {
-        // Replace already existing entry with this one
-        scopes.erase(pair.first);
-        scopes.insert(make_pair(scope_name, metadata));
-        return false;
+    if(scopes.find(scope_name) != scopes.end()) {
+        scopes.erase(scope_name);
+        commands.erase(scope_name);
     }
+    scopes[scope_name] = metadata;
+    commands[scope_name] = spawn_command;
     return true;
 }
 
@@ -188,6 +196,7 @@ bool RegistryObjectPrivate::remove(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
+    commands.erase(scope_name);
     return scopes.erase(scope_name) == 1;
 }
 
@@ -218,10 +227,11 @@ MetadataMap RegistryObject::list()
     return p->list();
 }
 
-bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
+bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata,
+        std::vector<std::string> const& spawn_command)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    return p->add(scope_name, metadata);
+    return p->add(scope_name, metadata, spawn_command);
 }
 
 bool RegistryObject::remove(std::string const& scope_name)
