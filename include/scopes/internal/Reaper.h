@@ -81,7 +81,7 @@ class Reaper;
 class ReapItem final
 {
 public:
-    NONCOPYABLE(ReapItem)
+    NONCOPYABLE(ReapItem);
     UNITY_DEFINES_PTRS(ReapItem);
 
     void refresh() noexcept; // Update time stamp on item to keep it alive. O(1) performance.
@@ -113,7 +113,7 @@ private:
 class Reaper final : public std::enable_shared_from_this<Reaper>
 {
 public:
-    NONCOPYABLE(Reaper)
+    NONCOPYABLE(Reaper);
     UNITY_DEFINES_PTRS(Reaper);
 
     ~Reaper() noexcept;
