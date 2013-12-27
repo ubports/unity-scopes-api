@@ -36,7 +36,7 @@ namespace internal
 
 // ScopeLoader loads the .so for a scope and TODO: complete this and updated comments below.
 
-class UNITY_API ScopeLoader final : public util::NonCopyable
+class UNITY_API ScopeLoader final
 {
 public:
     NONCOPYABLE(ScopeLoader)
