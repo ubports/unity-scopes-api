@@ -56,7 +56,7 @@ struct Current
 class ServantBase
 {
 public:
-    NONCOPYABLE(ServantBase)
+    NONCOPYABLE(ServantBase);
 
     void safe_dispatch_(Current const& current,
                         capnp::ObjectPointer::Reader& in_params,

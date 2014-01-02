@@ -125,9 +125,8 @@ call to stop() in a timely manner.
 class UNITY_API ScopeBase
 {
 public:
-    NONCOPYABLE(ScopeBase)
-
     /// @cond
+    NONCOPYABLE(ScopeBase);
     virtual ~ScopeBase() noexcept;
     /// @endcond
 

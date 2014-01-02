@@ -39,9 +39,10 @@ namespace internal
 namespace smartscopes
 {
 
-class HttpResponseHandle : private util::NonCopyable
+class HttpResponseHandle
 {
 public:
+    NONCOPYABLE(HttpResponseHandle);
     UNITY_DEFINES_PTRS(HttpResponseHandle);
 
     HttpResponseHandle(uint session_id, std::shared_future<std::string> future)
@@ -68,9 +69,10 @@ private:
     std::shared_future<std::string> future_;
 };
 
-class HttpClientInterface : private util::NonCopyable
+class HttpClientInterface
 {
 public:
+    NONCOPYABLE(HttpClientInterface);
     UNITY_DEFINES_PTRS(HttpClientInterface);
 
     HttpClientInterface() = default;

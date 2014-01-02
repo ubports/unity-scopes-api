@@ -40,7 +40,7 @@ namespace internal
 class UNITY_API CategoryImpl
 {
 public:
-    NONCOPYABLE(CategoryImpl)
+    NONCOPYABLE(CategoryImpl);
 
     CategoryImpl(VariantMap const& variant_map);
     CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);

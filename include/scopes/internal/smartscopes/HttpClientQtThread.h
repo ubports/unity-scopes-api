@@ -28,12 +28,13 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
-class Q_DECL_EXPORT HttpClientQtThread : public QThread,
-    private unity::util::NonCopyable
+class Q_DECL_EXPORT HttpClientQtThread : public QThread
 {
     Q_OBJECT
 
 public:
+    NONCOPYABLE(HttpClientQtThread);
+
     HttpClientQtThread(const QUrl& url, uint timeout);
     ~HttpClientQtThread();
 
