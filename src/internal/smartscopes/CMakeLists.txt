@@ -9,8 +9,8 @@ pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
-if(NOT JSONCPP_LIBRARY)
-  message(FATAL_ERROR "Jscon-cpp lib not found.")
+if(NOT JSONCPP_FOUND)
+  message(FATAL_ERROR "Dependency jsoncpp not found.")
 endif()
 
 add_library(
