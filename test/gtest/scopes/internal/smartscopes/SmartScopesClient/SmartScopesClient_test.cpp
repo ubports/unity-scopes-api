@@ -62,7 +62,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo", scopes[0].search_url);
-    EXPECT_EQ(false, scopes[0].invisible);
+    EXPECT_FALSE(scopes[0].invisible);
 
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url);

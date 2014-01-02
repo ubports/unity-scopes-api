@@ -39,7 +39,7 @@ namespace internal
 class UNITY_API ScopeLoader final
 {
 public:
-    NONCOPYABLE(ScopeLoader)
+    NONCOPYABLE(ScopeLoader);
     UNITY_DEFINES_PTRS(ScopeLoader);
 
     // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy

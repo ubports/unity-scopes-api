@@ -53,8 +53,8 @@ Calls to push() and finished() are made by an arbitrary thread.
 class UNITY_API ReceiverBase
 {
 public:
-    NONCOPYABLE(ReceiverBase)
     /// @cond
+    NONCOPYABLE(ReceiverBase);
     UNITY_DEFINES_PTRS(ReceiverBase);
 
     virtual ~ReceiverBase() noexcept;

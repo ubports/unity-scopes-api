@@ -35,6 +35,9 @@ HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
 HttpClientQtThread::~HttpClientQtThread()
 {
     cancel();
+
+    delete reply_;
+    delete manager_;
 }
 
 void HttpClientQtThread::run()
@@ -72,14 +75,7 @@ void HttpClientQtThread::cancel()
 
     if (reply_)
     {
-        delete reply_;
-        reply_ = nullptr;
-    }
-
-    if (manager_)
-    {
-        delete manager_;
-        manager_ = nullptr;
+        reply_->abort();
     }
 
     quit();
