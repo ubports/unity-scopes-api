@@ -103,8 +103,8 @@ TEST(OptionSelectorFilter, multi_selection)
 TEST(OptionSelectorFilter, serialize)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
-    auto option1 = filter1->add_option("1", "Option 1");
-    auto option2 = filter1->add_option("2", "Option 2");
+    filter1->add_option("1", "Option 1");
+    filter1->add_option("2", "Option 2");
 
     auto var = filter1->serialize();
     EXPECT_EQ("f1", var["id"].get_string());
@@ -161,5 +161,4 @@ TEST(OptionSelectorFilter, deserialize)
         EXPECT_EQ(1, filter.options().size());
         EXPECT_EQ("1", filter.options().front()->id());
     }
-
 }
