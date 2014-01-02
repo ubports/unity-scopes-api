@@ -83,7 +83,6 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
     in_params.setName(scope_name.c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
     auto receiver = future.get();
     auto segments = receiver->receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -119,7 +118,6 @@ MetadataMap ZmqRegistry::list()
     make_request_(request_builder, "list");
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
     auto receiver = future.get();
     auto segments = receiver->receive();
     capnp::SegmentArrayMessageReader reader(segments);
