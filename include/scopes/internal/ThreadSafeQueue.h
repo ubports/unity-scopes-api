@@ -47,7 +47,7 @@ template<typename T>
 class ThreadSafeQueue final
 {
 public:
-    NONCOPYABLE(ThreadSafeQueue)
+    NONCOPYABLE(ThreadSafeQueue);
     typedef T value_type;
 
     ThreadSafeQueue();
