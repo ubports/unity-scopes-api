@@ -46,7 +46,7 @@ namespace internal
 class UniqueID
 {
 public:
-    NONCOPYABLE(UniqueID)
+    NONCOPYABLE(UniqueID);
     UniqueID();                                         // Gets seed from std::random_device
     explicit UniqueID(std::mt19937::result_type seed);  // Uses specified seed
 

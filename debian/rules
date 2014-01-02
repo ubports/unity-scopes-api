@@ -13,4 +13,4 @@ override_dh_auto_configure:
 
 # Tests are not written to be run in parallel.
 override_dh_auto_test:
-    dh_auto_test --max-parallel=1 -- ARGS="--verbose"
+	dh_auto_test --max-parallel=1 -- ARGS="--verbose"
