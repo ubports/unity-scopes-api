@@ -53,9 +53,9 @@ public:
     virtual void run(ReplyProxy const& reply) override
     {
         Filters filters;
-        OptionSelectorFilter filter("f1", "Options");
-        filter.add_option("1", "Option 1");
-        filter.add_option("2", "Option 2");
+        auto filter = OptionSelectorFilter::create("f1", "Options");
+        filter->add_option("1", "Option 1");
+        filter->add_option("2", "Option 2");
         filters.push_back(filter);
         FilterState filter_state; // TODO: push real state from query obj
         reply->push(filters, filter_state);

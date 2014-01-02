@@ -45,11 +45,11 @@ public:
     virtual ~FilterBaseImpl();
     std::string id() const;
     VariantMap serialize() const;
-    static FilterBase deserialize(VariantMap const& var);
+    virtual std::string filter_type() const = 0;
+    static FilterBase::SCPtr deserialize(VariantMap const& var);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;
-    virtual std::string filter_type() const = 0;
     static Variant get(FilterState const& filter_state, std::string const& filter_id);
     static VariantMap& get(FilterState const& filter_state);
 

@@ -75,7 +75,7 @@ VariantMap& FilterBaseImpl::get(FilterState const& filter_state)
     return filter_state.p->get();
 }
 
-FilterBase FilterBaseImpl::deserialize(VariantMap const& var)
+FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
 {
     auto it = var.find("filter_type");
     if (it != var.end())
@@ -83,8 +83,7 @@ FilterBase FilterBaseImpl::deserialize(VariantMap const& var)
         auto ftype = it->second.get_string();
         if (ftype == "option_selector")
         {
-            OptionSelectorFilter filter(var);
-            return filter;
+            return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(var));
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }

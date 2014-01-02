@@ -130,7 +130,7 @@ bool ReplyImpl::push(unity::api::scopes::Filters const& filters, unity::api::sco
 
     for (auto const& f: filters)
     {
-        filters_var.push_back(Variant(f.serialize()));
+        filters_var.push_back(Variant(f->serialize()));
     }
     var["filters"] = filters_var;
     var["filter_state"] = filter_state.p->serialize();

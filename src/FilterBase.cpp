@@ -38,6 +38,11 @@ std::string FilterBase::id() const
     return p->id();
 }
 
+std::string FilterBase::filter_type() const
+{
+    return p->filter_type();
+}
+
 VariantMap FilterBase::serialize() const
 {
     return p->serialize();

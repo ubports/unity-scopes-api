@@ -40,7 +40,7 @@ class OptionSelectorFilterImpl;
 }
 
 /**
-\brief
+\brief Holds definition of filter option for OptionSelectorFilter.
 */
 class UNITY_API FilterOption final
 {

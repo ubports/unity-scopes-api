@@ -49,11 +49,13 @@ class ReplyImpl;
 class UNITY_API FilterState final
 {
 public:
+/// @cond
     FilterState();
     FilterState(FilterState const& other);
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
+/// @endcond
 
     /**
      \brief Check if state for given filter has been stored.

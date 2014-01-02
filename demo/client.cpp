@@ -24,6 +24,7 @@
 #include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/ScopeExceptions.h>
+#include <scopes/OptionSelectorFilter.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -33,6 +34,30 @@
 
 using namespace std;
 using namespace unity::api::scopes;
+
+// dump filter to stream
+std::ostream& operator<<(std::ostream& str, FilterBase const& filter)
+{
+    auto const ftype = filter.filter_type();
+    cout << "filter id=" << filter.id() << endl;
+    if (ftype == "option_selector")
+    {
+        auto const& selfilter = dynamic_cast<OptionSelectorFilter const&>(filter);
+        str << "OptionSelectorFilter" << endl;
+        str << " label: " << selfilter.label() << endl;
+        str << " multi-select: " << selfilter.multi_select() << endl;
+        str << " options:" << endl;
+        for (auto op: selfilter.options())
+        {
+            str << "    id: " << op->id() << ", label: " << op->label() << endl;
+        }
+    }
+    else
+    {
+        str << "Unknown filter type: " << ftype;
+    }
+    return str;
+}
 
 class Receiver : public ReceiverBase
 {
@@ -62,9 +87,9 @@ public:
     void push(Filters const& filters, FilterState const& /* filter_state */) override
     {
         cout << "received " << filters.size() << " filters" << endl;
-        for (auto const& f: filters)
+        for (auto f: filters)
         {
-            cout << " filter id=" << f.id() << endl;
+            cout << *f << endl;
         }
     }
 

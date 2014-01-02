@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <memory>
 #include <list>
 
@@ -47,12 +48,17 @@ Actual state of a filters is kept by a FilterState object.
 class UNITY_API FilterBase
 {
 public:
+/// @cond
+    UNITY_DEFINES_PTRS(FilterBase);
+/// @endcond
+
     /**
       \brief Get an identifier of this filter.
       \return filter id
       */
     std::string id() const;
     VariantMap serialize() const;
+    std::string filter_type() const;
     virtual ~FilterBase();
 
 protected:
@@ -61,7 +67,7 @@ protected:
     std::shared_ptr<internal::FilterBaseImpl> p;
 };
 
-typedef std::list<FilterBase> Filters;
+typedef std::list<FilterBase::SCPtr> Filters;
 
 } // namespace scopes
 

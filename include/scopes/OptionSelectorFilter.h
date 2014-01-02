@@ -49,7 +49,11 @@ A selection filter that displays a list of choices and allows one or more of the
 class UNITY_API OptionSelectorFilter : public FilterBase
 {
 public:
-    OptionSelectorFilter(std::string const& id, std::string const& label, bool multi_select = false);
+/// @cond
+    UNITY_DEFINES_PTRS(OptionSelectorFilter);
+/// @endcond
+
+    static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
      \brief Get label of this filter.
@@ -96,6 +100,7 @@ public:
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
+    OptionSelectorFilter(std::string const& id, std::string const& label, bool multi_select = false);
     OptionSelectorFilter(VariantMap const& var);
     internal::OptionSelectorFilterImpl* fwd() const;
     friend class internal::FilterBaseImpl;

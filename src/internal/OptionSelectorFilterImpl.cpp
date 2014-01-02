@@ -219,8 +219,6 @@ void OptionSelectorFilterImpl::update_state(FilterState& filter_state, std::stri
     }
 }
 
-
-
 } // namespace internal
 
 } // namespace scopes

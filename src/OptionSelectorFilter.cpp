@@ -38,6 +38,11 @@ OptionSelectorFilter::OptionSelectorFilter(VariantMap const& var)
 {
 }
 
+OptionSelectorFilter::SPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, bool multi_select)
+{
+    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(id, label, multi_select));
+}
+
 std::string OptionSelectorFilter::label() const
 {
     return fwd()->label();
