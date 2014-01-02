@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_FILTERBASE_H
 #define UNITY_SCOPES_FILTERBASE_H
 
+#include <unity/util/NonCopyable.h>
 #include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -50,6 +51,7 @@ class UNITY_API FilterBase
 public:
 /// @cond
     UNITY_DEFINES_PTRS(FilterBase);
+    NONCOPYABLE(FilterBase);
 /// @endcond
 
     /**
