@@ -4,17 +4,8 @@
 
 SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     cleanincludes
-    stand-alone-unity-headers
-    stand-alone-unity-internal-headers
-    stand-alone-unity-api-headers
-    stand-alone-unity-api-internal-headers
-    stand-alone-unity-api-scopes-headers
-    stand-alone-unity-api-scopes-internal-headers
-    clean-public-unity-headers
-    clean-public-unity-internal-headers
-    clean-public-unity-api-headers
-    clean-public-unity-api-internal-headers
-    clean-public-unity-api-scopes-headers
-    clean-public-unity-api-scopes-internal-headers
+    stand-alone-scopes-headers
+    stand-alone-scopes-internal-headers
+    clean-public-scopes-headers
     copyright
     whitespace)
