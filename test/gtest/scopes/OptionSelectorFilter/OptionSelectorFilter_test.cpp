@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 #include <scopes/FilterState.h>
 #include <scopes/OptionSelectorFilter.h>
+#include <scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::api::scopes;
@@ -97,4 +98,68 @@ TEST(OptionSelectorFilter, multi_selection)
     filter1->update_state(fstate, option2, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_EQ(0, filter1->active_options(fstate).size());
+}
+
+TEST(OptionSelectorFilter, serialize)
+{
+    auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+    auto option1 = filter1->add_option("1", "Option 1");
+    auto option2 = filter1->add_option("2", "Option 2");
+
+    auto var = filter1->serialize();
+    EXPECT_EQ("f1", var["id"].get_string());
+    EXPECT_EQ("option_selector", var["filter_type"].get_string());
+    EXPECT_EQ("Options", var["label"].get_string());
+
+    auto optarr = var["options"].get_array();
+    EXPECT_EQ(2, optarr.size());
+    EXPECT_EQ("1", optarr[0].get_dict()["id"].get_string());
+    EXPECT_EQ("Option 1", optarr[0].get_dict()["label"].get_string());
+    EXPECT_EQ("2", optarr[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Option 2", optarr[1].get_dict()["label"].get_string());
+}
+
+TEST(OptionSelectorFilter, deserialize)
+{
+    VariantMap var;
+    {
+        try
+        {
+            internal::OptionSelectorFilterImpl filter(var);
+            FAIL();
+        }
+        catch (unity::LogicException const&) {}
+    }
+
+    {
+        var["id"] = "f1";
+        var["filter_type"] = "option_selector";
+        // missing attributes of option selector
+        try
+        {
+            internal::OptionSelectorFilterImpl filter(var);
+        }
+        catch (unity::LogicException const&) {}
+    }
+    {
+        var["id"] = "f1";
+        var["filter_type"] = "option_selector";
+        var["label"] = "Filter 1";
+        var["multi_select"] = true;
+
+        VariantArray optarr;
+        VariantMap opt;
+        opt["id"] = "1";
+        opt["label"] = "Option 1";
+        optarr.push_back(Variant(opt));
+        var["options"] = optarr;
+        internal::OptionSelectorFilterImpl filter(var);
+
+        EXPECT_EQ("f1", filter.id());
+        EXPECT_EQ("Filter 1", filter.label());
+        EXPECT_EQ(true, filter.multi_select());
+        EXPECT_EQ(1, filter.options().size());
+        EXPECT_EQ("1", filter.options().front()->id());
+    }
+
 }
