@@ -20,8 +20,6 @@
 #include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <internal/zmq_middleware/capnproto/Reply.capnp.h>
 
-#include <iostream> // TODO: remove this
-
 using namespace std;
 
 namespace unity
@@ -93,7 +91,6 @@ void ZmqReply::finished(ReceiverBase::Reason reason, string const& error_message
         }
         case ReceiverBase::Error:
         {
-cerr << "sending error reply: " << error_message << endl;
             r = capnproto::Reply::FinishedReason::ERROR;
             in_params.setError(error_message);
             break;
