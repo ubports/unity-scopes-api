@@ -101,7 +101,7 @@ Code style
 
 To re-format source and headers with astyle and clang-format:
 
-    $ make formatstyle
+    $ make formatcode
 
 This fixes a whole lot of issues regarding style. The formatting changes made
 by this target are generally sensible (even though they may not be your
