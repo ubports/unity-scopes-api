@@ -126,6 +126,18 @@ if (Werror)
     endif()
 endif()
 
+set(SANITIZER "" CACHE STRING "Build with -fsanitize=<value> (legal values: thread, address)")
+
+if ("${SANITIZER}" STREQUAL "")
+    # Do nothing
+elseif (${SANITIZER} STREQUAL "thread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+elseif (${SANITIZER} STREQUAL "address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+else()
+    message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
+endif()
+
 option(IPC_MONITORING "Enable IPC traffic monitoring")
 
 if(IPC_MONITORING)
