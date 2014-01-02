@@ -54,7 +54,7 @@ class ZmqMiddleware;
 class ObjectAdapter final
 {
 public:
-    NONCOPYABLE(ObjectAdapter)
+    NONCOPYABLE(ObjectAdapter);
 
     ObjectAdapter(ZmqMiddleware& mw,
                   std::string const& name,

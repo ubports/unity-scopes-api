@@ -76,7 +76,7 @@ namespace internal
 class UNITY_API DynamicLoader
 {
 public:
-    NONCOPYABLE(DynamicLoader)
+    NONCOPYABLE(DynamicLoader);
 
     UNITY_DEFINES_PTRS(DynamicLoader);
 
