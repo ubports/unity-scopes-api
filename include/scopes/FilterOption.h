@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_FILTEROPTION_H
 #define UNITY_SCOPES_FILTEROPTION_H
 
+#include <unity/util/NonCopyable.h>
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <string>
@@ -47,6 +48,7 @@ class UNITY_API FilterOption final
 public:
 /// @cond
     UNITY_DEFINES_PTRS(FilterOption);
+    NONCOPYABLE(FilterOption);
 /// @endcond
 
     std::string id() const;
