@@ -96,6 +96,22 @@ To run the static C++ checks:
 
     $ make cppcheck
 
+Code style
+----------
+
+To re-format source and headers with astyle and clang-format:
+
+    $ make formatstyle
+
+This fixes a whole lot of issues regarding style. The formatting changes made
+by this target are generally sensible (even though they may not be your
+personal preference in all case). If there is a case where the formatting
+really messes things up, consider re-arranging the code to avoid the problem.
+The convenience of running the entire code base through the pretty-printer
+far outweighs any minor glitches with pretty printing, and it means that
+we get consistent code style for free, rather than endlessly having to
+watch out for formatting issues during code reviews.
+
 Thread and address sanitizer
 ----------------
 

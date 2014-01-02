@@ -25,7 +25,7 @@
 --add-brackets
 --convert-tabs
 --close-templates
---max-code-length=132
+--max-code-length=120
 
 # --pad-oper
 #

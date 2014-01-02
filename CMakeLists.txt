@@ -62,6 +62,36 @@ if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
 endif()
 
+#
+# Code style fixer. We put the code through astyle first because it makes some fixes that
+# clang-format won't do (such as "char *p" -> "char* p"). But astyle messes up other things
+# (particularly lambdas and assembly-style comments), which clang-format does right.
+# So, we run clang-format after running astyle, which undoes the damage done by astyle
+# without reverting desirable astyle fixes.
+#
+
+find_program(ASTYLE_COMMAND NAMES astyle)
+if (NOT ASTYLE_COMMAND)
+    message(WARNING "Cannot find astyle: formatcode target will not be available")
+else()
+    find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.5)
+    if (NOT CLANG_FORMAT_COMMAND)
+        message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
+    endif()
+endif()
+
+if (ASTYLE_COMMAND AND CLANG_FORMAT_COMMAND)
+    file(GLOB_RECURSE fmt_h ${PROJECT_SOURCE_DIR}/*.h)
+    file(GLOB_RECURSE fmt_cpp ${PROJECT_SOURCE_DIR}/*.cpp)
+    file(GLOB_RECURSE fmt_c ${PROJECT_SOURCE_DIR}/*.c)
+
+set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${fmt_h})
+    add_custom_target(formatcode ALL
+                      ${ASTYLE_COMMAND} --options=${PROJECT_SOURCE_DIR}/astyle-config --recursive ${PROJECT_SOURCE_DIR}/*.h ${PROJECT_SOURCE_DIR}/*.cpp ${PROJECT_SOURCE_DIR}/*.c
+                      COMMAND ${CLANG_FORMAT_COMMAND} -i -style=file ${fmt_h} ${fmt_cpp} ${fmt_c}
+                      VERBATIM)
+endif()
+
 find_program(CAPNPC_BIN capnpc)
 if(NOT CAPNPC_BIN)
   message(FATAL_ERROR "Capnp compiler not found.")
