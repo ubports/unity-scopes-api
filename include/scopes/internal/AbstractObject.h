@@ -37,7 +37,7 @@ namespace internal
 class AbstractObject
 {
 public:
-    NONCOPYABLE(AbstractObject)
+    NONCOPYABLE(AbstractObject);
 
     UNITY_DEFINES_PTRS(AbstractObject);
 

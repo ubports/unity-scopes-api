@@ -46,7 +46,7 @@ namespace zmq_middleware
 class ZmqSender final
 {
 public:
-    NONCOPYABLE(ZmqSender)
+    NONCOPYABLE(ZmqSender);
 
     ZmqSender(zmqpp::socket& s);
 
