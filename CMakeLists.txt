@@ -86,7 +86,7 @@ if (ASTYLE_COMMAND AND CLANG_FORMAT_COMMAND)
     file(GLOB_RECURSE fmt_c ${PROJECT_SOURCE_DIR}/*.c)
 
 set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${fmt_h})
-    add_custom_target(formatcode ALL
+    add_custom_target(formatcode
                       ${ASTYLE_COMMAND} --options=${PROJECT_SOURCE_DIR}/astyle-config --recursive ${PROJECT_SOURCE_DIR}/*.h ${PROJECT_SOURCE_DIR}/*.cpp ${PROJECT_SOURCE_DIR}/*.c
                       COMMAND ${CLANG_FORMAT_COMMAND} -i -style=file ${fmt_h} ${fmt_cpp} ${fmt_c}
                       VERBATIM)
