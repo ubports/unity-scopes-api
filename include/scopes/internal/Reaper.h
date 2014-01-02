@@ -78,9 +78,10 @@ class Reaper;
 // Letting a ReapItem go out of scope automatically calls destroy(), meaning that the item's callback
 // is *not* invoked when a ReapItem is destroyed.
 
-class ReapItem final : private util::NonCopyable
+class ReapItem final
 {
 public:
+    NONCOPYABLE(ReapItem);
     UNITY_DEFINES_PTRS(ReapItem);
 
     void refresh() noexcept; // Update time stamp on item to keep it alive. O(1) performance.
@@ -109,9 +110,10 @@ private:
 // It is safe to let a reaper go out of scope while there are still ReapItems for it. The methods
 // on the ReapItem do nothing if they are called after the reaper is gone.
 
-class Reaper final : public std::enable_shared_from_this<Reaper>, private util::NonCopyable
+class Reaper final : public std::enable_shared_from_this<Reaper>
 {
 public:
+    NONCOPYABLE(Reaper);
     UNITY_DEFINES_PTRS(Reaper);
 
     ~Reaper() noexcept;
@@ -137,6 +139,10 @@ public:
     // the total number of items).
     static SPtr create(int reap_interval, int expiry_interval, DestroyPolicy p = NoCallbackOnDestroy);
 
+    // Destroys the reaper and returns once any remaining items have been reaped (depending on the
+    // destroy policy). The destructor implicitly calls destroy().
+    void destroy();
+
     // Adds a new item to the reaper. The reaper calls cb once the item has not been refreshed for at
     // least expiry_interval seconds. O(1) performance.
     // The callback passed to add() must not block for any length of time. We have only one reaper
@@ -152,8 +158,9 @@ public:
 private:
     Reaper(int reap_interval, int expiry_interval, DestroyPolicy p);
     void set_self() noexcept;
+    void start();
 
-    void run();                             // Start function for reaper thread
+    void reap_func();                       // Start function for reaper thread
 
     void remove_zombies(reaper_private::Reaplist const&) noexcept;   // Invokes callbacks for expired entries
 

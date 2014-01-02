@@ -41,9 +41,11 @@ namespace internal
 // submit() accepts an arbitrary functor and returns a future that
 // the calling thread can use to wait for the task to complete.
 
-class ThreadPool final : private util::NonCopyable
+class ThreadPool final
 {
 public:
+    NONCOPYABLE(ThreadPool);
+
     ThreadPool(int size);
     ~ThreadPool() noexcept;
 

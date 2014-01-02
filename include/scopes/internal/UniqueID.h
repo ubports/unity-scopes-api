@@ -43,9 +43,10 @@ namespace internal
 // Generates a random number concatenated with a counter.
 // Return value is a string of 16 hex digits.
 
-class UniqueID : private util::NonCopyable
+class UniqueID
 {
 public:
+    NONCOPYABLE(UniqueID);
     UniqueID();                                         // Gets seed from std::random_device
     explicit UniqueID(std::mt19937::result_type seed);  // Uses specified seed
 

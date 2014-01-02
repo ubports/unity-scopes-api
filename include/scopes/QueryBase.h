@@ -51,9 +51,10 @@ class QueryObject;
 
 // TODO: documentation
 
-class UNITY_API QueryBase : private util::NonCopyable
+class UNITY_API QueryBase
 {
 public:
+    NONCOPYABLE(QueryBase);
     UNITY_DEFINES_PTRS(QueryBase);
 
     virtual void cancelled() = 0;                          // Originator cancelled the query

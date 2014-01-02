@@ -45,9 +45,11 @@ namespace zmq_middleware
 // to a Cap'n Proto segment list, taking care of any alignment issues. The receiver instance must stay
 // in scope until unmarshaling is complete.
 
-class ZmqReceiver final : private util::NonCopyable
+class ZmqReceiver final
 {
 public:
+    NONCOPYABLE(ZmqReceiver);
+
     ZmqReceiver(zmqpp::socket& s);
 
     kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> receive();

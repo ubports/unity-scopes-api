@@ -40,16 +40,16 @@ TEST(CategorisedResult, basic)
         result.set_title("a title");
         result.set_art("an icon");
         result.set_dnd_uri("http://canonical.com");
-        result.add_metadata("foo", Variant("bar"));
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("a title", result.title());
         EXPECT_EQ("an icon", result.art());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
-        EXPECT_FALSE(result.has_metadata("nonexisting"));
-        EXPECT_TRUE(result.has_metadata("foo"));
-        EXPECT_EQ("bar", result.metadata("foo").get_string());
-        EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
+        EXPECT_EQ("http://ubuntu.com", result.value("uri").get_string());
+        EXPECT_EQ("a title", result.value("title").get_string());
+        EXPECT_EQ("an icon", result.value("art").get_string());
+        EXPECT_EQ("http://canonical.com", result.dnd_uri());
+
         EXPECT_EQ("1", result.category()->id());
     }
 }
@@ -70,7 +70,7 @@ TEST(CategorisedResult, indexop)
 
         // referencing non-existing attribute creates it
         EXPECT_NO_THROW(result["nonexisting"]);
-        EXPECT_TRUE(result.has_metadata("nonexisting"));
+        EXPECT_TRUE(result.contains("nonexisting"));
         EXPECT_EQ(Variant::Type::Null, result["nonexisting"].which());
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
@@ -81,9 +81,9 @@ TEST(CategorisedResult, indexop)
         EXPECT_EQ("an icon", result["art"].get_string());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
         EXPECT_EQ("http://canonical.com", result["dnd_uri"].get_string());
-        EXPECT_TRUE(result.has_metadata("foo"));
-        EXPECT_EQ("bar", result.metadata("foo").get_string());
+        EXPECT_TRUE(result.contains("foo"));
         EXPECT_EQ("bar", result["foo"].get_string());
+        EXPECT_EQ("bar", result.value("foo").get_string());
         EXPECT_EQ("bar", result.serialize()["attrs"].get_dict()["foo"].get_string());
         EXPECT_EQ("1", result.category()->id());
     }
@@ -96,7 +96,7 @@ TEST(CategorisedResult, indexop)
         EXPECT_EQ("http://ubuntu.com", result2["uri"].get_string());
         // referencing non-existing attribute of const result object throws
         EXPECT_THROW(result2["nonexisting"], unity::InvalidArgumentException);
-        EXPECT_FALSE(result2.has_metadata("nonexisting"));
+        EXPECT_FALSE(result2.contains("nonexisting"));
     }
 }
 
@@ -112,7 +112,7 @@ TEST(CategorisedResult, copy)
         result.set_title("title a");
         result.set_art("icon a");
         result.set_dnd_uri("dnd_uri a");
-        result.add_metadata("common", Variant("o"));
+        result["common"] = "o";
 
         CategorisedResult copy(result);
 
@@ -121,10 +121,9 @@ TEST(CategorisedResult, copy)
         copy.set_art("icon b");
         copy.set_dnd_uri("dnd_uri b");
 
-        result.add_metadata("foo", Variant("bar"));
-        result.add_metadata("unique", Variant(123));
-        copy.add_metadata("foo", Variant("xyz"));
-
+        result["foo"] = Variant("bar");
+        result["unique"] = Variant(123);
+        copy["foo"] = Variant("xyz");
         {
             auto attrsvar = result.serialize()["attrs"].get_dict();
             EXPECT_EQ("uri a", result.uri());
@@ -163,8 +162,8 @@ TEST(CategorisedResult, copy)
         copy.set_art("icon b");
         copy.set_dnd_uri("dnd_uri b");
 
-        result.add_metadata("foo", Variant("bar"));
-        copy.add_metadata("foo", Variant("xyz"));
+        result["foo"] = Variant("bar");
+        copy["foo"] = Variant("xyz");
 
         EXPECT_EQ("uri a", result.uri());
         EXPECT_EQ("title a", result.title());
@@ -241,12 +240,23 @@ TEST(CategorisedResult, serialize_excp)
     auto cat = reg.register_category("1", "title", "icon", rdr);
     CategorisedResult result(cat);
 
-    // throw until mandatory attributes (uri, dnd_uri) are non-empty
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_uri("http://ubuntu.com");
-    EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-    result.set_dnd_uri("http://canonical.com");
-    EXPECT_NO_THROW(result.serialize());
+    {
+        // throw until mandatory attributes (uri, dnd_uri) are non-empty
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result.set_uri("http://ubuntu.com");
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result.set_dnd_uri("http://canonical.com");
+        EXPECT_NO_THROW(result.serialize());
+    }
+    {
+        result["uri"] = Variant(0);
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result["uri"] = "http://ubuntu.com";
+        result["dnd_uri"] = Variant(0);
+        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
+        result["dnd_uri"] = "http://ubuntu.com";
+        EXPECT_NO_THROW(result.serialize());
+    }
 }
 
 TEST(CategorisedResult, exceptions)
@@ -266,10 +276,14 @@ TEST(CategorisedResult, exceptions)
     {
         CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
+        EXPECT_THROW(result.value("nonexisting"), unity::InvalidArgumentException);
+    }
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
         result.set_title("a title");
         result.set_art("an icon");
         result.set_dnd_uri("http://canonical.com");
-        EXPECT_THROW(result.metadata("foo"), unity::InvalidArgumentException);
     }
 }
 
@@ -325,9 +339,11 @@ TEST(CategorisedResult, deserialize)
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
-        EXPECT_THROW(result.title(), unity::LogicException);
-        EXPECT_THROW(result.art(), unity::LogicException);
-        EXPECT_EQ("bar", result.metadata("foo").get_string());
+        EXPECT_EQ("", result.title());
+        EXPECT_EQ("", result.art());
+        EXPECT_FALSE(result.contains("title"));
+        EXPECT_FALSE(result.contains("art"));
+        EXPECT_EQ("bar", result["foo"].get_string());
     }
 }
 

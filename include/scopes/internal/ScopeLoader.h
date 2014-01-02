@@ -39,9 +39,10 @@ namespace internal
 
 // ScopeLoader loads the .so for a scope and TODO: complete this and updated comments below.
 
-class UNITY_API ScopeLoader final : public util::NonCopyable
+class UNITY_API ScopeLoader final
 {
 public:
+    NONCOPYABLE(ScopeLoader);
     UNITY_DEFINES_PTRS(ScopeLoader);
 
     // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy

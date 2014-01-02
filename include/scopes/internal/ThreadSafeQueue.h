@@ -44,9 +44,10 @@ namespace internal
 // If the queue is destroyed while threads are blocked in wait_and_pop(), wait_and_pop() throws std::runtime_error.
 
 template<typename T>
-class ThreadSafeQueue final : private util::NonCopyable
+class ThreadSafeQueue final
 {
 public:
+    NONCOPYABLE(ThreadSafeQueue);
     typedef T value_type;
 
     ThreadSafeQueue();

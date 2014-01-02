@@ -96,6 +96,12 @@ To run the static C++ checks:
 
     $ make cppcheck
 
+Thread and address sanitizer
+----------------
+
+Set SANITIZER to "thread" or "address" to build with the
+corresponding sanitizer enabled.
+
 Debugging IPC
 -------------
 

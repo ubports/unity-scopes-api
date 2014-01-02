@@ -34,9 +34,11 @@ namespace scopes
 namespace internal
 {
 
-class AbstractObject : private util::NonCopyable
+class AbstractObject
 {
 public:
+    NONCOPYABLE(AbstractObject);
+
     UNITY_DEFINES_PTRS(AbstractObject);
 
     virtual ~AbstractObject() noexcept;
