@@ -56,9 +56,12 @@ public:
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 
-    virtual std::string endpoint() const;
-    virtual std::string identity() const;
+    virtual std::string endpoint() const override;
+    virtual std::string identity() const override;
     RequestType type() const;
+
+    // Remote operation
+    virtual void ping() override;
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;

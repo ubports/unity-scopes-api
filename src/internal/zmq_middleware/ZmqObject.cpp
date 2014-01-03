@@ -84,6 +84,15 @@ string ZmqObjectProxy::identity() const
     return identity_;
 }
 
+void ZmqObjectProxy::ping()
+{
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "ping");
+
+    auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_(request_builder); });
+    future.wait();
+}
+
 RequestType ZmqObjectProxy::type() const
 {
     return type_;

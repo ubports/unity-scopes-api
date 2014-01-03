@@ -45,6 +45,9 @@ public:
     std::string endpoint() const;
     std::string identity() const;
 
+    // Remote operation
+    void ping();
+
 protected:
     internal::ObjectProxyImpl* pimpl() const noexcept; // Non-virtual because we can't use covariance with incomplete types
                                                        // Each derived proxy type implements a non-virtual fwd() method

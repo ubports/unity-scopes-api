@@ -48,6 +48,9 @@ public:
     virtual std::string identity() const = 0;
     virtual std::string endpoint() const = 0;
 
+    // Remote operation
+    virtual void ping() = 0;
+
 protected:
     MWObjectProxy(MiddlewareBase* mw_base);
 

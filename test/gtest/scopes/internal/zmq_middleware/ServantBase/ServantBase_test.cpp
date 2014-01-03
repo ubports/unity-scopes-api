@@ -108,6 +108,23 @@ TEST(ServantBase, success)
     EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
 }
 
+TEST(ServantBase, ping)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    Current current;
+    current.op_name = "ping";
+    current.adapter = &a;   // Dummy needed for the throw code to get at the adapter name and endpoint.
+
+    MyServant s(MyServant::NoException);
+    capnp::MallocMessageBuilder b;
+    auto response = b.initRoot<capnproto::Response>();
+    capnp::ObjectPointer::Reader in_params;
+    s.safe_dispatch_(current, in_params, response);
+    EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
+}
+
 TEST(ServantBase, exceptions)
 {
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
