@@ -115,13 +115,13 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
         {
             child_node = root_node->get_node(i);
 
-            if (!child_node->has_node("name") || !child_node->has_node("search_url"))
+            if (!child_node->has_node("name") || !child_node->has_node("base_url"))
             {
                 break;
             }
 
             scope.name = child_node->get_node("name")->as_string();
-            scope.search_url = child_node->get_node("search_url")->as_string();
+            scope.base_url = child_node->get_node("base_url")->as_string();
 
             scope.invisible = child_node->has_node("invisible") ?
                               child_node->get_node("invisible")->as_bool() : false;
@@ -139,14 +139,14 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
     }
 }
 
-SearchHandle::UPtr SmartScopesClient::search(std::string const& search_url, std::string const& query,
+SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url, std::string const& query,
                                              std::string const& session_id, uint query_id, std::string const& platform,
                                              std::string const& locale, std::string const& country,
                                              std::string const& latitude, std::string const& longitude,
                                              uint limit)
 {
     std::ostringstream search_uri;
-    search_uri << search_url << "?";
+    search_uri << base_url << "/search?";
 
     // mandatory parameters
 

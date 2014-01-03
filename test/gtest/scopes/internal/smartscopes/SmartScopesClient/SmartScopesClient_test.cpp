@@ -61,17 +61,17 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     ASSERT_EQ(2, scopes.size());
 
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo", scopes[0].search_url);
+    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/demo", scopes[0].base_url);
     EXPECT_FALSE(scopes[0].invisible);
 
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url);
+    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/demo2", scopes[1].base_url);
     EXPECT_EQ(true, scopes[1].invisible);
 }
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle = ssc_->search("http://127.0.0.1/smartscopes/v2/demo", "stuff", "1234", 0, "");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2, results.size());
@@ -97,8 +97,8 @@ TEST_F(SmartScopesClientTest, search)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
-    auto search_handle2 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle1 = ssc_->search("http://127.0.0.1/smartscopes/v2/demo", "stuff", "1234", 0, "");
+    auto search_handle2 = ssc_->search("http://127.0.0.1/smartscopes/v2/demo", "stuff", "1234", 0, "");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());

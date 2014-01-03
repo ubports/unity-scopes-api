@@ -29,14 +29,14 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/smartscopes/v2/remote-scopes':
         return [remote_scopes_response]
 
-    if environ['PATH_INFO'] == '/smartscopes/v2/search/demo' and environ['QUERY_STRING'] != '':
+    if environ['PATH_INFO'] == '/smartscopes/v2/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
     return ''
 
 remote_scopes_response = '\
-[{"search_url": "https://productsearch.ubuntu.com/smartscopes/v2/search/demo", "name": "Dummy Demo Scope" },\
-{"search_url": "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", "name": "Dummy Demo Scope 2", "invisible": true }]'
+[{"base_url": "https://productsearch.ubuntu.com/smartscopes/v2/demo", "name": "Dummy Demo Scope" },\
+{"base_url": "https://productsearch.ubuntu.com/smartscopes/v2/demo2", "name": "Dummy Demo Scope 2", "invisible": true }]'
 
 search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\

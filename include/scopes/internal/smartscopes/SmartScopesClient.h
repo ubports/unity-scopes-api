@@ -50,7 +50,7 @@ class SmartScopesClient;
 struct RemoteScope
 {
     std::string name;
-    std::string search_url;
+    std::string base_url;
     bool invisible = false;
 };
 
@@ -105,7 +105,7 @@ public:
 
     std::vector<RemoteScope> get_remote_scopes();
 
-    SearchHandle::UPtr search(std::string const& search_url, std::string const& query,
+    SearchHandle::UPtr search(std::string const& base_url, std::string const& query,
                               std::string const& session_id, uint query_id, std::string const& platform,
                               std::string const& locale = "", std::string const& country = "",
                               std::string const& latitude = "", std::string const& longitude = "",
