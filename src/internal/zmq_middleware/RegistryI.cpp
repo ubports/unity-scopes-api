@@ -20,10 +20,11 @@
 
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <scopes/internal/RegistryException.h>
+#include <scopes/internal/RegistryObject.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
-#include <scopes/internal/RegistryObject.h>
 #include <scopes/ScopeExceptions.h>
 
 #include <cassert>

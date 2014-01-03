@@ -19,6 +19,7 @@
 #include <scopes/internal/zmq_middleware/RegistryI.h>
 
 #include <scopes/internal/RegistryConfig.h>
+#include <scopes/internal/RegistryException.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/ScopeMetadataImpl.h>
 #include <scopes/internal/ScopeImpl.h>
