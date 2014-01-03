@@ -57,7 +57,6 @@ public:
     RegistryObjectPrivate() {};
     ~RegistryObjectPrivate();
     ScopeMetadata get_metadata(std::string const& scope_name);
-    ScopeProxy get_scope(std::string const& scope_name);
     MetadataMap list();
     bool add(std::string const& scope_name, ScopeMetadata const& metadata,
              std::vector<std::string> const& spawn_command);
@@ -116,21 +115,6 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
     }
     return it->second;
 
-}
-
-ScopeProxy RegistryObjectPrivate::get_scope(std::string const& scope_name)
-{
-    auto metadata = scopes.find(scope_name);
-    if (metadata == scopes.end())
-    {
-        throw NotFoundException("Tried to obtain unknown scope", scope_name);
-    }
-    auto search = scope_processes.find(scope_name);
-    if (search == scope_processes.end() || is_dead(search->second))
-    {
-        spawn_scope(scope_name);
-    }
-    return metadata->second.proxy();
 }
 
 void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
@@ -219,11 +203,17 @@ ScopeProxy RegistryObjectPrivate::locate(std::string const& scope_name)
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
         throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
-    // TODO: missing implementation. This should activate the scope if it isn't running already
-    // and return the proxy for the scope. Failures such as not being able to exec the scope
-    // need to raise RegistryException.
-    throw NotFoundException("Registry::locate(): no such scope",  scope_name);
-
+    auto metadata = scopes.find(scope_name);
+    if (metadata == scopes.end())
+    {
+        throw NotFoundException("Tried to obtain unknown scope", scope_name);
+    }
+    auto search = scope_processes.find(scope_name);
+    if (search == scope_processes.end() || is_dead(search->second))
+    {
+        spawn_scope(scope_name);
+    }
+    return metadata->second.proxy();
 }
 
 RegistryObject::RegistryObject() : p(new RegistryObjectPrivate())
@@ -239,12 +229,6 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return p->get_metadata(scope_name);
-}
-
-ScopeProxy RegistryObject::get_scope(std::string const& scope_name)
-{
-    lock_guard<decltype(mutex_)> lock(mutex_);
-    return p->get_scope(scope_name);
 }
 
 MetadataMap RegistryObject::list()
