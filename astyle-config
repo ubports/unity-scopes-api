@@ -18,7 +18,7 @@
 --style=allman
 --min-conditional-indent=2
 --indent-switches
---max-instatement-indent=80
+--max-instatement-indent=120
 --pad-header
 --align-pointer=type
 --align-reference=type

@@ -85,6 +85,10 @@ if (ASTYLE_COMMAND AND CLANG_FORMAT_COMMAND)
     file(GLOB_RECURSE fmt_cpp ${PROJECT_SOURCE_DIR}/*.cpp)
     file(GLOB_RECURSE fmt_c ${PROJECT_SOURCE_DIR}/*.c)
 
+    # Need to remove UnityScopesApi_tp.h from the found headers because clang-format-3.5
+    # incorrectly re-writes a macro: http://llvm.org/bugs/show_bug.cgi?id=18357
+    list(REMOVE_ITEM fmt_h ${PROJECT_SOURCE_DIR}/include/scopes/internal/lttng/UnityScopesApi_tp.h)
+
 set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${fmt_h})
     add_custom_target(formatcode
                       ${ASTYLE_COMMAND} --options=${PROJECT_SOURCE_DIR}/astyle-config --recursive ${PROJECT_SOURCE_DIR}/*.h ${PROJECT_SOURCE_DIR}/*.cpp ${PROJECT_SOURCE_DIR}/*.c
