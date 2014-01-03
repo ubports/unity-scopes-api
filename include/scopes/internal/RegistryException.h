@@ -16,12 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_REGISTRYIMPL_H
-#define UNITY_INTERNAL_REGISTRYIMPL_H
+#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
+#define UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
 
-#include <scopes/internal/MWRegistryProxyFwd.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/Registry.h>
+#include <unity/Exception.h>
 
 namespace unity
 {
@@ -35,23 +33,15 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeImpl;
-
-class RegistryImpl : public virtual ObjectProxyImpl
+class UNITY_API RegistryException : public unity::Exception
 {
 public:
-    RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
-    ~RegistryImpl() noexcept;
+    explicit RegistryException(std::string const& reason);
+    RegistryException(RegistryException const&);
+    RegistryException& operator=(RegistryException const&);
+    virtual ~RegistryException() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_name);
-    MetadataMap list();
-    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
-    ScopeProxy locate(std::string const& scope_name);
-
-    static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
-
-private:
-    MWRegistryProxy fwd() const;
+    virtual std::exception_ptr self() const override;
 };
 
 } // namespace internal

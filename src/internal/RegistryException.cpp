@@ -16,12 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_REGISTRYIMPL_H
-#define UNITY_INTERNAL_REGISTRYIMPL_H
+#include <scopes/internal/RegistryException.h>
 
-#include <scopes/internal/MWRegistryProxyFwd.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/Registry.h>
+using namespace std;
 
 namespace unity
 {
@@ -35,24 +32,26 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeImpl;
-
-class RegistryImpl : public virtual ObjectProxyImpl
+RegistryException::RegistryException(string const& reason) :
+    Exception("unity::api::scopes::RegistryException", reason)
 {
-public:
-    RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
-    ~RegistryImpl() noexcept;
+}
 
-    ScopeMetadata get_metadata(std::string const& scope_name);
-    MetadataMap list();
-    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
-    ScopeProxy locate(std::string const& scope_name);
+RegistryException::RegistryException(RegistryException const&) = default;
 
-    static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
+//! @cond
 
-private:
-    MWRegistryProxy fwd() const;
-};
+RegistryException& RegistryException::operator=(RegistryException const&) = default;
+
+
+RegistryException::~RegistryException() noexcept = default;
+
+//! @endcond
+
+exception_ptr RegistryException::self() const
+{
+    return make_exception_ptr(*this);
+}
 
 } // namespace internal
 
@@ -61,5 +60,3 @@ private:
 } // namespace api
 
 } // namespace unity
-
-#endif

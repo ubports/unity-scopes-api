@@ -19,11 +19,12 @@
 #include <scopes/internal/zmq_middleware/ZmqRegistry.h>
 
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
+#include <scopes/internal/RegistryException.h>
+#include <scopes/internal/ScopeImpl.h>
+#include <scopes/internal/ScopeMetadataImpl.h>
 #include <scopes/internal/zmq_middleware/VariantConverter.h>
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
 #include <scopes/ScopeExceptions.h>
 
 #include <capnp/message.h>
@@ -60,6 +61,7 @@ interface Registry
 {
     ScopeMetadata get_metadata(string name) throws NotFoundException;
     ScopeDict list();
+    ScopeProxy string( name) throws NotFoundException, RegistryException;
 };
 
 */
@@ -139,6 +141,47 @@ MetadataMap ZmqRegistry::list()
     return sm;
 }
 
+ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "locate");
+    auto in_params = request.initInParams().getAs<capnproto::Registry::LocateRequest>();
+    in_params.setName(scope_name.c_str());
+
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto receiver = future.get();
+    auto segments = receiver->receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto locate_response = response.getPayload().getAs<capnproto::Registry::LocateResponse>().getResponse();
+    switch (locate_response.which())
+    {
+        case capnproto::Registry::LocateResponse::Response::RETURN_VALUE:
+        {
+            auto proxy = locate_response.getReturnValue();
+            auto mw = dynamic_cast<ZmqMiddleware*>(mw_base());
+            assert(mw);
+            auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity());
+            return ScopeImpl::create(zmq_proxy, mw->runtime());
+        }
+        case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
+        {
+            auto ex = locate_response.getNotFoundException();
+            throw NotFoundException("Registry::locate(): no such scope", ex.getName().cStr());
+        }
+        case capnproto::Registry::LocateResponse::Response::REGISTRY_EXCEPTION:
+        {
+            auto ex = locate_response.getRegistryException();
+            throw RegistryException(ex.getReason().cStr());
+        }
+        default:
+        {
+            throw MiddlewareException("Registry::locate(): unknown user exception");
+        }
+    }
+}
 } // namespace zmq_middleware
 
 } // namespace internal
