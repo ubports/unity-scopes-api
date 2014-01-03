@@ -16,11 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ABSTRACTOBJECT_H
-#define UNITY_API_SCOPES_INTERNAL_ABSTRACTOBJECT_H
+#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
+#define UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
 
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/NonCopyable.h>
+#include <unity/Exception.h>
 
 namespace unity
 {
@@ -34,26 +33,15 @@ namespace scopes
 namespace internal
 {
 
-class AbstractObject
+class UNITY_API RegistryException : public unity::Exception
 {
 public:
-    NONCOPYABLE(AbstractObject);
+    explicit RegistryException(std::string const& reason);
+    RegistryException(RegistryException const&);
+    RegistryException& operator=(RegistryException const&);
+    virtual ~RegistryException() noexcept;
 
-    UNITY_DEFINES_PTRS(AbstractObject);
-
-    virtual ~AbstractObject() noexcept;
-
-    // Sets callback to allow this facade to disconnect itself from the middleware.
-    // Called by disconnect().
-    void set_disconnect_function(std::function<void()> func) noexcept;
-
-protected:
-    AbstractObject();
-
-    void disconnect() noexcept; // Disconnect self from middleware
-
-private:
-    std::function<void()> disconnect_func_;
+    virtual std::exception_ptr self() const override;
 };
 
 } // namespace internal

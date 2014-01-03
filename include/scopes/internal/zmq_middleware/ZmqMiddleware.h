@@ -90,6 +90,7 @@ private:
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
     std::unique_ptr<ThreadPool> invokers_;
+
     mutable std::mutex data_mutex_;             // Protects am_ and invokers_
 
     UniqueID unique_id_;

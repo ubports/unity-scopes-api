@@ -50,9 +50,8 @@ namespace internal
 class UNITY_API Category
 {
 public:
-    NONCOPYABLE(Category)
-
 /// @cond
+    NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 

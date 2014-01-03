@@ -40,7 +40,7 @@ class RegistryObjectPrivate;
 
 // Maintains a map of <scope name, scope proxy> pairs.
 
-class RegistryObject final : public AbstractObject
+class RegistryObject : public AbstractObject
 {
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
@@ -50,10 +50,9 @@ public:
 
     // Remote operation implementations
     ScopeMetadata get_metadata(std::string const& scope_name);
-
     MetadataMap list();
     ScopeProxy get_scope(std::string const& scope_name);
-
+    virtual ScopeProxy locate(std::string const& scope_name);  // virtual so we can mock the method for testing
     bool add(std::string const& scope_name, ScopeMetadata const& scope,
              std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);

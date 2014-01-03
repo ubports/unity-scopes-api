@@ -31,10 +31,16 @@ using Proxy = import "Proxy.capnp";
 #
 # ValueDict get_metadata(string name) throws NotFoundException;
 # map<string, ScopeMetadata> list();
+# ScopeProxy locate(string name) throws NotFoundException, RegistryException;
 
 struct NotFoundException
 {
     name @0 : Text;
+}
+
+struct RegistryException
+{
+    reason @0 : Text;
 }
 
 struct GetMetadataRequest
@@ -58,4 +64,19 @@ struct ListRequest
 struct ListResponse
 {
     returnValue @0 : List(ValueDict.ValueDict);
+}
+
+struct LocateRequest
+{
+    name @0 : Text;
+}
+
+struct LocateResponse
+{
+    response : union
+    {
+        returnValue         @0 : Proxy.Proxy;
+        notFoundException   @1 : NotFoundException;
+        registryException   @2 : RegistryException;
+    }
 }

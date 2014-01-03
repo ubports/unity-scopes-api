@@ -10,3 +10,7 @@ export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DLIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
+
+# Tests are not written to be run in parallel.
+override_dh_auto_test:
+	dh_auto_test --max-parallel=1 -- ARGS="--verbose"

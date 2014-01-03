@@ -16,11 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_ABSTRACTOBJECT_H
-#define UNITY_API_SCOPES_INTERNAL_ABSTRACTOBJECT_H
+#include <scopes/internal/RegistryException.h>
 
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/NonCopyable.h>
+using namespace std;
 
 namespace unity
 {
@@ -34,27 +32,26 @@ namespace scopes
 namespace internal
 {
 
-class AbstractObject
+RegistryException::RegistryException(string const& reason) :
+    Exception("unity::api::scopes::RegistryException", reason)
 {
-public:
-    NONCOPYABLE(AbstractObject);
+}
 
-    UNITY_DEFINES_PTRS(AbstractObject);
+RegistryException::RegistryException(RegistryException const&) = default;
 
-    virtual ~AbstractObject() noexcept;
+//! @cond
 
-    // Sets callback to allow this facade to disconnect itself from the middleware.
-    // Called by disconnect().
-    void set_disconnect_function(std::function<void()> func) noexcept;
+RegistryException& RegistryException::operator=(RegistryException const&) = default;
 
-protected:
-    AbstractObject();
 
-    void disconnect() noexcept; // Disconnect self from middleware
+RegistryException::~RegistryException() noexcept = default;
 
-private:
-    std::function<void()> disconnect_func_;
-};
+//! @endcond
+
+exception_ptr RegistryException::self() const
+{
+    return make_exception_ptr(*this);
+}
 
 } // namespace internal
 
@@ -63,5 +60,3 @@ private:
 } // namespace api
 
 } // namespace unity
-
-#endif

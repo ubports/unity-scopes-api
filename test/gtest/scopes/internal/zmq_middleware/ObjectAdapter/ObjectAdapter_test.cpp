@@ -105,6 +105,7 @@ TEST(ObjectAdapter, basic)
         a.activate();
         a.shutdown();
         a.wait_for_shutdown();
+        a.wait_for_shutdown(); // Second call benign, returns immediately
     }
     {
         wait();
@@ -158,6 +159,76 @@ TEST(ObjectAdapter, state_change)
         }
         a.shutdown();
         a.wait_for_shutdown();
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+
+        // Try to reactivate after shutdown
+        a.activate();
+        a.shutdown();
+        a.wait_for_shutdown();
+        try
+        {
+            a.activate();
+            FAIL();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+                      "state (adapter: testscope)",
+                      e.to_string());
+        }
+    }
+
+    {
+        // Two adapters on the same endpoint. Second one must enter failed state.
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        a.activate();
+        ObjectAdapter b(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        try
+        {
+            b.activate();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+                      "failure (adapter: testscope):\n"
+                      "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "(adapter: testscope):\n"
+                      "        Address already in use",
+                      e.to_string());
+        }
+        try
+        {
+            b.shutdown();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+                      "    Exception history:\n"
+                      "        Exception #1:\n"
+                      "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "(adapter: testscope):\n"
+                      "                Address already in use",
+                      e.to_string());
+        }
+        try
+        {
+            b.wait_for_shutdown();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+                       "    Exception history:\n"
+                       "        Exception #1:\n"
+                       "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                       "(adapter: testscope):\n"
+                       "                Address already in use",
+                       e.to_string());
+        }
     }
 }
 
@@ -251,7 +322,7 @@ TEST(ObjectAdapter, add_remove_find)
     catch (MiddlewareException const& e)
     {
         EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
-                  " id already used (adapter: testscope)",
+                  " id already in use (adapter: testscope)",
                   e.to_string());
     }
 
@@ -377,33 +448,58 @@ TEST(ObjectAdapter, bad_header)
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
-    a.activate();
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        a.activate();
 
-    // No servant registered, check that we get an ObjectNotExistException
-    zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
-    s.connect("ipc://testscope");
-    ZmqSender sender(s);
-    ZmqReceiver receiver(s);
+        zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
+        s.connect("ipc://testscope");
+        ZmqSender sender(s);
+        ZmqReceiver receiver(s);
 
-    capnp::MallocMessageBuilder b;
-    auto request = b.initRoot<capnproto::Request>();
-    request.setMode(capnproto::RequestMode::TWOWAY);
-    request.setId("id");
-    // Bad header: missing operation name
+        capnp::MallocMessageBuilder b;
+        auto request = b.initRoot<capnproto::Request>();
+        request.setMode(capnproto::RequestMode::TWOWAY);
+        request.setId("id");
+        // Bad header: missing operation name
 
-    auto segments = b.getSegmentsForOutput();
-    sender.send(segments);
-    segments = receiver.receive();
+        auto segments = b.getSegmentsForOutput();
+        sender.send(segments);
+        segments = receiver.receive();
 
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
-    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+        capnp::SegmentArrayMessageReader reader(segments);
+        auto response = reader.getRoot<capnproto::Response>();
+        EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
-    EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
-    EXPECT_STREQ("Invalid message header", ex.getUnknown().cStr());
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
+        EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
+        EXPECT_STREQ("Invalid message header", ex.getUnknown().cStr());
+    }
+
+    // Invalid message header a second time, with oneway adapter (for coverage)
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        a.activate();
+
+        zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
+        s.connect("ipc://testscope");
+        ZmqSender sender(s);
+
+        capnp::MallocMessageBuilder b;
+        auto request = b.initRoot<capnproto::Request>();
+        request.setMode(capnproto::RequestMode::ONEWAY);
+        request.setId("id");
+        // Bad header: missing operation name
+
+        auto segments = b.getSegmentsForOutput();
+        sender.send(segments);
+
+        wait();  // Give message time to get out before destroying the adapter
+
+        // No test here, for coverage only.
+    }
 }
 
 TEST(ObjectAdapter, corrupt_header)
@@ -411,34 +507,58 @@ TEST(ObjectAdapter, corrupt_header)
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
-    a.activate();
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        a.activate();
 
-    // No servant registered, check that we get an ObjectNotExistException
-    zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
-    s.connect("ipc://testscope");
-    ZmqSender sender(s);
-    ZmqReceiver receiver(s);
+        zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
+        s.connect("ipc://testscope");
+        ZmqSender sender(s);
+        ZmqReceiver receiver(s);
 
-    // Make a malformed message header so we get coverage on the exception case.
-    capnp::word buf[1];
-    *reinterpret_cast<uint64_t*>(buf) = 0x99;
-    kj::ArrayPtr<capnp::word const> badword(&buf[0], 1);
-    kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments(&badword, 1);
-    sender.send(segments);
+        // Make a malformed message header so we get coverage on the exception case.
+        capnp::word buf[1];
+        *reinterpret_cast<uint64_t*>(buf) = 0x99;
+        kj::ArrayPtr<capnp::word const> badword(&buf[0], 1);
+        kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments(&badword, 1);
+        sender.send(segments);
 
-    segments = receiver.receive();
+        segments = receiver.receive();
 
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
-    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+        capnp::SegmentArrayMessageReader reader(segments);
+        auto response = reader.getRoot<capnproto::Response>();
+        EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::RUNTIME_EXCEPTION);
 
-    auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
-    EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
-    string msg = ex.getUnknown().cStr();
-    boost::regex r("ObjectAdapter: error unmarshaling request header.*");
-    EXPECT_TRUE(boost::regex_match(msg, r));
+        auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
+        EXPECT_EQ(capnproto::RuntimeException::UNKNOWN, ex.which());
+        string msg = ex.getUnknown().cStr();
+        boost::regex r("ObjectAdapter: error unmarshaling request header.*");
+        EXPECT_TRUE(boost::regex_match(msg, r));
+    }
+
+    // Malformed message header a second time, with oneway adapter (for coverage)
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        a.activate();
+
+        zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
+        s.connect("ipc://testscope");
+        ZmqSender sender(s);
+        ZmqReceiver receiver(s);
+
+        // Make a malformed message header so we get coverage on the exception case.
+        capnp::word buf[1];
+        *reinterpret_cast<uint64_t*>(buf) = 0x99;
+        kj::ArrayPtr<capnp::word const> badword(&buf[0], 1);
+        kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments(&badword, 1);
+        sender.send(segments);
+
+        wait();  // Give message time to get out before destroying the adapter
+
+        // No test here, for coverage only.
+    }
 }
 
 TEST(ObjectAdapter, invoke_ok)
@@ -626,7 +746,7 @@ private:
 
 void invoke_thread(ZmqMiddleware* mw, RequestType t)
 {
-    zmqpp::socket s(*mw->context(), zmqpp::socket_type::request);
+    zmqpp::socket s(*mw->context(), t == RequestType::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push);
     s.connect("ipc://testscope");
     ZmqSender sender(s);
     ZmqReceiver receiver(s);
@@ -646,6 +766,10 @@ void invoke_thread(ZmqMiddleware* mw, RequestType t)
         auto response = reader.getRoot<capnproto::Response>();
         EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
     }
+    else
+    {
+        wait(50);  // Allow some time for oneway requests to actually make it on the wire.
+    }
 }
 
 TEST(ObjectAdapter, twoway_threading)
@@ -653,30 +777,31 @@ TEST(ObjectAdapter, twoway_threading)
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    wait();
-    const int num_threads = 5;
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, num_threads);
-    a.activate();
-
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
-    a.add("some_id", o);
 
-    // Create num_requests threads that each send a synchronous request.
+    const int num_threads = 5;
     const int num_requests = 20;
+    {
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, num_threads);
+        a.activate();
 
-    vector<thread> invokers;
-    for (auto i = 0; i < num_requests; ++i)
-    {
-        invokers.push_back(thread(invoke_thread, &mw, RequestType::Twoway));
-    }
-    for (auto& i : invokers)
-    {
-        i.join();
+        a.add("some_id", o);
+
+        // Send num_requests, each from its own thread.
+        vector<thread> invokers;
+        for (auto i = 0; i < num_requests; ++i)
+        {
+            invokers.push_back(thread(invoke_thread, &mw, RequestType::Twoway));
+        }
+        for (auto& i : invokers)
+        {
+            i.join();
+        }
     }
 
     // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
-    // in the servant ensures that we actually reach the maximum of num_threads.
+    // in the servant ensures that we actually reach the maximum of num_threads concurrent invocations.
     EXPECT_EQ(num_requests, o->num_invocations());
     EXPECT_EQ(num_threads, o->max_concurrent());
 }
@@ -686,36 +811,203 @@ TEST(ObjectAdapter, oneway_threading)
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    wait();
-    const int num_threads = 5;
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, num_threads);
-    a.activate();
-
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
-    a.add("some_id", o);
 
-    // Create num_requests threads that each send a synchronous request.
+    const int num_threads = 5;
     const int num_requests = 20;
+    {
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, num_threads);
+        a.activate();
 
-    vector<thread> invokers;
-    for (auto i = 0; i < num_requests; ++i)
-    {
-        invokers.push_back(thread(invoke_thread, &mw, RequestType::Oneway));
+        a.add("some_id", o);
+
+        // Send num_requests, each from its own thread.
+        vector<thread> invokers;
+        for (auto i = 0; i < num_requests; ++i)
+        {
+            invokers.push_back(thread(invoke_thread, &mw, RequestType::Oneway));
+        }
+        for (auto& i : invokers)
+        {
+            i.join();
+        }
+
+        // We need to delay here, otherwise we end up destroying the adapter before
+        // the oneway invocations are processed. We process num_threads requests
+        // in parallel, so the total time will be roughly the number of requests
+        // divided by the number of threads (which is the number of "batches"),
+        // plus a bit of slack.
+        wait(((num_requests / num_threads) + 1) * 100 + 100);
     }
-    for (auto& i : invokers)
-    {
-        i.join();
-    }
-    // We need to delay here, otherwise we end up destroying the adapter before
-    // the oneway invocations are processed. We process num_threads requests
-    // in parallel, so the total time will be roughly the number of requests
-    // divided by the number of requests (which is the number of "batches"),
-    // plus a bit of slack.
-    wait(((num_requests / num_threads) + 1) * 100 + 100);
 
     // We must have had num_requests in total, at most num_threads of which were processed concurrently. The delay
-    // in the servant ensures that we actually reach the maximum of num_threads.
+    // in the servant ensures that we actually reach the maximum of num_threads concurrent invocations.
+
     EXPECT_EQ(num_requests, o->num_invocations());
     EXPECT_EQ(num_threads, o->max_concurrent());
+}
+
+using namespace std::placeholders;
+
+// Servant that updates the servant map in various ways from its destructor, to verify
+// that no deadlock can arise if a servant does this.
+
+class UpdaterServant : public ServantBase
+{
+public:
+    UpdaterServant(function<void()> func) :
+        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&UpdaterServant::op, this, _1, _2, _3) } }),
+        func(func)
+    {
+    }
+
+    ~UpdaterServant()
+    {
+        func();
+    }
+
+    virtual void op(Current const&,
+                    capnp::ObjectPointer::Reader&,
+                    capnproto::Response::Builder& r)
+    {
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    }
+
+    function<void()> func;
+};
+
+TEST(ObjectAdapter, servant_map_destructor)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Servant calls remove on itself from its destructor after adapter is destroyed
+        auto test_func = [&]()
+        {
+            try
+            {
+                a.remove("fred");
+                FAIL();
+            }
+            catch (MiddlewareException const& e)
+            {
+                EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                          e.to_string());
+            }
+        };
+        a.add("fred", make_shared<UpdaterServant>(test_func));
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Servant calls remove on itself from its destructor while adapter is inactive
+        auto test_func = [&]()
+        {
+            try
+            {
+                a.remove("fred");
+                FAIL();
+            }
+            catch (MiddlewareException const& e)
+            {
+                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                          "cannot remove id \"fred\": id not present (adapter: testscope)",
+                          e.to_string());
+            }
+        };
+        auto servant = make_shared<UpdaterServant>(test_func);
+        a.add("fred", servant);
+        a.remove("fred");
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Servant calls remove on itself from its destructor while adapter is active
+        auto test_func = [&]()
+        {
+            try
+            {
+                a.remove("fred");
+                FAIL();
+            }
+            catch (MiddlewareException const& e)
+            {
+                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                          "cannot remove id \"fred\": id not present (adapter: testscope)",
+                          e.to_string());
+            }
+        };
+        auto servant = make_shared<UpdaterServant>(test_func);
+        a.add("fred", servant);
+        a.activate();
+        a.remove("fred");
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Servant removes another servant from its destructor while adapter is active
+        auto test_func = [&]()
+        {
+            EXPECT_NO_THROW(a.remove("joe"));
+        };
+        a.add("fred", make_shared<UpdaterServant>(test_func));
+        a.add("joe", make_shared<MyServant>());
+        a.activate();
+        a.remove("fred");
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Destroy active adapter with a bunch of servants in it
+        a.add("fred", make_shared<MyServant>());
+        a.add("joe", make_shared<MyServant>());
+        a.add("mary", make_shared<MyServant>());
+        a.activate();
+    }
+
+    {
+        wait();
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+
+        // Try adding and finding servant after adapter is destroyed
+        a.add("fred", make_shared<MyServant>());
+        a.activate();
+        a.shutdown();
+        a.wait_for_shutdown();
+        try
+        {
+            a.add("joe", make_shared<MyServant>());
+            FAIL();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+                      "state (adapter: testscope)",
+                      e.to_string());
+        }
+        try
+        {
+            a.find("joe");
+            FAIL();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+                      "state (adapter: testscope)",
+                      e.to_string());
+        }
+    }
 }

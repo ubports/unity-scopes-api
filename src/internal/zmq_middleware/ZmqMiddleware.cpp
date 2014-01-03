@@ -338,7 +338,6 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
 
 zmqpp::context* ZmqMiddleware::context() const noexcept
 {
-    // No lock here. context_ is initialized before any threads are created.
     return const_cast<zmqpp::context*>(&context_);
 }
 

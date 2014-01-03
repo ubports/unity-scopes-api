@@ -62,6 +62,7 @@ public:
     bool add(std::string const& scope_name, ScopeMetadata const& metadata,
              std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
+    ScopeProxy locate(std::string const& scope_name);
 
 private:
 
@@ -213,6 +214,17 @@ bool RegistryObjectPrivate::remove(std::string const& scope_name)
     return scopes.erase(scope_name) == 1;
 }
 
+ScopeProxy RegistryObjectPrivate::locate(std::string const& scope_name)
+{
+    // If the name is empty, it was sent as empty by the remote client.
+    if (scope_name.empty())
+        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+    // TODO: missing implementation. This should activate the scope if it isn't running already
+    // and return the proxy for the scope. Failures such as not being able to exec the scope
+    // need to raise RegistryException.
+    throw NotFoundException("Registry::locate(): no such scope",  scope_name);
+
+}
 
 RegistryObject::RegistryObject() : p(new RegistryObjectPrivate())
 {
@@ -252,6 +264,12 @@ bool RegistryObject::remove(std::string const& scope_name)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     return p->remove(scope_name);
+}
+
+ScopeProxy RegistryObject::locate(std::string const& scope_name)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    return p->locate(scope_name);
 }
 
 } // namespace internal
