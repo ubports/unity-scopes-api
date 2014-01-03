@@ -23,7 +23,6 @@
 #include <unity/Exception.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 
