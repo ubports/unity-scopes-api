@@ -58,8 +58,9 @@ exception NotFoundException
 
 interface Registry
 {
-    Scope* get_metadata(string name) throws NotFoundException;
+    ScopeProxy get_metadata(string name) throws NotFoundException;
     ScopeMap list();
+    ScopeProxy locate(string name) throws NotFoundException, RegistryException;
 };
 
 */
@@ -68,7 +69,8 @@ using namespace std::placeholders;
 
 RegistryI::RegistryI(RegistryObject::SPtr const& ro) :
     ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
-                      { "list", bind(&RegistryI::list_, this, _1, _2, _3) } })
+                      { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
+                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) } })
 
 {
 }
@@ -78,8 +80,8 @@ RegistryI::~RegistryI() noexcept
 }
 
 void RegistryI::get_metadata_(Current const&,
-                      capnp::ObjectPointer::Reader& in_params,
-                      capnproto::Response::Builder& r)
+                              capnp::ObjectPointer::Reader& in_params,
+                              capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
     string name = req.getName().cStr();
@@ -114,6 +116,36 @@ void RegistryI::list_(Current const&,
         auto dict = rv[i];
         to_value_dict(pair.second.serialize(), dict);
         ++i;
+    }
+}
+
+void RegistryI::locate_(Current const&,
+                        capnp::ObjectPointer::Reader& in_params,
+                        capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
+    string name = req.getName().cStr();
+    auto delegate = dynamic_pointer_cast<RegistryObject>(del());
+    try
+    {
+        auto scope_proxy = delegate->locate(name);
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
+        auto proxy = locate_response.initReturnValue();
+        proxy.setIdentity(scope_proxy->identity());
+        proxy.setEndpoint(scope_proxy->endpoint());
+    }
+    catch (NotFoundException const& e)
+    {
+        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
+        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
+        locate_response.initNotFoundException().setName(e.name().c_str());
+    }
+    catch (RegistryException const& e)
+    {
+        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
+        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
+        locate_response.initRegistryException().setReason(e.reason().c_str());
     }
 }
 

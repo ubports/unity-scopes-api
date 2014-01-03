@@ -111,6 +111,30 @@ private:
     std::string name_;
 };
 
+/**
+\brief Exception to indicate that the registry was unable to start a scope process.
+*/
+
+class UNITY_API RegistryException : public unity::Exception
+{
+public:
+    /**
+    \brief Constructs the exception.
+    \param reason Further details about the cause of the exception.
+    */
+    explicit RegistryException(std::string const& reason);
+    //! @cond
+    RegistryException(RegistryException const&);
+    RegistryException& operator=(RegistryException const&);
+    virtual ~RegistryException() noexcept;
+    //! @endcond
+
+    /**
+    \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    */
+    virtual std::exception_ptr self() const override;
+};
+
 } // namespace scopes
 
 } // namespace api

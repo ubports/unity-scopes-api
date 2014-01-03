@@ -101,6 +101,27 @@ string NotFoundException::name() const
     return name_;
 }
 
+RegistryException::RegistryException(string const& reason) :
+    Exception("unity::api::scopes::RegistryException", reason)
+{
+}
+
+RegistryException::RegistryException(RegistryException const&) = default;
+
+//! @cond
+
+RegistryException& RegistryException::operator=(RegistryException const&) = default;
+
+
+RegistryException::~RegistryException() noexcept = default;
+
+//! @endcond
+
+exception_ptr RegistryException::self() const
+{
+    return make_exception_ptr(*this);
+}
+
 } // namespace scopes
 
 } // namespace api
