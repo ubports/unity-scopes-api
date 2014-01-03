@@ -53,9 +53,10 @@ public:
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
     }
-    virtual void finished(ReceiverBase::Reason reason) override
+    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
