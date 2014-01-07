@@ -21,6 +21,7 @@
 
 #include <scopes/ScopeBase.h>
 #include <scopes/internal/DynamicLoader.h>
+#include <thread>
 
 namespace unity
 {
@@ -71,9 +72,7 @@ private:
     std::exception_ptr exception_;
 
     std::thread scope_thread_;
-    unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;
     std::unique_ptr<ScopeBase, DestroyFunction> scope_base_;
-    unity::scopes::RegistryProxy registry_;
 
     enum class ScopeState
     {

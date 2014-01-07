@@ -43,7 +43,7 @@ public:
         inc_stop();
     }
 
-    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&,
+    virtual unity::scopes::QueryBase::UPtr create_query(std::string const&,
                                                              unity::scopes::VariantMap const&) override
     {
         return nullptr;

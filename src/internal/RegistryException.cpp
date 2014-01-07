@@ -23,9 +23,6 @@ using namespace std;
 namespace unity
 {
 
-namespace api
-{
-
 namespace scopes
 {
 
@@ -56,7 +53,5 @@ exception_ptr RegistryException::self() const
 } // namespace internal
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
