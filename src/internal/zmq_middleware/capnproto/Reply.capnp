@@ -54,4 +54,5 @@ enum FinishedReason
 struct FinishedRequest
 {
     reason @0 : FinishedReason;
+    error @1  : Text;               # Present only if reason is error
 }

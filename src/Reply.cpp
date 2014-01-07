@@ -73,6 +73,10 @@ void Reply::finished() const
     return fwd()->finished();
 }
 
+void Reply::error(std::exception_ptr ex) const
+{
+    return fwd()->error(ex);
+}
 internal::ReplyImpl* Reply::fwd() const
 {
     return dynamic_cast<internal::ReplyImpl*>(pimpl());

@@ -43,11 +43,6 @@ public:
         inc_stop();
     }
 
-    virtual void run() override
-    {
-        inc_run();
-    }
-
     virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&,
                                                              unity::api::scopes::VariantMap const&) override
     {
