@@ -1,4 +1,4 @@
-set(HDR_INSTALL_DIR include)
+set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
 
 add_subdirectory(scopes)
 
