@@ -181,8 +181,9 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
     }
-    // TODO: check for names containing a slash, because that won't work if we use
-    //       the name for a socket in the file system.
+    if(scope_name.find('/') != std::string::npos) {
+        throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its name");
+    }
 
     if (scopes.find(scope_name) != scopes.end())
     {
