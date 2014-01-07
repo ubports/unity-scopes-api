@@ -70,6 +70,7 @@ private:
     std::map<std::string, std::vector<std::string>> commands;
 
     void spawn_scope(std::string const& scope_name);
+    int kill_process(pid_t pid);
     void shutdown();
 
 };
@@ -86,15 +87,21 @@ RegistryObjectPrivate::~RegistryObjectPrivate()
     }
 }
 
+int RegistryObjectPrivate::kill_process(pid_t pid) {
+    int exitcode;
+    // Currently just shoot children dead.
+    // If we want to get fancy and give them a graceful
+    // warning, this is the place to do it.
+    kill(pid, SIGKILL);
+    waitpid(pid, &exitcode, 0);
+    return exitcode;
+}
+
 void RegistryObjectPrivate::shutdown()
 {
     for (const auto &i : scope_processes)
     {
-        // Currently just shoot children dead.
-        // If we want to get fancy and give them a graceful
-        // warning, this is the place to do it.
-        kill(i.second, SIGKILL);
-        waitpid(i.second, nullptr, 0);
+        kill_process(i.second);
     }
     scope_processes.clear();
     commands.clear();
@@ -169,6 +176,7 @@ MetadataMap RegistryObjectPrivate::list()
 bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata,
                                 std::vector<std::string> const& spawn_command)
 {
+    bool return_value = true;
     if (scope_name.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
@@ -178,12 +186,19 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
 
     if (scopes.find(scope_name) != scopes.end())
     {
+        auto proc = scope_processes.find(scope_name);
+        if (proc != scope_processes.end())
+        {
+            kill_process(proc->second);
+            scope_processes.erase(scope_name);
+        }
         scopes.erase(scope_name);
         commands.erase(scope_name);
+        return_value = false;
     }
     scopes.insert(make_pair(scope_name, metadata));
     commands[scope_name] = spawn_command;
-    return true;
+    return return_value;
 }
 
 bool RegistryObjectPrivate::remove(std::string const& scope_name)
