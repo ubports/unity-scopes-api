@@ -41,9 +41,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime) :
+ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name) :
     ObjectProxyImpl(mw_proxy),
-    runtime_(runtime)
+    runtime_(runtime),
+    scope_name_(scope_name)
 {
     assert(runtime);
 }
@@ -59,7 +60,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ReplyObject::SPtr ro(make_shared<ReplyObject>(reply, runtime_));
+        ReplyObject::SPtr ro(make_shared<ReplyObject>(reply, runtime_, scope_name_));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a
@@ -91,9 +92,9 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
     return ctrl;
 }
 
-ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime)
+ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name)
 {
-    return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime)));
+    return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime, scope_name)));
 }
 
 MWScopeProxy ScopeImpl::fwd() const

@@ -61,7 +61,7 @@ public:
     Result(Result&&);
     Result& operator=(Result&&);
 
-    void store(Result const& other);
+    void store(Result const& other, bool intercept_preview_req = false);
     bool has_stored_result() const;
     Result retrieve() const;
 
@@ -69,6 +69,7 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
+    void intercept_activation();
 
     /**
        \brief Returns reference of a Result attribute.
@@ -91,6 +92,7 @@ public:
     std::string title() const noexcept;
     std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
+
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;
 
@@ -103,6 +105,7 @@ public:
 private:
     explicit Result(const VariantMap &variant_map);
     Result(internal::ResultImpl* impl);
+    Result(std::shared_ptr<internal::ResultImpl> impl);
 
     std::shared_ptr<internal::ResultImpl> p;
 

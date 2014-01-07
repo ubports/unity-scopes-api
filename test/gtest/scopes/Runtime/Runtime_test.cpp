@@ -93,7 +93,7 @@ TEST(Runtime, run_scope)
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get());
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     VariantMap hints;
     auto receiver = make_shared<Receiver>();

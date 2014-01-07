@@ -51,7 +51,7 @@ class ReplyObject final : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime);
+    ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
@@ -65,6 +65,7 @@ private:
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;
+    std::string origin_scope_name_;
     int num_push_;
 };
 

@@ -43,7 +43,8 @@ ResultImpl::ResultImpl(VariantMap const& variant_map)
 }
 
 ResultImpl::ResultImpl(ResultImpl const& other)
-    : attrs_(other.attrs_)
+    : attrs_(other.attrs_),
+      flags_(0)
 {
     if (other.stored_result_)
     {
@@ -64,11 +65,15 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     return *this;
 }
 
-void ResultImpl::store(Result const& other)
+void ResultImpl::store(Result const& other, bool intercept_preview_req)
 {
     if (this == other.p.get())
     {
         throw InvalidArgumentException("Result:: cannot store self");
+    }
+    if (intercept_preview_req)
+    {
+        flags_ |= Flags::InterceptPreview;
     }
     stored_result_.reset(new VariantMap(other.serialize()));
 }
@@ -85,6 +90,11 @@ Result ResultImpl::retrieve() const
         throw InvalidArgumentException("Result: no result has been stored");
     }
     return Result(*stored_result_);
+}
+
+void ResultImpl::set_origin(std::string const& scope_name)
+{
+    origin_ = scope_name;
 }
 
 void ResultImpl::set_uri(std::string const& uri)
@@ -105,6 +115,11 @@ void ResultImpl::set_art(std::string const& art)
 void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 {
     attrs_["dnd_uri"] = dnd_uri;
+}
+
+void ResultImpl::intercept_activation()
+{
+    flags_ |= Flags::InterceptActivation;
 }
 
 Variant& ResultImpl::operator[](std::string const& key)
@@ -157,6 +172,11 @@ std::string ResultImpl::dnd_uri() const noexcept
     return "";
 }
 
+std::string ResultImpl::origin() const noexcept
+{
+    return origin_;
+}
+
 bool ResultImpl::contains(std::string const& key) const
 {
     return attrs_.find(key) != attrs_.end();
@@ -194,6 +214,14 @@ void ResultImpl::throw_on_empty(std::string const& name) const
 
 void ResultImpl::serialize_internal(VariantMap& var) const
 {
+    if (flags_ != 0)
+    {
+        var["flags"] = flags_;
+    }
+    if (!origin_.empty())
+    {
+        var["origin"] = origin_;
+    }
     if (stored_result_)
     {
         var["result"] = *stored_result_;
@@ -219,9 +247,18 @@ void ResultImpl::deserialize(VariantMap const& var)
 {
     // check for ["internal"]["result"] dict which holds stored result.
     auto it = var.find("internal");
-    if (it != var.end())
+    if (it == var.end())
+    {
+        throw InvalidArgumentException("Missing 'internal' element'");
+    }
+    else
     {
         auto const& resvar = it->second.get_dict();
+        it = resvar.find("flags");
+        if (it != resvar.end())
+        {
+            flags_ = it->second.get_int();
+        }
         it = resvar.find("result");
         if (it != resvar.end())
         {

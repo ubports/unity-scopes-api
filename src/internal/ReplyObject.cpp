@@ -22,6 +22,7 @@
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
+#include <scopes/internal/CategorisedResultImpl.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -41,10 +42,11 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ReceiverBase::SPtr const& receiver_base, RuntimeImpl const* runtime) :
+ReplyObject::ReplyObject(ReceiverBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_name) :
     receiver_base_(receiver_base),
     cat_registry_(new CategoryRegistry()),
     finished_(false),
+    origin_scope_name_(scope_name),
     num_push_(0)
 {
     assert(receiver_base);
@@ -106,7 +108,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
             auto result_var = it->second.get_dict();
             try
             {
-                Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+                Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var)); //FIXME: leaks on excp from AnnotationImpl ctor
                 receiver_base_->push(std::move(annotation));
             }
             catch (std::exception const& e)
@@ -123,7 +125,9 @@ void ReplyObject::push(VariantMap const& result) noexcept
             auto result_var = it->second.get_dict();
             try
             {
-                CategorisedResult result(*cat_registry_, result_var);
+                auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
+                impl->set_origin(origin_scope_name_);
+                CategorisedResult result(impl);
                 receiver_base_->push(std::move(result));
             }
             catch (std::exception const& e)

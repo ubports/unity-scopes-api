@@ -195,7 +195,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
             catch (NotFoundException const&)
             {
             }
-            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime());
+            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
             mi->set_proxy(proxy);
             auto meta = ScopeMetadataImpl::create(move(mi));
             registry->add(pair.first, move(meta));
