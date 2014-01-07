@@ -40,9 +40,10 @@ namespace internal
 namespace smartscopes
 {
 
-class JsonNodeInterface : private util::NonCopyable
+class JsonNodeInterface
 {
 public:
+    NONCOPYABLE(JsonNodeInterface);
     UNITY_DEFINES_PTRS(JsonNodeInterface);
 
     enum NodeType

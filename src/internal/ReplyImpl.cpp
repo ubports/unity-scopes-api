@@ -30,6 +30,7 @@
 
 #include <sstream>
 #include <cassert>
+#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -70,7 +71,10 @@ void ReplyImpl::register_category(Category::SCPtr category)
     push(category);
 }
 
-Category::SCPtr ReplyImpl::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+Category::SCPtr ReplyImpl::register_category(std::string const& id,
+                                             std::string const& title,
+                                             std::string const &icon,
+                                             CategoryRenderer const& renderer_template)
 {
     auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
 
@@ -136,7 +140,7 @@ bool ReplyImpl::push(VariantMap const& variant_map)
         catch (MiddlewareException const& e)
         {
             // TODO: log error
-            finished(ReceiverBase::Error);
+            error(current_exception());
             return false;
         }
     }
@@ -154,14 +158,43 @@ void ReplyImpl::finished(ReceiverBase::Reason reason)
     {
         try
         {
-            fwd()->finished(reason);
+            fwd()->finished(reason, "");
         }
         catch (MiddlewareException const& e)
         {
             // TODO: log error
+            cerr << e.what() << endl;
         }
     }
 }
+
+void ReplyImpl::error(exception_ptr ex)
+{
+    string error_message;
+    try
+    {
+        rethrow_exception(ex);
+    }
+    catch (std::exception const& e)
+    {
+        error_message = e.what();
+    }
+    catch (...)
+    {
+        error_message = "unknown exception";
+    }
+
+    try
+    {
+        fwd()->finished(ReceiverBase::Error, error_message);
+    }
+    catch (MiddlewareException const& e)
+    {
+        // TODO: log error
+        cerr << e.what() << endl;
+    }
+}
+
 
 ReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
 {

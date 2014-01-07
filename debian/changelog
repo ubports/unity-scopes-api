@@ -1,10 +1,53 @@
-unity-scopes-api (0.1.6-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.1.7-0ubuntu1) UNRELEASED; urgency=low
 
+  * Added ability for scope to push an exception (as an exception_ptr). On the client side,
+    the exception is delivered as the what() string (if the exception is a std::exception) and
+    as "unknown exception", otherwise.
+
+ -- Michi Henning <michi.henning@canonical.com>  Fri, 03 Jan 2014 07:31:02 +1000
+
+unity-scopes-api (0.1.6+14.04.20131219.1-0ubuntu1) trusty; urgency=low
+
+  [ Pawel Stolowski ]
   * Added support for [] operator to the Result class, other minor changes to Result API.
   * Remove factory_configfile() API as well as the need to define it in
     the configuration files.
+  * Made title / art optional in Result / CategorisedResult. Report
+    uncaught exceptions from ScopeBase::run() to stderr. (LP: #1259963)
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 18 Dec 2013 10:11:37 +0100
+  [ Michal Hruby ]
+  * Bump version requirements.
+  * Loosen the version req so it works fine with PPAs.
+
+  [ Jussi Pakkanen ]
+  * Find libraries instead of using them blindly.
+  * Fix use of uninitialised variable.
+  * Use lowercased build type.
+  * Use the macro version of noncopyable.
+  * Made compile tests work when CCache is in use.
+  * Detect jsoncpp with pkg-config.
+
+  [ Marcus Tomlinson ]
+  * Removed unity/api directories in test tree. (LP: #1249896)
+  * Introduced Smart Scopes client functionality.
+  * Fixed timing issue in cancel_get test.
+  * Mock python servers now scan for an available port on localhost then
+    return that port to the associated test process.
+
+  [ Michi Henning ]
+  * Fixed typo in CMakeLists.txt error message.
+  * Made changes required by new API for exceptions in unity-api:
+    https://code.launchpad.net/~michihenning/unity-api/what-
+    fix/+merge/198871.
+  * Changed CXX flags to not abort the build in release mode when there
+    is a deprecation warning.
+  * Add notes on now the client- and server-side invocation and dispatch
+    are implemented. (LP: #1260253)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 106
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 19 Dec 2013 21:08:02 +0000
 
 unity-scopes-api (0.1.4-0ubuntu2) UNRELEASED; urgency=low
 

@@ -43,6 +43,7 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
     MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
+    ScopeProxy locate(std::string const& scope_name);
 
     static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
 

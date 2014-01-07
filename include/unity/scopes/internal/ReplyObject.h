@@ -53,7 +53,7 @@ public:
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept;
-    void finished(ReceiverBase::Reason reason) noexcept;
+    void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept;
 
 private:
     ReceiverBase::SPtr const receiver_base_;

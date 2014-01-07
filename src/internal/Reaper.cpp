@@ -68,7 +68,7 @@ void ReapItem::refresh() noexcept
     auto const reaper = wp_reaper.lock();
     if (reaper)
     {
-        lock_guard<mutex> lock(reaper->mutex_);
+        lock_guard<mutex> reaper_lock(reaper->mutex_);
         assert(it_ != reaper->list_.end());
         reaper_private::Item item(*it_);
         item.timestamp = chrono::steady_clock::now();
@@ -98,7 +98,7 @@ void ReapItem::destroy() noexcept
     auto const reaper = wp_reaper.lock();
     if (reaper)
     {
-        lock_guard<mutex> lock(reaper->mutex_);
+        lock_guard<mutex> reaper_lock(reaper->mutex_);
         assert(it_ != reaper->list_.end());
         reaper->list_.erase(it_);
     }
@@ -126,18 +126,11 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
         s << "Reaper: reap_interval (" << reap_interval << ") must be <= expiry_interval (" << expiry_interval << ").";
         throw unity::LogicException(s.str());
     }
-    reap_thread_ = thread(&Reaper::run, this);
 }
 
 Reaper::~Reaper() noexcept
 {
-    // Let the reaper thread know that it needs to stop doing things
-    {
-        lock_guard<mutex> lock(mutex_);
-        finish_ = true;
-    }
-    do_work_.notify_one();
-    reap_thread_.join();
+    destroy();
 }
 
 // Instantiate a new reaper. We call set_self() after instantiation so the reaper
@@ -149,12 +142,33 @@ Reaper::SPtr Reaper::create(int reap_interval, int expiry_interval, DestroyPolic
 {
     SPtr reaper(new Reaper(reap_interval, expiry_interval, p));
     reaper->set_self();
+    reaper->start();
     return reaper;
 }
 
 void Reaper::set_self() noexcept
 {
     self_ = shared_from_this();
+}
+
+void Reaper::start()
+{
+    reap_thread_ = thread(&Reaper::reap_func, this);
+}
+
+void Reaper::destroy()
+{
+    // Let the reaper thread know that it needs to stop doing things
+    {
+        lock_guard<mutex> lock(mutex_);
+        if (finish_)
+        {
+            return;
+        }
+        finish_ = true;
+        do_work_.notify_one();
+    }
+    reap_thread_.join();
 }
 
 // Add a new entry to the reaper. If the entry is not refreshed within the expiry interval,
@@ -167,17 +181,19 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
         throw unity::InvalidArgumentException("Reaper: invalid null callback passed to add().");
     }
 
+    lock_guard<mutex> lock(mutex_);
+
+    if (finish_)
+    {
+        throw unity::LogicException("Reaper: cannot add item to destroyed reaper.");
+    }
+
     // Put new Item at the head of the list.
     reaper_private::Reaplist::iterator ri;
-    size_t list_size;
-    {
-        lock_guard<mutex> lock(mutex_);
-        Item item(cb);
-        list_.push_front(item); // LRU order
-        ri = list_.begin();
-        list_size = list_.size();
-    }
-    if (list_size == 1) // List just became non-empty
+    Item item(cb);
+    list_.push_front(item); // LRU order
+    ri = list_.begin();
+    if (list_.size() == 1)
     {
         do_work_.notify_one();  // Wake up reaper thread
     }
@@ -198,7 +214,7 @@ size_t Reaper::size() const noexcept
 
 // Reaper thread
 
-void Reaper::run()
+void Reaper::reap_func()
 {
     unique_lock<mutex> lock(mutex_);
     for (;;)
@@ -222,8 +238,7 @@ void Reaper::run()
             auto const reap_interval = chrono::duration_cast<chrono::milliseconds>(reap_interval_);
             auto const sleep_interval = max(expiry_interval_ - oldest_item_age, reap_interval);
             auto const wakeup_time = now + sleep_interval;
-            while (!finish_ && do_work_.wait_until(lock, wakeup_time) != cv_status::timeout)
-                ;
+            do_work_.wait_until(lock, wakeup_time, [this]{ return finish_; });
         }
 
         if (finish_ && policy_ == NoCallbackOnDestroy)

@@ -27,10 +27,20 @@
 #include <scopes/internal/lttng/SimpleTracepoint.h>
 #include <stdint.h>
 
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 SIMPLE_TRACEPOINT(
   trace,
   TRACE_DEBUG,
   stp_integer(int, value)
 )
+
+#if __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif /* UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H */

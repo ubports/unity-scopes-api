@@ -71,9 +71,10 @@ struct SearchResult
     std::shared_ptr<SearchCategory> category;
 };
 
-class SearchHandle : private util::NonCopyable
+class SearchHandle
 {
 public:
+    NONCOPYABLE(SearchHandle);
     UNITY_DEFINES_PTRS(SearchHandle);
 
     ~SearchHandle();
@@ -89,10 +90,10 @@ private:
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
-class SmartScopesClient : private util::NonCopyable,
-    public std::enable_shared_from_this<SmartScopesClient>
+class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
 {
 public:
+    NONCOPYABLE(SmartScopesClient);
     UNITY_DEFINES_PTRS(SmartScopesClient);
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,

@@ -16,18 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_UNIQUEID_H
-#define UNITY_SCOPES_INTERNAL_UNIQUEID_H
+#ifndef UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
+#define UNITY_API_SCOPES_INTERNAL_REGISTRYEXCEPTION_H
 
-#include <unity/util/NonCopyable.h>
-
-#include <iomanip>
-#include <mutex>
-#include <random>
-#include <sstream>
-#include <string>
+#include <unity/Exception.h>
 
 namespace unity
+{
+
+namespace api
 {
 
 namespace scopes
@@ -36,30 +33,22 @@ namespace scopes
 namespace internal
 {
 
-// Poor man's thread-safe unique ID generator.
-// Generates a random number concatenated with a counter.
-// Return value is a string of 16 hex digits.
-
-class UniqueID
+class UNITY_API RegistryException : public unity::Exception
 {
 public:
-    NONCOPYABLE(UniqueID);
-    UniqueID();                                         // Gets seed from std::random_device
-    explicit UniqueID(std::mt19937::result_type seed);  // Uses specified seed
+    explicit RegistryException(std::string const& reason);
+    RegistryException(RegistryException const&);
+    RegistryException& operator=(RegistryException const&);
+    virtual ~RegistryException() noexcept;
 
-    std::string gen();                                  // Returns a unique id
-
-private:
-    std::mt19937 engine;
-    std::uniform_int_distribution<uint32_t> uniform_dist;
-    int counter;
-    std::ostringstream s;
-    std::mutex m;
+    virtual std::exception_ptr self() const override;
 };
 
 } // namespace internal
 
 } // namespace scopes
+
+} // namespace api
 
 } // namespace unity
 

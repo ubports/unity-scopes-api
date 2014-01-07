@@ -47,6 +47,7 @@ public:
     // Remote operations.
     virtual ScopeMetadata get_metadata(std::string const& scope_name) override;
     virtual MetadataMap list() override;
+    virtual ScopeProxy locate(std::string const& scope_name) override;
 };
 
 } // namespace zmq_middleware

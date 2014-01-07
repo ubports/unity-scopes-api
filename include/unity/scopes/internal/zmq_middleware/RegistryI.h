@@ -49,12 +49,16 @@ public:
 
 private:
     virtual void get_metadata_(Current const& current,
-                       capnp::ObjectPointer::Reader& in_params,
-                       capnproto::Response::Builder& r);
+                               capnp::ObjectPointer::Reader& in_params,
+                               capnproto::Response::Builder& r);
 
     virtual void list_(Current const& current,
                        capnp::ObjectPointer::Reader& in_params,
                        capnproto::Response::Builder& r);
+
+    virtual void locate_(Current const& current,
+                         capnp::ObjectPointer::Reader& in_params,
+                         capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware

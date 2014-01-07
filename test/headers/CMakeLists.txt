@@ -24,12 +24,12 @@ foreach(dir ${subdirs})
     # Test that each public header compiles stand-alone.
     add_test(stand-alone-${location}-headers
         ${CMAKE_CURRENT_SOURCE_DIR}/compile_headers.py
-            ${public_inc_dir} ${CMAKE_CXX_COMPILER} "${CMAKE_CXX_COMPILER_ARG1} -I${root_inc_dir} -I${public_inc_dir} ${other_inc_dirs} ${CMAKE_CXX_FLAGS}")
+            ${public_inc_dir} ${CMAKE_CXX_COMPILER} "${CMAKE_CXX_COMPILER_ARG1} -fsyntax-only -I${root_inc_dir} -I${public_inc_dir} ${other_inc_dirs} ${CMAKE_CXX_FLAGS}")
 
     # Test that each internal header compiles stand-alone.
     add_test(stand-alone-${location}-internal-headers
         ${CMAKE_CURRENT_SOURCE_DIR}/compile_headers.py
-            ${internal_inc_dir} ${CMAKE_CXX_COMPILER} "${CMAKE_CXX_COMPILER_ARG1} -I${root_inc_dir} -I${internal_inc_dir} ${other_inc_dirs} ${CMAKE_CXX_FLAGS}")
+            ${internal_inc_dir} ${CMAKE_CXX_COMPILER} "${CMAKE_CXX_COMPILER_ARG1} -fsyntax-only -I${root_inc_dir} -I${internal_inc_dir} ${other_inc_dirs} ${CMAKE_CXX_FLAGS}")
 
     # Test that no public header includes an internal header
     add_test(clean-public-${location}-headers ${CMAKE_CURRENT_SOURCE_DIR}/check_public_headers.py ${public_inc_dir})

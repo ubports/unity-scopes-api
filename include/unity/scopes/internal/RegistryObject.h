@@ -35,7 +35,7 @@ namespace internal
 
 // Maintains a map of <scope name, scope proxy> pairs.
 
-class RegistryObject final : public AbstractObject
+class RegistryObject : public AbstractObject
 {
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
@@ -45,9 +45,10 @@ public:
 
     // Remote operation implementations
     ScopeMetadata get_metadata(std::string const& scope_name);
-
     MetadataMap list();
+    virtual ScopeProxy locate(std::string const& scope_name);  // virtual so we can mock the method for testing
 
+    // Local methods
     bool add(std::string const& scope_name, ScopeMetadata const& scope);
     bool remove(std::string const& scope_name);
 

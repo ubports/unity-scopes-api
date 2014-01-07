@@ -22,7 +22,6 @@
 #include <scopes/ReceiverBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
-#include <unity/Exception.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -54,7 +53,7 @@ ReplyObject::~ReplyObject() noexcept
 {
     try
     {
-        finished(ReceiverBase::Finished);
+        finished(ReceiverBase::Finished, "");
     }
     catch (...)
     {
@@ -107,10 +106,11 @@ void ReplyObject::push(VariantMap const& result) noexcept
                 Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
                 receiver_base_->push(std::move(annotation));
             }
-            catch (unity::Exception const& e)
+            catch (std::exception const& e)
             {
-                // TODO: this is an internal error; log error
-                finished(ReceiverBase::Error);
+                // TODO: log this
+                cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
+                finished(ReceiverBase::Error, e.what());
             }
         }
 
@@ -125,9 +125,9 @@ void ReplyObject::push(VariantMap const& result) noexcept
             }
             catch (std::exception const& e)
             {
-                // TODO: this is an internal error; log error
+                // TODO: log this
                 cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
-                finished(ReceiverBase::Error);
+                finished(ReceiverBase::Error, e.what());
             }
         }
     }
@@ -137,7 +137,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         cerr << "ReplyObject::push(VariantMap): " << e.what() << endl;
         try
         {
-            finished(ReceiverBase::Error);
+            finished(ReceiverBase::Error, e.what());
         }
         catch (...)
         {
@@ -149,7 +149,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         cerr << "ReplyObject::push(VariantMap): unknown exception" << endl;
         try
         {
-            finished(ReceiverBase::Error);
+            finished(ReceiverBase::Error, "unknown exception");
         }
         catch (...)
         {
@@ -162,7 +162,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     }
 }
 
-void ReplyObject::finished(ReceiverBase::Reason r) noexcept
+void ReplyObject::finished(ReceiverBase::Reason r, string const& error_message) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -185,7 +185,7 @@ void ReplyObject::finished(ReceiverBase::Reason r) noexcept
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        receiver_base_->finished(r);
+        receiver_base_->finished(r, error_message);
     }
     catch (std::exception const& e)
     {

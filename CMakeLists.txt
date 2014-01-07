@@ -126,6 +126,18 @@ if (Werror)
     endif()
 endif()
 
+set(SANITIZER "" CACHE STRING "Build with -fsanitize=<value> (legal values: thread, address)")
+
+if ("${SANITIZER}" STREQUAL "")
+    # Do nothing
+elseif (${SANITIZER} STREQUAL "thread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+elseif (${SANITIZER} STREQUAL "address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+else()
+    message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
+endif()
+
 option(IPC_MONITORING "Enable IPC traffic monitoring")
 
 if(IPC_MONITORING)
@@ -138,7 +150,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 6)
+set(UNITY_SCOPES_MICRO 7)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)

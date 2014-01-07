@@ -52,8 +52,8 @@ before leaving `main()`; failure to do so results in undefined behavior.
 class UNITY_API Runtime
 {
 public:
-    NONCOPYABLE(Runtime)
     /// @cond
+    NONCOPYABLE(Runtime);
     UNITY_DEFINES_PTRS(Runtime);
     /// @endcond
 

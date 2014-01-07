@@ -57,9 +57,14 @@ public:
         }
     }
 
-    virtual void finished(Reason reason) override
+    virtual void finished(Reason reason, string const& error_message) override
     {
-        cout << "query to " << scope_name_ << " complete, status: " << to_string(reason) << endl;
+        cout << "query to " << scope_name_ << " complete, status: " << to_string(reason);
+        if (reason == ReceiverBase::Error)
+        {
+            cout << ": " << error_message;
+        }
+        cout << endl;
     }
 
     Receiver(string const& scope_name, ReplyProxy const& upstream) :

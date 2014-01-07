@@ -68,7 +68,7 @@ void ZmqReply::push(VariantMap const& result)
     future.wait();
 }
 
-void ZmqReply::finished(ReceiverBase::Reason reason)
+void ZmqReply::finished(ReceiverBase::Reason reason, string const& error_message)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "finished");
@@ -89,6 +89,7 @@ void ZmqReply::finished(ReceiverBase::Reason reason)
         case ReceiverBase::Error:
         {
             r = capnproto::Reply::FinishedReason::ERROR;
+            in_params.setError(error_message);
             break;
         }
         default:

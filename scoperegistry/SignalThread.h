@@ -33,7 +33,7 @@ namespace scoperegistry
 class SignalThread final
 {
 public:
-    NONCOPYABLE(SignalThread)
+    NONCOPYABLE(SignalThread);
 
     SignalThread();
     ~SignalThread() noexcept;

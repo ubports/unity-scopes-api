@@ -22,9 +22,6 @@
 #include <scopes/ScopeBase.h>
 #include <scopes/internal/DynamicLoader.h>
 
-#include <thread>
-#include <condition_variable>
-
 namespace unity
 {
 
@@ -39,7 +36,7 @@ namespace internal
 class UNITY_API ScopeLoader final
 {
 public:
-    NONCOPYABLE(ScopeLoader)
+    NONCOPYABLE(ScopeLoader);
     UNITY_DEFINES_PTRS(ScopeLoader);
 
     // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy
@@ -50,8 +47,7 @@ public:
     // allows the caller to receive any exceptions that may have been produced by the scope thread.
     void unload();
 
-    // These methods start or stop a scope. They are asynchronous, that is, they don't wait until the scope is
-    // started or stopped; instead they just instruct the scope to do what it is told without waiting.
+    // These methods start or stop a scope, that is, call through to the scope-provided versions in the dynamic library.
     void start();
     void stop();
 
@@ -68,45 +64,22 @@ public:
 
 private:
     ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);
-    void run_scope(unity::scopes::CreateFunction create_func, unity::scopes::DestroyFunction destroy_func);
-    void handle_thread_exception();
-
-    void run_application(unity::scopes::ScopeBase* scope);
-    void notify_app_thread_started();
 
     std::string scope_name_;
-    unity::scopes::ScopeBase* scope_base_;
     unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;
     unity::scopes::RegistryProxy registry_;
     std::exception_ptr exception_;
 
     std::thread scope_thread_;
+    unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;
+    std::unique_ptr<ScopeBase, DestroyFunction> scope_base_;
+    unity::scopes::RegistryProxy registry_;
 
     enum class ScopeState
     {
-        Created, Stopped, Started, Finished, Failed
+        Stopped, Started, Failed, Finished
     };
     ScopeState scope_state_;
-    std::condition_variable state_changed_;
-    mutable std::mutex state_mutex_;
-
-    enum class ScopeCmd
-    {
-        None, Start, Stop, Finish
-    };
-    ScopeCmd cmd_;
-    std::condition_variable cmd_changed_;
-    std::mutex cmd_mutex_;
-
-    std::thread run_thread_;
-
-    enum class AppState
-    {
-        Created, Started, Stopped
-    };
-    AppState run_thread_state_;
-    std::condition_variable run_thread_changed_;
-    std::mutex run_thread_mutex_;
 };
 
 } // namespace internal

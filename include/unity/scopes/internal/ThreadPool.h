@@ -41,7 +41,7 @@ namespace internal
 class ThreadPool final
 {
 public:
-    NONCOPYABLE(ThreadPool)
+    NONCOPYABLE(ThreadPool);
 
     ThreadPool(int size);
     ~ThreadPool() noexcept;

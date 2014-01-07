@@ -35,9 +35,10 @@ namespace internal
 class MWRegistry : public virtual MWObjectProxy
 {
 public:
-    // Remote operation implementation
+    // Remote operations
     virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
     virtual MetadataMap list() = 0;
+    virtual ScopeProxy locate(std::string const& scope_name) = 0;
 
     virtual ~MWRegistry() noexcept;
 

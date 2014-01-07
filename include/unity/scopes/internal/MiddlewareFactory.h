@@ -39,7 +39,7 @@ class RuntimeImpl;
 class MiddlewareFactory final
 {
 public:
-    NONCOPYABLE(MiddlewareFactory)
+    NONCOPYABLE(MiddlewareFactory);
     UNITY_DEFINES_PTRS(MiddlewareFactory);
 
     MiddlewareFactory(RuntimeImpl* runtime);

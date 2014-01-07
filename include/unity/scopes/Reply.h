@@ -52,13 +52,15 @@ public:
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
     \return Category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template =
-            CategoryRenderer());
+    Category::SCPtr register_category(std::string const& id,
+                                      std::string const& title,
+                                      std::string const &icon,
+                                      CategoryRenderer const& renderer_template = CategoryRenderer());
 
     /**
     \brief Register an existing category instance and send it to the source of the query.
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating results and categories from
-    other scope(s).
+    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
+    results and categories from other scope(s).
     */
     void register_category(Category::SCPtr category);
 
@@ -86,11 +88,20 @@ public:
     was sent, that is, that the query is complete.
     The scope application code is responsible for calling finished() once it has sent the
     final result for a query.
-    Multiple calls to finished() are ignored.
+    Multiple calls to finished() and calls to error() after finished() was called are ignored.
     The destructor implicitly calls finished() if a Reply goes out of scope without
     a prior call to finished().
     */
     void finished() const;
+
+    /**
+    \brief Informs the source of a query that the query was terminated due to an error.
+    Multiple calls to error() and calls to finished() after error() was called are ignored.
+    \param ex An exception_ptr indicating the cause of the error. If ex is a `std::exception`,
+              the return value of `what()` is made available to the query source. Otherwise,
+              the query source receives `"unknown exception"`.
+    */
+    void error(std::exception_ptr ex) const;
 
     /**
     \brief Destroys a Reply.

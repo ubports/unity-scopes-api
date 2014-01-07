@@ -96,6 +96,21 @@ To run the static C++ checks:
 
     $ make cppcheck
 
+Thread and address sanitizer
+----------------
+
+Set SANITIZER to "thread" or "address" to build with the
+corresponding sanitizer enabled.
+
+zmq (as 3.2.3 and 4.0.3) causes a large number of warnings from
+thread sanitizer. It appears impossible to avoid these; they
+are caused by issues in the zmq library. The tsan-suppress file
+supresses the benign race conditions we currently know about. To
+run the tests (from the build directory) with these suppressions
+enabled, use:
+
+    $ TSAN_OPTIONS="suppressions=../tsan-suppress" make test
+
 Debugging IPC
 -------------
 

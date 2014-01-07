@@ -16,17 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
+#include <scopes/internal/RegistryException.h>
 
-#include <unity/util/NonCopyable.h>
-#include <capnp/common.h>
-#include <zmqpp/socket.hpp>
-
-#include <memory>
-#include <vector>
+using namespace std;
 
 namespace unity
+{
+
+namespace api
 {
 
 namespace scopes
@@ -35,30 +32,31 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
+RegistryException::RegistryException(string const& reason) :
+    Exception("unity::api::scopes::RegistryException", reason)
 {
+}
 
-// Simple message sender. Sends a Cap'n Proto segment list sending each segment as a zmq message part.
+RegistryException::RegistryException(RegistryException const&) = default;
 
-class ZmqSender final
+//! @cond
+
+RegistryException& RegistryException::operator=(RegistryException const&) = default;
+
+
+RegistryException::~RegistryException() noexcept = default;
+
+//! @endcond
+
+exception_ptr RegistryException::self() const
 {
-public:
-    NONCOPYABLE(ZmqSender);
-
-    ZmqSender(zmqpp::socket& s);
-
-    void send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments);
-
-private:
-    zmqpp::socket& s_;
-};
-
-} // namespace zmq_middleware
+    return make_exception_ptr(*this);
+}
 
 } // namespace internal
 
 } // namespace scopes
 
-} // namespace unity
+} // namespace api
 
-#endif
+} // namespace unity

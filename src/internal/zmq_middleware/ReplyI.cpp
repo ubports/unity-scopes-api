@@ -78,6 +78,7 @@ void ReplyI::finished_(Current const&,
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
     auto r = req.getReason();
     ReceiverBase::Reason reason;
+    string err;
     switch (r)
     {
         case capnproto::Reply::FinishedReason::FINISHED:
@@ -93,6 +94,7 @@ void ReplyI::finished_(Current const&,
         case capnproto::Reply::FinishedReason::ERROR:
         {
             reason = ReceiverBase::Error;
+            err = req.getError();
             break;
         }
         default:
@@ -101,7 +103,7 @@ void ReplyI::finished_(Current const&,
             reason = ReceiverBase::Error; // LCOV_EXCL_LINE
         }
     }
-    delegate->finished(reason);
+    delegate->finished(reason, err);
 }
 
 } // namespace zmq_middleware

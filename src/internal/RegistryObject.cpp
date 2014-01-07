@@ -86,6 +86,20 @@ bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& met
     return true;
 }
 
+ScopeProxy RegistryObject::locate(std::string const& scope_name)
+{
+    // If the name is empty, it was sent as empty by the remote client.
+    if (scope_name.empty())
+    {
+        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+    }
+
+    // TODO: missing implementation. This should activate the scope if it isn't running already
+    // and return the proxy for the scope. Failures such as not being able to exec the scope
+    // need to raise RegistryException.
+    throw NotFoundException("Registry::locate(): no such scope",  scope_name);
+}
+
 bool RegistryObject::remove(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.

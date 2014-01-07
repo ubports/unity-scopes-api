@@ -50,7 +50,7 @@ class RuntimeImpl;
 class MiddlewareBase
 {
 public:
-    NONCOPYABLE(MiddlewareBase)
+    NONCOPYABLE(MiddlewareBase);
     UNITY_DEFINES_PTRS(MiddlewareBase);
 
     MiddlewareBase(RuntimeImpl* runtime);

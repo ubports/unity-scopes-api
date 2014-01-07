@@ -63,6 +63,7 @@ public:
     bool push(unity::scopes::Annotation const& annotation);
     void finished();
     void finished(unity::scopes::ReceiverBase::Reason reason);
+    void error(std::exception_ptr ex);
 
     static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
 

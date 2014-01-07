@@ -58,9 +58,7 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
         if (str.empty())
         {
             // For pull sockets, receive() returns zero bytes when the socket is closed.
-            // TODO: dodgy, need to think about this. Need to prevent unmarshaling code
-            // from falling over if zero is returned in the middle of a multi-part message.
-            break;
+            throw std::runtime_error("ZmqReceiver::receive(): socket was closed");
         }
 
         if (str.size() % sizeof(capnp::word) != 0)      // Received message must contain an integral number of words.

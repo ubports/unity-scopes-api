@@ -50,8 +50,8 @@ Calls to push() and finished() are made by an arbitrary thread.
 class UNITY_API ReceiverBase
 {
 public:
-    NONCOPYABLE(ReceiverBase)
     /// @cond
+    NONCOPYABLE(ReceiverBase);
     UNITY_DEFINES_PTRS(ReceiverBase);
 
     virtual ~ReceiverBase() noexcept;
@@ -81,8 +81,8 @@ public:
     /**
     \brief Indicates the cause of a call to finished().
     The Error enumerator indicates that a query terminated abnormally, for example,
-    because a scope could not be reached over the network or terminated an query
-    abnormally.
+    because a scope could not be reached over the network, a query terminated
+    abnormally, or explicitly reported an error.
     */
     enum Reason { Finished, Cancelled, Error };
 
@@ -90,8 +90,10 @@ public:
     \brief Called once by the scopes run time after the final result for a query() was sent.
     Exceptions thrown from finished() are ignored.
     \param r Indicates the cause for the call to finished().
+    \param error_message If r is set to Reason::Error, error_message contains further details.
+           Otherwise, error_message is the empty string.
     */
-    virtual void finished(Reason r) = 0;
+    virtual void finished(Reason r, std::string const& error_message) = 0;
 
 protected:
     /// @cond

@@ -45,7 +45,7 @@ namespace zmq_middleware
 class ZmqReceiver final
 {
 public:
-    NONCOPYABLE(ZmqReceiver)
+    NONCOPYABLE(ZmqReceiver);
 
     ZmqReceiver(zmqpp::socket& s);
 

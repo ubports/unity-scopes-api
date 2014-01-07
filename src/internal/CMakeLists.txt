@@ -28,6 +28,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryConfig.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RegistryException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
