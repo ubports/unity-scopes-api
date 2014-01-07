@@ -123,7 +123,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         try
         {
-            reply->finished(ReceiverBase::Error, e.what());
+            reply->finished(ListenerBase::Error, e.what());
         }
         catch (...)
         {
@@ -136,7 +136,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         try
         {
-            reply->finished(ReceiverBase::Error, "unknown exception");
+            reply->finished(ListenerBase::Error, "unknown exception");
         }
         catch (...)
         {

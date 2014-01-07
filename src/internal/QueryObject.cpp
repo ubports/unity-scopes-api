@@ -95,14 +95,14 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ReceiverBase::Error, e.what());     // Oneway, can't block
+        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
         cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ReceiverBase::Error, "unknown exception");     // Oneway, can't block
+        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
         cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }
@@ -115,8 +115,8 @@ void QueryObject::cancel()
     {
         // Send finished() to up-stream client to tell him the query is done.
         // We send via the MWReplyProxy here because that allows passing
-        // a ReceiverBase::Reason (whereas the public ReplyProxy does not).
-        reply_->finished(ReceiverBase::Cancelled, "");     // Oneway, can't block
+        // a ListenerBase::Reason (whereas the public ReplyProxy does not).
+        reply_->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
     }
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).

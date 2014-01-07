@@ -24,7 +24,7 @@
 #include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 
 #include <atomic>
 
@@ -65,7 +65,7 @@ public:
     bool push(unity::api::scopes::CategorisedResult const& result);
     bool push(unity::api::scopes::Annotation const& annotation);
     void finished();
-    void finished(unity::api::scopes::ReceiverBase::Reason reason);
+    void finished(unity::api::scopes::ListenerBase::Reason reason);
     void error(std::exception_ptr ex);
 
     static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);

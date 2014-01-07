@@ -152,10 +152,10 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
-    finished(ReceiverBase::Finished);
+    finished(ListenerBase::Finished);
 }
 
-void ReplyImpl::finished(ReceiverBase::Reason reason)
+void ReplyImpl::finished(ListenerBase::Reason reason)
 {
     if (!finished_.exchange(true))
     {
@@ -189,7 +189,7 @@ void ReplyImpl::error(exception_ptr ex)
 
     try
     {
-        fwd()->finished(ReceiverBase::Error, error_message);
+        fwd()->finished(ListenerBase::Error, error_message);
     }
     catch (MiddlewareException const& e)
     {

@@ -19,7 +19,7 @@
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/AnnotationImpl.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
 
@@ -41,9 +41,8 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ReceiverBase::SPtr const& receiver_base, RuntimeImpl const* runtime) :
-    receiver_base_(receiver_base),
-    cat_registry_(new CategoryRegistry()),
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime) :
+    listener_base_(receiver_base),
     finished_(false),
     num_push_(0)
 {
@@ -56,7 +55,7 @@ ReplyObject::~ReplyObject() noexcept
 {
     try
     {
-        finished(ReceiverBase::Finished, "");
+        finished(ListenerBase::Finished, "");
     }
     catch (...)
     {
@@ -65,7 +64,7 @@ ReplyObject::~ReplyObject() noexcept
 
 void ReplyObject::push(VariantMap const& result) noexcept
 {
-    // We catch all exeptions so, if the application's push() method throws,
+    // We catch all exceptions so, if the application's push() method throws,
     // we can call finished(). Finished will be called exactly once, whether
     // push() or finished() throw or not.
     //
@@ -93,46 +92,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     lock.unlock(); // Forward invocations to application outside synchronization
     try
     {
-        auto it = result.find("category");
-        if (it != result.end())
-        {
-            auto cat = cat_registry_->register_category(it->second.get_dict());
-            receiver_base_->push(cat);
-        }
-
-        it = result.find("annotation");
-        if (it != result.end())
-        {
-            auto result_var = it->second.get_dict();
-            try
-            {
-                Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
-                receiver_base_->push(std::move(annotation));
-            }
-            catch (std::exception const& e)
-            {
-                // TODO: log this
-                cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
-                finished(ReceiverBase::Error, e.what());
-            }
-        }
-
-        it = result.find("result");
-        if (it != result.end())
-        {
-            auto result_var = it->second.get_dict();
-            try
-            {
-                CategorisedResult result(*cat_registry_, result_var);
-                receiver_base_->push(std::move(result));
-            }
-            catch (std::exception const& e)
-            {
-                // TODO: log this
-                cerr << "ReplyObject::receiver_base_->push(): " << e.what() << endl;
-                finished(ReceiverBase::Error, e.what());
-            }
-        }
+        process_data(result);
     }
     catch (std::exception const& e)
     {
@@ -140,7 +100,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         cerr << "ReplyObject::push(VariantMap): " << e.what() << endl;
         try
         {
-            finished(ReceiverBase::Error, e.what());
+            finished(ListenerBase::Error, e.what());
         }
         catch (...)
         {
@@ -152,7 +112,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         cerr << "ReplyObject::push(VariantMap): unknown exception" << endl;
         try
         {
-            finished(ReceiverBase::Error, "unknown exception");
+            finished(ListenerBase::Error, "unknown exception");
         }
         catch (...)
         {
@@ -165,7 +125,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     }
 }
 
-void ReplyObject::finished(ReceiverBase::Reason r, string const& error_message) noexcept
+void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -188,7 +148,7 @@ void ReplyObject::finished(ReceiverBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        receiver_base_->finished(r, error_message);
+        listener_base_->finished(r, error_message);
     }
     catch (std::exception const& e)
     {
@@ -199,6 +159,61 @@ void ReplyObject::finished(ReceiverBase::Reason r, string const& error_message) 
     {
         cerr << "ReplyObject::finished(): unknown exception" << endl;
         // TODO: log error
+    }
+}
+
+ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime),
+    receiver_(receiver),
+    cat_registry_(new CategoryRegistry())
+{
+}
+
+ResultReplyObject::~ResultReplyObject() noexcept
+{
+}
+
+void ResultReplyObject::process_data(VariantMap const& data)
+{
+    auto it = data.find("category");
+    if (it != data.end())
+    {
+        auto cat = cat_registry_->register_category(it->second.get_dict());
+        receiver_->push(cat);
+    }
+
+    it = data.find("annotation");
+    if (it != data.end())
+    {
+        auto result_var = it->second.get_dict();
+        try
+        {
+            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+            receiver_->push(std::move(annotation));
+        }
+        catch (std::exception const& e)
+        {
+            // TODO: log this
+            cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
+            finished(ListenerBase::Error, e.what());
+        }
+    }
+
+    it = data.find("result");
+    if (it != data.end())
+    {
+        auto result_var = it->second.get_dict();
+        try
+        {
+            CategorisedResult result(*cat_registry_, result_var);
+            receiver_->push(std::move(result));
+        }
+        catch (std::exception const& e)
+        {
+            // TODO: log this
+            cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
+            finished(ListenerBase::Error, e.what());
+        }
     }
 }
 

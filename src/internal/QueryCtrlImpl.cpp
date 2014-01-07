@@ -66,7 +66,7 @@ void QueryCtrlImpl::cancel()
         // Indicate (to ourselves) that this query is complete. Calling via the MWReplyProxy ensures
         // the finished() call will be processed by a seperate server-side thread,
         // so we cannot block here.
-        reply_proxy_->finished(ReceiverBase::Cancelled, "");
+        reply_proxy_->finished(ListenerBase::Cancelled, "");
     }
     catch (std::exception const& e)
     {

@@ -22,7 +22,7 @@
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/Reaper.h>
 #include <scopes/internal/CategoryRegistry.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/Variant.h>
 
 #include <atomic>
@@ -43,29 +43,43 @@ namespace internal
 class RuntimeImpl;
 
 // A ReplyObject sits in between the incoming requests from the middleware layer and the
-// ReceiverBase-derived implementation provided by the scope.
+// ListenerBase-derived implementation provided by the scope.
 // This allows us to intercept all replies.
 
-class ReplyObject final : public AbstractObject
+class ReplyObject : public AbstractObject
 {
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ReceiverBase::SPtr const& reply_base, RuntimeImpl const* runtime);
+    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime);
     virtual ~ReplyObject() noexcept;
+
+    virtual void process_data(VariantMap const& data) = 0;
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept;
-    void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept;
+    void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept;
 
 private:
-    ReceiverBase::SPtr const receiver_base_;
+    ListenerBase::SPtr const listener_base_;
     ReapItem::SPtr reap_item_;
-    std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;
     int num_push_;
+};
+
+class ResultReplyObject : public ReplyObject
+{
+public:
+    ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime);
+    virtual ~ResultReplyObject() noexcept;
+
+    virtual void process_data(VariantMap const& data) override;
+
+private:
+    SearchListener::SPtr const receiver_;
+    std::shared_ptr<CategoryRegistry> cat_registry_;
 };
 
 } // namespace internal

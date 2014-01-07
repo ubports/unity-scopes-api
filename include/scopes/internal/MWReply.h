@@ -21,7 +21,7 @@
 
 #include <scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/Variant.h>
 
 #include <string>
@@ -44,7 +44,7 @@ public:
     virtual ~MWReply() noexcept;
 
     virtual void push(VariantMap const& result) = 0;
-    virtual void finished(ReceiverBase::Reason reason, std::string const& error_message) = 0;
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;
 
 protected:
     MWReply(MiddlewareBase* mw_base);

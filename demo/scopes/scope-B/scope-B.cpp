@@ -36,7 +36,7 @@ using namespace unity::api::scopes;
 // A Receiver instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class Receiver: public ReceiverBase
+class Receiver: public SearchListener
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -60,7 +60,7 @@ public:
     virtual void finished(Reason reason, string const& error_message) override
     {
         cout << "query to " << scope_name_ << " complete, status: " << to_string(reason);
-        if (reason == ReceiverBase::Error)
+        if (reason == ListenerBase::Error)
         {
             cout << ": " << error_message;
         }
@@ -111,7 +111,7 @@ public:
             assert(0);
         }
 
-        ReceiverBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
+        SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);
     }

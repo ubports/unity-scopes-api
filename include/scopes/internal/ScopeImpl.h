@@ -22,7 +22,7 @@
 #include <scopes/internal/MWScopeProxyFwd.h>
 #include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/QueryCtrlProxyFwd.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/ScopeProxyFwd.h>
 #include <scopes/Variant.h>
 
@@ -46,7 +46,7 @@ public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
     virtual ~ScopeImpl() noexcept;
 
-    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime);
 

@@ -39,7 +39,7 @@ class Query;
 namespace internal
 {
 class AnnotationImpl;
-class ReplyObject;
+class ResultReplyObject;
 }
 
 /**
@@ -138,7 +138,7 @@ private:
     Annotation(internal::AnnotationImpl* impl);
     std::shared_ptr<internal::AnnotationImpl> p;
 
-    friend class internal::ReplyObject;
+    friend class internal::ResultReplyObject;
 };
 
 } // namespace scopes

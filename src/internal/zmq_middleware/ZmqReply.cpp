@@ -71,7 +71,7 @@ void ZmqReply::push(VariantMap const& result)
     future.wait();
 }
 
-void ZmqReply::finished(ReceiverBase::Reason reason, string const& error_message)
+void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "finished");
@@ -79,17 +79,17 @@ void ZmqReply::finished(ReceiverBase::Reason reason, string const& error_message
     capnproto::Reply::FinishedReason r;
     switch (reason)
     {
-        case ReceiverBase::Finished:
+        case ListenerBase::Finished:
         {
             r = capnproto::Reply::FinishedReason::FINISHED;
             break;
         }
-        case ReceiverBase::Cancelled:
+        case ListenerBase::Cancelled:
         {
             r = capnproto::Reply::FinishedReason::CANCELLED;
             break;
         }
-        case ReceiverBase::Error:
+        case ListenerBase::Error:
         {
             r = capnproto::Reply::FinishedReason::ERROR;
             in_params.setError(error_message);
