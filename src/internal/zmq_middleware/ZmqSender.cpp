@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqSender.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 
 #include <cassert>
 

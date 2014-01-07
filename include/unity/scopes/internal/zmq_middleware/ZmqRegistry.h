@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREGISTRY_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREGISTRY_H
 
-#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <scopes/internal/zmq_middleware/ZmqRegistryProxyFwd.h>
-#include <scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistryProxyFwd.h>
+#include <unity/scopes/internal/MWRegistry.h>
 
 namespace unity
 {

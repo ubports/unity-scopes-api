@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYCTRLI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYCTRLI_H
 
-#include <scopes/internal/MWQueryCtrl.h>
-#include <scopes/internal/QueryCtrlObject.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWQueryCtrl.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {

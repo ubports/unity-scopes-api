@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MiddlewareFactory.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 

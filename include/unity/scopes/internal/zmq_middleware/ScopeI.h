@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
 
-#include <scopes/internal/MWScope.h>
-#include <scopes/internal/ScopeObject.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {

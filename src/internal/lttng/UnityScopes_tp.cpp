@@ -19,4 +19,4 @@
 #define TRACEPOINT_DEFINE
 #define TRACEPOINT_PROBE_DYNAMIC_LINKAGE
 
-#include <scopes/internal/lttng/UnityScopes_tp.h>
+#include <unity/scopes/internal/lttng/UnityScopes_tp.h>

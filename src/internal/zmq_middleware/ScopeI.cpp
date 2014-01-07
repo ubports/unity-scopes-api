@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ScopeI.h>
+#include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 
 #include <internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
-#include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
-#include <scopes/internal/zmq_middleware/ZmqReply.h>
-#include <scopes/internal/zmq_middleware/ZmqScope.h>
-#include <scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
+#include <unity/scopes/internal/ScopeObject.h>
 
 #include <cassert>
 

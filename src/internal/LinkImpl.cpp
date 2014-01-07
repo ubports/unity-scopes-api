@@ -15,7 +15,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/LinkImpl.h>
+#include <unity/scopes/internal/LinkImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity

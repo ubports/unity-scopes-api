@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_FILTERSTATE_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

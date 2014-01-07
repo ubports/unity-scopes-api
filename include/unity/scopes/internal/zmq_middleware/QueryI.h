@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
 
-#include <scopes/internal/MWQuery.h>
-#include <scopes/internal/QueryObject.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWQuery.h>
+#include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {

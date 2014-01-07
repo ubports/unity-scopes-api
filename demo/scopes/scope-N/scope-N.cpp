@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
+#include <unity/scopes/ScopeBase.h>
 
 #include <iostream>
 #include <thread>

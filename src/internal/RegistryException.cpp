@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RegistryException.h>
 
 using namespace std;
 

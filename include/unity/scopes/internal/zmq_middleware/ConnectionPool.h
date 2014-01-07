@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 
-#include <scopes/internal/zmq_middleware/RequestType.h>
+#include <unity/scopes/internal/zmq_middleware/RequestType.h>
 #include <unity/util/NonCopyable.h>
 
 #include <zmqpp/socket.hpp>

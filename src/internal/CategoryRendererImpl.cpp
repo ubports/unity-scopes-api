@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/CategoryRendererImpl.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/CategoryRendererImpl.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <unity/util/FileIO.h>
 
 namespace unity

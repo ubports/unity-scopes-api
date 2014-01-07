@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/FilterState.h>
+#include <unity/scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity

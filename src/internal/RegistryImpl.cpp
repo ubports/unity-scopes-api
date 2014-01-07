@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RegistryImpl.h>
+#include <unity/scopes/internal/RegistryImpl.h>
 
-#include <scopes/internal/MWRegistry.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;

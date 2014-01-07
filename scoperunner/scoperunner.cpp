@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeLoader.h>
-#include <scopes/internal/ThreadSafeQueue.h>
-#include <scopes/internal/MWRegistry.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ThreadSafeQueue.h>
+#include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

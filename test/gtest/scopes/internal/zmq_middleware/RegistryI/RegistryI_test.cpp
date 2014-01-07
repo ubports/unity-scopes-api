@@ -16,17 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/RegistryI.h>
+#include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/RegistryException.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/UniqueID.h>
-#include <scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>

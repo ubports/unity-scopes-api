@@ -16,17 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/ReplyImpl.h>
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/MWReply.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/Annotation.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/Reply.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/CategoryRenderer.h>
 
 #include <sstream>
 #include <cassert>

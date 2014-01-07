@@ -16,9 +16,9 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <scopes/internal/smartscopes/HttpClientQt.h>
-#include <scopes/internal/smartscopes/JsonCppNode.h>
-#include <scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/UnityExceptions.h>
 

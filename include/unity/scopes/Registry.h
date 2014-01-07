@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_REGISTRY_H
 #define UNITY_SCOPES_REGISTRY_H
 
-#include <scopes/ObjectProxy.h>
-#include <scopes/RegistryProxyFwd.h>
-#include <scopes/ScopeMetadata.h>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 #include <map>
 

@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_MIDDLEWAREFACTORY_H
 #define UNITY_SCOPES_INTERNAL_MIDDLEWAREFACTORY_H
 
-#include <scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
 
 namespace unity
 {

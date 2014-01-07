@@ -22,9 +22,9 @@
 #undef TRACEPOINT_PROVIDER
 #undef TRACEPOINT_INCLUDE
 #define TRACEPOINT_PROVIDER unity_scopes_api
-#define TRACEPOINT_INCLUDE <scopes/internal/lttng/UnityScopes_tp.h>
+#define TRACEPOINT_INCLUDE <unity/scopes/internal/lttng/UnityScopes_tp.h>
 
-#include <scopes/internal/lttng/SimpleTracepoint.h>
+#include <unity/scopes/internal/lttng/SimpleTracepoint.h>
 #include <stdint.h>
 
 #if __clang__

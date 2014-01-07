@@ -17,8 +17,8 @@
  */
 
 
-#include <scopes/Query.h>
-#include <scopes/internal/QueryImpl.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/internal/QueryImpl.h>
 
 namespace unity
 {

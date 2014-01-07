@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/internal/QueryCtrlImpl.h>
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/MWQueryCtrl.h>
-#include <scopes/internal/MWReply.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/QueryCtrl.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWQueryCtrl.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added

@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REPLYI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REPLYI_H
 
-#include <scopes/internal/MWReply.h>
-#include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {

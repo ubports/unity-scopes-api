@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_THREADPOOL_H
 #define UNITY_SCOPES_INTERNAL_THREADPOOL_H
 
-#include <scopes/internal/ThreadSafeQueue.h>
-#include <scopes/internal/TaskWrapper.h>
+#include <unity/scopes/internal/ThreadSafeQueue.h>
+#include <unity/scopes/internal/TaskWrapper.h>
 #include <unity/UnityExceptions.h>
 
 #include <future>

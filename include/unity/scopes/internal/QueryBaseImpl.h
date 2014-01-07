@@ -19,9 +19,9 @@
 #ifndef UNITY_INTERNAL_QUERYBASEIMPL_H
 #define UNITY_INTERNAL_QUERYBASEIMPL_H
 
-#include <scopes/internal/QueryCtrlImpl.h>
-#include <scopes/ScopeProxyFwd.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 #include <vector>
 

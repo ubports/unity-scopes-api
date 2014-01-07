@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ObjectProxy.h>
+#include <unity/scopes/ObjectProxy.h>
 
-#include <scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/internal/ObjectProxyImpl.h>
 
 using namespace std;
 

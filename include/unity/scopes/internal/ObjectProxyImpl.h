@@ -19,8 +19,8 @@
 #ifndef UNITY_INTERNAL_OBJECTPROXYIMPL_H
 #define UNITY_INTERNAL_OBJECTPROXYIMPL_H
 
-#include<scopes/internal/MWObjectProxyFwd.h>
-#include<scopes/ObjectProxyFwd.h>
+#include<unity/scopes/internal/MWObjectProxyFwd.h>
+#include<unity/scopes/ObjectProxyFwd.h>
 
 namespace unity
 {

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ThreadPool.h>
+#include <unity/scopes/internal/ThreadPool.h>
 
 #include <unity/UnityExceptions.h>
 

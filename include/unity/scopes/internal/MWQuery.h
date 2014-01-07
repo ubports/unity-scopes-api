@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWQUERY_H
 #define UNITY_SCOPES_INTERNAL_MWQUERY_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
 
 namespace unity
 {

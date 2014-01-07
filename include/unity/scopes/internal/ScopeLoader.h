@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPELOADER_H
 #define UNITY_SCOPES_INTERNAL_SCOPELOADER_H
 
-#include <scopes/ScopeBase.h>
-#include <scopes/internal/DynamicLoader.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/internal/DynamicLoader.h>
 #include <thread>
 
 namespace unity

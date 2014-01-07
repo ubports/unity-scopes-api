@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWREPLY_H
 #define UNITY_SCOPES_INTERNAL_MWREPLY_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Variant.h>
 
 #include <string>
 

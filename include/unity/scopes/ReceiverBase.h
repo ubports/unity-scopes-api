@@ -21,8 +21,8 @@
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <scopes/Category.h>
-#include <scopes/Annotation.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Annotation.h>
 
 #include <string>
 

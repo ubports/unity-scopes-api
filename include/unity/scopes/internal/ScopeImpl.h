@@ -19,12 +19,12 @@
 #ifndef UNITY_INTERNAL_SCOPEIMPL_H
 #define UNITY_INTERNAL_SCOPEIMPL_H
 
-#include <scopes/internal/MWScopeProxyFwd.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/QueryCtrlProxyFwd.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/ScopeProxyFwd.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/internal/MWScopeProxyFwd.h>
+#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

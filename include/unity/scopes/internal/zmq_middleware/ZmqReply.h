@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
 
-#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <scopes/internal/MWReply.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
+#include <unity/scopes/internal/MWReply.h>
 
 namespace unity
 {

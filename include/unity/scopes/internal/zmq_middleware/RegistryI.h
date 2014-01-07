@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
 
-#include <scopes/internal/MWRegistry.h>
-#include <scopes/internal/RegistryObject.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/RegistryObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/UniqueID.h>
 
 using namespace std;
 

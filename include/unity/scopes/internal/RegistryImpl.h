@@ -19,9 +19,9 @@
 #ifndef UNITY_INTERNAL_REGISTRYIMPL_H
 #define UNITY_INTERNAL_REGISTRYIMPL_H
 
-#include <scopes/internal/MWRegistryProxyFwd.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/Registry.h>
+#include <unity/scopes/internal/MWRegistryProxyFwd.h>
+#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/Registry.h>
 
 namespace unity
 {

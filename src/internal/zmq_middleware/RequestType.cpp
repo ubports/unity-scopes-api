@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/RequestType.h>
+#include <unity/scopes/internal/zmq_middleware/RequestType.h>
 
 using namespace std;
 

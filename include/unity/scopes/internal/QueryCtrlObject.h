@@ -19,7 +19,7 @@
 #ifndef UNITY_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
 #define UNITY_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/AbstractObject.h>
 
 #include <atomic>
 

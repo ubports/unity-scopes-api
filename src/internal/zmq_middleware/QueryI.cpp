@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/QueryI.h>
+#include <unity/scopes/internal/zmq_middleware/QueryI.h>
 
 #include <internal/zmq_middleware/capnproto/Query.capnp.h>
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <scopes/internal/zmq_middleware/ZmqReply.h>
-#include <scopes/internal/QueryObject.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/scopes/internal/QueryObject.h>
 
 using namespace std;
 

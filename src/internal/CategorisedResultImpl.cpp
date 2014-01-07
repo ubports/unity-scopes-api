@@ -16,10 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/CategorisedResultImpl.h>
-#include <scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/Category.h>
+#include <unity/scopes/Category.h>
 #include <sstream>
 
 namespace unity

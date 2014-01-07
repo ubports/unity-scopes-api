@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 

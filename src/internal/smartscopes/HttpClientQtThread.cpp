@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include "scopes/internal/smartscopes/HttpClientQtThread.h"
+#include "unity/scopes/internal/smartscopes/HttpClientQtThread.h"
 
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>

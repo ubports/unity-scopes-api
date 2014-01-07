@@ -20,11 +20,11 @@
 #define UNITY_INTERNAL_ANNOTATIONIMPL_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/Query.h>
-#include <scopes/Variant.h>
-#include <scopes/Annotation.h>
-#include <scopes/Link.h>
-#include <scopes/Category.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/Link.h>
+#include <unity/scopes/Category.h>
 #include <list>
 
 namespace unity

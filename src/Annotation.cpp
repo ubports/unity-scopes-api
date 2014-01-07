@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Annotation.h>
-#include <scopes/Query.h>
-#include <scopes/internal/AnnotationImpl.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/internal/AnnotationImpl.h>
 
 namespace unity
 {

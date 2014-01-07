@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/CategoryRenderer.h>
-#include <scopes/QueryCtrl.h>
-#include <scopes/Registry.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Runtime.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>

@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ReplyI.h>
+#include <unity/scopes/internal/zmq_middleware/ReplyI.h>
 
 #include <internal/zmq_middleware/capnproto/Reply.capnp.h>
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <scopes/internal/zmq_middleware/ZmqReply.h>
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
-#include <scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/ReplyObject.h>
 
 using namespace std;
 

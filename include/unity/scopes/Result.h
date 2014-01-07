@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_RESULT_H
 #define UNITY_SCOPES_RESULT_H
 
-#include <scopes/Variant.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
 

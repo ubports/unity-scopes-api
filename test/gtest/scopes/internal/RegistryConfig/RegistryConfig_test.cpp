@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 

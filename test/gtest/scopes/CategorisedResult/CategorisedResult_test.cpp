@@ -16,10 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/CategorisedResult.h>
-#include <scopes/Category.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 

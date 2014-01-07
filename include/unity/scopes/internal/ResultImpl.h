@@ -21,7 +21,7 @@
 
 #include <string>
 #include <memory>
-#include <scopes/Variant.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

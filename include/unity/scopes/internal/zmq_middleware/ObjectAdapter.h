@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 
-#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/NonCopyable.h>
 #include <zmqpp/socket.hpp>
 

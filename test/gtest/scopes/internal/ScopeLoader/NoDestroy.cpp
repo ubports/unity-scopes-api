@@ -19,7 +19,7 @@
 #include "MyScope.h"
 #include "Counters.h"
 
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 
 // Library that doesn't have the expected destroy method
 

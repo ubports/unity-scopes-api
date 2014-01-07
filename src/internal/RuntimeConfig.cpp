@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 
 using namespace std;
 

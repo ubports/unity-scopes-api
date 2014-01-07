@@ -23,8 +23,8 @@
 #include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
-#include <scopes/FilterState.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/FilterState.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

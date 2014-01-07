@@ -19,13 +19,13 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQMIDDLEWARE_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQMIDDLEWARE_H
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/MWRegistryProxyFwd.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/internal/ThreadPool.h>
-#include <scopes/internal/UniqueID.h>
-#include <scopes/internal/zmq_middleware/ZmqConfig.h>
-#include <scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWRegistryProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/ThreadPool.h>
+#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
 

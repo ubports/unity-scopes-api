@@ -19,10 +19,10 @@
 #ifndef UNITY_INTERNAL_QUERYCTRLIMPL_H
 #define UNITY_INTERNAL_QUERYCTRLIMPL_H
 
-#include <scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
 
 namespace unity
 {

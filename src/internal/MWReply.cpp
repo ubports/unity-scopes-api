@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MWReply.h>
+#include <unity/scopes/internal/MWReply.h>
 
 using namespace std;
 

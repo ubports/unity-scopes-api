@@ -20,7 +20,7 @@
 #include "Counters.h"
 #include "PerScopeVariables.h"
 
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>

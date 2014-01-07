@@ -21,7 +21,7 @@
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
 

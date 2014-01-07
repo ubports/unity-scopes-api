@@ -19,16 +19,16 @@
 #ifndef UNITY_SCOPES_INTERNAL_MIDDLEWAREBASE_H
 #define UNITY_SCOPES_INTERNAL_MIDDLEWAREBASE_H
 
-#include <scopes/internal/MWObjectProxyFwd.h>
-#include <scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <scopes/internal/MWQueryProxyFwd.h>
-#include <scopes/internal/MWRegistryProxyFwd.h>
-#include <scopes/internal/MWScopeProxyFwd.h>
-#include <scopes/internal/QueryObject.h>
-#include <scopes/internal/QueryCtrlObject.h>
-#include <scopes/internal/RegistryObject.h>
-#include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/MWObjectProxyFwd.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWQueryProxyFwd.h>
+#include <unity/scopes/internal/MWRegistryProxyFwd.h>
+#include <unity/scopes/internal/MWScopeProxyFwd.h>
+#include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/internal/RegistryObject.h>
+#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/ScopeObject.h>
 
 namespace unity
 {

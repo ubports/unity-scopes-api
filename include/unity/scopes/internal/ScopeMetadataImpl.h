@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEMETADATAIMPL_H
 #define UNITY_SCOPES_INTERNAL_SCOPEMETADATAIMPL_H
 
-#include <scopes/internal/MWScope.h>
-#include <scopes/ScopeMetadata.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 #include <unordered_set>
 

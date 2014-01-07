@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/QueryImpl.h>
-#include <scopes/Query.h>
+#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 

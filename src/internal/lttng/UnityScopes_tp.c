@@ -18,5 +18,5 @@
 
 #define TRACEPOINT_CREATE_PROBES
 
-#include <scopes/internal/lttng/UnityScopes_tp.h>
+#include <unity/scopes/internal/lttng/UnityScopes_tp.h>
 #include <lttng/tracepoint-event.h>

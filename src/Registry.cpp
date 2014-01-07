@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Registry.h>
+#include <unity/scopes/Registry.h>
 
-#include <scopes/internal/RegistryImpl.h>
+#include <unity/scopes/internal/RegistryImpl.h>
 
 namespace unity
 {

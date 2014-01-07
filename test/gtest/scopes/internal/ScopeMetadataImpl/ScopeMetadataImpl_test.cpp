@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.

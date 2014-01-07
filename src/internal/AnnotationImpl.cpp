@@ -15,8 +15,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/AnnotationImpl.h>
-#include <scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/AnnotationImpl.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 #include <iostream>

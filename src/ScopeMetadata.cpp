@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeMetadata.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/ScopeMetadata.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 
 #include <cassert>
 

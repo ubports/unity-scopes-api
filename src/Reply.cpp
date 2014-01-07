@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Reply.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/Annotation.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/CategoryRenderer.h>
 
-#include <scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/ReplyImpl.h>
 
 namespace unity
 {

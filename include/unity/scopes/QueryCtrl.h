@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_QUERYCTRL_H
 #define UNITY_SCOPES_QUERYCTRL_H
 
-#include <scopes/ObjectProxy.h>
-#include <scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
 
 namespace unity
 {

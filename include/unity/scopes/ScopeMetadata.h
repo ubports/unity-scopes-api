@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_SCOPEMETADATA_H
 #define UNITY_SCOPES_SCOPEMETADATA_H
 
-#include <scopes/Scope.h>
+#include <unity/scopes/Scope.h>
 
 namespace unity
 {

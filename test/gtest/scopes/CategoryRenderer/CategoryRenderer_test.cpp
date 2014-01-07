@@ -17,7 +17,7 @@
  */
 
 #include <scope-api-testconfig.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 #include <fstream>
 #include <gtest/gtest.h>

@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/CategorisedResult.h>
-#include <scopes/internal/CategorisedResultImpl.h>
-#include <scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 
 namespace unity
 {

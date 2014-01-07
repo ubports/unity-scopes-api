@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqConfig.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 
 using namespace std;
 

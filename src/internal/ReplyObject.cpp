@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/AnnotationImpl.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
+#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/AnnotationImpl.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added

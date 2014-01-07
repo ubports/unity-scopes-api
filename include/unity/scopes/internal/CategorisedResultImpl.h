@@ -21,8 +21,8 @@
 
 #include <string>
 #include <memory>
-#include <scopes/internal/ResultImpl.h>
-#include <scopes/Category.h>
+#include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/Category.h>
 
 namespace unity
 {

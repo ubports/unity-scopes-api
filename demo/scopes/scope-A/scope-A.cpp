@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
-#include <scopes/Reply.h>
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/Query.h>
-#include <scopes/Annotation.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Annotation.h>
 
 #include <iostream>
 

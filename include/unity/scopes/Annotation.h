@@ -20,9 +20,9 @@
 #define UNITY_SCOPES_ANNOTATION_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/Variant.h>
-#include <scopes/Link.h>
-#include <scopes/Category.h>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/Link.h>
+#include <unity/scopes/Category.h>
 #include <list>
 #include <memory>
 

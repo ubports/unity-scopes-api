@@ -19,10 +19,10 @@
 #ifndef UNITY_REPLYS_INTERNAL_QUERYOBJECT_H
 #define UNITY_REPLYS_INTERNAL_QUERYOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <scopes/ReplyProxyFwd.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/ReplyProxyFwd.h>
 
 #include <atomic>
 #include <mutex>

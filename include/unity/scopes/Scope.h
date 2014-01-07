@@ -19,11 +19,11 @@
 #ifndef UNITY_SCOPES_SCOPE_H
 #define UNITY_SCOPES_SCOPE_H
 
-#include <scopes/ObjectProxy.h>
-#include <scopes/QueryCtrlProxyFwd.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/ScopeProxyFwd.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

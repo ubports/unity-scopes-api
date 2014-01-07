@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_CATEGORISEDRESULT_H
 #define UNITY_SCOPES_CATEGORISEDRESULT_H
 
-#include <scopes/Result.h>
-#include <scopes/Category.h>
+#include <unity/scopes/Result.h>
+#include <unity/scopes/Category.h>
 
 namespace unity
 {

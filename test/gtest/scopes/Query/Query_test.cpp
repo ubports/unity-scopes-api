@@ -17,7 +17,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <scopes/Query.h>
+#include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;

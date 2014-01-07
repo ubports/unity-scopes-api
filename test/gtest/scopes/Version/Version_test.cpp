@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Version.h>
+#include <unity/scopes/Version.h>
 
 #include <gtest/gtest.h>
 

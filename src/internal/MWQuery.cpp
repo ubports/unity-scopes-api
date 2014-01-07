@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MWQuery.h>
+#include <unity/scopes/internal/MWQuery.h>
 
 using namespace std;
 

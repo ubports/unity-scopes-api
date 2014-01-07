@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
-#include <scopes/internal/DynamicLoader.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 #include <scope-api-testconfig.h>
 #include <gtest/gtest.h>

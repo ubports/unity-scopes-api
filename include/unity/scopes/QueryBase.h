@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_QUERYBASE_H
 #define UNITY_SCOPES_QUERYBASE_H
 
-#include <scopes/QueryCtrlProxyFwd.h>
-#include <scopes/ReplyProxyFwd.h>
-#include <scopes/ScopeProxyFwd.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>

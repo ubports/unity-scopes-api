@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MWScope.h>
+#include <unity/scopes/internal/MWScope.h>
 
 using namespace std;
 

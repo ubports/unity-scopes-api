@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
 #define UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
 
-#include <scopes/Category.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
 #include <mutex>

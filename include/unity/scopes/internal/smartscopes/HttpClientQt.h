@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
 
-#include <scopes/internal/smartscopes/HttpClientInterface.h>
+#include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <map>
 
 class QCoreApplication;

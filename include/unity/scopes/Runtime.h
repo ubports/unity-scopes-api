@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_RUNTIME_H
 #define UNITY_SCOPES_RUNTIME_H
 
-#include <scopes/RegistryProxyFwd.h>
+#include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 

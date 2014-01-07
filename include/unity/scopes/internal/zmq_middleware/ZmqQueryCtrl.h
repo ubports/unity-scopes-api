@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYCTRL_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYCTRL_H
 
-#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <scopes/internal/zmq_middleware/ZmqQueryCtrlProxyFwd.h>
-#include <scopes/internal/MWQueryCtrl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWQueryCtrl.h>
 
 namespace unity
 {

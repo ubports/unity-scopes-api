@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_REGISTRYPROXYFWD_H
 #define UNITY_SCOPES_REGISTRYPROXYFWD_H
 
-#include <scopes/RegistryProxyFwd.h>
+#include <unity/scopes/RegistryProxyFwd.h>
 
 #include <memory>
 

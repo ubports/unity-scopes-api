@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/MWRegistry.h>
 
 using namespace std;
 

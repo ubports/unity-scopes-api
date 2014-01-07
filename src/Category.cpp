@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Category.h>
-#include <scopes/internal/CategoryImpl.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/internal/CategoryImpl.h>
 
 namespace unity
 {

@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_REPLY_H
 #define UNITY_SCOPES_REPLY_H
 
-#include <scopes/ObjectProxy.h>
-#include <scopes/ReplyProxyFwd.h>
-#include <scopes/Category.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategoryRenderer.h>
 
 namespace unity
 {

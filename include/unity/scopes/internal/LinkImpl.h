@@ -22,8 +22,8 @@
 #include <unity/SymbolExport.h>
 #include <string>
 #include <memory>
-#include <scopes/Query.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {

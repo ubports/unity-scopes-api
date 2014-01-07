@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
-#include <scopes/Registry.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/Registry.h>
 
 #include <mutex>
 

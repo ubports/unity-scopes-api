@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/Exception.h>
 
 #include <cassert>

@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/RegistryImpl.h>
-#include <scopes/internal/RuntimeConfig.h>
-#include <scopes/internal/UniqueID.h>
-#include <scopes/ScopeBase.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryImpl.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

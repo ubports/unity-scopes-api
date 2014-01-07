@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;

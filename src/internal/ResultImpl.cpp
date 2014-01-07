@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/ResultImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/Result.h>
+#include <unity/scopes/Result.h>
 #include <sstream>
 
 namespace unity

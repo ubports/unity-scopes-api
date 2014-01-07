@@ -16,16 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 
 #include <internal/zmq_middleware/capnproto/Registry.capnp.h>
-#include <scopes/internal/RegistryException.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
-#include <scopes/internal/zmq_middleware/ZmqException.h>
-#include <scopes/internal/zmq_middleware/ZmqScope.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <capnp/message.h>
 

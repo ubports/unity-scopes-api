@@ -19,15 +19,15 @@
 #include "FindFiles.h"
 #include "SignalThread.h"
 
-#include <scopes/internal/MiddlewareFactory.h>
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/RegistryObject.h>
-#include <scopes/internal/RuntimeConfig.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeConfig.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryObject.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeConfig.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 

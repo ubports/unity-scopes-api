@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
 
-#include <scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <scopes/internal/zmq_middleware/ZmqQueryProxyFwd.h>
-#include <scopes/internal/MWQuery.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqQueryProxyFwd.h>
+#include <unity/scopes/internal/MWQuery.h>
 
 namespace unity
 {

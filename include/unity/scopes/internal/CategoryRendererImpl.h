@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_CATEGORYRENDERERIMPL_H
 #define UNITY_SCOPES_CATEGORYRENDERERIMPL_H
 
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <unity/SymbolExport.h>
 #include <string>
 

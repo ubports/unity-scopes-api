@@ -17,8 +17,8 @@
  */
 
 
-#include <scopes/Link.h>
-#include <scopes/internal/LinkImpl.h>
+#include <unity/scopes/Link.h>
+#include <unity/scopes/internal/LinkImpl.h>
 
 namespace unity
 {

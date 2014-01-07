@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
 #define UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
 
-#include <scopes/internal/ConfigBase.h>
-#include <scopes/Runtime.h>
+#include <unity/scopes/internal/ConfigBase.h>
+#include <unity/scopes/Runtime.h>
 
 namespace unity
 {

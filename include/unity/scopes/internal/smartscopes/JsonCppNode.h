@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
 
-#include <scopes/internal/smartscopes/JsonNodeInterface.h>
+#include <unity/scopes/internal/smartscopes/JsonNodeInterface.h>
 
 #include <jsoncpp/json/reader.h>
 

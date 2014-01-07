@@ -19,11 +19,11 @@
 #ifndef UNITY_REPLYS_INTERNAL_REPLYOBJECT_H
 #define UNITY_REPLYS_INTERNAL_REPLYOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
-#include <scopes/internal/Reaper.h>
-#include <scopes/internal/CategoryRegistry.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/Reaper.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Variant.h>
 
 #include <atomic>
 #include <condition_variable>

@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>

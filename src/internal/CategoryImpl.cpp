@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/CategoryImpl.h>
+#include <unity/scopes/internal/CategoryImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity

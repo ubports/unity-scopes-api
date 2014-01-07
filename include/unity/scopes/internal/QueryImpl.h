@@ -20,8 +20,8 @@
 #define UNITY_INTERNAL_QUERYIMPL_H
 
 #include <unity/SymbolExport.h>
-#include <scopes/Variant.h>
-#include <scopes/FilterState.h>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterState.h>
 #include <string>
 
 namespace unity

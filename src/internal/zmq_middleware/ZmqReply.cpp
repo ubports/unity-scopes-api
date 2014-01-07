@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqReply.h>
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <internal/zmq_middleware/capnproto/Reply.capnp.h>
 
 using namespace std;

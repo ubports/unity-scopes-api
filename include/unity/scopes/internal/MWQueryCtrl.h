@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWQUERYCTRL_H
 #define UNITY_SCOPES_INTERNAL_MWQUERYCTRL_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 
 namespace unity
 {

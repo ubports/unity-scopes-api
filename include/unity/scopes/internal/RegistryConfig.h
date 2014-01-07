@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
 
-#include <scopes/internal/ConfigBase.h>
+#include <unity/scopes/internal/ConfigBase.h>
 
 namespace unity
 {

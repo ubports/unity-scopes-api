@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <scopes/internal/smartscopes/HttpClientQt.h>
-#include <scopes/internal/smartscopes/HttpClientQtThread.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQtThread.h>
 #include <unity/UnityExceptions.h>
 
 #include <QCoreApplication>

@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqScope.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
-#include <scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
-#include <scopes/internal/zmq_middleware/ZmqException.h>
-#include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
-#include <scopes/internal/zmq_middleware/ZmqReply.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 
 using namespace std;
 

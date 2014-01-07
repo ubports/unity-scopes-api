@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/MWScope.h>
-#include <scopes/internal/QueryCtrlImpl.h>
-#include <scopes/Scope.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/Scope.h>
 #include <unity/Exception.h>
 
 #include <cassert>

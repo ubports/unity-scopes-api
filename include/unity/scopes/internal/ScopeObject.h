@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
-#include <scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/Variant.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 #include <string>
 

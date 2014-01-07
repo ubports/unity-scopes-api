@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWREGISTRY_H
 #define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/Registry.h>
-#include <scopes/ScopeMetadata.h>
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 namespace unity
 {

@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
 #define UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
 
-#include <scopes/internal/MiddlewareBase.h>
-#include <scopes/internal/MiddlewareFactory.h>
-#include <scopes/internal/Reaper.h>
-#include <scopes/Runtime.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/internal/Reaper.h>
+#include <unity/scopes/Runtime.h>
 
 #include <atomic>
 

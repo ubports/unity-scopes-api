@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_OBJECTPROXY_H
 #define UNITY_SCOPES_OBJECTPROXY_H
 
-#include <scopes/ObjectProxyFwd.h>
+#include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/SymbolExport.h>
 
 namespace unity

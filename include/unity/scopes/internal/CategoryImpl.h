@@ -20,8 +20,8 @@
 #define UNITY_SCOPES_CATEGORYIMPL_H
 
 #include <unity/util/NonCopyable.h>
-#include <scopes/Variant.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <string>
 #include <memory>
 

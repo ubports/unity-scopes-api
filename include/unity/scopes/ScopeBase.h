@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <scopes/QueryBase.h>
-#include <scopes/RegistryProxyFwd.h>
-#include <scopes/Version.h>
+#include <unity/scopes/QueryBase.h>
+#include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/Version.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -68,7 +68,7 @@ Scopes are accessed by the scopes run time as a shared library (one library per 
 Each scope must implement a class that derives from ScopeBase, for example:
 
 ~~~
-#include <scopes/ScopeBase.h>
+#include <unity/scopes/ScopeBase.h>
 
 class MyScope : public unity::api::scopes::ScopeBase
 {

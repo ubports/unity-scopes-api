@@ -19,12 +19,12 @@
 #ifndef UNITY_INTERNAL_REPLYIMPL_H
 #define UNITY_INTERNAL_REPLYIMPL_H
 
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/internal/CategoryRegistry.h>
-#include <scopes/internal/ObjectProxyImpl.h>
-#include <scopes/ReplyProxyFwd.h>
-#include <scopes/Category.h>
-#include <scopes/ReceiverBase.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/ReceiverBase.h>
 
 #include <atomic>
 

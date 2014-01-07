@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/VariantConverter.h>
+#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <internal/zmq_middleware/capnproto/ValueDict.capnp.h>
 #include <unity/UnityExceptions.h>
 

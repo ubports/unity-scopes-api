@@ -19,7 +19,7 @@
 #ifndef UNITY_REPLYS_INTERNAL_MWOBJECTPROXY_H
 #define UNITY_REPLYS_INTERNAL_MWOBJECTPROXY_H
 
-#include <scopes/internal/MWObjectProxyFwd.h>
+#include <unity/scopes/internal/MWObjectProxyFwd.h>
 
 namespace unity
 {
