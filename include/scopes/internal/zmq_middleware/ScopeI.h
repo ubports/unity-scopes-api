@@ -48,6 +48,9 @@ private:
     virtual void create_query_(Current const& current,
                                capnp::ObjectPointer::Reader& in_params,
                                capnproto::Response::Builder& r);
+    virtual void preview_(Current const& current,
+                          capnp::ObjectPointer::Reader& in_params,
+                          capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware

@@ -47,6 +47,12 @@ public:
     {
         return nullptr;
     }
+
+    virtual unity::api::scopes::QueryBase::UPtr preview(unity::api::scopes::Result const&,
+                                                        unity::api::scopes::VariantMap const&) override
+    {
+        return nullptr;
+    }
 };
 
 #endif

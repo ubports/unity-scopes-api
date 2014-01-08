@@ -213,6 +213,12 @@ public:
         return QueryBase::UPtr(new MyQuery(q, queue));
     }
 
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
+
 private:
     string scope_name_;
     Queue queue;

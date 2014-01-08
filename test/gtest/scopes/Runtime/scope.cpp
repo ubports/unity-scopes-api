@@ -63,6 +63,11 @@ public:
     {
         return QueryBase::UPtr(new TestQuery());
     }
+
+    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override
+    {
+        return nullptr;
+    }
 };
 
 int main(int, char **argv) {

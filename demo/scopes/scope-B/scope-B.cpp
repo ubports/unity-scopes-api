@@ -150,6 +150,12 @@ public:
         return query;
     }
 
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
+
 private:
     string scope_name_;
     ScopeProxy scope_c_;
