@@ -23,6 +23,7 @@
 #include <scopes/internal/MWReplyProxyFwd.h>
 #include <scopes/internal/MWScopeProxyFwd.h>
 #include <scopes/QueryCtrlProxyFwd.h>
+#include <scopes/Result.h>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -43,6 +44,7 @@ public:
     virtual ~MWScope() noexcept;
 
     virtual QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual QueryCtrlProxy preview(Result const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
 
 protected:
     MWScope(MiddlewareBase* mw_base);

@@ -91,10 +91,10 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
     }
     return ctrl;
 }
-/*
-PreviewCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListenerBase::SPtr const& reply) const
+
+QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
 {
-    PreviewCtrlProxy ctrl;
+    QueryCtrlProxy ctrl;
     try
     {
         // Create a middleware server-side object that can receive incoming
@@ -130,7 +130,7 @@ PreviewCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hint
     }
     return ctrl;
 }
-*/
+
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime)
 {
     return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime)));

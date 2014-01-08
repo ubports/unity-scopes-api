@@ -217,6 +217,33 @@ void ResultReplyObject::process_data(VariantMap const& data)
     }
 }
 
+PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime),
+    receiver_(receiver)
+{
+}
+
+PreviewReplyObject::~PreviewReplyObject() noexcept
+{
+}
+
+void PreviewReplyObject::process_data(VariantMap const& data)
+{
+    auto it = data.find("widgets");
+    if (it != data.end())
+    {
+        // TODO: push the widget list
+    }
+
+    it = data.find("data");
+    if (it != data.end())
+    {
+        // TODO: push the actual data
+    }
+    // FIXME: just a test that it's talking to PreviewListener
+    receiver_->push("example-data", Variant("foo"));
+}
+
 } // namespace internal
 
 } // namespace scopes

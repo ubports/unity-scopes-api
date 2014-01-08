@@ -82,6 +82,18 @@ private:
     std::shared_ptr<CategoryRegistry> cat_registry_;
 };
 
+class PreviewReplyObject : public ReplyObject
+{
+public:
+    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime);
+    virtual ~PreviewReplyObject() noexcept;
+
+    virtual void process_data(VariantMap const& data) override;
+
+private:
+    PreviewListener::SPtr const receiver_;
+};
+
 } // namespace internal
 
 } // namespace scopes
