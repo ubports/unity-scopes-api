@@ -353,11 +353,10 @@ main(int argc, char* argv[])
         auto canonical_groups = create_scope_groups(scope_group_configdir, all_scopes);
         auto oem_groups = create_scope_groups(oem_group_configdir, all_scopes);
 
-        MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
         // Add the registry implementation to the middleware.
         RegistryObject::SPtr registry(new RegistryObject);
-        middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
@@ -369,6 +368,10 @@ main(int argc, char* argv[])
 
         // Start a scoperunner for each OEM scope group and add the corresponding proxies to the registry
         // TODO: run_scopes(signal_thread, scoperunner_path, config_file, oem_groups);
+
+        // Now that the registry table is populated, we can add the registry to the middleware, so
+        // it starts processing incoming requests.
+        middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Wait until we are done.
         middleware->wait_for_shutdown();
