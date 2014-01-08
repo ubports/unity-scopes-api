@@ -213,7 +213,7 @@ set(TESTLIBS ${UNITY_SCOPES_LIB}) # HACK
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 
-set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_PREFIX} CACHE PATH "Destination install dir for the library")
+set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
 # Tests
 include(CTest)
