@@ -44,7 +44,7 @@ void ScopeBase::run()
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationBase::UPtr ScopeBase::activate(ResultItem const& result, VariantMap const& hints)
+ActivationBase::UPtr ScopeBase::activate(Result const& result, VariantMap const& hints)
 {
     return ActivationBase::UPtr(nullptr); // same as returning an activation base instance that returns NotHandled
 }

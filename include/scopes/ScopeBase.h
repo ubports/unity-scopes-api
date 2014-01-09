@@ -193,7 +193,7 @@ public:
     /*
      * TODO: doc string
      */
-    virtual ActivationBase::UPtr activate(ResultItem const& result, VariantMap const& hints);
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
 
     /*
      * FIXME: doc string

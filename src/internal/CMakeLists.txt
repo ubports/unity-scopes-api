@@ -4,6 +4,7 @@ add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ActivationObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationResponseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationImpl.cpp
