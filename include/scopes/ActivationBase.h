@@ -13,10 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
+#ifndef UNITY_SCOPES_ACTIVATIONBASE_H
+#define UNITY_SCOPES_ACTIVATIONBASE_H
+
+#include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
+#include <scopes/ActivationResponse.h>
 
 namespace unity
 {
@@ -27,37 +32,40 @@ namespace api
 namespace scopes
 {
 
-//! @cond
-
-ScopeBase::ScopeBase()
+namespace internal
 {
+class ActivationBaseImpl;
 }
 
-ScopeBase::~ScopeBase() noexcept
+/**
+\brief
+*/
+class UNITY_API ActivationBase
 {
-}
+public:
+    NONCOPYABLE(ActivationBase);
+    UNITY_DEFINES_PTRS(ActivationBase);
 
-//! @endcond
+    virtual void cancelled() = 0;
+    virtual ActivationResponse activate() = 0;
 
-void ScopeBase::run()
-{
-    // Intentionally empty: default "do nothing" implementation.
-}
-    
-ActivationBase::UPtr ScopeBase::activate(ResultItem const& result, VariantMap const& hints)
-{
-    return ActivationBase::UPtr(nullptr); // same as returning an activation base instance that returns NotHandled
-}
+    /// @cond
+    virtual ~ActivationBase() noexcept;
+    /// @endcond
 
-void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
-{
-    v_major = unity::api::scopes::major_version();
-    v_minor = unity::api::scopes::minor_version();
-    v_micro = unity::api::scopes::micro_version();
-}
+protected:
+    /// @cond
+    ActivationBase();
+    /// @endcond
+
+private:
+    std::unique_ptr<internal::ActivationBaseImpl> p;
+};
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
+#endif

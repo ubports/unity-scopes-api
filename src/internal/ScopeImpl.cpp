@@ -22,6 +22,7 @@
 #include <scopes/internal/MWScope.h>
 #include <scopes/internal/QueryCtrlImpl.h>
 #include <scopes/Scope.h>
+#include <scopes/Result.h>
 #include <unity/Exception.h>
 
 #include <cassert>
@@ -89,6 +90,12 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         }
         throw;
     }
+    return ctrl;
+}
+    
+QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const
+{
+    QueryCtrlProxy ctrl;
     return ctrl;
 }
 

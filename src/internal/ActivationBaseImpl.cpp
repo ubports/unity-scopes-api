@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#include <scopes/ScopeBase.h>
+#include <scopes/internal/ActivationBaseImpl.h>
 
 namespace unity
 {
@@ -27,34 +27,9 @@ namespace api
 namespace scopes
 {
 
-//! @cond
-
-ScopeBase::ScopeBase()
+namespace internal
 {
-}
-
-ScopeBase::~ScopeBase() noexcept
-{
-}
-
-//! @endcond
-
-void ScopeBase::run()
-{
-    // Intentionally empty: default "do nothing" implementation.
-}
-    
-ActivationBase::UPtr ScopeBase::activate(ResultItem const& result, VariantMap const& hints)
-{
-    return ActivationBase::UPtr(nullptr); // same as returning an activation base instance that returns NotHandled
-}
-
-void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
-{
-    v_major = unity::api::scopes::major_version();
-    v_minor = unity::api::scopes::minor_version();
-    v_micro = unity::api::scopes::micro_version();
-}
+} // namespace internal
 
 } // namespace scopes
 

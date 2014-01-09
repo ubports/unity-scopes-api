@@ -24,6 +24,7 @@
 #include <scopes/internal/zmq_middleware/ZmqException.h>
 #include <scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
+#include <scopes/Result.h>
 
 using namespace std;
 
@@ -92,6 +93,36 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
+    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    return QueryCtrlImpl::create(p, reply_proxy);
+}
+
+QueryCtrlProxy ZmqScope::activate(Result const& result, VariantMap const& hints, MWReplyProxy const& reply)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
+    {
+        auto request = make_request_(request_builder, "activate");
+        auto in_params = request.initInParams().getAs<capnproto::Scope::ActivationRequest>();
+        auto res = in_params.initResult();
+        to_value_dict(result.serialize(), res);
+        auto h = in_params.initHints();
+        to_value_dict(hints, h);
+        auto p = in_params.initReplyProxy();
+        p.setEndpoint(reply_proxy->endpoint().c_str());
+        p.setIdentity(reply_proxy->identity().c_str());
+    }
+
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    future.wait();
+
+    auto receiver = future.get();
+    auto segments = receiver->receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto proxy = response.getPayload().getAs<capnproto::Scope::ActivationResponse>().getReturnValue();
     ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
     return QueryCtrlImpl::create(p, reply_proxy);
 }

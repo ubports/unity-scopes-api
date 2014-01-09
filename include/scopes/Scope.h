@@ -23,6 +23,7 @@
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ReceiverBase.h>
 #include <scopes/ScopeProxyFwd.h>
+#include <scopes/ActivationReceiverBase.h>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -33,6 +34,8 @@ namespace api
 
 namespace scopes
 {
+
+class Result;
 
 namespace internal
 {
@@ -54,6 +57,8 @@ public:
     also arrive while the query() method is still running.
     */
     QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const;
+
+    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

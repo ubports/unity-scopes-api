@@ -21,6 +21,7 @@
 
 #include <scopes/QueryBase.h>
 #include <scopes/RegistryProxyFwd.h>
+#include <scopes/ActivationBase.h>
 #include <scopes/Version.h>
 
 /**
@@ -61,6 +62,8 @@ namespace api
 
 namespace scopes
 {
+
+class ResultItem;
 
 /**
 \file ScopeBase.h
@@ -185,6 +188,8 @@ public:
     /param hints TODO, complete doc
     */
     virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
+
+    virtual ActivationBase::UPtr activate(ResultItem const& result, VariantMap const& hints);
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

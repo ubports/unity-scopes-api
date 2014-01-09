@@ -13,17 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
-#define UNITY_API_SCOPES_INTERNAL_MWSCOPE_H
+#ifndef UNITY_SCOPES_ACTIVATIONRESPONSE_H
+#define UNITY_SCOPES_ACTIVATIONRESPONSE_H
 
-#include <scopes/internal/MWObjectProxy.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
-#include <scopes/internal/MWScopeProxyFwd.h>
-#include <scopes/QueryCtrlProxyFwd.h>
+#include <unity/SymbolExport.h>
 #include <scopes/Variant.h>
+#include <memory>
 
 namespace unity
 {
@@ -33,24 +31,37 @@ namespace api
 
 namespace scopes
 {
-class Result;
 
 namespace internal
 {
+class ActivationResponseImpl;
+}
 
-class MWScope : public virtual MWObjectProxy
+/**
+\brief
+*/
+class UNITY_API ActivationResponse final
 {
 public:
-    virtual ~MWScope() noexcept;
+    enum Status
+    {
+        NotHandled,
+        Handled,
+        ShowPreview
+    };
 
-    virtual QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply) = 0;
-    virtual QueryCtrlProxy activate(Result const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    ActivationResponse(Status status);
+    ~ActivationResponse();
+    ActivationResponse(ActivationResponse const& other);
+    ActivationResponse(ActivationResponse&& other);
+    ActivationResponse& operator=(ActivationResponse const& other);
+    ActivationResponse& operator=(ActivationResponse&& other);
+    void setHints(VariantMap const& hints);
+    VariantMap hints() const;
 
-protected:
-    MWScope(MiddlewareBase* mw_base);
+private:
+    std::shared_ptr<internal::ActivationResponseImpl> p;
 };
-
-} // namespace internal
 
 } // namespace scopes
 

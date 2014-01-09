@@ -44,6 +44,11 @@ QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints
 {
     return fwd()->create_query(q, hints, reply);
 }
+    
+QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const
+{
+    return fwd()->activate(result, hints, reply);
+}
 
 internal::ScopeImpl* Scope::fwd() const
 {
