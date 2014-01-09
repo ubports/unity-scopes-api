@@ -83,10 +83,9 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     }
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
 
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);

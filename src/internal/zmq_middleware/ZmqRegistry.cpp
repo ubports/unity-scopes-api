@@ -86,7 +86,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -121,7 +121,7 @@ MetadataMap ZmqRegistry::list()
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -150,7 +150,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
