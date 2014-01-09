@@ -50,6 +50,9 @@ class ZmqReceiver final
 public:
     NONCOPYABLE(ZmqReceiver);
 
+    ZmqReceiver(ZmqReceiver&&) = default;
+    ZmqReceiver& operator=(ZmqReceiver&&) = default;
+
     ZmqReceiver(zmqpp::socket& s);
 
     kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> receive();

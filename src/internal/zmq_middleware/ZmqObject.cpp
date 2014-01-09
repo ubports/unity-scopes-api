@@ -113,9 +113,9 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
 }
 
 // Get a socket to the endpoint for this proxy, write the request on the wire and, if the invocation
-// is twoway, return a reader for the response.
+// is twoway, return a receiver for the response.
 
-unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
+ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
 {
     thread_local static ConnectionPool pool(*mw_base()->context());
 
@@ -133,7 +133,7 @@ unique_ptr<ZmqReceiver> ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_param
     }
 #endif
 
-    return unique_ptr<ZmqReceiver>(new ZmqReceiver(s));
+    return ZmqReceiver(s);
 }
 
 } // namespace zmq_middleware
