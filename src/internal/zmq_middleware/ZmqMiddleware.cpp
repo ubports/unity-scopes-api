@@ -19,7 +19,6 @@
 #include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
 #include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/QueryI.h>
 #include <scopes/internal/zmq_middleware/QueryCtrlI.h>
@@ -32,8 +31,6 @@
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
 #include <scopes/internal/zmq_middleware/ZmqScope.h>
 #include <scopes/internal/zmq_middleware/RethrowException.h>
-#include <scopes/ScopeExceptions.h>
-#include <unity/UnityExceptions.h>
 
 using namespace std;
 
