@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
-#include <internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/UnityExceptions.h>
 

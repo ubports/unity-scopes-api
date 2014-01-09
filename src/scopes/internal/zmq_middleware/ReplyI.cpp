@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ReplyI.h>
 
-#include <internal/zmq_middleware/capnproto/Reply.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/Reply.capnp.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>

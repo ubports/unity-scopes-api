@@ -19,7 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
 #include <unity/scopes/internal/QueryCtrlImpl.h>
-#include <internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>

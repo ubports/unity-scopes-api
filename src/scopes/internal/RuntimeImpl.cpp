@@ -30,7 +30,7 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
-#include <config.h>
+#include <unity/config.h>
 
 using namespace std;
 using namespace unity::scopes;

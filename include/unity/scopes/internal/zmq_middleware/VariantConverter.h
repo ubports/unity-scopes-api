@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_VARIANTCONVERTER_H
 
 #include <unity/scopes/Variant.h>
-#include <internal/zmq_middleware/capnproto/ValueDict.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/ValueDict.capnp.h>
 
 namespace unity
 {

@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
-#include <internal/zmq_middleware/capnproto/ValueDict.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/ValueDict.capnp.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
