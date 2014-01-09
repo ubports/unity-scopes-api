@@ -19,6 +19,9 @@
 #ifndef UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
 #define UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
 
+#include <scopes/ActivationResponse.h>
+#include <unity/util/NonCopyable.h>
+
 namespace unity
 {
 
@@ -34,6 +37,12 @@ namespace internal
 class ActivationBaseImpl final
 {
 public:
+    NONCOPYABLE(ActivationBaseImpl);
+
+    ActivationBaseImpl() = default;
+    ~ActivationBaseImpl() = default;
+    void cancelled();
+    ActivationResponse activate();
 };
 
 } // namespace internal

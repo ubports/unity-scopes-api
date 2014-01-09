@@ -61,6 +61,10 @@ public:
     ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     void run(MWReplyProxy const& reply) noexcept override;
     void cancel() override;
+
+private:
+    std::shared_ptr<ActivationBase> act_base_;
+    MWReplyProxy reply_;
 };
 
 // A QueryObject sits in between the incoming requests from the middleware layer and the

@@ -17,6 +17,7 @@
 */
 
 #include <scopes/ActivationBase.h>
+#include <scopes/internal/ActivationBaseImpl.h>
 
 namespace unity
 {
@@ -26,6 +27,25 @@ namespace api
 
 namespace scopes
 {
+
+ActivationBase::ActivationBase()
+    : p(new internal::ActivationBaseImpl())
+{
+}
+
+ActivationBase::~ActivationBase() noexcept
+{
+}
+    
+void ActivationBase::cancelled()
+{
+    //default implementation does nothing
+}
+
+ActivationResponse ActivationBase::activate()
+{
+    return p->activate();
+}
 
 } // namespace scopes
 

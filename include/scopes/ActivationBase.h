@@ -38,25 +38,20 @@ class ActivationBaseImpl;
 }
 
 /**
-\brief
+\brief TODO
 */
 class UNITY_API ActivationBase
 {
 public:
+    /// @cond
     NONCOPYABLE(ActivationBase);
     UNITY_DEFINES_PTRS(ActivationBase);
-
-    virtual void cancelled() = 0;
-    virtual ActivationResponse activate() = 0;
-
-    /// @cond
+    ActivationBase();
     virtual ~ActivationBase() noexcept;
     /// @endcond
 
-protected:
-    /// @cond
-    ActivationBase();
-    /// @endcond
+    virtual void cancelled();
+    virtual ActivationResponse activate();
 
 private:
     std::unique_ptr<internal::ActivationBaseImpl> p;
