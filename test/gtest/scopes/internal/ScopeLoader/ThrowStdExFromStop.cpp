@@ -41,7 +41,7 @@ extern "C"
     EXPORT
     unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         inc_create();
         return new MyThrowingScope;
@@ -50,7 +50,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         inc_destroy();
         delete scope_base;

@@ -46,7 +46,7 @@ protected:
 EXPORT
 unity::scopes::ScopeBase*
 // cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_CREATE_FUNCTION()
+UNITY_SCOPE_CREATE_FUNCTION()
 {
     return new MyScope;
 }
@@ -54,7 +54,7 @@ UNITY_API_SCOPE_CREATE_FUNCTION()
 EXPORT
 void
 // cppcheck-suppress unusedFunction
-UNITY_API_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
+UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
     delete scope;
 }
