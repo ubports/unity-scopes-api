@@ -67,6 +67,11 @@ public:
     {
         return QueryBase::UPtr(new MyQuery);
     }
+
+    virtual QueryBase::UPtr preview(Result const&, VariantMap const&) override
+    {
+        return nullptr;
+    }
 };
 
 extern "C"

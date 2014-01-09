@@ -229,6 +229,12 @@ public:
         return query;
     }
 
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << scope_name_ << ": preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
+
     MyScope()
         : done_(false)
     {

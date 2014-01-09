@@ -51,6 +51,10 @@ public:
     virtual QueryCtrlProxy activate(Result const& result,
                                     VariantMap const& hints,
                                     MWReplyProxy const& reply) override;
+
+    virtual QueryCtrlProxy preview(Result const& result,
+                                   VariantMap const& hints,
+                                   MWReplyProxy const& reply) override;
 };
 
 } // namespace zmq_middleware

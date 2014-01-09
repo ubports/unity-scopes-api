@@ -23,7 +23,7 @@
 #include <mutex>
 
 #include <scopes/CategorisedResult.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/MWScope.h>
@@ -42,7 +42,7 @@ TEST(Runtime, basic)
     rt->destroy();
 }
 
-class Receiver : public ReceiverBase
+class Receiver : public SearchListener
 {
 public:
     virtual void push(CategorisedResult result) override
@@ -53,7 +53,7 @@ public:
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
     }
-    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);

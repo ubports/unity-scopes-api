@@ -83,6 +83,12 @@ public:
         cout << "RemoteScope: created query: \"" << q << "\"" << endl;
         return query;
     }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "RemoteScope: requested preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
 };
 
 extern "C"

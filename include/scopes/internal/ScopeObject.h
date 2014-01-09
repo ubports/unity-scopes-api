@@ -22,6 +22,7 @@
 #include <scopes/internal/AbstractObject.h>
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/internal/MWReplyProxyFwd.h>
+#include <scopes/Result.h>
 #include <scopes/Variant.h>
 
 #include <string>
@@ -61,8 +62,12 @@ public:
                                   VariantMap const& hints,
                                   MWReplyProxy const& reply,
                                   MiddlewareBase* mw_base);
+    MWQueryCtrlProxy preview(Result const& result,
+                             VariantMap const& hints,
+                             MWReplyProxy const& reply,
+                             MiddlewareBase* mw_base);
 
-    //MWQueryCtrlProxy activate(Result const& result, VariantMap const& hints, 
+    //MWQueryCtrlProxy activate(Result const& result, VariantMap const& hints,
 
 private:
     RuntimeImpl* const runtime_;

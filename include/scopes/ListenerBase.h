@@ -40,7 +40,7 @@ class CategorisedResult;
 /**
 \brief Abstract base class to receive the results of a query.
 TODO: fix doc
-The scope application code must instantiate a class derived from ReceiverBase and pass that instance as
+The scope application code must instantiate a class derived from ListenerBase and pass that instance as
 a parameter to the Scope::query() method. Once a query is sent, the scopes run time repeatedly
 invokes the push() method, once for each result returned by the query. Once a query is complete,
 the finished() method is called once, to inform the caller that the query is complete.
@@ -50,14 +50,47 @@ Calls to push() and finished() are made by an arbitrary thread.
 // TODO: add doc for thread pool and concurrent calls to push()
 */
 
-class UNITY_API ReceiverBase
+class UNITY_API ListenerBase
 {
 public:
     /// @cond
-    NONCOPYABLE(ReceiverBase);
-    UNITY_DEFINES_PTRS(ReceiverBase);
+    NONCOPYABLE(ListenerBase);
+    UNITY_DEFINES_PTRS(ListenerBase);
 
-    virtual ~ReceiverBase() noexcept;
+    virtual ~ListenerBase() noexcept;
+    /// @endcond
+
+    /**
+    \brief Indicates the cause of a call to finished().
+    The Error enumerator indicates that a query terminated abnormally, for example,
+    because a scope could not be reached over the network, a query terminated
+    abnormally, or explicitly reported an error.
+    */
+    enum Reason { Finished, Cancelled, Error };
+
+    /**
+    \brief Called once by the scopes run time after the final result for a query() was sent.
+    Exceptions thrown from finished() are ignored.
+    \param r Indicates the cause for the call to finished().
+    \param error_message If r is set to Reason::Error, error_message contains further details.
+           Otherwise, error_message is the empty string.
+    */
+    virtual void finished(Reason r, std::string const& error_message) = 0;
+
+protected:
+    /// @cond
+    ListenerBase();
+    /// @endcond
+};
+
+class UNITY_API SearchListener : public ListenerBase
+{
+public:
+    /// @cond
+    NONCOPYABLE(SearchListener);
+    UNITY_DEFINES_PTRS(SearchListener);
+
+    virtual ~SearchListener() noexcept;
     /// @endcond
 
     /**
@@ -81,34 +114,43 @@ public:
     */
     virtual void push(Category::SCPtr category);
 
-    /**
-    \brief Indicates the cause of a call to finished().
-    The Error enumerator indicates that a query terminated abnormally, for example,
-    because a scope could not be reached over the network, a query terminated
-    abnormally, or explicitly reported an error.
-    */
-    enum Reason { Finished, Cancelled, Error };
+protected:
+    /// @cond
+    SearchListener();
+    /// @endcond
+};
+
+class UNITY_API PreviewListener : public ListenerBase
+{
+public:
+    /// @cond
+    NONCOPYABLE(PreviewListener);
+    UNITY_DEFINES_PTRS(PreviewListener);
+
+    virtual ~PreviewListener() noexcept;
+    /// @endcond
 
     /**
-    \brief Called once by the scopes run time after the final result for a query() was sent.
-    Exceptions thrown from finished() are ignored.
-    \param r Indicates the cause for the call to finished().
-    \param error_message If r is set to Reason::Error, error_message contains further details.
-           Otherwise, error_message is the empty string.
+    \brief Called by the scopes runtime for each preview chunk that is returned by preview().
     */
-    virtual void finished(Reason r, std::string const& error_message) = 0;
+    //virtual void push(PreviewWidgetList const&) = 0; // TODO: enable!
+
+    /**
+    \brief Called by the scopes runtime for each data field that is returned by preview().
+    */
+    virtual void push(std::string const& key, Variant const& value) = 0;
 
 protected:
     /// @cond
-    ReceiverBase();
+    PreviewListener();
     /// @endcond
 };
 
 /**
-\brief Convenience function to convert a ReceiverBase::Reason enumerator to a string.
+\brief Convenience function to convert a ListenerBase::Reason enumerator to a string.
 \return Possible return values are "finished", "cancelled", and "error".
 */
-char const* to_string(ReceiverBase::Reason reason);
+char const* to_string(ListenerBase::Reason reason);
 
 } // namespace scopes
 

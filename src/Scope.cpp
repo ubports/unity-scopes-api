@@ -40,11 +40,11 @@ Scope::~Scope() noexcept
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
     return fwd()->create_query(q, hints, reply);
 }
-    
+
 QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const
 {
     return fwd()->activate(result, hints, reply);

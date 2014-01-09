@@ -34,7 +34,7 @@ namespace scopes
 namespace internal
 {
     class CategorisedResultImpl;
-    class ReplyObject;
+    class ResultReplyObject;
 }
 
 /**
@@ -70,7 +70,7 @@ private:
     CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
     internal::CategorisedResultImpl* fwd() const;
 
-    friend class internal::ReplyObject;
+    friend class internal::ResultReplyObject;
 };
 
 } // namespace scopes

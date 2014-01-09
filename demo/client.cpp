@@ -19,7 +19,7 @@
 #include <scopes/CategoryRenderer.h>
 #include <scopes/QueryCtrl.h>
 #include <scopes/Registry.h>
-#include <scopes/ReceiverBase.h>
+#include <scopes/ListenerBase.h>
 #include <scopes/Runtime.h>
 #include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
@@ -34,7 +34,7 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-class Receiver : public ReceiverBase
+class Receiver : public SearchListener
 {
 public:
 
@@ -68,10 +68,10 @@ public:
         }
     }
 
-    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         cout << "query complete, status: " << to_string(reason);
-        if (reason == ReceiverBase::Error)
+        if (reason == ListenerBase::Error)
         {
             cout << ": " << error_message;
         }

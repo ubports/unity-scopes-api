@@ -88,6 +88,12 @@ public:
         cout << "scope-A: created query: \"" << q << "\"" << endl;
         return query;
     }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-A: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
 };
 
 extern "C"

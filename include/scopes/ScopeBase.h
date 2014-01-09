@@ -23,6 +23,7 @@
 #include <scopes/RegistryProxyFwd.h>
 #include <scopes/ActivationBase.h>
 #include <scopes/Version.h>
+#include <scopes/Result.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -189,7 +190,15 @@ public:
     */
     virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
 
+    /*
+     * TODO: doc string
+     */
     virtual ActivationBase::UPtr activate(ResultItem const& result, VariantMap const& hints);
+
+    /*
+     * FIXME: doc string
+     */
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

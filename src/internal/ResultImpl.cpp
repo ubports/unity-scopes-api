@@ -288,6 +288,11 @@ void ResultImpl::deserialize(VariantMap const& var)
     }
 }
 
+Result ResultImpl::create_result(VariantMap const& variant_map)
+{
+    return Result(variant_map);
+}
+
 } // namespace internal
 
 } // namespace scopes

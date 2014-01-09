@@ -18,7 +18,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ReceiverBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp
