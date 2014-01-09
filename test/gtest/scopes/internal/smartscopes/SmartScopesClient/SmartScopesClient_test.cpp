@@ -29,8 +29,8 @@
 #include <thread>
 
 using namespace testing;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::scopes;
+using namespace unity::scopes::internal::smartscopes;
 using namespace unity::api::test::scopes::internal::smartscopes;
 
 namespace

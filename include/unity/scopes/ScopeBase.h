@@ -70,7 +70,7 @@ Each scope must implement a class that derives from ScopeBase, for example:
 ~~~
 #include <unity/scopes/ScopeBase.h>
 
-class MyScope : public unity::api::scopes::ScopeBase
+class MyScope : public unity::scopes::ScopeBase
 {
 public:
     MyScope();
@@ -96,14 +96,14 @@ Rather than hard-coding the names of the functions, use the #UNITY_SCOPE_CREATE_
 #UNITY_SCOPE_DESTROY_FUNCTION macros, for example:
 
 ~~~
-unity::api::scopes::ScopeBase*
+unity::scopes::ScopeBase*
 UNITY_SCOPE_CREATE_FUNCTION()
 {
     return new MyScope; // Example only, heap-allocation is not mandatory
 }
 
 void
-UNITY_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope)
+UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
     delete scope;       // Example only, heap-allocation is not mandatory
 }

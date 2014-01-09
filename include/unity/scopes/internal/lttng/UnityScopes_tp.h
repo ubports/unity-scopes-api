@@ -21,7 +21,7 @@
 
 #undef TRACEPOINT_PROVIDER
 #undef TRACEPOINT_INCLUDE
-#define TRACEPOINT_PROVIDER unity_scopes_api
+#define TRACEPOINT_PROVIDER unity_scopes
 #define TRACEPOINT_INCLUDE <unity/scopes/internal/lttng/UnityScopes_tp.h>
 
 #include <unity/scopes/internal/lttng/SimpleTracepoint.h>
@@ -43,4 +43,4 @@ SIMPLE_TRACEPOINT(
 #pragma clang diagnostic pop
 #endif
 
-#endif /* UNITY_API_SCOPES_INTERNAL_LTTNG_UNITYSCOPESAPI_TP_H */
+#endif /* UNITY_SCOPES_INTERNAL_LTTNG_UNITYSCOPES_TP_H */

@@ -28,7 +28,7 @@
 
 #include <iostream>
 
-using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::scopes::internal::smartscopes;
 
 //-- HttpClientQt
 

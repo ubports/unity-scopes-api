@@ -23,7 +23,7 @@
 #include <memory>
 
 using namespace testing;
-using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::scopes::internal::smartscopes;
 
 namespace
 {

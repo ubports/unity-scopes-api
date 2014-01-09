@@ -29,8 +29,8 @@
 static const std::string c_base_url = "https://productsearch.ubuntu.com";
 static const std::string c_remote_scopes_resource = "/smartscopes/v2/remote-scopes";
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal::smartscopes;
+using namespace unity::scopes;
+using namespace unity::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
