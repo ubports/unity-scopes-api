@@ -29,7 +29,7 @@ namespace scopes
 
 namespace internal
 {
-    
+
 ActivationResponse ActivationBaseImpl::activate()
 {
     return ActivationResponse(ActivationResponse::Status::NotHandled);

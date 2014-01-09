@@ -36,7 +36,7 @@ ActivationBase::ActivationBase()
 ActivationBase::~ActivationBase() noexcept
 {
 }
-    
+
 void ActivationBase::cancelled()
 {
     //default implementation does nothing
