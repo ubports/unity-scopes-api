@@ -39,8 +39,8 @@ namespace internal
 ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProxy const& registry) :
     scope_name_(name),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
-    scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     registry_(registry),
+    scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
     if (!registry)
