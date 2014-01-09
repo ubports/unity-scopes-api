@@ -1011,3 +1011,105 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
     }
 }
+
+namespace
+{
+
+bool test_finished;
+std::mutex server_mutex;
+std::condition_variable server_done;
+
+}
+
+void
+mock_server(string const& endpoint, zmqpp::socket_type stype)
+{
+    // Simulate a server bound to the endpoint already
+    zmqpp::context c;
+    zmqpp::socket s(c, stype);
+    s.set(zmqpp::socket_option::linger, 0);
+    s.set(zmqpp::socket_option::receive_timeout, 500);
+    s.bind(endpoint);
+
+    // Wait for test to tell us to go away
+    unique_lock<mutex> lock(server_mutex);
+    server_done.wait(lock, []{ return test_finished; });
+}
+
+TEST(ObjectAdapter, double_bind)
+{
+    const string endpoint = "ipc://testscope";
+
+    {
+        // Simulate a server bound to the endpoint already
+        {
+            lock_guard<mutex> lock(server_mutex);
+            test_finished = false;
+        }
+        std::thread t(&mock_server, endpoint, zmqpp::socket_type::router);
+
+        wait(200);  // Give zmq some time to finish the bind.
+
+        ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                         (RuntimeImpl*)0x1);
+        wait();
+        try
+        {
+            ObjectAdapter a(mw, "testscope", endpoint, RequestType::Twoway, 5);
+            a.activate();
+            a.shutdown();
+            FAIL();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_STREQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+                         "(adapter: testscope):\n"
+                         "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "(adapter: testscope): address in use: ipc://testscope", e.what());
+        }
+
+        {
+            lock_guard<mutex> lock(server_mutex);
+            test_finished = true;
+            server_done.notify_one();
+        }
+        t.join();
+    }
+
+    // Same test again, but for pull socket
+    {
+        // Simulate a server bound to the endpoint already
+        {
+            lock_guard<mutex> lock(server_mutex);
+            test_finished = false;
+        }
+        std::thread t(&mock_server, endpoint, zmqpp::socket_type::pull);
+
+        wait(200);  // Give zmq some time to finish the bind.
+
+        ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                         (RuntimeImpl*)0x1);
+        wait();
+        try
+        {
+            ObjectAdapter a(mw, "testscope", endpoint, RequestType::Twoway, 5);
+            a.activate();
+            a.shutdown();
+            FAIL();
+        }
+        catch (MiddlewareException const& e)
+        {
+            EXPECT_STREQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+                         "(adapter: testscope):\n"
+                         "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "(adapter: testscope): address in use: ipc://testscope", e.what());
+        }
+
+        {
+            lock_guard<mutex> lock(server_mutex);
+            test_finished = true;
+            server_done.notify_one();
+        }
+        t.join();
+    }
+}

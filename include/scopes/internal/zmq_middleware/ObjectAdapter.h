@@ -103,7 +103,6 @@ private:
 
     void cleanup();
     void join_with_all_threads();
-    void clear_servants();
 
     void store_exception(scopes::MiddlewareException& ex);
 
