@@ -246,7 +246,7 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr cons
     return proxy;
 }
 
-MWQueryProxy ZmqMiddleware::add_query_object(QueryObject::SPtr const& query)
+MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
 {
     assert(query);
 

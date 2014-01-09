@@ -38,7 +38,7 @@ class ActivationResponseImpl;
 }
 
 /**
-\brief
+\brief TODO
 */
 class UNITY_API ActivationResponse final
 {
@@ -59,8 +59,12 @@ public:
     void setHints(VariantMap const& hints);
     VariantMap hints() const;
 
+    VariantMap serialize() const;
+
 private:
     std::shared_ptr<internal::ActivationResponseImpl> p;
+    ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl);
+    friend class internal::ActivationResponseImpl;
 };
 
 } // namespace scopes

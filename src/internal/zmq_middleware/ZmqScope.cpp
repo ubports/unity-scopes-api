@@ -121,7 +121,7 @@ QueryCtrlProxy ZmqScope::activate(Result const& result, VariantMap const& hints,
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto proxy = response.getPayload().getAs<capnproto::Scope::ActivationResponse>().getReturnValue();
+    auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
     ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
     return QueryCtrlImpl::create(p, reply_proxy);
 }

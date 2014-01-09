@@ -60,11 +60,6 @@ struct ActivationRequest
     replyProxy @2 : Proxy.Proxy;
 }
 
-struct ActivationResponse
-{
-    returnValue @0 : Proxy.Proxy;
-}
-
 struct PreviewRequest
 {
     result @0     : ValueDict.ValueDict;

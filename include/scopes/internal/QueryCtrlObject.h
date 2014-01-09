@@ -35,7 +35,7 @@ namespace scopes
 namespace internal
 {
 
-class QueryObject;
+class QueryObjectBase;
 
 class QueryCtrlObject final : public AbstractObject
 {
@@ -51,10 +51,10 @@ public:
 
     // Called by create_query() after instantiation to tell this ctrl what its corresponding
     // query facade is.
-    void set_query(std::shared_ptr<QueryObject> const& qo);
+    void set_query(std::shared_ptr<QueryObjectBase> const& qo);
 
 private:
-    std::weak_ptr<QueryObject> qo_;
+    std::weak_ptr<QueryObjectBase> qo_;
     std::atomic_bool destroyed_;
 };
 

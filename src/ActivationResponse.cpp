@@ -33,6 +33,11 @@ ActivationResponse::ActivationResponse(Status status)
 {
 }
 
+ActivationResponse::ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl)
+    : p(pimpl)
+{
+}
+
 ActivationResponse::~ActivationResponse() = default;
 
 ActivationResponse::ActivationResponse(ActivationResponse const& other)
@@ -61,6 +66,11 @@ void ActivationResponse::setHints(VariantMap const& hints)
 VariantMap ActivationResponse::hints() const
 {
     return p->hints();
+}
+
+VariantMap ActivationResponse::serialize() const
+{
+    return p->serialize();
 }
 
 } // namespace scopes

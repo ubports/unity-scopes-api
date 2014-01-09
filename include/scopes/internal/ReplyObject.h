@@ -84,6 +84,16 @@ private:
     std::shared_ptr<CategoryRegistry> cat_registry_;
 };
 
+class ActivationReplyObject : public ReplyObject
+{
+public:
+    ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
+    virtual void process_data(VariantMap const& data) override;
+
+private:
+    ActivationListener::SPtr const receiver_;
+};
+
 class PreviewReplyObject : public ReplyObject
 {
 public:

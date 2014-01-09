@@ -37,6 +37,7 @@ class ActivationResponseImpl final
 {
 public:
     ActivationResponseImpl(ActivationResponse::Status status);
+    ActivationResponseImpl(VariantMap const& var);
     ~ActivationResponseImpl() = default;
 
     ActivationResponseImpl(ActivationResponseImpl const& other) = default;
@@ -46,6 +47,10 @@ public:
 
     void setHints(VariantMap const& hints);
     VariantMap hints() const;
+
+    VariantMap serialize() const;
+
+    static ActivationResponse create(VariantMap const& var);
 
 private:
     ActivationResponse::Status status_;

@@ -24,7 +24,6 @@
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ListenerBase.h>
 #include <scopes/ScopeProxyFwd.h>
-#include <scopes/ActivationReceiverBase.h>
 #include <scopes/Result.h>
 #include <scopes/Variant.h>
 #include <string>
@@ -52,7 +51,7 @@ public:
     virtual ~ScopeImpl() noexcept;
 
     QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
-    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
     QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);

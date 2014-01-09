@@ -44,9 +44,25 @@ namespace scopes
 namespace internal
 {
 
+ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
+    : QueryObjectBase()
+{
+}
+
+void ActivationQueryObject::cancel()
+{
+    //TODO
+}
+
+void ActivationQueryObject::run(MWReplyProxy const& reply) noexcept
+{
+    //TODO
+}
+
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
+    QueryObjectBase(),
     query_base_(query_base),
     reply_(reply),
     ctrl_(ctrl),

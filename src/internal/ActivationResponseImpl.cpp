@@ -17,6 +17,7 @@
 */
 
 #include <scopes/internal/ActivationResponseImpl.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -35,6 +36,23 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
 {
 }
 
+ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
+{
+    auto it = var.find("hints");
+    if (it == var.end())
+    {
+        throw LogicException("Invalid data, missing 'hints'");
+    }
+    hints_ = it->second.get_dict();
+
+    it = var.find("status");
+    if (it == var.end())
+    {
+        throw LogicException("Invalid data, missing 'status'");
+    }
+    status_ = static_cast<ActivationResponse::Status>(it->second.get_int());
+}
+
 void ActivationResponseImpl::setHints(VariantMap const& hints)
 {
     hints_ = hints;
@@ -43,6 +61,20 @@ void ActivationResponseImpl::setHints(VariantMap const& hints)
 VariantMap ActivationResponseImpl::hints() const
 {
     return hints_;
+}
+
+VariantMap ActivationResponseImpl::serialize() const
+{
+    VariantMap vm;
+    vm["status"] = static_cast<int>(status_);
+    vm["hints"] = Variant(hints_);
+    return vm;
+}
+
+ActivationResponse ActivationResponseImpl::create(VariantMap const& var)
+{
+    auto impl = std::make_shared<ActivationResponseImpl>(var);
+    return ActivationResponse(impl);
 }
 
 } // namespace internal

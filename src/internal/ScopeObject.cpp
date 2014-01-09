@@ -193,7 +193,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
-        QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
+        ActivationQueryObject::SPtr qo(make_shared<ActivationQueryObject>(act_base, reply, ctrl_proxy));
         MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
@@ -204,7 +204,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
         // the run() implementation in a different thread, so we cannot block here.
         // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
         // count high until the run() request arrives in the query via the middleware.
-        qo->set_self(qo);
+        //qo->set_self(qo);
 
         query_proxy->run(reply);
     }
@@ -217,7 +217,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
         catch (...)
         {
         }
-        cerr << "create_query(): " << e.what() << endl;
+        cerr << "activate(): " << e.what() << endl;
         // TODO: log error
         throw;
     }
@@ -230,7 +230,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
         catch (...)
         {
         }
-        cerr << "create_query(): unknown exception" << endl;
+        cerr << "activate(): unknown exception" << endl;
         // TODO: log error
         throw;
     }

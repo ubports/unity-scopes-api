@@ -37,18 +37,38 @@ namespace scopes
 {
 
 class QueryBase;
+class ActivationBase;
 
 namespace internal
 {
 
 class QueryCtrlObject;
 
+class QueryObjectBase : public AbstractObject
+{
+public:
+    UNITY_DEFINES_PTRS(QueryObjectBase);
+    // Remote operation implementation
+    virtual void run(MWReplyProxy const& reply) noexcept = 0;
+    virtual void cancel() = 0;
+};
+
+class ActivationQueryObject final : public QueryObjectBase
+{
+public:
+    UNITY_DEFINES_PTRS(ActivationQueryObject);
+
+    ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    void run(MWReplyProxy const& reply) noexcept override;
+    void cancel() override;
+};
+
 // A QueryObject sits in between the incoming requests from the middleware layer and the
 // QueryBase-derived implementation. This allows us to receive cancel requests. In turn,
 // the implementation of this object ensures that the corresponding ReplyObject is disabled.
 // TODO: Probably need to flesh out this comment.
 
-class QueryObject final : public AbstractObject
+class QueryObject final : public QueryObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(QueryObject);
@@ -57,10 +77,10 @@ public:
     virtual ~QueryObject() noexcept;
 
     // Remote operation implementation
-    void run(MWReplyProxy const& reply) noexcept;
+    void run(MWReplyProxy const& reply) noexcept override;
 
     // Called locally only, by QueryCtrlObject.
-    void cancel();
+    void cancel() override;
 
     bool pushable() const noexcept; // Called locallly only, by ReplyImpl
 

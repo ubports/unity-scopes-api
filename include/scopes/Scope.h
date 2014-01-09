@@ -23,7 +23,6 @@
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ListenerBase.h>
 #include <scopes/ScopeProxyFwd.h>
-#include <scopes/ActivationReceiverBase.h>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -58,7 +57,7 @@ public:
     */
     QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
 
-    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationReceiverBase::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.
