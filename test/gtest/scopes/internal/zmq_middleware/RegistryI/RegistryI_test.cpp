@@ -205,7 +205,7 @@ TEST(RegistryI, exceptions)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
+        EXPECT_EQ("unity::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
                   e.to_string());
     }
 
@@ -216,7 +216,7 @@ TEST(RegistryI, exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: unity::InvalidArgumentException: "
+        EXPECT_EQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
                   "Registry: Cannot search for scope with empty name",
                   e.to_string());
     }
@@ -298,7 +298,7 @@ TEST(RegistryI, locate)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_STREQ("unity::api::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
+        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
                      e.what());
     }
 
@@ -309,7 +309,7 @@ TEST(RegistryI, locate)
     }
     catch (RegistryException const& e)
     {
-        EXPECT_STREQ("unity::api::scopes::RegistryException: Couldn't start error_scope", e.what());
+        EXPECT_STREQ("unity::scopes::RegistryException: Couldn't start error_scope", e.what());
     }
 
 #if 0

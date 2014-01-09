@@ -27,7 +27,7 @@ namespace scopes
 {
 
 MiddlewareException::MiddlewareException(string const& reason) :
-    Exception("unity::api::scopes::MiddlewareException", reason)
+    Exception("unity::scopes::MiddlewareException", reason)
 {
 }
 
@@ -48,7 +48,7 @@ exception_ptr MiddlewareException::self() const
 }
 
 ConfigException::ConfigException(string const& reason) :
-    Exception("unity::api::scopes::ConfigException", reason)
+    Exception("unity::scopes::ConfigException", reason)
 {
 }
 
@@ -71,7 +71,7 @@ self() const
 }
 
 NotFoundException::NotFoundException(string const& reason, string const& name) :
-    Exception("unity::api::scopes::NotFoundException",
+    Exception("unity::scopes::NotFoundException",
               reason + (reason.empty() ? "" : " ") + "(name = " + name + ")"),
     name_(name)
 {

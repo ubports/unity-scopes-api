@@ -64,7 +64,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = art)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = art)", e.to_string());
     }
 
     try
@@ -74,7 +74,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = icon)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = icon)", e.to_string());
     }
 
     try
@@ -84,7 +84,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = search_hint)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = search_hint)", e.to_string());
     }
 
     try
@@ -94,7 +94,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = hot_key)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.to_string());
     }
 
     // Check that the copy has the same values as the original

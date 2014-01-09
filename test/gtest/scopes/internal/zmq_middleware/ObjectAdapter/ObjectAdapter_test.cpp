@@ -176,7 +176,7 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }
@@ -194,9 +194,9 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+            EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
                       "failure (adapter: testscope):\n"
-                      "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                       "(adapter: testscope):\n"
                       "        Address already in use",
                       e.to_string());
@@ -207,10 +207,10 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
                       "    Exception history:\n"
                       "        Exception #1:\n"
-                      "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                       "(adapter: testscope):\n"
                       "                Address already in use",
                       e.to_string());
@@ -221,10 +221,10 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
                        "    Exception history:\n"
                        "        Exception #1:\n"
-                       "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                       "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                        "(adapter: testscope):\n"
                        "                Address already in use",
                        e.to_string());
@@ -321,7 +321,7 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
+        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
                   " id already in use (adapter: testscope)",
                   e.to_string());
     }
@@ -333,7 +333,7 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
+        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
                   " id not present (adapter: testscope)",
                   e.to_string());
     }
@@ -896,7 +896,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
                           e.to_string());
             }
         };
@@ -917,7 +917,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
                           "cannot remove id \"fred\": id not present (adapter: testscope)",
                           e.to_string());
             }
@@ -941,7 +941,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
                           "cannot remove id \"fred\": id not present (adapter: testscope)",
                           e.to_string());
             }
@@ -994,7 +994,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }
@@ -1005,7 +1005,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }

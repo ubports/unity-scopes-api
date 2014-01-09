@@ -46,6 +46,6 @@ TEST(MiddlewareFactory, BadKind)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: Invalid middleware kind: NoSuchMiddleware", e.to_string());
+        EXPECT_EQ("unity::scopes::ConfigException: Invalid middleware kind: NoSuchMiddleware", e.to_string());
     }
 }

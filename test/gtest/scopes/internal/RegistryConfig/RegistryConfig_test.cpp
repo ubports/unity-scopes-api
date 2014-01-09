@@ -59,7 +59,7 @@ TEST(RegistryConfig, ScoperunnerRelativePath)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
+        EXPECT_EQ("unity::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
                   "must be an absolute path",
                   e.to_string());
     }

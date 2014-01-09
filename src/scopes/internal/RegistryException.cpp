@@ -30,7 +30,7 @@ namespace internal
 {
 
 RegistryException::RegistryException(string const& reason) :
-    Exception("unity::api::scopes::RegistryException", reason)
+    Exception("unity::scopes::RegistryException", reason)
 {
 }
 
