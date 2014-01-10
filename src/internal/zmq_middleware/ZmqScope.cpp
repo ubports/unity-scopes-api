@@ -96,7 +96,7 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     return QueryCtrlImpl::create(p, reply_proxy);
 }
 
-QueryCtrlProxy ZmqScope::activate(Result const& result, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
@@ -104,7 +104,7 @@ QueryCtrlProxy ZmqScope::activate(Result const& result, VariantMap const& hints,
         auto request = make_request_(request_builder, "activate");
         auto in_params = request.initInParams().getAs<capnproto::Scope::ActivationRequest>();
         auto res = in_params.initResult();
-        to_value_dict(result.serialize(), res);
+        to_value_dict(result, res);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
         auto p = in_params.initReplyProxy();

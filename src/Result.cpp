@@ -108,6 +108,16 @@ void Result::intercept_activation()
     p->intercept_activation();
 }
 
+bool Result::direct_activation() const
+{
+    return p->direct_activation();
+}
+
+std::string Result::activation_scope_name() const
+{
+    return p->activation_scope_name();
+}
+
 Variant& Result::operator[](std::string const& key)
 {
     return (*p)[key];

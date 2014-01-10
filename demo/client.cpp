@@ -242,8 +242,24 @@ int main(int argc, char* argv[])
             if (result != nullptr)
             {
                 cout << "client: activating result item #" << activate_result_index << ", uri:" << result->uri() << endl;
-                meta.proxy()->activate(*result, vm, act_reply);
-                act_reply->wait_until_finished();
+                bool direct_activation = result->direct_activation();
+                cout << "\tdirect activation: " << direct_activation << endl;
+                if (!direct_activation)
+                {
+                    auto target_scope = result->activation_scope_name();
+                    ScopeProxy proxy;
+                    if (target_scope == meta.scope_name())
+                    {
+                        proxy = meta.proxy();
+                    }
+                    else
+                    {
+                        meta = r->get_metadata(target_scope);
+                    }
+                    cout << "\tactivation scope name: " << target_scope << endl;
+                    proxy->activate(*result, vm, act_reply);
+                    act_reply->wait_until_finished();
+                }
             }
             else
             {

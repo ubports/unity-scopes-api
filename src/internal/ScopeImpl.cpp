@@ -18,6 +18,7 @@
 
 #include <scopes/internal/ScopeImpl.h>
 
+#include <scopes/internal/ResultImpl.h>
 #include <scopes/internal/MiddlewareBase.h>
 #include <scopes/internal/MWScope.h>
 #include <scopes/internal/QueryCtrlImpl.h>
@@ -104,13 +105,8 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
         ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the the create_query() method across the bus. This is a
-        // synchronous twoway interaction with the scope, so it can return
-        // the QueryCtrlProxy. Because the Scope implementation has a separate
-        // thread for create_query() calls, this is guaranteed not to block for
-        // any length of time. (No application code other than the QueryBase constructor
-        // is called by create_query() on the server side.)
-        ctrl = fwd()->activate(result, hints, rp);
+        // Forward the activate() method across the bus.
+        ctrl = fwd()->activate(result.p->activation_target(), hints, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

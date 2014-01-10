@@ -21,6 +21,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 #include <scopes/Variant.h>
 
 namespace unity
@@ -56,6 +57,9 @@ public:
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
     void intercept_activation();
+    bool direct_activation() const;
+    std::string activation_scope_name() const;
+    VariantMap activation_target() const;
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
 
@@ -74,19 +78,23 @@ public:
     static Result create_result(VariantMap const&);
 
 protected:
-    virtual void serialize_internal(VariantMap& var) const;
-
-private:
-
     // activation and preview flags
     // they can be OR'ed, so need to be powers of 2
     enum Flags
     {
-        ActivationNotHandled = 0,
+        ActivationNotHandled = 0, // direct activation
         InterceptActivation = 1,
         InterceptPreview = 2
     };
 
+    virtual void serialize_internal(VariantMap& var) const;
+
+    // find stored result whose flags give true in cmp_func, and pass it to found_func;
+    // this is done recursively as stored result can be nested.
+    // return true if found, otherwise false.
+    bool find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const;
+
+private:
     void deserialize(VariantMap const& var);
     void throw_on_non_string(std::string const& name, Variant::Type vtype) const;
     void throw_on_empty(std::string const& name) const;

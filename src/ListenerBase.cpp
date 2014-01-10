@@ -80,7 +80,7 @@ void ActivationListener::activation_response(ActivationResponse const& /* respon
 {
     // Intentionally empty: "do nothing" default implementation.
 }
-    
+
 void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
 {
     // Intentionally empty: "do nothing" default implementation.

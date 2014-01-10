@@ -48,7 +48,7 @@ public:
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply) override;
 
-    virtual QueryCtrlProxy activate(Result const& result,
+    virtual QueryCtrlProxy activate(VariantMap const& result,
                                     VariantMap const& hints,
                                     MWReplyProxy const& reply) override;
 
