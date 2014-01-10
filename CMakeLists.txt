@@ -75,7 +75,7 @@ set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 include(GNUInstallDirs)
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}/include
+    include/
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_BINARY_DIR}/src
     ${OTHER_INCLUDE_DIRS}

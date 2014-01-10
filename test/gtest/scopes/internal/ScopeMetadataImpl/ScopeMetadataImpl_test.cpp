@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
@@ -29,9 +29,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ScopeMetadataImpl, basic)
 {
@@ -64,7 +64,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = art)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = art)", e.to_string());
     }
 
     try
@@ -74,7 +74,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = icon)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = icon)", e.to_string());
     }
 
     try
@@ -84,7 +84,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = search_hint)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = search_hint)", e.to_string());
     }
 
     try
@@ -94,7 +94,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: attribute not set (name = hot_key)", e.to_string());
+        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.to_string());
     }
 
     // Check that the copy has the same values as the original

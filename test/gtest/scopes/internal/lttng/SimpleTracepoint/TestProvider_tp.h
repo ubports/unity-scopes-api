@@ -24,7 +24,7 @@
 #define TRACEPOINT_PROVIDER test_provider
 #define TRACEPOINT_INCLUDE <TestProvider_tp.h>
 
-#include <scopes/internal/lttng/SimpleTracepoint.h>
+#include <unity/scopes/internal/lttng/SimpleTracepoint.h>
 #include <stdint.h>
 
 SIMPLE_TRACEPOINT(
