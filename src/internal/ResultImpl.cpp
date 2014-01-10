@@ -59,6 +59,8 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     if (this != &other)
     {
         attrs_ = other.attrs_;
+        flags_ = other.flags_;
+        origin_ = other.origin_;
         if (other.stored_result_)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
