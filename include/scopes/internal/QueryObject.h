@@ -19,8 +19,7 @@
 #ifndef UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
 #define UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
 
-#include <scopes/internal/AbstractObject.h>
-#include <scopes/internal/MWReplyProxyFwd.h>
+#include <scopes/internal/QueryObjectBase.h>
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/ReplyProxyFwd.h>
 
@@ -42,15 +41,6 @@ namespace internal
 {
 
 class QueryCtrlObject;
-
-class QueryObjectBase : public AbstractObject
-{
-public:
-    UNITY_DEFINES_PTRS(QueryObjectBase);
-    // Remote operation implementation
-    virtual void run(MWReplyProxy const& reply) noexcept = 0;
-    virtual void cancel() = 0;
-};
 
 // A QueryObject sits in between the incoming requests from the middleware layer and the
 // QueryBase-derived implementation. This allows us to receive cancel requests. In turn,
