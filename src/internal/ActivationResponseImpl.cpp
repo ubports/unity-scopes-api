@@ -53,6 +53,11 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
     status_ = static_cast<ActivationResponse::Status>(it->second.get_int());
 }
 
+ActivationResponse::Status ActivationResponseImpl::status() const
+{
+    return status_;
+}
+
 void ActivationResponseImpl::setHints(VariantMap const& hints)
 {
     hints_ = hints;

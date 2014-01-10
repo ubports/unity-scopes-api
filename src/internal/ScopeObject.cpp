@@ -170,7 +170,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
     try
     {
         act_base = scope_base_->activate(result, hints);
-        if (!act_base) // FIXME: turn into NotHandled
+        if (!act_base)
         {
             // TODO: log error, scope returned null pointer.
             throw ResourceException("Scope \"" + runtime_->scope_name() +

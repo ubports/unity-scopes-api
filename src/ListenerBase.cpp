@@ -80,6 +80,11 @@ void ActivationListener::activation_response(ActivationResponse const& /* respon
 {
     // Intentionally empty: "do nothing" default implementation.
 }
+    
+void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
 
 // Possibly overkill, but safer than using the enum as the index into an array,
 // in case the enumeration is ever added to or the enumerators get re-ordered.

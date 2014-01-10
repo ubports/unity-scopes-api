@@ -56,6 +56,7 @@ public:
     ActivationResponse(ActivationResponse&& other);
     ActivationResponse& operator=(ActivationResponse const& other);
     ActivationResponse& operator=(ActivationResponse&& other);
+    ActivationResponse::Status status() const;
     void setHints(VariantMap const& hints);
     VariantMap hints() const;
 

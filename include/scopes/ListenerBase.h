@@ -161,6 +161,7 @@ public:
     \brief TODO
     */
     virtual void activation_response(ActivationResponse const& response);
+    void finished(Reason r, std::string const& error_message) override;
 
 protected:
     /// @cond

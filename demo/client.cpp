@@ -24,9 +24,12 @@
 #include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/ScopeExceptions.h>
+#include <scopes/ActivationResponse.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
+#include <cstdlib>
+#include <string.h>
 #include <iostream>
 #include <mutex>
 #include <unistd.h>
@@ -37,6 +40,11 @@ using namespace unity::api::scopes;
 class Receiver : public SearchListener
 {
 public:
+    Receiver(int index_to_activate)
+        : index_to_activate_(index_to_activate),
+          push_result_count_(0)
+    {
+    }
 
     virtual void push(Category::SCPtr category) override
     {
@@ -54,6 +62,11 @@ public:
              << " category id: "
              << result.category()->id()
              << endl;
+        ++push_result_count_;
+        if (index_to_activate_ > 0 && push_result_count_ == index_to_activate_)
+        {
+            activate_result_ = std::make_shared<Result>(result);
+        }
     }
 
     virtual void push(Annotation annotation) override
@@ -89,6 +102,11 @@ public:
         condvar_.wait(lock, [this] { return this->query_complete_; });
     }
 
+    std::shared_ptr<Result> result_to_activate() const
+    {
+        return activate_result_;
+    }
+
     Receiver() :
         query_complete_(false)
     {
@@ -96,21 +114,73 @@ public:
 
 private:
     bool query_complete_;
+    int index_to_activate_;
+    mutex mutex_;
+    condition_variable condvar_;
+    int push_result_count_ = 0;
+    std::shared_ptr<Result> activate_result_;
+};
+
+class ActivationReceiver : public ActivationListener
+{
+public:
+    void activation_response(ActivationResponse const& response) override
+    {
+        cout << "\tGot activation response: " << response.status() << endl;
+    }
+
+    void finished(Reason r, std::string const& error_message)
+    {
+        cout << "\tActivation finished, reason: " << r << ", error_message: " << error_message << endl;
+        condvar_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<decltype(mutex_)> lock(mutex_);
+        condvar_.wait(lock);
+    }
+
+private:
     mutex mutex_;
     condition_variable condvar_;
 };
 
+void print_usage()
+{
+    cerr << "usage: ./client <scope-letter> query [activate n]" << endl;
+    cerr << "For example: ./client B iron" << endl;
+    cerr << "         or: ./client B iron activate 1" << endl;
+    exit(1);
+}
+
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    if (argc < 3)
     {
-        cerr << "usage: ./client <scope-letter> query" << endl;
-        cerr << "For example: ./client B iron" << endl;
-        return 1;
+        print_usage();
     }
 
     string scope_name = string("scope-") + argv[1];
     string search_string = argv[2];
+    int activate_result_index = 0; //the default index of 0 won't activate
+
+    // poor man's getopt
+    if (argc == 5)
+    {
+        if (strcmp(argv[3], "activate") == 0)
+        {
+            activate_result_index = atoi(argv[4]);
+        }
+        else
+        {
+            print_usage();
+        }
+    }
+    else
+    {
+        print_usage();
+    }
 
     try
     {
@@ -155,7 +225,7 @@ int main(int argc, char* argv[])
         catch (NotFoundException const& e)
         {
         }
-        shared_ptr<Receiver> reply(new Receiver);
+        shared_ptr<Receiver> reply(new Receiver(activate_result_index));
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
@@ -163,6 +233,23 @@ int main(int argc, char* argv[])
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
+
+        // handle activation
+        if (activate_result_index > 0)
+        {
+            shared_ptr<ActivationReceiver> act_reply(new ActivationReceiver);
+            auto result = reply->result_to_activate();
+            if (result != nullptr)
+            {
+                cout << "client: activating result item #" << activate_result_index << ", uri:" << result->uri() << endl;
+                meta.proxy()->activate(*result, vm, act_reply);
+                act_reply->wait_until_finished();
+            }
+            else
+            {
+                cout << "Nothing to activate! Invalid result index?" << endl;
+            }
+        }
     }
 
     catch (unity::Exception const& e)

@@ -63,6 +63,11 @@ void ActivationResponse::setHints(VariantMap const& hints)
     p->setHints(hints);
 }
 
+ActivationResponse::Status ActivationResponse::status() const
+{
+    return p->status();
+}
+
 VariantMap ActivationResponse::hints() const
 {
     return p->hints();

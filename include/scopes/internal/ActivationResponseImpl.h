@@ -45,6 +45,7 @@ public:
     ActivationResponseImpl& operator=(ActivationResponseImpl const& other) = default;
     ActivationResponseImpl& operator=(ActivationResponseImpl && other) = default;
 
+    ActivationResponse::Status status() const;
     void setHints(VariantMap const& hints);
     VariantMap hints() const;
 
