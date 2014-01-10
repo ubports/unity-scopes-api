@@ -14,12 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#ifndef UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
-#define UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
-
-#include <scopes/internal/ReplyObject.h>
 #include <scopes/ActivationListener.h>
 
 namespace unity
@@ -31,25 +27,26 @@ namespace api
 namespace scopes
 {
 
-namespace internal
+ActivationListener::ActivationListener()
 {
+}
 
-class ActivationReplyObject : public ReplyObject
+ActivationListener::~ActivationListener()
 {
-public:
-    ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual void process_data(VariantMap const& data) override;
+}
 
-private:
-    ActivationListener::SPtr const receiver_;
-};
+void ActivationListener::activation_response(ActivationResponse const& /* response */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
 
-} // namespace internal
+void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif

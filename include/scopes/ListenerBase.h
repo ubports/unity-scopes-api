@@ -36,7 +36,6 @@ namespace scopes
 {
 
 class CategorisedResult;
-class ActivationResponse;
 
 /**
 \brief Abstract base class to receive the results of a query.
@@ -146,29 +145,6 @@ protected:
     PreviewListener();
     /// @endcond
 };
-
-class UNITY_API ActivationListener: public ListenerBase
-{
-public:
-    /// @cond
-    NONCOPYABLE(ActivationListener);
-    UNITY_DEFINES_PTRS(ActivationListener);
-
-    ~ActivationListener() noexcept;
-    /// @endcond
-
-    /**
-    \brief TODO
-    */
-    virtual void activation_response(ActivationResponse const& response);
-    void finished(Reason r, std::string const& error_message) override;
-
-protected:
-    /// @cond
-    ActivationListener();
-    /// @endcond
-};
-
 
 /**
 \brief Convenience function to convert a ListenerBase::Reason enumerator to a string.

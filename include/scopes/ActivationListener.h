@@ -16,11 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
-#define UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
+#ifndef UNITY_SCOPES_XXX_H
+#define UNITY_SCOPES_XXX_H
 
-#include <scopes/internal/ReplyObject.h>
-#include <scopes/ActivationListener.h>
+#include <unity/SymbolExport.h>
+#include <scopes/ListenerBase.h>
 
 namespace unity
 {
@@ -30,21 +30,32 @@ namespace api
 
 namespace scopes
 {
+class ActivationResponse;
 
-namespace internal
-{
-
-class ActivationReplyObject : public ReplyObject
+/**
+\brief
+*/
+class UNITY_API ActivationListener: public ListenerBase
 {
 public:
-    ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual void process_data(VariantMap const& data) override;
+    /// @cond
+    NONCOPYABLE(ActivationListener);
+    UNITY_DEFINES_PTRS(ActivationListener);
 
-private:
-    ActivationListener::SPtr const receiver_;
+    ~ActivationListener() noexcept;
+    /// @endcond
+
+    /**
+    \brief TODO
+    */
+    virtual void activation_response(ActivationResponse const& response);
+    void finished(Reason r, std::string const& error_message) override;
+
+protected:
+    /// @cond
+    ActivationListener();
+    /// @endcond
 };
-
-} // namespace internal
 
 } // namespace scopes
 

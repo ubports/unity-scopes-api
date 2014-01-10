@@ -23,6 +23,7 @@
 #include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/QueryCtrlProxyFwd.h>
 #include <scopes/ListenerBase.h>
+#include <scopes/ActivationListener.h>
 #include <scopes/ScopeProxyFwd.h>
 #include <scopes/Result.h>
 #include <scopes/Variant.h>
