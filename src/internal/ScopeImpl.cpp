@@ -117,7 +117,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
         {
             // TODO: if things go wrong, we need to make sure that the reply object
             // is disconnected from the middleware, so it gets deallocated.
-            //reply->finished(ListenerBase::Error, e.what());
+            reply->finished(ListenerBase::Error, e.what());
             throw;
         }
         catch (...)
