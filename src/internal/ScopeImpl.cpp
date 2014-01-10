@@ -26,6 +26,7 @@
 #include <scopes/Scope.h>
 #include <scopes/Result.h>
 #include <unity/Exception.h>
+#include <scopes/internal/ActivationReplyObject.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added

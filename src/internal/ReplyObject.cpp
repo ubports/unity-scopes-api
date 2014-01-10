@@ -23,8 +23,6 @@
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
 #include <scopes/internal/CategorisedResultImpl.h>
-#include <scopes/internal/ActivationResponseImpl.h>
-#include <scopes/ActivationResponse.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -253,18 +251,6 @@ void PreviewReplyObject::process_data(VariantMap const& data)
     }
     // FIXME: just a test that it's talking to PreviewListener
     receiver_->push("example-data", Variant("foo"));
-}
-
-ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
-    receiver_(receiver)
-{
-}
-
-void ActivationReplyObject::process_data(VariantMap const& data)
-{
-    ActivationResponse resp = ActivationResponseImpl::create(data);
-    receiver_->activation_response(resp);
 }
 
 } // namespace internal
