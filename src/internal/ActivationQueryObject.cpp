@@ -37,7 +37,7 @@ namespace scopes
 namespace internal
 {
 
-ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
+ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& /* ctrl */)
     : QueryObjectBase(),
     act_base_(act_base),
     reply_(reply)

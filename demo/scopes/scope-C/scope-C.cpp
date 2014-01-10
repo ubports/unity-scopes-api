@@ -223,7 +223,7 @@ public:
         return QueryBase::UPtr(new MyQuery(q, queue));
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints) override
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& /* hints */) override
     {
         cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
         return ActivationBase::UPtr(new MyActivation());
