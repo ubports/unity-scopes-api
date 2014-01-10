@@ -23,6 +23,7 @@
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <scopes/internal/MWReply.h>
 #include <scopes/internal/QueryObject.h>
+#include <scopes/internal/ActivationQueryObject.h>
 #include <scopes/internal/RuntimeImpl.h>
 #include <scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>

@@ -14,11 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ */
 
-#include <scopes/internal/ActivationReplyObject.h>
-#include <scopes/ActivationResponse.h>
-#include <scopes/internal/ActivationResponseImpl.h>
+#ifndef UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#define UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
+
+#include <scopes/internal/QueryObject.h>
 
 namespace unity
 {
@@ -28,21 +29,24 @@ namespace api
 
 namespace scopes
 {
+class ActivationBase;
 
 namespace internal
 {
 
-ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
-    receiver_(receiver)
+class ActivationQueryObject final : public QueryObjectBase
 {
-}
+public:
+    UNITY_DEFINES_PTRS(ActivationQueryObject);
 
-void ActivationReplyObject::process_data(VariantMap const& data)
-{
-    ActivationResponse resp = ActivationResponseImpl::create(data);
-    receiver_->activation_response(resp);
-}
+    ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    void run(MWReplyProxy const& reply) noexcept override;
+    void cancel() override;
+
+private:
+    std::shared_ptr<ActivationBase> act_base_;
+    MWReplyProxy reply_;
+};
 
 } // namespace internal
 
@@ -51,3 +55,5 @@ void ActivationReplyObject::process_data(VariantMap const& data)
 } // namespace api
 
 } // namespace unity
+
+#endif

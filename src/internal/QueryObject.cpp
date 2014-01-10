@@ -45,42 +45,6 @@ namespace scopes
 namespace internal
 {
 
-ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
-    : QueryObjectBase(),
-    act_base_(act_base),
-    reply_(reply)
-{
-}
-
-void ActivationQueryObject::cancel()
-{
-    //TODO
-}
-
-void ActivationQueryObject::run(MWReplyProxy const& reply) noexcept
-{
-    try
-    {
-        // no need for intermediate proxy (like with ReplyImpl::create),
-        // since we get single return value from the public API
-        // and just push it ourseleves
-        auto res = act_base_->activate();
-        reply->push(res.serialize());
-    }
-    catch (std::exception const& e)
-    {
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
-        cerr << "ActivationQueryObject::run(): " << e.what() << endl;
-    }
-    catch (...)
-    {
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
-        cerr << "ActivationQueryObject::run(): unknown exception" << endl;
-    }
-}
-
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
