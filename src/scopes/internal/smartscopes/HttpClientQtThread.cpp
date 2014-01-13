@@ -51,8 +51,8 @@ void HttpClientQtThread::run()
 
         reply_ = manager_->get(request);
 
-        connect(manager_, SIGNAL(finished(QNetworkReply*)), this, SLOT(queryDone(QNetworkReply*)));
-        connect(this, SIGNAL(abort()), reply_, SLOT(abort()));
+        connect(manager_, &QNetworkAccessManager::finished, this, &HttpClientQtThread::queryDone);
+        connect(this, &HttpClientQtThread::abort, reply_, &QNetworkReply::abort);
     }
 
     QTimer timeout;
