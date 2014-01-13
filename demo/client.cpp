@@ -251,14 +251,11 @@ int main(int argc, char* argv[])
                 {
                     auto target_scope = result->activation_scope_name();
                     ScopeProxy proxy;
-                    if (target_scope == meta.scope_name())
-                    {
-                        proxy = meta.proxy();
-                    }
-                    else
+                    if (target_scope != meta.scope_name()) // if activation scope is different than current, get the right proxy
                     {
                         meta = r->get_metadata(target_scope);
                     }
+                    proxy = meta.proxy();
                     cout << "\tactivation scope name: " << target_scope << endl;
                     proxy->activate(*result, vm, act_reply);
                     act_reply->wait_until_finished();
