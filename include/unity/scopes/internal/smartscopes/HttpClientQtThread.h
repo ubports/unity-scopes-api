@@ -45,6 +45,9 @@ public Q_SLOTS:
     void cancel();
     void queryDone(QNetworkReply*);
 
+Q_SIGNALS:
+    void abort();
+
 private:
     QUrl url_;
     uint timeout_;
