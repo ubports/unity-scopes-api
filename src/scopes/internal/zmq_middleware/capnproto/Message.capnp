@@ -39,7 +39,7 @@ struct Request
     mode     @0 : RequestMode;   # Response required?
     id       @1 : Text;          # Identity of target object
     opName   @2 : Text;          # Operation name
-    inParams @3 : Object;        # In-parameters for the operation
+    inParams @3 : AnyPointer;    # In-parameters for the operation
 }
 
 # Responses indicate success or an exception. All twoway invocations can raise run-time exceptions (such
@@ -60,7 +60,7 @@ enum ResponseStatus
 struct Response
 {
     status  @0 : ResponseStatus;
-    payload @1 : Object;            # Out-params followed by return value (if any), or exception data
+    payload @1 : AnyPointer;            # Out-params followed by return value (if any), or exception data
 }
 
 # Run-time exceptions

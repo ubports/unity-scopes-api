@@ -52,7 +52,7 @@ ServantBase::~ServantBase() noexcept
 }
 
 void ServantBase::dispatch_(Current const& current,
-                            capnp::ObjectPointer::Reader& in_params,
+                            capnp::AnyPointer::Reader& in_params,
                             capnproto::Response::Builder& r)
 {
     auto it = dispatch_table_.find(current.op_name);
@@ -70,7 +70,7 @@ void ServantBase::dispatch_(Current const& current,
 // sensible back to the client.
 
 void ServantBase::safe_dispatch_(Current const& current,
-                                 capnp::ObjectPointer::Reader& in_params,
+                                 capnp::AnyPointer::Reader& in_params,
                                  capnproto::Response::Builder& r) noexcept
 {
     string error;

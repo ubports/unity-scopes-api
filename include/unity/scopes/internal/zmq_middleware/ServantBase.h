@@ -56,13 +56,13 @@ public:
     NONCOPYABLE(ServantBase);
 
     void safe_dispatch_(Current const& current,
-                        capnp::ObjectPointer::Reader& in_params,
+                        capnp::AnyPointer::Reader& in_params,
                         capnproto::Response::Builder& r) noexcept;
     virtual ~ServantBase() noexcept;
 
 protected:
     typedef std::function<void(Current const&,
-                               capnp::ObjectPointer::Reader& in_params,
+                               capnp::AnyPointer::Reader& in_params,
                                capnproto::Response::Builder& r)> DispatchFunc;
 
     typedef std::unordered_map<std::string, DispatchFunc> DispatchTable;
@@ -70,7 +70,7 @@ protected:
     ServantBase(std::shared_ptr<AbstractObject> const& delegate, DispatchTable funcs);
 
     void dispatch_(Current const& current,
-                   capnp::ObjectPointer::Reader& in_params,
+                   capnp::AnyPointer::Reader& in_params,
                    capnproto::Response::Builder& r);
 
     std::shared_ptr<AbstractObject> del() const noexcept;
