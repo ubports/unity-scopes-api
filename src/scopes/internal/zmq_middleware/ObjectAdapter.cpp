@@ -614,7 +614,9 @@ void ObjectAdapter::worker_thread()
                     req = message->getRoot<capnproto::Request>();
                     current.id = req.getId().cStr();
                     current.op_name = req.getOpName().cStr();
-                    if (current.id.empty() || current.op_name.empty() || !req.hasMode())
+                    auto mode = req.getMode();
+                    if (current.id.empty() || current.op_name.empty() ||
+                        (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))
                     {
                         if (type_ == RequestType::Twoway)
                         {
@@ -630,7 +632,6 @@ void ObjectAdapter::worker_thread()
                         }
                         continue;
                     }
-                    auto mode = req.getMode();
                     auto expected_mode = type_ == RequestType::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
                     if (mode != expected_mode) // Can't do oneway on a twoway adapter and vice-versa.
                     {

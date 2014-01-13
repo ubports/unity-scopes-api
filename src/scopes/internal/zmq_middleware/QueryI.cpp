@@ -60,7 +60,7 @@ QueryI::~QueryI() noexcept
 }
 
 void QueryI::run_(Current const& current,
-                  capnp::ObjectPointer::Reader& in_params,
+                  capnp::AnyPointer::Reader& in_params,
                   capnproto::Response::Builder&)
 {
     auto req = in_params.getAs<capnproto::Query::RunRequest>();
