@@ -62,7 +62,7 @@ public:
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
-    std::unique_ptr<ZmqReceiver> invoke_(capnp::MessageBuilder& out_params);
+    ZmqReceiver invoke_(capnp::MessageBuilder& out_params);
 
 private:
     std::string endpoint_;

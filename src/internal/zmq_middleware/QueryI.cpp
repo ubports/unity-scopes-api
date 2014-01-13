@@ -22,6 +22,7 @@
 #include <scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <scopes/internal/zmq_middleware/ZmqReply.h>
 #include <scopes/internal/QueryObject.h>
+#include <cassert>
 
 using namespace std;
 
@@ -52,7 +53,7 @@ interface Query
 
 using namespace std::placeholders;
 
-QueryI::QueryI(QueryObject::SPtr const& qo) :
+QueryI::QueryI(QueryObjectBase::SPtr const& qo) :
     ServantBase(qo, { { "run", bind(&QueryI::run_, this, _1, _2, _3) } })
 
 {
@@ -69,7 +70,10 @@ void QueryI::run_(Current const& current,
     auto req = in_params.getAs<capnproto::Query::RunRequest>();
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-    auto delegate = dynamic_pointer_cast<QueryObject>(del());
+    auto delegate = dynamic_pointer_cast<QueryObjectBase>(del());
+
+    assert(delegate);
+
     delegate->run(reply_proxy);
 }
 

@@ -22,6 +22,7 @@
 #include <scopes/ListenerBase.h>
 #include <scopes/Category.h>
 #include <scopes/CategorisedResult.h>
+#include <scopes/internal/CategorisedResultImpl.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -41,9 +42,10 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime) :
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_name) :
     listener_base_(receiver_base),
     finished_(false),
+    origin_scope_name_(scope_name),
     num_push_(0)
 {
     assert(receiver_base);
@@ -162,8 +164,13 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
-ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime),
+std::string ReplyObject::origin_scope_name() const
+{
+    return origin_scope_name_;
+}
+
+ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver),
     cat_registry_(new CategoryRegistry())
 {
@@ -188,7 +195,7 @@ void ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         try
         {
-            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var)); //FIXME: leaks on excp from AnnotationImpl ctor
             receiver_->push(std::move(annotation));
         }
         catch (std::exception const& e)
@@ -205,7 +212,9 @@ void ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         try
         {
-            CategorisedResult result(*cat_registry_, result_var);
+            auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
+            impl->set_origin(origin_scope_name());
+            CategorisedResult result(impl);
             receiver_->push(std::move(result));
         }
         catch (std::exception const& e)
@@ -217,8 +226,8 @@ void ResultReplyObject::process_data(VariantMap const& data)
     }
 }
 
-PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime),
+PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver)
 {
 }

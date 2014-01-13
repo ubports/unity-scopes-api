@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 #include <scopes/Result.h>
 #include <sstream>
+#include <cassert>
 
 namespace unity
 {
@@ -43,7 +44,9 @@ ResultImpl::ResultImpl(VariantMap const& variant_map)
 }
 
 ResultImpl::ResultImpl(ResultImpl const& other)
-    : attrs_(other.attrs_)
+    : attrs_(other.attrs_),
+      origin_(other.origin_),
+      flags_(other.flags_)
 {
     if (other.stored_result_)
     {
@@ -56,6 +59,8 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     if (this != &other)
     {
         attrs_ = other.attrs_;
+        flags_ = other.flags_;
+        origin_ = other.origin_;
         if (other.stored_result_)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
@@ -64,11 +69,15 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     return *this;
 }
 
-void ResultImpl::store(Result const& other)
+void ResultImpl::store(Result const& other, bool intercept_preview_req)
 {
     if (this == other.p.get())
     {
         throw InvalidArgumentException("Result:: cannot store self");
+    }
+    if (intercept_preview_req)
+    {
+        flags_ |= Flags::InterceptPreview;
     }
     stored_result_.reset(new VariantMap(other.serialize()));
 }
@@ -85,6 +94,11 @@ Result ResultImpl::retrieve() const
         throw InvalidArgumentException("Result: no result has been stored");
     }
     return Result(*stored_result_);
+}
+
+void ResultImpl::set_origin(std::string const& scope_name)
+{
+    origin_ = scope_name;
 }
 
 void ResultImpl::set_uri(std::string const& uri)
@@ -105,6 +119,118 @@ void ResultImpl::set_art(std::string const& art)
 void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 {
     attrs_["dnd_uri"] = dnd_uri;
+}
+
+void ResultImpl::intercept_activation()
+{
+    flags_ |= Flags::InterceptActivation;
+}
+
+bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
+{
+    if (stored_result_ == nullptr)
+        return false;
+
+    // visit stored results recursively,
+    // check if any of them intercepts activation;
+    // if not, it is direct activation in the shell
+    for (VariantMap stored = *stored_result_;;)
+    {
+        auto it = stored.find("internal");
+        if (it == stored.end())
+        {
+            throw LogicException("Invalid structure of stored result, missing 'internal");
+        }
+        const VariantMap internal_var = it->second.get_dict();
+        auto intit = internal_var.find("flags");
+        if (intit != internal_var.end())
+        {
+            if (cmp_func(static_cast<Flags>(intit->second.get_int())))
+            {
+                found_func(stored);
+                return true;
+            }
+        }
+
+        // nested stored result?
+        intit = internal_var.find("result");
+        if (intit == internal_var.end())
+            break;
+        stored = intit->second.get_dict();
+    }
+    return false;
+}
+
+bool ResultImpl::direct_activation() const
+{
+    if (flags_ & Flags::InterceptActivation)
+    {
+        return false;
+    }
+
+    // visit stored results recursively,
+    // check if any of them intercepts activation;
+    // if not, it is direct activation in the shell
+    if (find_stored_result(
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
+                [](VariantMap const&) {})
+       )
+    {
+        return false;
+    }
+    return true;
+}
+
+std::string ResultImpl::activation_scope_name() const
+{
+    if (flags_ & Flags::InterceptActivation)
+    {
+        return origin_;
+    }
+
+    std::string target;
+    // visit stored results recursively,
+    // check if any of them intercepts activation;
+    // if not, it is direct activation in the shell
+    if (find_stored_result(
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
+                [&target](VariantMap const& var) {
+                    auto it = var.find("internal");
+                    if (it != var.end())
+                    {
+                        it = it->second.get_dict().find("origin");
+                        target = it->second.get_string();
+                    }
+                })
+       )
+    {
+        assert(target.empty());
+        return target;
+    }
+    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+}
+
+VariantMap ResultImpl::activation_target() const
+{
+    if (flags_ & Flags::InterceptActivation)
+    {
+        return serialize();
+    }
+
+    VariantMap res;
+    // visit stored results recursively,
+    // check if any of them intercepts activation;
+    // if not, it is direct activation in the shell
+    if (find_stored_result(
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
+                [&res](VariantMap const& var) {
+                    res = var;
+                })
+       )
+    {
+        return res;
+    }
+    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
 }
 
 Variant& ResultImpl::operator[](std::string const& key)
@@ -157,6 +283,11 @@ std::string ResultImpl::dnd_uri() const noexcept
     return "";
 }
 
+std::string ResultImpl::origin() const noexcept
+{
+    return origin_;
+}
+
 bool ResultImpl::contains(std::string const& key) const
 {
     return attrs_.find(key) != attrs_.end();
@@ -194,6 +325,14 @@ void ResultImpl::throw_on_empty(std::string const& name) const
 
 void ResultImpl::serialize_internal(VariantMap& var) const
 {
+    if (flags_ != 0)
+    {
+        var["flags"] = flags_;
+    }
+    if (!origin_.empty())
+    {
+        var["origin"] = origin_;
+    }
     if (stored_result_)
     {
         var["result"] = *stored_result_;
@@ -219,9 +358,18 @@ void ResultImpl::deserialize(VariantMap const& var)
 {
     // check for ["internal"]["result"] dict which holds stored result.
     auto it = var.find("internal");
-    if (it != var.end())
+    if (it == var.end())
+    {
+        throw InvalidArgumentException("Missing 'internal' element'");
+    }
+    else
     {
         auto const& resvar = it->second.get_dict();
+        it = resvar.find("flags");
+        if (it != resvar.end())
+        {
+            flags_ = it->second.get_int();
+        }
         it = resvar.find("result");
         if (it != resvar.end())
         {

@@ -13,15 +13,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#ifndef UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
-
-#include <scopes/internal/AbstractObject.h>
-
-#include <atomic>
+#include <scopes/internal/ActivationReplyObject.h>
+#include <scopes/ActivationResponse.h>
+#include <scopes/internal/ActivationResponseImpl.h>
 
 namespace unity
 {
@@ -35,28 +32,17 @@ namespace scopes
 namespace internal
 {
 
-class QueryObjectBase;
-
-class QueryCtrlObject final : public AbstractObject
+ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
+    receiver_(receiver)
 {
-public:
-    UNITY_DEFINES_PTRS(QueryCtrlObject);
+}
 
-    QueryCtrlObject();
-    virtual ~QueryCtrlObject() noexcept;
-
-    // Remote operation implementations
-    void cancel();
-    void destroy();
-
-    // Called by create_query() after instantiation to tell this ctrl what its corresponding
-    // query facade is.
-    void set_query(std::shared_ptr<QueryObjectBase> const& qo);
-
-private:
-    std::weak_ptr<QueryObjectBase> qo_;
-    std::atomic_bool destroyed_;
-};
+void ActivationReplyObject::process_data(VariantMap const& data)
+{
+    ActivationResponse resp = ActivationResponseImpl::create(data);
+    receiver_->activation_response(resp);
+}
 
 } // namespace internal
 
@@ -65,5 +51,3 @@ private:
 } // namespace api
 
 } // namespace unity
-
-#endif

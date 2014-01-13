@@ -51,7 +51,7 @@ class ReplyObject : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime);
+    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~ReplyObject() noexcept;
 
     virtual void process_data(VariantMap const& data) = 0;
@@ -59,6 +59,7 @@ public:
     // Remote operation implementations
     void push(VariantMap const& result) noexcept;
     void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept;
+    std::string origin_scope_name() const;
 
 private:
     ListenerBase::SPtr const listener_base_;
@@ -66,13 +67,14 @@ private:
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;
+    std::string origin_scope_name_;
     int num_push_;
 };
 
 class ResultReplyObject : public ReplyObject
 {
 public:
-    ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime);
+    ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~ResultReplyObject() noexcept;
 
     virtual void process_data(VariantMap const& data) override;
@@ -85,7 +87,7 @@ private:
 class PreviewReplyObject : public ReplyObject
 {
 public:
-    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime);
+    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~PreviewReplyObject() noexcept;
 
     virtual void process_data(VariantMap const& data) override;

@@ -53,7 +53,7 @@ void QueryCtrlObject::cancel()
         return;
     }
 
-    QueryObject::SPtr qo = qo_.lock();
+    QueryObjectBase::SPtr qo = qo_.lock();
     if (qo)
     {
         qo->cancel();
@@ -73,7 +73,7 @@ void QueryCtrlObject::destroy()
 // Called by create_query() to tell us what the query facade object
 // is. We use the query facade object to forward cancellation.
 
-void QueryCtrlObject::set_query(QueryObject::SPtr const& qo)
+void QueryCtrlObject::set_query(QueryObjectBase::SPtr const& qo)
 {
     assert(!qo_.lock());
     qo_ = qo;

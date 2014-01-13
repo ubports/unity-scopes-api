@@ -34,6 +34,7 @@ namespace api
 
 namespace scopes
 {
+class Result;
 
 namespace internal
 {
@@ -44,6 +45,7 @@ public:
     virtual ~MWScope() noexcept;
 
     virtual QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy preview(Result const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
 
 protected:

@@ -37,6 +37,7 @@ class CategorisedResult;
 namespace internal
 {
 class ResultImpl;
+class ScopeImpl;
 }
 
 /**
@@ -61,7 +62,7 @@ public:
     Result(Result&&);
     Result& operator=(Result&&);
 
-    void store(Result const& other);
+    void store(Result const& other, bool intercept_preview_req = false);
     bool has_stored_result() const;
     Result retrieve() const;
 
@@ -69,6 +70,27 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
+
+    /**
+     \brief Indicates to the receiver of this result that this scope should intercept its activation.
+     If not called, the result will be activated directly by the Unity shell whithout involving the scope,
+     assuming appropriate uri schema handler is present on the system.
+     */
+    void intercept_activation();
+
+    /**
+     \brief Check if this result should be activated directly by the shell (scope doesn't handle activation of this result).
+     \return true if this result needs to be activated directly
+     */
+    bool direct_activation() const;
+
+    /**
+     \brief Get name of a scope that handles activation of this result.
+     Throws LogicException if it should be handled directly by the shell.
+     Note that scope that handles activation of this result may be different than the scope that sent it (origin).
+     \return scope name
+     */
+    std::string activation_scope_name() const;
 
     /**
        \brief Returns reference of a Result attribute.
@@ -91,6 +113,7 @@ public:
     std::string title() const noexcept;
     std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
+
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;
 
@@ -103,10 +126,12 @@ public:
 private:
     explicit Result(const VariantMap &variant_map);
     Result(internal::ResultImpl* impl);
+    Result(std::shared_ptr<internal::ResultImpl> impl);
 
     std::shared_ptr<internal::ResultImpl> p;
 
     friend class internal::ResultImpl;
+    friend class internal::ScopeImpl;
     friend class CategorisedResult;
 };
 

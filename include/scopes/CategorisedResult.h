@@ -67,7 +67,7 @@ public:
     Category::SCPtr category() const;
 
 private:
-    CategorisedResult(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
+    CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
     internal::CategorisedResultImpl* fwd() const;
 
     friend class internal::ResultReplyObject;

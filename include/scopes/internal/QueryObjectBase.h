@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
+#ifndef UNITY_INTERNAL_QUERYOBJECTBASE_H
+#define UNITY_INTERNAL_QUERYOBJECTBASE_H
 
 #include <scopes/internal/AbstractObject.h>
-
-#include <atomic>
+#include <unity/util/DefinesPtrs.h>
+#include <scopes/internal/MWReplyProxyFwd.h>
 
 namespace unity
 {
@@ -35,27 +35,13 @@ namespace scopes
 namespace internal
 {
 
-class QueryObjectBase;
-
-class QueryCtrlObject final : public AbstractObject
+class QueryObjectBase : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(QueryCtrlObject);
-
-    QueryCtrlObject();
-    virtual ~QueryCtrlObject() noexcept;
-
-    // Remote operation implementations
-    void cancel();
-    void destroy();
-
-    // Called by create_query() after instantiation to tell this ctrl what its corresponding
-    // query facade is.
-    void set_query(std::shared_ptr<QueryObjectBase> const& qo);
-
-private:
-    std::weak_ptr<QueryObjectBase> qo_;
-    std::atomic_bool destroyed_;
+    UNITY_DEFINES_PTRS(QueryObjectBase);
+    // Remote operation implementation
+    virtual void run(MWReplyProxy const& reply) noexcept = 0;
+    virtual void cancel() = 0;
 };
 
 } // namespace internal

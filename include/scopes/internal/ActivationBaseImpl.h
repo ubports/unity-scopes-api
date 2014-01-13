@@ -13,15 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_QUERYCTRLOBJECT_H
+#ifndef UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
+#define UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
 
-#include <scopes/internal/AbstractObject.h>
-
-#include <atomic>
+#include <scopes/ActivationResponse.h>
+#include <unity/util/NonCopyable.h>
 
 namespace unity
 {
@@ -35,27 +34,15 @@ namespace scopes
 namespace internal
 {
 
-class QueryObjectBase;
-
-class QueryCtrlObject final : public AbstractObject
+class ActivationBaseImpl final
 {
 public:
-    UNITY_DEFINES_PTRS(QueryCtrlObject);
+    NONCOPYABLE(ActivationBaseImpl);
 
-    QueryCtrlObject();
-    virtual ~QueryCtrlObject() noexcept;
-
-    // Remote operation implementations
+    ActivationBaseImpl() = default;
+    ~ActivationBaseImpl() = default;
     void cancel();
-    void destroy();
-
-    // Called by create_query() after instantiation to tell this ctrl what its corresponding
-    // query facade is.
-    void set_query(std::shared_ptr<QueryObjectBase> const& qo);
-
-private:
-    std::weak_ptr<QueryObjectBase> qo_;
-    std::atomic_bool destroyed_;
+    ActivationResponse activate();
 };
 
 } // namespace internal

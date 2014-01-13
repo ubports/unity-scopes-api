@@ -23,6 +23,7 @@
 #include <scopes/internal/QueryCtrlObject.h>
 #include <scopes/internal/ReplyImpl.h>
 #include <scopes/QueryBase.h>
+#include <scopes/ActivationBase.h>
 #include <scopes/Reply.h>
 #include <unity/Exception.h>
 
@@ -47,6 +48,7 @@ namespace internal
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
+    QueryObjectBase(),
     query_base_(query_base),
     reply_(reply),
     ctrl_(ctrl),

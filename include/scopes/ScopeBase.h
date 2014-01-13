@@ -21,6 +21,7 @@
 
 #include <scopes/QueryBase.h>
 #include <scopes/RegistryProxyFwd.h>
+#include <scopes/ActivationBase.h>
 #include <scopes/Version.h>
 #include <scopes/Result.h>
 
@@ -62,6 +63,8 @@ namespace api
 
 namespace scopes
 {
+
+class ResultItem;
 
 /**
 \file ScopeBase.h
@@ -186,6 +189,11 @@ public:
     /param hints TODO, complete doc
     */
     virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
+
+    /*
+     * TODO: doc string
+     */
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
 
     /*
      * FIXME: doc string

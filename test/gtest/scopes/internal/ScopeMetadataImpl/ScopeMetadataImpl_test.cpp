@@ -41,7 +41,7 @@ TEST(ScopeMetadataImpl, basic)
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_name("scope_name");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
+    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
     mi->set_display_name("display_name");
     mi->set_description("description");
 
@@ -122,7 +122,7 @@ TEST(ScopeMetadataImpl, basic)
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
     ti->set_scope_name("tmp scope_name");
     mw_proxy = mw.create_scope_proxy("tmp identity", "tmp endpoint");
-    ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
+    ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "tmp scope_name"));
     ti->set_display_name("tmp display_name");
     ti->set_description("tmp description");
     ti->set_art("tmp art");
@@ -189,7 +189,7 @@ TEST(ScopeMetadataImpl, serialize)
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_name("scope_name");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
+    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
     mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_art("art");
@@ -254,7 +254,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     try
     {
         auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-        mi.set_proxy(ScopeImpl::create(mw_proxy, mw.runtime()));
+        mi.set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
         mi.serialize();
         FAIL();
     }

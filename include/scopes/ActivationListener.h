@@ -13,12 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Scope.h>
+#ifndef UNITY_SCOPES_XXX_H
+#define UNITY_SCOPES_XXX_H
 
-#include <scopes/internal/ScopeImpl.h>
+#include <unity/SymbolExport.h>
+#include <scopes/ListenerBase.h>
 
 namespace unity
 {
@@ -28,37 +30,37 @@ namespace api
 
 namespace scopes
 {
+class ActivationResponse;
 
-//! @cond
-
-Scope::Scope(internal::ScopeImpl* impl) :
-    ObjectProxy(impl)
+/**
+\brief
+*/
+class UNITY_API ActivationListener: public ListenerBase
 {
-}
+public:
+    /// @cond
+    NONCOPYABLE(ActivationListener);
+    UNITY_DEFINES_PTRS(ActivationListener);
 
-Scope::~Scope() noexcept
-{
-}
+    ~ActivationListener() noexcept;
+    /// @endcond
 
-QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
-{
-    return fwd()->create_query(q, hints, reply);
-}
+    /**
+    \brief TODO
+    */
+    virtual void activation_response(ActivationResponse const& response);
+    void finished(Reason r, std::string const& error_message) override;
 
-QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
-{
-    return fwd()->activate(result, hints, reply);
-}
-
-internal::ScopeImpl* Scope::fwd() const
-{
-    return dynamic_cast<internal::ScopeImpl*>(pimpl());
-}
-
-//! @endcond
+protected:
+    /// @cond
+    ActivationListener();
+    /// @endcond
+};
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
+
+#endif

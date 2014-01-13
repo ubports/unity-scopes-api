@@ -13,12 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#include <scopes/Scope.h>
-
-#include <scopes/internal/ScopeImpl.h>
+#include <scopes/ActivationListener.h>
 
 namespace unity
 {
@@ -29,33 +27,23 @@ namespace api
 namespace scopes
 {
 
-//! @cond
-
-Scope::Scope(internal::ScopeImpl* impl) :
-    ObjectProxy(impl)
+ActivationListener::ActivationListener()
 {
 }
 
-Scope::~Scope() noexcept
+ActivationListener::~ActivationListener()
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
+void ActivationListener::activation_response(ActivationResponse const& /* response */)
 {
-    return fwd()->create_query(q, hints, reply);
+    // Intentionally empty: "do nothing" default implementation.
 }
 
-QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
 {
-    return fwd()->activate(result, hints, reply);
+    // Intentionally empty: "do nothing" default implementation.
 }
-
-internal::ScopeImpl* Scope::fwd() const
-{
-    return dynamic_cast<internal::ScopeImpl*>(pimpl());
-}
-
-//! @endcond
 
 } // namespace scopes
 

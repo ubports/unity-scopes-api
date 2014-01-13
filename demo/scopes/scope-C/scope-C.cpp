@@ -17,6 +17,7 @@
  */
 
 #include <scopes/ScopeBase.h>
+#include <scopes/ActivationBase.h>
 #include <scopes/CategorisedResult.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/Category.h>
@@ -160,6 +161,14 @@ private:
     Queue& queue_;
 };
 
+class MyActivation : public ActivationBase
+{
+    ActivationResponse activate() override
+    {
+        return ActivationResponse(ActivationResponse::Status::Handled);
+    }
+};
+
 class MyScope : public ScopeBase
 {
 public:
@@ -198,6 +207,7 @@ public:
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
                 result.set_art("icon");
                 result.set_dnd_uri("dnd_uri");
+                result.intercept_activation();
                 if (!reply->push(result))
                 {
                     break; // Query was cancelled
@@ -211,6 +221,12 @@ public:
     {
         cout << scope_name_ << ": created query: \"" << q << "\"" << endl;
         return QueryBase::UPtr(new MyQuery(q, queue));
+    }
+
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& /* hints */) override
+    {
+        cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
+        return ActivationBase::UPtr(new MyActivation());
     }
 
     virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override

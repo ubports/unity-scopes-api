@@ -13,18 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
-#define UNITY_API_REPLYS_INTERNAL_QUERYOBJECT_H
+#ifndef UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#define UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
 
-#include <scopes/internal/QueryObjectBase.h>
+#include <scopes/internal/QueryObject.h>
 #include <scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <scopes/ReplyProxyFwd.h>
-
-#include <atomic>
-#include <mutex>
 
 namespace unity
 {
@@ -34,45 +30,29 @@ namespace api
 
 namespace scopes
 {
-
-class QueryBase;
+class ActivationBase;
 
 namespace internal
 {
 
-class QueryCtrlObject;
-
-// A QueryObject sits in between the incoming requests from the middleware layer and the
-// QueryBase-derived implementation. This allows us to receive cancel requests. In turn,
-// the implementation of this object ensures that the corresponding ReplyObject is disabled.
-// TODO: Probably need to flesh out this comment.
-
-class QueryObject final : public QueryObjectBase
+class ActivationQueryObject final : public QueryObjectBase
 {
 public:
-    UNITY_DEFINES_PTRS(QueryObject);
+    UNITY_DEFINES_PTRS(ActivationQueryObject);
 
-    QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~QueryObject() noexcept;
-
-    // Remote operation implementation
+    ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    virtual ~ActivationQueryObject() noexcept;
     void run(MWReplyProxy const& reply) noexcept override;
-
-    // Called locally only, by QueryCtrlObject.
     void cancel() override;
-
-    bool pushable() const noexcept; // Called locallly only, by ReplyImpl
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(SPtr const& self);
 
 private:
-    std::shared_ptr<QueryBase> query_base_;
+    std::shared_ptr<ActivationBase> act_base_;
     MWReplyProxy reply_;
-    std::weak_ptr<Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
-    std::atomic_bool pushable_;
     SPtr self_;
 };
 

@@ -17,6 +17,7 @@
  */
 
 #include <scopes/ScopeBase.h>
+#include <scopes/ActivationBase.h>
 
 namespace unity
 {
@@ -42,6 +43,11 @@ ScopeBase::~ScopeBase() noexcept
 void ScopeBase::run()
 {
     // Intentionally empty: default "do nothing" implementation.
+}
+
+ActivationBase::UPtr ScopeBase::activate(Result const& result, VariantMap const& hints)
+{
+    return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }
 
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept

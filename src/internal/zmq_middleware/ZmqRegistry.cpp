@@ -86,7 +86,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -121,7 +121,7 @@ MetadataMap ZmqRegistry::list()
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -150,7 +150,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
-    auto segments = receiver->receive();
+    auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -164,7 +164,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
             auto mw = dynamic_cast<ZmqMiddleware*>(mw_base());
             assert(mw);
             auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity());
-            return ScopeImpl::create(zmq_proxy, mw->runtime());
+            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_name);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {

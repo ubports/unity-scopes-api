@@ -53,6 +53,13 @@ struct CreateQueryResponse
     returnValue @0 : Proxy.Proxy;
 }
 
+struct ActivationRequest
+{
+    result @0     : ValueDict.ValueDict;
+    hints @1      : ValueDict.ValueDict;
+    replyProxy @2 : Proxy.Proxy;
+}
+
 struct PreviewRequest
 {
     result @0     : ValueDict.ValueDict;
