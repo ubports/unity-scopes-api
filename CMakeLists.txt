@@ -141,6 +141,10 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
+# These tests are slow, so make it possible not to run them
+# during day-to-day development.
+option(headertests "Check that headers compile cleanly" ON)
+
 if (Werror)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
