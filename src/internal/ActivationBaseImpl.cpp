@@ -35,6 +35,11 @@ ActivationResponse ActivationBaseImpl::activate()
     return ActivationResponse(ActivationResponse::Status::NotHandled);
 }
 
+void ActivationBaseImpl::cancel()
+{
+    // do nothing
+}
+
 } // namespace internal
 
 } // namespace scopes

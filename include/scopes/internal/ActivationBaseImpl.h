@@ -41,7 +41,7 @@ public:
 
     ActivationBaseImpl() = default;
     ~ActivationBaseImpl() = default;
-    void cancelled();
+    void cancel();
     ActivationResponse activate();
 };
 

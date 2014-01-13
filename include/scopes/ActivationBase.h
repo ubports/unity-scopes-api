@@ -54,6 +54,7 @@ public:
     virtual ActivationResponse activate();
 
 private:
+    void cancel();
     std::unique_ptr<internal::ActivationBaseImpl> p;
 };
 

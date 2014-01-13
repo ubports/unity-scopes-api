@@ -47,6 +47,12 @@ ActivationResponse ActivationBase::activate()
     return p->activate();
 }
 
+void ActivationBase::cancel()
+{
+    p->cancel();    // this currently doesn't do anything
+    cancelled();    // Inform this query that it was cancelled
+}
+
 } // namespace scopes
 
 } // namespace api

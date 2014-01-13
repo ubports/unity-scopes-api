@@ -205,7 +205,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
         // the run() implementation in a different thread, so we cannot block here.
         // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
         // count high until the run() request arrives in the query via the middleware.
-        //qo->set_self(qo);
+        qo->set_self(qo);
 
         query_proxy->run(reply);
     }
