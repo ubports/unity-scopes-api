@@ -35,10 +35,12 @@ namespace internal
 {
 
 ResultImpl::ResultImpl()
+    : flags_(Flags::ActivationNotHandled)
 {
 }
 
 ResultImpl::ResultImpl(VariantMap const& variant_map)
+    : flags_(Flags::ActivationNotHandled)
 {
     deserialize(variant_map);
 }
@@ -124,6 +126,7 @@ void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 void ResultImpl::intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
+    origin_.clear(); //clear the origin scope name, ReplyObject with set it anew with correct scope
 }
 
 bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
@@ -143,13 +146,11 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, 
         }
         const VariantMap internal_var = it->second.get_dict();
         auto intit = internal_var.find("flags");
-        if (intit != internal_var.end())
+        const Flags flags = (intit != internal_var.end() ? static_cast<Flags>(intit->second.get_int()) : Flags::ActivationNotHandled);
+        if (cmp_func(flags))
         {
-            if (cmp_func(static_cast<Flags>(intit->second.get_int())))
-            {
-                found_func(stored);
-                return true;
-            }
+            found_func(stored);
+            return true;
         }
 
         // nested stored result?
@@ -231,6 +232,11 @@ VariantMap ResultImpl::activation_target() const
         return res;
     }
     throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+}
+
+int ResultImpl::flags() const
+{
+    return flags_;
 }
 
 Variant& ResultImpl::operator[](std::string const& key)
@@ -369,6 +375,11 @@ void ResultImpl::deserialize(VariantMap const& var)
         if (it != resvar.end())
         {
             flags_ = it->second.get_int();
+        }
+        it = resvar.find("origin");
+        if (it != resvar.end())
+        {
+            origin_ = it->second.get_string();
         }
         it = resvar.find("result");
         if (it != resvar.end())
