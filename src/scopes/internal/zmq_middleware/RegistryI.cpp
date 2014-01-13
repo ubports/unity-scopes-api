@@ -78,7 +78,7 @@ RegistryI::~RegistryI() noexcept
 }
 
 void RegistryI::get_metadata_(Current const&,
-                              capnp::ObjectPointer::Reader& in_params,
+                              capnp::AnyPointer::Reader& in_params,
                               capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
@@ -101,7 +101,7 @@ void RegistryI::get_metadata_(Current const&,
 }
 
 void RegistryI::list_(Current const&,
-                      capnp::ObjectPointer::Reader&,
+                      capnp::AnyPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<RegistryObject>(del());
@@ -118,7 +118,7 @@ void RegistryI::list_(Current const&,
 }
 
 void RegistryI::locate_(Current const&,
-                        capnp::ObjectPointer::Reader& in_params,
+                        capnp::AnyPointer::Reader& in_params,
                         capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();

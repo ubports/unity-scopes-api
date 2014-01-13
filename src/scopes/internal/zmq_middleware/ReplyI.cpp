@@ -61,7 +61,7 @@ ReplyI::~ReplyI() noexcept
 }
 
 void ReplyI::push_(Current const&,
-                   capnp::ObjectPointer::Reader& in_params,
+                   capnp::AnyPointer::Reader& in_params,
                    capnproto::Response::Builder&)
 {
     auto req = in_params.getAs<capnproto::Reply::PushRequest>();
@@ -71,7 +71,7 @@ void ReplyI::push_(Current const&,
 }
 
 void ReplyI::finished_(Current const&,
-                       capnp::ObjectPointer::Reader& in_params,
+                       capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<ReplyObject>(del());

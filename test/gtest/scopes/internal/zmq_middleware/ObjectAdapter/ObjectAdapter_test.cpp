@@ -272,7 +272,7 @@ public:
     }
 
     virtual void success_op(Current const&,
-                            capnp::ObjectPointer::Reader&,
+                            capnp::AnyPointer::Reader&,
                             capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
@@ -604,7 +604,7 @@ public:
     }
 
     virtual void ONE_op(Current const& current,
-                        capnp::ObjectPointer::Reader&,
+                        capnp::AnyPointer::Reader&,
                         capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
@@ -715,7 +715,7 @@ public:
     }
 
     virtual void count_op(Current const&,
-                          capnp::ObjectPointer::Reader&,
+                          capnp::AnyPointer::Reader&,
                           capnproto::Response::Builder& r)
     {
         ++num_invocations_;
@@ -868,7 +868,7 @@ public:
     }
 
     virtual void op(Current const&,
-                    capnp::ObjectPointer::Reader&,
+                    capnp::AnyPointer::Reader&,
                     capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
