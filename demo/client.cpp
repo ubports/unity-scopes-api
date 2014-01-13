@@ -166,20 +166,23 @@ int main(int argc, char* argv[])
     int activate_result_index = 0; //the default index of 0 won't activate
 
     // poor man's getopt
-    if (argc == 5)
+    if (argc > 3)
     {
-        if (strcmp(argv[3], "activate") == 0)
+        if (argc == 5)
         {
-            activate_result_index = atoi(argv[4]);
+            if (strcmp(argv[3], "activate") == 0)
+            {
+                activate_result_index = atoi(argv[4]);
+            }
+            else
+            {
+                print_usage();
+            }
         }
         else
         {
             print_usage();
         }
-    }
-    else
-    {
-        print_usage();
     }
 
     try
