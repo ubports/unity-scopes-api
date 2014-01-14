@@ -205,6 +205,11 @@ void populate_registry(RegistryObject::SPtr const& registry,
             spawn_command.push_back(config_file);
             spawn_command.push_back(pair.first);
             registry->add(pair.first, move(meta), spawn_command);
+            // FIXME, HACK HACK HACK HACK
+            // The middleware should spawn scope processes with lookup() on demand.
+            // Because it currently does not have the plumbing, we start every scope immediately.
+            // When the plumbing appears, remove this.
+            registry->locate(pair.first);
         }
         catch (unity::Exception const& e)
         {
