@@ -20,7 +20,7 @@
 #include <scopes/Category.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
-#include <scopes/internal/CategorisedResultImpl.h>
+#include <scopes/internal/ReplyObject.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -387,83 +387,4 @@ TEST(CategorisedResult, store)
     EXPECT_EQ("title1", inresult.title());
     EXPECT_EQ("icon1", inresult.art());
     EXPECT_EQ("dnduri1", inresult.dnd_uri());
-}
-
-TEST(CategorisedResult, activation)
-{
-    CategoryRegistry reg;
-    CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
-    {
-        CategorisedResult result(cat);
-        result.set_uri("http://ubuntu.com");
-        result.set_dnd_uri("http://canonical.com");
-
-        EXPECT_EQ(true, result.direct_activation());
-        EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
-
-        result.set_intercept_activation();
-        EXPECT_EQ(false, result.direct_activation());
-        EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
-    }
-
-    // simple case: result coming from a regular scope, no aggregation
-    {
-        internal::ResultImpl result;
-        result.set_uri("http://ubuntu.com");
-        result.set_dnd_uri("http://canonical.com");
-        result.set_intercept_activation();
-        EXPECT_EQ("", result.origin());
-        result.set_origin("scope-foo");
-        EXPECT_EQ("scope-foo", result.origin());
-        EXPECT_EQ("scope-foo", result.activation_scope_name());
-    }
-
-    // nested result, the original result has activation interception flag set, aggregator doesn't intercept activation
-    {
-        auto resultimpl = std::shared_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(cat));
-        resultimpl->set_uri("http://ubuntu.com");
-        resultimpl->set_dnd_uri("http://canonical.com");
-        resultimpl->set_intercept_activation();
-        resultimpl->set_origin("scope-foo"); // this is normally done by ReplyObject if InterceptActivation is set
-        auto result = internal::CategorisedResultImpl::create_result(resultimpl);
-        EXPECT_EQ(false, result.direct_activation());
-        EXPECT_EQ("scope-foo", result.activation_scope_name());
-
-        auto outerresultimpl = std::shared_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(cat));
-        outerresultimpl->set_uri("http://ubuntu.com/2");
-        outerresultimpl->set_dnd_uri("http://canonical.com/2");
-        outerresultimpl->store(result, false);
-        EXPECT_EQ(0, outerresultimpl->flags());
-        auto outerresult = internal::CategorisedResultImpl::create_result(outerresultimpl);
-
-        EXPECT_TRUE(outerresult.has_stored_result());
-        EXPECT_FALSE(outerresult.direct_activation());
-        EXPECT_EQ("scope-foo", outerresult.activation_scope_name());
-    }
-
-    // nested result, the original result has activation interception flag set, aggregator intercepts activation
-    {
-        auto resultimpl = std::shared_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(cat));
-        resultimpl->set_uri("http://ubuntu.com");
-        resultimpl->set_dnd_uri("http://canonical.com");
-        resultimpl->set_intercept_activation();
-        resultimpl->set_origin("scope-foo"); // this is normally done by ReplyObject if InterceptActivation is set
-        auto result = internal::CategorisedResultImpl::create_result(resultimpl);
-        EXPECT_EQ(false, result.direct_activation());
-        EXPECT_EQ("scope-foo", result.activation_scope_name());
-
-        auto outerresultimpl = std::shared_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(cat));
-        outerresultimpl->set_uri("http://ubuntu.com/2");
-        outerresultimpl->set_dnd_uri("http://canonical.com/2");
-        outerresultimpl->store(result, false);
-        outerresultimpl->set_intercept_activation();
-        outerresultimpl->set_origin("scope-bar"); // this is normally done by ReplyObject if InterceptActivation is set
-        auto outerresult = internal::CategorisedResultImpl::create_result(outerresultimpl);
-
-        EXPECT_TRUE(outerresult.has_stored_result());
-        EXPECT_FALSE(outerresult.direct_activation());
-        EXPECT_EQ("scope-bar", outerresult.activation_scope_name());
-    }
-
 }
