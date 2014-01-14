@@ -76,7 +76,7 @@ public:
      If not called, the result will be activated directly by the Unity shell whithout involving the scope,
      assuming appropriate uri schema handler is present on the system.
      */
-    void intercept_activation();
+    void set_intercept_activation();
 
     /**
      \brief Check if this result should be activated directly by the shell (scope doesn't handle activation of this result).
@@ -86,8 +86,8 @@ public:
 
     /**
      \brief Get name of a scope that handles activation of this result.
-     Throws LogicException if it should be handled directly by the shell.
-     Note that scope that handles activation of this result may be different than the scope that sent it (origin).
+     Throws LogicException if it should be handled directly by the shell or if the name is undefined. The name is only available when
+     receiving this result from a scope (it is undefined when the result is just created).
      \return scope name
      */
     std::string activation_scope_name() const;

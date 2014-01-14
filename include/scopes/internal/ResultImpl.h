@@ -65,7 +65,7 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
-    void intercept_activation();
+    void set_intercept_activation();
     bool direct_activation() const;
     int flags() const;
     std::string activation_scope_name() const;
@@ -102,7 +102,7 @@ private:
 
     VariantMap attrs_;
     std::shared_ptr<VariantMap> stored_result_;
-    std::string origin_; // name of the scope that is interested in receiving activation request
+    std::string origin_;
     int flags_;
 };
 

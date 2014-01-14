@@ -123,10 +123,15 @@ void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
     attrs_["dnd_uri"] = dnd_uri;
 }
 
-void ResultImpl::intercept_activation()
+void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
-    origin_.clear(); //clear the origin scope name, ReplyObject with set it anew with correct scope
+
+    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope)
+    // if it sees it's empty and InterceptActivation flag is set.
+    // this is needed to support the case where aggregator scope just passes the original result
+    // upstream - in that case we want the original scope to receive activation.
+    origin_.clear();
 }
 
 bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
@@ -184,12 +189,35 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (!origin_.empty())
+    if (!origin_.empty() && (flags_ & Flags::InterceptActivation))
     {
         return origin_;
     }
 
-    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+    std::string target;
+    // visit stored results recursively,
+    // check if any of them intercepts activation;
+    // if not, it is direct activation in the shell
+    if (find_stored_result(
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
+                [&target](VariantMap const& var) {
+                    auto it = var.find("internal");
+                    if (it != var.end())
+                    {
+                        auto intvar = it->second.get_dict();
+                        it = intvar.find("origin");
+                        if (it != intvar.end())
+                        {
+                            target = it->second.get_string();
+                        }
+                    }
+                })
+       )
+    {
+        return target;
+    }
+
+    throw LogicException("No activation target for result with uri '" + uri() + "'");
 }
 
 VariantMap ResultImpl::activation_target() const

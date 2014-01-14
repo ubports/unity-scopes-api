@@ -70,6 +70,7 @@ private:
     CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
     internal::CategorisedResultImpl* fwd() const;
 
+    friend class internal::CategorisedResultImpl;
     friend class internal::ResultReplyObject;
 };
 
