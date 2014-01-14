@@ -102,7 +102,7 @@ private:
 
     VariantMap attrs_;
     std::shared_ptr<VariantMap> stored_result_;
-    std::string origin_;
+    std::string origin_; // name of the scope that is interested in receiving activation request
     int flags_;
 };
 

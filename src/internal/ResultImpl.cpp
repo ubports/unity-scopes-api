@@ -184,30 +184,11 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (flags_ & Flags::InterceptActivation)
+    if (!origin_.empty())
     {
         return origin_;
     }
 
-    std::string target;
-    // visit stored results recursively,
-    // check if any of them intercepts activation;
-    // if not, it is direct activation in the shell
-    if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&target](VariantMap const& var) {
-                    auto it = var.find("internal");
-                    if (it != var.end())
-                    {
-                        it = it->second.get_dict().find("origin");
-                        target = it->second.get_string();
-                    }
-                })
-       )
-    {
-        assert(target.empty());
-        return target;
-    }
     throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
 }
 
