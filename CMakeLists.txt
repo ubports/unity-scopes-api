@@ -117,7 +117,7 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-if (Werror)
+if (${Werror})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
     if ("${cmake_build_type_lower}" STREQUAL "release" OR "${cmake_build_type_lower}" STREQUAL "relwithdebinfo")
