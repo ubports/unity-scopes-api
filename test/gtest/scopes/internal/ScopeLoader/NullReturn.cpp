@@ -19,7 +19,7 @@
 #include "MyScope.h"
 #include "Counters.h"
 
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 
 #include <cassert>
 
@@ -27,9 +27,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         inc_create();
         return nullptr;
@@ -38,7 +38,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         inc_destroy();
         // We use an abort instead of EXPECT_EQ because we can't see the symbols

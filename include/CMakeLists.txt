@@ -1,7 +1,2 @@
-set(HDR_INSTALL_DIR include)
-
-add_subdirectory(scopes)
-
-file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-
+add_subdirectory(unity)
 set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${headers} PARENT_SCOPE)

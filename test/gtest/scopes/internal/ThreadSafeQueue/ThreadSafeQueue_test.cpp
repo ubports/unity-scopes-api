@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ThreadSafeQueue.h>
+#include <unity/scopes/internal/ThreadSafeQueue.h>
 
 #include <gtest/gtest.h>
 
 #include <future>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 TEST(ThreadSafeQueue, basic)
 {

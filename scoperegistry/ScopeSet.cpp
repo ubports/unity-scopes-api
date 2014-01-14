@@ -18,18 +18,18 @@
 
 #include"FindFiles.h"
 #include"ScopeSet.h"
-#include <scopes/ScopeMetadata.h>
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/ScopeConfig.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeMetadata.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/ScopeConfig.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include<memory>
 #include<map>
 #include<set>
 #include<cstring>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 namespace scoperegistry
 {
@@ -111,7 +111,7 @@ std::vector<std::string> ScopeSet::list() const
     return list;
 }
 
-const unity::api::scopes::internal::ScopeConfig&
+const unity::scopes::internal::ScopeConfig&
 ScopeSet::get(const std::string& name)
 {
     if (p->scopes.find(name) == p->scopes.end())

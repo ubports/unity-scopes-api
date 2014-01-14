@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
-#include <internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <scopes/internal/zmq_middleware/ServantBase.h>
-#include <scopes/internal/zmq_middleware/ZmqException.h>
-#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
-#include <scopes/internal/zmq_middleware/ZmqReceiver.h>
-#include <scopes/internal/zmq_middleware/ZmqSender.h>
-#include <scopes/ScopeExceptions.h>
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
@@ -34,9 +34,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // We use this to sleep in between adapter creation and shutdown. That's
 // necessary because zmq closes sockets asynchronously. Without the wait,
@@ -176,7 +176,7 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }
@@ -194,9 +194,9 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+            EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
                       "failure (adapter: testscope):\n"
-                      "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                       "(adapter: testscope):\n"
                       "        Address already in use",
                       e.to_string());
@@ -207,10 +207,10 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
                       "    Exception history:\n"
                       "        Exception #1:\n"
-                      "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                      "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                       "(adapter: testscope):\n"
                       "                Address already in use",
                       e.to_string());
@@ -221,10 +221,10 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
                        "    Exception history:\n"
                        "        Exception #1:\n"
-                       "            unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                       "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                        "(adapter: testscope):\n"
                        "                Address already in use",
                        e.to_string());
@@ -272,7 +272,7 @@ public:
     }
 
     virtual void success_op(Current const&,
-                            capnp::ObjectPointer::Reader&,
+                            capnp::AnyPointer::Reader&,
                             capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
@@ -321,7 +321,7 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
+        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
                   " id already in use (adapter: testscope)",
                   e.to_string());
     }
@@ -333,7 +333,7 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
+        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
                   " id not present (adapter: testscope)",
                   e.to_string());
     }
@@ -604,7 +604,7 @@ public:
     }
 
     virtual void ONE_op(Current const& current,
-                        capnp::ObjectPointer::Reader&,
+                        capnp::AnyPointer::Reader&,
                         capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
@@ -715,7 +715,7 @@ public:
     }
 
     virtual void count_op(Current const&,
-                          capnp::ObjectPointer::Reader&,
+                          capnp::AnyPointer::Reader&,
                           capnproto::Response::Builder& r)
     {
         ++num_invocations_;
@@ -868,7 +868,7 @@ public:
     }
 
     virtual void op(Current const&,
-                    capnp::ObjectPointer::Reader&,
+                    capnp::AnyPointer::Reader&,
                     capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
@@ -896,7 +896,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
                           e.to_string());
             }
         };
@@ -917,7 +917,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
                           "cannot remove id \"fred\": id not present (adapter: testscope)",
                           e.to_string());
             }
@@ -941,7 +941,7 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::api::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
                           "cannot remove id \"fred\": id not present (adapter: testscope)",
                           e.to_string());
             }
@@ -994,7 +994,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }
@@ -1005,7 +1005,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::api::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
                       "state (adapter: testscope)",
                       e.to_string());
         }

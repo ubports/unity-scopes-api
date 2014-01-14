@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/MiddlewareFactory.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(MiddlewareFactory, basic)
 {
@@ -46,6 +46,6 @@ TEST(MiddlewareFactory, BadKind)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: Invalid middleware kind: NoSuchMiddleware", e.to_string());
+        EXPECT_EQ("unity::scopes::ConfigException: Invalid middleware kind: NoSuchMiddleware", e.to_string());
     }
 }

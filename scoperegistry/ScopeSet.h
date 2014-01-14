@@ -21,8 +21,8 @@
 
 #include<vector>
 #include<string>
-#include<scopes/internal/RegistryConfig.h>
-#include<scopes/internal/ScopeConfig.h>
+#include<unity/scopes/internal/RegistryConfig.h>
+#include<unity/scopes/internal/ScopeConfig.h>
 
 
 namespace scoperegistry
@@ -36,14 +36,14 @@ class ScopeSet final
 
 public:
 
-    ScopeSet(const ::unity::api::scopes::internal::RegistryConfig& c);
+    ScopeSet(const ::unity::scopes::internal::RegistryConfig& c);
     ~ScopeSet();
 
     ScopeSet(const ScopeSet&) = delete;
     ScopeSet& operator=(const ScopeSet&) = delete;
 
     std::vector<std::string> list() const;
-    const unity::api::scopes::internal::ScopeConfig& get(const std::string& name);
+    const unity::scopes::internal::ScopeConfig& get(const std::string& name);
 
 private:
     ScopeSetPrivate* p;
