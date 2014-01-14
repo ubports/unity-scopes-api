@@ -47,7 +47,7 @@ public:
 };
 
 // test activation paramaters / flags passed from scope to client
-TEST(CategorisedResult, activation_params)
+TEST(Activation, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
@@ -59,15 +59,58 @@ TEST(CategorisedResult, activation_params)
         result.set_uri("http://ubuntu.com");
         result.set_dnd_uri("http://canonical.com");
 
-        EXPECT_EQ(true, result.direct_activation());
+        EXPECT_TRUE(result.direct_activation());
         EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
 
         result.set_intercept_activation();
-        EXPECT_EQ(false, result.direct_activation());
+        EXPECT_FALSE(result.direct_activation());
         EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
     }
+}
 
-    // nested result, the original result has activation interception flag set, aggregator doesn't intercept activation
+TEST(Activation, direct_activation)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
+    // activation interception not set
+    {
+        std::shared_ptr<CategorisedResult> received_result;
+        auto df = []() -> void {};
+        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
+                {
+                    received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        reply.set_disconnect_function(df);
+
+        {
+            CategorisedResult result(cat);
+            result.set_uri("http://ubuntu.com");
+            result.set_dnd_uri("http://canonical.com");
+
+            // push category and result through ResultReplyObject
+            VariantMap var;
+            var["category"] = cat->serialize();
+            var["result"] = result.serialize();
+            reply.process_data(var);
+        }
+
+        EXPECT_TRUE(received_result != nullptr);
+        EXPECT_TRUE(received_result->direct_activation());
+        EXPECT_THROW(received_result->activation_scope_name(), unity::LogicException);
+    }
+}
+
+// an aggregator scope just passes the result and doesn't set InterceptActivation
+TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
@@ -93,7 +136,128 @@ TEST(CategorisedResult, activation_params)
         }
 
         EXPECT_TRUE(received_result != nullptr);
-        EXPECT_EQ(false, received_result->direct_activation());
+        EXPECT_FALSE(received_result->direct_activation());
+        EXPECT_EQ("scope-foo", received_result->activation_scope_name());
+
+        // simulate aggregator scope
+        std::shared_ptr<CategorisedResult> agg_received_result;
+        auto aggreceiver = std::make_shared<DummyReceiver>([&agg_received_result](CategorisedResult result)
+                {
+                    agg_received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "scope-bar");
+        aggreply.set_disconnect_function(df);
+
+        {
+            // push category and unchanged result through ResultReplyObject
+            VariantMap var;
+            var["category"] = cat->serialize();
+            var["result"] = received_result->serialize();
+            aggreply.process_data(var);
+        }
+
+        EXPECT_TRUE(agg_received_result != nullptr);
+        EXPECT_FALSE(agg_received_result->has_stored_result());
+        EXPECT_FALSE(agg_received_result->direct_activation());
+        // activation_scope_name unchanged since aggregator doesn't intercept activation
+        EXPECT_EQ("scope-foo", agg_received_result->activation_scope_name());
+    }
+}
+
+// an aggregator scope just passes the result and sets InterceptActivation
+TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
+    {
+        std::shared_ptr<CategorisedResult> received_result;
+        auto df = []() -> void {};
+        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
+                {
+                    received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        reply.set_disconnect_function(df);
+
+        {
+            CategorisedResult result(cat);
+            result.set_uri("http://ubuntu.com");
+            result.set_dnd_uri("http://canonical.com");
+            result.set_intercept_activation();
+
+            // push category and result through ResultReplyObject
+            VariantMap var;
+            var["category"] = cat->serialize();
+            var["result"] = result.serialize();
+            reply.process_data(var);
+        }
+
+        EXPECT_TRUE(received_result != nullptr);
+        EXPECT_FALSE(received_result->direct_activation());
+        EXPECT_EQ("scope-foo", received_result->activation_scope_name());
+
+        // simulate aggregator scope
+        std::shared_ptr<CategorisedResult> agg_received_result;
+        auto aggreceiver = std::make_shared<DummyReceiver>([&agg_received_result](CategorisedResult result)
+                {
+                    agg_received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "scope-bar");
+        aggreply.set_disconnect_function(df);
+
+        {
+            received_result->set_intercept_activation(); // agg scope want to receive activation
+            // push category and unchanged result through ResultReplyObject
+            VariantMap var;
+            var["category"] = cat->serialize();
+            var["result"] = received_result->serialize();
+            aggreply.process_data(var);
+        }
+
+        EXPECT_TRUE(agg_received_result != nullptr);
+        EXPECT_FALSE(agg_received_result->has_stored_result());
+        EXPECT_FALSE(agg_received_result->direct_activation());
+        // activation_scope_name unchanged since aggregator doesn't intercept activation
+        EXPECT_EQ("scope-bar", agg_received_result->activation_scope_name());
+    }
+}
+
+// an aggregator scope stores the original result but doesn't set InterceptActivation
+TEST(Activation, agg_scope_stores_and_doesnt_intercept)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
+    {
+        std::shared_ptr<CategorisedResult> received_result;
+        auto df = []() -> void {};
+        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
+                {
+                    received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        reply.set_disconnect_function(df);
+
+        {
+            CategorisedResult result(cat);
+            result.set_uri("http://ubuntu.com");
+            result.set_dnd_uri("http://canonical.com");
+            result.set_intercept_activation();
+
+            // push category and result through ResultReplyObject
+            VariantMap var;
+            var["category"] = cat->serialize();
+            var["result"] = result.serialize();
+            reply.process_data(var);
+        }
+
+        EXPECT_TRUE(received_result != nullptr);
+        EXPECT_FALSE(received_result->direct_activation());
         EXPECT_EQ("scope-foo", received_result->activation_scope_name());
 
         // simulate aggregator scope
@@ -124,8 +288,15 @@ TEST(CategorisedResult, activation_params)
         // activation_scope_name unchanged since aggregator doesn't intercept activation
         EXPECT_EQ("scope-foo", agg_received_result->activation_scope_name());
     }
+}
 
-    // nested result, the original result has activation interception flag set, aggregator intercepts activation
+// an aggregator scope stores the original result and sets InterceptActivation
+TEST(Activation, agg_scope_stores_and_intercepts)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
@@ -151,7 +322,7 @@ TEST(CategorisedResult, activation_params)
         }
 
         EXPECT_TRUE(received_result != nullptr);
-        EXPECT_EQ(false, received_result->direct_activation());
+        EXPECT_FALSE(received_result->direct_activation());
         EXPECT_EQ("scope-foo", received_result->activation_scope_name());
 
         // simulate aggregator scope
