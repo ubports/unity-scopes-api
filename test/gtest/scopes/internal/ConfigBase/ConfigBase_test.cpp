@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ConfigBase.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/ConfigBase.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -25,8 +25,8 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 class MyConfig : public ConfigBase
 {
@@ -65,7 +65,7 @@ TEST(ConfigBase, non_optional_string)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal empty value for Empty", e.to_string());
+        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal empty value for Empty", e.to_string());
     }
 }
 
@@ -81,7 +81,7 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
+        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
                   "legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }
@@ -92,7 +92,7 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
+        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
                   "legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }
@@ -109,7 +109,7 @@ TEST(ConfigBase, throw_ex)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"Test.ini\": error", e.to_string());
+        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": error", e.to_string());
     }
 }
 

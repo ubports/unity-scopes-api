@@ -16,17 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/RegistryI.h>
+#include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/RegistryException.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/UniqueID.h>
-#include <scopes/internal/zmq_middleware/ZmqRegistry.h>
-#include <internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -37,9 +37,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
@@ -205,7 +205,7 @@ TEST(RegistryI, exceptions)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
+        EXPECT_EQ("unity::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
                   e.to_string());
     }
 
@@ -216,7 +216,7 @@ TEST(RegistryI, exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: unity::InvalidArgumentException: "
+        EXPECT_EQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
                   "Registry: Cannot search for scope with empty name",
                   e.to_string());
     }
@@ -298,7 +298,7 @@ TEST(RegistryI, locate)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_STREQ("unity::api::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
+        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
                      e.what());
     }
 
@@ -309,7 +309,7 @@ TEST(RegistryI, locate)
     }
     catch (RegistryException const& e)
     {
-        EXPECT_STREQ("unity::api::scopes::RegistryException: Couldn't start error_scope", e.what());
+        EXPECT_STREQ("unity::scopes::RegistryException: Couldn't start error_scope", e.what());
     }
 
 #if 0

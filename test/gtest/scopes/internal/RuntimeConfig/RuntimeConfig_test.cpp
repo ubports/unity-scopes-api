@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RuntimeConfig.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(RuntimeConfig, basic)
 {
@@ -42,7 +42,7 @@ TEST(RuntimeConfig, RegistryIDEmpty)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"RegIDEmpty.ini\": Illegal empty value for Registry.Identity",
+        EXPECT_EQ("unity::scopes::ConfigException: \"RegIDEmpty.ini\": Illegal empty value for Registry.Identity",
                   e.to_string());
     }
 }
@@ -56,7 +56,7 @@ TEST(RuntimeConfig, BadRegistryID)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"BadRegID.ini\": Illegal character in value for "
+        EXPECT_EQ("unity::scopes::ConfigException: \"BadRegID.ini\": Illegal character in value for "
                   "Registry.Identity: \"Regi/stry\": identity cannot contain '/'",
                   e.to_string());
     }
@@ -71,7 +71,7 @@ TEST(RuntimeConfig, RegistryFileEmpty)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"RegFileEmpty.ini\": Illegal empty value for Registry.ConfigFile",
+        EXPECT_EQ("unity::scopes::ConfigException: \"RegFileEmpty.ini\": Illegal empty value for Registry.ConfigFile",
                   e.to_string());
     }
 }
@@ -85,7 +85,7 @@ TEST(RuntimeConfig, MiddlewareEmpty)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"MWEmpty.ini\": Illegal empty value for Default.Middleware",
+        EXPECT_EQ("unity::scopes::ConfigException: \"MWEmpty.ini\": Illegal empty value for Default.Middleware",
                   e.to_string());
     }
 }
@@ -99,7 +99,7 @@ TEST(RuntimeConfig, BadMiddleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: \"BadMW.ini\": Illegal value for Default.Middleware: "
+        EXPECT_EQ("unity::scopes::ConfigException: \"BadMW.ini\": Illegal value for Default.Middleware: "
                   "\"Foo\": legal values are \"Zmq\" and \"REST\"",
                   e.to_string());
     }

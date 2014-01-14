@@ -22,18 +22,18 @@
 
 #include <mutex>
 
-#include <scopes/CategorisedResult.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Runtime.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/MWScope.h>
-#include <scopes/internal/ScopeImpl.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Runtime, basic)
 {

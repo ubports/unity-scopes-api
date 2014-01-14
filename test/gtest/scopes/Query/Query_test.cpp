@@ -17,11 +17,11 @@
  */
 
 #include <gtest/gtest.h>
-#include <scopes/Query.h>
+#include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 // basic test of Query setters and getters
 TEST(Query, basic)

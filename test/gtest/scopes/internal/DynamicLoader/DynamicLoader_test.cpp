@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/DynamicLoader.h>
+#include <unity/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -24,7 +24,7 @@
 #include <scope-api-testconfig.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 namespace
 {

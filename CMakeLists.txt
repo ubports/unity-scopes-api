@@ -62,6 +62,30 @@ if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
 endif()
 
+#
+# Code style fixer. We put the code through astyle first because it makes some fixes that
+# clang-format won't do (such as "char *p" -> "char* p"). But astyle messes up other things
+# (particularly lambdas and assembly-style comments), which clang-format does right.
+# So, we run clang-format after running astyle, which undoes the damage done by astyle
+# without reverting desirable astyle fixes.
+#
+
+find_program(ASTYLE_COMMAND NAMES astyle)
+if (NOT ASTYLE_COMMAND)
+    message(WARNING "Cannot find astyle: formatcode target will not be available")
+else()
+    find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.5)
+    if (NOT CLANG_FORMAT_COMMAND)
+        message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
+    endif()
+endif()
+
+if (ASTYLE_COMMAND AND CLANG_FORMAT_COMMAND)
+set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${fmt_h})
+    add_custom_target(formatcode
+                      ${PROJECT_SOURCE_DIR}/tools/format-files.sh ${PROJECT_SOURCE_DIR} ${ASTYLE_COMMAND} ${CLANG_FORMAT_COMMAND})
+endif()
+
 find_program(CAPNPC_BIN capnpc)
 if(NOT CAPNPC_BIN)
   message(FATAL_ERROR "Capnp compiler not found.")
@@ -75,7 +99,7 @@ set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 include(GNUInstallDirs)
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}/include
+    include/
     ${CMAKE_BINARY_DIR}/include
     ${CMAKE_BINARY_DIR}/src
     ${OTHER_INCLUDE_DIRS}
@@ -117,6 +141,10 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
+# These tests are slow, so make it possible not to run them
+# during day-to-day development.
+option(headertests "Check that headers compile cleanly" ON)
+
 if (${Werror})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
@@ -150,7 +178,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 7)
+set(UNITY_SCOPES_MICRO 8)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -213,7 +241,8 @@ set(TESTLIBS ${UNITY_SCOPES_LIB}) # HACK
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 
-set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_PREFIX} CACHE PATH "Destination install dir for the library")
+set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
+set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
 
 # Tests
 include(CTest)
