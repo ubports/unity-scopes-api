@@ -17,15 +17,15 @@
  */
 
 #include <gtest/gtest.h>
-#include <scopes/Annotation.h>
-#include <scopes/Query.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/internal/CategoryRegistry.h>
-#include <scopes/internal/AnnotationImpl.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/UnityExceptions.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Annotation, link)
 {

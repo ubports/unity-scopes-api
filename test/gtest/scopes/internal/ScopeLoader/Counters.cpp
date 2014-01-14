@@ -27,7 +27,6 @@ namespace
 int create_calls;
 int destroy_calls;
 int start_calls;
-int run_calls;
 int stop_calls;
 std::mutex count_mutex;
 
@@ -72,18 +71,6 @@ void inc_start()
     ++start_calls;
 }
 
-int num_run()
-{
-    lock_guard<mutex> lock(count_mutex);
-    return run_calls;
-}
-
-void inc_run()
-{
-    lock_guard<mutex> lock(count_mutex);
-    ++run_calls;
-}
-
 int num_stop()
 {
     lock_guard<mutex> lock(count_mutex);
@@ -102,6 +89,5 @@ void reset_counters()
     create_calls = 0;
     destroy_calls = 0;
     start_calls = 0;
-    run_calls = 0;
     stop_calls = 0;
 }

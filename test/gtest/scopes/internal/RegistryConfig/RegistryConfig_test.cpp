@@ -16,16 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(RegistryConfig, basic)
 {
@@ -59,7 +59,7 @@ TEST(RegistryConfig, ScoperunnerRelativePath)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
+        EXPECT_EQ("unity::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
                   "must be an absolute path",
                   e.to_string());
     }

@@ -16,20 +16,20 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
-#include <scopes/Reply.h>
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/Query.h>
-#include <scopes/Annotation.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Annotation.h>
 
 #include <iostream>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
@@ -94,9 +94,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope;
     }
@@ -104,7 +104,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }

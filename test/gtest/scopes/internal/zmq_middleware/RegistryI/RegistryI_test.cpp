@@ -16,15 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/RegistryI.h>
+#include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 
-#include <scopes/internal/RegistryConfig.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeMetadataImpl.h>
-#include <scopes/internal/ScopeImpl.h>
-#include <scopes/internal/UniqueID.h>
-#include <internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -35,9 +37,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
@@ -190,7 +192,7 @@ TEST(RegistryI, exceptions)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     RegistryObject::SPtr ro(make_shared<RegistryObject>());
-    auto registry = middleware->add_registry_object(identity, ro);
+    middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
     ro->add("scope1", move(make_meta("scope1", proxy, middleware)));
 
@@ -203,7 +205,7 @@ TEST(RegistryI, exceptions)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
+        EXPECT_EQ("unity::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
                   e.to_string());
     }
 
@@ -214,7 +216,7 @@ TEST(RegistryI, exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::MiddlewareException: unity::InvalidArgumentException: "
+        EXPECT_EQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
                   "Registry: Cannot search for scope with empty name",
                   e.to_string());
     }
@@ -241,4 +243,97 @@ TEST(RegistryI, exceptions)
         EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
                   e.to_string());
     }
+}
+
+// RegistryObject that overrides the locate() method, so we can test it without having to run
+// a full registry that spawns new processes.
+
+class MockRegistryObject : public RegistryObject
+{
+public:
+    MockRegistryObject()
+    {
+    }
+
+    virtual ScopeProxy locate(string const& scope_name) override
+    {
+        if (scope_name == "no_such_scope")
+        {
+            throw NotFoundException("no can find", scope_name);
+        }
+        if (scope_name == "error_scope")
+        {
+            throw RegistryException("Couldn't start error_scope");
+        }
+        return get_metadata(scope_name).proxy();
+    }
+};
+
+TEST(RegistryI, locate)
+{
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
+        "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+
+    string identity = runtime->registry_identity();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    string mw_kind = c.mw_kind();
+    string mw_endpoint = c.endpoint();
+    string mw_configfile = c.mw_configfile();
+
+    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+    MockRegistryObject::SPtr mro(make_shared<MockRegistryObject>());
+    auto r = middleware->add_registry_object(identity, mro);
+    auto r_proxy = dynamic_pointer_cast<ZmqRegistry>(r);
+    auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
+    mro->add("scope1", move(make_meta("scope1", proxy, middleware)));
+
+    auto p = r_proxy->locate("scope1");
+    EXPECT_EQ("scope1", p->identity());
+    EXPECT_EQ("ipc:///tmp/scope1", p->endpoint());
+
+    try
+    {
+        r_proxy->locate("no_such_scope");
+        FAIL();
+    }
+    catch (NotFoundException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
+                     e.what());
+    }
+
+    try
+    {
+        r_proxy->locate("error_scope");
+        FAIL();
+    }
+    catch (RegistryException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::RegistryException: Couldn't start error_scope", e.what());
+    }
+
+#if 0
+    try
+    {
+        auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
+        ro->add("", move(make_meta("blah", proxy, middleware)));
+        FAIL();
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+                  e.to_string());
+    }
+
+    try
+    {
+        ro->remove("");
+        FAIL();
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+                  e.to_string());
+    }
+#endif
 }

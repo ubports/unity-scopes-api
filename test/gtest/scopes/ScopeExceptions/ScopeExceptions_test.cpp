@@ -16,18 +16,18 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(MiddlewareException, state)
 {
     {
         MiddlewareException e("some error");
-        EXPECT_STREQ("unity::api::scopes::MiddlewareException: some error", e.what());
+        EXPECT_STREQ("unity::scopes::MiddlewareException: some error", e.what());
         EXPECT_THROW(rethrow_exception(e.self()), MiddlewareException);
         MiddlewareException e2("blah");
         e2 = e;
@@ -39,7 +39,7 @@ TEST(ConfigException, state)
 {
     {
         ConfigException e("some error");
-        EXPECT_STREQ("unity::api::scopes::ConfigException: some error", e.what());
+        EXPECT_STREQ("unity::scopes::ConfigException: some error", e.what());
         EXPECT_THROW(rethrow_exception(e.self()), ConfigException);
         ConfigException e2("blah");
         e2 = e;
@@ -51,7 +51,7 @@ TEST(NotFoundException, state)
 {
     {
         NotFoundException e("some error", "name");
-        EXPECT_STREQ("unity::api::scopes::NotFoundException: some error (name = name)", e.what());
+        EXPECT_STREQ("unity::scopes::NotFoundException: some error (name = name)", e.what());
         EXPECT_EQ("name", e.name());
         EXPECT_THROW(rethrow_exception(e.self()), NotFoundException);
         NotFoundException e2("blah", "name");

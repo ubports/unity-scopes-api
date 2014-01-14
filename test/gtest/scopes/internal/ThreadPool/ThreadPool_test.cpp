@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/ThreadPool.h>
+#include <unity/scopes/internal/ThreadPool.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 TEST(ThreadPool, basic)
 {
