@@ -15,7 +15,7 @@ install(FILES Groups.ini DESTINATION ${SCOPES_DEFAULT_DATADIR}/scope-groups)
 configure_file(scope-registry.conf.in scope-registry.conf @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scope-registry.conf DESTINATION ${CMAKE_INSTALL_DATADIR}/upstart/sessions)
 
-# Empty directory for scopes to put their conf files into.
+# Empty directory for scopes to put their conf files into
 # If we start install our own conf files here, this can be
 # removed (installing files implicitly creates the subdirs)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scopes)
