@@ -22,12 +22,17 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
+#include <unity/util/ResourcePtr.h>
 #include <zmqpp/message.hpp>
 #include <zmqpp/poller.hpp>
 
 #include <cassert>
 #include <sstream>
 #include <iostream>  // TODO: remove this once logging is added
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 using namespace std;
 
@@ -67,11 +72,13 @@ ObjectAdapter::~ObjectAdapter() noexcept
         // TODO: log error
         cerr << "~ObjectAdapter(): exception from shutdown(): " << e.what() << endl;
     }
+    // LCOV_EXCL_START
     catch (...)
     {
         // TODO: log error
         cerr << "~ObjectAdapter(): unknown exception from shutdown()" << endl;
     }
+    // LCOV_EXCL_STOP
 
     // We need to make sure that wait_for_shutdown() is always called because it joins
     // with any threads that may still be running.
@@ -84,11 +91,13 @@ ObjectAdapter::~ObjectAdapter() noexcept
         // TODO: log error
         cerr << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what() << endl;
     }
+    // LCOV_EXCL_START
     catch (...)
     {
         // TODO: log error
         cerr << "~ObjectAdapter(): unknown exception from wait_for_shutdown()" << endl;
     }
+    // LCOV_EXCL_STOP
 }
 
 ZmqMiddleware* ObjectAdapter::mw() const
@@ -163,16 +172,7 @@ void ObjectAdapter::remove(std::string const& id)
     }
     // Lock released here, so we don't call servant destructor while holding a lock
 
-    try
-    {
-        servant = nullptr;  // This may trigger destructor call on the servant
-    }
-    catch (...)
-    {
-        // Servant destructors shoudn't throw, but we don't rely on it and report it explicitly.
-        throw MiddlewareException("ObjectAdapter::remove() (adapter: " + name_ +
-                                  "): exception from servant destructor"); // LCOV_EXCL_LINE
-    }
+    servant = nullptr;  // This may trigger destructor call on the servant
 }
 
 shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const
@@ -387,11 +387,13 @@ void ObjectAdapter::run_workers()
         {
             f.get();
         }
-        catch (...) // LCOV_EXCL_LINE
+        // LCOV_EXCL_START
+        catch (...) //
         {
             stop_workers();
-            throw MiddlewareException("ObjectAdapter::run_workers(): worker thread failure (adapter: " + name_ + ")"); // LCOV_EXCL_LINE
+            throw MiddlewareException("ObjectAdapter::run_workers(): worker thread failure (adapter: " + name_ + ")");
         }
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -424,6 +426,7 @@ void ObjectAdapter::stop_workers() noexcept
     {
         ctrl_->send("stop");
     }
+    // LCOV_EXCL_START
     catch (std::exception const& e)
     {
         // TODO: log this instead
@@ -434,6 +437,48 @@ void ObjectAdapter::stop_workers() noexcept
         // TODO: log this instead
         cerr << "ObjectAdapter::stop_workers(): unknown exception" << endl;
     }
+    // LCOV_EXCL_STOP
+}
+
+// For the ipc transport, zmq permits more than one server to bind to the same endpoint.
+// If a server binds to an endpoint while another server is using that endpoint, the
+// second server silently "steals" the endpoint from the previous server, so all
+// connects after that point go to the new server, while connects that happened earlier
+// go to the old server. This is meant as a fail-over feature, and cannot be disabled.
+//
+// We don't want this and need an error if two servers try to use the same endpoint.
+// Hacky solution: we check whether it's possible to successfully connect to the
+// endpoint. If so, a server is still running there, and we throw. This has a
+// small race because a second server may connect after the check, but before
+// the bind. But, in practice, that's good enough for our purposes.
+
+void ObjectAdapter::safe_bind(zmqpp::socket& s, string const& endpoint)
+{
+    const std::string transport_prefix = "ipc://";
+    if (endpoint.substr(0, transport_prefix.size()) == transport_prefix)
+    {
+        string path = endpoint.substr(transport_prefix.size());
+        struct sockaddr_un addr;
+        memset(&addr, 0, sizeof(addr));
+        addr.sun_family = AF_UNIX;
+        strncpy(addr.sun_path, path.c_str(), path.size());
+        int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
+        if (fd == -1)
+        {
+            // LCOV_EXCL_START
+            throw MiddlewareException("ObjectAdapter: broker thread failure (adapter: " + name_ + "): " +
+                                      "cannot create socket: " + strerror(errno));
+            // LCOV_EXCL_STOP
+        }
+        util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
+        if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
+        {
+            // Connect succeeded, so another server is using the socket already.
+            throw MiddlewareException("ObjectAdapter: broker thread failure (adapter: " + name_ + "): " +
+                                      "address in use: " + endpoint);
+        }
+    }
+    s.bind(endpoint);
 }
 
 void ObjectAdapter::broker_thread()
@@ -461,7 +506,8 @@ void ObjectAdapter::broker_thread()
             poller.add(ctrl);
 
             frontend.set(zmqpp::socket_option::linger, 0);
-            frontend.bind(endpoint_);
+            // "Safe" bind: prevents two servers from binding to the same endpoint.
+            safe_bind(frontend, endpoint_);
             poller.add(frontend);
 
             backend.set(zmqpp::socket_option::linger, 0);
@@ -549,7 +595,7 @@ void ObjectAdapter::broker_thread()
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(make_exception_ptr(e));
         }
-        catch (future_error)
+        catch (future_error)  // LCOV_EXCL_LINE
         {
         }
     }
@@ -699,9 +745,9 @@ void ObjectAdapter::worker_thread()
             }
         }
     }
+    // LCOV_EXCL_START
     catch (...)
     {
-        // LCOV_EXCL_START
         stop_workers();  // Fatal error, we need to stop all other workers and the broker.
         MiddlewareException e("ObjectAdapter: worker thread failure (adapter: " + name_ + ")");
         store_exception(e);
@@ -714,14 +760,14 @@ void ObjectAdapter::worker_thread()
         catch (future_error)
         {
         }
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 }
 
 void ObjectAdapter::cleanup()
 {
     join_with_all_threads();
-    clear_servants();
+    servants_.clear();
 }
 
 void ObjectAdapter::join_with_all_threads()
@@ -736,27 +782,6 @@ void ObjectAdapter::join_with_all_threads()
     if (broker_.joinable())
     {
         broker_.join();
-    }
-}
-
-void ObjectAdapter::clear_servants()
-{
-    try
-    {
-        ServantMap tmp;
-        {
-            lock_guard<mutex> map_lock(map_mutex_);
-            if (!servants_.empty())
-            {
-                tmp = move(servants_);
-            }
-        }
-    }  // tmp destroyed here, which trigges destructor calls for any servants kept alive only by the map
-    catch (...)
-    {
-        // Servant destructors shoudn't throw, but we don't rely on it and report it explicitly.
-        throw MiddlewareException("ObjectAdapter::clear_servants() (adapter: " + name_ +
-                                  "): exception from servant destructor"); // LCOV_EXCL_LINE
     }
 }
 
