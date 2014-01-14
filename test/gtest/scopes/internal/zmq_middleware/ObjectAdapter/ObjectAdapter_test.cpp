@@ -1062,9 +1062,9 @@ TEST(ObjectAdapter, double_bind)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
                          "(adapter: testscope):\n"
-                         "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                          "(adapter: testscope): address in use: ipc://testscope", e.what());
         }
 
@@ -1099,9 +1099,9 @@ TEST(ObjectAdapter, double_bind)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::api::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
                          "(adapter: testscope):\n"
-                         "    unity::api::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
                          "(adapter: testscope): address in use: ipc://testscope", e.what());
         }
 
