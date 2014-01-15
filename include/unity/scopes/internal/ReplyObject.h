@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/ReplyObjectBase.h>
 #include <unity/scopes/internal/Reaper.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/ReceiverBase.h>
@@ -43,7 +43,7 @@ class RuntimeImpl;
 // ReceiverBase-derived implementation provided by the scope.
 // This allows us to intercept all replies.
 
-class ReplyObject final : public AbstractObject
+class ReplyObject final : public ReplyObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
@@ -52,8 +52,8 @@ public:
     virtual ~ReplyObject() noexcept;
 
     // Remote operation implementations
-    void push(VariantMap const& result) noexcept;
-    void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept;
+    virtual void push(VariantMap const& result) noexcept override;
+    virtual void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept override;
 
 private:
     ReceiverBase::SPtr const receiver_base_;

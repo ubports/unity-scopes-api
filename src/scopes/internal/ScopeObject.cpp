@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>

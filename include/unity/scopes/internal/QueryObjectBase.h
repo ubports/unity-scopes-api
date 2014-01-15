@@ -16,11 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
 
-#include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
 
+#include <atomic>
 #include <mutex>
 
 namespace unity
@@ -32,28 +34,13 @@ namespace scopes
 namespace internal
 {
 
-// Maintains a map of <scope name, scope proxy> pairs.
-
-class RegistryObject : public RegistryObjectBase
+class QueryObjectBase : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
+    UNITY_DEFINES_PTRS(QueryObjectBase);
 
-    RegistryObject();
-    virtual ~RegistryObject() noexcept;
-
-    // Remote operation implementations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) override;
-    virtual MetadataMap list() override;
-    virtual ScopeProxy locate(std::string const& scope_name) override;
-
-    // Local methods
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
-    bool remove(std::string const& scope_name);
-
-private:
-    mutable MetadataMap scopes_;
-    mutable std::mutex mutex_;
+    virtual void run(MWReplyProxy const& reply) noexcept = 0;
+    virtual void cancel() = 0;
 };
 
 } // namespace internal

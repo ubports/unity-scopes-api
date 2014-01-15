@@ -19,8 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_QUERYOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
@@ -38,14 +37,12 @@ class QueryBase;
 namespace internal
 {
 
-class QueryCtrlObject;
-
 // A QueryObject sits in between the incoming requests from the middleware layer and the
 // QueryBase-derived implementation. This allows us to receive cancel requests. In turn,
 // the implementation of this object ensures that the corresponding ReplyObject is disabled.
 // TODO: Probably need to flesh out this comment.
 
-class QueryObject final : public AbstractObject
+class QueryObject final : public QueryObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(QueryObject);
@@ -53,13 +50,14 @@ public:
     QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     virtual ~QueryObject() noexcept;
 
-    // Remote operation implementation
-    void run(MWReplyProxy const& reply) noexcept;
+    // Remote operation implementations
+    void run(MWReplyProxy const& reply) noexcept override;
+    void cancel() override;                  // Called locally only, by QueryCtrlObject.
 
-    // Called locally only, by QueryCtrlObject.
-    void cancel();
+    // Local methods
 
-    bool pushable() const noexcept; // Called locallly only, by ReplyImpl
+    // Called by ReplyImpl to check whether the query was cancelled or had an error
+    bool pushable() const noexcept;
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.

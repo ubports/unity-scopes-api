@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECT_H
 #define UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/QueryCtrlObjectBase.h>
 
 #include <atomic>
 
@@ -34,7 +34,7 @@ namespace internal
 
 class QueryObject;
 
-class QueryCtrlObject final : public AbstractObject
+class QueryCtrlObject final : public QueryCtrlObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(QueryCtrlObject);
@@ -43,8 +43,8 @@ public:
     virtual ~QueryCtrlObject() noexcept;
 
     // Remote operation implementations
-    void cancel();
-    void destroy();
+    virtual void cancel() override;
+    virtual void destroy() override;
 
     // Called by create_query() after instantiation to tell this ctrl what its corresponding
     // query facade is.

@@ -16,12 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
 
-#include <unity/scopes/internal/RegistryObjectBase.h>
-
-#include <mutex>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -29,31 +30,23 @@ namespace unity
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace internal
 {
 
-// Maintains a map of <scope name, scope proxy> pairs.
+class MiddlewareBase;
+class RuntimeImpl;
 
-class RegistryObject : public RegistryObjectBase
+class ScopeObjectBase : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
+    UNITY_DEFINES_PTRS(ScopeObjectBase);
 
-    RegistryObject();
-    virtual ~RegistryObject() noexcept;
-
-    // Remote operation implementations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) override;
-    virtual MetadataMap list() override;
-    virtual ScopeProxy locate(std::string const& scope_name) override;
-
-    // Local methods
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
-    bool remove(std::string const& scope_name);
-
-private:
-    mutable MetadataMap scopes_;
-    mutable std::mutex mutex_;
+    virtual MWQueryCtrlProxy create_query(std::string const& q,
+                                          VariantMap const& hints,
+                                          MWReplyProxy const& reply,
+                                          MiddlewareBase* mw_base) = 0;
 };
 
 } // namespace internal

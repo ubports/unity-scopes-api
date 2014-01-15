@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
 
 #include <unity/scopes/internal/MWScope.h>
-#include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
@@ -38,7 +38,7 @@ namespace zmq_middleware
 class ScopeI : public ServantBase
 {
 public:
-    ScopeI(ScopeObject::SPtr const& so);
+    ScopeI(ScopeObjectBase::SPtr const& so);
     virtual ~ScopeI() noexcept;
 
 private:

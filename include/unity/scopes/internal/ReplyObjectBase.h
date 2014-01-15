@@ -16,12 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
 
-#include <unity/scopes/internal/RegistryObjectBase.h>
-
-#include <mutex>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/ReceiverBase.h>
 
 namespace unity
 {
@@ -32,28 +31,13 @@ namespace scopes
 namespace internal
 {
 
-// Maintains a map of <scope name, scope proxy> pairs.
-
-class RegistryObject : public RegistryObjectBase
+class ReplyObjectBase : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
+    UNITY_DEFINES_PTRS(ReplyObjectBase);
 
-    RegistryObject();
-    virtual ~RegistryObject() noexcept;
-
-    // Remote operation implementations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) override;
-    virtual MetadataMap list() override;
-    virtual ScopeProxy locate(std::string const& scope_name) override;
-
-    // Local methods
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
-    bool remove(std::string const& scope_name);
-
-private:
-    mutable MetadataMap scopes_;
-    mutable std::mutex mutex_;
+    virtual void push(VariantMap const& result) noexcept = 0;
+    virtual void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept = 0;
 };
 
 } // namespace internal

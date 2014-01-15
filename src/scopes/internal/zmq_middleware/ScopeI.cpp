@@ -24,7 +24,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/scopes/internal/ScopeObject.h>
 
 #include <cassert>
 
@@ -58,7 +57,7 @@ interface Scope
 
 using namespace std::placeholders;
 
-ScopeI::ScopeI(ScopeObject::SPtr const& so) :
+ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
     ServantBase(so, { { "create_query", bind(&ScopeI::create_query_, this, _1, _2, _3) } })
 
 {
@@ -77,7 +76,7 @@ void ScopeI::create_query_(Current const& current,
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
-    auto delegate = dynamic_pointer_cast<ScopeObject>(del());
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query, hints, reply_proxy, current.adapter->mw()));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);

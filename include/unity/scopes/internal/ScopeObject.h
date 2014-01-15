@@ -19,10 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/ScopeObjectBase.h>
 
 #include <string>
 
@@ -44,7 +41,7 @@ class RuntimeImpl;
 // ScopeBase-derived implementation provided by the scope. It forwards incoming
 // queries to the actual scope. This allows us to intercept all queries for a scope.
 
-class ScopeObject final : public AbstractObject
+class ScopeObject final : public ScopeObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
@@ -53,10 +50,10 @@ public:
     virtual ~ScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(std::string const& q,
-                                  VariantMap const& hints,
-                                  MWReplyProxy const& reply,
-                                  MiddlewareBase* mw_base);
+    virtual MWQueryCtrlProxy create_query(std::string const& q,
+                                          VariantMap const& hints,
+                                          MWReplyProxy const& reply,
+                                          MiddlewareBase* mw_base) override;
 
 private:
     RuntimeImpl* const runtime_;

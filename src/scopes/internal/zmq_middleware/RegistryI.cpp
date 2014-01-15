@@ -21,7 +21,7 @@
 #include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <unity/scopes/internal/RegistryException.h>
-#include <unity/scopes/internal/RegistryObject.h>
+#include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
@@ -65,7 +65,7 @@ interface Registry
 
 using namespace std::placeholders;
 
-RegistryI::RegistryI(RegistryObject::SPtr const& ro) :
+RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
                       { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
                       { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) } })
@@ -83,7 +83,7 @@ void RegistryI::get_metadata_(Current const&,
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
     string name = req.getName().cStr();
-    auto delegate = dynamic_pointer_cast<RegistryObject>(del());
+    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     try
     {
         auto meta = delegate->get_metadata(name);
@@ -104,7 +104,7 @@ void RegistryI::list_(Current const&,
                       capnp::AnyPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
-    auto delegate = dynamic_pointer_cast<RegistryObject>(del());
+    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     auto metadata_map = delegate->list();
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue(metadata_map.size());
@@ -123,7 +123,7 @@ void RegistryI::locate_(Current const&,
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
     string name = req.getName().cStr();
-    auto delegate = dynamic_pointer_cast<RegistryObject>(del());
+    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     try
     {
         auto scope_proxy = delegate->locate(name);
