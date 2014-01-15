@@ -36,12 +36,12 @@ namespace api
 namespace scopes
 {
 
-class TestQuery : public QueryBase
+class TestQuery : public SearchQuery
 {
 public:
     virtual void cancelled() override {}
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
