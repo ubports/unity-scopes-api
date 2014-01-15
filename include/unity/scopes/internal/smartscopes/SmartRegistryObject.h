@@ -49,6 +49,8 @@ public:
     MetadataMap list();
 
 private:
+    void refresh_thread();
+
     void get_remote_scopes();
     bool add(std::string const& scope_name, ScopeMetadata const& scope);
 
@@ -56,7 +58,12 @@ private:
     smartscopes::SmartScopesClient ssclient_;
 
     MetadataMap scopes_;
-    std::mutex mutex_;
+    std::mutex scopes_mutex_;
+
+    std::thread refresh_thread_;
+    std::mutex refresh_mutex_;
+    std::condition_variable_any refresh_wait_;
+    bool refresh_stopped_;
 };
 
 } // namespace smartscopes

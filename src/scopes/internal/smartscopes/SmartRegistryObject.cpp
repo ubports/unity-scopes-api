@@ -42,13 +42,22 @@ namespace smartscopes
 
 SmartRegistryObject::SmartRegistryObject()
     : ssclient_(make_shared< HttpClientQt >(4),
-                make_shared< JsonCppNode >())
+                make_shared< JsonCppNode >()),
+      refresh_thread_(std::thread(&SmartRegistryObject::refresh_thread, this)),
+      refresh_stopped_(false)
 {
-    get_remote_scopes();
 }
 
 SmartRegistryObject::~SmartRegistryObject() noexcept
 {
+    {
+        lock_guard<mutex> lock(refresh_mutex_);
+
+        refresh_stopped_ = true;
+        refresh_wait_.notify_all();
+    }
+
+    refresh_thread_.join();
 }
 
 ScopeMetadata SmartRegistryObject::get_metadata(std::string const& scope_name)
@@ -59,7 +68,7 @@ ScopeMetadata SmartRegistryObject::get_metadata(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
     }
 
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    lock_guard<mutex> lock(scopes_mutex_);
 
     auto const& it = scopes_.find(scope_name);
     if (it == scopes_.end())
@@ -71,13 +80,27 @@ ScopeMetadata SmartRegistryObject::get_metadata(std::string const& scope_name)
 
 MetadataMap SmartRegistryObject::list()
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    lock_guard<mutex> lock(scopes_mutex_);
     return scopes_;
+}
+
+void SmartRegistryObject::refresh_thread()
+{
+    lock_guard<mutex> lock(refresh_mutex_);
+
+    while (!refresh_stopped_)
+    {
+        get_remote_scopes();
+
+        refresh_wait_.wait_for(refresh_mutex_, chrono::hours(24));
+    }
 }
 
 void SmartRegistryObject::get_remote_scopes()
 {
     std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
+
+    lock_guard<mutex> lock(scopes_mutex_);
 
     for( RemoteScope& scope : remote_scopes )
     {
@@ -93,8 +116,8 @@ void SmartRegistryObject::get_remote_scopes()
 
         mi->set_proxy(ScopeProxy()); ///! given to me from usa (pass ssclient* to proxy)
 
-        auto meta = ScopeMetadataImpl::create(move(mi));
-        add(scope.name, move(meta));
+        ///!auto meta = ScopeMetadataImpl::create(move(mi));
+        ///!add(scope.name, move(meta));
     }
 }
 
@@ -105,7 +128,7 @@ bool SmartRegistryObject::add(std::string const& scope_name, ScopeMetadata const
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
     }
 
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    lock_guard<mutex> lock(scopes_mutex_);
 
     auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
     if (!pair.second)
