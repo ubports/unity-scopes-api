@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/CategoryRenderer.h>
-#include <scopes/QueryCtrl.h>
-#include <scopes/Registry.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Runtime.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 class Receiver : public ReceiverBase
 {
@@ -40,28 +40,42 @@ public:
 
     virtual void push(Category::SCPtr category) override
     {
-        cout << "received category: id=" << category->id() << " title=" << category->title() << " icon=" << category->icon() << " template=" <<
-            category->renderer_template().data() << endl;
+        cout << "received category: id=" << category->id()
+             << " title=" << category->title()
+             << " icon=" << category->icon()
+             << " template=" << category->renderer_template().data()
+             << endl;
     }
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result: uri=" << result.uri() << " title=" << result.title() << " category id: " << result.category()->id() << endl;
+        cout << "received result: uri=" << result.uri()
+             << " title=" << result.title()
+             << " category id: "
+             << result.category()->id()
+             << endl;
     }
 
     virtual void push(Annotation annotation) override
     {
         auto links = annotation.links();
-        cout << "received annotation of type " << annotation.annotation_type() << " with " << links.size() << " link(s):" << endl;
+        cout << "received annotation of type " << annotation.annotation_type()
+             << " with " << links.size() << " link(s):"
+             << endl;
         for (auto link: links)
         {
             cout << "  " << link->query().to_string() << endl;
         }
     }
 
-    virtual void finished(ReceiverBase::Reason reason) override
+    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
     {
-        cout << "query complete, status: " << to_string(reason) << endl;
+        cout << "query complete, status: " << to_string(reason);
+        if (reason == ReceiverBase::Error)
+        {
+            cout << ": " << error_message;
+        }
+        cout << endl;
         {
             unique_lock<decltype(mutex_)> lock(mutex_);
             query_complete_ = true;

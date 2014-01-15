@@ -18,14 +18,14 @@
 --style=allman
 --min-conditional-indent=2
 --indent-switches
---max-instatement-indent=80
+--max-instatement-indent=120
 --pad-header
 --align-pointer=type
 --align-reference=type
 --add-brackets
 --convert-tabs
 --close-templates
---max-code-length=132
+--max-code-length=120
 
 # --pad-oper
 #

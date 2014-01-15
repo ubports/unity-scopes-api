@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/RegistryProxyFwd.h>
-#include <scopes/Reply.h>
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/ScopeBase.h>
+#include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeBase.h>
 
 #include <algorithm>
 #include <atomic>
@@ -35,7 +35,7 @@
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 // Simple queue that stores query-string/reply pairs, using MyQuery* as a key for removal.
 // The put() method adds a pair at the tail, and the get() method returns a pair at the head.
@@ -246,9 +246,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope;
     }
@@ -256,7 +256,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }

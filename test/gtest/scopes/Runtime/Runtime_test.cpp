@@ -22,18 +22,18 @@
 
 #include <mutex>
 
-#include <scopes/CategorisedResult.h>
-#include <scopes/ReceiverBase.h>
-#include <scopes/Runtime.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/MWScope.h>
-#include <scopes/internal/ScopeImpl.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Runtime, basic)
 {
@@ -53,9 +53,10 @@ public:
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
     }
-    virtual void finished(ReceiverBase::Reason reason) override
+    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);

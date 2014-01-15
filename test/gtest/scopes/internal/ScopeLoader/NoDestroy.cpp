@@ -19,7 +19,7 @@
 #include "MyScope.h"
 #include "Counters.h"
 
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 
 // Library that doesn't have the expected destroy method
 
@@ -27,9 +27,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         inc_create();
         return new MyScope;
