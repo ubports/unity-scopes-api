@@ -1,5 +1,3 @@
-set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
-
 add_subdirectory(scopes)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

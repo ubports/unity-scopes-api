@@ -100,7 +100,7 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
         get_qt_thread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url, timeout));
 
         QEventLoop loop;
-        QObject::connect(get_qt_thread_.get(), SIGNAL(finished()), &loop, SLOT(quit()));
+        QObject::connect(get_qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
 
         get_qt_thread_->start();
         loop.exec();

@@ -60,7 +60,7 @@ TEST(RegistryI, get_metadata)
     try
     {
         RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-            "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+            "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
         string identity = runtime->registry_identity();
         RegistryConfig c(identity, runtime->registry_configfile());
@@ -88,7 +88,7 @@ TEST(RegistryI, get_metadata)
 TEST(RegistryI, list)
 {
     RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -134,7 +134,7 @@ TEST(RegistryI, list)
 TEST(RegistryI, add_remove)
 {
     RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -182,7 +182,7 @@ TEST(RegistryI, add_remove)
 TEST(RegistryI, exceptions)
 {
     RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -272,7 +272,7 @@ public:
 TEST(RegistryI, locate)
 {
     RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "Registry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
