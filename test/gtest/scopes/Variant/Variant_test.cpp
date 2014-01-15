@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Variant.h>
+#include <unity/scopes/Variant.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -24,7 +24,7 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Variant, basic)
 {

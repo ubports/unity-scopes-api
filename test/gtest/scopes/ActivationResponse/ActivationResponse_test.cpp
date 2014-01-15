@@ -16,13 +16,13 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/ActivationResponse.h>
-#include <scopes/internal/ActivationResponseImpl.h>
+#include <unity/scopes/ActivationResponse.h>
+#include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(ActivationResponse, basic)
 {

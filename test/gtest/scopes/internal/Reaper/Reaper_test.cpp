@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/Reaper.h>
+#include <unity/scopes/internal/Reaper.h>
 
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 class Counter
 {

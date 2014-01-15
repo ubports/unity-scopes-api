@@ -16,16 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
-#include <scopes/ScopeExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
@@ -69,7 +69,7 @@ TEST(RuntimeImpl, error)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::api::scopes::ConfigException: Cannot instantiate run time for testscope, "
+        EXPECT_EQ("unity::scopes::ConfigException: Cannot instantiate run time for testscope, "
                   "config file: NoSuchFile.ini:\n"
                   "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
                   e.to_string());

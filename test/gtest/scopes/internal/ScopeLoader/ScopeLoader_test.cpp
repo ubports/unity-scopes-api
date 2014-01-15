@@ -16,9 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/RegistryImpl.h>
-#include <scopes/ScopeBase.h>
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/RegistryImpl.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -30,8 +30,8 @@
 #include <thread>
 
 using namespace std;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 namespace
 {
@@ -114,7 +114,7 @@ TEST(ScopeLoader, version_mismatch)
                        "    unity::ResourceException: Scope testScope was compiled with major version 666 of the "
                        "Unity scopes run time. This version is incompatible with the current major version "
                        "\\([0-9]+\\)\\.");
-        EXPECT_TRUE(boost::regex_match(e.to_string(), r));
+        EXPECT_TRUE(boost::regex_match(e.to_string(), r)) << e.to_string();
     }
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -210,7 +210,7 @@ TEST(ScopeLoader, no_load)
     }
     catch (unity::Exception const& e)
     {
-        boost::regex r("unity::ResourceException: .*/libNoDestroy.so: undefined symbol: unity_api_scope_destroy");
+        boost::regex r("unity::ResourceException: .*/libNoDestroy.so: undefined symbol: unity_scope_destroy");
         EXPECT_TRUE(boost::regex_match(e.to_string(), r));
         EXPECT_EQ(0, num_create());
         EXPECT_EQ(0, num_destroy());
@@ -230,7 +230,7 @@ TEST(ScopeLoader, null_return)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_api_scope_create",
+        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
                   e.to_string());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
@@ -251,7 +251,7 @@ TEST(ScopeLoader, null_return_unload)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_api_scope_create",
+        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
                   e.to_string());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());

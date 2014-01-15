@@ -16,9 +16,9 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <scopes/internal/smartscopes/HttpClientQt.h>
-#include <scopes/internal/smartscopes/JsonCppNode.h>
-#include <scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -29,9 +29,9 @@
 #include <thread>
 
 using namespace testing;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal::smartscopes;
-using namespace unity::api::test::scopes::internal::smartscopes;
+using namespace unity::scopes;
+using namespace unity::scopes::internal::smartscopes;
+using namespace unity::test::scopes::internal::smartscopes;
 
 namespace
 {

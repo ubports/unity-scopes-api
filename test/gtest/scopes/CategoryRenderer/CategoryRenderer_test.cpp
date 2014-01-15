@@ -17,13 +17,13 @@
  */
 
 #include <scope-api-testconfig.h>
-#include <scopes/CategoryRenderer.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 #include <fstream>
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(CategoryRenderer, basic)
 {

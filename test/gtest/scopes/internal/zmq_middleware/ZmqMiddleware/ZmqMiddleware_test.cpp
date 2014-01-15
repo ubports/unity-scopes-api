@@ -16,14 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ZmqMiddleware.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // Basic test.
 

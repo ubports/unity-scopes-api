@@ -16,21 +16,18 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/Reply.h>
-#include <scopes/Runtime.h>
-#include <scopes/ScopeBase.h>
-#include <scopes/ActivationBase.h>
-#include <scopes/ActivationListener.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationListener.h>
 
 #ifndef UNITY_SCOPES_TEST_SCOPE_H
 #define UNITY_SCOPES_TEST_SCOPE_H
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -106,8 +103,6 @@ public:
 };
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
 

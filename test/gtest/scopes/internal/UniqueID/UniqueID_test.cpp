@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/UniqueID.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes::internal;
 
 bool has_suffix(string const& s, string const& suffix)
 {

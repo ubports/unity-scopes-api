@@ -16,14 +16,14 @@
  * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/Reply.h>
-#include <scopes/Runtime.h>
-#include <scopes/ScopeBase.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/ScopeBase.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 class TestQuery : public SearchQuery
 {

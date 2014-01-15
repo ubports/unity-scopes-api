@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/CategoryRenderer.h>
-#include <scopes/QueryCtrl.h>
-#include <scopes/Registry.h>
-#include <scopes/ListenerBase.h>
-#include <scopes/Runtime.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/ScopeExceptions.h>
-#include <scopes/ActivationResponse.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/ActivationResponse.h>
 #include <unity/UnityExceptions.h>
 
 #include <condition_variable>
@@ -35,7 +35,7 @@
 #include <unistd.h>
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 class Receiver : public SearchListener
 {

@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/UnityExceptions.h>
 
 #include "../RaiiServer.h"
@@ -26,8 +26,8 @@
 #include <thread>
 
 using namespace testing;
-using namespace unity::api::scopes::internal::smartscopes;
-using namespace unity::api::test::scopes::internal::smartscopes;
+using namespace unity::scopes::internal::smartscopes;
+using namespace unity::test::scopes::internal::smartscopes;
 
 namespace
 {

@@ -16,21 +16,21 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scopes/CategorisedResult.h>
-#include <scopes/Category.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/internal/CategoryRegistry.h>
-#include <scopes/internal/CategorisedResultImpl.h>
-#include <scopes/internal/ReplyObject.h>
-#include <scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/ScopeImpl.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
 #include <TestScope.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 class DummyReceiver : public SearchListener
 {
