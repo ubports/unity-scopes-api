@@ -34,7 +34,7 @@ namespace scopes
 //! @cond
 
 PreviewReply::PreviewReply(internal::ReplyImpl* impl) :
-    ReplyBase(impl)
+    ObjectProxy(impl), ReplyBase(impl)
 {
 }
 

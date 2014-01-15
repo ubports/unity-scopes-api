@@ -44,10 +44,10 @@ class ReplyImpl;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class UNITY_API PreviewReply : public ReplyBase
+class UNITY_API PreviewReply : public virtual ReplyBase
 {
 public:
-    PreviewReply(PreviewReply const&) = default;
+    PreviewReply(PreviewReply const&) = delete;
 
     bool push(PreviewWidgetList const& widget_list) const;
 

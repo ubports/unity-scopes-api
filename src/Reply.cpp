@@ -62,7 +62,7 @@ internal::ReplyImpl* ReplyBase::fwd() const
 }
 
 SearchReply::SearchReply(internal::ReplyImpl* impl) :
-    ReplyBase(impl)
+    ObjectProxy(impl), ReplyBase(impl)
 {
 }
 

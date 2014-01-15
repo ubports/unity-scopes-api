@@ -49,7 +49,7 @@ class Annotation;
 class UNITY_API ReplyBase : public virtual ObjectProxy
 {
 public:
-    ReplyBase(ReplyBase const&) = default;
+    ReplyBase(ReplyBase const&) = delete;
 
     /**
     \brief Informs the source of a query that the query results are complete.
@@ -88,10 +88,10 @@ protected:
                                                // forward cancellation.
 };
 
-class UNITY_API SearchReply : public ReplyBase
+class UNITY_API SearchReply : public virtual ReplyBase
 {
 public:
-    SearchReply(SearchReply const&) = default;
+    SearchReply(SearchReply const&) = delete;
 
     /**
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
