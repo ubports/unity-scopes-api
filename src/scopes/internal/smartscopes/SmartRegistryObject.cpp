@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/smartscopes/JsonCppNode.h>
 
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;
@@ -77,6 +78,23 @@ MetadataMap SmartRegistryObject::list()
 void SmartRegistryObject::get_remote_scopes()
 {
     std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
+
+    for( RemoteScope& scope : remote_scopes )
+    {
+        unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(nullptr));
+
+        mi->set_scope_name(scope.name);
+        mi->set_proxy(ScopeProxy()); ///! given to me from usa (pass ssclient* to proxy)
+        mi->set_display_name(scope.name);
+        mi->set_description(scope.description);
+        //mi->set_art("");
+        //mi->set_icon("");
+        //mi->set_search_hint("");
+        //mi->set_hot_key("");
+
+        auto meta = ScopeMetadataImpl::create(move(mi));
+        add(scope.name, move(meta));
+    }
 }
 
 bool SmartRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
