@@ -1,5 +1,13 @@
 add_subdirectory(remotescope)
 
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/SmartScopeObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SmartRegistryObject.cpp
+)
+set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
+
+# -- libsmartscopes --
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

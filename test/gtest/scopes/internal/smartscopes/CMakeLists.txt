@@ -1,3 +1,5 @@
 add_subdirectory(HttpClient)
 add_subdirectory(JsonNode)
+add_subdirectory(SmartRegistryObject)
+add_subdirectory(SmartScopeObject)
 add_subdirectory(SmartScopesClient)
