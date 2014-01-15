@@ -23,9 +23,11 @@
 #include <scopes/internal/CategorisedResultImpl.h>
 #include <scopes/internal/ReplyObject.h>
 #include <scopes/internal/RuntimeImpl.h>
+#include <scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
+#include <TestScope.h>
 
 using namespace unity::api::scopes;
 using namespace unity::api::scopes::internal;
@@ -44,6 +46,63 @@ public:
     void finished(Reason /* r */, std::string const& /* error_message */) override {}
 
     std::function<void(CategorisedResult)> push_func_;
+};
+
+class WaitUntilFinished
+{
+public:
+    void wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+protected:
+    void notify()
+    {
+        // Signal that the query has completed.
+        std::unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+private:
+    bool query_complete_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+
+};
+
+class SearchReceiver : public SearchListener, public WaitUntilFinished
+{
+public:
+    virtual void push(CategorisedResult result) override
+    {
+        this->result = std::make_shared<Result>(result);
+    }
+
+    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    {
+        notify();
+    }
+
+    std::shared_ptr<Result> result;
+};
+
+class ActivationReceiver : public ActivationListener, public WaitUntilFinished
+{
+public:
+    virtual void activation_response(ActivationResponse const& response)
+    {
+        this->response = std::make_shared<ActivationResponse>(response);
+    }
+
+    void finished(Reason /* r */, std::string const& /* error_message */) override
+    {
+        notify();
+    }
+
+    std::shared_ptr<ActivationResponse> response;
 };
 
 // test activation paramaters / flags passed from scope to client
@@ -354,4 +413,54 @@ TEST(Activation, agg_scope_stores_and_intercepts)
         // scope changed to agg scope because it intercepts activation
         EXPECT_EQ("scope-bar", agg_received_result->activation_scope_name());
     }
+}
+
+// does actual activation with a test scope
+TEST(Activation, scope)
+{
+    pid_t pid;
+    switch (pid = fork())
+    {
+        case -1:
+            FAIL();
+        case 0: // child
+            auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
+            TestScope scope;
+            rt->run_scope(&scope);
+            FAIL();
+    }
+
+    // parent: connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+
+    VariantMap hints;
+    auto receiver = std::make_shared<SearchReceiver>();
+    auto ctrl = scope->create_query("test", hints, receiver);
+    receiver->wait_until_finished();
+
+    auto result = receiver->result;
+    EXPECT_TRUE(result != nullptr);
+    EXPECT_FALSE(result->direct_activation());
+    EXPECT_EQ("uri", result->uri());
+    EXPECT_EQ("dnd_uri", result->dnd_uri());
+    EXPECT_EQ("TestScope", result->activation_scope_name());
+
+    // activate result
+    auto act_receiver = std::make_shared<ActivationReceiver>();
+    hints["iron"] = "maiden";
+    ctrl = scope->activate(*result, hints, act_receiver);
+    act_receiver->wait_until_finished();
+
+    auto response = act_receiver->response;
+    EXPECT_TRUE(response != nullptr);
+    EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
+    EXPECT_EQ("bar", response->hints()["foo"].get_string());
+    EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
+    EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+
+    kill(pid, SIGTERM);
 }
