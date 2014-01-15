@@ -72,7 +72,9 @@ public:
     void set_dnd_uri(std::string const& dnd_uri);
 
     /**
-     \brief Indicates to the receiver of this result that this scope should intercept its activation.
+     \brief Indicates to the receiver that this scope should intercept activation request for this result.
+     A scope which sets intercept activation flag for its result should re-implement ScopeBase::activate()
+     and provide an implementation of ActivationBase that handles actual activation.
      If not called, the result will be activated directly by the Unity shell whithout involving the scope,
      assuming appropriate uri schema handler is present on the system.
      */

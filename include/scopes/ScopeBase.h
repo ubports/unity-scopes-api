@@ -190,8 +190,16 @@ public:
     */
     virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
 
-    /*
-     * TODO: doc string
+    /**
+    \brief Called by the scopes run time when a scope needs to respond to a result activation request.
+    This method must return an instance that is derived from ActivationBase. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly. That call to activate() is made
+    by an arbitrary thread.
+    Default implementation returns an instance of ActivationBase that responds with
+    ActivationResponse::Status::NotHandled.
+    \param result The result that should be activated.
+    \param hints arbitrary hints sent by the client
      */
     virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
 
