@@ -203,7 +203,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
             vector<string> spawn_command;
             spawn_command.push_back(scoperunner_path);
             spawn_command.push_back(config_file);
-            spawn_command.push_back(pair.first);
+            spawn_command.push_back(pair.second);
             registry->add(pair.first, move(meta), spawn_command);
             // FIXME, HACK HACK HACK HACK
             // The middleware should spawn scope processes with lookup() on demand.
