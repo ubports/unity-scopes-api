@@ -13,13 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
-
-#include <memory>
+#include <scopes/PreviewWidget.h>
+#include <scopes/internal/PreviewWidgetImpl.h>
 
 namespace unity
 {
@@ -30,17 +28,32 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
-class SearchReply;
-class PreviewReply;
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+//! @cond
+
+PreviewWidget::PreviewWidget(std::string const& definition)
+    : p(new internal::PreviewWidgetImpl(definition))
+{
+}
+
+PreviewWidget::PreviewWidget(VariantMap const& variant_map)
+    : p(new internal::PreviewWidgetImpl(variant_map))
+{
+}
+
+std::string PreviewWidget::data() const
+{
+    return p->data();
+}
+
+VariantMap PreviewWidget::serialize() const
+{
+    return p->serialize();
+}
+
+//! @endcond
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif

@@ -46,14 +46,14 @@ class MyQuery;
 class Queue
 {
 public:
-    void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
+    void put(MyQuery const* query, string const& query_string, SearchReplyProxy const& reply_proxy)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         queries_.push_back(QueryData { query, query_string, reply_proxy });
         condvar_.notify_one();
     }
 
-    bool get(string& query_string, ReplyProxy& reply_proxy)
+    bool get(string& query_string, SearchReplyProxy& reply_proxy)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
@@ -105,7 +105,7 @@ private:
     {
         MyQuery const* query;
         string query_string;
-        ReplyProxy reply_proxy;
+        SearchReplyProxy reply_proxy;
 
         bool operator==(QueryData const& rhs) const
         {
@@ -123,9 +123,9 @@ private:
 // The run() method of the scope acts as a worker thread to push replies to remembered queries.
 // This example shows that letting run() return immediately is OK, and that the MyQuery instance stays
 // alive as long as it can still be cancelled, which is while there is at least one
-// ReplyProxy still in existence for this query.
+// SearchReplyProxy still in existence for this query.
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query, Queue& queue) :
@@ -150,7 +150,7 @@ public:
         cerr << "scope-C: \"" + query_ + "\" cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         queue_.put(this, query_, reply);
         cerr << "scope-C: run() returning" << endl;
@@ -188,7 +188,7 @@ public:
         for (;;)
         {
             string query;
-            ReplyProxy reply;
+            SearchReplyProxy reply;
             if (!queue.get(query, reply))
             {
                 cerr << "worker thread terminating, queue was cleared" << endl;

@@ -13,13 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
-
-#include <memory>
+#include <scopes/internal/PreviewWidgetImpl.h>
+#include <scopes/PreviewWidget.h>
 
 namespace unity
 {
@@ -30,17 +28,45 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
-class SearchReply;
-class PreviewReply;
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+namespace internal
+
+{
+
+//! @cond
+
+PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
+    : data_(json_text)
+{
+    //TODO: json validation
+}
+
+PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& variant_map)
+{
+    auto it = variant_map.find("data");
+    if (it != variant_map.end() && it->second.which() == Variant::Type::String)
+    {
+        data_ = it->second.get_string();
+    }
+}
+
+std::string PreviewWidgetImpl::data() const
+{
+    return data_;
+}
+
+VariantMap PreviewWidgetImpl::serialize() const
+{
+    VariantMap vm;
+    vm["data"] = data_;
+    return vm;
+}
+
+//! @endcond
+
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif

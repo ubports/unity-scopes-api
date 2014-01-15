@@ -16,10 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
+#include <scopes/PreviewReply.h>
+#include <scopes/Result.h>
+#include <scopes/PreviewWidget.h>
 
-#include <memory>
+#include <scopes/internal/ReplyImpl.h>
 
 namespace unity
 {
@@ -30,17 +31,31 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
-class SearchReply;
-class PreviewReply;
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+//! @cond
+
+PreviewReply::PreviewReply(internal::ReplyImpl* impl) :
+    ReplyBase(impl)
+{
+}
+
+PreviewReply::~PreviewReply() noexcept
+{
+}
+
+bool PreviewReply::push(PreviewWidgetList const& widgets) const
+{
+    return fwd()->push(widgets);
+}
+
+bool PreviewReply::push(std::string const& key, Variant const& value) const
+{
+    return fwd()->push(key, value);
+}
+
+//! @endcond
 
 } // namespace scopes
 
 } // namespace api
 
 } // namespace unity
-
-#endif

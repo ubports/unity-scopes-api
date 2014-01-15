@@ -23,6 +23,8 @@
 
 #include <scopes/internal/ReplyImpl.h>
 
+#include <cassert>
+
 namespace unity
 {
 
@@ -34,52 +36,63 @@ namespace scopes
 
 //! @cond
 
-Reply::Reply(internal::ReplyImpl* impl) :
+ReplyBase::ReplyBase(internal::ReplyImpl* impl) :
     ObjectProxy(impl)
 {
+    assert(impl);
 }
 
-Reply::~Reply() noexcept
+ReplyBase::~ReplyBase() noexcept
 {
 }
 
-Category::SCPtr Reply::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
-{
-    return fwd()->register_category(id, title, icon, renderer_template);
-}
-
-void Reply::register_category(Category::SCPtr category)
-{
-    fwd()->register_category(category);
-}
-
-Category::SCPtr Reply::lookup_category(std::string const& id) const
-{
-    return fwd()->lookup_category(id);
-}
-
-bool Reply::push(CategorisedResult const& result) const
-{
-    return fwd()->push(result);
-}
-
-bool Reply::push(Annotation const& annotation) const
-{
-    return fwd()->push(annotation);
-}
-
-void Reply::finished() const
+void ReplyBase::finished() const
 {
     return fwd()->finished();
 }
 
-void Reply::error(std::exception_ptr ex) const
+void ReplyBase::error(std::exception_ptr ex) const
 {
     return fwd()->error(ex);
 }
-internal::ReplyImpl* Reply::fwd() const
+
+internal::ReplyImpl* ReplyBase::fwd() const
 {
     return dynamic_cast<internal::ReplyImpl*>(pimpl());
+}
+
+SearchReply::SearchReply(internal::ReplyImpl* impl) :
+    ReplyBase(impl)
+{
+}
+
+SearchReply::~SearchReply() noexcept
+{
+}
+
+Category::SCPtr SearchReply::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+{
+    return fwd()->register_category(id, title, icon, renderer_template);
+}
+
+void SearchReply::register_category(Category::SCPtr category)
+{
+    fwd()->register_category(category);
+}
+
+Category::SCPtr SearchReply::lookup_category(std::string const& id) const
+{
+    return fwd()->lookup_category(id);
+}
+
+bool SearchReply::push(CategorisedResult const& result) const
+{
+    return fwd()->push(result);
+}
+
+bool SearchReply::push(Annotation const& annotation) const
+{
+    return fwd()->push(annotation);
 }
 
 //! @endcond

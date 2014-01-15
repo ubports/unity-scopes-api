@@ -58,13 +58,6 @@ public:
     UNITY_DEFINES_PTRS(QueryBase);
 
     virtual void cancelled() = 0;                          // Originator cancelled the query
-    virtual void run(ReplyProxy const& reply) = 0;         // Called by the run time to start this query
-
-    // Create a sub-query.
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   VariantMap const& hints,
-                                   std::shared_ptr<SearchListener> const& reply);
 
     /// @cond
     virtual ~QueryBase() noexcept;
@@ -75,11 +68,54 @@ protected:
     QueryBase();
     /// @endcond
 
-private:
     void cancel();
     friend class internal::QueryObject;       // So QueryObject can call cancel()
 
     std::unique_ptr<internal::QueryBaseImpl> p;
+};
+
+class UNITY_API SearchQuery: public QueryBase
+{
+public:
+    NONCOPYABLE(SearchQuery);
+    UNITY_DEFINES_PTRS(SearchQuery);
+
+    virtual void run(SearchReplyProxy const& reply) = 0;         // Called by the run time to start this query
+
+    // Create a sub-query.
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   VariantMap const& hints,
+                                   std::shared_ptr<SearchListener> const& reply);
+
+    /// @cond
+    virtual ~SearchQuery() noexcept;
+    /// @endcond
+
+protected:
+    /// @cond
+    SearchQuery();
+    /// @endcond
+};
+
+class UNITY_API PreviewQuery: public QueryBase
+{
+public:
+    NONCOPYABLE(PreviewQuery);
+    UNITY_DEFINES_PTRS(PreviewQuery);
+
+    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
+
+    // TODO: Add a method for subpreview request?
+
+    /// @cond
+    virtual ~PreviewQuery() noexcept;
+    /// @endcond
+
+protected:
+    /// @cond
+    PreviewQuery();
+    /// @endcond
 };
 
 } // namespace scopes

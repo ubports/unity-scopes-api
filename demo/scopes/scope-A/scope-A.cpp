@@ -33,7 +33,7 @@ using namespace unity::api::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query) :
@@ -49,7 +49,7 @@ public:
     {
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);

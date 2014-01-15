@@ -29,7 +29,7 @@
 using namespace std;
 using namespace unity::api::scopes;
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     explicit MyQuery(string const& query)
@@ -45,7 +45,7 @@ public:
     {
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);

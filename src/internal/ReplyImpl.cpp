@@ -26,6 +26,8 @@
 #include <scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <scopes/Reply.h>
+#include <scopes/PreviewReply.h>
+#include <scopes/ReplyProxyFwd.h>
 #include <scopes/CategoryRenderer.h>
 
 #include <sstream>
@@ -126,6 +128,26 @@ bool ReplyImpl::push(unity::api::scopes::Annotation const& annotation)
     return push(var);
 }
 
+bool ReplyImpl::push(unity::api::scopes::PreviewWidgetList const& widgets)
+{
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& widget : widgets)
+    {
+        arr.push_back(Variant(widget.serialize()));
+    }
+    vm["widgets"] = arr;
+    return push(vm);
+}
+
+bool ReplyImpl::push(std::string const& key, Variant const& value)
+{
+    VariantMap vm;
+    vm["key"] = Variant(key);
+    vm["data"] = value;
+    return push(vm);
+}
+
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
     if (!qo_->pushable())
@@ -199,9 +221,18 @@ void ReplyImpl::error(exception_ptr ex)
 }
 
 
-ReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
 {
-    return ReplyProxy(new Reply((new ReplyImpl(mw_proxy, qo))));
+    auto reply_impl = new ReplyImpl(mw_proxy, qo);
+    auto reply = new SearchReply(reply_impl);
+    return SearchReplyProxy(reply);
+}
+
+PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+{
+    auto reply_impl = new ReplyImpl(mw_proxy, qo);
+    auto reply = new PreviewReply(reply_impl);
+    return PreviewReplyProxy(reply);
 }
 
 MWReplyProxy ReplyImpl::fwd() const

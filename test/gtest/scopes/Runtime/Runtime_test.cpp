@@ -100,5 +100,5 @@ TEST(Runtime, run_scope)
     auto ctrl = scope->create_query("test", hints, receiver);
     receiver->wait_until_finished();
 
-    kill(pid, SIGTERM);
+    //kill(pid, SIGTERM);
 }

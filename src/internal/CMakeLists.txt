@@ -25,6 +25,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp

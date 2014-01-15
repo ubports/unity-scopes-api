@@ -67,7 +67,7 @@ public:
         cout << endl;
     }
 
-    Receiver(string const& scope_name, ReplyProxy const& upstream) :
+    Receiver(string const& scope_name, SearchReplyProxy const& upstream) :
         scope_name_(scope_name),
         upstream_(upstream)
     {
@@ -75,10 +75,10 @@ public:
 
 private:
     string scope_name_;
-    ReplyProxy upstream_;
+    SearchReplyProxy upstream_;
 };
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
@@ -97,7 +97,7 @@ public:
         cout << "query to " << scope_name_ << " was cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& upstream_reply)
+    virtual void run(SearchReplyProxy const& upstream_reply)
     {
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try

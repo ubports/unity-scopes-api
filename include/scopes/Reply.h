@@ -46,10 +46,52 @@ class Annotation;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class UNITY_API Reply : public virtual ObjectProxy
+class UNITY_API ReplyBase : public virtual ObjectProxy
 {
 public:
-    Reply(Reply const&) = default;
+    ReplyBase(ReplyBase const&) = default;
+
+    /**
+    \brief Informs the source of a query that the query results are complete.
+    Calling finished() informs the source of a query that the final result for the query
+    was sent, that is, that the query is complete.
+    The scope application code is responsible for calling finished() once it has sent the
+    final result for a query.
+    Multiple calls to finished() and calls to error() after finished() was called are ignored.
+    The destructor implicitly calls finished() if a Reply goes out of scope without
+    a prior call to finished().
+    */
+    void finished() const;
+
+    /**
+    \brief Informs the source of a query that the query was terminated due to an error.
+    Multiple calls to error() and calls to finished() after error() was called are ignored.
+    \param ex An exception_ptr indicating the cause of the error. If ex is a `std::exception`,
+              the return value of `what()` is made available to the query source. Otherwise,
+              the query source receives `"unknown exception"`.
+    */
+    void error(std::exception_ptr ex) const;
+
+    /**
+    \brief Destroys a Reply.
+    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
+    */
+    virtual ~ReplyBase() noexcept;
+
+protected:
+    ReplyBase(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    friend class internal::ReplyImpl;
+
+    internal::ReplyImpl* fwd() const;
+
+    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
+                                               // forward cancellation.
+};
+
+class UNITY_API SearchReply : public ReplyBase
+{
+public:
+    SearchReply(SearchReply const&) = default;
 
     /**
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
@@ -86,41 +128,14 @@ public:
     bool push(Annotation const& annotation) const;
 
     /**
-    \brief Informs the source of a query that the query results are complete.
-    Calling finished() informs the source of a query that the final result for the query
-    was sent, that is, that the query is complete.
-    The scope application code is responsible for calling finished() once it has sent the
-    final result for a query.
-    Multiple calls to finished() and calls to error() after finished() was called are ignored.
-    The destructor implicitly calls finished() if a Reply goes out of scope without
-    a prior call to finished().
-    */
-    void finished() const;
-
-    /**
-    \brief Informs the source of a query that the query was terminated due to an error.
-    Multiple calls to error() and calls to finished() after error() was called are ignored.
-    \param ex An exception_ptr indicating the cause of the error. If ex is a `std::exception`,
-              the return value of `what()` is made available to the query source. Otherwise,
-              the query source receives `"unknown exception"`.
-    */
-    void error(std::exception_ptr ex) const;
-
-    /**
     \brief Destroys a Reply.
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
-    virtual ~Reply() noexcept;
+    virtual ~SearchReply() noexcept;
 
 protected:
-    Reply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    SearchReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
-
-private:
-    internal::ReplyImpl* fwd() const;
-
-    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
-                                               // forward cancellation.
 };
 
 } // namespace scopes

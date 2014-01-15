@@ -32,7 +32,7 @@ using namespace unity::api::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query, CategoryRenderer const& renderer) :
@@ -52,7 +52,7 @@ public:
         cerr << "MyQuery/" << query_ << " cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));

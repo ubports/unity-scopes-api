@@ -24,6 +24,7 @@
 #include <scopes/internal/ObjectProxyImpl.h>
 #include <scopes/ReplyProxyFwd.h>
 #include <scopes/Category.h>
+#include <scopes/PreviewWidget.h>
 #include <scopes/ListenerBase.h>
 
 #include <atomic>
@@ -64,11 +65,14 @@ public:
 
     bool push(unity::api::scopes::CategorisedResult const& result);
     bool push(unity::api::scopes::Annotation const& annotation);
+    bool push(unity::api::scopes::PreviewWidgetList const& widgets);
+    bool push(std::string const& key, Variant const& value);
     void finished();
     void finished(unity::api::scopes::ListenerBase::Reason reason);
     void error(std::exception_ptr ex);
 
-    static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
+    static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
+    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
 
     typedef std::function<void()> CleanupFunc;
 

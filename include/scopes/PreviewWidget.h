@@ -13,13 +13,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
+#ifndef UNITY_API_SCOPES_PREVIEW_WIDGET_H
+#define UNITY_API_SCOPES_PREVIEW_WIDGET_H
 
+#include <unity/util/NonCopyable.h>
+#include <unity/util/DefinesPtrs.h>
+#include <scopes/Variant.h>
+#include <string>
 #include <memory>
+#include <list>
 
 namespace unity
 {
@@ -30,12 +35,31 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
-class SearchReply;
-class PreviewReply;
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+namespace internal
+{
+    class PreviewWidgetImpl;
+}
+
+class UNITY_API PreviewWidget
+{
+public:
+/// @cond
+    NONCOPYABLE(PreviewWidget);
+    UNITY_DEFINES_PTRS(PreviewWidget);
+/// @endcond
+
+    PreviewWidget(std::string const& definition);
+
+    std::string data() const;
+    VariantMap serialize() const;
+
+private:
+    PreviewWidget(VariantMap const& variant_map);
+
+    std::shared_ptr<internal::PreviewWidgetImpl> p;
+};
+
+typedef std::list<PreviewWidget> PreviewWidgetList;
 
 } // namespace scopes
 

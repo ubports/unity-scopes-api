@@ -91,7 +91,9 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     // On return, replies for the query may still be outstanding.
     try
     {
-        query_base_->run(reply_proxy);
+        auto search_query = dynamic_pointer_cast<SearchQuery>(query_base_);
+        assert(search_query);
+        search_query->run(reply_proxy);
     }
     catch (std::exception const& e)
     {

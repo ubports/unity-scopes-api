@@ -13,13 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_REPLYPROXY_H
-#define UNITY_API_SCOPES_REPLYPROXY_H
+#ifndef UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
+#define UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
 
-#include <memory>
+#include <scopes/PreviewWidget.h>
+#include <unity/SymbolExport.h>
+#include <string>
 
 namespace unity
 {
@@ -30,12 +32,24 @@ namespace api
 namespace scopes
 {
 
-class ReplyBase;
-class SearchReply;
-class PreviewReply;
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+namespace internal
+{
+
+class PreviewWidgetImpl
+{
+public:
+    PreviewWidgetImpl(std::string const& json_text);
+    PreviewWidgetImpl(VariantMap const& variant_map);
+
+    std::string data() const;
+
+    VariantMap serialize() const;
+
+private:
+    std::string data_;
+};
+
+} // namespace internal
 
 } // namespace scopes
 

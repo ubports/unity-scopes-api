@@ -40,18 +40,34 @@ QueryBase::~QueryBase() noexcept
 {
 }
 
-QueryCtrlProxy QueryBase::create_subquery(ScopeProxy const& scope,
-                                          string const& query_string,
-                                          VariantMap const& hints,
-                                          shared_ptr<SearchListener> const& reply)
-{
-    return p->create_subquery(scope, query_string, hints, reply);
-}
-
 void QueryBase::cancel()
 {
     p->cancel();    // Forward cancel to subqueries
     cancelled();    // Inform this query that it was cancelled
+}
+
+SearchQuery::SearchQuery() : QueryBase()
+{
+}
+
+SearchQuery::~SearchQuery() noexcept
+{
+}
+
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            string const& query_string,
+                                            VariantMap const& hints,
+                                            shared_ptr<SearchListener> const& reply)
+{
+    return p->create_subquery(scope, query_string, hints, reply);
+}
+
+PreviewQuery::PreviewQuery() : QueryBase()
+{
+}
+
+PreviewQuery::~PreviewQuery() noexcept
+{
 }
 
 } // namespace scopes
