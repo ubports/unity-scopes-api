@@ -59,23 +59,24 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
 {
     if (url_.empty())
     {
-        std::string base_url_env = ::getenv("SMART_SCOPES_SERVER");
-        if (!base_url_env.empty())
+        char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
+        std::string base_url = base_url_env ? base_url_env : "";
+        if (!base_url.empty())
         {
             // find the last occurrence of ':' in the url in order to extract the port number
             // * ignore the colon after "http"/"https"
 
             const size_t hier_pos = strlen("https");
 
-            uint64_t found = base_url_env.find_last_of(':');
+            uint64_t found = base_url.find_last_of(':');
             if (found != std::string::npos && found > hier_pos)
             {
-                url_ = base_url_env.substr(0, found);
-                port_ = std::stoi(base_url_env.substr(found + 1));
+                url_ = base_url.substr(0, found);
+                port_ = std::stoi(base_url.substr(found + 1));
             }
             else
             {
-                url_ = base_url_env;
+                url_ = base_url;
             }
         }
         else
