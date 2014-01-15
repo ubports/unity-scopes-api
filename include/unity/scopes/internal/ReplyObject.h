@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_REPLYS_INTERNAL_REPLYOBJECT_H
-#define UNITY_REPLYS_INTERNAL_REPLYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
+#define UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/Reaper.h>

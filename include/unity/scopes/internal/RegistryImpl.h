@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_REGISTRYIMPL_H
-#define UNITY_INTERNAL_REGISTRYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_REGISTRYIMPL_H
+#define UNITY_SCOPES_INTERNAL_REGISTRYIMPL_H
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/ObjectProxyImpl.h>

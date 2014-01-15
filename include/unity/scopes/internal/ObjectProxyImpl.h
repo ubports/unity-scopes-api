@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_OBJECTPROXYIMPL_H
-#define UNITY_INTERNAL_OBJECTPROXYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
+#define UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
 
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
 #include<unity/scopes/ObjectProxyFwd.h>
