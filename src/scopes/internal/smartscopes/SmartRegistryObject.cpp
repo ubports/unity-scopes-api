@@ -84,13 +84,14 @@ void SmartRegistryObject::get_remote_scopes()
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(nullptr));
 
         mi->set_scope_name(scope.name);
-        mi->set_proxy(ScopeProxy()); ///! given to me from usa (pass ssclient* to proxy)
         mi->set_display_name(scope.name);
         mi->set_description(scope.description);
-        //mi->set_art("");
-        //mi->set_icon("");
-        //mi->set_search_hint("");
-        //mi->set_hot_key("");
+        mi->set_art("");
+        mi->set_icon("");
+        mi->set_search_hint("");
+        mi->set_hot_key("");
+
+        mi->set_proxy(ScopeProxy()); ///! given to me from usa (pass ssclient* to proxy)
 
         auto meta = ScopeMetadataImpl::create(move(mi));
         add(scope.name, move(meta));

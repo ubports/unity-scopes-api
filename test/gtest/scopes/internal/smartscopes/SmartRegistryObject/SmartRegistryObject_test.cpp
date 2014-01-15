@@ -24,5 +24,6 @@ using namespace unity::scopes::internal::smartscopes;
 
 TEST(SmartRegistryObject, basic)
 {
+    ::putenv("SMART_SCOPES_SERVER='http://localhost:8000'");
     SmartRegistryObject reg;
 }

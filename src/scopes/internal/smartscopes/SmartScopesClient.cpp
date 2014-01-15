@@ -26,8 +26,8 @@
 #include <sstream>
 #include <cstring>
 
-static const std::string c_base_url = "https://productsearch.ubuntu.com";
-static const std::string c_remote_scopes_resource = "/smartscopes/v2/remote-scopes";
+static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
+static const std::string c_remote_scopes_resource = "/remote-scopes";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
