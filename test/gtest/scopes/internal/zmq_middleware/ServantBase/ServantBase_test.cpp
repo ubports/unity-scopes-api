@@ -120,7 +120,7 @@ TEST(ServantBase, ping)
     MyServant s(MyServant::NoException);
     capnp::MallocMessageBuilder b;
     auto response = b.initRoot<capnproto::Response>();
-    capnp::ObjectPointer::Reader in_params;
+    capnp::AnyPointer::Reader in_params;
     s.safe_dispatch_(current, in_params, response);
     EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
 }
