@@ -45,7 +45,7 @@ ActivationResponse::ActivationResponse(ActivationResponse const& other)
 {
 }
 
-ActivationResponse::ActivationResponse(ActivationResponse&& other) = default;
+ActivationResponse::ActivationResponse(ActivationResponse&&) = default;
 
 ActivationResponse& ActivationResponse::operator=(ActivationResponse const& other)
 {
@@ -56,7 +56,7 @@ ActivationResponse& ActivationResponse::operator=(ActivationResponse const& othe
     return *this;
 }
 
-ActivationResponse& ActivationResponse::operator=(ActivationResponse&& other) = default;
+ActivationResponse& ActivationResponse::operator=(ActivationResponse&&) = default;
 
 void ActivationResponse::setHints(VariantMap const& hints)
 {
