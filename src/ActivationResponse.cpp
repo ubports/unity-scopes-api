@@ -41,7 +41,7 @@ ActivationResponse::ActivationResponse(std::shared_ptr<internal::ActivationRespo
 ActivationResponse::~ActivationResponse() = default;
 
 ActivationResponse::ActivationResponse(ActivationResponse const& other)
-    : p(new internal::ActivationResponseImpl(*p))
+    : p(new internal::ActivationResponseImpl(*other.p))
 {
 }
 

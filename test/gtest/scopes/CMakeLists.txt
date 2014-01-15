@@ -1,6 +1,7 @@
 add_subdirectory(internal)
 add_subdirectory(Runtime)
 add_subdirectory(Activation)
+add_subdirectory(ActivationResponse)
 add_subdirectory(Annotation)
 add_subdirectory(ScopeBase)
 add_subdirectory(ScopeExceptions)
