@@ -87,3 +87,8 @@ PushRequest (capnproto structure)
 =================================
  result : ValueDict with "category" and/or "result" or "annotation" key and
   serialized Category / CategorisedResult / Annotation respectively.
+
+ActivationResponse (returned by serialize())
+============================================
+ 'status'      : int (corresponds to ActivationResponse::Status enum)
+ 'hints'       : dict
