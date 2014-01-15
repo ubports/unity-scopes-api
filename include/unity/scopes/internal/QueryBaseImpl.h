@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_QUERYBASEIMPL_H
-#define UNITY_INTERNAL_QUERYBASEIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
+#define UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
 
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/ScopeProxyFwd.h>
