@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_QUERYCTRLIMPL_H
-#define UNITY_INTERNAL_QUERYCTRLIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_QUERYCTRLIMPL_H
+#define UNITY_SCOPES_INTERNAL_QUERYCTRLIMPL_H
 
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
