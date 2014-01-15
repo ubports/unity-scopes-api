@@ -38,7 +38,9 @@ class ActivationBaseImpl;
 }
 
 /**
-\brief TODO
+\brief Base class for a activation request that is executed inside a scope.
+The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
+Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
 class UNITY_API ActivationBase
 {
@@ -50,7 +52,16 @@ public:
     virtual ~ActivationBase() noexcept;
     /// @endcond
 
+    /**
+     \brief Called when the originator of the activation request cancelled it.
+     */
     virtual void cancelled();
+
+    /**
+     \brief Return response to the activation request.
+     The response is received by the originator of the request. Default implementation
+     returns ActivationResponse(ActivationResponse::Status::NotHandled.
+     */
     virtual ActivationResponse activate();
 
 private:

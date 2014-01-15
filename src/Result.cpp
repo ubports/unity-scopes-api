@@ -103,9 +103,9 @@ void Result::set_dnd_uri(std::string const& dnd_uri)
     p->set_dnd_uri(dnd_uri);
 }
 
-void Result::intercept_activation()
+void Result::set_intercept_activation()
 {
-    p->intercept_activation();
+    p->set_intercept_activation();
 }
 
 bool Result::direct_activation() const

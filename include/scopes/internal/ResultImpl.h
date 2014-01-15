@@ -40,6 +40,15 @@ namespace internal
 class ResultImpl
 {
 public:
+    // activation and preview flags
+    // they can be OR'ed, so need to be powers of 2
+    enum Flags
+    {
+        ActivationNotHandled = 0, // direct activation
+        InterceptActivation = 1,
+        InterceptPreview = 2
+    };
+
     ResultImpl();
     ResultImpl(VariantMap const& variant_map);
     ResultImpl(ResultImpl const& other);
@@ -56,8 +65,9 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
-    void intercept_activation();
+    void set_intercept_activation();
     bool direct_activation() const;
+    int flags() const;
     std::string activation_scope_name() const;
     VariantMap activation_target() const;
     Variant& operator[](std::string const& key);
@@ -78,15 +88,6 @@ public:
     static Result create_result(VariantMap const&);
 
 protected:
-    // activation and preview flags
-    // they can be OR'ed, so need to be powers of 2
-    enum Flags
-    {
-        ActivationNotHandled = 0, // direct activation
-        InterceptActivation = 1,
-        InterceptPreview = 2
-    };
-
     virtual void serialize_internal(VariantMap& var) const;
 
     // find stored result whose flags give true in cmp_func, and pass it to found_func;

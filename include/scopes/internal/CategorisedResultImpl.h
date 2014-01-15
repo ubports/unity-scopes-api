@@ -23,6 +23,7 @@
 #include <memory>
 #include <scopes/internal/ResultImpl.h>
 #include <scopes/Category.h>
+#include <scopes/CategorisedResult.h>
 
 namespace unity
 {
@@ -46,6 +47,8 @@ public:
 
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;
+
+    static CategorisedResult create_result(std::shared_ptr<CategorisedResultImpl> impl);
 
 protected:
     void serialize_internal(VariantMap& var) const override;

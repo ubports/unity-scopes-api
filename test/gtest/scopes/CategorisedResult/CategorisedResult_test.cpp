@@ -20,6 +20,7 @@
 #include <scopes/Category.h>
 #include <scopes/CategoryRenderer.h>
 #include <scopes/internal/CategoryRegistry.h>
+#include <scopes/internal/ReplyObject.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 

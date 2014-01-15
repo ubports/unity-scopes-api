@@ -207,7 +207,7 @@ public:
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
                 result.set_art("icon");
                 result.set_dnd_uri("dnd_uri");
-                result.intercept_activation();
+                result.set_intercept_activation();
                 if (!reply->push(result))
                 {
                     break; // Query was cancelled

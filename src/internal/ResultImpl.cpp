@@ -35,10 +35,12 @@ namespace internal
 {
 
 ResultImpl::ResultImpl()
+    : flags_(Flags::ActivationNotHandled)
 {
 }
 
 ResultImpl::ResultImpl(VariantMap const& variant_map)
+    : flags_(Flags::ActivationNotHandled)
 {
     deserialize(variant_map);
 }
@@ -121,9 +123,15 @@ void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
     attrs_["dnd_uri"] = dnd_uri;
 }
 
-void ResultImpl::intercept_activation()
+void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
+
+    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope)
+    // if it sees it's empty and InterceptActivation flag is set.
+    // this is needed to support the case where aggregator scope just passes the original result
+    // upstream - in that case we want the original scope to receive activation.
+    origin_.clear();
 }
 
 bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
@@ -143,13 +151,11 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, 
         }
         const VariantMap internal_var = it->second.get_dict();
         auto intit = internal_var.find("flags");
-        if (intit != internal_var.end())
+        const Flags flags = (intit != internal_var.end() ? static_cast<Flags>(intit->second.get_int()) : Flags::ActivationNotHandled);
+        if (cmp_func(flags))
         {
-            if (cmp_func(static_cast<Flags>(intit->second.get_int())))
-            {
-                found_func(stored);
-                return true;
-            }
+            found_func(stored);
+            return true;
         }
 
         // nested stored result?
@@ -183,7 +189,7 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (flags_ & Flags::InterceptActivation)
+    if (!origin_.empty() && (flags_ & Flags::InterceptActivation))
     {
         return origin_;
     }
@@ -198,16 +204,20 @@ std::string ResultImpl::activation_scope_name() const
                     auto it = var.find("internal");
                     if (it != var.end())
                     {
-                        it = it->second.get_dict().find("origin");
-                        target = it->second.get_string();
+                        auto intvar = it->second.get_dict();
+                        it = intvar.find("origin");
+                        if (it != intvar.end())
+                        {
+                            target = it->second.get_string();
+                        }
                     }
                 })
        )
     {
-        assert(target.empty());
         return target;
     }
-    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+
+    throw LogicException("No activation target for result with uri '" + uri() + "'");
 }
 
 VariantMap ResultImpl::activation_target() const
@@ -231,6 +241,11 @@ VariantMap ResultImpl::activation_target() const
         return res;
     }
     throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+}
+
+int ResultImpl::flags() const
+{
+    return flags_;
 }
 
 Variant& ResultImpl::operator[](std::string const& key)
@@ -369,6 +384,11 @@ void ResultImpl::deserialize(VariantMap const& var)
         if (it != resvar.end())
         {
             flags_ = it->second.get_int();
+        }
+        it = resvar.find("origin");
+        if (it != resvar.end())
+        {
+            origin_ = it->second.get_string();
         }
         it = resvar.find("result");
         if (it != resvar.end())

@@ -38,29 +38,47 @@ class ActivationResponseImpl;
 }
 
 /**
-\brief TODO
+\brief Carries response to a Result activation request.
 */
 class UNITY_API ActivationResponse final
 {
 public:
     enum Status
     {
-        NotHandled,
-        Handled,
-        ShowPreview
+        NotHandled, //<! Activation of this result wasn't handled by the scope
+        Handled, //<! Activation of this result was handled.
+        ShowPreview //<! Preview should be requested for this result.
     };
 
+    /// @cond
     ActivationResponse(Status status);
     ~ActivationResponse();
     ActivationResponse(ActivationResponse const& other);
     ActivationResponse(ActivationResponse&& other);
     ActivationResponse& operator=(ActivationResponse const& other);
     ActivationResponse& operator=(ActivationResponse&& other);
+    /// @endcond
+
+    /**
+    \brief Get activation status.
+    \return activation status
+    */
     ActivationResponse::Status status() const;
+
+    /**
+     \brief Attach arbitrary hints to this response.
+     */
     void setHints(VariantMap const& hints);
+
+    /**
+     \brief Get hints attached to this response object.
+     \return hints
+     */
     VariantMap hints() const;
 
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 private:
     std::shared_ptr<internal::ActivationResponseImpl> p;

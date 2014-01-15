@@ -90,6 +90,11 @@ void CategorisedResultImpl::serialize_internal(VariantMap& var) const
     var["cat_id"] = category_->id();
 }
 
+CategorisedResult CategorisedResultImpl::create_result(std::shared_ptr<CategorisedResultImpl> impl)
+{
+    return CategorisedResult(impl);
+}
+
 } // namespace internal
 
 } // namespace scopes
