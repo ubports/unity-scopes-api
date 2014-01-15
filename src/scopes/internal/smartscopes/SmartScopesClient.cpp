@@ -153,7 +153,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url, std::s
 
     // mandatory parameters
 
-    search_uri << "query=\"" << http_client_->to_percent_encoding(query) << "\"";
+    search_uri << "q=\"" << http_client_->to_percent_encoding(query) << "\"";
     search_uri << "&session_id=\"" << session_id << "\"";
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=\"" << platform << "\"";
