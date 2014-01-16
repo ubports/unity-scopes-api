@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/smartscopes/JsonCppNode.h>
 
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/UnityExceptions.h>
 
@@ -37,7 +38,12 @@ SSRegistryObject::SSRegistryObject()
     : ssclient_(std::make_shared<HttpClientQt>(4),
                 std::make_shared<JsonCppNode>()),
       refresh_thread_(std::thread(&SSRegistryObject::refresh_thread, this)),
-      refresh_stopped_(false) {}
+      refresh_stopped_(false)
+{
+    middleware_factory_.reset(new MiddlewareFactory(nullptr));
+    middleware_ = middleware_factory_->create("smartscopes", "REST", "");
+    proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
+}
 
 SSRegistryObject::~SSRegistryObject() noexcept {
   {
@@ -102,11 +108,10 @@ void SSRegistryObject::get_remote_scopes() {
     metadata->set_search_hint("");
     metadata->set_hot_key("");
 
-    metadata->set_proxy(ScopeProxy()); ///! given to me from usa (pass ssclient*
-                                       ///to proxy)
+    metadata->set_proxy(proxy_);
 
-    ///!auto meta = ScopeMetadataImpl::create(move(metadata));
-    ///!add(scope.name, move(meta));
+    auto meta = ScopeMetadataImpl::create(move(metadata));
+    add(scope.name, std::move(meta));
   }
 }
 
