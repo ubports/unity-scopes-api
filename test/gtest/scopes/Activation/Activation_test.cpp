@@ -105,6 +105,15 @@ public:
     std::shared_ptr<ActivationResponse> response;
 };
 
+// helper function to serialize category and result into a dict expected by ResultReplyObject
+VariantMap serialize_data(Category::SCPtr category, CategorisedResult const& result)
+{
+    VariantMap var;
+    var["category"] = category->serialize();
+    var["result"] = result.serialize();
+    return var;
+}
+
 TEST(Activation, direct_activation)
 {
     CategoryRegistry reg;
@@ -129,15 +138,122 @@ TEST(Activation, direct_activation)
             result.set_dnd_uri("http://canonical.com");
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = result.serialize();
-            reply.process_data(var);
+            reply.process_data(serialize_data(cat, result));
         }
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_TRUE(received_result->direct_activation());
         EXPECT_EQ("scope-foo", received_result->activation_scope_name()); // direct activation, but name is still available
+    }
+}
+
+// direct activation with an aggregator; aggregator scope doesn't store the original result, just passes it
+TEST(Activation, direct_activation_agg_scope_doesnt_store)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
+    {
+        std::shared_ptr<CategorisedResult> received_result;
+        auto df = []() -> void {};
+        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
+                {
+                    received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        reply.set_disconnect_function(df);
+
+        {
+            CategorisedResult result(cat);
+            result.set_uri("http://ubuntu.com");
+            result.set_dnd_uri("http://canonical.com");
+
+            // push category and result through ResultReplyObject
+            reply.process_data(serialize_data(cat, result));
+        }
+
+        EXPECT_TRUE(received_result != nullptr);
+        EXPECT_TRUE(received_result->direct_activation());
+        EXPECT_EQ("scope-foo", received_result->activation_scope_name());
+
+        // simulate aggregator scope
+        std::shared_ptr<CategorisedResult> agg_received_result;
+        auto aggreceiver = std::make_shared<DummyReceiver>([&agg_received_result](CategorisedResult result)
+                {
+                    agg_received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "scope-bar");
+        aggreply.set_disconnect_function(df);
+
+        {
+            // push category and unchanged result through ResultReplyObject
+            aggreply.process_data(serialize_data(cat, *received_result));
+        }
+
+        EXPECT_TRUE(agg_received_result != nullptr);
+        EXPECT_FALSE(agg_received_result->has_stored_result());
+        EXPECT_TRUE(agg_received_result->direct_activation());
+        EXPECT_EQ("scope-foo", agg_received_result->activation_scope_name());
+    }
+}
+
+// direct activation with an aggregator; aggregator scope stores the original result
+TEST(Activation, direct_activation_agg_scope_stores)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+
+    {
+        std::shared_ptr<CategorisedResult> received_result;
+        auto df = []() -> void {};
+        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
+                {
+                    received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        reply.set_disconnect_function(df);
+
+        {
+            CategorisedResult result(cat);
+            result.set_uri("http://ubuntu.com");
+            result.set_dnd_uri("http://canonical.com");
+
+            // push category and result through ResultReplyObject
+            reply.process_data(serialize_data(cat, result));
+        }
+
+        EXPECT_TRUE(received_result != nullptr);
+        EXPECT_TRUE(received_result->direct_activation());
+        EXPECT_EQ("scope-foo", received_result->activation_scope_name());
+
+        // simulate aggregator scope
+        std::shared_ptr<CategorisedResult> agg_received_result;
+        auto aggreceiver = std::make_shared<DummyReceiver>([&agg_received_result](CategorisedResult result)
+                {
+                    agg_received_result.reset(new CategorisedResult(result));
+                });
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "scope-bar");
+        aggreply.set_disconnect_function(df);
+
+        {
+            CategorisedResult outerresult(cat);
+            outerresult.set_uri("http://ubuntu.com/2");
+            outerresult.set_dnd_uri("http://canonical.com/2");
+            outerresult.store(*received_result, false);
+
+            // push category and result through ResultReplyObject
+            aggreply.process_data(serialize_data(cat, outerresult));
+        }
+
+        EXPECT_TRUE(agg_received_result != nullptr);
+        EXPECT_TRUE(agg_received_result->has_stored_result());
+        EXPECT_TRUE(agg_received_result->direct_activation());
+        // activation_scope_name points to the leaf scope
+        EXPECT_EQ("scope-foo", agg_received_result->activation_scope_name());
     }
 }
 
@@ -166,10 +282,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
             result.set_intercept_activation();
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = result.serialize();
-            reply.process_data(var);
+            reply.process_data(serialize_data(cat, result));
         }
 
         EXPECT_TRUE(received_result != nullptr);
@@ -187,10 +300,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
 
         {
             // push category and unchanged result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = received_result->serialize();
-            aggreply.process_data(var);
+            aggreply.process_data(serialize_data(cat, *received_result));
         }
 
         EXPECT_TRUE(agg_received_result != nullptr);
@@ -226,10 +336,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
             result.set_intercept_activation();
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = result.serialize();
-            reply.process_data(var);
+            reply.process_data(serialize_data(cat, result));
         }
 
         EXPECT_TRUE(received_result != nullptr);
@@ -248,10 +355,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
         {
             received_result->set_intercept_activation(); // agg scope want to receive activation
             // push category and unchanged result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = received_result->serialize();
-            aggreply.process_data(var);
+            aggreply.process_data(serialize_data(cat, *received_result));
         }
 
         EXPECT_TRUE(agg_received_result != nullptr);
@@ -287,10 +391,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
             result.set_intercept_activation();
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = result.serialize();
-            reply.process_data(var);
+            reply.process_data(serialize_data(cat, result));
         }
 
         EXPECT_TRUE(received_result != nullptr);
@@ -313,10 +414,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
             outerresult.store(*received_result, false);
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = outerresult.serialize();
-            aggreply.process_data(var);
+            aggreply.process_data(serialize_data(cat, outerresult));
         }
 
         EXPECT_TRUE(agg_received_result != nullptr);
@@ -352,10 +450,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
             result.set_intercept_activation();
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = result.serialize();
-            reply.process_data(var);
+            reply.process_data(serialize_data(cat, result));
         }
 
         EXPECT_TRUE(received_result != nullptr);
@@ -379,10 +474,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
             outerresult.set_intercept_activation();
 
             // push category and result through ResultReplyObject
-            VariantMap var;
-            var["category"] = cat->serialize();
-            var["result"] = outerresult.serialize();
-            aggreply.process_data(var);
+            aggreply.process_data(serialize_data(cat, outerresult));
         }
 
         EXPECT_TRUE(agg_received_result != nullptr);
