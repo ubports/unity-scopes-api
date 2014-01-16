@@ -83,8 +83,8 @@ void ResultReplyObject::process_data(VariantMap const& data)
         {
             auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
 
-            // set result origin if sender is interested in intercepting and its origin is unset
-            if (((impl->flags() & ResultImpl::Flags::InterceptActivation) != 0) && impl->origin().empty())
+            // set result origin
+            if (impl->origin().empty())
             {
                 impl->set_origin(origin_scope_name());
             }

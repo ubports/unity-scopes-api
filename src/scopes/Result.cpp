@@ -65,9 +65,9 @@ Result::Result(Result&&) = default;
 
 Result& Result::operator=(Result&&) = default;
 
-void Result::store(Result const& other, bool intercept_preview_req)
+void Result::store(Result const& other, bool intercept_activation)
 {
-    p->store(other, intercept_preview_req);
+    p->store(other, intercept_activation);
 }
 
 bool Result::has_stored_result() const

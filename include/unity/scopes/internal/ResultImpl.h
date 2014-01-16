@@ -37,13 +37,12 @@ namespace internal
 class ResultImpl
 {
 public:
-    // activation and preview flags
-    // they can be OR'ed, so need to be powers of 2
+    // activation and preview flags, used internally only.
+    // some of them can potentially be OR'ed if we add more, so let's make them powers of 2
     enum Flags
     {
         ActivationNotHandled = 0, // direct activation
-        InterceptActivation = 1,
-        InterceptPreview = 2
+        InterceptActivation = 1
     };
 
     ResultImpl();
@@ -53,7 +52,7 @@ public:
 
     virtual ~ResultImpl() = default;
 
-    void store(Result const& other, bool intercept_preview_req);
+    void store(Result const& other, bool intercept_activation);
     bool has_stored_result() const;
     Result retrieve() const;
     void set_origin(std::string const& scope_name);

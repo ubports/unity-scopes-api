@@ -68,15 +68,15 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     return *this;
 }
 
-void ResultImpl::store(Result const& other, bool intercept_preview_req)
+void ResultImpl::store(Result const& other, bool intercept_activation)
 {
     if (this == other.p.get())
     {
         throw InvalidArgumentException("Result:: cannot store self");
     }
-    if (intercept_preview_req)
+    if (intercept_activation)
     {
-        flags_ |= Flags::InterceptPreview;
+        set_intercept_activation();
     }
     stored_result_.reset(new VariantMap(other.serialize()));
 }
@@ -124,8 +124,7 @@ void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
 
-    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope)
-    // if it sees it's empty and InterceptActivation flag is set.
+    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope);
     // this is needed to support the case where aggregator scope just passes the original result
     // upstream - in that case we want the original scope to receive activation.
     origin_.clear();
