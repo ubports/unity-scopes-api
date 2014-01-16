@@ -105,28 +105,6 @@ public:
     std::shared_ptr<ActivationResponse> response;
 };
 
-// test activation paramaters / flags passed from scope to client
-TEST(Activation, exceptions)
-{
-    CategoryRegistry reg;
-    CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
-
-    // exception - activation_scope_name undefined unless result is actually transferred
-    {
-        CategorisedResult result(cat);
-        result.set_uri("http://ubuntu.com");
-        result.set_dnd_uri("http://canonical.com");
-
-        EXPECT_TRUE(result.direct_activation());
-        EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
-
-        result.set_intercept_activation();
-        EXPECT_FALSE(result.direct_activation());
-        EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
-    }
-}
-
 TEST(Activation, direct_activation)
 {
     CategoryRegistry reg;
@@ -159,7 +137,7 @@ TEST(Activation, direct_activation)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_TRUE(received_result->direct_activation());
-        EXPECT_THROW(received_result->activation_scope_name(), unity::LogicException);
+        EXPECT_EQ("scope-foo", received_result->activation_scope_name()); // direct activation, but name is still available
     }
 }
 
@@ -279,7 +257,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
-        // activation_scope_name unchanged since aggregator doesn't intercept activation
+        // activation_scope_name changed since aggregator intercepts activation
         EXPECT_EQ("scope-bar", agg_received_result->activation_scope_name());
     }
 }

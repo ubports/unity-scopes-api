@@ -130,7 +130,9 @@ void ResultImpl::set_intercept_activation()
     origin_.clear();
 }
 
-bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
+bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func,
+                                    std::function<void(VariantMap const&)> const& found_func,
+                                    std::function<void(VariantMap const&)> const& not_found_func) const
 {
     if (stored_result_ == nullptr)
         return false;
@@ -152,6 +154,10 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, 
         {
             found_func(stored);
             return true;
+        }
+        else
+        {
+            not_found_func(stored);
         }
 
         // nested stored result?
@@ -175,6 +181,7 @@ bool ResultImpl::direct_activation() const
     // if not, it is direct activation in the shell
     if (find_stored_result(
                 [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
+                [](VariantMap const&) {},
                 [](VariantMap const&) {})
        )
     {
@@ -185,35 +192,44 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (!origin_.empty() && (flags_ & Flags::InterceptActivation))
+    if (flags_ & Flags::InterceptActivation || stored_result_ == nullptr)
     {
         return origin_;
     }
 
+    const auto get_origin = [](VariantMap const& var) -> std::string {
+        auto it = var.find("internal");
+        if (it != var.end())
+        {
+            auto intvar = it->second.get_dict();
+            it = intvar.find("origin");
+            if (it != intvar.end())
+            {
+                return it->second.get_string();
+            }
+            throw unity::LogicException("'origin' element missing");
+        }
+        throw unity::LogicException("'internal' element missing");
+    };
+
     std::string target;
+    std::string first_origin; // the most inner origin for nested results (from aggregator scopes)
     // visit stored results recursively,
     // check if any of them intercepts activation;
-    // if not, it is direct activation in the shell
+    // if not, return the most inner origin
     if (find_stored_result(
                 [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&target](VariantMap const& var) {
-                    auto it = var.find("internal");
-                    if (it != var.end())
-                    {
-                        auto intvar = it->second.get_dict();
-                        it = intvar.find("origin");
-                        if (it != intvar.end())
-                        {
-                            target = it->second.get_string();
-                        }
-                    }
+                [&target, &get_origin](VariantMap const& var) {
+                    target = get_origin(var);
+                },
+                [&first_origin, &get_origin](VariantMap const& var) {
+                    first_origin = get_origin(var);
                 })
        )
     {
         return target;
     }
-
-    throw LogicException("No activation target for result with uri '" + uri() + "'");
+    return first_origin;
 }
 
 VariantMap ResultImpl::activation_target() const
@@ -231,6 +247,8 @@ VariantMap ResultImpl::activation_target() const
                 [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
                 [&res](VariantMap const& var) {
                     res = var;
+                },
+                [&res](VariantMap const&) {
                 })
        )
     {
