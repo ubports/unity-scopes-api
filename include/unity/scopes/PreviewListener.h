@@ -22,6 +22,7 @@
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
+#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Variant.h>
 
 #include <string>
@@ -45,7 +46,7 @@ public:
     /**
     \brief Called by the scopes runtime for each preview chunk that is returned by preview().
     */
-    //virtual void push(PreviewWidgetList const&) = 0; // TODO: enable!
+    virtual void push(PreviewWidgetList const&) = 0;
 
     /**
     \brief Called by the scopes runtime for each data field that is returned by preview().

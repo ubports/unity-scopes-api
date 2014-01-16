@@ -149,12 +149,30 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    void push(PreviewWidgetList const& widgets) override
+    {
+        cout << "\tGot preview widgets:" << endl;
+        for (auto it = widgets.begin(); it != widgets.end(); ++it)
+        {
+            cout << "\t\t" << it->data();
+            cout << endl;
+        }
+    }
+
     void push(std::string const& key, Variant const& value) override
     {
-        cout << "\tPushed preview data: " << key;
+        cout << "\tPushed preview data: \"" << key << "\", value: ";
         if (value.which() == Variant::Type::String)
         {
-            cout << "value: " << value.get_string();
+            cout << value.get_string();
+        }
+        else if (value.which() == Variant::Type::Null)
+        {
+            cout << "(null)";
+        }
+        else
+        {
+            cout << "(non-string value)";
         }
         cout << endl;
     }

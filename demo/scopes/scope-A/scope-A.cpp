@@ -18,9 +18,11 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Annotation.h>
 
@@ -90,6 +92,12 @@ public:
 
     virtual void run(PreviewReplyProxy const& reply) override
     {
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("4 blah"));
         cout << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
     }
 

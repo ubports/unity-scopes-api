@@ -41,7 +41,6 @@ class UNITY_API PreviewWidget
 {
 public:
 /// @cond
-    NONCOPYABLE(PreviewWidget);
     UNITY_DEFINES_PTRS(PreviewWidget);
 /// @endcond
 
