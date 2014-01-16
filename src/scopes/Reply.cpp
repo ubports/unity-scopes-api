@@ -16,7 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategoryRenderer.h>

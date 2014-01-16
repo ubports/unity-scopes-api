@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/Registry.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>

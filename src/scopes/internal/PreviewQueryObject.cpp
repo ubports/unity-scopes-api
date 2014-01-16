@@ -23,7 +23,7 @@
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/PreviewReply.h>
 #include <iostream>
 #include <cassert>

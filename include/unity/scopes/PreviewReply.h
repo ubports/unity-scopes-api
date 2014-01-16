@@ -23,7 +23,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/ReplyBase.h>
 
 namespace unity
 {
