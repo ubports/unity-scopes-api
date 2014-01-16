@@ -19,10 +19,12 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListener.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchListener.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp
