@@ -19,7 +19,8 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <unity/scopes/QueryBase.h>
+#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/PreviewQuery.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>

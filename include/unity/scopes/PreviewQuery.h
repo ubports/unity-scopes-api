@@ -16,13 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERYBASE_H
-#define UNITY_SCOPES_QUERYBASE_H
+#ifndef UNITY_SCOPES_PREVIEWQUERYBASE_H
+#define UNITY_SCOPES_PREVIEWQUERYBASE_H
 
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/QueryBase.h>
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
@@ -46,27 +47,24 @@ class QueryObject;
 
 // TODO: documentation
 
-class UNITY_API QueryBase
+class UNITY_API PreviewQuery: public QueryBase
 {
 public:
-    NONCOPYABLE(QueryBase);
-    UNITY_DEFINES_PTRS(QueryBase);
+    NONCOPYABLE(PreviewQuery);
+    UNITY_DEFINES_PTRS(PreviewQuery);
 
-    virtual void cancelled() = 0;                          // Originator cancelled the query
+    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
+
+    // TODO: Add a method for subpreview request?
 
     /// @cond
-    virtual ~QueryBase() noexcept;
+    virtual ~PreviewQuery() noexcept;
     /// @endcond
 
 protected:
     /// @cond
-    QueryBase();
+    PreviewQuery();
     /// @endcond
-
-    void cancel();
-    friend class internal::QueryObject;       // So QueryObject can call cancel()
-
-    std::unique_ptr<internal::QueryBaseImpl> p;
 };
 
 } // namespace scopes

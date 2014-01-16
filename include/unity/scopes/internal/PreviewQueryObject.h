@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_PREVIEWQUERYOBJECT_H
 
 #include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/PreviewQuery.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 
 namespace unity

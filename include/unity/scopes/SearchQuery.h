@@ -16,9 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERYBASE_H
-#define UNITY_SCOPES_QUERYBASE_H
+#ifndef UNITY_SCOPES_SEARCHQUERYBASE_H
+#define UNITY_SCOPES_SEARCHQUERYBASE_H
 
+#include <unity/scopes/QueryBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -34,6 +35,8 @@ namespace unity
 namespace scopes
 {
 
+class SearchListener;
+
 namespace internal
 {
 
@@ -46,27 +49,28 @@ class QueryObject;
 
 // TODO: documentation
 
-class UNITY_API QueryBase
+class UNITY_API SearchQuery: public QueryBase
 {
 public:
-    NONCOPYABLE(QueryBase);
-    UNITY_DEFINES_PTRS(QueryBase);
+    NONCOPYABLE(SearchQuery);
+    UNITY_DEFINES_PTRS(SearchQuery);
 
-    virtual void cancelled() = 0;                          // Originator cancelled the query
+    virtual void run(SearchReplyProxy const& reply) = 0;         // Called by the run time to start this query
+
+    // Create a sub-query.
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   VariantMap const& hints,
+                                   std::shared_ptr<SearchListener> const& reply);
 
     /// @cond
-    virtual ~QueryBase() noexcept;
+    virtual ~SearchQuery() noexcept;
     /// @endcond
 
 protected:
     /// @cond
-    QueryBase();
+    SearchQuery();
     /// @endcond
-
-    void cancel();
-    friend class internal::QueryObject;       // So QueryObject can call cancel()
-
-    std::unique_ptr<internal::QueryBaseImpl> p;
 };
 
 } // namespace scopes
