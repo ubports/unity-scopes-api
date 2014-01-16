@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/SmartRegistryObject.h>
+#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/smartscopes/JsonCppNode.h>
@@ -37,15 +37,15 @@ namespace internal
 namespace smartscopes
 {
 
-SmartRegistryObject::SmartRegistryObject()
+SSRegistryObject::SSRegistryObject()
     : ssclient_(std::make_shared< HttpClientQt >(4),
                 std::make_shared< JsonCppNode >()),
-      refresh_thread_(std::thread(&SmartRegistryObject::refresh_thread, this)),
+      refresh_thread_(std::thread(&SSRegistryObject::refresh_thread, this)),
       refresh_stopped_(false)
 {
 }
 
-SmartRegistryObject::~SmartRegistryObject() noexcept
+SSRegistryObject::~SSRegistryObject() noexcept
 {
     {
         std::lock_guard<std::mutex> lock(refresh_mutex_);
@@ -57,7 +57,7 @@ SmartRegistryObject::~SmartRegistryObject() noexcept
     refresh_thread_.join();
 }
 
-ScopeMetadata SmartRegistryObject::get_metadata(std::string const& scope_name)
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -75,13 +75,13 @@ ScopeMetadata SmartRegistryObject::get_metadata(std::string const& scope_name)
     return it->second;
 }
 
-MetadataMap SmartRegistryObject::list()
+MetadataMap SSRegistryObject::list()
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
     return scopes_;
 }
 
-void SmartRegistryObject::refresh_thread()
+void SSRegistryObject::refresh_thread()
 {
     std::lock_guard<std::mutex> lock(refresh_mutex_);
 
@@ -93,7 +93,7 @@ void SmartRegistryObject::refresh_thread()
     }
 }
 
-void SmartRegistryObject::get_remote_scopes()
+void SSRegistryObject::get_remote_scopes()
 {
     std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
 
@@ -118,7 +118,7 @@ void SmartRegistryObject::get_remote_scopes()
     }
 }
 
-bool SmartRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
+bool SSRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata)
 {
     if (scope_name.empty())
     {

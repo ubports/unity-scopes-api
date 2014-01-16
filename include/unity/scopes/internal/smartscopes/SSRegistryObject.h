@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTREGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTREGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
+#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
@@ -37,13 +37,13 @@ namespace internal
 namespace smartscopes
 {
 
-class SmartRegistryObject : public AbstractObject
+class SSRegistryObject : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(SmartRegistryObject);
+    UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SmartRegistryObject();
-    virtual ~SmartRegistryObject() noexcept;
+    SSRegistryObject();
+    virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
@@ -74,4 +74,4 @@ private:
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTREGISTRYOBJECT_H
+#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H

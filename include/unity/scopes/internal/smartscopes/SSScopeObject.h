@@ -16,7 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/SmartScopeObject.h>
+#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
+#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
+
+#include <unity/scopes/internal/AbstractObject.h>
 
 namespace unity
 {
@@ -30,6 +33,13 @@ namespace internal
 namespace smartscopes
 {
 
+class SSScopeObject final : public AbstractObject
+{
+public:
+
+private:
+};
+
 } // namespace smartscopes
 
 } // namespace internal
@@ -37,3 +47,5 @@ namespace smartscopes
 } // namespace scopes
 
 } // namespace unity
+
+#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H

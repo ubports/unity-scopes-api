@@ -16,14 +16,14 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/SmartRegistryObject.h>
+#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <gtest/gtest.h>
 
 using namespace unity::scopes::internal::smartscopes;
 
-TEST(SmartRegistryObject, basic)
+TEST(SSRegistryObject, basic)
 {
     ::putenv("SMART_SCOPES_SERVER=http://127.0.0.1:8000");
-    SmartRegistryObject reg;
+    SSRegistryObject reg;
 }

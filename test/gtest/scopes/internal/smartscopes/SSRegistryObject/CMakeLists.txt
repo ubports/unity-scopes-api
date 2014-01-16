@@ -3,19 +3,19 @@ include_directories(
 )
 
 add_executable(
-    SmartScopeObject_test
+    SSRegistryObject_test
 
-    SmartScopeObject_test.cpp
+    SSRegistryObject_test.cpp
 )
 
 target_link_libraries(
-    SmartScopeObject_test
+    SSRegistryObject_test
 
     ${TESTLIBS}
 )
 
 add_test(
-    SmartScopeObject
+    SSRegistryObject
 
-    SmartScopeObject_test
+    SSRegistryObject_test
 )
