@@ -4,8 +4,8 @@
 
 SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     cleanincludes
-    stand-alone-scopes-headers
-    stand-alone-scopes-internal-headers
-    clean-public-scopes-headers
+    stand-alone-unity-scopes-headers
+    stand-alone-unity-scopes-internal-headers
+    clean-public-unity-scopes-headers
     copyright
     whitespace)
