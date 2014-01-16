@@ -40,8 +40,8 @@ using namespace unity::scopes;
 class Receiver : public SearchListener
 {
 public:
-    Receiver(int index_to_activate)
-        : index_to_activate_(index_to_activate),
+    Receiver(int index_to_save)
+        : index_to_save_(index_to_save),
           push_result_count_(0)
     {
     }
@@ -63,9 +63,9 @@ public:
              << result.category()->id()
              << endl;
         ++push_result_count_;
-        if (index_to_activate_ > 0 && push_result_count_ == index_to_activate_)
+        if (index_to_save_ > 0 && push_result_count_ == index_to_save_)
         {
-            activate_result_ = std::make_shared<Result>(result);
+            saved_result_ = std::make_shared<Result>(result);
         }
     }
 
@@ -102,9 +102,9 @@ public:
         condvar_.wait(lock, [this] { return this->query_complete_; });
     }
 
-    std::shared_ptr<Result> result_to_activate() const
+    std::shared_ptr<Result> saved_result() const
     {
-        return activate_result_;
+        return saved_result_;
     }
 
     Receiver() :
@@ -114,11 +114,11 @@ public:
 
 private:
     bool query_complete_;
-    int index_to_activate_;
+    int index_to_save_;
     mutex mutex_;
     condition_variable condvar_;
     int push_result_count_ = 0;
-    std::shared_ptr<Result> activate_result_;
+    std::shared_ptr<Result> saved_result_;
 };
 
 class ActivationReceiver : public ActivationListener
@@ -146,6 +146,36 @@ private:
     condition_variable condvar_;
 };
 
+class PreviewReceiver : public PreviewListener
+{
+public:
+    void push(std::string const& key, Variant const& value) override
+    {
+        cout << "\tPushed preview data: " << key;
+        if (value.which() == Variant::Type::String)
+        {
+            cout << "value: " << value.get_string();
+        }
+        cout << endl;
+    }
+
+    void finished(Reason r, std::string const& error_message) override
+    {
+        cout << "\tPreview finished, reason: " << r << ", error_message: " << error_message << endl;
+        condvar_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<decltype(mutex_)> lock(mutex_);
+        condvar_.wait(lock);
+    }
+
+private:
+    mutex mutex_;
+    condition_variable condvar_;
+};
+
 void print_usage()
 {
     cerr << "usage: ./client <scope-letter> query [activate n]" << endl;
@@ -153,6 +183,13 @@ void print_usage()
     cerr << "         or: ./client B iron activate 1" << endl;
     exit(1);
 }
+
+enum class ResultOperation
+{
+    None,
+    Activation,
+    Preview
+};
 
 int main(int argc, char* argv[])
 {
@@ -163,7 +200,8 @@ int main(int argc, char* argv[])
 
     string scope_name = string("scope-") + argv[1];
     string search_string = argv[2];
-    int activate_result_index = 0; //the default index of 0 won't activate
+    int result_index = 0; //the default index of 0 won't activate
+    ResultOperation result_op;
 
     // poor man's getopt
     if (argc > 3)
@@ -172,7 +210,13 @@ int main(int argc, char* argv[])
         {
             if (strcmp(argv[3], "activate") == 0)
             {
-                activate_result_index = atoi(argv[4]);
+                result_index = atoi(argv[4]);
+                result_op = ResultOperation::Activation;
+            }
+            else if (strcmp(argv[3], "preview") == 0)
+            {
+                result_index = atoi(argv[4]);
+                result_op = ResultOperation::Preview;
             }
             else
             {
@@ -228,7 +272,7 @@ int main(int argc, char* argv[])
         catch (NotFoundException const& e)
         {
         }
-        shared_ptr<Receiver> reply(new Receiver(activate_result_index));
+        shared_ptr<Receiver> reply(new Receiver(result_index));
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
@@ -238,13 +282,18 @@ int main(int argc, char* argv[])
         cout << "client: wait returned" << endl;
 
         // handle activation
-        if (activate_result_index > 0)
+        if (result_index > 0)
         {
-            shared_ptr<ActivationReceiver> act_reply(new ActivationReceiver);
-            auto result = reply->result_to_activate();
-            if (result != nullptr)
+            auto result = reply->saved_result();
+            if (!result)
             {
-                cout << "client: activating result item #" << activate_result_index << ", uri:" << result->uri() << endl;
+                cout << "Nothing to activate! Invalid result index?" << endl;
+                return 1;
+            }
+            if (result_op == ResultOperation::Activation)
+            {
+                shared_ptr<ActivationReceiver> act_reply(new ActivationReceiver);
+                cout << "client: activating result item #" << result_index << ", uri:" << result->uri() << endl;
                 bool direct_activation = result->direct_activation();
                 cout << "\tdirect activation: " << direct_activation << endl;
                 if (!direct_activation)
@@ -263,7 +312,10 @@ int main(int argc, char* argv[])
             }
             else
             {
-                cout << "Nothing to activate! Invalid result index?" << endl;
+                shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
+                cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
+                meta.proxy()->preview(*result, vm, preview_reply);
+                preview_reply->wait_until_finished();
             }
         }
     }

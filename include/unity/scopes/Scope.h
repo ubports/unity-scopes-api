@@ -57,6 +57,8 @@ public:
 
     QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
 
+    QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
+
     /**
     \brief Destroys a Scope.
     Destroying a Scope has no effect on any query that might still be in progress.

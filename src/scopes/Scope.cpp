@@ -47,6 +47,11 @@ QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, Ac
     return fwd()->activate(result, hints, reply);
 }
 
+QueryCtrlProxy Scope::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+{
+    return fwd()->preview(result, hints, reply);
+}
+
 internal::ScopeImpl* Scope::fwd() const
 {
     return dynamic_cast<internal::ScopeImpl*>(pimpl());

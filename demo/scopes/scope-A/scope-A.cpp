@@ -72,6 +72,31 @@ private:
     string query_;
 };
 
+class MyPreview : public PreviewQuery
+{
+public:
+    MyPreview(string const& uri) :
+        uri_(uri)
+    {
+    }
+
+    ~MyPreview() noexcept
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        cout << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
+    }
+
+private:
+    string uri_;
+};
+
 class MyScope : public ScopeBase
 {
 public:
@@ -91,8 +116,9 @@ public:
 
     virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
     {
-        cout << "scope-A: preview: \"" << result.uri() << "\"" << endl;
-        return nullptr;
+        QueryBase::UPtr preview(new MyPreview(result.uri()));
+        cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
+        return preview;
     }
 };
 
