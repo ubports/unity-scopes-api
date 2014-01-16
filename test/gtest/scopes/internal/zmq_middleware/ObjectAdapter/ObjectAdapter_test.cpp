@@ -1124,3 +1124,119 @@ TEST(ObjectAdapter, double_bind)
         t.join();
     }
 }
+
+TEST(ObjectAdapter, dflt_servant)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    a.activate();
+
+    zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    shared_ptr<MyServant> o(new MyServant);
+    a.add_dflt_servant("some_cat", o);
+    try
+    {
+        a.add_dflt_servant("some_cat", o);
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::add_dflt_servant(): "
+                     "cannot add category \"some_cat\": category already in use (adapter: testscope)",
+                     e.what());
+    }
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setCat("some_cat");
+    request.setOpName("success_op");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+
+    a.remove_dflt_servant("some_cat");
+    try
+    {
+        a.remove_dflt_servant("some_cat");
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::remove_dflt_servant(): "
+                     "cannot remove category \"some_cat\": category not present (adapter: testscope)",
+                     e.what());
+    }
+}
+
+TEST(ObjectAdapter, dflt_servant_exceptions)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    a.activate();
+
+    try
+    {
+        a.add_dflt_servant("", nullptr);
+        FAIL();
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        EXPECT_EQ("unity::InvalidArgumentException: ObjectAdapter::add_dflt_servant(): "
+                  "invalid nullptr object (adapter: testscope)",
+                  e.to_string());
+    }
+
+    ObjectAdapter b(mw, "testscope2", "ipc://testscope", RequestType::Oneway, 2);
+    EXPECT_THROW(b.activate(), MiddlewareException);
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.add_dflt_servant("some_cat", o);
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
+    }
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.remove_dflt_servant("some_cat");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
+    }
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.find_dflt_servant("some_cat");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
+    }
+}
