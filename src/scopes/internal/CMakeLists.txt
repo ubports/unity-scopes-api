@@ -25,6 +25,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
@@ -39,6 +40,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ResultReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
