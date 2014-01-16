@@ -17,6 +17,8 @@
  */
 
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/PreviewListener.h>
 
 #include <cassert>
 #include <unordered_map>

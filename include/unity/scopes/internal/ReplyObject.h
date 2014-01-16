@@ -22,7 +22,8 @@
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/Reaper.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/PreviewListener.h>
 #include <unity/scopes/Variant.h>
 
 #include <atomic>

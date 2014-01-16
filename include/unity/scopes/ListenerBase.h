@@ -16,13 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RECEIVERBASE_H
-#define UNITY_SCOPES_RECEIVERBASE_H
+#ifndef UNITY_SCOPES_LISTENERBASE_H
+#define UNITY_SCOPES_LISTENERBASE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Annotation.h>
 
 #include <string>
 
@@ -31,8 +29,6 @@ namespace unity
 
 namespace scopes
 {
-
-class CategorisedResult;
 
 /**
 \brief Abstract base class to receive the results of a query.
@@ -77,69 +73,6 @@ public:
 protected:
     /// @cond
     ListenerBase();
-    /// @endcond
-};
-
-class UNITY_API SearchListener : public ListenerBase
-{
-public:
-    /// @cond
-    NONCOPYABLE(SearchListener);
-    UNITY_DEFINES_PTRS(SearchListener);
-
-    virtual ~SearchListener() noexcept;
-    /// @endcond
-
-    /**
-    \brief Called once by the scopes run time for each result that is returned by a query().
-    */
-    virtual void push(CategorisedResult result) = 0;
-
-    /**
-    \brief Called once by the scopes run time for each annotation that is returned by a query().
-    The default implementation does nothing.
-    */
-    virtual void push(Annotation annotation);
-
-    /**
-    \brief Called once by the scopes run time for each category that is returned by a query().
-    The default implementation does nothing. Receipt of categories may be interleaved with
-    the receipt of results, that is, there is no guarantee that the complete set of categories
-    will be provided before the first query result.
-
-    If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
-    */
-    virtual void push(Category::SCPtr category);
-
-protected:
-    /// @cond
-    SearchListener();
-    /// @endcond
-};
-
-class UNITY_API PreviewListener : public ListenerBase
-{
-public:
-    /// @cond
-    NONCOPYABLE(PreviewListener);
-    UNITY_DEFINES_PTRS(PreviewListener);
-
-    virtual ~PreviewListener() noexcept;
-    /// @endcond
-
-    /**
-    \brief Called by the scopes runtime for each preview chunk that is returned by preview().
-    */
-    //virtual void push(PreviewWidgetList const&) = 0; // TODO: enable!
-
-    /**
-    \brief Called by the scopes runtime for each data field that is returned by preview().
-    */
-    virtual void push(std::string const& key, Variant const& value) = 0;
-
-protected:
-    /// @cond
-    PreviewListener();
     /// @endcond
 };
 

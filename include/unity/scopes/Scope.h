@@ -21,7 +21,8 @@
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/PreviewListener.h>
 #include <unity/scopes/ActivationListener.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
