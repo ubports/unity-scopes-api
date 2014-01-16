@@ -16,14 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
-#define UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
+#include <unity/scopes/internal/zmq_middleware/Current.h>
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/InvokeInfo.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 namespace unity
 {
@@ -31,29 +26,21 @@ namespace unity
 namespace scopes
 {
 
-class ScopeBase;
-
 namespace internal
 {
 
-class MiddlewareBase;
-class RuntimeImpl;
-
-class ScopeObjectBase : public AbstractObject
+namespace zmq_middleware
 {
-public:
-    UNITY_DEFINES_PTRS(ScopeObjectBase);
 
-    virtual MWQueryCtrlProxy create_query(std::string const& q,
-                                          VariantMap const& hints,
-                                          MWReplyProxy const& reply,
-                                          InvokeInfo const& info) = 0;
-};
+unity::scopes::internal::InvokeInfo to_info(Current const& c)
+{
+    return { c.id, c.adapter->mw() };
+}
+
+} // namespace zmq_middleware
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

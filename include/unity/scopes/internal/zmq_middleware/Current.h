@@ -19,6 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
 
+#include <unity/scopes/internal/InvokeInfo.h>
+
 #include <string>
 
 namespace unity
@@ -42,6 +44,8 @@ struct Current
     std::string op_name;
     ObjectAdapter* adapter;
 };
+
+unity::scopes::internal::InvokeInfo to_info(Current const& c);
 
 } // namespace zmq_middleware
 

@@ -60,7 +60,7 @@ ScopeObject::~ScopeObject() noexcept
 MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
-                                           MiddlewareBase* mw_base)
+                                           InvokeInfo const& info)
 {
     if (!reply)
     {
@@ -97,13 +97,13 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         // Instantiate the query ctrl and connect it to the middleware.
         QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = mw_base->add_query_ctrl_object(co);
+        ctrl_proxy = info.mw->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
         QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
+        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.

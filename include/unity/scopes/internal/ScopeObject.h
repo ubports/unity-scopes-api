@@ -53,7 +53,7 @@ public:
     virtual MWQueryCtrlProxy create_query(std::string const& q,
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
-                                          MiddlewareBase* mw_base) override;
+                                          InvokeInfo const& info) override;
 
 private:
     RuntimeImpl* const runtime_;

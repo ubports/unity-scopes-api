@@ -30,14 +30,16 @@ namespace scopes
 namespace internal
 {
 
+class MiddlewareBase;
+
 // InvokeInfo is passed to all server-side implementation objects. It is intended
 // mainly for the implementation of default servants, which need to incarnate
-// different middleware (that is, conceptual object) on a per-request basis.
+// different middleware object (that is, conceptual object) on a per-request basis.
 
 struct InvokeInfo
 {
-    std::string& id;       // Identity of invocation target
-    // More to come here over time...
+    std::string const& id;       // Identity of invocation target
+    MiddlewareBase*    mw;       // Middleware for this request
 };
 
 } // namespace internal

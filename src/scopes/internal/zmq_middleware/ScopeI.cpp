@@ -83,7 +83,7 @@ void ScopeI::create_query_(Current const& current,
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query,
                                                                                 hints,
                                                                                 reply_proxy,
-                                                                                current.adapter->mw()));
+                                                                                to_info(current)));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();

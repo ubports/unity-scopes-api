@@ -131,8 +131,8 @@ void RegistryI::locate_(Current const&,
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
         auto proxy = locate_response.initReturnValue();
         proxy.setIdentity(scope_proxy->identity());
-        proxy.setEndpoint(scope_proxy->endpoint());
         proxy.setCategory("Scope");
+        proxy.setEndpoint(scope_proxy->endpoint());
     }
     catch (NotFoundException const& e)
     {

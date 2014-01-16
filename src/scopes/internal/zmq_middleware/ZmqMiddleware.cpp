@@ -246,6 +246,24 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
     return proxy;
 }
 
+void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
+{
+    assert(ctrl);
+
+    MWQueryCtrlProxy proxy;
+    try
+    {
+        shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
+        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir());
+        auto df = safe_dflt_add(adapter, "QueryCtrl", qci);
+        ctrl->set_disconnect_function(df);
+    }
+    catch (...)
+    {
+        throw; // TODO
+    }
+}
+
 MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
 {
     assert(query);
@@ -331,6 +349,24 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         throw; // TODO
     }
     return proxy;
+}
+
+void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
+{
+    assert(scope);
+
+    MWScopeProxy proxy;
+    try
+    {
+        shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
+        auto adapter = find_adapter(server_name_, config_.private_dir());
+        auto df = safe_dflt_add(adapter, "Scope", si);
+        scope->set_disconnect_function(df);
+    }
+    catch (...)
+    {
+        throw; // TODO
+    }
 }
 
 zmqpp::context* ZmqMiddleware::context() const noexcept
@@ -435,13 +471,6 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
 {
     string id = identity.empty() ? unique_id_.gen() : identity;
 
-#if 0 // TODO: is this necessary? Needs to match what happens in stop()
-    lock_guard<mutex> lock(state_mutex_);
-    if (!adapter)
-    {
-        throw LogicException("Cannot add object to stopped middleware");
-    }
-#endif
     disconnect_func = [adapter, id]
     {
         try
@@ -453,6 +482,24 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
         }
     };
     return adapter->add(id, servant);
+}
+
+function<void()> ZmqMiddleware::safe_dflt_add(shared_ptr<ObjectAdapter> const& adapter,
+                                              string const& category,
+                                              shared_ptr<ServantBase> const& servant)
+{
+    function<void()> disconnect_func = [adapter, category]
+    {
+        try
+        {
+            adapter->remove_dflt_servant(category);
+        }
+        catch (...)
+        {
+        }
+    };
+    adapter->add_dflt_servant(category, servant);
+    return disconnect_func;
 }
 
 } // namespace zmq_middleware

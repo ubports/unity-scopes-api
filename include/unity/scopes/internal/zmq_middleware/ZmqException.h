@@ -38,7 +38,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-class Current;
+struct Current;
 
 void marshal_unknown_exception(capnproto::Response::Builder& r, std::string const& s);
 void marshal_object_not_exist_exception(capnproto::Response::Builder& r, Current const& c);
