@@ -20,6 +20,11 @@
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Variant.h>
+
+#include <string>
 
 namespace unity
 {
@@ -27,8 +32,13 @@ namespace unity
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace internal
 {
+
+class MiddlewareBase;
+class RuntimeImpl;
 
 namespace smartscopes
 {
@@ -36,8 +46,20 @@ namespace smartscopes
 class SSScopeObject final : public AbstractObject
 {
 public:
+    UNITY_DEFINES_PTRS(SSScopeObject);
+
+    SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
+    virtual ~SSScopeObject() noexcept;
+
+    // Remote operation implementations
+    MWQueryCtrlProxy create_query(std::string const& q,
+                                  VariantMap const& hints,
+                                  MWReplyProxy const& reply,
+                                  MiddlewareBase* mw_base);
 
 private:
+    RuntimeImpl* const runtime_;
+    ScopeBase* const scope_base_;
 };
 
 } // namespace smartscopes

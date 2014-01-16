@@ -81,6 +81,11 @@ MetadataMap SSRegistryObject::list()
     return scopes_;
 }
 
+ScopeProxy SSRegistryObject::locate(std::string const& scope_name)
+{
+    return ScopeProxy();
+}
+
 void SSRegistryObject::refresh_thread()
 {
     std::lock_guard<std::mutex> lock(refresh_mutex_);

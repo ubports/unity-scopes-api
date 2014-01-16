@@ -48,6 +48,8 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
 
+    virtual ScopeProxy locate(std::string const& scope_name);
+
 private:
     void refresh_thread();
 
