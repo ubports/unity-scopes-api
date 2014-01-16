@@ -21,7 +21,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
-#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/UnityExceptions.h>

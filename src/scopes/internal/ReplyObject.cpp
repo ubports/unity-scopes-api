@@ -17,6 +17,8 @@
  */
 
 #include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/ResultReplyObject.h>
+#include <unity/scopes/internal/PreviewReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/scopes/ListenerBase.h>

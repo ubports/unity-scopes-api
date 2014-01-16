@@ -21,9 +21,7 @@
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/Reaper.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/SearchListener.h>
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Variant.h>
 
 #include <atomic>
@@ -67,31 +65,6 @@ private:
     std::condition_variable idle_;
     std::string origin_scope_name_;
     int num_push_;
-};
-
-class ResultReplyObject : public ReplyObject
-{
-public:
-    ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual ~ResultReplyObject() noexcept;
-
-    virtual void process_data(VariantMap const& data) override;
-
-private:
-    SearchListener::SPtr const receiver_;
-    std::shared_ptr<CategoryRegistry> cat_registry_;
-};
-
-class PreviewReplyObject : public ReplyObject
-{
-public:
-    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual ~PreviewReplyObject() noexcept;
-
-    virtual void process_data(VariantMap const& data) override;
-
-private:
-    PreviewListener::SPtr const receiver_;
 };
 
 } // namespace internal
