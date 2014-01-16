@@ -25,47 +25,42 @@
 
 #include <mutex>
 
-namespace unity
-{
+namespace unity {
 
-namespace scopes
-{
+namespace scopes {
 
-namespace internal
-{
+namespace internal {
 
-namespace smartscopes
-{
+namespace smartscopes {
 
-class SSRegistryObject : public AbstractObject
-{
+class SSRegistryObject : public AbstractObject {
 public:
-    UNITY_DEFINES_PTRS(SSRegistryObject);
+  UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SSRegistryObject();
-    virtual ~SSRegistryObject() noexcept;
+  SSRegistryObject();
+  virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_name);
-    MetadataMap list();
+  ScopeMetadata get_metadata(std::string const &scope_name);
+  MetadataMap list();
 
-    virtual ScopeProxy locate(std::string const& scope_name);
-
-private:
-    void refresh_thread();
-
-    void get_remote_scopes();
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
+  virtual ScopeProxy locate(std::string const &scope_name);
 
 private:
-    smartscopes::SmartScopesClient ssclient_;
+  void refresh_thread();
 
-    MetadataMap scopes_;
-    std::mutex scopes_mutex_;
+  void get_remote_scopes();
+  bool add(std::string const &scope_name, ScopeMetadata const &scope);
 
-    std::thread refresh_thread_;
-    std::mutex refresh_mutex_;
-    std::condition_variable_any refresh_wait_;
-    bool refresh_stopped_;
+private:
+  smartscopes::SmartScopesClient ssclient_;
+
+  MetadataMap scopes_;
+  std::mutex scopes_mutex_;
+
+  std::thread refresh_thread_;
+  std::mutex refresh_mutex_;
+  std::condition_variable_any refresh_cond_;
+  bool refresh_stopped_;
 };
 
 } // namespace smartscopes

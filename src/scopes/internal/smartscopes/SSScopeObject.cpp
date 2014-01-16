@@ -35,117 +35,105 @@ using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-namespace unity
-{
+namespace unity {
 
-namespace scopes
-{
+namespace scopes {
 
-namespace internal
-{
+namespace internal {
 
-namespace smartscopes
-{
+namespace smartscopes {
 
-SSScopeObject::SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
-    runtime_(runtime),
-    scope_base_(scope_base)
-{
-    assert(runtime);
-    assert(scope_base);
+SSScopeObject::SSScopeObject(RuntimeImpl *runtime, ScopeBase *scope_base)
+    : runtime_(runtime), scope_base_(scope_base) {
+  assert(runtime);
+  assert(scope_base);
 }
 
-SSScopeObject::~SSScopeObject() noexcept
-{
-}
+SSScopeObject::~SSScopeObject() noexcept {}
 
-MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
-                                             VariantMap const& hints,
-                                             MWReplyProxy const& reply,
-                                             MiddlewareBase* mw_base)
-{
-    if (!reply)
-    {
-        // We can't assert here because the null proxy may have been sent by a broken client, that is,
-        // it can be null because it was sent by the remote end as null. This should never happen but,
-        // to be safe, we don't assert, in case someone is running a broken client.
+MWQueryCtrlProxy SSScopeObject::create_query(std::string const &q,
+                                             VariantMap const &hints,
+                                             MWReplyProxy const &reply,
+                                             MiddlewareBase *mw_base) {
+  if (!reply) {
+    // We can't assert here because the null proxy may have been sent by a
+    // broken client, that is,
+    // it can be null because it was sent by the remote end as null. This should
+    // never happen but,
+    // to be safe, we don't assert, in case someone is running a broken client.
 
-        // TODO: log error about incoming request containing an invalid reply proxy.
+    // TODO: log error about incoming request containing an invalid reply proxy.
 
-        throw LogicException("Scope \"" + runtime_->scope_name() + "\": create_query(\"" +
-                             q + "\") called with null reply proxy");
+    throw LogicException("Scope \"" + runtime_->scope_name() +
+                         "\": create_query(\"" + q +
+                         "\") called with null reply proxy");
+  }
+
+  // Ask scope to instantiate a new query.
+  QueryBase::SPtr query_base;
+  try {
+    query_base = scope_base_->create_query(q, hints);
+    if (!query_base) {
+      // TODO: log error, scope returned null pointer.
+      throw ResourceException("Scope \"" + runtime_->scope_name() +
+                              "\" returned nullptr from create_query(\"" + q +
+                              "\")");
     }
+  }
+  catch (...) {
+    throw ResourceException("Scope \"" + runtime_->scope_name() +
+                            "\" threw an exception from create_query(\"" + q +
+                            "\")");
+  }
 
-    // Ask scope to instantiate a new query.
-    QueryBase::SPtr query_base;
-    try
-    {
-        query_base = scope_base_->create_query(q, hints);
-        if (!query_base)
-        {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                    "\" returned nullptr from create_query(\"" + q + "\")");
-        }
+  MWQueryCtrlProxy ctrl_proxy;
+  try {
+    // Instantiate the query ctrl and connect it to the middleware.
+    QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
+    ctrl_proxy = mw_base->add_query_ctrl_object(co);
+
+    // Instantiate the query. We tell it what the ctrl is so,
+    // when the query completes, it can tell the ctrl object
+    // to destroy itself.
+    QueryObject::SPtr qo(
+        make_shared<QueryObject>(query_base, reply, ctrl_proxy));
+    MWQueryProxy query_proxy = mw_base->add_query_object(qo);
+
+    // We tell the ctrl what the query facade is so, when cancel() is sent
+    // to the ctrl, it can forward it to the facade.
+    co->set_query(qo);
+
+    // Start the query. We call via the middleware, which calls
+    // the run() implementation in a different thread, so we cannot block here.
+    // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the
+    // reference
+    // count high until the run() request arrives in the query via the
+    // middleware.
+    qo->set_self(qo);
+
+    query_proxy->run(reply);
+  }
+  catch (std::exception const & e) {
+    try {
+      reply->finished(ReceiverBase::Error, e.what());
     }
-    catch (...)
-    {
-        throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                "\" threw an exception from create_query(\"" + q + "\")");
+    catch (...) {
     }
-
-    MWQueryCtrlProxy ctrl_proxy;
-    try
-    {
-        // Instantiate the query ctrl and connect it to the middleware.
-        QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = mw_base->add_query_ctrl_object(co);
-
-        // Instantiate the query. We tell it what the ctrl is so,
-        // when the query completes, it can tell the ctrl object
-        // to destroy itself.
-        QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
-
-        // We tell the ctrl what the query facade is so, when cancel() is sent
-        // to the ctrl, it can forward it to the facade.
-        co->set_query(qo);
-
-        // Start the query. We call via the middleware, which calls
-        // the run() implementation in a different thread, so we cannot block here.
-        // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-        // count high until the run() request arrives in the query via the middleware.
-        qo->set_self(qo);
-
-        query_proxy->run(reply);
+    cerr << "create_query(): " << e.what() << endl;
+    // TODO: log error
+    throw;
+  }
+  catch (...) {
+    try {
+      reply->finished(ReceiverBase::Error, "unknown exception");
     }
-    catch (std::exception const& e)
-    {
-        try
-        {
-            reply->finished(ReceiverBase::Error, e.what());
-        }
-        catch (...)
-        {
-        }
-        cerr << "create_query(): " << e.what() << endl;
-        // TODO: log error
-        throw;
+    catch (...) {
     }
-    catch (...)
-    {
-        try
-        {
-            reply->finished(ReceiverBase::Error, "unknown exception");
-        }
-        catch (...)
-        {
-        }
-        cerr << "create_query(): unknown exception" << endl;
-        // TODO: log error
-        throw;
-    }
-    return ctrl_proxy;
+    cerr << "create_query(): unknown exception" << endl;
+    // TODO: log error
+    throw;
+  }
+  return ctrl_proxy;
 }
 
 } // namespace smartscopes
