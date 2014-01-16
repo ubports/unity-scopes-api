@@ -192,7 +192,7 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (flags_ & Flags::InterceptActivation || stored_result_ == nullptr)
+    if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
     {
         return origin_;
     }
@@ -213,48 +213,50 @@ std::string ResultImpl::activation_scope_name() const
     };
 
     std::string target;
-    std::string first_origin; // the most inner origin for nested results (from aggregator scopes)
+    std::string most_inner; // the most inner origin for nested results (from aggregator scopes)
     // visit stored results recursively,
     // check if any of them intercepts activation;
     // if not, return the most inner origin
     if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&target, &get_origin](VariantMap const& var) {
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
+                [&target, &get_origin](VariantMap const& var) {                        // if found
                     target = get_origin(var);
                 },
-                [&first_origin, &get_origin](VariantMap const& var) {
-                    first_origin = get_origin(var);
+                [&most_inner, &get_origin](VariantMap const& var) {                    // if not found
+                    most_inner = get_origin(var);
                 })
        )
     {
         return target;
     }
-    return first_origin;
+    return most_inner;
 }
 
 VariantMap ResultImpl::activation_target() const
 {
-    if (flags_ & Flags::InterceptActivation)
+    if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
     {
         return serialize();
     }
 
     VariantMap res;
+    VariantMap most_inner;
     // visit stored results recursively,
-    // check if any of them intercepts activation;
-    // if not, it is direct activation in the shell
+    // check if any of them intercepts activation, if so, return it.;
+    // if not, return the most inner result.
     if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&res](VariantMap const& var) {
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
+                [&res](VariantMap const& var) {                                        // if found
                     res = var;
                 },
-                [&res](VariantMap const&) {
+                [&most_inner](VariantMap const& var) {                                 // if not found
+                    most_inner = var;
                 })
        )
     {
         return res;
     }
-    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+    return most_inner;
 }
 
 int ResultImpl::flags() const
