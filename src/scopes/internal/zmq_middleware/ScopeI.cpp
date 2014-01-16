@@ -75,15 +75,22 @@ void ScopeI::create_query_(Current const& current,
     auto query = req.getQuery().cStr();
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
-    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
+                              proxy.getEndpoint().cStr(),
+                              proxy.getIdentity().cStr(),
+                              proxy.getCategory().cStr()));
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
-    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query, hints, reply_proxy, current.adapter->mw()));
+    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query,
+                                                                                hints,
+                                                                                reply_proxy,
+                                                                                current.adapter->mw()));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
 }
 
 } // namespace zmq_middleware

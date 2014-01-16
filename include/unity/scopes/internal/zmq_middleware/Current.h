@@ -16,12 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERY_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqQueryProxyFwd.h>
-#include <unity/scopes/internal/MWQuery.h>
+#include <string>
 
 namespace unity
 {
@@ -35,16 +33,14 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqQuery : public virtual ZmqObjectProxy, public virtual MWQuery
-{
-public:
-    ZmqQuery(ZmqMiddleware* mw_base,
-             std::string const& endpoint,
-             std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqQuery() noexcept;
+class ObjectAdapter;
 
-    virtual void run(MWReplyProxy const& reply) override;
+struct Current
+{
+    std::string id;
+    std::string category;
+    std::string op_name;
+    ObjectAdapter* adapter;
 };
 
 } // namespace zmq_middleware

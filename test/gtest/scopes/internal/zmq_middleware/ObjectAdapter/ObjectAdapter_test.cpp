@@ -359,6 +359,7 @@ TEST(ObjectAdapter, dispatch_oneway_to_twoway)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::ONEWAY);    // No good for twoway adapter.
     request.setId("id");
+    request.setCat("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -393,6 +394,7 @@ TEST(ObjectAdapter, dispatch_twoway_to_oneway)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);    // No good for oneway adapter.
     request.setId("id");
+    request.setId("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -421,6 +423,7 @@ TEST(ObjectAdapter, dispatch_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("id");
+    request.setCat("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -462,6 +465,7 @@ TEST(ObjectAdapter, bad_header)
         auto request = b.initRoot<capnproto::Request>();
         request.setMode(capnproto::RequestMode::TWOWAY);
         request.setId("id");
+        request.setCat("cat");
         // Bad header: missing operation name
 
         auto segments = b.getSegmentsForOutput();
@@ -491,6 +495,7 @@ TEST(ObjectAdapter, bad_header)
         auto request = b.initRoot<capnproto::Request>();
         request.setMode(capnproto::RequestMode::ONEWAY);
         request.setId("id");
+        request.setCat("cat");
         // Bad header: missing operation name
 
         auto segments = b.getSegmentsForOutput();
@@ -582,6 +587,7 @@ TEST(ObjectAdapter, invoke_ok)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("success_op");
 
     auto segments = b.getSegmentsForOutput();
@@ -608,7 +614,7 @@ public:
                         capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-        marshal_object_not_exist_exception(r, current.id, current.adapter->endpoint(), current.adapter->name());
+        marshal_object_not_exist_exception(r, current);
     }
 };
 
@@ -633,6 +639,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("ONE_op");
 
     auto segments = b.getSegmentsForOutput();
@@ -651,6 +658,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
     auto proxy = one.getProxy();
     EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
     EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_STREQ("some_cat", proxy.getCategory().cStr());
     EXPECT_TRUE(one.hasAdapter());
     EXPECT_STREQ("testscope", one.getAdapter().cStr());
 }
@@ -676,6 +684,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -694,6 +703,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     auto proxy = opne.getProxy();
     EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
     EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_STREQ("some_cat", proxy.getCategory().cStr());
     EXPECT_TRUE(opne.hasAdapter());
     EXPECT_STREQ("testscope", opne.getAdapter().cStr());
     EXPECT_TRUE(opne.hasAdapter());
@@ -755,6 +765,7 @@ void invoke_thread(ZmqMiddleware* mw, RequestType t)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(t == RequestType::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("count_op");
 
     auto segments = b.getSegmentsForOutput();

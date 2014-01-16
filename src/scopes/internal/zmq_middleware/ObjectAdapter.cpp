@@ -143,7 +143,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         s << "ObjectAdapter::add(): " << "cannot add id \"" << id << "\": id already in use (adapter: " << name_  << ")";
         throw MiddlewareException(s.str());
     }
-    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_));
+    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_, ""));
 }
 
 void ObjectAdapter::remove(std::string const& id)
@@ -626,7 +626,7 @@ void ObjectAdapter::worker_thread()
             ready_.set_value();
         }
 
-        struct Current current;
+        Current current;
         current.adapter = this;     // Stays the same for all invocations, so we set this once only.
 
         bool finish = false;
@@ -649,7 +649,7 @@ void ObjectAdapter::worker_thread()
 
             if (!finish && poller.has_input(s)) // We stop reading new incoming messages once told to finish.
             {
-                // Unmarshal the type-independent part of the message (id, operation name, mode).
+                // Unmarshal the type-independent part of the message (id, category, operation name, mode).
                 capnproto::Request::Reader req;
                 unique_ptr<capnp::SegmentArrayMessageReader> message;
                 try
@@ -659,6 +659,7 @@ void ObjectAdapter::worker_thread()
                     message.reset(new capnp::SegmentArrayMessageReader(segments));
                     req = message->getRoot<capnproto::Request>();
                     current.id = req.getId().cStr();
+                    current.category = req.getCat().cStr();
                     current.op_name = req.getOpName().cStr();
                     auto mode = req.getMode();
                     if (current.id.empty() || current.op_name.empty() ||
@@ -726,7 +727,7 @@ void ObjectAdapter::worker_thread()
                     if (type_ == RequestType::Twoway)
                     {
                         capnp::MallocMessageBuilder b;
-                        auto exr = create_object_not_exist_response(b, current.id, endpoint_, name_);
+                        auto exr = create_object_not_exist_response(b, current);
                         sender.send(exr);
                     }
                     continue;

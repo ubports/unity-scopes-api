@@ -47,14 +47,23 @@ class ZmqReceiver;
 class ZmqObjectProxy : public virtual MWObjectProxy
 {
 public:
-    ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity, RequestType t);
+    ZmqObjectProxy(ZmqMiddleware* mw_base,
+                   std::string const& endpoint,
+                   std::string const& identity,
+                   std::string const& category);
+    ZmqObjectProxy(ZmqMiddleware* mw_base,
+                   std::string const& endpoint,
+                   std::string const& identity,
+                   RequestType t,
+                   std::string const& category);
     virtual ~ZmqObjectProxy() noexcept;
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 
     virtual std::string endpoint() const;
     virtual std::string identity() const;
+
+    std::string category() const;
     RequestType type() const;
 
 protected:
@@ -64,6 +73,7 @@ protected:
 private:
     std::string endpoint_;
     std::string identity_;
+    std::string category_;
     RequestType type_;
 };
 

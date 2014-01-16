@@ -38,7 +38,10 @@ namespace zmq_middleware
 class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
 {
 public:
-    ZmqReply(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
+    ZmqReply(ZmqMiddleware* mw_base,
+             std::string const& endpoint,
+             std::string const& identity,
+             std::string const& category);
     virtual ~ZmqReply() noexcept;
 
     virtual void push(VariantMap const& result) override;

@@ -53,9 +53,9 @@ interface Scope
 
 */
 
-ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway),
+    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway, category),
     MWScope(mw_base)
 {
 }
@@ -77,6 +77,7 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
         auto p = in_params.initReplyProxy();
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());
+        p.setCategory(reply_proxy->category().c_str());
     }
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
@@ -88,7 +89,10 @@ QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hi
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
-    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(),
+                                         proxy.getEndpoint().cStr(),
+                                         proxy.getIdentity().cStr(),
+                                         proxy.getCategory().cStr()));
     return QueryCtrlImpl::create(p, reply_proxy);
 }
 

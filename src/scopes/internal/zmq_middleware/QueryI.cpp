@@ -65,7 +65,10 @@ void QueryI::run_(Current const& current,
 {
     auto req = in_params.getAs<capnproto::Query::RunRequest>();
     auto proxy = req.getReplyProxy();
-    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
+                              proxy.getEndpoint().cStr(),
+                              proxy.getIdentity().cStr(),
+                              proxy.getCategory().cStr()));
     auto delegate = dynamic_pointer_cast<QueryObject>(del());
     delegate->run(reply_proxy);
 }

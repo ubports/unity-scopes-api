@@ -38,23 +38,16 @@ namespace internal
 namespace zmq_middleware
 {
 
+class Current;
+
 void marshal_unknown_exception(capnproto::Response::Builder& r, std::string const& s);
-void marshal_object_not_exist_exception(capnproto::Response::Builder& r,
-                                        std::string const& id,
-                                        std::string const& endpoint,
-                                        std::string const& adapter);
-void marshal_operation_not_exist_exception(capnproto::Response::Builder& r,
-                                           std::string const& id,
-                                           std::string const& endpoint,
-                                           std::string const& adapter,
-                                           std::string const& op_name);
+void marshal_object_not_exist_exception(capnproto::Response::Builder& r, Current const& c);
+void marshal_operation_not_exist_exception(capnproto::Response::Builder& r, Current const& c);
 
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_unknown_response(capnp::MessageBuilder& b,
                                                                             std::string const& s);
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_response(capnp::MessageBuilder& b,
-                                                                                     std::string const& id,
-                                                                                     std::string const& endpoint,
-                                                                                     std::string const& adapter);
+                                                                                     Current const& c);
 
 void throw_if_runtime_exception(capnproto::Response::Reader const& reader);
 

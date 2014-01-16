@@ -132,6 +132,7 @@ void RegistryI::locate_(Current const&,
         auto proxy = locate_response.initReturnValue();
         proxy.setIdentity(scope_proxy->identity());
         proxy.setEndpoint(scope_proxy->endpoint());
+        proxy.setCategory("Scope");
     }
     catch (NotFoundException const& e)
     {

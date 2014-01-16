@@ -168,12 +168,12 @@ void ZmqMiddleware::wait_for_shutdown()
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
-MWProxy ZmqMiddleware::create_proxy(string const& identity, string const& endpoint)
+MWProxy ZmqMiddleware::create_proxy(string const& identity, string const& endpoint, string const& category)
 {
     MWProxy proxy;
     try
     {
-        proxy.reset(new ZmqObjectProxy(this, endpoint, identity));
+        proxy.reset(new ZmqObjectProxy(this, endpoint, identity, category));
     }
     catch (zmqpp::exception const& e)
     {
@@ -187,7 +187,7 @@ MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, str
     MWRegistryProxy proxy;
     try
     {
-        proxy.reset(new ZmqRegistry(this, endpoint, identity));
+        proxy.reset(new ZmqRegistry(this, endpoint, identity, "Registry"));
     }
     catch (zmqpp::exception const& e)
     {
@@ -202,7 +202,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
     try
     {
         string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
-        proxy.reset(new ZmqScope(this, endpoint, identity));
+        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope"));
     }
     catch (zmqpp::exception const& e)
     {
@@ -216,7 +216,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     MWScopeProxy proxy;
     try
     {
-        proxy.reset(new ZmqScope(this, endpoint, identity));
+        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope"));
     }
     catch (zmqpp::exception const& e)
     {
@@ -237,7 +237,7 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
-        return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity()));
+        return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity(), "QueryCtrl"));
     }
     catch (...)
     {
@@ -258,7 +258,7 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
-        return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity()));
+        return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity(), "Query"));
     }
     catch (...)
     {
@@ -281,7 +281,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
-        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity()));
+        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry"));
     }
     catch (...)
     {
@@ -302,7 +302,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
         function<void()> df;
         auto proxy = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
-        return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity()));
+        return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity(), "Reply"));
     }
     catch (...)
     {
@@ -324,7 +324,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
-        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity()));
+        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope"));
     }
     catch (...)
     {

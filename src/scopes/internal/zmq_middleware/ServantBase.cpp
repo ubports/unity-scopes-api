@@ -58,7 +58,7 @@ void ServantBase::dispatch_(Current const& current,
     auto it = dispatch_table_.find(current.op_name);
     if (it == dispatch_table_.end())
     {
-        marshal_operation_not_exist_exception(r, current.id, current.adapter->endpoint(), current.adapter->name(), current.op_name);
+        marshal_operation_not_exist_exception(r, current);
         return;
     }
     auto dispatch_func = it->second;
