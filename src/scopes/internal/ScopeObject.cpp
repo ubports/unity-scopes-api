@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/ActivationQueryObject.h>
+#include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
@@ -280,7 +281,9 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
-        QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
+        auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
+        assert(preview_query);
+        QueryObject::SPtr qo(make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy));
         MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent

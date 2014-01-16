@@ -45,7 +45,7 @@ class QueryCtrlObject;
 // the implementation of this object ensures that the corresponding ReplyObject is disabled.
 // TODO: Probably need to flesh out this comment.
 
-class QueryObject final : public QueryObjectBase
+class QueryObject : public QueryObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(QueryObject);
@@ -65,7 +65,7 @@ public:
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(SPtr const& self);
 
-private:
+protected:
     std::shared_ptr<QueryBase> query_base_;
     MWReplyProxy reply_;
     std::weak_ptr<ReplyBase> reply_proxy_;
