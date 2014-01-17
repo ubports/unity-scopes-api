@@ -18,20 +18,21 @@
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 
 using namespace std;
 using namespace unity::scopes;
 
-class TestQuery : public QueryBase
+class TestQuery : public SearchQuery
 {
 public:
     virtual void cancelled() override
     {
     }
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
@@ -40,6 +41,23 @@ public:
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
+    }
+};
+
+class TestPreview : public PreviewQuery
+{
+public:
+    virtual void cancelled() override
+    {
+    }
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("Bar"));
     }
 };
 
@@ -62,6 +80,11 @@ public:
     virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override
     {
         return QueryBase::UPtr(new TestQuery());
+    }
+
+    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override
+    {
+        return QueryBase::UPtr(new TestPreview());
     }
 };
 

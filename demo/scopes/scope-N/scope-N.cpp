@@ -29,7 +29,7 @@ using namespace unity::scopes;
 // Simplest possible scope: does absolutely nothing other than to implement the pure virtuals
 // it inherits from its base classes. Despite this, the scope works correctly with a client.
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery()
@@ -45,7 +45,7 @@ public:
         cerr << "scope-no-op: received cancel request" << endl;
     }
 
-    virtual void run(ReplyProxy const&) override
+    virtual void run(SearchReplyProxy const&) override
     {
         cerr << "scope-no-op: received query" << endl;
         this_thread::sleep_for(chrono::seconds(3));
@@ -66,6 +66,11 @@ public:
     virtual QueryBase::UPtr create_query(string const&, VariantMap const&) override
     {
         return QueryBase::UPtr(new MyQuery);
+    }
+
+    virtual QueryBase::UPtr preview(Result const&, VariantMap const&) override
+    {
+        return nullptr;
     }
 };
 

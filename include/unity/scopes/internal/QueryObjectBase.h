@@ -13,17 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
 #define UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
 
 #include <unity/scopes/internal/AbstractObject.h>
+#include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
-
-#include <atomic>
-#include <mutex>
 
 namespace unity
 {
@@ -38,7 +36,7 @@ class QueryObjectBase : public AbstractObject
 {
 public:
     UNITY_DEFINES_PTRS(QueryObjectBase);
-
+    // Remote operation implementation
     virtual void run(MWReplyProxy const& reply) noexcept = 0;
     virtual void cancel() = 0;
 };

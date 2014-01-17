@@ -34,6 +34,7 @@ class CategorisedResult;
 namespace internal
 {
 class ResultImpl;
+class ScopeImpl;
 }
 
 /**
@@ -58,7 +59,7 @@ public:
     Result(Result&&);
     Result& operator=(Result&&);
 
-    void store(Result const& other);
+    void store(Result const& other, bool intercept_activation = false);
     bool has_stored_result() const;
     Result retrieve() const;
 
@@ -66,6 +67,33 @@ public:
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
+
+    /**
+     \brief Indicates to the receiver that this scope should intercept activation request for this result.
+     By default, scope receives preview requests for the results it creates but does not receive activation
+     requests (they are handled directly by the shell).
+     Intercepting activation implies intercepting preview requests as well; this is important for scopes which
+     just forward results from other scopes and call set_intercept_activation() on them.
+     A scope which sets intercept activation flag for a result should re-implement ScopeBase::activate()
+     and provide an implementation of ActivationBase that handles actual activation.
+     If not called, the result will be activated directly by the Unity shell whithout involving the scope,
+     assuming appropriate uri schema handler is present on the system.
+     */
+    void set_intercept_activation();
+
+    /**
+     \brief Check if this result should be activated directly by the shell (scope doesn't handle activation of this result).
+     \return true if this result needs to be activated directly
+     */
+    bool direct_activation() const;
+
+    /**
+     \brief Get name of a scope that handles activation and preview of this result.
+     The name is only available when receiving this result from a scope, otherwise this method throws LogicException.
+     Note that activation request should only be sent to a scope returned by this method if direct_activation() is false.
+     \return scope name
+     */
+    std::string activation_scope_name() const;
 
     /**
        \brief Returns reference of a Result attribute.
@@ -88,6 +116,7 @@ public:
     std::string title() const noexcept;
     std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
+
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;
 
@@ -100,10 +129,12 @@ public:
 private:
     explicit Result(const VariantMap &variant_map);
     Result(internal::ResultImpl* impl);
+    Result(std::shared_ptr<internal::ResultImpl> impl);
 
     std::shared_ptr<internal::ResultImpl> p;
 
     friend class internal::ResultImpl;
+    friend class internal::ScopeImpl;
     friend class CategorisedResult;
 };
 

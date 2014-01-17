@@ -32,6 +32,8 @@ namespace scopes
 namespace internal
 {
 
+class RegistryObjectPrivate;
+
 // Maintains a map of <scope name, scope proxy> pairs.
 
 class RegistryObject : public RegistryObjectBase
@@ -47,12 +49,12 @@ public:
     virtual MetadataMap list() override;
     virtual ScopeProxy locate(std::string const& scope_name) override;
 
-    // Local methods
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
+    bool add(std::string const& scope_name, ScopeMetadata const& scope,
+             std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
 
 private:
-    mutable MetadataMap scopes_;
+    RegistryObjectPrivate* p;
     mutable std::mutex mutex_;
 };
 

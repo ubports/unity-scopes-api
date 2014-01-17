@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
@@ -32,7 +32,7 @@ using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query, CategoryRenderer const& renderer) :
@@ -52,7 +52,7 @@ public:
         cerr << "MyQuery/" << query_ << " cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         cerr << "scope-slow: run called for \"" << query_ << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
@@ -96,6 +96,12 @@ public:
         }
 
         return query;
+    }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
     }
 
 private:

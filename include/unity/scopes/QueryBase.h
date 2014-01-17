@@ -34,8 +34,6 @@ namespace unity
 namespace scopes
 {
 
-class ReceiverBase;
-
 namespace internal
 {
 
@@ -55,13 +53,6 @@ public:
     UNITY_DEFINES_PTRS(QueryBase);
 
     virtual void cancelled() = 0;                          // Originator cancelled the query
-    virtual void run(ReplyProxy const& reply) = 0;         // Called by the run time to start this query
-
-    // Create a sub-query.
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   VariantMap const& hints,
-                                   std::shared_ptr<ReceiverBase> const& reply);
 
     /// @cond
     virtual ~QueryBase() noexcept;
@@ -72,7 +63,6 @@ protected:
     QueryBase();
     /// @endcond
 
-private:
     void cancel();
     friend class internal::QueryObject;       // So QueryObject can call cancel()
 
