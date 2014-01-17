@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/Registry.h>
+#include <unity/scopes/ScopeProxyFwd.h>
 
 #include <mutex>
 
@@ -32,6 +33,8 @@ namespace scopes
 
 namespace internal
 {
+
+class RegistryObjectPrivate;
 
 // Maintains a map of <scope name, scope proxy> pairs.
 
@@ -46,14 +49,14 @@ public:
     // Remote operation implementations
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
+    ScopeProxy get_scope(std::string const& scope_name);
     virtual ScopeProxy locate(std::string const& scope_name);  // virtual so we can mock the method for testing
-
-    // Local methods
-    bool add(std::string const& scope_name, ScopeMetadata const& scope);
+    bool add(std::string const& scope_name, ScopeMetadata const& scope,
+             std::vector<std::string> const& spawn_command);
     bool remove(std::string const& scope_name);
 
 private:
-    mutable MetadataMap scopes_;
+    RegistryObjectPrivate* p;
     mutable std::mutex mutex_;
 };
 
