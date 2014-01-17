@@ -41,13 +41,12 @@ SSRegistryObject::SSRegistryObject(const std::string &config_file)
               std::make_shared<JsonCppNode>()),
     refresh_stopped_(false)
 {
-  RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", config_file);
+  RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", config_file);
 
-  RegistryConfig c(runtime->registry_identity(), runtime->registry_configfile());
-  std::string mw_kind = c.mw_kind();
+  RegistryConfig config(runtime->registry_identity(), runtime->registry_configfile());
+  std::string mw_kind = config.mw_kind();
 
   middleware_ = runtime->factory()->find(runtime->registry_identity(), mw_kind);
-
   proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
 
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
