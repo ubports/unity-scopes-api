@@ -145,7 +145,7 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func,
         auto it = stored.find("internal");
         if (it == stored.end())
         {
-            throw LogicException("Invalid structure of stored result, missing 'internal");
+            throw LogicException("ResultImpl::find_stored_result(): Invalid structure of stored result, missing 'internal");
         }
         const VariantMap internal_var = it->second.get_dict();
         auto intit = internal_var.find("flags");
@@ -207,9 +207,9 @@ std::string ResultImpl::activation_scope_name() const
             {
                 return it->second.get_string();
             }
-            throw unity::LogicException("'origin' element missing");
+            throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
         }
-        throw unity::LogicException("'internal' element missing");
+        throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
     };
 
     std::string target;
