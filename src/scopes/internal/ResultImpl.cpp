@@ -140,7 +140,9 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func,
     // visit stored results recursively,
     // check if any of them intercepts activation;
     // if not, it is direct activation in the shell
-    for (VariantMap stored = *stored_result_;;)
+    bool found = false;
+    VariantMap stored = *stored_result_;
+    while (!found)
     {
         auto it = stored.find("internal");
         if (it == stored.end())
@@ -153,20 +155,19 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func,
         if (cmp_func(flags))
         {
             found_func(stored);
-            return true;
+            found = true;
         }
         else
         {
             not_found_func(stored);
+            // nested stored result?
+            intit = internal_var.find("result");
+            if (intit == internal_var.end())
+                break; // reached the most inner result and it doesn't match, so break the loop
+            stored = intit->second.get_dict();
         }
-
-        // nested stored result?
-        intit = internal_var.find("result");
-        if (intit == internal_var.end())
-            break;
-        stored = intit->second.get_dict();
     }
-    return false;
+    return found;
 }
 
 bool ResultImpl::direct_activation() const
@@ -179,15 +180,10 @@ bool ResultImpl::direct_activation() const
     // visit stored results recursively,
     // check if any of them intercepts activation;
     // if not, it is direct activation in the shell
-    if (find_stored_result(
+    return !find_stored_result(
                 [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [](VariantMap const&) {},
-                [](VariantMap const&) {})
-       )
-    {
-        return false;
-    }
-    return true;
+                [](VariantMap const&) {},  // do nothing if matches
+                [](VariantMap const&) {}); // do nothing if doesn't match
 }
 
 std::string ResultImpl::activation_scope_name() const
