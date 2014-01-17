@@ -64,7 +64,7 @@ void ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         try
         {
-            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var)); //FIXME: leaks on excp from AnnotationImpl ctor
+            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
             receiver_->push(std::move(annotation));
         }
         catch (std::exception const& e)
