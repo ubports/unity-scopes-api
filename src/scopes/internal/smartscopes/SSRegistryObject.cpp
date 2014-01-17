@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/smartscopes/JsonCppNode.h>
 
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/UnityExceptions.h>
@@ -35,14 +37,20 @@ namespace internal {
 namespace smartscopes {
 
 SSRegistryObject::SSRegistryObject()
-    : ssclient_(std::make_shared<HttpClientQt>(4),
-                std::make_shared<JsonCppNode>()),
-      refresh_thread_(std::thread(&SSRegistryObject::refresh_thread, this)),
-      refresh_stopped_(false)
+  : ssclient_(std::make_shared<HttpClientQt>(4),
+              std::make_shared<JsonCppNode>()),
+    refresh_thread_(std::thread(&SSRegistryObject::refresh_thread, this)),
+    refresh_stopped_(false)
 {
-    middleware_factory_.reset(new MiddlewareFactory(nullptr));
-    middleware_ = middleware_factory_->create("smartscopes", "REST", "");
-    proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
+  RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", "");
+  std::string identity = runtime->registry_identity();
+
+  RegistryConfig c(identity, runtime->registry_configfile());
+  std::string mw_kind = c.mw_kind();
+
+  middleware_ = runtime->factory()->find(identity, mw_kind);
+
+  proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
 }
 
 SSRegistryObject::~SSRegistryObject() noexcept {
@@ -60,7 +68,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const &scope_name) {
   // If the name is empty, it was sent as empty by the remote client.
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-        "Registry: Cannot search for scope with empty name");
+          "SSRegistry: Cannot search for scope with empty name");
   }
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -119,7 +127,7 @@ bool SSRegistryObject::add(std::string const &scope_name,
                            ScopeMetadata const &metadata) {
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-        "Registry: Cannot add scope with empty name");
+          "SSRegistry: Cannot add scope with empty name");
   }
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);

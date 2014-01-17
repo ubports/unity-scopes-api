@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/Registry.h>
 
@@ -63,7 +63,6 @@ private:
   std::condition_variable_any refresh_cond_;
   bool refresh_stopped_;
 
-  MiddlewareFactory::UPtr middleware_factory_;
   MiddlewareBase::SPtr middleware_;
   ScopeProxy proxy_;
 };
