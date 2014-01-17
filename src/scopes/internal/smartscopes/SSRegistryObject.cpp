@@ -50,6 +50,7 @@ SSRegistryObject::SSRegistryObject(const std::string &registry_name, const std::
 
   ///! middleware_->add_registry_object(runtime->registry_identity(), shared_from_this());
 
+  get_remote_scopes();
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
 
@@ -94,27 +95,34 @@ void SSRegistryObject::refresh_thread() {
   std::lock_guard<std::mutex> lock(refresh_mutex_);
 
   while (!refresh_stopped_) {
-    scopes_.clear();
-    std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
-
-    for (RemoteScope &scope : remote_scopes) {
-      std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
-
-      metadata->set_scope_name(scope.name);
-      metadata->set_display_name(scope.name);
-      metadata->set_description(scope.description);
-      metadata->set_art("");
-      metadata->set_icon("");
-      metadata->set_search_hint("");
-      metadata->set_hot_key("");
-
-      metadata->set_proxy(proxy_);
-
-      auto meta = ScopeMetadataImpl::create(move(metadata));
-      add(scope.name, std::move(meta));
-    }
-
     refresh_cond_.wait_for(refresh_mutex_, std::chrono::hours(24));
+
+    if (!refresh_stopped_)
+    {
+      get_remote_scopes();
+    }
+  }
+}
+
+void SSRegistryObject::get_remote_scopes() {
+  scopes_.clear();
+  std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
+
+  for (RemoteScope &scope : remote_scopes) {
+    std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
+
+    metadata->set_scope_name(scope.name);
+    metadata->set_display_name(scope.name);
+    metadata->set_description(scope.description);
+    metadata->set_art("");
+    metadata->set_icon("");
+    metadata->set_search_hint("");
+    metadata->set_hot_key("");
+
+    metadata->set_proxy(proxy_);
+
+    auto meta = ScopeMetadataImpl::create(move(metadata));
+    add(scope.name, std::move(meta));
   }
 }
 

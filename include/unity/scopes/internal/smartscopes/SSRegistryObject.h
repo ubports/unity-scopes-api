@@ -49,6 +49,7 @@ public:
 private:
   void refresh_thread();
 
+  void get_remote_scopes();
   bool add(std::string const &scope_name, ScopeMetadata const &scope);
 
 private:
