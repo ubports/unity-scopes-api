@@ -28,6 +28,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetDefinitionBuilderImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp

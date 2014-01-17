@@ -14,53 +14,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
-
-#include <unity/util/NonCopyable.h>
-#include <unity/util/DefinesPtrs.h>
-#include <unity/scopes/Variant.h>
-#include <string>
-#include <memory>
-#include <list>
+#include <unity/scopes/PreviewWidgetDefinitionBuilder.h>
+#include <unity/scopes/internal/PreviewWidgetDefinitionBuilderImpl.h>
 
 namespace unity
 {
 
 namespace scopes
 {
-    class PreviewWidgetDefinitionBuilder;
 
-namespace internal
+PreviewWidgetDefinitionBuilder::PreviewWidgetDefinitionBuilder(std::string const& widget_type)
+    : p(new internal::PreviewWidgetDefinitionBuilderImpl(widget_type))
 {
-    class PreviewWidgetImpl;
 }
 
-class UNITY_API PreviewWidget
+PreviewWidgetDefinitionBuilder::~PreviewWidgetDefinitionBuilder() = default;
+
+void PreviewWidgetDefinitionBuilder::add_attribute(std::string const& attribute, Variant const& key)
 {
-public:
-/// @cond
-    UNITY_DEFINES_PTRS(PreviewWidget);
-/// @endcond
+    p->add_attribute(attribute, key);
+}
 
-    PreviewWidget(std::string const& definition);
-    PreviewWidget(PreviewWidgetDefinitionBuilder const& builder);
-
-    std::string data() const;
-    VariantMap serialize() const;
-
-private:
-    PreviewWidget(VariantMap const& variant_map);
-
-    std::shared_ptr<internal::PreviewWidgetImpl> p;
-};
-
-typedef std::list<PreviewWidget> PreviewWidgetList;
+void PreviewWidgetDefinitionBuilder::add_attribute(std::string const& top_attribute, std::initializer_list<std::pair<std::string, Variant>> const& mappings)
+{
+    p->add_attribute(top_attribute, mappings);
+}
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

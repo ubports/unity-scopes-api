@@ -18,6 +18,7 @@
 
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
+#include <unity/scopes/PreviewWidgetDefinitionBuilder.h>
 
 namespace unity
 {
@@ -29,6 +30,11 @@ namespace scopes
 
 PreviewWidget::PreviewWidget(std::string const& definition)
     : p(new internal::PreviewWidgetImpl(definition))
+{
+}
+
+PreviewWidget::PreviewWidget(PreviewWidgetDefinitionBuilder const& builder)
+    : p(new internal::PreviewWidgetImpl("")) // TODO
 {
 }
 
