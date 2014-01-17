@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/QueryBase.h>
+#include <unity/scopes/SearchQuery.h>
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
@@ -28,19 +28,20 @@ namespace unity
 namespace scopes
 {
 
-QueryBase::QueryBase() :
-    p(new internal::QueryBaseImpl)
+SearchQuery::SearchQuery() : QueryBase()
 {
 }
 
-QueryBase::~QueryBase() noexcept
+SearchQuery::~SearchQuery() noexcept
 {
 }
 
-void QueryBase::cancel()
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            string const& query_string,
+                                            VariantMap const& hints,
+                                            shared_ptr<SearchListener> const& reply)
 {
-    p->cancel();    // Forward cancel to subqueries
-    cancelled();    // Inform this query that it was cancelled
+    return p->create_subquery(scope, query_string, hints, reply);
 }
 
 } // namespace scopes

@@ -13,43 +13,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michal Hruby <michal.hruby@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_PREVIEWQUERYOBJECT_H
-#define UNITY_INTERNAL_PREVIEWQUERYOBJECT_H
-
-#include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/PreviewQuery.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+
+#include <unity/scopes/internal/QueryBaseImpl.h>
+
+using namespace std;
 
 namespace unity
 {
 
 namespace scopes
 {
-class PreviewQuery;
 
-namespace internal
+PreviewQuery::PreviewQuery() : QueryBase()
 {
+}
 
-class PreviewQueryObject final : public QueryObject
+PreviewQuery::~PreviewQuery() noexcept
 {
-public:
-    UNITY_DEFINES_PTRS(PreviewQueryObject);
-
-    PreviewQueryObject(std::shared_ptr<PreviewQuery> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~PreviewQueryObject() noexcept;
-    void run(MWReplyProxy const& reply) noexcept override;
-
-private:
-    std::shared_ptr<PreviewQuery> preview_base_;
-};
-
-} // namespace internal
+}
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

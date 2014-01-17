@@ -21,6 +21,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
