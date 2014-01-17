@@ -105,8 +105,10 @@ void SSRegistryObject::refresh_thread() {
 }
 
 void SSRegistryObject::get_remote_scopes() {
-  scopes_.clear();
   std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
+
+  std::lock_guard<std::mutex> lock(scopes_mutex_);
+  scopes_.clear();
 
   for (RemoteScope &scope : remote_scopes) {
     std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
@@ -132,8 +134,6 @@ bool SSRegistryObject::add(std::string const &scope_name,
     throw unity::InvalidArgumentException(
           "SSRegistryObject: Cannot add scope with empty name");
   }
-
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
 
   auto const &pair = scopes_.insert(make_pair(scope_name, metadata));
   if (!pair.second) {
