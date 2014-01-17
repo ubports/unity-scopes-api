@@ -34,11 +34,11 @@ namespace internal {
 
 namespace smartscopes {
 
-class SSRegistryObject : public AbstractObject {
+class SSRegistryObject : public std::enable_shared_from_this<SSRegistryObject>, public AbstractObject {
 public:
   UNITY_DEFINES_PTRS(SSRegistryObject);
 
-  SSRegistryObject(std::string const &config_file);
+  SSRegistryObject(std::string const &registry_name, std::string const &config_file);
   virtual ~SSRegistryObject() noexcept;
 
   ScopeMetadata get_metadata(std::string const &scope_name);
@@ -49,7 +49,6 @@ public:
 private:
   void refresh_thread();
 
-  void get_remote_scopes();
   bool add(std::string const &scope_name, ScopeMetadata const &scope);
 
 private:

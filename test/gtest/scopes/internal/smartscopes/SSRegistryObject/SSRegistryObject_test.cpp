@@ -22,10 +22,16 @@
 #include <scope-api-testconfig.h>
 
 using namespace unity::scopes::internal::smartscopes;
+using namespace unity::scopes;
 
 TEST(SSRegistryObject, basic)
 {
-    ::putenv("SMART_SCOPES_SERVER=http://127.0.0.1:8000");
-    SSRegistryObject reg(SS_RUNTIME_PATH);
-    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+  ::putenv("SMART_SCOPES_SERVER=http://127.0.0.1:8000");
+  SSRegistryObject reg("SSRegistry", SS_RUNTIME_PATH);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  ScopeMetadata meta = reg.get_metadata("Wikipedia");
+  EXPECT_EQ("Wikipedia",meta.scope_name());
+  EXPECT_EQ("Wikipedia",meta.display_name());
+  EXPECT_EQ("The free encyclopedia that anyone can edit.", meta.description());
 }
