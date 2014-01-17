@@ -88,9 +88,9 @@ public:
     bool direct_activation() const;
 
     /**
-     \brief Get name of a scope that handles activation of this result.
-     Throws LogicException if it should be handled directly by the shell or if the name is undefined. The name is only available when
-     receiving this result from a scope (it is undefined when the result is just created).
+     \brief Get name of a scope that handles activation and preview of this result.
+     The name is only available when receiving this result from a scope (it is undefined when the result is just created),
+     otherwise it's an empty string. Note that activation request should only be sent to a scope if direct_activation() is false.
      \return scope name
      */
     std::string activation_scope_name() const;
