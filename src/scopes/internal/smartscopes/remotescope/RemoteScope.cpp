@@ -63,6 +63,37 @@ private:
     string query_;
 };
 
+class MyPreview : public PreviewQuery
+{
+public:
+    explicit MyPreview(string const& uri)
+        : uri_(uri)
+    {
+    }
+
+    ~MyPreview() noexcept
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("Bar"));
+        cout << "RemoteScope: preview \"" << uri_ << "\" complete" << endl;
+    }
+
+private:
+    string uri_;
+};
+
 class MyScope : public ScopeBase
 {
 public:
@@ -87,8 +118,9 @@ public:
 
     virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
     {
+        QueryBase::UPtr preview(new MyPreview(result.uri()));
         cout << "RemoteScope: requested preview: \"" << result.uri() << "\"" << endl;
-        return nullptr;
+        return preview;
     }
 };
 
