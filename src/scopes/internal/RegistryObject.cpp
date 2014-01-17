@@ -78,9 +78,13 @@ RegistryObjectPrivate::~RegistryObjectPrivate()
     {
         shutdown();
     }
+    catch (const Exception &e)
+    {
+        fprintf(stderr, "Error when shutting down registry: %s\n", e.what());
+    }
     catch (...)
     {
-        // FIXME, write error log.
+        fprintf(stderr, "Unknown error when shutting down registry.\n");
     }
 }
 
@@ -99,6 +103,8 @@ void RegistryObjectPrivate::shutdown()
     for (const auto &i : scope_processes)
     {
         kill_process(i.second);
+        // If and when we move to graceful shutdown, check that exit status
+        // was zero and print error message here.
     }
     scope_processes.clear();
     commands.clear();
@@ -135,7 +141,8 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         waitpid(process->second, &status, 0);
         if (status != 0)
         {
-            // FIXME, print log message.
+            fprintf(stderr, "Scope %s has exited with nonzero error status %d.\n",
+                    scope_name.c_str(), status);
         }
         scope_processes.erase(scope_name);
     }
@@ -161,7 +168,9 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
             throw SyscallException("cannot exec scoperunner", errno);
         }
     }
-    // FIXME print spawn info to log.
+    const vector<string>& cmd = commands[scope_name];
+    fprintf(stderr, "Spawning scope %s to process number %d with command line %s %s %s.\n",
+            scope_name.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
     scope_processes[scope_name] = pid;
 }
 
