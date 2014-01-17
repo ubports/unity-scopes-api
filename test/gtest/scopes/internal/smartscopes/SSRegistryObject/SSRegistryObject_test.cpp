@@ -19,12 +19,13 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <gtest/gtest.h>
+#include <scope-api-testconfig.h>
 
 using namespace unity::scopes::internal::smartscopes;
 
 TEST(SSRegistryObject, basic)
 {
     ::putenv("SMART_SCOPES_SERVER=http://127.0.0.1:8000");
-    SSRegistryObject reg;
+    SSRegistryObject reg(TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
     std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 }

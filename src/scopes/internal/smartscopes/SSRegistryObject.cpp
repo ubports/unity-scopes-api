@@ -36,21 +36,21 @@ namespace internal {
 
 namespace smartscopes {
 
-SSRegistryObject::SSRegistryObject()
+SSRegistryObject::SSRegistryObject(const std::string &config_file)
   : ssclient_(std::make_shared<HttpClientQt>(4),
               std::make_shared<JsonCppNode>()),
-    refresh_thread_(std::thread(&SSRegistryObject::refresh_thread, this)),
     refresh_stopped_(false)
 {
-  RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", "");
-  std::string identity = runtime->registry_identity();
+  RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", config_file);
 
-  RegistryConfig c(identity, runtime->registry_configfile());
+  RegistryConfig c(runtime->registry_identity(), runtime->registry_configfile());
   std::string mw_kind = c.mw_kind();
 
-  middleware_ = runtime->factory()->find(identity, mw_kind);
+  middleware_ = runtime->factory()->find(runtime->registry_identity(), mw_kind);
 
   proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
+
+  refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
 
 SSRegistryObject::~SSRegistryObject() noexcept {
@@ -102,8 +102,6 @@ void SSRegistryObject::refresh_thread() {
 
 void SSRegistryObject::get_remote_scopes() {
   std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
-
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
 
   for (RemoteScope &scope : remote_scopes) {
     std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));

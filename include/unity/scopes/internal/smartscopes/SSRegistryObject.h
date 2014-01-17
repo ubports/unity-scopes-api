@@ -38,7 +38,7 @@ class SSRegistryObject : public AbstractObject {
 public:
   UNITY_DEFINES_PTRS(SSRegistryObject);
 
-  SSRegistryObject();
+  SSRegistryObject(std::string const &config_file);
   virtual ~SSRegistryObject() noexcept;
 
   ScopeMetadata get_metadata(std::string const &scope_name);
