@@ -21,6 +21,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -33,10 +34,17 @@ class Result;
 
 namespace internal
 {
-
 class ResultImpl
 {
 public:
+    // activation and preview flags, used internally only.
+    // some of them can potentially be OR'ed if we add more, so let's make them powers of 2
+    enum Flags
+    {
+        ActivationNotHandled = 0, // direct activation
+        InterceptActivation = 1
+    };
+
     ResultImpl();
     ResultImpl(VariantMap const& variant_map);
     ResultImpl(ResultImpl const& other);
@@ -44,14 +52,20 @@ public:
 
     virtual ~ResultImpl() = default;
 
-    void store(Result const& other);
+    void store(Result const& other, bool intercept_activation);
     bool has_stored_result() const;
     Result retrieve() const;
+    void set_origin(std::string const& scope_name);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
+    void set_intercept_activation();
+    bool direct_activation() const;
+    int flags() const;
+    std::string activation_scope_name() const;
+    VariantMap activation_target() const;
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
 
@@ -59,13 +73,26 @@ public:
     std::string title() const noexcept;
     std::string art() const noexcept;
     std::string dnd_uri() const noexcept;
+    std::string origin() const noexcept;
     bool contains(std::string const& key) const;
     Variant const& value(std::string const& key) const;
 
     VariantMap serialize() const;
 
+    // a public static method, so there's access to the private constructor
+    // without the need to define too many classes as friends
+    static Result create_result(VariantMap const&);
+
 protected:
     virtual void serialize_internal(VariantMap& var) const;
+
+    // find stored result whose flags give true in cmp_func, pass it to found_func and return;
+    // non-matching results are passed to not_found_func.
+    // this is done recursively as stored result can be nested.
+    // return true if found, otherwise false.
+    bool find_stored_result(std::function<bool(Flags)> const& cmp_func,
+                            std::function<void(VariantMap const&)> const& found_func,
+                            std::function<void(VariantMap const&)> const& not_found_func) const;
 
 private:
     void deserialize(VariantMap const& var);
@@ -74,6 +101,8 @@ private:
 
     VariantMap attrs_;
     std::shared_ptr<VariantMap> stored_result_;
+    std::string origin_;
+    int flags_;
 };
 
 } // namespace internal

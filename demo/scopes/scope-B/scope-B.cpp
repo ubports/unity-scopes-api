@@ -17,10 +17,11 @@
  */
 
 #include <unity/scopes/Registry.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
@@ -36,7 +37,7 @@ using namespace unity::scopes;
 // A Receiver instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class Receiver: public ReceiverBase
+class Receiver: public SearchListener
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -60,14 +61,14 @@ public:
     virtual void finished(Reason reason, string const& error_message) override
     {
         cout << "query to " << scope_name_ << " complete, status: " << to_string(reason);
-        if (reason == ReceiverBase::Error)
+        if (reason == ListenerBase::Error)
         {
             cout << ": " << error_message;
         }
         cout << endl;
     }
 
-    Receiver(string const& scope_name, ReplyProxy const& upstream) :
+    Receiver(string const& scope_name, SearchReplyProxy const& upstream) :
         scope_name_(scope_name),
         upstream_(upstream)
     {
@@ -75,10 +76,10 @@ public:
 
 private:
     string scope_name_;
-    ReplyProxy upstream_;
+    SearchReplyProxy upstream_;
 };
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
@@ -97,7 +98,7 @@ public:
         cout << "query to " << scope_name_ << " was cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& upstream_reply)
+    virtual void run(SearchReplyProxy const& upstream_reply)
     {
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
@@ -111,7 +112,7 @@ public:
             assert(0);
         }
 
-        ReceiverBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
+        SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);
     }
@@ -148,6 +149,12 @@ public:
         QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q << "\"" << endl;
         return query;
+    }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
     }
 
 private:

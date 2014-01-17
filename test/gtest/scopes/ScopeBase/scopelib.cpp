@@ -39,6 +39,12 @@ public:
         return nullptr;
     }
 
+    virtual unity::scopes::QueryBase::UPtr preview(unity::scopes::Result const&,
+                                                   unity::scopes::VariantMap const&) override
+    {
+        return nullptr;
+    }
+
 protected:
     virtual ~MyScope() noexcept {}
 };

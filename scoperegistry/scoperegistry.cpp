@@ -197,7 +197,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
             catch (NotFoundException const&)
             {
             }
-            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime());
+            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
             mi->set_proxy(proxy);
             auto meta = ScopeMetadataImpl::create(move(mi));
             vector<string> spawn_command;

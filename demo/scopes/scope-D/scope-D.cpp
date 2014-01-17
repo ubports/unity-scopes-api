@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/RegistryProxyFwd.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
@@ -48,14 +48,14 @@ class MyQuery;
 class Queue
 {
 public:
-    void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
+    void put(MyQuery const* query, string const& query_string, SearchReplyProxy const& reply_proxy)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         queries_.push_back(QueryData { query, query_string, reply_proxy });
         condvar_.notify_one();
     }
 
-    bool get(string& query_string, ReplyProxy& reply_proxy)
+    bool get(string& query_string, SearchReplyProxy& reply_proxy)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
@@ -107,7 +107,7 @@ private:
     {
         MyQuery const* query;
         string query_string;
-        ReplyProxy reply_proxy;
+        SearchReplyProxy reply_proxy;
 
         bool operator==(QueryData const& rhs) const
         {
@@ -121,7 +121,7 @@ private:
     std::condition_variable condvar_;
 };
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
@@ -153,7 +153,7 @@ public:
         cerr << "query for \"" << scope_name_ << ":" << query_ << "\" cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         // The query can do anything it likes with this method, that is, run() can push results
         // directly on the provided reply, or it can save the reply for later use and return from
@@ -200,7 +200,7 @@ public:
         while (!done_.load())
         {
             string query;
-            ReplyProxy reply_proxy;
+            SearchReplyProxy reply_proxy;
             if (queue_.get(query, reply_proxy) && !done_.load())
             {
                 auto cat = reply_proxy->register_category("cat1", "Category 1", "", rdr);
@@ -227,6 +227,12 @@ public:
         QueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
         cerr << scope_name_ << ": created query: \"" << q << "\"" << endl;
         return query;
+    }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << scope_name_ << ": preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
     }
 
     MyScope()

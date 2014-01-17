@@ -38,7 +38,7 @@ namespace zmq_middleware
 class QueryI : public ServantBase
 {
 public:
-    QueryI(QueryObject::SPtr const& qo);
+    QueryI(QueryObjectBase::SPtr const& qo);
     virtual ~QueryI() noexcept;
 
 private:
