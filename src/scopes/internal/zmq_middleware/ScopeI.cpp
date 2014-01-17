@@ -112,7 +112,6 @@ void ScopeI::activate_(Current const& current,
     p.setIdentity(ctrl_proxy->identity().c_str());
 }
 
-    
 void ScopeI::activate_preview_action_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r)
