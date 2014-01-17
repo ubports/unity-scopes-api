@@ -38,14 +38,14 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
     auto it = var.find("hints");
     if (it == var.end())
     {
-        throw LogicException("Invalid data, missing 'hints'");
+        throw LogicException("ActivationResponseImpl(): Invalid data, missing 'hints'");
     }
     hints_ = it->second.get_dict();
 
     it = var.find("status");
     if (it == var.end())
     {
-        throw LogicException("Invalid data, missing 'status'");
+        throw LogicException("ActivationResponseImpl(): Invalid data, missing 'status'");
     }
     status_ = static_cast<ActivationResponse::Status>(it->second.get_int());
 }

@@ -23,8 +23,11 @@
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
+#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/PreviewQuery.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/Exception.h>
 
 #include <iostream>

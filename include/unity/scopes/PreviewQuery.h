@@ -16,16 +16,18 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWLISTENER_H
-#define UNITY_SCOPES_PREVIEWLISTENER_H
+#ifndef UNITY_SCOPES_PREVIEWQUERYBASE_H
+#define UNITY_SCOPES_PREVIEWQUERYBASE_H
 
-#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/QueryBase.h>
+
+#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Variant.h>
-
-#include <string>
 
 namespace unity
 {
@@ -33,29 +35,35 @@ namespace unity
 namespace scopes
 {
 
-class UNITY_API PreviewListener : public ListenerBase
+namespace internal
+{
+
+class QueryBaseImpl;
+class QueryObject;
+
+} // namespace internal
+
+// Abstract server-side base interface for a query that is executed inside a scope.
+
+// TODO: documentation
+
+class UNITY_API PreviewQuery: public QueryBase
 {
 public:
+    NONCOPYABLE(PreviewQuery);
+    UNITY_DEFINES_PTRS(PreviewQuery);
+
+    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
+
+    // TODO: Add a method for subpreview request?
+
     /// @cond
-    NONCOPYABLE(PreviewListener);
-    UNITY_DEFINES_PTRS(PreviewListener);
-
-    virtual ~PreviewListener() noexcept;
+    virtual ~PreviewQuery() noexcept;
     /// @endcond
-
-    /**
-    \brief Called by the scopes runtime for each preview chunk that is returned by preview().
-    */
-    virtual void push(PreviewWidgetList const&) = 0;
-
-    /**
-    \brief Called by the scopes runtime for each data field that is returned by preview().
-    */
-    virtual void push(std::string const& key, Variant const& value) = 0;
 
 protected:
     /// @cond
-    PreviewListener();
+    PreviewQuery();
     /// @endcond
 };
 

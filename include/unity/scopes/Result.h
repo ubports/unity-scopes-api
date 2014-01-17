@@ -59,7 +59,7 @@ public:
     Result(Result&&);
     Result& operator=(Result&&);
 
-    void store(Result const& other, bool intercept_preview_req = false);
+    void store(Result const& other, bool intercept_activation = false);
     bool has_stored_result() const;
     Result retrieve() const;
 
@@ -70,7 +70,11 @@ public:
 
     /**
      \brief Indicates to the receiver that this scope should intercept activation request for this result.
-     A scope which sets intercept activation flag for its result should re-implement ScopeBase::activate()
+     By default, scope receives preview requests for the results it creates but does not receive activation
+     requests (they are handled directly by the shell).
+     Intercepting activation implies intercepting preview requests as well; this is important for scopes which
+     just forward results from other scopes and call set_intercept_activation() on them.
+     A scope which sets intercept activation flag for a result should re-implement ScopeBase::activate()
      and provide an implementation of ActivationBase that handles actual activation.
      If not called, the result will be activated directly by the Unity shell whithout involving the scope,
      assuming appropriate uri schema handler is present on the system.
@@ -84,9 +88,9 @@ public:
     bool direct_activation() const;
 
     /**
-     \brief Get name of a scope that handles activation of this result.
-     Throws LogicException if it should be handled directly by the shell or if the name is undefined. The name is only available when
-     receiving this result from a scope (it is undefined when the result is just created).
+     \brief Get name of a scope that handles activation and preview of this result.
+     The name is only available when receiving this result from a scope, otherwise this method throws LogicException.
+     Note that activation request should only be sent to a scope returned by this method if direct_activation() is false.
      \return scope name
      */
     std::string activation_scope_name() const;

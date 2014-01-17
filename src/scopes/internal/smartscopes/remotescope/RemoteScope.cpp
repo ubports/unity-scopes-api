@@ -18,6 +18,7 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>

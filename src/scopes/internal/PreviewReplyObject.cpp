@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/PreviewReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/PreviewWidget.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -47,18 +48,31 @@ PreviewReplyObject::~PreviewReplyObject() noexcept
 void PreviewReplyObject::process_data(VariantMap const& data)
 {
     auto it = data.find("widgets");
-    if (it != data.end())
+    if (it != data.end() && it->second.which() == Variant::Type::Array)
     {
-        // TODO: push the widget list
+        VariantArray arr = it->second.get_array();
+        PreviewWidgetList list;
+        for (unsigned i = 0; i < arr.size(); i++)
+        {
+            if (arr[i].which() != Variant::Type::Dict) continue;
+            VariantMap inner(arr[i].get_dict());
+            auto json_it = inner.find("data");
+            if (json_it->second.which() != Variant::Type::String) continue;
+
+            list.emplace_back(PreviewWidget(json_it->second.get_string()));
+        }
+        receiver_->push(list);
     }
 
-    it = data.find("data");
-    if (it != data.end())
+    auto data_it = data.find("preview-data");
+    if (data_it != data.end() && data_it->second.which() == Variant::Type::Dict)
     {
-        // TODO: push the actual data
+        VariantMap data = data_it->second.get_dict();
+        for (auto it = data.begin(); it != data.end(); ++it)
+        {
+            receiver_->push(it->first, it->second);
+        }
     }
-    // FIXME: just a test that it's talking to PreviewListener
-    receiver_->push("example-data", Variant("foo"));
 }
 
 } // namespace internal

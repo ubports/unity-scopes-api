@@ -154,9 +154,11 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
 // For each scope, open the config file for each scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
-void add_metadata(RegistryObject::SPtr const& registry,
-                  map<string, string> const& all_scopes,
-                  MiddlewareBase::SPtr const& mw)
+void populate_registry(RegistryObject::SPtr const& registry,
+                       map<string, string> const& all_scopes,
+                       MiddlewareBase::SPtr const& mw,
+                       string const& scoperunner_path,
+                       string const& config_file)
 {
     for (auto pair : all_scopes)
     {
@@ -198,7 +200,16 @@ void add_metadata(RegistryObject::SPtr const& registry,
             ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
             mi->set_proxy(proxy);
             auto meta = ScopeMetadataImpl::create(move(mi));
-            registry->add(pair.first, move(meta));
+            vector<string> spawn_command;
+            spawn_command.push_back(scoperunner_path);
+            spawn_command.push_back(config_file);
+            spawn_command.push_back(pair.second);
+            registry->add(pair.first, move(meta), spawn_command);
+            // FIXME, HACK HACK HACK HACK
+            // The middleware should spawn scope processes with lookup() on demand.
+            // Because it currently does not have the plumbing, we start every scope immediately.
+            // When the plumbing appears, remove this.
+            registry->locate(pair.first);
         }
         catch (unity::Exception const& e)
         {
@@ -206,7 +217,7 @@ void add_metadata(RegistryObject::SPtr const& registry,
         }
     }
 }
-
+// Not needed any more. Remove once registry spawner works.
 void run_scopes(SignalThread& sigthread,
                 string const& scoperunner_path,
                 string const& config_file,
@@ -256,9 +267,6 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
 
     int exit_status = 1;
-
-    // Run a separate thread to deal with SIGCHLD. This allows us to report when a scope process exits abnormally.
-    SignalThread signal_thread;
 
     try
     {
@@ -361,13 +369,7 @@ main(int argc, char* argv[])
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
         // they look for another scope in the registry.
-        add_metadata(registry, all_scopes, middleware);
-
-        // Start a scoperunner for each Canonical scope group and add the corresponding proxies to the registry
-        run_scopes(signal_thread, scoperunner_path, config_file, canonical_groups);
-
-        // Start a scoperunner for each OEM scope group and add the corresponding proxies to the registry
-        // TODO: run_scopes(signal_thread, scoperunner_path, config_file, oem_groups);
+        populate_registry(registry, all_scopes, middleware, scoperunner_path, config_file);
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.

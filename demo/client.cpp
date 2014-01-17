@@ -107,6 +107,11 @@ public:
         return saved_result_;
     }
 
+    int result_count() const
+    {
+        return push_result_count_;
+    }
+
     Receiver() :
         query_complete_(false)
     {
@@ -149,12 +154,30 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    void push(PreviewWidgetList const& widgets) override
+    {
+        cout << "\tGot preview widgets:" << endl;
+        for (auto it = widgets.begin(); it != widgets.end(); ++it)
+        {
+            cout << "\t\t" << it->data();
+            cout << endl;
+        }
+    }
+
     void push(std::string const& key, Variant const& value) override
     {
-        cout << "\tPushed preview data: " << key;
+        cout << "\tPushed preview data: \"" << key << "\", value: ";
         if (value.which() == Variant::Type::String)
         {
-            cout << "value: " << value.get_string();
+            cout << value.get_string();
+        }
+        else if (value.which() == Variant::Type::Null)
+        {
+            cout << "(null)";
+        }
+        else
+        {
+            cout << "(non-string value)";
         }
         cout << endl;
     }
@@ -201,7 +224,7 @@ int main(int argc, char* argv[])
     string scope_name = string("scope-") + argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
-    ResultOperation result_op;
+    ResultOperation result_op = ResultOperation::None;
 
     // poor man's getopt
     if (argc > 3)
@@ -287,7 +310,7 @@ int main(int argc, char* argv[])
             auto result = reply->saved_result();
             if (!result)
             {
-                cout << "Nothing to activate! Invalid result index?" << endl;
+                cout << "Nothing to activate! Requested result with index " << result_index << " but got " << reply->result_count() << " result(s) only" << endl;
                 return 1;
             }
             if (result_op == ResultOperation::Activation)
@@ -310,7 +333,7 @@ int main(int argc, char* argv[])
                     act_reply->wait_until_finished();
                 }
             }
-            else
+            else if (result_op == ResultOperation::Preview)
             {
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;

@@ -37,13 +37,12 @@ namespace internal
 class ResultImpl
 {
 public:
-    // activation and preview flags
-    // they can be OR'ed, so need to be powers of 2
+    // activation and preview flags, used internally only.
+    // some of them can potentially be OR'ed if we add more, so let's make them powers of 2
     enum Flags
     {
         ActivationNotHandled = 0, // direct activation
-        InterceptActivation = 1,
-        InterceptPreview = 2
+        InterceptActivation = 1
     };
 
     ResultImpl();
@@ -53,7 +52,7 @@ public:
 
     virtual ~ResultImpl() = default;
 
-    void store(Result const& other, bool intercept_preview_req);
+    void store(Result const& other, bool intercept_activation);
     bool has_stored_result() const;
     Result retrieve() const;
     void set_origin(std::string const& scope_name);
@@ -87,10 +86,13 @@ public:
 protected:
     virtual void serialize_internal(VariantMap& var) const;
 
-    // find stored result whose flags give true in cmp_func, and pass it to found_func;
+    // find stored result whose flags give true in cmp_func, pass it to found_func and return;
+    // non-matching results are passed to not_found_func.
     // this is done recursively as stored result can be nested.
     // return true if found, otherwise false.
-    bool find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const;
+    bool find_stored_result(std::function<bool(Flags)> const& cmp_func,
+                            std::function<void(VariantMap const&)> const& found_func,
+                            std::function<void(VariantMap const&)> const& not_found_func) const;
 
 private:
     void deserialize(VariantMap const& var);

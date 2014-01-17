@@ -42,7 +42,7 @@ public:
     void run(MWReplyProxy const& reply) noexcept override;
     void cancel() override;
 
-    // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
+    // Called by activate(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(SPtr const& self);
 

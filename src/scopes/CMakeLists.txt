@@ -14,6 +14,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
@@ -25,6 +26,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchListener.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp

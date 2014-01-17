@@ -68,15 +68,15 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
     return *this;
 }
 
-void ResultImpl::store(Result const& other, bool intercept_preview_req)
+void ResultImpl::store(Result const& other, bool intercept_activation)
 {
     if (this == other.p.get())
     {
         throw InvalidArgumentException("Result:: cannot store self");
     }
-    if (intercept_preview_req)
+    if (intercept_activation)
     {
-        flags_ |= Flags::InterceptPreview;
+        set_intercept_activation();
     }
     stored_result_.reset(new VariantMap(other.serialize()));
 }
@@ -124,14 +124,15 @@ void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
 
-    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope)
-    // if it sees it's empty and InterceptActivation flag is set.
+    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope);
     // this is needed to support the case where aggregator scope just passes the original result
     // upstream - in that case we want the original scope to receive activation.
     origin_.clear();
 }
 
-bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, std::function<void(VariantMap const&)> const& found_func) const
+bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func,
+                                    std::function<void(VariantMap const&)> const& found_func,
+                                    std::function<void(VariantMap const&)> const& not_found_func) const
 {
     if (stored_result_ == nullptr)
         return false;
@@ -139,12 +140,14 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, 
     // visit stored results recursively,
     // check if any of them intercepts activation;
     // if not, it is direct activation in the shell
-    for (VariantMap stored = *stored_result_;;)
+    bool found = false;
+    VariantMap stored = *stored_result_;
+    while (!found)
     {
         auto it = stored.find("internal");
         if (it == stored.end())
         {
-            throw LogicException("Invalid structure of stored result, missing 'internal");
+            throw LogicException("ResultImpl::find_stored_result(): Invalid structure of stored result, missing 'internal");
         }
         const VariantMap internal_var = it->second.get_dict();
         auto intit = internal_var.find("flags");
@@ -152,16 +155,19 @@ bool ResultImpl::find_stored_result(std::function<bool(Flags)> const& cmp_func, 
         if (cmp_func(flags))
         {
             found_func(stored);
-            return true;
+            found = true;
         }
-
-        // nested stored result?
-        intit = internal_var.find("result");
-        if (intit == internal_var.end())
-            break;
-        stored = intit->second.get_dict();
+        else
+        {
+            not_found_func(stored);
+            // nested stored result?
+            intit = internal_var.find("result");
+            if (intit == internal_var.end())
+                break; // reached the most inner result and it doesn't match, so break the loop
+            stored = intit->second.get_dict();
+        }
     }
-    return false;
+    return found;
 }
 
 bool ResultImpl::direct_activation() const
@@ -174,70 +180,83 @@ bool ResultImpl::direct_activation() const
     // visit stored results recursively,
     // check if any of them intercepts activation;
     // if not, it is direct activation in the shell
-    if (find_stored_result(
+    return !find_stored_result(
                 [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [](VariantMap const&) {})
-       )
-    {
-        return false;
-    }
-    return true;
+                [](VariantMap const&) {},  // do nothing if matches
+                [](VariantMap const&) {}); // do nothing if doesn't match
 }
 
 std::string ResultImpl::activation_scope_name() const
 {
-    if (!origin_.empty() && (flags_ & Flags::InterceptActivation))
-    {
-        return origin_;
-    }
-
     std::string target;
-    // visit stored results recursively,
-    // check if any of them intercepts activation;
-    // if not, it is direct activation in the shell
-    if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&target](VariantMap const& var) {
-                    auto it = var.find("internal");
-                    if (it != var.end())
-                    {
-                        auto intvar = it->second.get_dict();
-                        it = intvar.find("origin");
-                        if (it != intvar.end())
-                        {
-                            target = it->second.get_string();
-                        }
-                    }
-                })
-       )
+    if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
     {
-        return target;
+        target = origin_;
+    }
+    else
+    {
+        const auto get_origin = [](VariantMap const& var) -> std::string {
+            auto it = var.find("internal");
+            if (it != var.end())
+            {
+                auto intvar = it->second.get_dict();
+                it = intvar.find("origin");
+                if (it != intvar.end())
+                {
+                    return it->second.get_string();
+                }
+                throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
+            }
+            throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
+        };
+
+        // visit stored results recursively,
+        // check if any of them intercepts activation;
+        // if not, return the most inner origin
+        find_stored_result(
+                    [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
+                    [&target, &get_origin](VariantMap const& var) {                        // if found
+                        // target becomes the actual return value from activation_scope_name(), since find_stored_result stops at this point.
+                        target = get_origin(var);
+                    },
+                    [&target, &get_origin](VariantMap const& var) {                    // if not found
+                        // set target from current inner result, find_stored_result continues searching so it may get overwritten
+                        target = get_origin(var);
+                    });
     }
 
-    throw LogicException("No activation target for result with uri '" + uri() + "'");
+    if (target.empty())
+    {
+        throw LogicException("Result::activation_scope_name(): undefined target scope");
+    }
+    return target;
 }
 
 VariantMap ResultImpl::activation_target() const
 {
-    if (flags_ & Flags::InterceptActivation)
+    if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
     {
         return serialize();
     }
 
     VariantMap res;
+    VariantMap most_inner;
     // visit stored results recursively,
-    // check if any of them intercepts activation;
-    // if not, it is direct activation in the shell
+    // check if any of them intercepts activation, if so, return it.;
+    // if not, return the most inner result.
     if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; },
-                [&res](VariantMap const& var) {
+                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
+                [&res](VariantMap const& var) {                                        // if found
                     res = var;
+                },
+                [&most_inner](VariantMap const& var) {                                 // if not found
+                    most_inner = var;
                 })
        )
     {
         return res;
     }
-    throw LogicException("No activation target for result with uri '" + uri() + "', it should be activated directly");
+    return most_inner;
 }
 
 int ResultImpl::flags() const

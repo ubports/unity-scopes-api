@@ -13,18 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
+#include <unity/scopes/SearchQuery.h>
 
-#include <unity/util/NonCopyable.h>
-#include <unity/util/DefinesPtrs.h>
-#include <unity/scopes/Variant.h>
-#include <string>
-#include <memory>
-#include <list>
+#include <unity/scopes/internal/QueryBaseImpl.h>
+
+using namespace std;
 
 namespace unity
 {
@@ -32,33 +28,22 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+SearchQuery::SearchQuery() : QueryBase()
 {
-    class PreviewWidgetImpl;
 }
 
-class UNITY_API PreviewWidget
+SearchQuery::~SearchQuery() noexcept
 {
-public:
-/// @cond
-    UNITY_DEFINES_PTRS(PreviewWidget);
-/// @endcond
+}
 
-    PreviewWidget(std::string const& definition);
-
-    std::string data() const;
-    VariantMap serialize() const;
-
-private:
-    PreviewWidget(VariantMap const& variant_map);
-
-    std::shared_ptr<internal::PreviewWidgetImpl> p;
-};
-
-typedef std::list<PreviewWidget> PreviewWidgetList;
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            string const& query_string,
+                                            VariantMap const& hints,
+                                            shared_ptr<SearchListener> const& reply)
+{
+    return p->create_subquery(scope, query_string, hints, reply);
+}
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

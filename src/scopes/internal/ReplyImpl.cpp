@@ -140,8 +140,9 @@ bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
 bool ReplyImpl::push(std::string const& key, Variant const& value)
 {
     VariantMap vm;
-    vm["key"] = Variant(key);
-    vm["data"] = value;
+    VariantMap nested;
+    nested[key] = value;
+    vm["preview-data"] = nested;
     return push(vm);
 }
 
