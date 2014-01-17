@@ -188,44 +188,48 @@ bool ResultImpl::direct_activation() const
 
 std::string ResultImpl::activation_scope_name() const
 {
+    std::string target;
     if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
     {
-        return origin_;
+        target = origin_;
     }
-
-    const auto get_origin = [](VariantMap const& var) -> std::string {
-        auto it = var.find("internal");
-        if (it != var.end())
-        {
-            auto intvar = it->second.get_dict();
-            it = intvar.find("origin");
-            if (it != intvar.end())
-            {
-                return it->second.get_string();
-            }
-            throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
-        }
-        throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
-    };
-
-    std::string target;
-    std::string most_inner; // the most inner origin for nested results (from aggregator scopes)
-    // visit stored results recursively,
-    // check if any of them intercepts activation;
-    // if not, return the most inner origin
-    if (find_stored_result(
-                [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
-                [&target, &get_origin](VariantMap const& var) {                        // if found
-                    target = get_origin(var);
-                },
-                [&most_inner, &get_origin](VariantMap const& var) {                    // if not found
-                    most_inner = get_origin(var);
-                })
-       )
+    else
     {
-        return target;
+        const auto get_origin = [](VariantMap const& var) -> std::string {
+            auto it = var.find("internal");
+            if (it != var.end())
+            {
+                auto intvar = it->second.get_dict();
+                it = intvar.find("origin");
+                if (it != intvar.end())
+                {
+                    return it->second.get_string();
+                }
+                throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
+            }
+            throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
+        };
+
+        // visit stored results recursively,
+        // check if any of them intercepts activation;
+        // if not, return the most inner origin
+        find_stored_result(
+                    [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
+                    [&target, &get_origin](VariantMap const& var) {                        // if found
+                        // target becomes the actual return value from activation_scope_name(), since find_stored_result stops at this point.
+                        target = get_origin(var);
+                    },
+                    [&target, &get_origin](VariantMap const& var) {                    // if not found
+                        // set target from current inner result, find_stored_result continues searching so it may get overwritten
+                        target = get_origin(var);
+                    });
     }
-    return most_inner;
+
+    if (target.empty())
+    {
+        throw LogicException("Result::activation_scope_name(): undefined target scope");
+    }
+    return target;
 }
 
 VariantMap ResultImpl::activation_target() const

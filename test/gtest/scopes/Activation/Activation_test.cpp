@@ -114,6 +114,24 @@ VariantMap serialize_data(Category::SCPtr category, CategorisedResult const& res
     return var;
 }
 
+TEST(Activation, exceptions)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", rdr);
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
+        result.set_dnd_uri("http://canonical.com");
+
+        EXPECT_TRUE(result.direct_activation());
+        result.set_intercept_activation();
+
+        EXPECT_FALSE(result.direct_activation());
+        EXPECT_THROW(result.activation_scope_name(), unity::LogicException);
+    }
+}
+
 TEST(Activation, direct_activation)
 {
     CategoryRegistry reg;
