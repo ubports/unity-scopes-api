@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RESULTIMPL_H
-#define UNITY_SCOPES_RESULTIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_RESULTIMPL_H
+#define UNITY_SCOPES_INTERNAL_RESULTIMPL_H
 
 #include <string>
 #include <memory>

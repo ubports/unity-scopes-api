@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_CATEGORYIMPL_H
-#define UNITY_SCOPES_CATEGORYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
+#define UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
 
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Variant.h>

@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_REPLYS_INTERNAL_MWOBJECTPROXYFWD_H
-#define UNITY_REPLYS_INTERNAL_MWOBJECTPROXYFWD_H
+#ifndef UNITY_SCOPES_INTERNAL_MWOBJECTPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_MWOBJECTPROXYFWD_H
 
 #include <memory>
 
