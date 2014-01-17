@@ -66,6 +66,12 @@ public:
                               MWReplyProxy const &reply,
                               MiddlewareBase* mw_base);
 
+    MWQueryCtrlProxy activate_preview_action(Result const& result,
+                              VariantMap const& hints,
+                              std::string const& action_id,
+                              MWReplyProxy const &reply,
+                              MiddlewareBase* mw_base);
+
     MWQueryCtrlProxy preview(Result const& result,
                              VariantMap const& hints,
                              MWReplyProxy const& reply,
