@@ -60,11 +60,6 @@ string ObjectProxy::endpoint() const
     return p->endpoint();
 }
 
-void ObjectProxy::ping()
-{
-    p->ping();
-}
-
 internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
 {
     return p.get();
