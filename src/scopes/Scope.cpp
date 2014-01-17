@@ -49,7 +49,7 @@ QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, Ac
 
 QueryCtrlProxy Scope::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
-    fwd()->activate_preview_action(result, hints, action_id, reply);
+    return fwd()->activate_preview_action(result, hints, action_id, reply);
 }
 
 QueryCtrlProxy Scope::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
