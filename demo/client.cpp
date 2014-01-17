@@ -107,6 +107,11 @@ public:
         return saved_result_;
     }
 
+    int result_count() const
+    {
+        return push_result_count_;
+    }
+
     Receiver() :
         query_complete_(false)
     {
@@ -305,7 +310,7 @@ int main(int argc, char* argv[])
             auto result = reply->saved_result();
             if (!result)
             {
-                cout << "Nothing to activate! Invalid result index?" << endl;
+                cout << "Nothing to activate! Requested result with index " << result_index << " but got " << reply->result_count() << " result(s) only" << endl;
                 return 1;
             }
             if (result_op == ResultOperation::Activation)
