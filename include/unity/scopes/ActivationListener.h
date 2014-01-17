@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_XXX_H
-#define UNITY_SCOPES_XXX_H
+#ifndef UNITY_SCOPES_ACTIVATIONLISTENER_H
+#define UNITY_SCOPES_ACTIVATIONLISTENER_H
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/ListenerBase.h>
