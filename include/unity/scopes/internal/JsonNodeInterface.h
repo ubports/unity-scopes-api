@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
+#ifndef UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
+#define UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -32,9 +32,6 @@ namespace scopes
 {
 
 namespace internal
-{
-
-namespace smartscopes
 {
 
 class JsonNodeInterface
@@ -70,12 +67,10 @@ public:
     virtual JsonNodeInterface::SPtr get_node(uint node_index) const = 0;
 };
 
-} // namespace smartscopes
-
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
+#endif // UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H

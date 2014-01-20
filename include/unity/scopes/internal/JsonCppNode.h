@@ -16,10 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#ifndef UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
+#define UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
 
-#include <unity/scopes/internal/smartscopes/JsonNodeInterface.h>
+#include <unity/scopes/internal/JsonNodeInterface.h>
 
 #include <jsoncpp/json/reader.h>
 
@@ -30,9 +30,6 @@ namespace scopes
 {
 
 namespace internal
-{
-
-namespace smartscopes
 {
 
 class JsonCppNode : public JsonNodeInterface
@@ -64,12 +61,10 @@ private:
     Json::Value root_;
 };
 
-} // namespace smartscopes
-
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#endif // UNITY_SCOPES_INTERNAL_JSONCPPNODE_H

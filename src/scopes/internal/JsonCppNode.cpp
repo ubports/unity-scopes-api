@@ -16,11 +16,11 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
-using namespace unity::scopes::internal::smartscopes;
+using namespace unity::scopes::internal;
 
 JsonCppNode::JsonCppNode(std::string const& json_string)
 {

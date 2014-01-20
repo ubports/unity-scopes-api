@@ -16,14 +16,14 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 #include <memory>
 
 using namespace testing;
-using namespace unity::scopes::internal::smartscopes;
+using namespace unity::scopes::internal;
 
 namespace
 {
