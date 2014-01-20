@@ -52,14 +52,17 @@ Variant json_to_variant(JsonNodeInterface::SCPtr node)
             }
         case JsonNodeInterface::NodeType::Object:
             {
-                // TODO
                 VariantMap var;
+                for (auto m: node->member_names())
+                {
+                    var[m] = json_to_variant(node->get_node(m));
+                }
                 return Variant(var);
             }
         case JsonNodeInterface::NodeType::String:
             return Variant(node->as_string());
         case JsonNodeInterface::NodeType::Int:
-        case JsonNodeInterface::NodeType::UInt:
+        case JsonNodeInterface::NodeType::UInt: //FIXME: potentially unsafe
             return Variant(node->as_int());
         case JsonNodeInterface::NodeType::Real:
             return Variant(node->as_double());
