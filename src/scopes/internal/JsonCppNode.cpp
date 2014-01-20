@@ -161,13 +161,12 @@ JsonNodeInterface::SPtr JsonCppNode::get_node() const
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
 {
-    const Json::Value& value_node = root_[node_name];
-
-    if (!value_node)
+    if (!root_.isMember(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
+    const Json::Value& value_node = root_[node_name];
     return std::make_shared<JsonCppNode>(value_node);
 }
 
