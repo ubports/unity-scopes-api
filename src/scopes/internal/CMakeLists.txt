@@ -28,7 +28,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetDefinitionBuilderImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp
@@ -53,6 +52,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/VariantMapBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
 

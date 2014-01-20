@@ -14,14 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-
-#include <unity/scopes/Variant.h>
-#include <string>
-#include <tuple>
+#include <unity/scopes/internal/VariantMapBuilderImpl.h>
 
 namespace unity
 {
@@ -32,23 +27,31 @@ namespace scopes
 namespace internal
 {
 
-class PreviewWidgetDefinitionBuilderImpl final
+void VariantMapBuilderImpl::add_attribute(std::string const& key, Variant const& value)
 {
-public:
-    PreviewWidgetDefinitionBuilderImpl(std::string const& widget_type);
-    ~PreviewWidgetDefinitionBuilderImpl() = default;
-    void add_attribute(std::string const& attribute, Variant const& key);
-    void add_attribute(std::string const& top_attribute, std::initializer_list<std::pair<std::string, Variant>> const& mappings);
-    VariantMap get_definition() const;
+    widget_def_[key] = value;
+}
 
-private:
-    VariantMap widget_def_;
-};
+void VariantMapBuilderImpl::add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple)
+{
+    VariantArray va;
+    auto it = widget_def_.find(array_key);
+    if (it != widget_def_.end())
+    {
+        va = it->second.get_array();
+    }
+
+    va.push_back(Variant(VariantMap(tuple.begin(), tuple.end())));
+    widget_def_[array_key] = va;
+}
+
+VariantMap VariantMapBuilderImpl::get_definition() const
+{
+    return widget_def_;
+}
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

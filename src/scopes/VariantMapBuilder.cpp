@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <unity/scopes/PreviewWidgetDefinitionBuilder.h>
-#include <unity/scopes/internal/PreviewWidgetDefinitionBuilderImpl.h>
+#include <unity/scopes/VariantMapBuilder.h>
+#include <unity/scopes/internal/VariantMapBuilderImpl.h>
 
 namespace unity
 {
@@ -25,21 +25,18 @@ namespace unity
 namespace scopes
 {
 
-PreviewWidgetDefinitionBuilder::PreviewWidgetDefinitionBuilder(std::string const& widget_type)
-    : p(new internal::PreviewWidgetDefinitionBuilderImpl(widget_type))
+VariantMapBuilder::VariantMapBuilder() = default;
+
+VariantMapBuilder::~VariantMapBuilder() = default;
+
+void VariantMapBuilder::add_attribute(std::string const& key, Variant const& value)
 {
+    p->add_attribute(key, value);
 }
 
-PreviewWidgetDefinitionBuilder::~PreviewWidgetDefinitionBuilder() = default;
-
-void PreviewWidgetDefinitionBuilder::add_attribute(std::string const& attribute, Variant const& key)
+void VariantMapBuilder::add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {
-    p->add_attribute(attribute, key);
-}
-
-void PreviewWidgetDefinitionBuilder::add_attribute(std::string const& top_attribute, std::initializer_list<std::pair<std::string, Variant>> const& mappings)
-{
-    p->add_attribute(top_attribute, mappings);
+    p->add_tuple(array_key, tuple);
 }
 
 } // namespace scopes

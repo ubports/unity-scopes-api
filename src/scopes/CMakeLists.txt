@@ -17,7 +17,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetDefinitionBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/VariantMapBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp

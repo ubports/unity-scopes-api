@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_SCOPES_PREVIEWWIDGETDEFINITIONBUILDER_H
+#ifndef UNITY_SCOPES_VARIANTMAPBUILDER_H
+#define UNITY_SCOPES_VARIANTMAPBUILDER_H
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
@@ -34,25 +34,25 @@ class PreviewWidget;
 
 namespace internal
 {
-class PreviewWidgetDefinitionBuilderImpl;
+class VariantMapBuilderImpl;
 }
 
 /**
 \brief TODO
 */
-class UNITY_API PreviewWidgetDefinitionBuilder
+class UNITY_API VariantMapBuilder
 {
 public:
-    PreviewWidgetDefinitionBuilder(std::string const& widget_type);
-    virtual ~PreviewWidgetDefinitionBuilder();
+    VariantMapBuilder();
+    virtual ~VariantMapBuilder();
 
     /**
-    \brief Adds a top-level attribute mapping to this widget.
+    \brief Adds a top-level key-value mapping.
      */
-    void add_attribute(std::string const& attribute, Variant const& key);
+    void add_attribute(std::string const& key, Variant const& value);
 
     /**
-    \brief Adds attribute mappings to a an array of dictionaries.
+    \brief Adds a tuple of key-value pairs to an array.
     An example of using it to fill in "reviews" definition like this:
      {
          "type": "reviews",
@@ -63,10 +63,10 @@ public:
      PreviewWidgetDefinitionBuilder builder("reviews");
      builder.add_attribute("reviews", {{"rating", Variant("myrating")}, {"review", Variant("data")}, {"author", Variant("author")}});
     */
-    void add_attribute(std::string const& top_attribute, std::initializer_list<std::pair<std::string, Variant>> const& mappings);
+    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
 
 private:
-    std::shared_ptr<internal::PreviewWidgetDefinitionBuilderImpl> p;
+    std::shared_ptr<internal::VariantMapBuilderImpl> p;
 
     friend class PreviewWidget;
 };

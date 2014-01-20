@@ -16,48 +16,36 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
+#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
 
-#include <unity/util/NonCopyable.h>
-#include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Variant.h>
 #include <string>
-#include <memory>
-#include <list>
+#include <tuple>
 
 namespace unity
 {
 
 namespace scopes
 {
-    class VariantMapBuilder;
 
 namespace internal
 {
-    class PreviewWidgetImpl;
-}
 
-class UNITY_API PreviewWidget
+class VariantMapBuilderImpl final
 {
 public:
-/// @cond
-    UNITY_DEFINES_PTRS(PreviewWidget);
-/// @endcond
-
-    PreviewWidget(std::string const& definition);
-    PreviewWidget(VariantMapBuilder const& builder);
-
-    std::string data() const;
-    VariantMap serialize() const;
+    VariantMapBuilderImpl() = default;
+    ~VariantMapBuilderImpl() = default;
+    void add_attribute(std::string const& key, Variant const& value);
+    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+    VariantMap get_definition() const;
 
 private:
-    PreviewWidget(VariantMap const& variant_map);
-
-    std::shared_ptr<internal::PreviewWidgetImpl> p;
+    VariantMap widget_def_;
 };
 
-typedef std::list<PreviewWidget> PreviewWidgetList;
+} // namespace internal
 
 } // namespace scopes
 

@@ -18,7 +18,7 @@
 
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
-#include <unity/scopes/PreviewWidgetDefinitionBuilder.h>
+#include <unity/scopes/VariantMapBuilder.h>
 
 namespace unity
 {
@@ -33,7 +33,7 @@ PreviewWidget::PreviewWidget(std::string const& definition)
 {
 }
 
-PreviewWidget::PreviewWidget(PreviewWidgetDefinitionBuilder const& builder)
+PreviewWidget::PreviewWidget(VariantMapBuilder const& builder)
     : p(new internal::PreviewWidgetImpl("")) // TODO
 {
 }
