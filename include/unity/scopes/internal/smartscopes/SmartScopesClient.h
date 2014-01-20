@@ -101,7 +101,7 @@ public:
 
     virtual ~SmartScopesClient();
 
-    std::vector<RemoteScope> get_remote_scopes();
+    std::vector<RemoteScope> get_remote_scopes(std::string const& locale = "");
 
     SearchHandle::UPtr search(std::string const& base_url, std::string const& query,
                               std::string const& session_id, uint query_id, std::string const& platform,

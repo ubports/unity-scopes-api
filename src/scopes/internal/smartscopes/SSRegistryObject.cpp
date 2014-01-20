@@ -36,19 +36,23 @@ namespace internal {
 
 namespace smartscopes {
 
-SSRegistryObject::SSRegistryObject(const std::string &registry_name, const std::string &config_file)
-  : ssclient_(std::make_shared<HttpClientQt>(4),
-              std::make_shared<JsonCppNode>()),
-    refresh_stopped_(false) {
+SSRegistryObject::SSRegistryObject(const std::string &registry_name,
+                                   const std::string &config_file)
+    : ssclient_(std::make_shared<HttpClientQt>(4),
+                std::make_shared<JsonCppNode>()),
+      refresh_stopped_(false) {
   RuntimeImpl::UPtr runtime = RuntimeImpl::create(registry_name, config_file);
 
-  RegistryConfig config(runtime->registry_identity(), runtime->registry_configfile());
+  RegistryConfig config(runtime->registry_identity(),
+                        runtime->registry_configfile());
   std::string mw_kind = config.mw_kind();
 
   middleware_ = runtime->factory()->find(runtime->registry_identity(), mw_kind);
-  proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"), middleware_->runtime());
+  proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"),
+                             middleware_->runtime(), "smartscopes");
 
-  ///! middleware_->add_registry_object(runtime->registry_identity(), shared_from_this());
+  ///! middleware_->add_registry_object(runtime->registry_identity(),
+  /// shared_from_this());
 
   get_remote_scopes();
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
@@ -69,7 +73,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const &scope_name) {
   // If the name is empty, it was sent as empty by the remote client.
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-          "SSRegistryObject: Cannot search for scope with empty name");
+        "SSRegistryObject: Cannot search for scope with empty name");
   }
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -97,8 +101,7 @@ void SSRegistryObject::refresh_thread() {
   while (!refresh_stopped_) {
     refresh_cond_.wait_for(refresh_mutex_, std::chrono::hours(24));
 
-    if (!refresh_stopped_)
-    {
+    if (!refresh_stopped_) {
       get_remote_scopes();
     }
   }
@@ -132,7 +135,7 @@ bool SSRegistryObject::add(std::string const &scope_name,
                            ScopeMetadata const &metadata) {
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-          "SSRegistryObject: Cannot add scope with empty name");
+        "SSRegistryObject: Cannot add scope with empty name");
   }
 
   auto const &pair = scopes_.insert(make_pair(scope_name, metadata));

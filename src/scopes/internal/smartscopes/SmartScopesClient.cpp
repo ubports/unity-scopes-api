@@ -28,6 +28,7 @@
 
 static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
+static const std::string c_search_resource = "/search";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -91,12 +92,22 @@ SmartScopesClient::~SmartScopesClient()
 
 }
 
-std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
+std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
 {
     try
     {
+        std::ostringstream remote_scopes_uri;
+        remote_scopes_uri << url_ << c_remote_scopes_resource << "?";
+
+        // optional parameters
+
+        if (!locale.empty())
+        {
+            remote_scopes_uri << "&locale=\"" << locale << "\"";
+        }
+
         std::string response_str;
-        HttpResponseHandle::SPtr response = http_client_->get(url_ + c_remote_scopes_resource, port_);
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
@@ -149,7 +160,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url, std::s
                                              uint limit)
 {
     std::ostringstream search_uri;
-    search_uri << base_url << "/search?";
+    search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
 
