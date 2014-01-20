@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_QUERYOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
@@ -45,7 +45,7 @@ class QueryCtrlObject;
 // the implementation of this object ensures that the corresponding ReplyObject is disabled.
 // TODO: Probably need to flesh out this comment.
 
-class QueryObject final : public AbstractObject
+class QueryObject : public QueryObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(QueryObject);
@@ -54,10 +54,10 @@ public:
     virtual ~QueryObject() noexcept;
 
     // Remote operation implementation
-    void run(MWReplyProxy const& reply) noexcept;
+    void run(MWReplyProxy const& reply) noexcept override;
 
     // Called locally only, by QueryCtrlObject.
-    void cancel();
+    void cancel() override;
 
     bool pushable() const noexcept; // Called locallly only, by ReplyImpl
 
@@ -65,10 +65,10 @@ public:
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(SPtr const& self);
 
-private:
+protected:
     std::shared_ptr<QueryBase> query_base_;
     MWReplyProxy reply_;
-    std::weak_ptr<Reply> reply_proxy_;
+    std::weak_ptr<ReplyBase> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     std::atomic_bool pushable_;
     SPtr self_;

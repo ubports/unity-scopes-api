@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/ListenerBase.h>
 
 #include <cassert>
 #include <unordered_map>
@@ -31,22 +31,12 @@ namespace scopes
 
 //! @cond
 
-ReceiverBase::ReceiverBase()
+ListenerBase::ListenerBase()
 {
 }
 
-ReceiverBase::~ReceiverBase() noexcept
+ListenerBase::~ListenerBase() noexcept
 {
-}
-
-void ReceiverBase::push(Category::SCPtr /* category */)
-{
-    // Intentionally empty: "do nothing" default implementation.
-}
-
-void ReceiverBase::push(Annotation /* annotation */)
-{
-    // Intentionally empty: "do nothing" default implementation.
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,
@@ -54,12 +44,12 @@ void ReceiverBase::push(Annotation /* annotation */)
 
 static unordered_map<int, char const*> const reasons =
 {
-    pair<int, char const*>(static_cast<int>(ReceiverBase::Finished),  "finished"),
-    pair<int, char const*>(static_cast<int>(ReceiverBase::Cancelled), "cancelled"),
-    pair<int, char const*>(static_cast<int>(ReceiverBase::Error),     "error")
+    pair<int, char const*>(static_cast<int>(ListenerBase::Finished),  "finished"),
+    pair<int, char const*>(static_cast<int>(ListenerBase::Cancelled), "cancelled"),
+    pair<int, char const*>(static_cast<int>(ListenerBase::Error),     "error")
 };
 
-char const* to_string(ReceiverBase::Reason reason)
+char const* to_string(ListenerBase::Reason reason)
 {
     assert(reasons.find(static_cast<int>(reason)) != reasons.end());
     return reasons.find(static_cast<int>(reason))->second;

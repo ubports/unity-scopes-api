@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/Result.h>
 
 #include <string>
 
@@ -33,6 +34,7 @@ namespace scopes
 {
 
 class ScopeBase;
+class Result;
 
 namespace internal
 {
@@ -57,6 +59,17 @@ public:
                                   VariantMap const& hints,
                                   MWReplyProxy const& reply,
                                   MiddlewareBase* mw_base);
+
+
+    MWQueryCtrlProxy activate(Result const& result,
+                              VariantMap const& hints,
+                              MWReplyProxy const &reply,
+                              MiddlewareBase* mw_base);
+
+    MWQueryCtrlProxy preview(Result const& result,
+                             VariantMap const& hints,
+                             MWReplyProxy const& reply,
+                             MiddlewareBase* mw_base);
 
 private:
     RuntimeImpl* const runtime_;

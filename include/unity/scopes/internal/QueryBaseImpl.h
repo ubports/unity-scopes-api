@@ -31,7 +31,7 @@ namespace unity
 namespace scopes
 {
 
-class ReceiverBase;
+class SearchListener;
 
 namespace internal
 {
@@ -45,7 +45,7 @@ public:
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    VariantMap const& hints,
-                                   std::shared_ptr<ReceiverBase> const& reply);
+                                   std::shared_ptr<SearchListener> const& reply);
     void cancel();
 
 private:

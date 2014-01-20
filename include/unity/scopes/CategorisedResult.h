@@ -31,7 +31,7 @@ namespace scopes
 namespace internal
 {
     class CategorisedResultImpl;
-    class ReplyObject;
+    class ResultReplyObject;
 }
 
 /**
@@ -64,10 +64,11 @@ public:
     Category::SCPtr category() const;
 
 private:
-    CategorisedResult(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
+    CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
     internal::CategorisedResultImpl* fwd() const;
 
-    friend class internal::ReplyObject;
+    friend class internal::CategorisedResultImpl;
+    friend class internal::ResultReplyObject;
 };
 
 } // namespace scopes

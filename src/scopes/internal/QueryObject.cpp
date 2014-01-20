@@ -23,7 +23,11 @@
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/Exception.h>
 
 #include <iostream>
@@ -44,6 +48,7 @@ namespace internal
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
+    QueryObjectBase(),
     query_base_(query_base),
     reply_(reply),
     ctrl_(ctrl),
@@ -86,20 +91,22 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     // On return, replies for the query may still be outstanding.
     try
     {
-        query_base_->run(reply_proxy);
+        auto search_query = dynamic_pointer_cast<SearchQuery>(query_base_);
+        assert(search_query);
+        search_query->run(reply_proxy);
     }
     catch (std::exception const& e)
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ReceiverBase::Error, e.what());     // Oneway, can't block
+        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
         cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ReceiverBase::Error, "unknown exception");     // Oneway, can't block
+        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
         cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }
@@ -112,8 +119,8 @@ void QueryObject::cancel()
     {
         // Send finished() to up-stream client to tell him the query is done.
         // We send via the MWReplyProxy here because that allows passing
-        // a ReceiverBase::Reason (whereas the public ReplyProxy does not).
-        reply_->finished(ReceiverBase::Cancelled, "");     // Oneway, can't block
+        // a ListenerBase::Reason (whereas the public ReplyProxy does not).
+        reply_->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
     }
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).

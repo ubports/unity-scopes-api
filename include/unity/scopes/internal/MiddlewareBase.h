@@ -67,7 +67,7 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) = 0;
-    virtual MWQueryProxy add_query_object(QueryObject::SPtr const& query) = 0;
+    virtual MWQueryProxy add_query_object(QueryObjectBase::SPtr const& query) = 0;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObject::SPtr const& registry) = 0;
     virtual MWReplyProxy add_reply_object(ReplyObject::SPtr const& reply) = 0;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) = 0;

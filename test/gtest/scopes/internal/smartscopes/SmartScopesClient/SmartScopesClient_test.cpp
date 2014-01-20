@@ -31,7 +31,7 @@
 using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
-using namespace unity::api::test::scopes::internal::smartscopes;
+using namespace unity::test::scopes::internal::smartscopes;
 
 namespace
 {

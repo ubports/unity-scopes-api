@@ -50,7 +50,7 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
     mi->set_description("description " + name);
     mi->set_search_hint("search hint " + name);
     mi->set_hot_key("hot key " + name);
-    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime());
+    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
 }
