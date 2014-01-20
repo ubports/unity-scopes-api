@@ -52,6 +52,7 @@ public:
     virtual void read_json(std::string const& json_string) = 0;
 
     virtual int size() const = 0;
+    virtual std::vector<std::string> member_names() const = 0;
     virtual NodeType type() const = 0;
 
     virtual std::string as_string() const = 0;

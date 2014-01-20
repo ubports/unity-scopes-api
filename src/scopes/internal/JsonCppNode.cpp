@@ -60,6 +60,15 @@ int JsonCppNode::size() const
     return root_.size();
 }
 
+std::vector<std::string> JsonCppNode::member_names() const
+{
+    if (root_.type() != Json::objectValue)
+    {
+        throw unity::LogicException("Root node is not an object");
+    }
+    return root_.getMemberNames();
+}
+
 JsonNodeInterface::NodeType JsonCppNode::type() const
 {
     switch (root_.type())

@@ -21,6 +21,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <algorithm>
 
 using namespace testing;
 using namespace unity::scopes::internal;
@@ -56,6 +57,12 @@ TEST_F(JsonNodeTest, flat_values)
 
     EXPECT_NO_THROW(root_node_->read_json(json_string));
     EXPECT_EQ(3, root_node_->size());
+
+    auto members = root_node_->member_names();
+    EXPECT_EQ(3, members.size());
+    EXPECT_TRUE(std::find(members.begin(), members.end(), "firstName") != members.end());
+    EXPECT_TRUE(std::find(members.begin(), members.end(), "age") != members.end());
+    EXPECT_TRUE(std::find(members.begin(), members.end(), "human") != members.end());
 
     // get root value
 

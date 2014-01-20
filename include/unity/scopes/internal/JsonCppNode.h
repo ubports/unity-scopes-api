@@ -43,6 +43,7 @@ public:
     void read_json(std::string const& json_string) override;
 
     int size() const override;
+    std::vector<std::string> member_names() const override;
     NodeType type() const override;
 
     std::string as_string() const override;
