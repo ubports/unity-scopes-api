@@ -16,48 +16,25 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
+#ifndef UNITY_INTERNAL_JSONUTILS_H
+#define UNITY_INTERNAL_JSONUTILS_H
 
-#include <unity/util/NonCopyable.h>
-#include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Variant.h>
-#include <string>
-#include <memory>
-#include <list>
+#include <unity/scopes/internal/JsonNodeInterface.h>
 
 namespace unity
 {
 
 namespace scopes
 {
-    class VariantMapBuilder;
 
 namespace internal
 {
-    class PreviewWidgetImpl;
-}
 
-class UNITY_API PreviewWidget
-{
-public:
-/// @cond
-    UNITY_DEFINES_PTRS(PreviewWidget);
-/// @endcond
+Variant json_to_variant(std::string const& json);
+Variant json_to_variant(JsonNodeInterface::SCPtr node);
 
-    PreviewWidget(std::string const& definition);
-    PreviewWidget(VariantMap const& definition);
-
-    std::string data() const;
-    VariantMap serialize() const;
-
-private:
-    //PreviewWidget(VariantMap const& variant_map);
-
-    std::shared_ptr<internal::PreviewWidgetImpl> p;
-};
-
-typedef std::list<PreviewWidget> PreviewWidgetList;
+} // namespace internal
 
 } // namespace scopes
 
