@@ -93,7 +93,7 @@ endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
-set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${JSONCPP_LDFLAGS} ${OTHER_LIBS})
+set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -217,6 +217,7 @@ endif()
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    ${JSONCPP_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}
