@@ -39,10 +39,11 @@ public:
     ~VariantMapBuilderImpl() = default;
     void add_attribute(std::string const& key, Variant const& value);
     void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
-    VariantMap get_definition() const;
+    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
+    VariantMap variant_map() const;
 
 private:
-    VariantMap widget_def_;
+    VariantMap variant_;
 };
 
 } // namespace internal

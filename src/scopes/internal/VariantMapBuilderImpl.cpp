@@ -29,25 +29,38 @@ namespace internal
 
 void VariantMapBuilderImpl::add_attribute(std::string const& key, Variant const& value)
 {
-    widget_def_[key] = value;
+    variant_[key] = value;
 }
 
 void VariantMapBuilderImpl::add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {
     VariantArray va;
-    auto it = widget_def_.find(array_key);
-    if (it != widget_def_.end())
+    auto it = variant_.find(array_key);
+    if (it != variant_.end())
     {
         va = it->second.get_array();
     }
 
     va.push_back(Variant(VariantMap(tuple.begin(), tuple.end())));
-    widget_def_[array_key] = va;
+    variant_[array_key] = std::move(va);
 }
 
-VariantMap VariantMapBuilderImpl::get_definition() const
+void VariantMapBuilderImpl::add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple)
 {
-    return widget_def_;
+    VariantArray va;
+    auto it = variant_.find(array_key);
+    if (it != variant_.end())
+    {
+        va = it->second.get_array();
+    }
+
+    va.push_back(Variant(VariantMap(tuple.begin(), tuple.end())));
+    variant_[array_key] = std::move(va);
+}
+
+VariantMap VariantMapBuilderImpl::variant_map() const
+{
+    return variant_;
 }
 
 } // namespace internal

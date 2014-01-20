@@ -22,6 +22,7 @@
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <string>
+#include <vector>
 #include <memory>
 #include <tuple>
 
@@ -38,7 +39,31 @@ class VariantMapBuilderImpl;
 }
 
 /**
-\brief TODO
+\brief Helper class for creating and populating VariantMap (dictionary) instances.
+The main purpose of this class is to ease creation of dictionaries needed for PreviewWidget
+instances or any other classes that require non-trivial definitions.
+
+For example, a definiton of a PreviewWidget that corresponds with the following JSON template:
+{
+    "type": "reviews",
+    "rating-icon-empty": null, // icon url
+    "rating-icon-half": null, // icon url
+    "rating-icon-full": null, // icon url
+    "reviews": [{"rating": null, "review": null, "author": null}]
+}
+
+can be created with VariantMapBuilder as follows:
+
+\code
+VariantMapBuilder builder;
+builder.add_attribute("type", "reviews");
+builder.add_attribute("rating-icon-empty", Variant::Null);
+builder.add_attribute("rating-icon-half", Variant::Null);
+builder.add_attribute("rating-icon-full", Variant::Null);
+builder.add_tuple("reviews", {{"rating", Variant("myrating")}, {"review", Variant("data")}, {"author", Variant("author")}});
+
+Preview widget(builder.variant_map());
+\endcode
 */
 class UNITY_API VariantMapBuilder
 {
@@ -53,17 +78,28 @@ public:
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
-    An example of using it to fill in "reviews" definition like this:
+    It can be used multiple times for same key to create an array of tuples assigned to that key, for example:
      {
-         "type": "reviews",
          ...
-         "reviews": [{"rating": "myrating", "review": "data", "author": "author"}]
+         "mykey": [{"a": 1, "b": 2}, {"c": 2, "d" : 3}]
      }
 
-     PreviewWidgetDefinitionBuilder builder("reviews");
-     builder.add_attribute("reviews", {{"rating", Variant("myrating")}, {"review", Variant("data")}, {"author", Variant("author")}});
+     \code
+     VariantMapBuilder builder;
+     builder.add_tuple("mykey", {{"a", Variant(1)}, {"b", Variant(2)}});
+     builder.add_tuple("mykey", {{"c", Variant(1)}, {"d", Variant(2)}});
+     \endcode
     */
     void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+
+    /**
+    \brief Adds a tuple of key-value pairs to an array.
+    This is and overloaded version of add_tupe that takes std::vector instead of std::initializer_list, making it more friendly for language
+    bindings.
+    */
+    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
+
+    VariantMap variant_map() const;
 
 private:
     std::shared_ptr<internal::VariantMapBuilderImpl> p;
