@@ -120,7 +120,7 @@ void ScopeI::activate_preview_action_(Current const& current,
     auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
-    auto action_id = to_variant_map(req.getAction())["action_id"].get_string(); // FIXME proper Action class?
+    auto action_id = req.getAction().cStr();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
     auto delegate = dynamic_pointer_cast<ScopeObject>(del());
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate_preview_action(result, hints, action_id, reply_proxy, current.adapter->mw()));

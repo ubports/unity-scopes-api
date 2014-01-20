@@ -134,11 +134,7 @@ QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result, Varia
         to_value_dict(result, res);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
-        // TODO Action class?
-        VariantMap action;
-        action["action_id"] = action_id;
-        auto a = in_params.initAction();
-        to_value_dict(action, a);
+        in_params.setAction(action_id);
         auto p = in_params.initReplyProxy();
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());
