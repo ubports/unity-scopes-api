@@ -57,11 +57,11 @@ public:
      {
          "type": "reviews",
          ...
-         "reviews": [{"rating": null, "review": null, "author": null}]
+         "reviews": [{"rating": "myrating", "review": "data", "author": "author"}]
      }
 
      PreviewWidgetDefinitionBuilder builder("reviews");
-     builder.add_attribute("reviews", {{"rating", Variant(1)}, {"review", Variant("Awesome!")}, {"author", Variant("John Smith")}});
+     builder.add_attribute("reviews", {{"rating", Variant("myrating")}, {"review", Variant("data")}, {"author", Variant("author")}});
     */
     void add_attribute(std::string const& top_attribute, std::initializer_list<std::pair<std::string, Variant>> const& mappings);
 
