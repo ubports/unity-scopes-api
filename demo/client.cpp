@@ -32,10 +32,55 @@
 #include <string.h>
 #include <iostream>
 #include <mutex>
+#include <cassert>
 #include <unistd.h>
 
 using namespace std;
 using namespace unity::scopes;
+
+// output variant in a json-like format; note, it doesn't do escaping etc.,
+// so the output is not suitable input for a json parser, it's only for
+// debugging purposes.
+ostream& operator<<(ostream& str, Variant const& var)
+{
+    switch (var.which())
+    {
+        case Variant::Type::Int:
+            str << var.get_int();
+            break;
+        case Variant::Type::Null:
+            str << "null";
+            break;
+        case Variant::Type::Bool:
+            str << var.get_bool();
+            break;
+        case Variant::Type::String:
+            str << "\"" << var.get_string() << "\"";
+            break;
+        case Variant::Type::Double:
+            str << var.get_double();
+            break;
+        case Variant::Type::Dict:
+            str << "{";
+            for (auto kv: var.get_dict())
+            {
+                str << "\"" << kv.first << "\":" << kv.second;
+            }
+            str << "}";
+            break;
+        case Variant::Type::Array:
+            str << "[";
+            for (auto v: var.get_array())
+            {
+                str << v << ",";
+            }
+            str << "]";
+            break;
+         default:
+            assert(0);
+    }
+    return str;
+}
 
 class Receiver : public SearchListener
 {

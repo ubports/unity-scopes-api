@@ -48,12 +48,10 @@ public:
     PreviewWidget(std::string const& definition);
     PreviewWidget(VariantMap const& definition);
 
-    std::string data() const;
+    Variant data() const;
     VariantMap serialize() const;
 
 private:
-    //PreviewWidget(VariantMap const& variant_map);
-
     std::shared_ptr<internal::PreviewWidgetImpl> p;
 };
 

@@ -33,23 +33,17 @@ namespace internal
 //! @cond
 
 PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
-    : data_(json_text)
 {
     //TODO: json validation
-    auto var = json_to_variant(json_text);
-    //TODO hook up
+    data_ = json_to_variant(json_text);
 }
 
-PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& variant_map)
+PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
 {
-    auto it = variant_map.find("data");
-    if (it != variant_map.end() && it->second.which() == Variant::Type::String)
-    {
-        data_ = it->second.get_string();
-    }
+    data_ = definition;
 }
 
-std::string PreviewWidgetImpl::data() const
+Variant PreviewWidgetImpl::data() const
 {
     return data_;
 }

@@ -57,9 +57,9 @@ void PreviewReplyObject::process_data(VariantMap const& data)
             if (arr[i].which() != Variant::Type::Dict) continue;
             VariantMap inner(arr[i].get_dict());
             auto json_it = inner.find("data");
-            if (json_it->second.which() != Variant::Type::String) continue;
+            if (json_it->second.which() != Variant::Type::Dict) continue;
 
-            list.emplace_back(PreviewWidget(json_it->second.get_string()));
+            list.emplace_back(PreviewWidget(json_it->second.get_dict()));
         }
         receiver_->push(list);
     }

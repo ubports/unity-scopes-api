@@ -38,7 +38,7 @@ PreviewWidget::PreviewWidget(VariantMap const& definition)
 {
 }
 
-std::string PreviewWidget::data() const
+Variant PreviewWidget::data() const
 {
     return p->data();
 }
