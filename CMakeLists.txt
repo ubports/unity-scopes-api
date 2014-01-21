@@ -356,6 +356,9 @@ option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
+if ("${cmake_build_type_lower}" STREQUAL "release" OR "${cmake_build_type_lower}" STREQUAL "relwithdebinfo")
+  set(BUILD_DOC_WITH_ALL ALL)
+endif()
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
     message(WARNING "Cannot generate documentation: doxygen and/or graphviz not found")
 else()
@@ -370,7 +373,7 @@ else()
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
-    add_custom_target(doc ALL
+    add_custom_target(doc ${BUILD_DOC_WITH_ALL}
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc)
