@@ -32,6 +32,12 @@ Result::Result(internal::ResultImpl* impl)
 {
 }
 
+Result::Result(std::shared_ptr<internal::ResultImpl> impl)
+    : p(impl)
+{
+}
+
+
 Result::Result(const VariantMap &variant_map)
     : p(new internal::ResultImpl(variant_map))
 {
@@ -59,9 +65,9 @@ Result::Result(Result&&) = default;
 
 Result& Result::operator=(Result&&) = default;
 
-void Result::store(Result const& other)
+void Result::store(Result const& other, bool intercept_activation)
 {
-    p->store(other);
+    p->store(other, intercept_activation);
 }
 
 bool Result::has_stored_result() const
@@ -92,6 +98,21 @@ void Result::set_art(std::string const& image)
 void Result::set_dnd_uri(std::string const& dnd_uri)
 {
     p->set_dnd_uri(dnd_uri);
+}
+
+void Result::set_intercept_activation()
+{
+    p->set_intercept_activation();
+}
+
+bool Result::direct_activation() const
+{
+    return p->direct_activation();
+}
+
+std::string Result::activation_scope_name() const
+{
+    return p->activation_scope_name();
 }
 
 Variant& Result::operator[](std::string const& key)

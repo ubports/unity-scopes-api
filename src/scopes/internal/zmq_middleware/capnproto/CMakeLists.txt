@@ -1,5 +1,6 @@
 set(CAPNPROTO_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Message.capnp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Object.capnp
     ${CMAKE_CURRENT_SOURCE_DIR}/Proxy.capnp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.capnp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.capnp

@@ -16,13 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RECEIVERBASE_H
-#define UNITY_SCOPES_RECEIVERBASE_H
+#ifndef UNITY_SCOPES_LISTENERBASE_H
+#define UNITY_SCOPES_LISTENERBASE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Annotation.h>
 
 #include <string>
 
@@ -32,12 +30,10 @@ namespace unity
 namespace scopes
 {
 
-class CategorisedResult;
-
 /**
 \brief Abstract base class to receive the results of a query.
 TODO: fix doc
-The scope application code must instantiate a class derived from ReceiverBase and pass that instance as
+The scope application code must instantiate a class derived from ListenerBase and pass that instance as
 a parameter to the Scope::query() method. Once a query is sent, the scopes run time repeatedly
 invokes the push() method, once for each result returned by the query. Once a query is complete,
 the finished() method is called once, to inform the caller that the query is complete.
@@ -47,36 +43,15 @@ Calls to push() and finished() are made by an arbitrary thread.
 // TODO: add doc for thread pool and concurrent calls to push()
 */
 
-class UNITY_API ReceiverBase
+class UNITY_API ListenerBase
 {
 public:
     /// @cond
-    NONCOPYABLE(ReceiverBase);
-    UNITY_DEFINES_PTRS(ReceiverBase);
+    NONCOPYABLE(ListenerBase);
+    UNITY_DEFINES_PTRS(ListenerBase);
 
-    virtual ~ReceiverBase() noexcept;
+    virtual ~ListenerBase() noexcept;
     /// @endcond
-
-    /**
-    \brief Called once by the scopes run time for each result that is returned by a query().
-    */
-    virtual void push(CategorisedResult result) = 0;
-
-    /**
-    \brief Called once by the scopes run time for each annotation that is returned by a query().
-    The default implementation does nothing.
-    */
-    virtual void push(Annotation annotation);
-
-    /**
-    \brief Called once by the scopes run time for each category that is returned by a query().
-    The default implementation does nothing. Receipt of categories may be interleaved with
-    the receipt of results, that is, there is no guarantee that the complete set of categories
-    will be provided before the first query result.
-
-    If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
-    */
-    virtual void push(Category::SCPtr category);
 
     /**
     \brief Indicates the cause of a call to finished().
@@ -97,15 +72,15 @@ public:
 
 protected:
     /// @cond
-    ReceiverBase();
+    ListenerBase();
     /// @endcond
 };
 
 /**
-\brief Convenience function to convert a ReceiverBase::Reason enumerator to a string.
+\brief Convenience function to convert a ListenerBase::Reason enumerator to a string.
 \return Possible return values are "finished", "cancelled", and "error".
 */
-char const* to_string(ReceiverBase::Reason reason);
+char const* to_string(ListenerBase::Reason reason);
 
 } // namespace scopes
 

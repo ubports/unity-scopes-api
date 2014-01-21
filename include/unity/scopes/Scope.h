@@ -21,7 +21,9 @@
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/ActivationListener.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
@@ -30,6 +32,8 @@ namespace unity
 
 namespace scopes
 {
+
+class Result;
 
 namespace internal
 {
@@ -45,12 +49,16 @@ class UNITY_API Scope : public virtual ObjectProxy
 public:
     /**
     \brief Initiates a query.
-    The query() method expects an instance derived from ReceiverBase, which it uses to return
+    The query() method expects an instance derived from ListenerBase, which it uses to return
     the results for the query. query() is an asynchronous method, that is, it returns immediately;
     results for the query typically will arrive only after the query() method completes (but may
     also arrive while the query() method is still running.
     */
-    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
+
+    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
+
+    QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

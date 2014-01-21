@@ -17,7 +17,11 @@
  */
 
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
@@ -29,7 +33,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     explicit MyQuery(string const& query)
@@ -45,7 +49,7 @@ public:
     {
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
@@ -60,6 +64,37 @@ public:
 
 private:
     string query_;
+};
+
+class MyPreview : public PreviewQuery
+{
+public:
+    explicit MyPreview(string const& uri)
+        : uri_(uri)
+    {
+    }
+
+    ~MyPreview() noexcept
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("Bar"));
+        cout << "RemoteScope: preview \"" << uri_ << "\" complete" << endl;
+    }
+
+private:
+    string uri_;
 };
 
 class MyScope : public ScopeBase
@@ -82,6 +117,13 @@ public:
         QueryBase::UPtr query(new MyQuery(q));
         cout << "RemoteScope: created query: \"" << q << "\"" << endl;
         return query;
+    }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        QueryBase::UPtr preview(new MyPreview(result.uri()));
+        cout << "RemoteScope: requested preview: \"" << result.uri() << "\"" << endl;
+        return preview;
     }
 };
 

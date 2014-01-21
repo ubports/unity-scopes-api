@@ -16,15 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_REPLYIMPL_H
-#define UNITY_INTERNAL_REPLYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLYIMPL_H
+#define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/ObjectProxyImpl.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/Category.h>
-#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/ListenerBase.h>
 
 #include <atomic>
 
@@ -61,11 +62,14 @@ public:
 
     bool push(unity::scopes::CategorisedResult const& result);
     bool push(unity::scopes::Annotation const& annotation);
+    bool push(unity::scopes::PreviewWidgetList const& widgets);
+    bool push(std::string const& key, Variant const& value);
     void finished();
-    void finished(unity::scopes::ReceiverBase::Reason reason);
+    void finished(unity::scopes::ListenerBase::Reason reason);
     void error(std::exception_ptr ex);
 
-    static ReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
+    static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
+    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
 
     typedef std::function<void()> CleanupFunc;
 

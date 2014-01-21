@@ -1,10 +1,17 @@
-unity-scopes-api (0.1.7-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.2.0-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Michi Henning ]
   * Added ability for scope to push an exception (as an exception_ptr). On the client side,
     the exception is delivered as the what() string (if the exception is a std::exception) and
     as "unknown exception", otherwise.
 
- -- Michi Henning <michi.henning@canonical.com>  Fri, 03 Jan 2014 07:31:02 +1000
+  [ Jussi Pakkanen ]
+  * Version bump due to namespace peeling.
+
+  [ Michal Hruby ]
+  * Added preview and activation APIs.
+
+ -- Michal Hruby <michal.hruby@canonical.com>  Thu, 16 Jan 2014 14:56:05 +0200
 
 unity-scopes-api (0.1.6+14.04.20131219.1-0ubuntu1) trusty; urgency=low
 

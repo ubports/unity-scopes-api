@@ -141,7 +141,11 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-if (Werror)
+# These tests are slow, so make it possible not to run them
+# during day-to-day development.
+option(headertests "Check that headers compile cleanly" ON)
+
+if (${Werror})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
     if ("${cmake_build_type_lower}" STREQUAL "release" OR "${cmake_build_type_lower}" STREQUAL "relwithdebinfo")
@@ -173,8 +177,8 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 1)
-set(UNITY_SCOPES_MICRO 7)
+set(UNITY_SCOPES_MINOR 2)
+set(UNITY_SCOPES_MICRO 0)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -238,6 +242,7 @@ set(TESTLIBS ${UNITY_SCOPES_LIB}) # HACK
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
+set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
 
 # Tests
 include(CTest)

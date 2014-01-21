@@ -39,7 +39,7 @@ format="$3"
 files=`find "$dir" -name '*.h' -o -name '*.cpp' -o -name '*.c' \
     | grep -v UnityScopesApi_tp.h`
 
-"$astyle" --options="$dir"/astyle-config $files
+"$astyle" --options="$dir"/astyle-config -n $files
 [ $? -ne 0 ] && exit $?
 
 "$format" -i -style=file $files

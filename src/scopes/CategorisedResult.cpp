@@ -33,13 +33,13 @@ CategorisedResult::CategorisedResult(Category::SCPtr category)
 {
 }
 
-CategorisedResult::CategorisedResult(Category::SCPtr category, const VariantMap &variant_map)
-    : Result(new internal::CategorisedResultImpl(category, variant_map))
+CategorisedResult::CategorisedResult(std::shared_ptr<internal::ResultImpl> impl)
+    : Result(impl)
 {
 }
 
-CategorisedResult::CategorisedResult(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
-    : Result(new internal::CategorisedResultImpl(reg, variant_map))
+CategorisedResult::CategorisedResult(Category::SCPtr category, const VariantMap &variant_map)
+    : Result(new internal::CategorisedResultImpl(category, variant_map))
 {
 }
 

@@ -273,7 +273,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     auto endpoint = it2->second.get_string();
     throw_on_empty("proxy.endpoint", endpoint);
     auto mw_proxy = mw_->create_scope_proxy(identity, endpoint);
-    proxy_ = ScopeImpl::create(mw_proxy, mw_->runtime());
+    proxy_ = ScopeImpl::create(mw_proxy, mw_->runtime(), scope_name_);
 
     it = find_or_throw(var, "display_name");
     display_name_ = it->second.get_string();

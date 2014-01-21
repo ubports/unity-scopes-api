@@ -161,7 +161,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
             auto mw = dynamic_cast<ZmqMiddleware*>(mw_base());
             assert(mw);
             auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity());
-            return ScopeImpl::create(zmq_proxy, mw->runtime());
+            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_name);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {

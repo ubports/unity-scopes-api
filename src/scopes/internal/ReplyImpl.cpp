@@ -25,7 +25,9 @@
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/CategoryRenderer.h>
 
 #include <sstream>
@@ -123,6 +125,27 @@ bool ReplyImpl::push(unity::scopes::Annotation const& annotation)
     return push(var);
 }
 
+bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
+{
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& widget : widgets)
+    {
+        arr.push_back(Variant(widget.serialize()));
+    }
+    vm["widgets"] = arr;
+    return push(vm);
+}
+
+bool ReplyImpl::push(std::string const& key, Variant const& value)
+{
+    VariantMap vm;
+    VariantMap nested;
+    nested[key] = value;
+    vm["preview-data"] = nested;
+    return push(vm);
+}
+
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
     if (!qo_->pushable())
@@ -149,10 +172,10 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
-    finished(ReceiverBase::Finished);
+    finished(ListenerBase::Finished);
 }
 
-void ReplyImpl::finished(ReceiverBase::Reason reason)
+void ReplyImpl::finished(ListenerBase::Reason reason)
 {
     if (!finished_.exchange(true))
     {
@@ -186,7 +209,7 @@ void ReplyImpl::error(exception_ptr ex)
 
     try
     {
-        fwd()->finished(ReceiverBase::Error, error_message);
+        fwd()->finished(ListenerBase::Error, error_message);
     }
     catch (MiddlewareException const& e)
     {
@@ -196,9 +219,18 @@ void ReplyImpl::error(exception_ptr ex)
 }
 
 
-ReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
 {
-    return ReplyProxy(new Reply((new ReplyImpl(mw_proxy, qo))));
+    auto reply_impl = new ReplyImpl(mw_proxy, qo);
+    auto reply = new SearchReply(reply_impl);
+    return SearchReplyProxy(reply);
+}
+
+PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+{
+    auto reply_impl = new ReplyImpl(mw_proxy, qo);
+    auto reply = new PreviewReply(reply_impl);
+    return PreviewReplyProxy(reply);
 }
 
 MWReplyProxy ReplyImpl::fwd() const

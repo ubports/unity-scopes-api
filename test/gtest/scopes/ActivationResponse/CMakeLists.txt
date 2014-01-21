@@ -1,0 +1,4 @@
+add_executable(ActivationResponse_test ActivationResponse_test.cpp)
+target_link_libraries(ActivationResponse_test ${TESTLIBS})
+
+add_test(ActivationResponse ActivationResponse_test)

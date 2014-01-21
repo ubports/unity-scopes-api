@@ -92,13 +92,14 @@ private:
     zmqpp::socket subscribe_to_ctrl_socket();
     void stop_workers() noexcept;
 
+    void safe_bind(zmqpp::socket& s, std::string const& endpoint);
+
     // Thread start functions
     void broker_thread();
     void worker_thread();
 
     void cleanup();
     void join_with_all_threads();
-    void clear_servants();
 
     void store_exception(scopes::MiddlewareException& ex);
 

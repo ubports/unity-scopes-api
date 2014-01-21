@@ -18,20 +18,23 @@
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
+
+#include "scope.h"
 
 using namespace std;
 using namespace unity::scopes;
 
-class TestQuery : public QueryBase
+class TestQuery : public SearchQuery
 {
 public:
     virtual void cancelled() override
     {
     }
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
@@ -43,31 +46,42 @@ public:
     }
 };
 
-class TestScope : public ScopeBase
+class TestPreview : public PreviewQuery
 {
 public:
-    virtual int start(string const&, RegistryProxy const &) override
-    {
-        return VERSION;
-    }
-
-    virtual void stop() override
+    virtual void cancelled() override
     {
     }
-
-    virtual void run() override
+    virtual void run(PreviewReplyProxy const& reply) override
     {
-    }
-
-    virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override
-    {
-        return QueryBase::UPtr(new TestQuery());
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("Bar"));
     }
 };
 
-int main(int, char **argv) {
-    auto rt = Runtime::create_scope_runtime("TestScope", argv[1]);
-    TestScope scope;
-    rt->run_scope(&scope);
-    return 0;
+int TestScope::start(string const&, RegistryProxy const &)
+{
+    return VERSION;
+}
+
+void TestScope::stop()
+{
+}
+
+void TestScope::run()
+{
+}
+
+QueryBase::UPtr TestScope::create_query(string const &, VariantMap const &)
+{
+    return QueryBase::UPtr(new TestQuery());
+}
+
+QueryBase::UPtr TestScope::preview(Result const&, VariantMap const &)
+{
+    return QueryBase::UPtr(new TestPreview());
 }

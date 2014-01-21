@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_OBJECTPROXYIMPL_H
-#define UNITY_INTERNAL_OBJECTPROXYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
+#define UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
 
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
 #include<unity/scopes/ObjectProxyFwd.h>
@@ -39,6 +39,9 @@ public:
 
     virtual std::string identity() const;
     virtual std::string endpoint() const;
+
+    // Remote operation
+    virtual void ping();
 
 protected:
     MWProxy proxy() const;                  // Non-virtual because we cannot use covariance with incomplete types.

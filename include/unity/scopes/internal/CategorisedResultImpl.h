@@ -16,13 +16,14 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RESULTIMPL_H
-#define UNITY_SCOPES_RESULTIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_RESULTIMPL_H
+#define UNITY_SCOPES_INTERNAL_RESULTIMPL_H
 
 #include <string>
 #include <memory>
 #include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
 
 namespace unity
 {
@@ -43,6 +44,8 @@ public:
 
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;
+
+    static CategorisedResult create_result(std::shared_ptr<CategorisedResultImpl> impl);
 
 protected:
     void serialize_internal(VariantMap& var) const override;
