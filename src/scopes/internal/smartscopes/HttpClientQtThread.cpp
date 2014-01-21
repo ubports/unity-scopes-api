@@ -28,24 +28,22 @@ HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
       url_(url),
       timeout_(timeout),
       reply_(nullptr),
-      manager_(nullptr)
+      manager_(new QNetworkAccessManager(this))
 {
+    moveToThread(this);
 }
 
 HttpClientQtThread::~HttpClientQtThread()
 {
     cancel();
 
-    delete reply_;
-    delete manager_;
+    reply_->deleteLater();
 }
 
 void HttpClientQtThread::run()
 {
     {
         std::lock_guard<std::mutex> lock(reply_mutex_);
-
-        manager_ = new QNetworkAccessManager();
 
         QNetworkRequest request(url_);
 
