@@ -36,8 +36,8 @@ HttpClientQtThread::~HttpClientQtThread()
 {
     cancel();
 
-    reply_->deleteLater();
-    manager_->deleteLater();
+    quit();
+    wait();
 }
 
 void HttpClientQtThread::run()
@@ -58,6 +58,9 @@ void HttpClientQtThread::run()
     QTimer timeout;
     timeout.singleShot(timeout_, this, SLOT(cancel()));
     QThread::exec(); // enter event loop
+
+    delete reply_;
+    delete manager_;
 }
 
 QNetworkReply* HttpClientQtThread::getReply()
@@ -66,19 +69,9 @@ QNetworkReply* HttpClientQtThread::getReply()
     return reply_;
 }
 
-void HttpClientQtThread::queryDone(QNetworkReply*)
-{
-    quit();
-}
-
 void HttpClientQtThread::cancel()
 {
     std::lock_guard<std::mutex> lock(reply_mutex_);
-
-    if (reply_)
-    {
-        emit abort();
-    }
-
-    quit();
+    emit abort();
+    emit queryDone();
 }

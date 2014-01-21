@@ -43,10 +43,10 @@ public:
 
 public Q_SLOTS:
     void cancel();
-    void queryDone(QNetworkReply*);
 
 Q_SIGNALS:
     void abort();
+    void queryDone();
 
 private:
     QUrl url_;
