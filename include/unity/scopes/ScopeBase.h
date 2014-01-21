@@ -19,9 +19,12 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <unity/scopes/QueryBase.h>
+#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/PreviewQuery.h>
 #include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>
+#include <unity/scopes/Result.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -58,6 +61,8 @@ namespace unity
 
 namespace scopes
 {
+
+class ResultItem;
 
 /**
 \file ScopeBase.h
@@ -182,6 +187,24 @@ public:
     /param hints TODO, complete doc
     */
     virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
+
+    /**
+    \brief Called by the scopes run time when a scope needs to respond to a result activation request.
+    This method must return an instance that is derived from ActivationBase. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly. That call to activate() is made
+    by an arbitrary thread.
+    Default implementation returns an instance of ActivationBase that responds with
+    ActivationResponse::Status::NotHandled.
+    \param result The result that should be activated.
+    \param hints arbitrary hints sent by the client
+     */
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
+
+    /*
+     * FIXME: doc string
+     */
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

@@ -47,6 +47,14 @@ public:
     virtual QueryCtrlProxy create_query(std::string const& q,
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply) override;
+
+    virtual QueryCtrlProxy activate(VariantMap const& result,
+                                    VariantMap const& hints,
+                                    MWReplyProxy const& reply) override;
+
+    virtual QueryCtrlProxy preview(Result const& result,
+                                   VariantMap const& hints,
+                                   MWReplyProxy const& reply) override;
 };
 
 } // namespace zmq_middleware

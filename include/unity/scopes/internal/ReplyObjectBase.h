@@ -20,7 +20,8 @@
 #define UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -37,7 +38,7 @@ public:
     UNITY_DEFINES_PTRS(ReplyObjectBase);
 
     virtual void push(VariantMap const& result) noexcept = 0;
-    virtual void finished(ReceiverBase::Reason reason, std::string const& error_message) noexcept = 0;
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
 };
 
 } // namespace internal

@@ -23,7 +23,7 @@
 #include <mutex>
 
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/ReceiverBase.h>
+#include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWScope.h>
@@ -42,7 +42,7 @@ TEST(Runtime, basic)
     rt->destroy();
 }
 
-class Receiver : public ReceiverBase
+class Receiver : public SearchListener
 {
 public:
     virtual void push(CategorisedResult result) override
@@ -52,8 +52,9 @@ public:
         EXPECT_EQ("art", result.art());
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
+        last_result_ = std::make_shared<Result>(result);
     }
-    virtual void finished(ReceiverBase::Reason reason, string const& error_message) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
@@ -68,11 +69,53 @@ public:
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+    std::shared_ptr<Result> last_result()
+    {
+        return last_result_;
+    }
 private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
     int count_;
+    std::shared_ptr<Result> last_result_;
+};
+
+class PreviewReceiver : public PreviewListener
+{
+public:
+    virtual void push(PreviewWidgetList const& widgets) override
+    {
+        EXPECT_EQ(widgets.size(), 2);
+        widgets_pushes_++;
+    }
+    virtual void push(std::string const& key, Variant const&) override
+    {
+        EXPECT_TRUE(key == "author" || key == "rating");
+        data_pushes_++;
+    }
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
+        EXPECT_EQ(1, widgets_pushes_);
+        EXPECT_EQ(2, data_pushes_);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+    int widgets_pushes_;
+    int data_pushes_;
 };
 
 TEST(Runtime, run_scope)
@@ -93,12 +136,16 @@ TEST(Runtime, run_scope)
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get());
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     VariantMap hints;
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->create_query("test", hints, receiver);
     receiver->wait_until_finished();
+
+    auto previewer = make_shared<PreviewReceiver>();
+    auto preview_ctrl = scope->preview(*(receiver->last_result().get()), hints, previewer);
+    previewer->wait_until_finished();
 
     kill(pid, SIGTERM);
 }

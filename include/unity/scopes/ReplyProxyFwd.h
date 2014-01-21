@@ -27,8 +27,12 @@ namespace unity
 namespace scopes
 {
 
-class Reply;
-typedef std::shared_ptr<Reply> ReplyProxy;
+class ReplyBase;
+class SearchReply;
+class PreviewReply;
+typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
+typedef std::shared_ptr<SearchReply> SearchReplyProxy;
+typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
 
 } // namespace scopes
 

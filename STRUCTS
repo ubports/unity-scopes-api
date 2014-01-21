@@ -19,8 +19,8 @@ This document describes data structures that are serialized and exchanged by
 middleware.
 -----------------------------------------------------------------------------
 
-CategorisedResult (returned by serialize()):
-=======================================
+Result (returned by serialize()):
+=================================
 'attrs' : {
     'uri' : string
     'title' : string
@@ -29,8 +29,19 @@ CategorisedResult (returned by serialize()):
     + any custom key-value attribute added by scope author.
 },
 'internal' : {
-    'cat_id' : string
     'result' : dictionary (serialized Result), optional
+    'flags'  : integer, optional (activation/preview flags defined by ResultImpl::Flags enum)
+    'origin' : string (scope name)
+}
+
+CategorisedResult (returned by serialize()):
+=======================================
+'attrs' : {
+    // all Result's attributes
+},
+'internal' : {
+    'cat_id' : string
+    + all Result's internal values
 }
 
 Category (returned by serialize()):
@@ -76,3 +87,8 @@ PushRequest (capnproto structure)
 =================================
  result : ValueDict with "category" and/or "result" or "annotation" key and
   serialized Category / CategorisedResult / Annotation respectively.
+
+ActivationResponse (returned by serialize())
+============================================
+ 'status'      : int (corresponds to ActivationResponse::Status enum)
+ 'hints'       : dict

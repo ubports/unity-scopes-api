@@ -37,9 +37,19 @@ Scope::~Scope() noexcept
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, ReceiverBase::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
     return fwd()->create_query(q, hints, reply);
+}
+
+QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+{
+    return fwd()->activate(result, hints, reply);
+}
+
+QueryCtrlProxy Scope::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+{
+    return fwd()->preview(result, hints, reply);
 }
 
 internal::ScopeImpl* Scope::fwd() const

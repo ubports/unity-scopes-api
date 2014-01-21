@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Result.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -48,6 +49,16 @@ public:
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) = 0;
+
+    virtual MWQueryCtrlProxy activate(Result const& result,
+                                      VariantMap const& hints,
+                                      MWReplyProxy const &reply,
+                                      InvokeInfo const& info) = 0;
+
+    virtual MWQueryCtrlProxy preview(Result const& result,
+                                     VariantMap const& hints,
+                                     MWReplyProxy const& reply,
+                                     InvokeInfo const& info) = 0;
 };
 
 } // namespace internal

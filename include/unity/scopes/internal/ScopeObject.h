@@ -30,6 +30,7 @@ namespace scopes
 {
 
 class ScopeBase;
+class Result;
 
 namespace internal
 {
@@ -54,6 +55,16 @@ public:
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) override;
+
+    MWQueryCtrlProxy activate(Result const& result,
+                              VariantMap const& hints,
+                              MWReplyProxy const &reply,
+                              InvokeInfo const& info) override;
+
+    MWQueryCtrlProxy preview(Result const& result,
+                             VariantMap const& hints,
+                             MWReplyProxy const& reply,
+                             InvokeInfo const& info) override;
 
 private:
     RuntimeImpl* const runtime_;

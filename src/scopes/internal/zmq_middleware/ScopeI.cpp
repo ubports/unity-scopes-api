@@ -19,6 +19,8 @@
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
@@ -51,6 +53,8 @@ interface Reply;
 interface Scope
 {
     QueryCtrl* create_query(string query, ValueDict hints, Reply* replyProxy);
+    QueryCtrl* preview(ValueDict result, ValueDict hints, Reply* replyProxy);
+    QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
 };
 
 */
@@ -58,8 +62,11 @@ interface Scope
 using namespace std::placeholders;
 
 ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
-    ServantBase(so, { { "create_query", bind(&ScopeI::create_query_, this, _1, _2, _3) } })
-
+    ServantBase(so, {
+        { "create_query", bind(&ScopeI::create_query_, this, _1, _2, _3) },
+        { "preview", bind(&ScopeI::preview_, this, _1, _2, _3) },
+        { "activate", bind(&ScopeI::activate_, this, _1, _2, _3) }
+    })
 {
 }
 
@@ -80,10 +87,65 @@ void ScopeI::create_query_(Current const& current,
                               proxy.getIdentity().cStr(),
                               proxy.getCategory().cStr()));
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query,
                                                                                 hints,
                                                                                 reply_proxy,
                                                                                 to_info(current)));
+    assert(ctrl_proxy);
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
+    auto p = create_query_response.initReturnValue();
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
+}
+
+void ScopeI::activate_(Current const& current,
+               capnp::AnyPointer::Reader& in_params,
+               capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Scope::ActivationRequest>();
+    auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
+    auto hints = to_variant_map(req.getHints());
+    auto proxy = req.getReplyProxy();
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
+                                           proxy.getEndpoint().cStr(),
+                                           proxy.getIdentity().cStr(),
+                                           proxy.getCategory().cStr()));
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate(result,
+                                                                            hints,
+                                                                            reply_proxy,
+                                                                            to_info(current)));
+    assert(ctrl_proxy);
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
+    auto p = create_query_response.initReturnValue();
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
+}
+
+void ScopeI::preview_(Current const& current,
+                      capnp::AnyPointer::Reader& in_params,
+                      capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Scope::PreviewRequest>();
+    auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
+    auto hints = to_variant_map(req.getHints());
+    auto proxy = req.getReplyProxy();
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
+                                           proxy.getEndpoint().cStr(),
+                                           proxy.getIdentity().cStr(),
+                                           proxy.getCategory().cStr()));
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->preview(result,
+                                                                           hints,
+                                                                           reply_proxy,
+                                                                           to_info(current)));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
