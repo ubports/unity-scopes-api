@@ -60,7 +60,7 @@ builder.add_attribute("type", "reviews");
 builder.add_attribute("rating-icon-empty", Variant::Null);
 builder.add_attribute("rating-icon-half", Variant::Null);
 builder.add_attribute("rating-icon-full", Variant::Null);
-builder.add_tuple("reviews", {{"rating", Variant("myrating")}, {"review", Variant("data")}, {"author", Variant("author")}});
+builder.add_tuple("reviews", {{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
 
 Preview widget(builder.variant_map());
 \endcode
@@ -87,7 +87,7 @@ public:
      \code
      VariantMapBuilder builder;
      builder.add_tuple("mykey", {{"a", Variant(1)}, {"b", Variant(2)}});
-     builder.add_tuple("mykey", {{"c", Variant(1)}, {"d", Variant(2)}});
+     builder.add_tuple("mykey", {{"c", Variant(2)}, {"d", Variant(3)}});
      \endcode
     */
     void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);

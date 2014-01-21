@@ -62,8 +62,8 @@ Variant json_to_variant(JsonNodeInterface::SCPtr node)
         case JsonNodeInterface::NodeType::String:
             return Variant(node->as_string());
         case JsonNodeInterface::NodeType::Int:
-        case JsonNodeInterface::NodeType::UInt: //FIXME: potentially unsafe
-            return Variant(node->as_int());
+        case JsonNodeInterface::NodeType::UInt:
+            return Variant(node->as_int()); // this can throw std::runtime_error from jsoncpp if uint to int conversion is not possible
         case JsonNodeInterface::NodeType::Real:
             return Variant(node->as_double());
         case JsonNodeInterface::NodeType::Bool:
