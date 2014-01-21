@@ -58,6 +58,11 @@ void ServantBase::dispatch_(Current const& current,
     auto it = dispatch_table_.find(current.op_name);
     if (it == dispatch_table_.end())
     {
+        if (current.op_name == "ping")
+        {
+            r.setStatus(capnproto::ResponseStatus::SUCCESS);
+            return;
+        }
         marshal_operation_not_exist_exception(r, current);
         return;
     }

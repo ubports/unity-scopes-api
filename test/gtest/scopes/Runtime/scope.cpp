@@ -23,6 +23,8 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 
+#include "scope.h"
+
 using namespace std;
 using namespace unity::scopes;
 
@@ -61,36 +63,25 @@ public:
     }
 };
 
-class TestScope : public ScopeBase
+int TestScope::start(string const&, RegistryProxy const &)
 {
-public:
-    virtual int start(string const&, RegistryProxy const &) override
-    {
-        return VERSION;
-    }
+    return VERSION;
+}
 
-    virtual void stop() override
-    {
-    }
+void TestScope::stop()
+{
+}
 
-    virtual void run() override
-    {
-    }
+void TestScope::run()
+{
+}
 
-    virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override
-    {
-        return QueryBase::UPtr(new TestQuery());
-    }
+QueryBase::UPtr TestScope::create_query(string const &, VariantMap const &)
+{
+    return QueryBase::UPtr(new TestQuery());
+}
 
-    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override
-    {
-        return QueryBase::UPtr(new TestPreview());
-    }
-};
-
-int main(int, char **argv) {
-    auto rt = Runtime::create_scope_runtime("TestScope", argv[1]);
-    TestScope scope;
-    rt->run_scope(&scope);
-    return 0;
+QueryBase::UPtr TestScope::preview(Result const&, VariantMap const &)
+{
+    return QueryBase::UPtr(new TestPreview());
 }
