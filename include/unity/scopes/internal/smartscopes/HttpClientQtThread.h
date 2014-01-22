@@ -38,22 +38,27 @@ public:
     HttpClientQtThread(const QUrl& url, uint timeout);
     ~HttpClientQtThread();
 
+    bool get_reply(std::string& reply);
+
+private:
     void run();
-    QNetworkReply* getReply();
 
 public Q_SLOTS:
     void cancel();
+    void timeout();
+    void got_reply(QNetworkReply* reply);
 
 Q_SIGNALS:
     void abort();
-    void queryDone();
+    void query_done();
 
 private:
     QUrl url_;
     uint timeout_;
-    QNetworkReply* reply_;
-    QNetworkAccessManager* manager_;
     std::mutex reply_mutex_;
+
+    bool success_;
+    std::string reply_;
 };
 
 #endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
