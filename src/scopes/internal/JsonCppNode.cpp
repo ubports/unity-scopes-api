@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
+#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -53,6 +55,12 @@ void JsonCppNode::read_json(std::string const& json_string)
     {
         throw unity::ResourceException("Failed to parse json string: " + reader.getFormattedErrorMessages());
     }
+}
+
+std::string JsonCppNode::to_json_string()
+{
+    Json::FastWriter writer;
+    return writer.write(root_);
 }
 
 int JsonCppNode::size() const

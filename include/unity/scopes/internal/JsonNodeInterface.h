@@ -50,6 +50,7 @@ public:
 
     virtual void clear() = 0;
     virtual void read_json(std::string const& json_string) = 0;
+    virtual std::string to_json_string() = 0;
 
     virtual int size() const = 0;
     virtual std::vector<std::string> member_names() const = 0;

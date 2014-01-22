@@ -20,8 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
 
 #include <unity/scopes/internal/JsonNodeInterface.h>
-
-#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/value.h>
 
 namespace unity
 {
@@ -41,6 +40,7 @@ public:
 
     void clear() override;
     void read_json(std::string const& json_string) override;
+    std::string to_json_string() override;
 
     int size() const override;
     std::vector<std::string> member_names() const override;
