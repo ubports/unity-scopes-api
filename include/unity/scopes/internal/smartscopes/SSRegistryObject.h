@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/Registry.h>
@@ -34,17 +34,17 @@ namespace internal {
 
 namespace smartscopes {
 
-class SSRegistryObject : public std::enable_shared_from_this<SSRegistryObject>, public AbstractObject {
+class SSRegistryObject : public RegistryObjectBase {
 public:
   UNITY_DEFINES_PTRS(SSRegistryObject);
 
   SSRegistryObject(MiddlewareBase::SPtr middleware);
   virtual ~SSRegistryObject() noexcept;
 
-  ScopeMetadata get_metadata(std::string const &scope_name);
-  MetadataMap list();
+  ScopeMetadata get_metadata(std::string const &scope_name) override;
+  MetadataMap list() override;
 
-  virtual ScopeProxy locate(std::string const &scope_name);
+  ScopeProxy locate(std::string const &scope_name) override;
 
 private:
   void refresh_thread();

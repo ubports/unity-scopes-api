@@ -42,8 +42,6 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware)
       refresh_stopped_(false),
       middleware_(middleware) {
 
-  ///! here we need to create an instance of a scope in process like scope runner does.
-
   proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"),
                              middleware_->runtime(), "smartscopes");
 
@@ -85,6 +83,7 @@ MetadataMap SSRegistryObject::list() {
 }
 
 ScopeProxy SSRegistryObject::locate(std::string const &scope_name) {
+  (void)scope_name;
   return ScopeProxy();
 }
 

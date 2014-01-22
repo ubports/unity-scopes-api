@@ -23,74 +23,70 @@
 
 #include <cassert>
 #include <iostream>
-#include <libgen.h>
 
-using namespace std;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 
-char const* prog_name;
-
-namespace
+static void error(std::string const& msg)
 {
-
-void error(string const& msg)
-{
-    assert(!msg.empty());
-    cerr << prog_name << ": " << msg << endl;
+  assert(!msg.empty());
+  std::cerr << "smartscopesproxy: " << msg << std::endl;
 }
 
-} // namespace
-
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    prog_name = basename(argv[0]);
+  if (argc > 1 && std::string(argv[1]) == "test")
+  {
+    char server_url[] = "SMART_SCOPES_SERVER=http://127.0.0.1:8000";
+    ::putenv(server_url);
+  }
 
-    char const* const config_file = argc > 1 ? argv[1] : "";
+  int exit_status = 1;
 
-    int exit_status = 1;
+  try
+  {
+    // Instantiate a runtime
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
 
-    try
-    {
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", config_file);
+    // Get middleware handle
+    std::string identity = runtime->registry_identity();
 
-        string identity = runtime->registry_identity();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    std::string mw_kind = c.mw_kind();
 
-        RegistryConfig c(identity, runtime->registry_configfile());
-        string mw_kind = c.mw_kind();
+    MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+    // Instantiate a SS registry
+    SSRegistryObject::SPtr registry(new SSRegistryObject(middleware));
 
-        SSRegistryObject::SPtr registry(new SSRegistryObject(middleware));
+    // Add the SS registry to the middleware
+    middleware->add_registry_object(runtime->registry_identity(), registry);
 
-        // Add the registry to the middleware
-        ///! middleware->add_registry_object(runtime->registry_identity(), registry);
+    // Wait until shutdown
+    middleware->wait_for_shutdown();
 
-        // Wait until shutdown
-        middleware->wait_for_shutdown();
-        exit_status = 0;
-    }
-    catch (unity::Exception const& e)
-    {
-        error(e.to_string());
-    }
-    catch (std::exception const& e)
-    {
-        error(e.what());
-    }
-    catch (string const& e)
-    {
-        error("fatal error: " + e);
-    }
-    catch (char const* e)
-    {
-        error(string("fatal error: ") + e);
-    }
-    catch (...)
-    {
-        error("terminated due to unknown exception");
-    }
+    exit_status = 0;
+  }
+  catch (unity::Exception const& e)
+  {
+    error(e.to_string());
+  }
+  catch (std::exception const& e)
+  {
+    error(e.what());
+  }
+  catch (std::string const& e)
+  {
+    error("fatal error: " + e);
+  }
+  catch (char const* e)
+  {
+    error(std::string("fatal error: ") + e);
+  }
+  catch (...)
+  {
+    error("terminated due to unknown exception");
+  }
 
-    return exit_status;
+  return exit_status;
 }

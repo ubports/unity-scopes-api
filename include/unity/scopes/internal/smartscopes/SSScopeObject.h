@@ -19,11 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/Variant.h>
-#include <unity/scopes/Result.h>
+#include <unity/scopes/internal/ScopeObjectBase.h>
 
 #include <string>
 
@@ -45,11 +41,7 @@ class RuntimeImpl;
 namespace smartscopes
 {
 
-// A SSScopeObject sits in between the incoming requests from the middleware layer and the
-// ScopeBase-derived implementation provided by the scope. It forwards incoming
-// queries to the actual scope. This allows us to intercept all queries for a scope.
-
-class SSScopeObject final : public AbstractObject
+class SSScopeObject final : public ScopeObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(SSScopeObject);
@@ -58,21 +50,20 @@ public:
     virtual ~SSScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(std::string const& q,
-                                  VariantMap const& hints,
-                                  MWReplyProxy const& reply,
-                                  MiddlewareBase* mw_base);
-
+    virtual MWQueryCtrlProxy create_query(std::string const& q,
+                                          VariantMap const& hints,
+                                          MWReplyProxy const& reply,
+                                          InvokeInfo const& info) override;
 
     MWQueryCtrlProxy activate(Result const& result,
                               VariantMap const& hints,
                               MWReplyProxy const &reply,
-                              MiddlewareBase* mw_base);
+                              InvokeInfo const& info) override;
 
     MWQueryCtrlProxy preview(Result const& result,
                              VariantMap const& hints,
                              MWReplyProxy const& reply,
-                             MiddlewareBase* mw_base);
+                             InvokeInfo const& info) override;
 
 private:
     RuntimeImpl* const runtime_;
