@@ -13,35 +13,36 @@ client (i.e. Unity Dash or another scope).
 \subsection scopebase Create a scope class that implements ScopeBase inteface.
 
 There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
-\link unity::api::scopes::ScopeBase::start() start\endlink and \link unity::api::scopes::ScopeBase::create_query() create_query\endlink methods. 
+\link unity::scopes::ScopeBase::start() start\endlink and \link unity::scopes::ScopeBase::create_query() create_query\endlink methods. 
 
 \code{.cpp}
-class MyScope: public unity::api::scopes::ScopeBase
+class MyScope: public unity::scopes::ScopeBase
 {
 public:
-    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override;
+    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override;
     virtual void stop() override;
     virtual void run() override;
-    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const& query, unity::api::scopes::VariantMap const&) override;
+    virtual unity::scopes::QueryBase::UPtr create_query(std::string const& query, unity::scopes::VariantMap const&) override;
+    virtual unity::scopes::QueryBase::UPtr preview(unity::scopes::Result const&, unity::scopes::VariantMap const&) override;
 }
 \endcode
 
-The \link unity::api::scopes::ScopeBase::start() start\endlink method must, at the very least return ScopeBase::VERSION, e.g.
+The \link unity::scopes::ScopeBase::start() start\endlink method must, at the very least return ScopeBase::VERSION, e.g.
 
 \code{.cpp}
-int MyScope::start(string const&, unity::api::scopes::RegistryProxy const&)
+int MyScope::start(string const&, unity::scopes::RegistryProxy const&)
 {
     return ScopeBase::VERSION;
 }
 \endcode
 
-The \link unity::api::scopes::ScopeBase::stop() stop\endlink method should release any resources, such as network connections where applicable. See the
-documentation of \link unity::api::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::api::scopes::ScopeBase::run() ScopeBase::run\endlink;
+The \link unity::scopes::ScopeBase::stop() stop\endlink method should release any resources, such as network connections where applicable. See the
+documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
-The \link unity::api::scopes::QueryBase::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
+The \link unity::scopes::SearchQuery::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
-\link unity::api::scopes::QueryBase QueryBase\endlink interface, e.g:
+\link unity::scopes::SearchQuery SearchQuery\endlink interface, e.g:
 
 \code{.cpp}
 QueryBase::UPtr MyScope::create_query(string const& query, VariantMap const&)
@@ -53,17 +54,17 @@ QueryBase::UPtr MyScope::create_query(string const& query, VariantMap const&)
 
 \subsection querybase Create a query class that implements QueryBase interface.
 
-The central and most important method that needs to be implemented in this interface is \link unity::api::scopes::QueryBase run\endlink.
+The central and most important method that needs to be implemented in this interface is \link unity::scopes::SearchQuery run\endlink.
 This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
 matching the query.
 
-The \link unity::api::scopes::QueryBase run\endlink method gets passed an instance of ReplyProxy, which represents a receiver of query results. Please note
-that ReplyProxy is just a shared pointer for \link unity::api::scopes::Reply Reply\endlink object. The two most important
-methods of Reply object that every scope have to use are \link unity::api::scopes::Reply::register_category register_category\endlink
-and \link unity::api::scopes::Reply::push push\endlink.
+The \link unity::scopes::SearchQuery run\endlink method gets passed an instance of SearchReplyProxy, which represents a receiver of query results. Please note
+that SearchReplyProxy is just a shared pointer for \link unity::scopes::SearchReply SearchReply\endlink object. The two most important
+methods of SearchReply object that every scope have to use are \link unity::scopes::SearchReply::register_category register_category\endlink
+and \link unity::scopes::SearchReply::push push\endlink.
 
-The \link unity::api::scopes::Reply::register_category register_category\endlink method is a factory method for creating new categories (see
-\link unity::api::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but it's recommended to create
+The \link unity::scopes::SearchReply::register_category register_category\endlink method is a factory method for creating new categories (see
+\link unity::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but it's recommended to create
 them as soon as possible (ideally as soon as they are known to the scope).
 
 Registering a category has the following effects:
@@ -74,13 +75,13 @@ Registering a category has the following effects:
 - a space for registered category is removed (collapsed) by the Dash if category
   turns out to be empty at the end of the search.
 
-The actual search results have to be wrapped inside \link unity::api::scopes::ResultItem ResultItem\endlink objects and
-passed to \link unity::api::scopes::Reply::push push\endlink.
+The actual search results have to be wrapped inside \link unity::scopes::CategorisedResult CategorisedResult\endlink objects and
+passed to \link unity::scopes::SearchReply::push push\endlink.
 
 A typical implementation of run may look like this:
 
 \code{.cpp}
-void MyQuery::run(ReplyProxy const& reply)
+void MyQuery::run(SearchReplyProxy const& reply)
 {
     auto category = reply->register_category("recommended", "Recommended", icon, "");
     //... query a local or remote backend
@@ -88,12 +89,12 @@ void MyQuery::run(ReplyProxy const& reply)
     for (auto res: backend.get_results(search_query)) // for every result returned by a backend
     {
         ...
-        ResultItem result(category); // create a result item in "recommended" category
+        CategorisedResult result(category); // create a result item in "recommended" category
         result.set_uri(...);
         result.set_title(...);
         result.set_art(...);
         result.set_dnd_uri(...);
-        result.add_metadata("my-custom-attribute", Variant(...)); // add arbitrary data as needed
+        result["my-custom-attribute"] = Variant(...); // add arbitrary data as needed
 
         reply->push(result); // send result to the client
     }
@@ -108,12 +109,12 @@ typical code snippet to do this looks as follows:
 
 \code{.cpp}
 extern "C" {
-    EXPORT unity::api::scopes::ScopeBase* UNITY_API_SCOPE_CREATE_FUNCTION()
+    EXPORT unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope();
     }
 
-    EXPORT void UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    EXPORT void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }
@@ -123,19 +124,19 @@ extern "C" {
 \section aggscope A simple aggregator scope which combines results from other scopes.
 
 Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
-implementation of run method of \link unity::api::scopes::QueryBase QueryBase\endlink and in the new class that has to implement
-\link unity::api::scopes::ReceiverBase ReceiverBase\endlink interface, which receives result from other scope(s).
+implementation of run method of \link unity::scopes::SearchQuery SearchQuery\endlink and in the new class that has to implement
+\link unity::scopes::SearchListener SearchListener\endlink interface, which receives result from other scope(s).
 
-\subsection subquery Query another scopes via QueryBase::create_subquery()
+\subsection subquery Query another scopes via SearchQuery::create_subquery()
 
-To send search query to another scope, use \link unity::api::scope::QueryBase create_subquery\endlink inside your implementation of QueryBase.
-This method requires - among search query string - an instance of \link unity::api::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
-\link unity::api::scopes::ReceiverBase ReceiverBase\endlink interface. ScopeProxy can be obtained from unity::api::scopes::RegistryProxy and the right place to
-do this is in the implementation of \link unity::api::scopes::ScopeBase::start() start()\endlink method of \link unity::api::scopes::ScopeBase ScopeBase\endlink interface.
+To send search query to another scope, use \link unity::scope::SearchQuery create_subquery\endlink inside your implementation of SearchQuery.
+This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
+\link unity::scopes::SearchListener SearchListener\endlink interface. ScopeProxy can be obtained from unity::scopes::RegistryProxy and the right place to
+do this is in the implementation of \link unity::scopes::ScopeBase::start() start()\endlink method of \link unity::scopes::ScopeBase ScopeBase\endlink interface.
 
 \code{.cpp}
 
-int MyScope::start(std::string const&, unity::api::scopes::RegistryProxy const& registry)
+int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& registry)
 {
     try
     {
@@ -148,7 +149,7 @@ int MyScope::start(std::string const&, unity::api::scopes::RegistryProxy const& 
     return VERSION;
 }
 
-unity::api::scopes::QueryBase::UPtr MyScope::create_query(std::string const& query, unity::api::scopes::VariantMap const&)
+unity::scopes::QueryBase::UPtr MyScope::create_query(std::string const& query, unity::scopes::VariantMap const&)
 {
     QueryBase::UPtr q(new MyQuery(query, scope_to_query_));
     return q;
@@ -156,19 +157,19 @@ unity::api::scopes::QueryBase::UPtr MyScope::create_query(std::string const& que
 
 ...
 
-void MyQuery::run(unity::api::scopes::ReplyProxy const& upstream_reply) 
+void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply) 
 {
     auto category = reply->register_category("recommended", "Recommended", icon, "");
-    ReceiverBase::SPtr reply(new MyReceiver(upstream_reply, category));
+    SearchListener::SPtr reply(new MyReceiver(upstream_reply, category));
     create_subquery(scope_to_query_, query_, VariantMap(), reply);
     ...
 }
 \endcode
 
-\subsection receiver Create a class that implements ReceiverBase interface
+\subsection receiver Create a class that implements SearchListener interface
 
-The \link unity::api::scopes::ReceiverBase ReceiverBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
-implementation receive \link unity::api::scopes::ReceiverBase::push result items and categories\endlink returned by that query. A simple implementation of
+The \link unity::scopes::SearchListener SearchListener\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
+implementation receive \link unity::scopes::SearchListener::push result items and categories\endlink returned by that query. A simple implementation of
 an aggregator scope may just register all categories it receives and push all received results upstream to the query originator, e.g.
 
 \code{.cpp}
