@@ -38,12 +38,12 @@ public:
     PreviewWidgetImpl(std::string const& json_text);
     PreviewWidgetImpl(VariantMap const& definition);
 
-    Variant data() const;
+    std::string data() const;
 
     VariantMap serialize() const;
 
 private:
-    Variant data_; // json template converted to a variant map
+    std::string data_; // json template converted to a variant map
 };
 
 } // namespace internal

@@ -42,7 +42,7 @@ public:
 
     void clear() override;
     void read_json(std::string const& json_string) override;
-    std::string to_json_string() override;
+    std::string to_json_string() const override;
     Variant to_variant() override;
 
     int size() const override;

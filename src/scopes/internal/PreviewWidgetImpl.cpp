@@ -33,18 +33,20 @@ namespace internal
 //! @cond
 
 PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
+    : data_(json_text)
 {
     //TODO: json validation
-    internal::JsonCppNode node(json_text);
-    data_ = node.to_variant();
 }
 
 PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
 {
-    data_ = definition;
+    const Variant var(definition);
+    const internal::JsonCppNode node(var);
+    data_ = node.to_json_string();
+    //TODO: json validation
 }
 
-Variant PreviewWidgetImpl::data() const
+std::string PreviewWidgetImpl::data() const
 {
     return data_;
 }

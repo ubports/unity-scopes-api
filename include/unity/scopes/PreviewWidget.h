@@ -48,7 +48,7 @@ public:
     PreviewWidget(std::string const& definition);
     PreviewWidget(VariantMap const& definition);
 
-    Variant data() const;
+    std::string data() const;
     VariantMap serialize() const;
 
 private:

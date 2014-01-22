@@ -156,7 +156,7 @@ void JsonCppNode::read_json(std::string const& json_string)
     }
 }
 
-std::string JsonCppNode::to_json_string()
+std::string JsonCppNode::to_json_string() const
 {
     Json::FastWriter writer;
     return writer.write(root_);
