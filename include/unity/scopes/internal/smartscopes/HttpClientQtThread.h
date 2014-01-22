@@ -50,7 +50,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void abort();
-    void query_done();
 
 private:
     QUrl url_;

@@ -35,7 +35,6 @@ HttpClientQtThread::~HttpClientQtThread()
 {
     cancel();
 
-    quit();
     wait();
 }
 
@@ -74,7 +73,7 @@ void HttpClientQtThread::cancel()
     reply_ = "Request to " + url_.url().toStdString() + ":" + std::to_string(url_.port()) + " cancelled";
 
     emit abort();
-    emit query_done();
+    quit();
 }
 
 void HttpClientQtThread::timeout()
@@ -85,7 +84,7 @@ void HttpClientQtThread::timeout()
     reply_ = "Request to " + url_.url().toStdString() + ":" + std::to_string(url_.port()) + " timed out";
 
     emit abort();
-    emit query_done();
+    quit();
 }
 
 void HttpClientQtThread::got_reply(QNetworkReply* reply)
@@ -116,5 +115,5 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
         reply_ = QString(reply->readAll()).toStdString();
     }
 
-    emit query_done();
+    quit();
 }
