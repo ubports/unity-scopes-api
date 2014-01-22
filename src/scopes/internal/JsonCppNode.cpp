@@ -77,7 +77,6 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
                 }
                 return val;
             }
-            break;
         case Variant::Type::Null:
             return Json::Value(Json::ValueType::nullValue);
         default:
@@ -86,7 +85,6 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
                 s << "json_to_variant(): unsupported json type ";
                 s << static_cast<int>(var.which());
                 throw unity::LogicException(s.str());
-                break;
             }
     }
 }
@@ -130,7 +128,6 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
                 s << "json_to_variant(): unsupported json type ";
                 s << static_cast<int>(value.type());
                 throw unity::LogicException(s.str());
-                break;
             }
     }
 }

@@ -30,6 +30,7 @@
 #include <condition_variable>
 #include <cstdlib>
 #include <string.h>
+#include <sstream>
 #include <iostream>
 #include <mutex>
 #include <cassert>
@@ -41,8 +42,9 @@ using namespace unity::scopes;
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
-ostream& operator<<(ostream& str, Variant const& var)
+std::string to_string(Variant const& var)
 {
+    std::ostringstream str;
     switch (var.which())
     {
         case Variant::Type::Int:
@@ -64,7 +66,7 @@ ostream& operator<<(ostream& str, Variant const& var)
             str << "{";
             for (auto kv: var.get_dict())
             {
-                str << "\"" << kv.first << "\":" << kv.second;
+                str << "\"" << kv.first << "\":" << to_string(kv.second);
             }
             str << "}";
             break;
@@ -72,14 +74,14 @@ ostream& operator<<(ostream& str, Variant const& var)
             str << "[";
             for (auto v: var.get_array())
             {
-                str << v << ",";
+                str << to_string(v) << ",";
             }
             str << "]";
             break;
          default:
             assert(0);
     }
-    return str;
+    return str.str();
 }
 
 class Receiver : public SearchListener
@@ -212,19 +214,7 @@ public:
     void push(std::string const& key, Variant const& value) override
     {
         cout << "\tPushed preview data: \"" << key << "\", value: ";
-        if (value.which() == Variant::Type::String)
-        {
-            cout << value.get_string();
-        }
-        else if (value.which() == Variant::Type::Null)
-        {
-            cout << "(null)";
-        }
-        else
-        {
-            cout << "(non-string value)";
-        }
-        cout << endl;
+        cout << to_string(value) << endl;
     }
 
     void finished(Reason r, std::string const& error_message) override
