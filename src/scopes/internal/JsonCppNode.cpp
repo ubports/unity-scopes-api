@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>
+#include <sstream>
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -37,8 +38,57 @@ JsonCppNode::JsonCppNode(const Json::Value& root)
 {
 }
 
+JsonCppNode::JsonCppNode(const Variant& var)
+{
+    root_ = from_variant(var);
+}
+
 JsonCppNode::~JsonCppNode()
 {
+}
+
+Json::Value JsonCppNode::from_variant(Variant const& var)
+{
+    switch (var.which())
+    {
+        case Variant::Type::Int:
+            return Json::Value(var.get_int());
+        case Variant::Type::Bool:
+            return Json::Value(var.get_bool());
+        case Variant::Type::String:
+            return Json::Value(var.get_string());
+        case Variant::Type::Double:
+            return Json::Value(var.get_double());
+        case Variant::Type::Dict:
+            {
+                Json::Value val(Json::ValueType::objectValue);
+                for (auto v: var.get_dict())
+                {
+                    val[v.first] = from_variant(v.second);
+                }
+                return val;
+            }
+        case Variant::Type::Array:
+            {
+                Json::Value val(Json::ValueType::arrayValue);
+                for (auto v: var.get_array())
+                {
+                    val.append(from_variant(v));
+                }
+                return val;
+            }
+            break;
+        case Variant::Type::Null:
+            return Json::Value(Json::ValueType::nullValue);
+        default:
+            {
+                std::ostringstream s;
+                s << "json_to_variant(): unsupported json type ";
+                s << static_cast<int>(var.which());
+                throw unity::LogicException(s.str());
+                break;
+            }
+    }
 }
 
 void JsonCppNode::clear()

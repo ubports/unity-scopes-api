@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/JsonNodeInterface.h>
 #include <jsoncpp/json/value.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -36,6 +37,7 @@ class JsonCppNode : public JsonNodeInterface
 public:
     explicit JsonCppNode(std::string const& json_string = "");
     explicit JsonCppNode(const Json::Value& root);
+    explicit JsonCppNode(const Variant& var);
     ~JsonCppNode();
 
     void clear() override;
@@ -59,6 +61,7 @@ public:
     JsonNodeInterface::SPtr get_node(uint node_index) const override;
 
 private:
+    static Json::Value from_variant(Variant const& var);
     Json::Value root_;
 };
 
