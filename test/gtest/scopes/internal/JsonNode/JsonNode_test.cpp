@@ -185,4 +185,21 @@ TEST_F(JsonNodeTest, from_variant)
     EXPECT_EQ(true, node.get_node("wee")->get_node(2)->as_bool());
 }
 
+TEST_F(JsonNodeTest, to_variant)
+{
+    std::string json_string = R"({"a":1, "b": 2.0, "c":null, "d":[1,true,"foo"]})";
+    JsonCppNode node(json_string);
+    auto var = node.to_variant();
+    auto outer = var.get_dict();
+    EXPECT_EQ(4, outer.size());
+    EXPECT_EQ(1, outer["a"].get_int());
+    EXPECT_TRUE(outer["b"].get_double() - 2.0f < 0.00001f);
+    EXPECT_TRUE(outer["c"].is_null());
+    auto arr = outer["d"].get_array();
+    EXPECT_EQ(3, arr.size());
+    EXPECT_EQ(1, arr[0].get_int());
+    EXPECT_TRUE(arr[1].get_bool());
+    EXPECT_EQ("foo", arr[2].get_string());
+}
+
 } // namespace

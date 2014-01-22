@@ -91,6 +91,55 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
     }
 }
 
+Variant JsonCppNode::to_variant(Json::Value const& value)
+{
+    switch (value.type())
+    {
+        case Json::ValueType::nullValue:
+            return Variant::null();
+        case Json::ValueType::arrayValue:
+            {
+                VariantArray arr;
+                for (unsigned int i=0; i<value.size(); ++i)
+                {
+                    arr.push_back(to_variant(value[i]));
+                }
+                return Variant(arr);
+            }
+        case Json::ValueType::objectValue:
+            {
+                VariantMap var;
+                for (auto m: value.getMemberNames())
+                {
+                    var[m] = to_variant(value[m]);
+                }
+                return Variant(var);
+            }
+        case Json::ValueType::stringValue:
+            return Variant(value.asString());
+        case Json::ValueType::intValue:
+        case Json::ValueType::uintValue:
+            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if uint to int conversion is not possible
+        case Json::ValueType::realValue:
+            return Variant(value.asDouble());
+        case Json::ValueType::booleanValue:
+            return Variant(value.asBool());
+        default:
+            {
+                std::ostringstream s;
+                s << "json_to_variant(): unsupported json type ";
+                s << static_cast<int>(value.type());
+                throw unity::LogicException(s.str());
+                break;
+            }
+    }
+}
+
+Variant JsonCppNode::to_variant()
+{
+    return to_variant(root_);
+}
+
 void JsonCppNode::clear()
 {
     root_.clear();

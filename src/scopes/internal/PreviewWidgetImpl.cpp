@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/internal/JsonUtils.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 
 namespace unity
 {
@@ -35,7 +35,8 @@ namespace internal
 PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
 {
     //TODO: json validation
-    data_ = json_to_variant(json_text);
+    internal::JsonCppNode node(json_text);
+    data_ = node.to_variant();
 }
 
 PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)

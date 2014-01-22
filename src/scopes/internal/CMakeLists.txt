@@ -16,7 +16,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonCppNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/JsonUtils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
