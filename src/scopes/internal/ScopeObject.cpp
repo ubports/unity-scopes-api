@@ -307,7 +307,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
         catch (...)
         {
         }
-        cerr << "create_query(): " << e.what() << endl;
+        cerr << "preview(): " << e.what() << endl;
         // TODO: log error
         throw;
     }
@@ -320,7 +320,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
         catch (...)
         {
         }
-        cerr << "create_query(): unknown exception" << endl;
+        cerr << "preview(): unknown exception" << endl;
         // TODO: log error
         throw;
     }
