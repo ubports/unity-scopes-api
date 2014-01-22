@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply);     // Returns (almost) immediately
+        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

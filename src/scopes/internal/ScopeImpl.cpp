@@ -58,36 +58,26 @@ ScopeImpl::~ScopeImpl() noexcept
 QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
     try
     {
-        // Create a middleware server-side object that can receive incoming
-        // push() and finished() messages over the network.
-        ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return
-        // the QueryCtrlProxy. Because the Scope implementation has a separate
-        // thread for create_query() calls, this is guaranteed not to block for
-        // any length of time. (No application code other than the QueryBase constructor
-        // is called by create_query() on the server side.)
+        // the QueryCtrlProxy. This may block for some time, for example, if
+        // the scope is not running and needs to be activated by the registry first.
         ctrl = fwd()->create_query(q, hints, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << "create_query(): " << e.what() << endl;
         try
         {
-            // TODO: if things go wrong, we need to make sure that the reply object
-            // is disconnected from the middleware, so it gets deallocated.
-            reply->finished(ListenerBase::Error, e.what());
-            throw;
+            ro->finished(ListenerBase::Error, e.what());
         }
         catch (...)
         {
-            cerr << "create_query(): unknown exception" << endl;
         }
         throw;
     }

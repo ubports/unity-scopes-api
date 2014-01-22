@@ -109,7 +109,6 @@ void ScopeI::activate_(Current const& current,
     auto p = create_query_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-
 }
 
 void ScopeI::preview_(Current const& current,

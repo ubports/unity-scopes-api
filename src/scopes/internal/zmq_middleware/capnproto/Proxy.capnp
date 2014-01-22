@@ -16,13 +16,13 @@
 # Authored by: Michi Henning <michi.henning@canonical.com>
 #
 
-@0xb26286dd0ff9410f;
+@0x8fe122e718a84617;
 
 using Cxx = import "/capnp/c++.capnp";
 
 $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 
-# Proxy definition. A proxy is a pair of <endpoint, identity>. The endpoint must include
+# Proxy definition. The endpoint must include
 # the protocol, which controls how to interpret the remainder of the string. For example:
 #
 # "tcp://localhost:5555" (TCP on loopback, port 5555
@@ -36,4 +36,5 @@ struct Proxy
 {
     endpoint @0 : Text;
     identity @1 : Text;
+    timeout  @2 : Int64;  # timeout for twoway proxies in milliseconds, -1 == wait forever
 }

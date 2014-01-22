@@ -60,6 +60,11 @@ string ObjectProxy::endpoint() const
     return p->endpoint();
 }
 
+int64_t ObjectProxy::timeout() const
+{
+    return p->timeout();
+}
+
 internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
 {
     return p.get();

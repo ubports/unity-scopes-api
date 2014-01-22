@@ -38,7 +38,7 @@ namespace zmq_middleware
 class ZmqScope : public virtual ZmqObjectProxy, public virtual MWScope
 {
 public:
-    ZmqScope(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
+    ZmqScope(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity, int64_t timeout);
     virtual ~ZmqScope() noexcept;
 
     virtual QueryCtrlProxy create_query(std::string const& q,

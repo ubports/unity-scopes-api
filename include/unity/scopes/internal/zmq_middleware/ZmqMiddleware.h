@@ -58,8 +58,6 @@ public:
     virtual void stop() override;
     virtual void wait_for_shutdown() override;
 
-    virtual MWProxy create_proxy(std::string const& identity, std::string const& endpoint) override;
-
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;

@@ -41,6 +41,7 @@ public:
 
     std::string endpoint() const;
     std::string identity() const;
+    int64_t timeout() const;      // Timeout in milliseconds, -1 == no timeout
 
 protected:
     internal::ObjectProxyImpl* pimpl() const noexcept; // Non-virtual because we can't use covariance with incomplete types

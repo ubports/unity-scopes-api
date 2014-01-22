@@ -8,7 +8,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyI.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/RequestType.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RequestMode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
