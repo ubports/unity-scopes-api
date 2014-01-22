@@ -36,23 +36,16 @@ namespace internal {
 
 namespace smartscopes {
 
-SSRegistryObject::SSRegistryObject(const std::string &registry_name,
-                                   const std::string &config_file)
+SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware)
     : ssclient_(std::make_shared<HttpClientQt>(4),
                 std::make_shared<JsonCppNode>()),
-      refresh_stopped_(false) {
-  RuntimeImpl::UPtr runtime = RuntimeImpl::create(registry_name, config_file);
+      refresh_stopped_(false),
+      middleware_(middleware) {
 
-  RegistryConfig config(runtime->registry_identity(),
-                        runtime->registry_configfile());
-  std::string mw_kind = config.mw_kind();
+  ///! here we need to create an instance of a scope in process like scope runner does.
 
-  middleware_ = runtime->factory()->find(runtime->registry_identity(), mw_kind);
   proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"),
                              middleware_->runtime(), "smartscopes");
-
-  ///! middleware_->add_registry_object(runtime->registry_identity(),
-  /// shared_from_this());
 
   get_remote_scopes();
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);

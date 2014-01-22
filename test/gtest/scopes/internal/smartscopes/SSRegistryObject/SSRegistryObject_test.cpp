@@ -16,20 +16,34 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+//#include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
-using namespace unity::scopes::internal::smartscopes;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::smartscopes;
 
 TEST(SSRegistryObject, basic)
 {
   ::putenv("SMART_SCOPES_SERVER=http://127.0.0.1:8000");
-  SSRegistryObject reg("SSRegistry", SS_RUNTIME_PATH);
 
-  ScopeMetadata meta = reg.get_metadata("Wikipedia");
+  RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+
+  std::string identity = runtime->registry_identity();
+
+  RegistryConfig c(identity, runtime->registry_configfile());
+  std::string mw_kind = c.mw_kind();
+
+  MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+
+  SSRegistryObject::SPtr reg(new SSRegistryObject(middleware));
+
+  ScopeMetadata meta = reg->get_metadata("Wikipedia");
   EXPECT_EQ("Wikipedia",meta.scope_name());
   EXPECT_EQ("Wikipedia",meta.display_name());
   EXPECT_EQ("The free encyclopedia that anyone can edit.", meta.description());

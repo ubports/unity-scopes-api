@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -26,6 +27,7 @@
 
 using namespace std;
 using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::smartscopes;
 
 char const* prog_name;
 
@@ -51,7 +53,7 @@ main(int argc, char* argv[])
 
     try
     {
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", config_file);
 
         string identity = runtime->registry_identity();
 
@@ -60,12 +62,10 @@ main(int argc, char* argv[])
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-        RegistryObject::SPtr registry(new RegistryObject);
-
-        ///! here we need to create an instance of a scope in process like scope runner does.
+        SSRegistryObject::SPtr registry(new SSRegistryObject(middleware));
 
         // Add the registry to the middleware
-        middleware->add_registry_object(runtime->registry_identity(), registry);
+        ///! middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Wait until shutdown
         middleware->wait_for_shutdown();

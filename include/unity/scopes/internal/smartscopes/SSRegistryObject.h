@@ -38,7 +38,7 @@ class SSRegistryObject : public std::enable_shared_from_this<SSRegistryObject>, 
 public:
   UNITY_DEFINES_PTRS(SSRegistryObject);
 
-  SSRegistryObject(std::string const &registry_name, std::string const &config_file);
+  SSRegistryObject(MiddlewareBase::SPtr middleware);
   virtual ~SSRegistryObject() noexcept;
 
   ScopeMetadata get_metadata(std::string const &scope_name);
