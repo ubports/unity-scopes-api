@@ -112,7 +112,8 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     else
     {
         success_ = true;
-        reply_ = QString::fromUtf8(reply->readAll()).toStdString();
+        QByteArray byte_array = reply->readAll();
+        reply_ = std::string(byte_array.constData(), byte_array.size());
     }
 
     quit();
