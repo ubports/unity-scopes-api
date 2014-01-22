@@ -3,68 +3,6 @@
 # weird things with pointers that point somewhere into the middle of an allocated
 # block to avoid copies. In turn, that causes bogus reports from valgrind.
 
-{
-    Ice::initialize
-    Memcheck:Leak
-    ...
-    fun:_ZN3Ice10initializeERKNS_18InitializationDataEi
-    ...
-}
-
-{
-    Ice::Properties::load
-    Memcheck:Leak
-    ...
-    fun:_ZN3Ice11PropertiesI4loadERKSs
-    ...
-}
-
-{
-    Ice::DefaultsAndOverrides
-    Memcheck:Leak
-    fun:_Znwm
-    ...
-    fun:_ZNSsC1EPKcRKSaIcE
-    ...
-}
-
-{
-    Ice::unescapeString
-    Memcheck:Leak
-    fun:_Znwm
-    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
-    fun:_ZNSs4_Rep8_M_cloneERKSaIcEm
-    fun:_ZNSs7reserveEm
-    fun:_ZN15IceUtilInternal14unescapeStringERKSsmm
-    ...
-}
-
-{
-    Ice::setProperty
-    Memcheck:Leak
-    fun:_Znwm
-    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
-    fun:_ZNSs12_S_constructIPcEES0_T_S1_RKSaIcESt20forward_iterator_tag
-    fun:_ZNSsC1ERKSsmm
-    fun:_ZN15IceUtilInternal4trimERKSs
-    fun:_ZN3Ice11PropertiesI11setPropertyERKSsS2_
-}
-
-{
-    Ice::ThreadPool
-    Memcheck:Leak
-    fun:_Znwm
-    ...
-    fun:_ZN11IceInternal10ThreadPool12nextThreadIdEv
-}
-
-{
-    Ice::EndpointFactoryManager
-    Memcheck:Leak
-    ...
-    fun:_ZNK11IceInternal22EndpointFactoryManager6createERKSsb
-}
-
 # Bogus "possibly leaked" reports for pthreads
 
 {
@@ -108,4 +46,17 @@
     fun:_ZNSs7reserveEm
     fun:_ZNSs6appendEPKcm
     ...
+}
+
+# Leak in dynamic linker
+{
+    DynLinker
+    Memcheck:Leak
+    match-leak-kinds: definite
+    fun:calloc
+    obj:*
+    fun:_Z24__tracepoints__ptrs_initv
+    fun:call_init.part.0
+    fun:_dl_init
+    obj:/lib/x86_64-linux-gnu/ld-2.18.so
 }

@@ -143,7 +143,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         s << "ObjectAdapter::add(): " << "cannot add id \"" << id << "\": id already in use (adapter: " << name_  << ")";
         throw MiddlewareException(s.str());
     }
-    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_));
+    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_, ""));
 }
 
 void ObjectAdapter::remove(std::string const& id)
@@ -189,6 +189,83 @@ shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const
 
     auto it = servants_.find(id);
     if (it != servants_.end())
+    {
+        return it->second;
+    }
+    return shared_ptr<ServantBase>();
+}
+
+void ObjectAdapter::add_dflt_servant(std::string const& category, std::shared_ptr<ServantBase> const& obj)
+{
+    if (!obj)
+    {
+        throw InvalidArgumentException("ObjectAdapter::add_dflt_servant(): invalid nullptr object (adapter: " + name_ + ")");
+    }
+
+    lock(map_mutex_, state_mutex_);
+    lock_guard<mutex> map_lock(map_mutex_, adopt_lock);
+    {
+        lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
+        if (state_ == Destroyed || state_ == Failed)
+        {
+            throw_bad_state(state_);
+        }
+    }
+
+    auto pair = dflt_servants_.insert(make_pair(category, obj));
+    if (!pair.second)
+    {
+        ostringstream s;
+        s << "ObjectAdapter::add_dflt_servant(): " << "cannot add category \"" << category
+          << "\": category already in use (adapter: " << name_  << ")";
+        throw MiddlewareException(s.str());
+    }
+}
+
+void ObjectAdapter::remove_dflt_servant(std::string const& category)
+{
+    shared_ptr<ServantBase> servant;
+    {
+        lock(map_mutex_, state_mutex_);
+        lock_guard<mutex> map_lock(map_mutex_, adopt_lock);
+        {
+            lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
+            if (state_ == Destroyed || state_ == Failed)
+            {
+                throw_bad_state(state_);
+            }
+        }
+
+        auto it = dflt_servants_.find(category);
+        if (it == dflt_servants_.end())
+        {
+            ostringstream s;
+            s << "ObjectAdapter::remove_dflt_servant(): " << "cannot remove category \"" << category
+              << "\": category not present (adapter: " << name_ << ")";
+            throw MiddlewareException(s.str());
+        }
+        servant = it->second;
+        dflt_servants_.erase(it);
+    }
+    // Lock released here, so we don't call servant destructor while holding a lock
+
+    servant = nullptr;  // This may trigger destructor call on the servant
+}
+
+shared_ptr<ServantBase> ObjectAdapter::find_dflt_servant(std::string const& category) const
+{
+    lock(map_mutex_, state_mutex_);
+    lock_guard<mutex> map_lock(map_mutex_, adopt_lock);
+    {
+        lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
+        if (state_ == Destroyed || state_ == Failed)
+        {
+            throw_bad_state(state_);
+        }
+    }
+
+    auto it = dflt_servants_.find(category);
+    if (it != dflt_servants_.end())
     {
         return it->second;
     }
@@ -481,6 +558,16 @@ void ObjectAdapter::safe_bind(zmqpp::socket& s, string const& endpoint)
     s.bind(endpoint);
 }
 
+shared_ptr<ServantBase> ObjectAdapter::find_servant(string const& id, string const& category)
+{
+    shared_ptr<ServantBase> servant = find(id);
+    if (!servant)
+    {
+        servant = find_dflt_servant(category);
+    }
+    return servant;
+}
+
 void ObjectAdapter::broker_thread()
 {
     try
@@ -626,7 +713,7 @@ void ObjectAdapter::worker_thread()
             ready_.set_value();
         }
 
-        struct Current current;
+        Current current;
         current.adapter = this;     // Stays the same for all invocations, so we set this once only.
 
         bool finish = false;
@@ -649,7 +736,7 @@ void ObjectAdapter::worker_thread()
 
             if (!finish && poller.has_input(s)) // We stop reading new incoming messages once told to finish.
             {
-                // Unmarshal the type-independent part of the message (id, operation name, mode).
+                // Unmarshal the type-independent part of the message (id, category, operation name, mode).
                 capnproto::Request::Reader req;
                 unique_ptr<capnp::SegmentArrayMessageReader> message;
                 try
@@ -659,6 +746,7 @@ void ObjectAdapter::worker_thread()
                     message.reset(new capnp::SegmentArrayMessageReader(segments));
                     req = message->getRoot<capnproto::Request>();
                     current.id = req.getId().cStr();
+                    current.category = req.getCat().cStr();
                     current.op_name = req.getOpName().cStr();
                     auto mode = req.getMode();
                     if (current.id.empty() || current.op_name.empty() ||
@@ -720,13 +808,13 @@ void ObjectAdapter::worker_thread()
                 }
 
                 // Look for a servant with matching id.
-                auto servant = find(current.id);
+                auto servant = find_servant(current.id, current.category);
                 if (!servant)
                 {
                     if (type_ == RequestType::Twoway)
                     {
                         capnp::MallocMessageBuilder b;
-                        auto exr = create_object_not_exist_response(b, current.id, endpoint_, name_);
+                        auto exr = create_object_not_exist_response(b, current);
                         sender.send(exr);
                     }
                     continue;

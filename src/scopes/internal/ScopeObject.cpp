@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/ActivationQueryObject.h>
 #include <unity/scopes/internal/PreviewQueryObject.h>
@@ -61,7 +62,7 @@ ScopeObject::~ScopeObject() noexcept
 MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
-                                           MiddlewareBase* mw_base)
+                                           InvokeInfo const& info)
 {
     if (!reply)
     {
@@ -98,13 +99,13 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         // Instantiate the query ctrl and connect it to the middleware.
         QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = mw_base->add_query_ctrl_object(co);
+        ctrl_proxy = info.mw->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
         QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
+        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.
@@ -150,7 +151,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
-                                           MiddlewareBase* mw_base)
+                                           InvokeInfo const& info)
 {
     if (!reply)
     {
@@ -187,13 +188,13 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
     {
         // Instantiate the query ctrl and connect it to the middleware.
         QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = mw_base->add_query_ctrl_object(co);
+        ctrl_proxy = info.mw->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
         ActivationQueryObject::SPtr qo(make_shared<ActivationQueryObject>(act_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
+        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.
@@ -239,7 +240,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                                       VariantMap const& hints,
                                       MWReplyProxy const& reply,
-                                      MiddlewareBase* mw_base)
+                                      InvokeInfo const& info)
 {
     if (!reply)
     {
@@ -276,7 +277,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
     {
         // Instantiate the query ctrl and connect it to the middleware.
         QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = mw_base->add_query_ctrl_object(co);
+        ctrl_proxy = info.mw->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
@@ -284,7 +285,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
         auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
         assert(preview_query);
         QueryObject::SPtr qo(make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
+        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.

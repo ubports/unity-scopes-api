@@ -38,8 +38,9 @@ struct Request
 {
     mode     @0 : RequestMode;   # Response required?
     id       @1 : Text;          # Identity of target object
-    opName   @2 : Text;          # Operation name
-    inParams @3 : AnyPointer;    # In-parameters for the operation
+    cat      @2 : Text;          # Category of target object
+    opName   @3 : Text;          # Operation name
+    inParams @4 : AnyPointer;    # In-parameters for the operation
 }
 
 # Responses indicate success or an exception. All twoway invocations can raise run-time exceptions (such

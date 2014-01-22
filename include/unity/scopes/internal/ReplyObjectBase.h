@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -32,23 +32,14 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
-
-class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
+class ReplyObjectBase : public AbstractObject
 {
 public:
-    ZmqReply(ZmqMiddleware* mw_base,
-             std::string const& endpoint,
-             std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqReply() noexcept;
+    UNITY_DEFINES_PTRS(ReplyObjectBase);
 
-    virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+    virtual void push(VariantMap const& result) noexcept = 0;
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 

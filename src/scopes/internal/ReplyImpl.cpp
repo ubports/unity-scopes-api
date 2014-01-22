@@ -20,9 +20,12 @@
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Annotation.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/SearchReply.h>
@@ -45,7 +48,7 @@ namespace scopes
 namespace internal
 {
 
-ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo) :
+ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
     ObjectProxyImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
@@ -148,7 +151,9 @@ bool ReplyImpl::push(std::string const& key, Variant const& value)
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
-    if (!qo_->pushable())
+    auto qo = dynamic_pointer_cast<QueryObject>(qo_);
+    assert(qo);
+    if (!qo->pushable())
     {
         return false; // Query was cancelled or had an error.
     }
@@ -218,15 +223,14 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-
-SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
 {
     auto reply_impl = new ReplyImpl(mw_proxy, qo);
     auto reply = new SearchReply(reply_impl);
     return SearchReplyProxy(reply);
 }
 
-PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo)
+PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
 {
     auto reply_impl = new ReplyImpl(mw_proxy, qo);
     auto reply = new PreviewReply(reply_impl);

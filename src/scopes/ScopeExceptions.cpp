@@ -47,6 +47,36 @@ exception_ptr MiddlewareException::self() const
     return make_exception_ptr(*this);
 }
 
+ObjectNotExistException::ObjectNotExistException(string const& reason, string const& id) :
+    Exception("unity::scopes::ObjectNotExistException",
+              reason + (reason.empty() ? "" : " ") + "(id = " + id + ")"),
+    MiddlewareException("unity::scopes::ObjectNotExistException" +
+                        reason + (reason.empty() ? "" : " ") + "(id = " + id + ")"),
+    id_(id)
+{
+}
+
+ObjectNotExistException::ObjectNotExistException(ObjectNotExistException const&) = default;
+
+//! @cond
+
+ObjectNotExistException& ObjectNotExistException::operator=(ObjectNotExistException const&) = default;
+
+
+ObjectNotExistException::~ObjectNotExistException() noexcept = default;
+
+//! @endcond
+
+exception_ptr ObjectNotExistException::self() const
+{
+    return make_exception_ptr(*this);
+}
+
+string ObjectNotExistException::id() const
+{
+    return id_;
+}
+
 ConfigException::ConfigException(string const& reason) :
     Exception("unity::scopes::ConfigException", reason)
 {

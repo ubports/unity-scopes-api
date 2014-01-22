@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/Result.h>
 #include <unity/Exception.h>
