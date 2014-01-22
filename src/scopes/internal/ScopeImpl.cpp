@@ -87,11 +87,9 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
 QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
+    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
     try
     {
-        // Create a middleware server-side object that can receive incoming
-        // push() and finished() messages over the network.
-        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
@@ -104,9 +102,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
         cerr << "activate(): " << e.what() << endl;
         try
         {
-            // TODO: if things go wrong, we need to make sure that the reply object
-            // is disconnected from the middleware, so it gets deallocated.
-            reply->finished(ListenerBase::Error, e.what());
+            ro->finished(ListenerBase::Error, e.what());
             throw;
         }
         catch (...)
@@ -121,11 +117,11 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
 QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
+    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
     try
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the the create_query() method across the bus. This is a
@@ -143,9 +139,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
         cerr << "preview(): " << e.what() << endl;
         try
         {
-            // TODO: if things go wrong, we need to make sure that the reply object
-            // is disconnected from the middleware, so it gets deallocated.
-            reply->finished(ListenerBase::Error, e.what());
+            ro->finished(ListenerBase::Error, e.what());
             throw;
         }
         catch (...)
