@@ -24,7 +24,10 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/QueryBase.h>
 
+#include <functional>
 #include <string>
 
 namespace unity
@@ -78,6 +81,9 @@ public:
                              MiddlewareBase* mw_base);
 
 private:
+    MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+        std::function<QueryObject::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
     RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
 };
