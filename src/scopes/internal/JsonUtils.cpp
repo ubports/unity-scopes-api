@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/JsonUtils.h>
 #include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -69,8 +70,13 @@ Variant json_to_variant(JsonNodeInterface::SCPtr node)
         case JsonNodeInterface::NodeType::Bool:
             return Variant(node->as_bool());
         default:
-            throw unity::LogicException("json_to_variant(): unsupported json type " + node->type());
-            break;
+            {
+                std::ostringstream s;
+                s << "json_to_variant(): unsupported json type ";
+                s << static_cast<int>(node->type());
+                throw unity::LogicException(s.str());
+                break;
+            }
     }
 }
 
