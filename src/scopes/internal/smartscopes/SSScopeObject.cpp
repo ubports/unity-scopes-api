@@ -68,6 +68,20 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
   return MWQueryCtrlProxy();
 }
 
+MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
+                                                        VariantMap const& hints,
+                                                        std::string const& action_id,
+                                                        MWReplyProxy const &reply,
+                                                        InvokeInfo const& info)
+{
+  (void)result;
+  (void)hints;
+  (void)action_id;
+  (void)reply;
+  (void)info;
+  return MWQueryCtrlProxy();
+}
+
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply,

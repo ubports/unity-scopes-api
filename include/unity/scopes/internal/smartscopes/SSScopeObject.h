@@ -44,30 +44,36 @@ namespace smartscopes
 class SSScopeObject final : public ScopeObjectBase
 {
 public:
-    UNITY_DEFINES_PTRS(SSScopeObject);
+  UNITY_DEFINES_PTRS(SSScopeObject);
 
-    SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
-    virtual ~SSScopeObject() noexcept;
+  SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
+  virtual ~SSScopeObject() noexcept;
 
-    // Remote operation implementations
-    virtual MWQueryCtrlProxy create_query(std::string const& q,
-                                          VariantMap const& hints,
-                                          MWReplyProxy const& reply,
-                                          InvokeInfo const& info) override;
+  // Remote operation implementations
+  MWQueryCtrlProxy create_query(std::string const& q,
+                                VariantMap const& hints,
+                                MWReplyProxy const& reply,
+                                InvokeInfo const& info) override;
 
-    MWQueryCtrlProxy activate(Result const& result,
-                              VariantMap const& hints,
-                              MWReplyProxy const &reply,
-                              InvokeInfo const& info) override;
+  MWQueryCtrlProxy activate(Result const& result,
+                            VariantMap const& hints,
+                            MWReplyProxy const &reply,
+                            InvokeInfo const& info) override;
 
-    MWQueryCtrlProxy preview(Result const& result,
-                             VariantMap const& hints,
-                             MWReplyProxy const& reply,
-                             InvokeInfo const& info) override;
+  MWQueryCtrlProxy activate_preview_action(Result const& result,
+                                           VariantMap const& hints,
+                                           std::string const& action_id,
+                                           MWReplyProxy const &reply,
+                                           InvokeInfo const& info) override;
+
+  MWQueryCtrlProxy preview(Result const& result,
+                           VariantMap const& hints,
+                           MWReplyProxy const& reply,
+                           InvokeInfo const& info) override;
 
 private:
-    RuntimeImpl* const runtime_;
-    ScopeBase* const scope_base_;
+  RuntimeImpl* const runtime_;
+  ScopeBase* const scope_base_;
 };
 
 } // namespace smartscopes
