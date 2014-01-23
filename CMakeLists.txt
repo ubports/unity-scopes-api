@@ -370,7 +370,7 @@ else()
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
-    add_custom_target(doc
+    add_custom_target(doc ALL
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc)
