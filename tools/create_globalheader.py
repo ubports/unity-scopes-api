@@ -21,10 +21,13 @@ from glob import glob
 import sys, os
 
 def build_header(inc_root, outfile):
-    for f in glob(os.path.join(inc_root, 'unity/scopes', '*.h')):
+    ofile = open(outfile, 'w')
+    headers = glob(os.path.join(inc_root, 'unity/scopes', '*.h'))
+    headers.sort()
+    for f in headers:
         base = os.path.split(f)[1]
         line = '#include<unity/scopes/%s>\n' % base
-        print(line)
+        ofile.write(line)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
