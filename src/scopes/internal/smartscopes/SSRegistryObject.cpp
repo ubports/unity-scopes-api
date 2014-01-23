@@ -18,14 +18,11 @@
 
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
-
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/internal/RegistryConfig.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity {
@@ -71,7 +68,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const &scope_name) {
 
   auto const &it = scopes_.find(scope_name);
   if (it == scopes_.end()) {
-    throw NotFoundException("Registry::get_metadata(): no such scope",
+    throw NotFoundException("SSRegistryObject::get_metadata(): no such scope",
                             scope_name);
   }
   return it->second;

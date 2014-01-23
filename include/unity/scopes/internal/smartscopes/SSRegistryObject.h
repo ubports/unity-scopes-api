@@ -19,10 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
 
-#include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
-#include <unity/scopes/Registry.h>
 
 #include <mutex>
 

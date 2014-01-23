@@ -19,7 +19,8 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
-//#include <unity/UnityExceptions.h>
+
+#include "../RaiiServer.h"
 
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
@@ -27,11 +28,14 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
+using namespace unity::test::scopes::internal::smartscopes;
 
 TEST(SSRegistryObject, basic)
 {
-  char server_url[] = "SMART_SCOPES_SERVER=http://127.0.0.1:8000";
-  ::putenv(server_url);
+  RaiiServer test_server(FAKE_SSS_PATH);
+
+  std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(test_server.port_);
+  ::putenv((char*)server_env.c_str());
 
   RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
 
@@ -44,8 +48,13 @@ TEST(SSRegistryObject, basic)
 
   SSRegistryObject::SPtr reg(new SSRegistryObject(middleware));
 
-//  ScopeMetadata meta = reg->get_metadata("Wikipedia");
-//  EXPECT_EQ("Wikipedia",meta.scope_name());
-//  EXPECT_EQ("Wikipedia",meta.display_name());
-//  EXPECT_EQ("The free encyclopedia that anyone can edit.", meta.description());
+  ScopeMetadata meta = reg->get_metadata("Dummy Demo Scope");
+  EXPECT_EQ("Dummy Demo Scope",meta.scope_name());
+  EXPECT_EQ("Dummy Demo Scope",meta.display_name());
+  EXPECT_EQ("Dummy demo scope.", meta.description());
+
+  meta = reg->get_metadata("Dummy Demo Scope 2");
+  EXPECT_EQ("Dummy Demo Scope 2",meta.scope_name());
+  EXPECT_EQ("Dummy Demo Scope 2",meta.display_name());
+  EXPECT_EQ("Dummy demo scope 2.", meta.description());
 }
