@@ -43,89 +43,63 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& query) :
-        query_(query)
-    {
-    }
+  SmartQuery(std::string const& id, SSRegistryObject::SPtr reg, std::string const& query) :
+    scope_id_(id),
+    registry_(reg),
+    query_(query)
+  {
+  }
 
-    ~SmartQuery() noexcept
-    {
-    }
+  ~SmartQuery() noexcept
+  {
+  }
 
-    virtual void cancelled() override
-    {
-    }
+  virtual void cancelled() override
+  {
+  }
 
-    virtual void run(SearchReplyProxy const& reply) override
-    {
-        CategoryRenderer rdr;
-        auto cat = reply->register_category("cat1", "Category 1", "", rdr);
-        CategorisedResult res(cat);
-        res.set_uri("uri");
-        res.set_title("SmartScope: result 1 for query \"" + query_ + "\"");
-        res.set_art("icon");
-        res.set_dnd_uri("dnd_uri");
-        reply->push(res);
+  virtual void run(SearchReplyProxy const& reply) override
+  {
+    CategoryRenderer rdr;
+    auto cat = reply->register_category("cat1", "Category 1", "", rdr);
+    CategorisedResult res(cat);
+    res.set_uri("uri");
+    res.set_title("SmartScope: result 1 for \"" + scope_id_ + "\": query \"" + query_ + "\"");
+    res.set_art("icon");
+    res.set_dnd_uri("dnd_uri");
+    reply->push(res);
 
-        Query q("SmartScope", query_, "");
-        Annotation annotation(Annotation::Type::Link);
-        annotation.add_link("More...", q);
-        reply->push(annotation);
+    Query q("SmartScope", query_, "");
+    Annotation annotation(Annotation::Type::Link);
+    annotation.add_link("More...", q);
+    reply->push(annotation);
 
-        std::cout << "SmartScope: query \"" << query_ << "\" complete" << std::endl;
-    }
-
-private:
-    std::string query_;
-};
-
-class SmartPreview : public PreviewQuery
-{
-public:
-    SmartPreview(std::string const& uri) :
-        uri_(uri)
-    {
-    }
-
-    ~SmartPreview() noexcept
-    {
-    }
-
-    virtual void cancelled() override
-    {
-    }
-
-    virtual void run(PreviewReplyProxy const& reply) override
-    {
-        PreviewWidgetList widgets;
-        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
-        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
-        reply->push(widgets);
-        reply->push("author", Variant("Foo"));
-        reply->push("rating", Variant("4 blah"));
-        std::cout << "SmartScope: preview for \"" << uri_ << "\" complete" << std::endl;
-    }
+    std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_ << "\" complete" << std::endl;
+  }
 
 private:
-    std::string uri_;
+  std::string scope_id_;
+  SSRegistryObject::SPtr registry_;
+  std::string query_;
 };
 
 class SmartScope
 {
 public:
-    QueryBase::UPtr create_query(std::string const& id, std::string const& q, VariantMap const&)
-    {
-        QueryBase::UPtr query(new SmartQuery(q));
-        std::cout << "SmartScope: created query: \"" << q << "\"" << std::endl;
-        return query;
-    }
+  SmartScope(SSRegistryObject::SPtr reg) :
+    reg_(reg)
+  {
+  }
 
-    QueryBase::UPtr preview(Result const& result, VariantMap const&)
-    {
-        QueryBase::UPtr preview(new SmartPreview(result.uri()));
-        std::cout << "SmartScope: created previewer: \"" << result.uri() << "\"" << std::endl;
-        return preview;
-    }
+  QueryBase::UPtr create_query(std::string const& id, std::string const& q, VariantMap const&)
+  {
+    QueryBase::UPtr query(new SmartQuery(id, reg_, q));
+    std::cout << "SmartScope: created query for \"" << id << "\": \"" << q << "\"" << std::endl;
+    return query;
+  }
+
+private:
+  SSRegistryObject::SPtr reg_;
 };
 
 } // namespace smartscopes

@@ -89,7 +89,6 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
 
 SmartScopesClient::~SmartScopesClient()
 {
-
 }
 
 std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)

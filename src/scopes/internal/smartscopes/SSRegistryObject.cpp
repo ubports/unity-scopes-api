@@ -34,8 +34,9 @@ namespace internal {
 namespace smartscopes {
 
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware)
-  : ssclient_(std::make_shared<HttpClientQt>(4),
-              std::make_shared<JsonCppNode>()),
+  : ssclient_(std::make_shared<SmartScopesClient>(
+                std::make_shared<HttpClientQt>(4),
+                std::make_shared<JsonCppNode>())),
     refresh_stopped_(false),
     middleware_(middleware) {
   get_remote_scopes();
@@ -91,6 +92,11 @@ std::string SSRegistryObject::get_base_url(std::string const& scope_name)
   }
 }
 
+SmartScopesClient::SPtr SSRegistryObject::get_ssclient()
+{
+  return ssclient_;
+}
+
 void SSRegistryObject::refresh_thread() {
   std::lock_guard<std::mutex> lock(refresh_mutex_);
 
@@ -104,7 +110,7 @@ void SSRegistryObject::refresh_thread() {
 }
 
 void SSRegistryObject::get_remote_scopes() {
-  std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
+  std::vector<RemoteScope> remote_scopes = ssclient_->get_remote_scopes();
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);
   base_urls_.clear();
