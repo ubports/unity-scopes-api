@@ -138,7 +138,7 @@ bool ReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::Filte
         filters_var.push_back(Variant(f->serialize()));
     }
     var["filters"] = filters_var;
-    var["filter_state"] = filter_state.p->serialize();
+    var["filter_state"] = filter_state.serialize();
     return push(var);
 }
 

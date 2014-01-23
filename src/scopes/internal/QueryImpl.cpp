@@ -137,6 +137,11 @@ std::string QueryImpl::to_string() const
     return s.str();
 }
 
+Query QueryImpl::create(VariantMap const& var)
+{
+    return Query(new QueryImpl(var));
+}
+
 Query QueryImpl::from_string()
 {
     //TODO

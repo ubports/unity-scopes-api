@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <unity/scopes/Query.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -109,7 +110,7 @@ TEST(Query, deserialize)
         vm["department_id"] = "dep1";
         vm["filter_state"] = Variant(VariantMap());
 
-        Query q(vm);
+        auto q = internal::QueryImpl::create(vm);
         EXPECT_EQ("scope-A", q.scope_name());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
@@ -124,7 +125,7 @@ TEST(Query, exceptions)
         try
         {
             // missing 'scope'
-            Query q(vm);
+            internal::QueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -136,7 +137,7 @@ TEST(Query, exceptions)
         try
         {
             // empty 'scope' not allowed
-            Query q(vm);
+            internal::QueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -147,7 +148,7 @@ TEST(Query, exceptions)
         vm["filter_state"] = Variant(VariantMap());
         try
         {
-            Query q(vm);
+            internal::QueryImpl::create(vm);
         }
         catch (unity::InvalidArgumentException const& e)
         {

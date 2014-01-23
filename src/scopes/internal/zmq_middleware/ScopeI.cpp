@@ -20,6 +20,7 @@
 
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
@@ -82,7 +83,7 @@ void ScopeI::create_query_(Current const& current,
                            capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
-    auto query = Query(to_variant_map(req.getQuery()));
+    auto query = internal::QueryImpl::create(to_variant_map(req.getQuery()));
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),

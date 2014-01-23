@@ -35,7 +35,6 @@ namespace internal
 {
 class FilterStateImpl;
 class FilterBaseImpl;
-class ReplyImpl;
 }
 
 /**
@@ -71,7 +70,6 @@ private:
     std::shared_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
     friend class internal::FilterStateImpl;
-    friend class internal::ReplyImpl;
 };
 
 } // namespace scopes
