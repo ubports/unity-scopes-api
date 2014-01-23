@@ -286,6 +286,12 @@ TEST(CategorisedResult, exceptions)
     {
         CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
+        result.set_dnd_uri("http://canonical.com");
+        EXPECT_THROW(result.set_category(nullptr), unity::InvalidArgumentException);
+    }
+    {
+        CategorisedResult result(cat);
+        result.set_uri("http://ubuntu.com");
         result.set_title("a title");
         result.set_art("an icon");
         result.set_dnd_uri("http://canonical.com");
