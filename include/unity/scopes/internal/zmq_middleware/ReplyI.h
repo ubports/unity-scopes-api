@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REPLYI_H
 
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/ReplyObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
@@ -38,7 +38,7 @@ namespace zmq_middleware
 class ReplyI : public ServantBase
 {
 public:
-    ReplyI(ReplyObject::SPtr const& ro);
+    ReplyI(ReplyObjectBase::SPtr const& ro);
     virtual ~ReplyI() noexcept;
 
 private:

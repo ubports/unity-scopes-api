@@ -38,8 +38,6 @@ class QueryBase;
 namespace internal
 {
 
-class QueryCtrlObject;
-
 // A QueryObject sits in between the incoming requests from the middleware layer and the
 // QueryBase-derived implementation. This allows us to receive cancel requests. In turn,
 // the implementation of this object ensures that the corresponding ReplyObject is disabled.
@@ -53,17 +51,16 @@ public:
     QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     virtual ~QueryObject() noexcept;
 
-    // Remote operation implementation
+    // Remote operation implementations
     void run(MWReplyProxy const& reply) noexcept override;
 
-    // Called locally only, by QueryCtrlObject.
-    void cancel() override;
-
-    bool pushable() const noexcept; // Called locallly only, by ReplyImpl
+    // Local methods
+    void cancel() override;         // Called locally only, by QueryCtrlObject.
+    bool pushable() const noexcept; // Called locally only, by ReplyImpl
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
-    void set_self(SPtr const& self);
+    void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
 protected:
     std::shared_ptr<QueryBase> query_base_;
@@ -71,7 +68,7 @@ protected:
     std::weak_ptr<ReplyBase> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     std::atomic_bool pushable_;
-    SPtr self_;
+    QueryObjectBase::SPtr self_;
 };
 
 } // namespace internal

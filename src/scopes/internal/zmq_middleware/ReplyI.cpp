@@ -22,7 +22,6 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
-#include <unity/scopes/internal/ReplyObject.h>
 
 using namespace std;
 
@@ -50,7 +49,7 @@ interface Reply
 
 using namespace std::placeholders;
 
-ReplyI::ReplyI(ReplyObject::SPtr const& ro) :
+ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
                       { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
 {
@@ -66,7 +65,7 @@ void ReplyI::push_(Current const&,
 {
     auto req = in_params.getAs<capnproto::Reply::PushRequest>();
     auto result = req.getResult();
-    auto delegate = dynamic_pointer_cast<ReplyObject>(del());
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     delegate->push(to_variant_map(result));
 }
 
@@ -74,7 +73,7 @@ void ReplyI::finished_(Current const&,
                        capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
 {
-    auto delegate = dynamic_pointer_cast<ReplyObject>(del());
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
     auto r = req.getReason();
     ListenerBase::Reason reason;

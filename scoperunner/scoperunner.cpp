@@ -16,10 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/ThreadSafeQueue.h>
-#include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 

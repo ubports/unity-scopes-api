@@ -11,17 +11,16 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECTBASE_H
 
-#include <unity/scopes/internal/MWQuery.h>
-#include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/Registry.h>
 
 namespace unity
 {
@@ -32,22 +31,15 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
-
-class QueryI : public ServantBase
+class RegistryObjectBase : public AbstractObject
 {
 public:
-    QueryI(QueryObjectBase::SPtr const& qo);
-    virtual ~QueryI() noexcept;
+    UNITY_DEFINES_PTRS(RegistryObjectBase);
 
-private:
-    virtual void run_(Current const& current,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r);
+    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
+    virtual MetadataMap list() = 0;
+    virtual ScopeProxy locate(std::string const& scope_name) = 0;
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 
