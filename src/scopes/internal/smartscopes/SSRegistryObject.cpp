@@ -34,14 +34,10 @@ namespace internal {
 namespace smartscopes {
 
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware)
-    : ssclient_(std::make_shared<HttpClientQt>(4),
-                std::make_shared<JsonCppNode>()),
-      refresh_stopped_(false),
-      middleware_(middleware) {
-
-  proxy_ = ScopeImpl::create(middleware_->create_scope_proxy("smartscopes"),
-                             middleware_->runtime(), "smartscopes");
-
+  : ssclient_(std::make_shared<HttpClientQt>(4),
+              std::make_shared<JsonCppNode>()),
+    refresh_stopped_(false),
+    middleware_(middleware) {
   get_remote_scopes();
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
@@ -61,7 +57,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const &scope_name) {
   // If the name is empty, it was sent as empty by the remote client.
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-        "SSRegistryObject: Cannot search for scope with empty name");
+          "SSRegistryObject: Cannot search for scope with empty name");
   }
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -118,7 +114,10 @@ void SSRegistryObject::get_remote_scopes() {
     metadata->set_search_hint("");
     metadata->set_hot_key("");
 
-    metadata->set_proxy(proxy_);
+    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name),
+                                         middleware_->runtime(), scope.name);
+
+    metadata->set_proxy(proxy);
 
     auto meta = ScopeMetadataImpl::create(move(metadata));
     add(scope.name, std::move(meta));
@@ -129,7 +128,7 @@ bool SSRegistryObject::add(std::string const &scope_name,
                            ScopeMetadata const &metadata) {
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
-        "SSRegistryObject: Cannot add scope with empty name");
+          "SSRegistryObject: Cannot add scope with empty name");
   }
 
   auto const &pair = scopes_.insert(make_pair(scope_name, metadata));

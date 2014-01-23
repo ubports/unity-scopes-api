@@ -63,7 +63,6 @@ private:
   bool refresh_stopped_;
 
   MiddlewareBase::SPtr middleware_;
-  ScopeProxy proxy_;
 };
 
 } // namespace smartscopes
