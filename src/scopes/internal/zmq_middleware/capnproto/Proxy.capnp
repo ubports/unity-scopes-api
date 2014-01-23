@@ -22,7 +22,7 @@ using Cxx = import "/capnp/c++.capnp";
 
 $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 
-# Proxy definition. A proxy is a pair of <endpoint, identity>. The endpoint must include
+# Proxy definition. A proxy is a tuple of <endpoint, identity, category>. The endpoint must include
 # the protocol, which controls how to interpret the remainder of the string. For example:
 #
 # "tcp://localhost:5555" (TCP on loopback, port 5555
@@ -31,9 +31,13 @@ $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 #
 # The identity can be anything. It must be unique withing the corresponding endpoint. The identity
 # determines the target object of a message sent via the proxy.
+#
+# The category is normally empty. For default servants, the category is used to identify the type
+# of the target object, such as "Scope", "Reply", etc.
 
 struct Proxy
 {
     endpoint @0 : Text;
     identity @1 : Text;
+    category @2 : Text;
 }

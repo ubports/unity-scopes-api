@@ -1,4 +1,4 @@
-unity-scopes-api (0.2.1-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.2.3-0ubuntu1) UNRELEASED; urgency=low
 
   [ Michi Henning ]
   * Added ability for scope to push an exception (as an exception_ptr). On the client side,
@@ -11,7 +11,10 @@ unity-scopes-api (0.2.1-0ubuntu1) UNRELEASED; urgency=low
   [ Michal Hruby ]
   * Added preview and activation APIs.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Tue, 21 Jan 2014 09:19:32 +0100
+  [ Michi Henning ]
+  * Added default servants for Scope and QueryCtrl interfaces.
+
+ -- Michi Henning <michi@ubuntu>  Thu, 23 Jan 2014 12:20:03 +1000
 
 unity-scopes-api (0.2.0+14.04.20140120-0ubuntu1) trusty; urgency=low
 

@@ -41,7 +41,10 @@ namespace zmq_middleware
 class ZmqRegistry : public virtual ZmqObjectProxy, public virtual MWRegistry
 {
 public:
-    ZmqRegistry(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
+    ZmqRegistry(ZmqMiddleware* mw_base,
+                std::string const& endpoint,
+                std::string const& identity,
+                std::string const& category);
     virtual ~ZmqRegistry() noexcept;
 
     // Remote operations.

@@ -359,6 +359,7 @@ TEST(ObjectAdapter, dispatch_oneway_to_twoway)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::ONEWAY);    // No good for twoway adapter.
     request.setId("id");
+    request.setCat("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -393,6 +394,7 @@ TEST(ObjectAdapter, dispatch_twoway_to_oneway)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);    // No good for oneway adapter.
     request.setId("id");
+    request.setId("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -421,6 +423,7 @@ TEST(ObjectAdapter, dispatch_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("id");
+    request.setCat("cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -462,6 +465,7 @@ TEST(ObjectAdapter, bad_header)
         auto request = b.initRoot<capnproto::Request>();
         request.setMode(capnproto::RequestMode::TWOWAY);
         request.setId("id");
+        request.setCat("cat");
         // Bad header: missing operation name
 
         auto segments = b.getSegmentsForOutput();
@@ -491,6 +495,7 @@ TEST(ObjectAdapter, bad_header)
         auto request = b.initRoot<capnproto::Request>();
         request.setMode(capnproto::RequestMode::ONEWAY);
         request.setId("id");
+        request.setCat("cat");
         // Bad header: missing operation name
 
         auto segments = b.getSegmentsForOutput();
@@ -582,6 +587,7 @@ TEST(ObjectAdapter, invoke_ok)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("success_op");
 
     auto segments = b.getSegmentsForOutput();
@@ -608,7 +614,7 @@ public:
                         capnproto::Response::Builder& r)
     {
         r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-        marshal_object_not_exist_exception(r, current.id, current.adapter->endpoint(), current.adapter->name());
+        marshal_object_not_exist_exception(r, current);
     }
 };
 
@@ -633,6 +639,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("ONE_op");
 
     auto segments = b.getSegmentsForOutput();
@@ -651,6 +658,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
     auto proxy = one.getProxy();
     EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
     EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_STREQ("some_cat", proxy.getCategory().cStr());
     EXPECT_TRUE(one.hasAdapter());
     EXPECT_STREQ("testscope", one.getAdapter().cStr());
 }
@@ -676,6 +684,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(capnproto::RequestMode::TWOWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("operation_name");
 
     auto segments = b.getSegmentsForOutput();
@@ -694,6 +703,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
     auto proxy = opne.getProxy();
     EXPECT_EQ(a.endpoint(), proxy.getEndpoint().cStr());
     EXPECT_STREQ("some_id", proxy.getIdentity().cStr());
+    EXPECT_STREQ("some_cat", proxy.getCategory().cStr());
     EXPECT_TRUE(opne.hasAdapter());
     EXPECT_STREQ("testscope", opne.getAdapter().cStr());
     EXPECT_TRUE(opne.hasAdapter());
@@ -755,6 +765,7 @@ void invoke_thread(ZmqMiddleware* mw, RequestType t)
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(t == RequestType::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
     request.setId("some_id");
+    request.setCat("some_cat");
     request.setOpName("count_op");
 
     auto segments = b.getSegmentsForOutput();
@@ -1111,5 +1122,121 @@ TEST(ObjectAdapter, double_bind)
             server_done.notify_one();
         }
         t.join();
+    }
+}
+
+TEST(ObjectAdapter, dflt_servant)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    a.activate();
+
+    zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+    ZmqReceiver receiver(s);
+
+    shared_ptr<MyServant> o(new MyServant);
+    a.add_dflt_servant("some_cat", o);
+    try
+    {
+        a.add_dflt_servant("some_cat", o);
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::add_dflt_servant(): "
+                     "cannot add category \"some_cat\": category already in use (adapter: testscope)",
+                     e.what());
+    }
+
+    capnp::MallocMessageBuilder b;
+    auto request = b.initRoot<capnproto::Request>();
+    request.setMode(capnproto::RequestMode::TWOWAY);
+    request.setId("some_id");
+    request.setCat("some_cat");
+    request.setOpName("success_op");
+
+    auto segments = b.getSegmentsForOutput();
+    sender.send(segments);
+    segments = receiver.receive();
+
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
+
+    a.remove_dflt_servant("some_cat");
+    try
+    {
+        a.remove_dflt_servant("some_cat");
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::remove_dflt_servant(): "
+                     "cannot remove category \"some_cat\": category not present (adapter: testscope)",
+                     e.what());
+    }
+}
+
+TEST(ObjectAdapter, dflt_servant_exceptions)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    wait();
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    a.activate();
+
+    try
+    {
+        a.add_dflt_servant("", nullptr);
+        FAIL();
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        EXPECT_EQ("unity::InvalidArgumentException: ObjectAdapter::add_dflt_servant(): "
+                  "invalid nullptr object (adapter: testscope)",
+                  e.to_string());
+    }
+
+    ObjectAdapter b(mw, "testscope2", "ipc://testscope", RequestType::Oneway, 2);
+    EXPECT_THROW(b.activate(), MiddlewareException);
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.add_dflt_servant("some_cat", o);
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
+    }
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.remove_dflt_servant("some_cat");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
+    }
+
+    try
+    {
+        shared_ptr<MyServant> o(new MyServant);
+        b.find_dflt_servant("some_cat");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+                     e.what());
     }
 }

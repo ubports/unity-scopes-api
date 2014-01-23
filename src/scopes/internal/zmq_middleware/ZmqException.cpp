@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 
+#include <unity/scopes/internal/zmq_middleware/Current.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <capnp/serialize.h>
@@ -50,39 +52,34 @@ void marshal_unknown_exception(capnproto::Response::Builder& r, string const& s)
     r.getPayload().setAs<capnproto::RuntimeException>(ex.getRoot<capnproto::RuntimeException>());
 }
 
-void marshal_object_not_exist_exception(capnproto::Response::Builder& r,
-                                        std::string const& id,
-                                        std::string const& endpoint,
-                                        std::string const& adapter)
+void marshal_object_not_exist_exception(capnproto::Response::Builder& r, Current const& c)
 {
     capnp::MallocMessageBuilder ex;
     auto payload = ex.initRoot<capnproto::RuntimeException>();
 
     auto one = payload.initObjectNotExist();
     auto proxy = one.initProxy();
-    proxy.setIdentity(id.c_str());
-    proxy.setEndpoint(endpoint.c_str());
-    one.setAdapter(adapter.c_str());
+    proxy.setIdentity(c.id.c_str());
+    proxy.setEndpoint(c.adapter->endpoint().c_str());
+    proxy.setCategory(c.category.c_str());
+    one.setAdapter(c.adapter->name().c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
     r.getPayload().setAs<capnproto::ObjectNotExistException>(ex.getRoot<capnproto::ObjectNotExistException>());
 }
 
-void marshal_operation_not_exist_exception(capnproto::Response::Builder& r,
-                                           std::string const& id,
-                                           std::string const& endpoint,
-                                           std::string const& adapter,
-                                           std::string const& op_name)
+void marshal_operation_not_exist_exception(capnproto::Response::Builder& r, Current const& c)
 {
     capnp::MallocMessageBuilder ex;
     auto payload = ex.initRoot<capnproto::RuntimeException>();
 
     auto opne = payload.initOperationNotExist();
     auto proxy = opne.initProxy();
-    proxy.setIdentity(id.c_str());
-    proxy.setEndpoint(endpoint.c_str());
-    opne.setAdapter(adapter.c_str());
-    opne.setOpName(op_name.c_str());
+    proxy.setIdentity(c.id.c_str());
+    proxy.setEndpoint(c.adapter->endpoint().c_str());
+    proxy.setCategory(c.category.c_str());
+    opne.setAdapter(c.adapter->name().c_str());
+    opne.setOpName(c.op_name.c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
     r.getPayload().setAs<capnproto::OperationNotExistException>(ex.getRoot<capnproto::OperationNotExistException>());
@@ -96,12 +93,10 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_unknown_response(capn
 }
 
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_response(capnp::MessageBuilder& b,
-                                                                                     string const& id,
-                                                                                     string const& endpoint,
-                                                                                     string const& adapter)
+                                                                                     Current const& c)
 {
     auto response = b.initRoot<capnproto::Response>();
-    marshal_object_not_exist_exception(response, id, endpoint, adapter);
+    marshal_object_not_exist_exception(response, c);
     return b.getSegmentsForOutput();
 }
 
@@ -129,7 +124,7 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
             auto proxy = one.getProxy();
             string msg = string("Object does not exist (adapter = ") + one.getAdapter().cStr() + ", endpoint = " +
                          proxy.getEndpoint().cStr() + ", identity = " + proxy.getIdentity().cStr() + ")";
-            throw MiddlewareException(msg);
+            throw ObjectNotExistException(msg, proxy.getIdentity().cStr());
         }
         case capnproto::RuntimeException::UNKNOWN:
         {
