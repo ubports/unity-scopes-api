@@ -53,7 +53,7 @@ SSRegistryObject::~SSRegistryObject() noexcept {
   refresh_thread_.join();
 }
 
-ScopeMetadata SSRegistryObject::get_metadata(std::string const &scope_name) {
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_name) {
   // If the name is empty, it was sent as empty by the remote client.
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
@@ -75,9 +75,20 @@ MetadataMap SSRegistryObject::list() {
   return scopes_;
 }
 
-ScopeProxy SSRegistryObject::locate(std::string const &scope_name) {
+ScopeProxy SSRegistryObject::locate(std::string const& scope_name) {
   (void)scope_name;
   return ScopeProxy();
+}
+
+std::string SSRegistryObject::get_base_url(std::string const& scope_name)
+{
+  if (base_urls_.find(scope_name) != end(base_urls_)) {
+    return base_urls_[scope_name];
+  }
+  else {
+    throw NotFoundException("SSRegistryObject::get_base_url(): no such scope",
+                            scope_name);
+  }
 }
 
 void SSRegistryObject::refresh_thread() {
@@ -96,9 +107,10 @@ void SSRegistryObject::get_remote_scopes() {
   std::vector<RemoteScope> remote_scopes = ssclient_.get_remote_scopes();
 
   std::lock_guard<std::mutex> lock(scopes_mutex_);
+  base_urls_.clear();
   scopes_.clear();
 
-  for (RemoteScope &scope : remote_scopes) {
+  for (RemoteScope const &scope : remote_scopes) {
     if (scope.invisible)
     {
       continue;
@@ -120,16 +132,19 @@ void SSRegistryObject::get_remote_scopes() {
     metadata->set_proxy(proxy);
 
     auto meta = ScopeMetadataImpl::create(move(metadata));
-    add(scope.name, std::move(meta));
+    add(scope.name, std::move(meta), scope);
   }
 }
 
-bool SSRegistryObject::add(std::string const &scope_name,
-                           ScopeMetadata const &metadata) {
+bool SSRegistryObject::add(std::string const& scope_name,
+                           ScopeMetadata const& metadata,
+                           RemoteScope const& remotedata) {
   if (scope_name.empty()) {
     throw unity::InvalidArgumentException(
           "SSRegistryObject: Cannot add scope with empty name");
   }
+
+  base_urls_[scope_name] = remotedata.base_url;
 
   auto const &pair = scopes_.insert(make_pair(scope_name, metadata));
   if (!pair.second) {

@@ -40,21 +40,24 @@ public:
   SSRegistryObject(MiddlewareBase::SPtr middleware);
   virtual ~SSRegistryObject() noexcept;
 
-  ScopeMetadata get_metadata(std::string const &scope_name) override;
+  ScopeMetadata get_metadata(std::string const& scope_name) override;
   MetadataMap list() override;
 
-  ScopeProxy locate(std::string const &scope_name) override;
+  ScopeProxy locate(std::string const& scope_name) override;
+
+  std::string get_base_url(std::string const& scope_name);
 
 private:
   void refresh_thread();
 
   void get_remote_scopes();
-  bool add(std::string const &scope_name, ScopeMetadata const &scope);
+  bool add(std::string const& scope_name, ScopeMetadata const& scope, RemoteScope const& remotedata);
 
 private:
   smartscopes::SmartScopesClient ssclient_;
 
   MetadataMap scopes_;
+  std::map<std::string, std::string> base_urls_;
   std::mutex scopes_mutex_;
 
   std::thread refresh_thread_;
