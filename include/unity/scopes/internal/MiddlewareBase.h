@@ -60,17 +60,21 @@ public:
     virtual void stop() = 0;
     virtual void wait_for_shutdown() = 0;
 
-    virtual MWProxy create_proxy(std::string const& identity, std::string const& endpoint) = 0;
+    virtual MWProxy create_proxy(std::string const& identity,
+                                 std::string const& endpoint,
+                                 std::string const& category) = 0;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) = 0;
+    virtual void add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) = 0;
     virtual MWQueryProxy add_query_object(QueryObjectBase::SPtr const& query) = 0;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) = 0;
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) = 0;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
+    virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
 
     RuntimeImpl* runtime() const noexcept;
 

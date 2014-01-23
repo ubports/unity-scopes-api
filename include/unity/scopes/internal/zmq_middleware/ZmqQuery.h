@@ -38,7 +38,10 @@ namespace zmq_middleware
 class ZmqQuery : public virtual ZmqObjectProxy, public virtual MWQuery
 {
 public:
-    ZmqQuery(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
+    ZmqQuery(ZmqMiddleware* mw_base,
+             std::string const& endpoint,
+             std::string const& identity,
+             std::string const& category);
     virtual ~ZmqQuery() noexcept;
 
     virtual void run(MWReplyProxy const& reply) override;
