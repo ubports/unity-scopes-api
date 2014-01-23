@@ -63,9 +63,9 @@ interface Registry
 
 */
 
-ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway),
+    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway, category),
     MWRegistry(mw_base)
 {
 }
@@ -160,7 +160,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
             auto proxy = locate_response.getReturnValue();
             auto mw = dynamic_cast<ZmqMiddleware*>(mw_base());
             assert(mw);
-            auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity());
+            auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity(), proxy.getCategory());
             return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_name);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:

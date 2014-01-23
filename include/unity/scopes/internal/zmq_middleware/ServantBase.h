@@ -21,6 +21,7 @@
 
 #include <capnp/dynamic.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/Current.h>
 #include <unity/util/NonCopyable.h>
 
 #include <memory>
@@ -40,15 +41,6 @@ class AbstractObject;
 
 namespace zmq_middleware
 {
-
-class ObjectAdapter;
-
-struct Current
-{
-    std::string id;
-    std::string op_name;
-    ObjectAdapter* adapter;
-};
 
 class ServantBase
 {

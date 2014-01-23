@@ -63,7 +63,7 @@ void ServantBase::dispatch_(Current const& current,
             r.setStatus(capnproto::ResponseStatus::SUCCESS);
             return;
         }
-        marshal_operation_not_exist_exception(r, current.id, current.adapter->endpoint(), current.adapter->name(), current.op_name);
+        marshal_operation_not_exist_exception(r, current);
         return;
     }
     auto dispatch_func = it->second;

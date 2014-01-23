@@ -44,9 +44,9 @@ interface Reply
 
 */
 
-ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
+    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway, category),
     MWReply(mw_base)
 {
 }

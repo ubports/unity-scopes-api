@@ -16,12 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#include <unity/scopes/internal/zmq_middleware/Current.h>
 
-#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 namespace unity
 {
@@ -35,18 +32,10 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
+unity::scopes::internal::InvokeInfo to_info(Current const& c)
 {
-public:
-    ZmqReply(ZmqMiddleware* mw_base,
-             std::string const& endpoint,
-             std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqReply();
-
-    virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
-};
+    return { c.id, c.adapter->mw() };
+}
 
 } // namespace zmq_middleware
 
@@ -55,5 +44,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

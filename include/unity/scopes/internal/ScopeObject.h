@@ -57,23 +57,23 @@ public:
     virtual MWQueryCtrlProxy create_query(std::string const& q,
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
-                                          MiddlewareBase* mw_base) override;
+                                          InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy activate(Result const& result,
-                                      VariantMap const& hints,
-                                      MWReplyProxy const &reply,
-                                      MiddlewareBase* mw_base);
+                              VariantMap const& hints,
+                              MWReplyProxy const &reply,
+                              InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
                                                      VariantMap const& hints,
                                                      std::string const& action_id,
                                                      MWReplyProxy const &reply,
-                                                     MiddlewareBase* mw_base);
+                                                     InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy preview(Result const& result,
                                      VariantMap const& hints,
                                      MWReplyProxy const& reply,
-                                     MiddlewareBase* mw_base);
+                                     InvokeInfo const& info) override;
 
 private:
     MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,

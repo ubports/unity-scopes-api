@@ -44,9 +44,9 @@ interface Query
 
 */
 
-ZmqQuery::ZmqQuery(ZmqMiddleware* mw_base, string const& endpoint, string const& identity) :
+ZmqQuery::ZmqQuery(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway),
+    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway, category),
     MWQuery(mw_base)
 {
 }
@@ -64,6 +64,7 @@ void ZmqQuery::run(MWReplyProxy const& reply)
     auto rp = dynamic_pointer_cast<ZmqReply>(reply);
     proxy.setEndpoint(rp->endpoint().c_str());
     proxy.setIdentity(rp->identity().c_str());
+    proxy.setCategory(rp->category().c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();

@@ -20,8 +20,10 @@
 #define UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
 
 #include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Result.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -46,7 +48,23 @@ public:
     virtual MWQueryCtrlProxy create_query(std::string const& q,
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
-                                          MiddlewareBase* mw_base) = 0;
+                                          InvokeInfo const& info) = 0;
+
+    virtual MWQueryCtrlProxy activate(Result const& result,
+                                      VariantMap const& hints,
+                                      MWReplyProxy const &reply,
+                                      InvokeInfo const& info) = 0;
+
+    virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
+                                                     VariantMap const& hints,
+                                                     std::string const& action_id,
+                                                     MWReplyProxy const &reply,
+                                                     InvokeInfo const& info) = 0;
+
+    virtual MWQueryCtrlProxy preview(Result const& result,
+                                     VariantMap const& hints,
+                                     MWReplyProxy const& reply,
+                                     InvokeInfo const& info) = 0;
 };
 
 } // namespace internal

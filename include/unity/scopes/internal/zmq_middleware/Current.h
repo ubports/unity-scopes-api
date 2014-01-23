@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/InvokeInfo.h>
+
+#include <string>
 
 namespace unity
 {
@@ -35,18 +35,17 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
-{
-public:
-    ZmqReply(ZmqMiddleware* mw_base,
-             std::string const& endpoint,
-             std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqReply();
+class ObjectAdapter;
 
-    virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+struct Current
+{
+    std::string id;
+    std::string category;
+    std::string op_name;
+    ObjectAdapter* adapter;
 };
+
+unity::scopes::internal::InvokeInfo to_info(Current const& c);
 
 } // namespace zmq_middleware
 
