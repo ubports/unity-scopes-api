@@ -57,7 +57,7 @@ SignalThread::SignalThread() :
     handler_thread_ = thread([this]{ this->wait_for_sigs(); });
 }
 
-SignalThread::~SignalThread() noexcept
+SignalThread::~SignalThread()
 {
     {
         lock_guard<mutex> lock(mutex_);

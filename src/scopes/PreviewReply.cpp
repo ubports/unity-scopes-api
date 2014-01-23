@@ -35,7 +35,7 @@ PreviewReply::PreviewReply(internal::ReplyImpl* impl) :
 {
 }
 
-PreviewReply::~PreviewReply() noexcept
+PreviewReply::~PreviewReply()
 {
 }
 

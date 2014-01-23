@@ -39,7 +39,7 @@ class ZmqQueryCtrl : public virtual ZmqObjectProxy, public virtual MWQueryCtrl
 {
 public:
     ZmqQueryCtrl(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqQueryCtrl() noexcept;
+    virtual ~ZmqQueryCtrl();
 
     virtual void cancel() override;
     virtual void destroy() override;

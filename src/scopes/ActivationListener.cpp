@@ -28,7 +28,7 @@ ActivationListener::ActivationListener()
 {
 }
 
-ActivationListener::~ActivationListener() noexcept
+ActivationListener::~ActivationListener()
 {
 }
 

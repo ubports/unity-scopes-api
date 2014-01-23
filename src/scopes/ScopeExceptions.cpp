@@ -38,7 +38,7 @@ MiddlewareException::MiddlewareException(MiddlewareException const&) = default;
 MiddlewareException& MiddlewareException::operator=(MiddlewareException const&) = default;
 
 
-MiddlewareException::~MiddlewareException() noexcept = default;
+MiddlewareException::~MiddlewareException() = default;
 
 //! @endcond
 
@@ -59,7 +59,7 @@ ConfigException::ConfigException(ConfigException const&) = default;
 ConfigException& ConfigException::operator=(ConfigException const&) = default;
 
 
-ConfigException::~ConfigException() noexcept = default;
+ConfigException::~ConfigException() = default;
 
 //! @endcond
 
@@ -84,7 +84,7 @@ NotFoundException::NotFoundException(NotFoundException const&) = default;
 NotFoundException& NotFoundException::operator=(NotFoundException const&) = default;
 
 
-NotFoundException::~NotFoundException() noexcept = default;
+NotFoundException::~NotFoundException() = default;
 
 //! @endcond
 

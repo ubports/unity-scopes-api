@@ -39,7 +39,7 @@ class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
 {
 public:
     ZmqReply(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqReply() noexcept;
+    virtual ~ZmqReply();
 
     virtual void push(VariantMap const& result) override;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;

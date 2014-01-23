@@ -51,7 +51,7 @@ ZmqQuery::ZmqQuery(ZmqMiddleware* mw_base, string const& endpoint, string const&
 {
 }
 
-ZmqQuery::~ZmqQuery() noexcept
+ZmqQuery::~ZmqQuery()
 {
 }
 

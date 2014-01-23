@@ -34,7 +34,7 @@ MWQueryCtrl::MWQueryCtrl(MiddlewareBase* mw_base) :
 {
 }
 
-MWQueryCtrl::~MWQueryCtrl() noexcept
+MWQueryCtrl::~MWQueryCtrl()
 {
 }
 

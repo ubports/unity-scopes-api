@@ -49,7 +49,7 @@ class ZmqObjectProxy : public virtual MWObjectProxy
 public:
     ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
     ZmqObjectProxy(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity, RequestType t);
-    virtual ~ZmqObjectProxy() noexcept;
+    virtual ~ZmqObjectProxy();
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 

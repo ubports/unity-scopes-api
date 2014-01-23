@@ -39,7 +39,7 @@ class ScopeI : public ServantBase
 {
 public:
     ScopeI(ScopeObjectBase::SPtr const& so);
-    virtual ~ScopeI() noexcept;
+    virtual ~ScopeI();
 
 private:
     virtual void create_query_(Current const& current,

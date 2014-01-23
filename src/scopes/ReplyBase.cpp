@@ -35,7 +35,7 @@ ReplyBase::ReplyBase(internal::ReplyImpl* impl) :
     assert(impl);
 }
 
-ReplyBase::~ReplyBase() noexcept
+ReplyBase::~ReplyBase()
 {
 }
 

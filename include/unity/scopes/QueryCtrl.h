@@ -53,7 +53,7 @@ public:
     Letting a QueryCtrl go out of scope has no effect on the query, that is, the destructor does _not_
     implicitly call cancel().
     */
-    virtual ~QueryCtrl() noexcept;
+    virtual ~QueryCtrl();
 
 protected:
     QueryCtrl(internal::QueryCtrlImpl* impl);         // Instantiated only by QueryCtrlImpl

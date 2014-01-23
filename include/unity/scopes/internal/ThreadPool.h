@@ -44,7 +44,7 @@ public:
     NONCOPYABLE(ThreadPool);
 
     ThreadPool(int size);
-    ~ThreadPool() noexcept;
+    ~ThreadPool();
 
     template<typename F>
     std::future<typename std::result_of<F()>::type> submit(F f);

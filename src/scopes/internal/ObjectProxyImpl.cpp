@@ -37,7 +37,7 @@ ObjectProxyImpl::ObjectProxyImpl(MWProxy const& mw_proxy) :
 {
 }
 
-ObjectProxyImpl::~ObjectProxyImpl() noexcept
+ObjectProxyImpl::~ObjectProxyImpl()
 {
 }
 

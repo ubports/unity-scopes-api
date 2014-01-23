@@ -51,7 +51,7 @@ ZmqReply::ZmqReply(ZmqMiddleware* mw_base, string const& endpoint, string const&
 {
 }
 
-ZmqReply::~ZmqReply() noexcept
+ZmqReply::~ZmqReply()
 {
 }
 

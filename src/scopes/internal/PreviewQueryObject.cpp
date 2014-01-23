@@ -47,7 +47,7 @@ PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQuery> const& prev
     assert(preview_base);
 }
 
-PreviewQueryObject::~PreviewQueryObject() noexcept
+PreviewQueryObject::~PreviewQueryObject()
 {
     // parent destructor will call ctrl_->destroy()
 }

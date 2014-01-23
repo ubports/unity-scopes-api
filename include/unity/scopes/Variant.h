@@ -101,7 +101,7 @@ public:
     /**
     \brief Destructor.
     */
-    ~Variant() noexcept;
+    ~Variant();
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.

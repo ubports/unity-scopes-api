@@ -39,7 +39,7 @@ class ZmqScope : public virtual ZmqObjectProxy, public virtual MWScope
 {
 public:
     ZmqScope(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqScope() noexcept;
+    virtual ~ZmqScope();
 
     virtual QueryCtrlProxy create_query(std::string const& q,
                                         VariantMap const& hints,

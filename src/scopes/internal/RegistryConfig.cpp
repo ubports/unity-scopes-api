@@ -57,7 +57,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     }
 }
 
-RegistryConfig::~RegistryConfig() noexcept
+RegistryConfig::~RegistryConfig()
 {
 }
 

@@ -42,7 +42,7 @@ class ZmqRegistry : public virtual ZmqObjectProxy, public virtual MWRegistry
 {
 public:
     ZmqRegistry(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqRegistry() noexcept;
+    virtual ~ZmqRegistry();
 
     // Remote operations.
     virtual ScopeMetadata get_metadata(std::string const& scope_name) override;

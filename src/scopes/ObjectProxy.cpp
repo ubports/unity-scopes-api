@@ -46,7 +46,7 @@ ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
 {
 }
 
-ObjectProxy::~ObjectProxy() noexcept
+ObjectProxy::~ObjectProxy()
 {
 }
 

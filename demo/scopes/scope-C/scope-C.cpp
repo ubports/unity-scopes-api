@@ -135,7 +135,7 @@ public:
         cerr << "My Query created" << endl;
     }
 
-    ~MyQuery() noexcept
+    ~MyQuery()
     {
         cerr << "My Query destroyed" << endl;
     }

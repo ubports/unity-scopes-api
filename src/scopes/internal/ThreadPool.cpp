@@ -63,7 +63,7 @@ ThreadPool::ThreadPool(int size)
     }
 }
 
-ThreadPool::~ThreadPool() noexcept
+ThreadPool::~ThreadPool()
 {
     queue_->destroy();
     try

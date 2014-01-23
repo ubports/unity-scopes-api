@@ -52,7 +52,7 @@ class ZmqMiddleware final : public MiddlewareBase
 {
 public:
     ZmqMiddleware(std::string const& server_name, std::string const& configfile, RuntimeImpl* runtime);
-    virtual ~ZmqMiddleware() noexcept;
+    virtual ~ZmqMiddleware();
 
     virtual void start() override;
     virtual void stop() override;

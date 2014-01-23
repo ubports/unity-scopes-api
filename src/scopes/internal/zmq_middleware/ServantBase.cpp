@@ -47,7 +47,7 @@ ServantBase::ServantBase(shared_ptr<AbstractObject> const& delegate, DispatchTab
     assert(delegate);
 }
 
-ServantBase::~ServantBase() noexcept
+ServantBase::~ServantBase()
 {
 }
 

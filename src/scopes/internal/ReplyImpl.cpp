@@ -58,7 +58,7 @@ ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBa
     assert(qo);
 }
 
-ReplyImpl::~ReplyImpl() noexcept
+ReplyImpl::~ReplyImpl()
 {
     try
     {

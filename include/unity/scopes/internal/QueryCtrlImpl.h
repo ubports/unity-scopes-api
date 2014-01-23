@@ -43,7 +43,7 @@ class QueryCtrlImpl : public virtual ObjectProxyImpl
 {
 public:
     QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
-    virtual ~QueryCtrlImpl() noexcept;
+    virtual ~QueryCtrlImpl();
 
     void cancel();
 

@@ -55,7 +55,7 @@ QueryCtrlI::QueryCtrlI(QueryCtrlObjectBase::SPtr const& qo) :
 {
 }
 
-QueryCtrlI::~QueryCtrlI() noexcept
+QueryCtrlI::~QueryCtrlI()
 {
 }
 

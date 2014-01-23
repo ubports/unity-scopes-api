@@ -58,7 +58,7 @@ public:
     void safe_dispatch_(Current const& current,
                         capnp::AnyPointer::Reader& in_params,
                         capnproto::Response::Builder& r) noexcept;
-    virtual ~ServantBase() noexcept;
+    virtual ~ServantBase();
 
 protected:
     typedef std::function<void(Current const&,

@@ -56,7 +56,7 @@ QueryI::QueryI(QueryObjectBase::SPtr const& qo) :
 {
 }
 
-QueryI::~QueryI() noexcept
+QueryI::~QueryI()
 {
 }
 

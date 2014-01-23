@@ -65,7 +65,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     }
 }
 
-RuntimeConfig::~RuntimeConfig() noexcept
+RuntimeConfig::~RuntimeConfig()
 {
 }
 

@@ -38,7 +38,7 @@ public:
 
     UNITY_DEFINES_PTRS(AbstractObject);
 
-    virtual ~AbstractObject() noexcept;
+    virtual ~AbstractObject();
 
     // Sets callback to allow this facade to disconnect itself from the middleware.
     // Called by disconnect().

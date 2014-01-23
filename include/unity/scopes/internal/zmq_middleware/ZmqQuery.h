@@ -39,7 +39,7 @@ class ZmqQuery : public virtual ZmqObjectProxy, public virtual MWQuery
 {
 public:
     ZmqQuery(ZmqMiddleware* mw_base, std::string const& endpoint, std::string const& identity);
-    virtual ~ZmqQuery() noexcept;
+    virtual ~ZmqQuery();
 
     virtual void run(MWReplyProxy const& reply) override;
 };

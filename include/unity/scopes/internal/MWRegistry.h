@@ -40,7 +40,7 @@ public:
     virtual MetadataMap list() = 0;
     virtual ScopeProxy locate(std::string const& scope_name) = 0;
 
-    virtual ~MWRegistry() noexcept;
+    virtual ~MWRegistry();
 
 protected:
     MWRegistry(MiddlewareBase* mw_base);

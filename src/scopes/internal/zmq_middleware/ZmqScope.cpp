@@ -61,7 +61,7 @@ ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const&
 {
 }
 
-ZmqScope::~ZmqScope() noexcept
+ZmqScope::~ZmqScope()
 {
 }
 

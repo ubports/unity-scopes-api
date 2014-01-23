@@ -84,7 +84,7 @@ public:
     void refresh() noexcept; // Update time stamp on item to keep it alive. O(1) performance.
     void destroy() noexcept; // Removes this item from the reaper *without* invoking the callback. O(1) performance.
 
-    ~ReapItem() noexcept;
+    ~ReapItem();
 
 private:
     ReapItem(std::weak_ptr<Reaper> const& reaper,
@@ -113,7 +113,7 @@ public:
     NONCOPYABLE(Reaper);
     UNITY_DEFINES_PTRS(Reaper);
 
-    ~Reaper() noexcept;
+    ~Reaper();
 
     enum DestroyPolicy { NoCallbackOnDestroy, CallbackOnDestroy };
 

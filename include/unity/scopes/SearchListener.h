@@ -42,7 +42,7 @@ public:
     NONCOPYABLE(SearchListener);
     UNITY_DEFINES_PTRS(SearchListener);
 
-    virtual ~SearchListener() noexcept;
+    virtual ~SearchListener();
     /// @endcond
 
     /**

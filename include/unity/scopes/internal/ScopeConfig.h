@@ -36,7 +36,7 @@ public:
     static constexpr const char* SCOPE_CONFIG_GROUP = "ScopeConfig";
 
     ScopeConfig(std::string const& configfile);
-    ~ScopeConfig() noexcept;
+    ~ScopeConfig();
 
     bool overrideable() const;      // Optional, returns false if not present
     std::string display_name() const;

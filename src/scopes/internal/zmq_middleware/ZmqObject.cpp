@@ -62,7 +62,7 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base, string const& endpoint, s
     assert(t != Unknown);
 }
 
-ZmqObjectProxy::~ZmqObjectProxy() noexcept
+ZmqObjectProxy::~ZmqObjectProxy()
 {
 }
 

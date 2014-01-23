@@ -34,7 +34,7 @@ MWQuery::MWQuery(MiddlewareBase* mw_base) :
 {
 }
 
-MWQuery::~MWQuery() noexcept
+MWQuery::~MWQuery()
 {
 }
 

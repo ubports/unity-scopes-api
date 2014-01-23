@@ -58,7 +58,7 @@ public:
                   std::string const& endpoint,
                   RequestType t,
                   int pool_size);
-    ~ObjectAdapter() noexcept;
+    ~ObjectAdapter();
 
     ZmqMiddleware* mw() const;
     std::string name() const;

@@ -40,7 +40,7 @@ public:
     UNITY_DEFINES_PTRS(QueryCtrlObject);
 
     QueryCtrlObject();
-    virtual ~QueryCtrlObject() noexcept;
+    virtual ~QueryCtrlObject();
 
     // Remote operation implementations
     virtual void cancel() override;

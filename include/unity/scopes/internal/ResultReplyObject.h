@@ -38,7 +38,7 @@ class ResultReplyObject : public ReplyObject
 {
 public:
     ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual ~ResultReplyObject() noexcept;
+    virtual ~ResultReplyObject();
 
     virtual void process_data(VariantMap const& data) override;
 

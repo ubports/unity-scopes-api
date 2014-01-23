@@ -39,7 +39,7 @@ class ReplyI : public ServantBase
 {
 public:
     ReplyI(ReplyObjectBase::SPtr const& ro);
-    virtual ~ReplyI() noexcept;
+    virtual ~ReplyI();
 
 private:
     virtual void push_(Current const& current,
