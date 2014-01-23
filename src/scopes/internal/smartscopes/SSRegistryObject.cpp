@@ -103,6 +103,11 @@ void SSRegistryObject::get_remote_scopes() {
   scopes_.clear();
 
   for (RemoteScope &scope : remote_scopes) {
+    if (scope.invisible)
+    {
+      continue;
+    }
+
     std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
     metadata->set_scope_name(scope.name);

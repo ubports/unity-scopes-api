@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include "../RaiiServer.h"
 
@@ -48,13 +49,16 @@ TEST(SSRegistryObject, basic)
 
   SSRegistryObject::SPtr reg(new SSRegistryObject(middleware));
 
+  // list scopes
+  MetadataMap scopes = reg->list();
+  EXPECT_EQ(scopes.size(), 1);
+
+  // visible scope
   ScopeMetadata meta = reg->get_metadata("Dummy Demo Scope");
   EXPECT_EQ("Dummy Demo Scope",meta.scope_name());
   EXPECT_EQ("Dummy Demo Scope",meta.display_name());
   EXPECT_EQ("Dummy demo scope.", meta.description());
 
-  meta = reg->get_metadata("Dummy Demo Scope 2");
-  EXPECT_EQ("Dummy Demo Scope 2",meta.scope_name());
-  EXPECT_EQ("Dummy Demo Scope 2",meta.display_name());
-  EXPECT_EQ("Dummy demo scope 2.", meta.description());
+  // invisible scope
+  EXPECT_THROW(reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
 }
