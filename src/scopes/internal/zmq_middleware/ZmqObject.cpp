@@ -157,7 +157,7 @@ ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params, int64_t t
         if (!p.has_input(s))
         {
             // If a request times out, we must close the corresponding socket, otherwise
-            // zmq gets confused: The reply will never be read, so the socket ends up
+            // zmq gets confused: the reply will never be read, so the socket ends up
             // in a bad state.
             pool.remove(endpoint_);
             throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");

@@ -70,6 +70,7 @@ public:
 
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool();
+    int64_t locate_timeout() const noexcept;
 
 private:
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
@@ -96,6 +97,8 @@ private:
     mutable std::mutex state_mutex_;            // Protects state_
 
     ZmqConfig config_;
+    const int64_t twoway_timeout_;              // Default timeout for twoway invocations
+    int64_t locate_timeout_;                    // Timeout for registry locate()
 };
 
 } // namespace zmq_middleware

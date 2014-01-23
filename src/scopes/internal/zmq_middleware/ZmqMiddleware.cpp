@@ -63,7 +63,9 @@ try :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Stopped),
-    config_(configfile)
+    config_(configfile),
+    twoway_timeout_(200),  // TODO: get timeout from config
+    locate_timeout_(1500)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
 }
@@ -173,7 +175,7 @@ MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, str
     MWRegistryProxy proxy;
     try
     {
-        proxy.reset(new ZmqRegistry(this, endpoint, identity, 100)); // TODO: get timeout from config
+        proxy.reset(new ZmqRegistry(this, endpoint, identity, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -188,7 +190,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
     try
     {
         string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
-        proxy.reset(new ZmqScope(this, endpoint, identity, 100));               // TODO: get timeout from config
+        proxy.reset(new ZmqScope(this, endpoint, identity, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -202,7 +204,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     MWScopeProxy proxy;
     try
     {
-        proxy.reset(new ZmqScope(this, endpoint, identity, 100));               // TODO: get timeout from config
+        proxy.reset(new ZmqScope(this, endpoint, identity, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -267,7 +269,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
-        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), 100)); // TODO: timeout from config
+        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), twoway_timeout_));
     }
     catch (...)
     {
@@ -310,7 +312,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
-        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), 100)); // TODO: timeout from config
+        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), twoway_timeout_));
     }
     catch (...)
     {
@@ -338,6 +340,11 @@ ThreadPool* ZmqMiddleware::invoke_pool()
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
     return invokers_.get();
+}
+
+int64_t ZmqMiddleware::locate_timeout() const noexcept
+{
+    return locate_timeout_;
 }
 
 namespace
