@@ -14,11 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#include <unity/scopes/internal/PreviewWidgetImpl.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/VariantMapBuilder.h>
+#include <unity/scopes/internal/VariantMapBuilderImpl.h>
 
 namespace unity
 {
@@ -26,41 +25,32 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-
+VariantMapBuilder::VariantMapBuilder()
+    : p(new internal::VariantMapBuilderImpl())
 {
-
-//! @cond
-
-PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
-    : data_(json_text)
-{
-    //TODO: json validation
 }
 
-PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
+VariantMapBuilder::~VariantMapBuilder() = default;
+
+void VariantMapBuilder::add_attribute(std::string const& key, Variant const& value)
 {
-    const Variant var(definition);
-    const internal::JsonCppNode node(var);
-    data_ = node.to_json_string();
-    //TODO: json validation
+    p->add_attribute(key, value);
 }
 
-std::string PreviewWidgetImpl::data() const
+void VariantMapBuilder::add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {
-    return data_;
+    p->add_tuple(array_key, tuple);
 }
 
-VariantMap PreviewWidgetImpl::serialize() const
+void VariantMapBuilder::add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple)
 {
-    VariantMap vm;
-    vm["data"] = data_;
-    return vm;
+    p->add_tuple(array_key, tuple);
 }
 
-//! @endcond
-
-} // namespace internal
+VariantMap VariantMapBuilder::variant_map() const
+{
+    return p->variant_map();
+}
 
 } // namespace scopes
 

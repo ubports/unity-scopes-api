@@ -18,6 +18,7 @@
 
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
+#include <unity/scopes/VariantMapBuilder.h>
 
 namespace unity
 {
@@ -32,8 +33,8 @@ PreviewWidget::PreviewWidget(std::string const& definition)
 {
 }
 
-PreviewWidget::PreviewWidget(VariantMap const& variant_map)
-    : p(new internal::PreviewWidgetImpl(variant_map))
+PreviewWidget::PreviewWidget(VariantMap const& definition)
+    : p(new internal::PreviewWidgetImpl(definition))
 {
 }
 

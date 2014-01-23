@@ -92,7 +92,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -186,6 +186,8 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # Static version for testing
 set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
 
+pkg_check_modules(JSONCPP jsoncpp REQUIRED)
+
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
   message(FATAL_ERROR "Zmq lib not found.")
@@ -215,6 +217,7 @@ endif()
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    ${JSONCPP_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}

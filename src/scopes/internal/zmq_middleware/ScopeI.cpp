@@ -64,7 +64,8 @@ ScopeI::ScopeI(ScopeObject::SPtr const& so) :
     ServantBase(so, {
         { "create_query", bind(&ScopeI::create_query_, this, _1, _2, _3) },
         { "preview", bind(&ScopeI::preview_, this, _1, _2, _3) },
-        { "activate", bind(&ScopeI::activate_, this, _1, _2, _3) }
+        { "activate", bind(&ScopeI::activate_, this, _1, _2, _3) },
+        { "activate_preview_action", bind(&ScopeI::activate_preview_action_, this, _1, _2, _3) }
     })
 {
 }
@@ -103,6 +104,26 @@ void ScopeI::activate_(Current const& current,
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
     auto delegate = dynamic_pointer_cast<ScopeObject>(del());
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate(result, hints, reply_proxy, current.adapter->mw()));
+    assert(ctrl_proxy);
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
+    auto p = create_query_response.initReturnValue();
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+}
+
+void ScopeI::activate_preview_action_(Current const& current,
+                           capnp::AnyPointer::Reader& in_params,
+                           capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Scope::ActionActivationRequest>();
+    auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
+    auto hints = to_variant_map(req.getHints());
+    auto proxy = req.getReplyProxy();
+    auto action_id = req.getAction().cStr();
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(), proxy.getEndpoint().cStr(), proxy.getIdentity().cStr()));
+    auto delegate = dynamic_pointer_cast<ScopeObject>(del());
+    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate_preview_action(result, hints, action_id, reply_proxy, current.adapter->mw()));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
