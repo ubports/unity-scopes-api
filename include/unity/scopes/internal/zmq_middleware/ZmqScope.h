@@ -44,7 +44,7 @@ public:
              std::string const& category);
     virtual ~ZmqScope() noexcept;
 
-    virtual QueryCtrlProxy create_query(std::string const& q,
+    virtual QueryCtrlProxy create_query(Query const& query,
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply) override;
 

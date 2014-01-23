@@ -27,6 +27,7 @@
 #include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -145,7 +146,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     return ctrl_proxy;
 }
 
-MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
+MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)

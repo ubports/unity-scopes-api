@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
+#include <unity/scopes/Query.h>
 
 #include <cassert>
 
@@ -81,7 +82,7 @@ void ScopeI::create_query_(Current const& current,
                            capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
-    auto query = req.getQuery().cStr();
+    auto query = Query(to_variant_map(req.getQuery()));
     auto hints = to_variant_map(req.getHints());
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),

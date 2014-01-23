@@ -72,7 +72,8 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->create_query(q, hints, rp);
+        const Query query(scope_name_, q, ""); //FIXME depatment id
+        ctrl = fwd()->create_query(query, hints, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

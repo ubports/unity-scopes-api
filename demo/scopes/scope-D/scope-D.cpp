@@ -22,6 +22,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Query.h>
 
 #include <algorithm>
 #include <atomic>
@@ -125,18 +126,18 @@ class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
-            string const& query,
+            Query const& query,
             Queue& queue) :
         scope_name_(scope_name),
         query_(query),
         queue_(queue)
     {
-        cerr << "query instance for \"" << scope_name_ << ":" << query << "\" created" << endl;
+        cerr << "query instance for \"" << scope_name_ << ":" << query.query_string() << "\" created" << endl;
     }
 
     virtual ~MyQuery() noexcept
     {
-        cerr << "query instance for \"" << scope_name_ << ":" << query_ << "\" destroyed" << endl;
+        cerr << "query instance for \"" << scope_name_ << ":" << query_.query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -150,7 +151,7 @@ public:
         // work may still be in progress on a query. Note that cancellations are frequent;
         // not responding to cancelled() correctly causes loss of performance.
 
-        cerr << "query for \"" << scope_name_ << ":" << query_ << "\" cancelled" << endl;
+        cerr << "query for \"" << scope_name_ << ":" << query_.query_string() << "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -160,12 +161,12 @@ public:
         // run(). It is OK to push results on the reply from a different thread.
         // The only obligation on run() is that, if cancelled() is called, and run() is still active
         // at that time, run() must tidy up and return in a timely fashion.
-        queue_.put(this, query_, reply);
+        queue_.put(this, query_.query_string(), reply);
     }
 
 private:
     string scope_name_;
-    string query_;
+    Query query_;
     Queue& queue_;
 };
 
@@ -222,10 +223,10 @@ public:
         }
     }
 
-    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
-        cerr << scope_name_ << ": created query: \"" << q << "\"" << endl;
+        cerr << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 

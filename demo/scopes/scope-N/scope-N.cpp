@@ -63,7 +63,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(string const&, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const&, VariantMap const&) override
     {
         return QueryBase::UPtr(new MyQuery);
     }
