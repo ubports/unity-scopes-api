@@ -11,17 +11,17 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
 
-#include <unity/scopes/internal/MWQuery.h>
-#include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -32,22 +32,14 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
-
-class QueryI : public ServantBase
+class ReplyObjectBase : public AbstractObject
 {
 public:
-    QueryI(QueryObjectBase::SPtr const& qo);
-    virtual ~QueryI() noexcept;
+    UNITY_DEFINES_PTRS(ReplyObjectBase);
 
-private:
-    virtual void run_(Current const& current,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r);
+    virtual void push(VariantMap const& result) noexcept = 0;
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 

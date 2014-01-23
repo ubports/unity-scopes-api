@@ -109,3 +109,24 @@
     fun:_ZNSs6appendEPKcm
     ...
 }
+
+# False positives for memory leaks in Qt
+
+{
+   QNetworkConfigurationManagerInit
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   fun:_ZN35QNetworkConfigurationManagerPrivate20updateConfigurationsEv
+   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
+}
+
+{
+   QCoreApplicationNotifyRealloc
+   Memcheck:Leak
+   fun:realloc
+   ...
+   fun:_ZN7QObject5eventEP6QEvent
+   fun:_ZN16QCoreApplication6notifyEP7QObjectP6QEvent
+}
+

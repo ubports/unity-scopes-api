@@ -62,11 +62,11 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
 
-    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) override;
+    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
     virtual MWQueryProxy add_query_object(QueryObjectBase::SPtr const& query) override;
-    virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObject::SPtr const& registry) override;
-    virtual MWReplyProxy add_reply_object(ReplyObject::SPtr const& reply) override;
-    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) override;
+    virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) override;
+    virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) override;
+    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) override;
 
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool();

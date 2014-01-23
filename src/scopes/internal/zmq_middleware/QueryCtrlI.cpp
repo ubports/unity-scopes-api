@@ -19,8 +19,6 @@
 #include <unity/scopes/internal/zmq_middleware/QueryCtrlI.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/QueryCtrl.capnp.h>
-#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
 
 #include <cassert>
 
@@ -50,7 +48,7 @@ interface QueryCtrl
 
 using namespace std::placeholders;
 
-QueryCtrlI::QueryCtrlI(QueryCtrlObject::SPtr const& qo) :
+QueryCtrlI::QueryCtrlI(QueryCtrlObjectBase::SPtr const& qo) :
     ServantBase(qo, { { "cancel", bind(&QueryCtrlI::cancel_, this, _1, _2, _3) },
                       { "destroy", bind(&QueryCtrlI::destroy_, this, _1, _2, _3) } })
 
@@ -65,7 +63,7 @@ void QueryCtrlI::cancel_(Current const&,
                          capnp::AnyPointer::Reader&,
                          capnproto::Response::Builder&)
 {
-    auto delegate = dynamic_pointer_cast<QueryCtrlObject>(del());
+    auto delegate = dynamic_pointer_cast<QueryCtrlObjectBase>(del());
     delegate->cancel();
 }
 
@@ -73,7 +71,7 @@ void QueryCtrlI::destroy_(Current const&,
                           capnp::AnyPointer::Reader&,
                           capnproto::Response::Builder&)
 {
-    auto delegate = dynamic_pointer_cast<QueryCtrlObject>(del());
+    auto delegate = dynamic_pointer_cast<QueryCtrlObjectBase>(del());
     delegate->destroy();
 }
 

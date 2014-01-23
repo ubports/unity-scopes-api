@@ -11,17 +11,15 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#ifndef UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECTBASE_H
 
-#include <unity/scopes/internal/MWQuery.h>
-#include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/AbstractObject.h>
 
 namespace unity
 {
@@ -32,22 +30,14 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
-
-class QueryI : public ServantBase
+class QueryCtrlObjectBase : public AbstractObject
 {
 public:
-    QueryI(QueryObjectBase::SPtr const& qo);
-    virtual ~QueryI() noexcept;
+    UNITY_DEFINES_PTRS(QueryCtrlObjectBase);
 
-private:
-    virtual void run_(Current const& current,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r);
+    virtual void cancel() = 0;
+    virtual void destroy() = 0;
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 

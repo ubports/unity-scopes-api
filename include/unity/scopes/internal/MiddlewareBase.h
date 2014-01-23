@@ -24,11 +24,11 @@
 #include <unity/scopes/internal/MWQueryProxyFwd.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
-#include <unity/scopes/internal/QueryObject.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
-#include <unity/scopes/internal/RegistryObject.h>
-#include <unity/scopes/internal/ReplyObject.h>
-#include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/internal/QueryCtrlObjectBase.h>
+#include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/ReplyObjectBase.h>
+#include <unity/scopes/internal/ScopeObjectBase.h>
 
 namespace unity
 {
@@ -64,11 +64,11 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
 
-    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl) = 0;
+    virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) = 0;
     virtual MWQueryProxy add_query_object(QueryObjectBase::SPtr const& query) = 0;
-    virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObject::SPtr const& registry) = 0;
-    virtual MWReplyProxy add_reply_object(ReplyObject::SPtr const& reply) = 0;
-    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObject::SPtr const& scope) = 0;
+    virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) = 0;
+    virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) = 0;
+    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
 
     RuntimeImpl* runtime() const noexcept;
 

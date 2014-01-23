@@ -42,7 +42,7 @@ class Annotation;
 namespace internal
 {
 
-class QueryObject;
+class QueryObjectBase;
 
 // Proxy used by a scope to push results for a query.
 // To indicate that it has sent the last result, the scope must call finished().
@@ -53,7 +53,7 @@ class QueryObject;
 class ReplyImpl : public virtual ObjectProxyImpl
 {
 public:
-    ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject>const & qo);
+    ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~ReplyImpl() noexcept;
 
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
@@ -68,8 +68,8 @@ public:
     void finished(unity::scopes::ListenerBase::Reason reason);
     void error(std::exception_ptr ex);
 
-    static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
-    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObject> const& qo);
+    static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
+    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
 
     typedef std::function<void()> CleanupFunc;
 
@@ -78,7 +78,7 @@ private:
     bool push(VariantMap const& variant_map);
     MWReplyProxy fwd() const;
 
-    std::shared_ptr<QueryObject> qo_;
+    std::shared_ptr<QueryObjectBase> qo_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
 };
