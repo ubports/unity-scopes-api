@@ -52,8 +52,10 @@ public:
 class TestActivation : public ActivationBase
 {
 public:
-    TestActivation(std::string uri, VariantMap hints)
-        : uri_(uri),
+    TestActivation(std::string const& hint, std::string const& hint_val, std::string const &uri, VariantMap const& hints)
+        : hint_key_(hint),
+          hint_val_(hint_val),
+          uri_(uri),
           recv_hints_(hints)
     {
     }
@@ -62,7 +64,7 @@ public:
     {
         ActivationResponse resp(ActivationResponse::Status::Handled);
         VariantMap var;
-        var["foo"] = "bar";
+        var[hint_key_] = hint_val_;
         var["received_hints"] = recv_hints_; // send received hints back for testing
         var["activated_uri"] = uri_; //send activated uri back for testing
         resp.setHints(var);
@@ -70,6 +72,8 @@ public:
     }
 
 private:
+    std::string hint_key_;
+    std::string hint_val_;
     std::string uri_;
     VariantMap recv_hints_;
 };
@@ -98,7 +102,12 @@ public:
 
     virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints) override
     {
-        return ActivationBase::UPtr(new TestActivation(result.uri(), hints));
+        return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints));
+    }
+
+    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id) override
+    {
+        return ActivationBase::UPtr(new TestActivation("activated action id", action_id, result.uri(), hints));
     }
 };
 

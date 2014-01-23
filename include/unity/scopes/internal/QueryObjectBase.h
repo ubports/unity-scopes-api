@@ -39,6 +39,10 @@ public:
     // Remote operation implementation
     virtual void run(MWReplyProxy const& reply) noexcept = 0;
     virtual void cancel() = 0;
+
+    // Used to hold the reference count high until the run call arrives via the middleware,
+    // and we can pass the shared_ptr to the ReplyImpl.
+    virtual void set_self(SPtr const& self) noexcept = 0;
 };
 
 } // namespace internal

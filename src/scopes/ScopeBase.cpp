@@ -47,6 +47,11 @@ ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, VariantMap 
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }
 
+ActivationBase::UPtr ScopeBase::activate_preview_action(Result const& /* result */, VariantMap const& /* hints */, std::string const& /* action_id */)
+{
+    return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
+}
+
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = unity::scopes::major_version();

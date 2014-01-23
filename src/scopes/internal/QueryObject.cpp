@@ -147,7 +147,7 @@ bool QueryObject::pushable() const noexcept
 // Whatever happens last (run() returning or the last ReplyProxy going out of scope) deallocates
 // this instance.
 
-void QueryObject::set_self(SPtr const& self)
+void QueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
 {
     assert(self);
     assert(!self_);

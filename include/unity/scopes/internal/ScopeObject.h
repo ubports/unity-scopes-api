@@ -20,7 +20,10 @@
 #define UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 
 #include <unity/scopes/internal/ScopeObjectBase.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/QueryBase.h>
 
+#include <functional>
 #include <string>
 
 namespace unity
@@ -56,17 +59,26 @@ public:
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) override;
 
-    MWQueryCtrlProxy activate(Result const& result,
+    virtual MWQueryCtrlProxy activate(Result const& result,
                               VariantMap const& hints,
                               MWReplyProxy const &reply,
                               InvokeInfo const& info) override;
 
-    MWQueryCtrlProxy preview(Result const& result,
-                             VariantMap const& hints,
-                             MWReplyProxy const& reply,
-                             InvokeInfo const& info) override;
+    virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
+                                                     VariantMap const& hints,
+                                                     std::string const& action_id,
+                                                     MWReplyProxy const &reply,
+                                                     InvokeInfo const& info) override;
+
+    virtual MWQueryCtrlProxy preview(Result const& result,
+                                     VariantMap const& hints,
+                                     MWReplyProxy const& reply,
+                                     InvokeInfo const& info) override;
 
 private:
+    MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+        std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
     RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
 };

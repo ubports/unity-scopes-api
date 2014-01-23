@@ -1,4 +1,4 @@
-unity-scopes-api (0.2.0-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.2.3-0ubuntu1) UNRELEASED; urgency=low
 
   [ Michi Henning ]
   * Added ability for scope to push an exception (as an exception_ptr). On the client side,
@@ -11,7 +11,103 @@ unity-scopes-api (0.2.0-0ubuntu1) UNRELEASED; urgency=low
   [ Michal Hruby ]
   * Added preview and activation APIs.
 
- -- Michal Hruby <michal.hruby@canonical.com>  Thu, 16 Jan 2014 14:56:05 +0200
+  [ Michi Henning ]
+  * Added default servants for Scope and QueryCtrl interfaces.
+
+ -- Michi Henning <michi@ubuntu>  Thu, 23 Jan 2014 12:20:03 +1000
+
+unity-scopes-api (0.2.0+14.04.20140120-0ubuntu1) trusty; urgency=low
+
+  [ Michi Henning ]
+  * Added ability for scope to push an exception (as an exception_ptr). On the client side,
+    the exception is delivered as the what() string (if the exception is a std::exception) and
+    as "unknown exception", otherwise.
+  * Disabled running the tests in parallel for CI. They are not written
+    to run concurrently because the different tests try to bind to the
+    same network endpoints. This should almost certainly fix the failure
+    reported here:
+    https://launchpadlibrarian.net/159997415/buildlog_ubuntu-saucy-
+    i386.unity-scopes-api_0.1.5-0~94~ubuntu13.10.1_FAILEDTOBUILD.txt.gz.
+  * Got rid of chatter from helgrind. (Needs helgrind 3.9.0 or later--
+    3.8.1 generates bogus errors.) Added public destroy() method so it
+    is possible to shut down the reaper explicitly. Fixed race condition
+    on setting the self_ weak_ptr.
+  * Changed code to match macro change here:
+    https://code.launchpad.net/~michihenning/unity-api/noncopyable-
+    fix/+merge/200084 Also removed remaining remnants of deprecated
+    NonCopyable class.
+  * Added CMake option to build with -fsanitize=thread. Fixed a bunch of
+    warnings when building with clang.
+  * Fixed valgrind error in HttpClient_test.cpp: execv was using
+    deallocated memory. Updated CTestCustom.cmake.in to correctly
+    suppress the tests that should not be run under valgrind.
+  * Fixed shutdown in ObjectAdapter and added proper exception handling
+    if the broker thread or a worker thread encounters an exception.
+  * Disabled code generation for stand-alone header compilation tests.
+    This makes the tests run marginally faster.
+  * Added locate() remote method to the Registry, for the scope
+    activation logic.
+  * Changed ScopeLoader to not run the scope in a separate thread. (This
+    is done by scoperunner anyway.) This fixes the problem of an
+    exception being thrown by start(), but the scoperunner not realizing
+    this. (LP: #1262536)
+  * Added suppressions file for thread sanitizer issues in zmq.
+  * Fixed race on registry start-up: registry was answering incoming
+    requests too early. Other minor cosmetic changes: replaced
+    factory()->create() call with factory()->find() because RuntimeImpl
+    already instantiates the middleware. Removed redundant #includes.
+    (LP: #1267026)
+  * Minor fix: got rid of unnecessary unique_ptr. No functional changes.
+  * Added formatcode target to CMakeLists.txt. This runs all source and
+    header files through a pretty-printer.
+  * Updated code for API changes in latest Cap'n Proto. (LP: #1268538)
+  * Added check to prevent two servers from binding to the same ipc
+    endpoint. Added coverage test for double-bind. Removed attempts to
+    deal with servant destructors that throw. It turns out that this
+    doesn't work because the destructor is called in the context of the
+    map destructor, which calls the shared_ptr destructors, so we end up
+    in terminate(). I might theoretically be possible to do this with a
+    custom deleter for the map and the shared_ptrs inside the map, but
+    the trouble isn't worth it. Destructors should never throw, that's
+    just how it is, and attempts to patch around that are a lost labor
+    of love. (LP: #1257676)
+  * Fix to stop SignalThread from spinning if waitpid() is called at a
+    point where there are no child processes. (LP: #1268524)
+  * Fixes a bunch of include guards that used the wrong symbol name.
+  * Added ping() method to all proxies.
+
+  [ Jussi Pakkanen ]
+  * Version bump due to namespace peeling.
+  * Use EXPECT_FALSE.
+  * Use built-in CMake machinery for libdir rather than building paths
+    yourself.
+  * Remove extra namespace layers.
+  * Fix -Werror.
+  * Fix header include path.
+  * Make it possible to not run headertests, which are slow.
+  * Create empty directory where scopes can install their configuration
+    files.
+  * Implement Registry.
+  * Some logging to RegistryObject.
+
+  [ Michal Hruby ]
+  * Added preview and activation APIs.
+  * Don't fork inside tests, as it screws up with coverage reports.
+  * Update tutorial to match with the current public API.
+
+  [ Marcus Tomlinson ]
+  * Fixed race conditions in HttpClientQtThread and RaiiServer. (LP:
+    #1262987)
+  * reply_->abort() (QCoreApplication::sendEvent) replaced by a signal-
+    slot connection (QCoreApplication::postEvent), which is allowed
+    across threads. (LP: #1267917)
+  * Added astyle flag to suppress the creation of .orig files when
+    formatting code.
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 142
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 20 Jan 2014 16:05:56 +0000
 
 unity-scopes-api (0.1.6+14.04.20131219.1-0ubuntu1) trusty; urgency=low
 
