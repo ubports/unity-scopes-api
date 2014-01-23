@@ -21,7 +21,7 @@
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 

@@ -39,4 +39,5 @@ remote_scopes_response = '\
 {"base_url": "https://productsearch.ubuntu.com/demo5", "name": "DummyScope5", "description": "Dummy scope 5.", "invisible": true }]'
 
 httpd = make_server('127.0.0.1', 8000, response)
+print('Serving on http://127.0.0.1:8000')
 httpd.serve_forever()

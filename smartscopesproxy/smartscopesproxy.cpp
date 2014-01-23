@@ -35,13 +35,14 @@ static void error(std::string const& msg)
 
 int main(int argc, char* argv[])
 {
-  if (argc > 1 && std::string(argv[1]) == "test")
-  {
-    char server_url[] = "SMART_SCOPES_SERVER=http://127.0.0.1:8000";
-    ::putenv(server_url);
-  }
-
   int exit_status = 1;
+
+  std::string server_url_env;
+  if (argc > 1)
+  {
+    server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
+    ::putenv(const_cast<char*>(server_url_env.c_str()));
+  }
 
   try
   {
