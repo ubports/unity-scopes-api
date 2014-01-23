@@ -33,7 +33,7 @@ namespace internal {
 
 namespace smartscopes {
 
-class SSRegistryObject : public RegistryObjectBase {
+class SSRegistryObject final : public RegistryObjectBase {
 public:
   UNITY_DEFINES_PTRS(SSRegistryObject);
 
