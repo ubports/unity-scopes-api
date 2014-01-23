@@ -35,6 +35,8 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <iostream>  // TODO: remove this once logging is added
+
 using namespace std;
 
 namespace unity
@@ -239,9 +241,11 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
         ctrl->set_disconnect_function(df);
         return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity(), "QueryCtrl"));
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_query_ctrl_object(): " << e.what() << endl;
+        throw;
     }
     return proxy;
 }
@@ -258,9 +262,11 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
         auto df = safe_dflt_add(adapter, "QueryCtrl", qci);
         ctrl->set_disconnect_function(df);
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_dflt_query_ctrl_object(): " << e.what() << endl;
+        throw;
     }
 }
 
@@ -278,9 +284,11 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
         query->set_disconnect_function(df);
         return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity(), "Query"));
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_query_object(): " << e.what() << endl;
+        throw;
     }
     return proxy;
 }
@@ -301,9 +309,11 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         registry->set_disconnect_function(df);
         return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry"));
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_registry_object(): " << e.what() << endl;
+        throw;
     }
     return proxy;
 }
@@ -322,9 +332,11 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
         reply->set_disconnect_function(df);
         return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity(), "Reply"));
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_reply_object(): " << e.what() << endl;
+        throw;
     }
     return proxy;
 }
@@ -344,9 +356,11 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         scope->set_disconnect_function(df);
         return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope"));
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_scope_object(): " << e.what() << endl;
+        throw;
     }
     return proxy;
 }
@@ -363,9 +377,11 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
         auto df = safe_dflt_add(adapter, "Scope", si);
         scope->set_disconnect_function(df);
     }
-    catch (...)
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
-        throw; // TODO
+        // TODO: log this
+        cerr << "unexpected exception in add_dflt_scope_object(): " << e.what() << endl;
+        throw;
     }
 }
 
@@ -479,6 +495,8 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
         }
         catch (...)
         {
+            // No error here; for concurrent invocations that each disconnect the servant,
+            // only one of them will succeed.
         }
     };
     return adapter->add(id, servant);
@@ -496,6 +514,8 @@ function<void()> ZmqMiddleware::safe_dflt_add(shared_ptr<ObjectAdapter> const& a
         }
         catch (...)
         {
+            // No error here; for concurrent invocations that each disconnect the servant,
+            // only one of them will succeed.
         }
     };
     adapter->add_dflt_servant(category, servant);
