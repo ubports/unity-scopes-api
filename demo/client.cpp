@@ -39,9 +39,10 @@
 using namespace std;
 using namespace unity::scopes;
 
-// dump filter to stream
-std::ostream& operator<<(std::ostream& str, FilterBase const& filter)
+// conver filter to a string
+std::string to_string(FilterBase const& filter)
 {
+    std::ostringstream str;
     auto const ftype = filter.filter_type();
     cout << "filter id=" << filter.id() << endl;
     if (ftype == "option_selector")
@@ -60,7 +61,7 @@ std::ostream& operator<<(std::ostream& str, FilterBase const& filter)
     {
         str << "Unknown filter type: " << ftype;
     }
-    return str;
+    return str.str();
 }
 
 // output variant in a json-like format; note, it doesn't do escaping etc.,
@@ -157,7 +158,7 @@ public:
         cout << "received " << filters.size() << " filters" << endl;
         for (auto f: filters)
         {
-            cout << *f << endl;
+            cout << to_string(*f) << endl;
         }
     }
 
