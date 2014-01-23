@@ -40,11 +40,6 @@ namespace internal
 class QueryBaseImpl;
 class QueryObject;
 
-namespace smartscopes
-{
-
-} // namespace smartscopes
-
 } // namespace internal
 
 // Abstract server-side base interface for a query that is executed inside a scope.
