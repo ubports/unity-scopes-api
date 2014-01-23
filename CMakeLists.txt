@@ -364,13 +364,14 @@ if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
     message(WARNING "Cannot generate documentation: doxygen and/or graphviz not found")
 else()
     if (DEVEL_DOCS)
-      message(STATUS "Creaing devel documentation")
+      message(STATUS "Creating devel documentation")
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile-devel.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     else()
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     endif()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
+                       COMMAND echo Doxygen warnings: `grep warning doxygen-warnings.txt | wc -l`
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
