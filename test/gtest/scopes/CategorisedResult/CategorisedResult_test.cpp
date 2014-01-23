@@ -21,6 +21,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/ReplyObject.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -52,6 +53,9 @@ TEST(CategorisedResult, basic)
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
 
         EXPECT_EQ("1", result.category()->id());
+
+        result.set_category(cat2);
+        EXPECT_EQ("2", result.category()->id());
     }
 }
 
@@ -309,7 +313,7 @@ TEST(CategorisedResult, deserialize)
         CategoryRegistry reg;
         CategoryRenderer rdr;
         auto cat = reg.register_category("1", "title", "icon", rdr);
-        CategorisedResult result(cat, outer);
+        auto result = internal::CategorisedResultImpl::create_result(std::make_shared<internal::CategorisedResultImpl>(cat, outer));
 
         auto outer_var = result.serialize();
         auto var = outer_var["attrs"].get_dict();
@@ -336,7 +340,7 @@ TEST(CategorisedResult, deserialize)
         CategoryRegistry reg;
         CategoryRenderer rdr;
         auto cat = reg.register_category("1", "title", "icon", rdr);
-        CategorisedResult result(cat, outer);
+        auto result = internal::CategorisedResultImpl::create_result(std::make_shared<internal::CategorisedResultImpl>(cat, outer));
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());
