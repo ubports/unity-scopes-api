@@ -225,7 +225,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     return proxy;
 }
 
-MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObject::SPtr const& ctrl)
+MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
 {
     assert(ctrl);
 
@@ -268,7 +268,7 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
 }
 
 
-MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, RegistryObject::SPtr const& registry)
+MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, RegistryObjectBase::SPtr const& registry)
 {
     assert(!identity.empty());
     assert(registry);
@@ -290,7 +290,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     return proxy;
 }
 
-MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
+MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
 {
     assert(reply);
 
@@ -311,7 +311,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObject::SPtr const& reply)
     return proxy;
 }
 
-MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject::SPtr const& scope)
+MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObjectBase::SPtr const& scope)
 {
     assert(!identity.empty());
     assert(scope);

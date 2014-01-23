@@ -19,12 +19,11 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/Variant.h>
-#include <unity/scopes/Result.h>
+#include <unity/scopes/internal/ScopeObjectBase.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/QueryBase.h>
 
+#include <functional>
 #include <string>
 
 namespace unity
@@ -46,7 +45,7 @@ class RuntimeImpl;
 // ScopeBase-derived implementation provided by the scope. It forwards incoming
 // queries to the actual scope. This allows us to intercept all queries for a scope.
 
-class ScopeObject final : public AbstractObject
+class ScopeObject final : public ScopeObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
@@ -55,23 +54,31 @@ public:
     virtual ~ScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(std::string const& q,
-                                  VariantMap const& hints,
-                                  MWReplyProxy const& reply,
-                                  MiddlewareBase* mw_base);
+    virtual MWQueryCtrlProxy create_query(std::string const& q,
+                                          VariantMap const& hints,
+                                          MWReplyProxy const& reply,
+                                          MiddlewareBase* mw_base) override;
 
+    virtual MWQueryCtrlProxy activate(Result const& result,
+                                      VariantMap const& hints,
+                                      MWReplyProxy const &reply,
+                                      MiddlewareBase* mw_base);
 
-    MWQueryCtrlProxy activate(Result const& result,
-                              VariantMap const& hints,
-                              MWReplyProxy const &reply,
-                              MiddlewareBase* mw_base);
+    virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
+                                                     VariantMap const& hints,
+                                                     std::string const& action_id,
+                                                     MWReplyProxy const &reply,
+                                                     MiddlewareBase* mw_base);
 
-    MWQueryCtrlProxy preview(Result const& result,
-                             VariantMap const& hints,
-                             MWReplyProxy const& reply,
-                             MiddlewareBase* mw_base);
+    virtual MWQueryCtrlProxy preview(Result const& result,
+                                     VariantMap const& hints,
+                                     MWReplyProxy const& reply,
+                                     MiddlewareBase* mw_base);
 
 private:
+    MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+        std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
     RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
 };

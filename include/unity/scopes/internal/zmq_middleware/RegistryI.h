@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
 
 #include <unity/scopes/internal/MWRegistry.h>
-#include <unity/scopes/internal/RegistryObject.h>
+#include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
@@ -44,7 +44,7 @@ namespace zmq_middleware
 class RegistryI : public ServantBase
 {
 public:
-    RegistryI(RegistryObject::SPtr const& ro);
+    RegistryI(RegistryObjectBase::SPtr const& ro);
     virtual ~RegistryI() noexcept;
 
 private:

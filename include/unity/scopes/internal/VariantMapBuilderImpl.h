@@ -16,9 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/PreviewWidgetImpl.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/internal/JsonCppNode.h>
+#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+
+#include <unity/scopes/Variant.h>
+#include <string>
+#include <tuple>
 
 namespace unity
 {
@@ -27,41 +30,26 @@ namespace scopes
 {
 
 namespace internal
-
 {
 
-//! @cond
-
-PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
-    : data_(json_text)
+class VariantMapBuilderImpl final
 {
-    //TODO: json validation
-}
+public:
+    VariantMapBuilderImpl() = default;
+    ~VariantMapBuilderImpl() = default;
+    void add_attribute(std::string const& key, Variant const& value);
+    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
+    VariantMap variant_map() const;
 
-PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
-{
-    const Variant var(definition);
-    const internal::JsonCppNode node(var);
-    data_ = node.to_json_string();
-    //TODO: json validation
-}
-
-std::string PreviewWidgetImpl::data() const
-{
-    return data_;
-}
-
-VariantMap PreviewWidgetImpl::serialize() const
-{
-    VariantMap vm;
-    vm["data"] = data_;
-    return vm;
-}
-
-//! @endcond
+private:
+    VariantMap variant_;
+};
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

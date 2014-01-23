@@ -104,32 +104,18 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
 
         get_qt_thread_->start();
         loop.exec();
-        get_qt_thread_->wait();
 
-        QNetworkReply* reply = get_qt_thread_->getReply();
+        std::string reply;
+        bool success = get_qt_thread_->get_reply(reply);
 
-        if (!reply)
+        if (!success)
         {
-            // no reply
-            unity::ResourceException e("No reply from " + request_url + ":" + std::to_string(port));
-            promise_->set_exception(e.self());
-        }
-        else if (!reply->isFinished())
-        {
-            // incomplete reply
-            unity::ResourceException e("Incomplete reply from " + request_url + ":" + std::to_string(port));
-            promise_->set_exception(e.self());
-        }
-        else if (reply->error() != QNetworkReply::NoError)
-        {
-            // communication error
-            unity::ResourceException e(reply->errorString().toStdString());
+            unity::ResourceException e(reply);
             promise_->set_exception(e.self());
         }
         else
         {
-            QString reply_string(reply->readAll());
-            promise_->set_value(reply_string.toStdString());
+            promise_->set_value(reply);
         }
     });
 

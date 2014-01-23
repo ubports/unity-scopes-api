@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYCTRLI_H
 
 #include <unity/scopes/internal/MWQueryCtrl.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/internal/QueryCtrlObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
@@ -38,7 +38,7 @@ namespace zmq_middleware
 class QueryCtrlI : public ServantBase
 {
 public:
-    QueryCtrlI(QueryCtrlObject::SPtr const& qo);
+    QueryCtrlI(QueryCtrlObjectBase::SPtr const& qo);
     virtual ~QueryCtrlI() noexcept;
 
 private:

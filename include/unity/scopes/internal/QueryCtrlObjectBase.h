@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/PreviewWidgetImpl.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/internal/JsonCppNode.h>
+#ifndef UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECTBASE_H
+
+#include <unity/scopes/internal/AbstractObject.h>
 
 namespace unity
 {
@@ -27,41 +28,21 @@ namespace scopes
 {
 
 namespace internal
-
 {
 
-//! @cond
-
-PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
-    : data_(json_text)
+class QueryCtrlObjectBase : public AbstractObject
 {
-    //TODO: json validation
-}
+public:
+    UNITY_DEFINES_PTRS(QueryCtrlObjectBase);
 
-PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
-{
-    const Variant var(definition);
-    const internal::JsonCppNode node(var);
-    data_ = node.to_json_string();
-    //TODO: json validation
-}
-
-std::string PreviewWidgetImpl::data() const
-{
-    return data_;
-}
-
-VariantMap PreviewWidgetImpl::serialize() const
-{
-    VariantMap vm;
-    vm["data"] = data_;
-    return vm;
-}
-
-//! @endcond
+    virtual void cancel() = 0;
+    virtual void destroy() = 0;
+};
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

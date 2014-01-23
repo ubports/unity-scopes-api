@@ -13,36 +13,40 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
-#define UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
+#define UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
 
-#include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
 
 namespace scopes
 {
-class ActivationBase;
+
+class ScopeBase;
 
 namespace internal
 {
 
-class ActivationQueryObject final : public QueryObject
+class MiddlewareBase;
+class RuntimeImpl;
+
+class ScopeObjectBase : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(ActivationQueryObject);
+    UNITY_DEFINES_PTRS(ScopeObjectBase);
 
-    ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~ActivationQueryObject() noexcept;
-    void run(MWReplyProxy const& reply) noexcept override;
-
-private:
-    std::shared_ptr<ActivationBase> act_base_;
+    virtual MWQueryCtrlProxy create_query(std::string const& q,
+                                          VariantMap const& hints,
+                                          MWReplyProxy const& reply,
+                                          MiddlewareBase* mw_base) = 0;
 };
 
 } // namespace internal

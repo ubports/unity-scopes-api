@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 
+#include <mutex>
+
 namespace unity
 {
 

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
