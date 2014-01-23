@@ -134,6 +134,10 @@ void SignalThread::wait_for_sigs()
                             cerr << "scoperegistry: wait() failed: " << strerror(errno) << endl;
                             _exit(1);
                         }
+                        if (errno == ECHILD)
+                        {
+                            break;  // We don't have any sub-processes
+                        }
                         continue; // Ignore stray SIGCHLD signals
                     }
                     if (pid == 0)

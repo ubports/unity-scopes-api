@@ -17,13 +17,13 @@
  */
 
 #include <gtest/gtest.h>
-#include <scopes/FilterState.h>
-#include <scopes/OptionSelectorFilter.h>
-#include <scopes/internal/OptionSelectorFilterImpl.h>
+#include <unity/scopes/FilterState.h>
+#include <unity/scopes/OptionSelectorFilter.h>
+#include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/UnityExceptions.h>
 
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(OptionSelectorFilter, basic)
 {

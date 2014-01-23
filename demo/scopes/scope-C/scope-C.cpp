@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/Category.h>
-#include <scopes/Reply.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <algorithm>
 #include <condition_variable>
@@ -32,7 +33,7 @@
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 // Simple queue that stores query-string/reply pairs, using MyQuery* as a key for removal.
 // The put() method adds a pair at the tail, and the get() method returns a pair at the head.
@@ -45,14 +46,14 @@ class MyQuery;
 class Queue
 {
 public:
-    void put(MyQuery const* query, string const& query_string, ReplyProxy const& reply_proxy)
+    void put(MyQuery const* query, string const& query_string, SearchReplyProxy const& reply_proxy)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         queries_.push_back(QueryData { query, query_string, reply_proxy });
         condvar_.notify_one();
     }
 
-    bool get(string& query_string, ReplyProxy& reply_proxy)
+    bool get(string& query_string, SearchReplyProxy& reply_proxy)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         condvar_.wait(lock, [this] { return !queries_.empty() || done_; });
@@ -104,7 +105,7 @@ private:
     {
         MyQuery const* query;
         string query_string;
-        ReplyProxy reply_proxy;
+        SearchReplyProxy reply_proxy;
 
         bool operator==(QueryData const& rhs) const
         {
@@ -122,9 +123,9 @@ private:
 // The run() method of the scope acts as a worker thread to push replies to remembered queries.
 // This example shows that letting run() return immediately is OK, and that the MyQuery instance stays
 // alive as long as it can still be cancelled, which is while there is at least one
-// ReplyProxy still in existence for this query.
+// SearchReplyProxy still in existence for this query.
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query, Queue& queue) :
@@ -149,7 +150,7 @@ public:
         cerr << "scope-C: \"" + query_ + "\" cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         queue_.put(this, query_, reply);
         cerr << "scope-C: run() returning" << endl;
@@ -158,6 +159,14 @@ public:
 private:
     string query_;
     Queue& queue_;
+};
+
+class MyActivation : public ActivationBase
+{
+    ActivationResponse activate() override
+    {
+        return ActivationResponse(ActivationResponse::Status::Handled);
+    }
 };
 
 class MyScope : public ScopeBase
@@ -179,7 +188,7 @@ public:
         for (;;)
         {
             string query;
-            ReplyProxy reply;
+            SearchReplyProxy reply;
             if (!queue.get(query, reply))
             {
                 cerr << "worker thread terminating, queue was cleared" << endl;
@@ -198,6 +207,7 @@ public:
                 result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
                 result.set_art("icon");
                 result.set_dnd_uri("dnd_uri");
+                result.set_intercept_activation();
                 if (!reply->push(result))
                 {
                     break; // Query was cancelled
@@ -213,6 +223,18 @@ public:
         return QueryBase::UPtr(new MyQuery(q, queue));
     }
 
+    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& /* hints */) override
+    {
+        cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
+        return ActivationBase::UPtr(new MyActivation());
+    }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
+
 private:
     string scope_name_;
     Queue queue;
@@ -222,9 +244,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope;
     }
@@ -232,7 +254,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }

@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Version.h>
+#include <unity/scopes/Version.h>
 
 #include <gtest/gtest.h>
 
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 TEST(Version, basic)
 {

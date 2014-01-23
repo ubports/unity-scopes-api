@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/Registry.h>
-#include <scopes/Reply.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/ScopeBase.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchQuery.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
@@ -29,14 +30,14 @@
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 // Example scope B: aggregates from scope C and D.
 
 // A Receiver instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class Receiver: public ReceiverBase
+class Receiver: public SearchListener
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -57,12 +58,17 @@ public:
         }
     }
 
-    virtual void finished(Reason reason) override
+    virtual void finished(Reason reason, string const& error_message) override
     {
-        cout << "query to " << scope_name_ << " complete, status: " << to_string(reason) << endl;
+        cout << "query to " << scope_name_ << " complete, status: " << to_string(reason);
+        if (reason == ListenerBase::Error)
+        {
+            cout << ": " << error_message;
+        }
+        cout << endl;
     }
 
-    Receiver(string const& scope_name, ReplyProxy const& upstream) :
+    Receiver(string const& scope_name, SearchReplyProxy const& upstream) :
         scope_name_(scope_name),
         upstream_(upstream)
     {
@@ -70,10 +76,10 @@ public:
 
 private:
     string scope_name_;
-    ReplyProxy upstream_;
+    SearchReplyProxy upstream_;
 };
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
@@ -92,7 +98,7 @@ public:
         cout << "query to " << scope_name_ << " was cancelled" << endl;
     }
 
-    virtual void run(ReplyProxy const& upstream_reply)
+    virtual void run(SearchReplyProxy const& upstream_reply)
     {
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
@@ -106,7 +112,7 @@ public:
             assert(0);
         }
 
-        ReceiverBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
+        SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
         create_subquery(scope_c_, query_, VariantMap(), reply);
         create_subquery(scope_d_, query_, VariantMap(), reply);
     }
@@ -145,6 +151,12 @@ public:
         return query;
     }
 
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
+        return nullptr;
+    }
+
 private:
     string scope_name_;
     ScopeProxy scope_c_;
@@ -155,9 +167,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope;
     }
@@ -165,7 +177,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }

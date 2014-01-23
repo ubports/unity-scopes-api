@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
-#include <internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <scopes/internal/zmq_middleware/ObjectAdapter.h>
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -29,9 +29,9 @@
 
 using namespace std;
 using namespace unity;
-using namespace unity::api::scopes;
-using namespace unity::api::scopes::internal;
-using namespace unity::api::scopes::internal::zmq_middleware;
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
+using namespace unity::scopes::internal::zmq_middleware;
 
 // Test servant that throws the exception passed to the constructor from the op() method.
 
@@ -53,7 +53,7 @@ public:
     }
 
     virtual void op(Current const&,
-                    capnp::ObjectPointer::Reader&,
+                    capnp::AnyPointer::Reader&,
                     capnproto::Response::Builder& r)
     {
 
@@ -103,7 +103,24 @@ TEST(ServantBase, success)
     MyServant s(MyServant::NoException);
     capnp::MallocMessageBuilder b;
     auto response = b.initRoot<capnproto::Response>();
-    capnp::ObjectPointer::Reader in_params;
+    capnp::AnyPointer::Reader in_params;
+    s.safe_dispatch_(current, in_params, response);
+    EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
+}
+
+TEST(ServantBase, ping)
+{
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    Current current;
+    current.op_name = "ping";
+    current.adapter = &a;   // Dummy needed for the throw code to get at the adapter name and endpoint.
+
+    MyServant s(MyServant::NoException);
+    capnp::MallocMessageBuilder b;
+    auto response = b.initRoot<capnproto::Response>();
+    capnp::AnyPointer::Reader in_params;
     s.safe_dispatch_(current, in_params, response);
     EXPECT_EQ(capnproto::ResponseStatus::SUCCESS, response.getStatus());
 }
@@ -121,7 +138,7 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::UnityException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::ObjectPointer::Reader in_params;
+        capnp::AnyPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
         auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
@@ -133,7 +150,7 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::StdException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::ObjectPointer::Reader in_params;
+        capnp::AnyPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
         auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
@@ -145,7 +162,7 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::OtherException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::ObjectPointer::Reader in_params;
+        capnp::AnyPointer::Reader in_params;
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());
         auto ex = response.getPayload().getAs<capnproto::RuntimeException>();
@@ -158,7 +175,7 @@ TEST(ServantBase, exceptions)
         MyServant s(MyServant::NoException);
         capnp::MallocMessageBuilder b;
         auto response = b.initRoot<capnproto::Response>();
-        capnp::ObjectPointer::Reader in_params;
+        capnp::AnyPointer::Reader in_params;
         current.op_name = "no_such_op";
         s.safe_dispatch_(current, in_params, response);
         EXPECT_EQ(capnproto::ResponseStatus::RUNTIME_EXCEPTION, response.getStatus());

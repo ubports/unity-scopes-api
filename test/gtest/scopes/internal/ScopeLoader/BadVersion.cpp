@@ -22,17 +22,17 @@
 
 #include "Counters.h"
 
-#include <scopes/internal/ScopeLoader.h>
+#include <unity/scopes/internal/ScopeLoader.h>
 
 #include <iostream>
 
-class EXPORT MyScope : public unity::api::scopes::ScopeBase
+class EXPORT MyScope : public unity::scopes::ScopeBase
 {
 public:
     MyScope() {}
     virtual ~MyScope() noexcept {}
 
-    virtual int start(std::string const&, unity::api::scopes::RegistryProxy const&) override
+    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override
     {
         inc_start();
         return VERSION;
@@ -43,13 +43,14 @@ public:
         inc_stop();
     }
 
-    virtual void run() override
+    virtual unity::scopes::QueryBase::UPtr create_query(std::string const&,
+                                                             unity::scopes::VariantMap const&) override
     {
-        inc_run();
+        return nullptr;
     }
 
-    virtual unity::api::scopes::QueryBase::UPtr create_query(std::string const&,
-                                                             unity::api::scopes::VariantMap const&) override
+    virtual unity::scopes::QueryBase::UPtr preview(unity::scopes::Result const&,
+                                                   unity::scopes::VariantMap const&) override
     {
         return nullptr;
     }
@@ -59,9 +60,9 @@ extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         inc_create();
         return new MyScope;
@@ -70,7 +71,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         inc_destroy();
         delete scope_base;

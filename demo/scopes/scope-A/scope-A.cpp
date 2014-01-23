@@ -16,25 +16,27 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <scopes/ScopeBase.h>
-#include <scopes/Reply.h>
-#include <scopes/Category.h>
-#include <scopes/CategorisedResult.h>
-#include <scopes/CategoryRenderer.h>
-#include <scopes/Query.h>
-#include <scopes/Annotation.h>
-#include <scopes/OptionSelectorFilter.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 
 #include <iostream>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
-using namespace unity::api::scopes;
+using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public QueryBase
+class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& query) :
@@ -50,7 +52,7 @@ public:
     {
     }
 
-    virtual void run(ReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const& reply) override
     {
         Filters filters;
         auto filter = OptionSelectorFilter::create("f1", "Options");
@@ -81,6 +83,37 @@ private:
     string query_;
 };
 
+class MyPreview : public PreviewQuery
+{
+public:
+    MyPreview(string const& uri) :
+        uri_(uri)
+    {
+    }
+
+    ~MyPreview() noexcept
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        PreviewWidgetList widgets;
+        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        reply->push(widgets);
+        reply->push("author", Variant("Foo"));
+        reply->push("rating", Variant("4 blah"));
+        cout << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
+    }
+
+private:
+    string uri_;
+};
+
 class MyScope : public ScopeBase
 {
 public:
@@ -97,15 +130,22 @@ public:
         cout << "scope-A: created query: \"" << q << "\"" << endl;
         return query;
     }
+
+    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    {
+        QueryBase::UPtr preview(new MyPreview(result.uri()));
+        cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
+        return preview;
+    }
 };
 
 extern "C"
 {
 
     EXPORT
-    unity::api::scopes::ScopeBase*
+    unity::scopes::ScopeBase*
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_CREATE_FUNCTION()
+    UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope;
     }
@@ -113,7 +153,7 @@ extern "C"
     EXPORT
     void
     // cppcheck-suppress unusedFunction
-    UNITY_API_SCOPE_DESTROY_FUNCTION(unity::api::scopes::ScopeBase* scope_base)
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }
