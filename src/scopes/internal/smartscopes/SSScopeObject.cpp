@@ -32,12 +32,10 @@ namespace internal
 namespace smartscopes
 {
 
-SSScopeObject::SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
-  runtime_(runtime),
-  scope_base_(scope_base)
+SSScopeObject::SSScopeObject(RuntimeImpl* runtime) :
+  runtime_(runtime)
 {
   assert(runtime);
-  assert(scope_base);
 }
 
 SSScopeObject::~SSScopeObject() noexcept

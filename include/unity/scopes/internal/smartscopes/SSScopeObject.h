@@ -46,7 +46,7 @@ class SSScopeObject final : public ScopeObjectBase
 public:
   UNITY_DEFINES_PTRS(SSScopeObject);
 
-  SSScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
+  SSScopeObject(RuntimeImpl* runtime);
   virtual ~SSScopeObject() noexcept;
 
   // Remote operation implementations
@@ -73,7 +73,6 @@ public:
 
 private:
   RuntimeImpl* const runtime_;
-  ScopeBase* const scope_base_;
 };
 
 } // namespace smartscopes

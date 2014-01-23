@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/UnityExceptions.h>
 
@@ -62,6 +63,12 @@ int main(int argc, char* argv[])
 
     // Add the SS registry to the middleware
     middleware->add_registry_object(runtime->registry_identity(), registry);
+
+    // Instantiate a SS scope
+    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(runtime.get()));
+
+    // Add the SS scope to the middleware
+    middleware->add_dflt_scope_object(std::move(scope));
 
     // Wait until shutdown
     middleware->wait_for_shutdown();
