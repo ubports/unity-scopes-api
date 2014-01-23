@@ -32,6 +32,8 @@
 
 #include <gtest/gtest.h>
 
+#include "scope.h"
+
 using namespace std;
 using namespace unity::scopes;
 
@@ -118,34 +120,54 @@ private:
     int data_pushes_;
 };
 
-TEST(Runtime, run_scope)
+TEST(Runtime, create_query)
 {
-    // Spawn the test scope
-    const char *const argv[] = {"./Runtime_TestScope", "Runtime.ini", NULL};
-    pid_t pid;
-    switch (pid = fork()) {
-    case -1:
-        FAIL();
-    case 0: // child
-        execv(argv[0], (char *const *)argv);
-        FAIL();
-    }
-
-    // Parent: connect to scope and run a query
+    // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
+    auto receiver = make_shared<Receiver>();
+    auto ctrl = scope->create_query("test", VariantMap(), receiver);
+    receiver->wait_until_finished();
+}
+
+TEST(Runtime, preview)
+{
+    // connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+
+    // run a query first, so we have a result to preview
     VariantMap hints;
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->create_query("test", hints, receiver);
     receiver->wait_until_finished();
 
-    auto previewer = make_shared<PreviewReceiver>();
-    auto preview_ctrl = scope->preview(*(receiver->last_result().get()), hints, previewer);
-    previewer->wait_until_finished();
+    auto result = receiver->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
 
-    kill(pid, SIGTERM);
+    auto previewer = make_shared<PreviewReceiver>();
+    auto preview_ctrl = scope->preview(*(result.get()), hints, previewer);
+    previewer->wait_until_finished();
+}
+
+void scope_thread()
+{
+    auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
+    TestScope scope;
+    rt->run_scope(&scope);
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    std::thread scope_t(scope_thread);
+    scope_t.detach();
+    return RUN_ALL_TESTS();
 }

@@ -13,43 +13,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
-#define UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
+#include <unity/scopes/ScopeBase.h>
 
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/SymbolExport.h>
-#include <string>
+using namespace std;
+using namespace unity::scopes;
 
-namespace unity
-{
-
-namespace scopes
-{
-
-namespace internal
-{
-
-class PreviewWidgetImpl
+class TestScope : public ScopeBase
 {
 public:
-    PreviewWidgetImpl(std::string const& json_text);
-    PreviewWidgetImpl(VariantMap const& definition);
+    virtual int start(string const&, RegistryProxy const &) override;
 
-    std::string data() const;
+    virtual void stop() override;
 
-    VariantMap serialize() const;
+    virtual void run() override;
 
-private:
-    std::string data_; // json template converted to a variant map
+    virtual QueryBase::UPtr create_query(string const &, VariantMap const &) override;
+    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override;
 };
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
-
-#endif

@@ -503,21 +503,16 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
+void scope_thread()
+{
+    auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
+    TestScope scope;
+    rt->run_scope(&scope);
+}
+
 // does actual activation with a test scope
 TEST(Activation, scope)
 {
-    pid_t pid;
-    switch (pid = fork())
-    {
-        case -1:
-            FAIL();
-        case 0: // child
-            auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
-            TestScope scope;
-            rt->run_scope(&scope);
-            FAIL();
-    }
-
     // parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -538,17 +533,40 @@ TEST(Activation, scope)
     EXPECT_EQ("TestScope", result->activation_scope_name());
 
     // activate result
-    auto act_receiver = std::make_shared<ActivationReceiver>();
-    hints["iron"] = "maiden";
-    ctrl = scope->activate(*result, hints, act_receiver);
-    act_receiver->wait_until_finished();
+    {
+        auto act_receiver = std::make_shared<ActivationReceiver>();
+        hints["iron"] = "maiden";
+        ctrl = scope->activate(*result, hints, act_receiver);
+        act_receiver->wait_until_finished();
 
-    auto response = act_receiver->response;
-    EXPECT_TRUE(response != nullptr);
-    EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
-    EXPECT_EQ("bar", response->hints()["foo"].get_string());
-    EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
-    EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+        auto response = act_receiver->response;
+        EXPECT_TRUE(response != nullptr);
+        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
+        EXPECT_EQ("bar", response->hints()["foo"].get_string());
+        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+    }
 
-    kill(pid, SIGTERM);
+    // activate action
+    {
+        auto act_receiver = std::make_shared<ActivationReceiver>();
+        hints["iron"] = "maiden";
+        ctrl = scope->activate_preview_action(*result, hints, "action1", act_receiver);
+        act_receiver->wait_until_finished();
+
+        auto response = act_receiver->response;
+        EXPECT_TRUE(response != nullptr);
+        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
+        EXPECT_EQ("action1", response->hints()["activated action id"].get_string());
+        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+    }
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    std::thread scope_t(scope_thread);
+    scope_t.detach();
+    return RUN_ALL_TESTS();
 }

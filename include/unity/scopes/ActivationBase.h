@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_ACTIVATIONBASE_H
 #define UNITY_SCOPES_ACTIVATIONBASE_H
 
+#include <unity/scopes/QueryBase.h>
 #include <unity/util/DefinesPtrs.h>
-#include <unity/util/NonCopyable.h>
 #include <unity/scopes/ActivationResponse.h>
 
 namespace unity
@@ -39,11 +39,10 @@ class ActivationBaseImpl;
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
 Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
-class UNITY_API ActivationBase
+class UNITY_API ActivationBase : public QueryBase
 {
 public:
     /// @cond
-    NONCOPYABLE(ActivationBase);
     UNITY_DEFINES_PTRS(ActivationBase);
     ActivationBase();
     virtual ~ActivationBase() noexcept;
@@ -52,7 +51,7 @@ public:
     /**
      \brief Called when the originator of the activation request cancelled it.
      */
-    virtual void cancelled();
+    virtual void cancelled() override;
 
     /**
      \brief Return response to the activation request.
@@ -62,7 +61,6 @@ public:
     virtual ActivationResponse activate();
 
 private:
-    void cancel();
     std::unique_ptr<internal::ActivationBaseImpl> p;
 };
 

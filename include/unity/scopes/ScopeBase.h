@@ -201,6 +201,8 @@ public:
      */
     virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
 
+    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id);
+
     /*
      * FIXME: doc string
      */

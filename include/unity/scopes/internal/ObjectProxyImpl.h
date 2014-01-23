@@ -40,6 +40,9 @@ public:
     virtual std::string identity() const;
     virtual std::string endpoint() const;
 
+    // Remote operation
+    virtual void ping();
+
 protected:
     MWProxy proxy() const;                  // Non-virtual because we cannot use covariance with incomplete types.
                                             // Each derived proxy implements a non-virtual fwd() method

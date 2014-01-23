@@ -31,6 +31,7 @@ namespace unity
 
 namespace scopes
 {
+    class VariantMapBuilder;
 
 namespace internal
 {
@@ -45,13 +46,12 @@ public:
 /// @endcond
 
     PreviewWidget(std::string const& definition);
+    PreviewWidget(VariantMap const& definition);
 
     std::string data() const;
     VariantMap serialize() const;
 
 private:
-    PreviewWidget(VariantMap const& variant_map);
-
     std::shared_ptr<internal::PreviewWidgetImpl> p;
 };
 

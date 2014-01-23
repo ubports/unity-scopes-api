@@ -60,7 +60,7 @@ public:
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
-    void set_self(SPtr const& self);
+    void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
 protected:
     std::shared_ptr<QueryBase> query_base_;
@@ -68,7 +68,7 @@ protected:
     std::weak_ptr<ReplyBase> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     std::atomic_bool pushable_;
-    SPtr self_;
+    QueryObjectBase::SPtr self_;
 };
 
 } // namespace internal

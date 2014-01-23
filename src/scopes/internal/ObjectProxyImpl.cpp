@@ -56,6 +56,11 @@ string ObjectProxyImpl::endpoint() const
     return mw_proxy_->endpoint();
 }
 
+void ObjectProxyImpl::ping()
+{
+    mw_proxy_->ping();
+}
+
 MWProxy ObjectProxyImpl::proxy() const
 {
     return mw_proxy_;

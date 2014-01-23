@@ -37,31 +37,14 @@ namespace internal
 {
 
 ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
-    : QueryObjectBase(),
-    act_base_(act_base),
-    reply_(reply),
-    ctrl_(ctrl)
+    : QueryObject(act_base, reply, ctrl),
+    act_base_(act_base)
 {
 }
 
 ActivationQueryObject::~ActivationQueryObject() noexcept
 {
-    try
-    {
-        ctrl_->destroy(); // Oneway, won't block
-    }
-    catch (...)
-    {
-        // TODO: log error
-    }
-}
-
-void ActivationQueryObject::cancel()
-{
-    // Send finished() to up-stream client to tell him the query is done.
-    // We send via the MWReplyProxy here because that allows passing
-    // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-    reply_->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
+    // parent destructor will call ctrl_->destroy()
 }
 
 void ActivationQueryObject::run(MWReplyProxy const& reply) noexcept
@@ -94,13 +77,6 @@ void ActivationQueryObject::run(MWReplyProxy const& reply) noexcept
         reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
         cerr << "ActivationQueryObject::run(): unknown exception" << endl;
     }
-}
-
-void ActivationQueryObject::set_self(SPtr const& self)
-{
-    assert(self);
-    assert(!self_);
-    self_ = self;
 }
 
 } // namespace internal
