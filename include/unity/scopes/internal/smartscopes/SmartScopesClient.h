@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
 
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
-#include <unity/scopes/internal/smartscopes/JsonNodeInterface.h>
+#include <unity/scopes/internal/JsonNodeInterface.h>
 
 #include <unity/util/NonCopyable.h>
 

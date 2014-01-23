@@ -16,12 +16,12 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#ifndef UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
+#define UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
 
-#include <unity/scopes/internal/smartscopes/JsonNodeInterface.h>
-
-#include <jsoncpp/json/reader.h>
+#include <unity/scopes/internal/JsonNodeInterface.h>
+#include <jsoncpp/json/value.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -32,20 +32,21 @@ namespace scopes
 namespace internal
 {
 
-namespace smartscopes
-{
-
 class JsonCppNode : public JsonNodeInterface
 {
 public:
     explicit JsonCppNode(std::string const& json_string = "");
     explicit JsonCppNode(const Json::Value& root);
+    explicit JsonCppNode(const Variant& var);
     ~JsonCppNode();
 
     void clear() override;
     void read_json(std::string const& json_string) override;
+    std::string to_json_string() const override;
+    Variant to_variant() override;
 
     int size() const override;
+    std::vector<std::string> member_names() const override;
     NodeType type() const override;
 
     std::string as_string() const override;
@@ -61,10 +62,10 @@ public:
     JsonNodeInterface::SPtr get_node(uint node_index) const override;
 
 private:
+    static Json::Value from_variant(Variant const& var);
+    static Variant to_variant(Json::Value const &val);
     Json::Value root_;
 };
-
-} // namespace smartscopes
 
 } // namespace internal
 
@@ -72,4 +73,4 @@ private:
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONCPPNODE_H
+#endif // UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
