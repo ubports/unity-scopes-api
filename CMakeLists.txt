@@ -92,7 +92,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -178,13 +178,15 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 2)
-set(UNITY_SCOPES_MICRO 0)
+set(UNITY_SCOPES_MICRO 3)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
 
 # Static version for testing
 set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
+
+pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
@@ -215,6 +217,7 @@ endif()
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    ${JSONCPP_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}

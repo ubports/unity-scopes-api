@@ -16,11 +16,12 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
+#ifndef UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
+#define UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
+#include <unity/scopes/Variant.h>
 
 #include <string>
 #include <vector>
@@ -32,9 +33,6 @@ namespace scopes
 {
 
 namespace internal
-{
-
-namespace smartscopes
 {
 
 class JsonNodeInterface
@@ -53,8 +51,11 @@ public:
 
     virtual void clear() = 0;
     virtual void read_json(std::string const& json_string) = 0;
+    virtual std::string to_json_string() const = 0;
+    virtual Variant to_variant() = 0;
 
     virtual int size() const = 0;
+    virtual std::vector<std::string> member_names() const = 0;
     virtual NodeType type() const = 0;
 
     virtual std::string as_string() const = 0;
@@ -70,12 +71,10 @@ public:
     virtual JsonNodeInterface::SPtr get_node(uint node_index) const = 0;
 };
 
-} // namespace smartscopes
-
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_JSONNODEINTERFACE_H
+#endif // UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H

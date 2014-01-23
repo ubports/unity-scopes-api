@@ -20,7 +20,6 @@
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWQuery.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
@@ -59,10 +58,10 @@ ScopeObject::~ScopeObject() noexcept
 {
 }
 
-MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
-                                           VariantMap const& hints,
-                                           MWReplyProxy const& reply,
-                                           InvokeInfo const& info)
+
+MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::function<QueryBase::SPtr()> const& query_factory_fun,
+        std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun)
 {
     if (!reply)
     {
@@ -72,26 +71,23 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 
         // TODO: log error about incoming request containing an invalid reply proxy.
 
-        throw LogicException("Scope \"" + runtime_->scope_name() + "\": create_query(\"" +
-                             q + "\") called with null reply proxy");
+        throw LogicException("Scope \"" + runtime_->scope_name() + "\": query() called with null reply proxy");
     }
 
     // Ask scope to instantiate a new query.
     QueryBase::SPtr query_base;
     try
     {
-        query_base = scope_base_->create_query(q, hints);
+        query_base = query_factory_fun();
         if (!query_base)
         {
             // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                    "\" returned nullptr from create_query(\"" + q + "\")");
+            throw ResourceException("Scope \"" + runtime_->scope_name() + "\" returned nullptr from query_factory_fun()");
         }
     }
     catch (...)
     {
-        throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                "\" threw an exception from create_query(\"" + q + "\")");
+        throw ResourceException("Scope \"" + runtime_->scope_name() + "\" threw an exception from query_factory_fun()");
     }
 
     MWQueryCtrlProxy ctrl_proxy;
@@ -99,13 +95,14 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
     {
         // Instantiate the query ctrl and connect it to the middleware.
         QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = info.mw->add_query_ctrl_object(co);
+        ctrl_proxy = mw_base->add_query_ctrl_object(co);
 
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
-        QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
+        //QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
+        QueryObjectBase::SPtr qo(query_object_factory_fun(query_base, ctrl_proxy));
+        MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
         // We tell the ctrl what the query facade is so, when cancel() is sent
         // to the ctrl, it can forward it to the facade.
@@ -128,7 +125,7 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         catch (...)
         {
         }
-        cerr << "create_query(): " << e.what() << endl;
+        cerr << "query(): " << e.what() << endl;
         // TODO: log error
         throw;
     }
@@ -141,11 +138,26 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
         catch (...)
         {
         }
-        cerr << "create_query(): unknown exception" << endl;
+        cerr << "query(): unknown exception" << endl;
         // TODO: log error
         throw;
     }
     return ctrl_proxy;
+}
+
+MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
+                                           VariantMap const& hints,
+                                           MWReplyProxy const& reply,
+                                           InvokeInfo const& info)
+{
+    return query(reply, info.mw,
+            [&q, &hints, this]() -> QueryBase::SPtr {
+                return this->scope_base_->create_query(q, hints);
+            },
+            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                return make_shared<QueryObject>(query_base, reply, ctrl_proxy);
+            }
+    );
 }
 
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
@@ -153,88 +165,34 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {
-    if (!reply)
-    {
-        // We can't assert here because the null proxy may have been sent by a broken client, that is,
-        // it can be null because it was sent by the remote end as null. This should never happen but,
-        // to be safe, we don't assert, in case someone is running a broken client.
+    return query(reply, info.mw,
+            [&result, &hints, this]() -> QueryBase::SPtr {
+                return this->scope_base_->activate(result, hints);
+            },
+            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                assert(activation_base);
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
+            }
+    );
+}
 
-        // TODO: log error about incoming request containing an invalid reply proxy.
-
-        throw LogicException("Scope \"" + runtime_->scope_name() + "\": activate(\"" +
-                             result.uri() + "\") called with null reply proxy");
-    }
-
-    // Ask scope to instantiate a new query.
-    ActivationBase::SPtr act_base;
-    try
-    {
-        act_base = scope_base_->activate(result, hints);
-        if (!act_base)
-        {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                    "\" returned nullptr from activate(\"" + result.uri() + "\")");
-        }
-    }
-    catch (...)
-    {
-        throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                "\" threw an exception from activate(\"" + result.uri() + "\")");
-    }
-
-    MWQueryCtrlProxy ctrl_proxy;
-    try
-    {
-        // Instantiate the query ctrl and connect it to the middleware.
-        QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = info.mw->add_query_ctrl_object(co);
-
-        // Instantiate the query. We tell it what the ctrl is so,
-        // when the query completes, it can tell the ctrl object
-        // to destroy itself.
-        ActivationQueryObject::SPtr qo(make_shared<ActivationQueryObject>(act_base, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
-
-        // We tell the ctrl what the query facade is so, when cancel() is sent
-        // to the ctrl, it can forward it to the facade.
-        co->set_query(qo);
-
-        // Start the query. We call via the middleware, which calls
-        // the run() implementation in a different thread, so we cannot block here.
-        // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-        // count high until the run() request arrives in the query via the middleware.
-        qo->set_self(qo);
-
-        query_proxy->run(reply);
-    }
-    catch (std::exception const& e)
-    {
-        try
-        {
-            reply->finished(ListenerBase::Error, e.what());
-        }
-        catch (...)
-        {
-        }
-        cerr << "activate(): " << e.what() << endl;
-        // TODO: log error
-        throw;
-    }
-    catch (...)
-    {
-        try
-        {
-            reply->finished(ListenerBase::Error, "unknown exception");
-        }
-        catch (...)
-        {
-        }
-        cerr << "activate(): unknown exception" << endl;
-        // TODO: log error
-        throw;
-    }
-    return ctrl_proxy;
+MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
+                              VariantMap const& hints,
+                              std::string const& action_id,
+                              MWReplyProxy const &reply,
+                              InvokeInfo const& info)
+{
+    return query(reply, info.mw,
+            [&result, &hints, &action_id, this]() -> QueryBase::SPtr {
+                return this->scope_base_->activate_preview_action(result, hints, action_id);
+            },
+            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                assert(activation_base);
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
+            }
+    );
 }
 
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
@@ -242,90 +200,16 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                                       MWReplyProxy const& reply,
                                       InvokeInfo const& info)
 {
-    if (!reply)
-    {
-        // We can't assert here because the null proxy may have been sent by a broken client, that is,
-        // it can be null because it was sent by the remote end as null. This should never happen but,
-        // to be safe, we don't assert, in case someone is running a broken client.
-
-        // TODO: log error about incoming request containing an invalid reply proxy.
-
-        throw LogicException("Scope \"" + runtime_->scope_name() + "\": preview(\"" +
-                             result.uri() + "\") called with null reply proxy");
-    }
-
-    // Ask scope to instantiate a new query.
-    QueryBase::SPtr query_base;
-    try
-    {
-        query_base = scope_base_->preview(result, hints);
-        if (!query_base)
-        {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                    "\" returned nullptr from preview(\"" + result.uri() + "\")");
-        }
-    }
-    catch (...)
-    {
-        throw ResourceException("Scope \"" + runtime_->scope_name() +
-                                "\" threw an exception from preview(\"" + result.uri() + "\")");
-    }
-
-    MWQueryCtrlProxy ctrl_proxy;
-    try
-    {
-        // Instantiate the query ctrl and connect it to the middleware.
-        QueryCtrlObject::SPtr co(make_shared<QueryCtrlObject>());
-        ctrl_proxy = info.mw->add_query_ctrl_object(co);
-
-        // Instantiate the query. We tell it what the ctrl is so,
-        // when the query completes, it can tell the ctrl object
-        // to destroy itself.
-        auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
-        assert(preview_query);
-        QueryObject::SPtr qo(make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy));
-        MWQueryProxy query_proxy = info.mw->add_query_object(qo);
-
-        // We tell the ctrl what the query facade is so, when cancel() is sent
-        // to the ctrl, it can forward it to the facade.
-        co->set_query(qo);
-
-        // Start the query. We call via the middleware, which calls
-        // the run() implementation in a different thread, so we cannot block here.
-        // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-        // count high until the run() request arrives in the query via the middleware.
-        qo->set_self(qo);
-
-        query_proxy->run(reply);
-    }
-    catch (std::exception const& e)
-    {
-        try
-        {
-            reply->finished(ListenerBase::Error, e.what());
-        }
-        catch (...)
-        {
-        }
-        cerr << "create_query(): " << e.what() << endl;
-        // TODO: log error
-        throw;
-    }
-    catch (...)
-    {
-        try
-        {
-            reply->finished(ListenerBase::Error, "unknown exception");
-        }
-        catch (...)
-        {
-        }
-        cerr << "create_query(): unknown exception" << endl;
-        // TODO: log error
-        throw;
-    }
-    return ctrl_proxy;
+    return query(reply, info.mw,
+            [&result, &hints, this]() -> QueryBase::SPtr {
+                return this->scope_base_->preview(result, hints);
+            },
+            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
+                assert(preview_query);
+                return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
+            }
+    );
 }
 
 } // namespace internal

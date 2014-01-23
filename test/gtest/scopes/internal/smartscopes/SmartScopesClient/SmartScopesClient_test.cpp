@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/UnityExceptions.h>
@@ -30,6 +30,7 @@
 
 using namespace testing;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 

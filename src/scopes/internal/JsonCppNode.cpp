@@ -16,11 +16,14 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/JsonCppNode.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/UnityExceptions.h>
+#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
+#include <sstream>
 
 using namespace unity::scopes;
-using namespace unity::scopes::internal::smartscopes;
+using namespace unity::scopes::internal;
 
 JsonCppNode::JsonCppNode(std::string const& json_string)
 {
@@ -35,8 +38,103 @@ JsonCppNode::JsonCppNode(const Json::Value& root)
 {
 }
 
+JsonCppNode::JsonCppNode(const Variant& var)
+{
+    root_ = from_variant(var);
+}
+
 JsonCppNode::~JsonCppNode()
 {
+}
+
+Json::Value JsonCppNode::from_variant(Variant const& var)
+{
+    switch (var.which())
+    {
+        case Variant::Type::Int:
+            return Json::Value(var.get_int());
+        case Variant::Type::Bool:
+            return Json::Value(var.get_bool());
+        case Variant::Type::String:
+            return Json::Value(var.get_string());
+        case Variant::Type::Double:
+            return Json::Value(var.get_double());
+        case Variant::Type::Dict:
+            {
+                Json::Value val(Json::ValueType::objectValue);
+                for (auto v: var.get_dict())
+                {
+                    val[v.first] = from_variant(v.second);
+                }
+                return val;
+            }
+        case Variant::Type::Array:
+            {
+                Json::Value val(Json::ValueType::arrayValue);
+                for (auto v: var.get_array())
+                {
+                    val.append(from_variant(v));
+                }
+                return val;
+            }
+        case Variant::Type::Null:
+            return Json::Value(Json::ValueType::nullValue);
+        default:
+            {
+                std::ostringstream s;
+                s << "json_to_variant(): unsupported json type ";
+                s << static_cast<int>(var.which());
+                throw unity::LogicException(s.str());
+            }
+    }
+}
+
+Variant JsonCppNode::to_variant(Json::Value const& value)
+{
+    switch (value.type())
+    {
+        case Json::ValueType::nullValue:
+            return Variant::null();
+        case Json::ValueType::arrayValue:
+            {
+                VariantArray arr;
+                for (unsigned int i=0; i<value.size(); ++i)
+                {
+                    arr.push_back(to_variant(value[i]));
+                }
+                return Variant(arr);
+            }
+        case Json::ValueType::objectValue:
+            {
+                VariantMap var;
+                for (auto m: value.getMemberNames())
+                {
+                    var[m] = to_variant(value[m]);
+                }
+                return Variant(var);
+            }
+        case Json::ValueType::stringValue:
+            return Variant(value.asString());
+        case Json::ValueType::intValue:
+        case Json::ValueType::uintValue:
+            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if uint to int conversion is not possible
+        case Json::ValueType::realValue:
+            return Variant(value.asDouble());
+        case Json::ValueType::booleanValue:
+            return Variant(value.asBool());
+        default:
+            {
+                std::ostringstream s;
+                s << "json_to_variant(): unsupported json type ";
+                s << static_cast<int>(value.type());
+                throw unity::LogicException(s.str());
+            }
+    }
+}
+
+Variant JsonCppNode::to_variant()
+{
+    return to_variant(root_);
 }
 
 void JsonCppNode::clear()
@@ -55,9 +153,24 @@ void JsonCppNode::read_json(std::string const& json_string)
     }
 }
 
+std::string JsonCppNode::to_json_string() const
+{
+    Json::FastWriter writer;
+    return writer.write(root_);
+}
+
 int JsonCppNode::size() const
 {
     return root_.size();
+}
+
+std::vector<std::string> JsonCppNode::member_names() const
+{
+    if (root_.type() != Json::objectValue)
+    {
+        throw unity::LogicException("Root node is not an object");
+    }
+    return root_.getMemberNames();
 }
 
 JsonNodeInterface::NodeType JsonCppNode::type() const
@@ -152,13 +265,12 @@ JsonNodeInterface::SPtr JsonCppNode::get_node() const
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
 {
-    const Json::Value& value_node = root_[node_name];
-
-    if (!value_node)
+    if (!root_.isMember(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
+    const Json::Value& value_node = root_[node_name];
     return std::make_shared<JsonCppNode>(value_node);
 }
 

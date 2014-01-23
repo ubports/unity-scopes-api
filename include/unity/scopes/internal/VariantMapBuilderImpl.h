@@ -13,17 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
-#define UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
+#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
 
-#include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-
-#include <atomic>
-#include <mutex>
+#include <unity/scopes/Variant.h>
+#include <string>
+#include <tuple>
 
 namespace unity
 {
@@ -34,13 +32,18 @@ namespace scopes
 namespace internal
 {
 
-class QueryObjectBase : public AbstractObject
+class VariantMapBuilderImpl final
 {
 public:
-    UNITY_DEFINES_PTRS(QueryObjectBase);
+    VariantMapBuilderImpl() = default;
+    ~VariantMapBuilderImpl() = default;
+    void add_attribute(std::string const& key, Variant const& value);
+    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
+    VariantMap variant_map() const;
 
-    virtual void run(MWReplyProxy const& reply) noexcept = 0;
-    virtual void cancel() = 0;
+private:
+    VariantMap variant_;
 };
 
 } // namespace internal
