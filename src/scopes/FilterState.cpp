@@ -53,6 +53,11 @@ FilterState& FilterState::operator=(FilterState const& other)
     return *this;
 }
 
+VariantMap FilterState::serialize() const
+{
+    return p->serialize();
+}
+
 bool FilterState::has_filter(std::string const& id) const
 {
     return p->has_filter(id);

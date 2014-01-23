@@ -52,6 +52,7 @@ public:
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
+    VariantMap serialize() const;
 /// @endcond
 
     /**
