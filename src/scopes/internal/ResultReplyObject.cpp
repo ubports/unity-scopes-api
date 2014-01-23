@@ -67,12 +67,24 @@ void ResultReplyObject::process_data(VariantMap const& data)
             {
                 filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
             }
-            auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
-            receiver_->push(filters, filter_state);
+            try
+            {
+                auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
+                receiver_->push(filters, filter_state);
+            }
+            catch (std::exception const& e)
+            {
+                // TODO: log this
+                cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
+                finished(ListenerBase::Error, e.what());
+            }
         }
         else
         {
-            throw unity::LogicException("ReplyObject::push(): filters present but missing filter_state data");
+            // TODO: log this
+            const std::string msg("ReplyObject::push(): filters present but missing filter_state data");
+            cerr << msg << endl;
+            finished(ListenerBase::Error, msg);
         }
     }
 
