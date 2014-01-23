@@ -35,7 +35,7 @@ static void error(std::string const& msg)
 }
 
 int main(int argc, char* argv[])
-{
+{  
   int exit_status = 1;
 
   std::string server_url_env;
@@ -50,24 +50,23 @@ int main(int argc, char* argv[])
     // Instantiate a runtime
     RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
 
-    // Get middleware handle
+    // Get middleware handle from runtime
     std::string identity = runtime->registry_identity();
-
     RegistryConfig c(identity, runtime->registry_configfile());
     std::string mw_kind = c.mw_kind();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-    // Instantiate a SS registry
+    // Instantiate a SS registry object
     SSRegistryObject::SPtr registry(new SSRegistryObject(middleware));
 
-    // Add the SS registry to the middleware
+    // Add the SS registry object to the middleware
     middleware->add_registry_object(runtime->registry_identity(), registry);
 
-    // Instantiate a SS scope
-    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(runtime.get()));
+    // Instantiate a SS scope object
+    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(runtime.get(), registry));
 
-    // Add the SS scope to the middleware
+    // Add the SS scope object to the middleware
     middleware->add_dflt_scope_object(std::move(scope));
 
     // Wait until shutdown

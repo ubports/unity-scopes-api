@@ -20,6 +20,8 @@
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 
 #include <unity/scopes/internal/ScopeObjectBase.h>
+#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+#include <unity/scopes/QueryBase.h>
 
 #include <string>
 
@@ -29,24 +31,20 @@ namespace unity
 namespace scopes
 {
 
-class ScopeBase;
-class Result;
-
 namespace internal
 {
 
-class MiddlewareBase;
-class RuntimeImpl;
-
 namespace smartscopes
 {
+
+class SmartScope;
 
 class SSScopeObject final : public ScopeObjectBase
 {
 public:
   UNITY_DEFINES_PTRS(SSScopeObject);
 
-  SSScopeObject(RuntimeImpl* runtime);
+  SSScopeObject(RuntimeImpl* runtime, SSRegistryObject::SPtr registry);
   virtual ~SSScopeObject() noexcept;
 
   // Remote operation implementations
@@ -72,7 +70,14 @@ public:
                            InvokeInfo const& info) override;
 
 private:
+  MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+      std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+      std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
+
+private:
   RuntimeImpl* const runtime_;
+  SSRegistryObject::SPtr registry_;
+  std::unique_ptr<SmartScope> const smartscope_;
 };
 
 } // namespace smartscopes

@@ -18,30 +18,37 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
 #include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/PreviewQuery.h>
-#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Annotation.h>
 
 #include <iostream>
 
-#define EXPORT __attribute__ ((visibility ("default")))
+namespace unity
+{
 
-using namespace std;
-using namespace unity::scopes;
+namespace scopes
+{
 
-class MyQuery : public SearchQuery
+namespace internal
+{
+
+namespace smartscopes
+{
+
+class SmartQuery : public SearchQuery
 {
 public:
-    explicit MyQuery(string const& query)
-        : query_(query)
+    SmartQuery(std::string const& query) :
+        query_(query)
     {
     }
 
-    ~MyQuery() noexcept
+    ~SmartQuery() noexcept
     {
     }
 
@@ -55,26 +62,32 @@ public:
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
         CategorisedResult res(cat);
         res.set_uri("uri");
-        res.set_title("RemoteScope: result 1 for query \"" + query_ + "\"");
+        res.set_title("SmartScope: result 1 for query \"" + query_ + "\"");
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
-        cout << "RemoteScope: query \"" << query_ << "\" complete" << endl;
+
+        Query q("SmartScope", query_, "");
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("More...", q);
+        reply->push(annotation);
+
+        std::cout << "SmartScope: query \"" << query_ << "\" complete" << std::endl;
     }
 
 private:
-    string query_;
+    std::string query_;
 };
 
-class MyPreview : public PreviewQuery
+class SmartPreview : public PreviewQuery
 {
 public:
-    explicit MyPreview(string const& uri)
-        : uri_(uri)
+    SmartPreview(std::string const& uri) :
+        uri_(uri)
     {
     }
 
-    ~MyPreview() noexcept
+    ~SmartPreview() noexcept
     {
     }
 
@@ -89,61 +102,36 @@ public:
         widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
         reply->push(widgets);
         reply->push("author", Variant("Foo"));
-        reply->push("rating", Variant("Bar"));
-        cout << "RemoteScope: preview \"" << uri_ << "\" complete" << endl;
+        reply->push("rating", Variant("4 blah"));
+        std::cout << "SmartScope: preview for \"" << uri_ << "\" complete" << std::endl;
     }
 
 private:
-    string uri_;
+    std::string uri_;
 };
 
-class MyScope : public ScopeBase
+class SmartScope
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
+    QueryBase::UPtr create_query(std::string const& id, std::string const& q, VariantMap const&)
     {
-        return VERSION;
-    }
-
-    virtual void stop() override
-    {
-    }
-    virtual void run() override
-    {
-    }
-
-    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
-    {
-        QueryBase::UPtr query(new MyQuery(q));
-        cout << "RemoteScope: created query: \"" << q << "\"" << endl;
+        QueryBase::UPtr query(new SmartQuery(q));
+        std::cout << "SmartScope: created query: \"" << q << "\"" << std::endl;
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    QueryBase::UPtr preview(Result const& result, VariantMap const&)
     {
-        QueryBase::UPtr preview(new MyPreview(result.uri()));
-        cout << "RemoteScope: requested preview: \"" << result.uri() << "\"" << endl;
+        QueryBase::UPtr preview(new SmartPreview(result.uri()));
+        std::cout << "SmartScope: created previewer: \"" << result.uri() << "\"" << std::endl;
         return preview;
     }
 };
 
-extern "C"
-{
+} // namespace smartscopes
 
-    EXPORT
-    unity::scopes::ScopeBase*
-    // cppcheck-suppress unusedFunction
-    UNITY_SCOPE_CREATE_FUNCTION()
-    {
-        return new MyScope;
-    }
+} // namespace internal
 
-    EXPORT
-    void
-    // cppcheck-suppress unusedFunction
-    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
-    {
-        delete scope_base;
-    }
+} // namespace scopes
 
-}
+} // namespace unity

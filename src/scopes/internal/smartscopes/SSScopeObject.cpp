@@ -17,6 +17,8 @@
  */
 
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
+#include <unity/scopes/internal/smartscopes/SmartScope.h>
+#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 
 #include <cassert>
 
@@ -32,8 +34,10 @@ namespace internal
 namespace smartscopes
 {
 
-SSScopeObject::SSScopeObject(RuntimeImpl* runtime) :
-  runtime_(runtime)
+SSScopeObject::SSScopeObject(RuntimeImpl* runtime, SSRegistryObject::SPtr registry) :
+  runtime_(runtime),
+  registry_(registry),
+  smartscope_(new SmartScope())
 {
   assert(runtime);
 }
@@ -47,11 +51,14 @@ MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
-  (void)q;
-  (void)hints;
-  (void)reply;
-  (void)info;
-  return MWQueryCtrlProxy();
+  return query(reply, info.mw,
+          [&q, &hints, &info, this]() -> QueryBase::SPtr {
+              return this->smartscope_->create_query(info.id, q, hints);
+          },
+          [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+              return std::make_shared<SSQueryObject>(query_base, reply, ctrl_proxy);
+          }
+  );
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
@@ -90,6 +97,12 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
   (void)reply;
   (void)info;
   return MWQueryCtrlProxy();
+}
+
+MWQueryCtrlProxy SSScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::function<QueryBase::SPtr()> const& query_factory_fun,
+        std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun)
+{
 }
 
 } // namespace smartscopes

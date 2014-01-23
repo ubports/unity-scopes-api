@@ -1,5 +1,3 @@
-add_subdirectory(remotescope)
-
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSRegistryObject.cpp
