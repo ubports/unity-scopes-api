@@ -45,8 +45,8 @@ TEST(RegistryConfig, RegistryIDEmpty)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Registry identity cannot be an empty string",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Registry identity cannot be an empty string",
+                     e.what());
     }
 }
 
@@ -59,8 +59,8 @@ TEST(RegistryConfig, ScoperunnerRelativePath)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
-                  "must be an absolute path",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: ScoperunnerRelativePath.ini: Scoperunner.Path "
+                     "must be an absolute path",
+                     e.what());
     }
 }

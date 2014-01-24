@@ -191,9 +191,9 @@ TEST(Variant, exceptions)
     }
     catch (LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: Variant does not contain a bool value:\n"
-                  "    boost::bad_get: failed value get using boost::get",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: Variant does not contain a bool value:\n"
+                     "    boost::bad_get: failed value get using boost::get",
+                     e.what());
     }
 
     try
@@ -204,9 +204,9 @@ TEST(Variant, exceptions)
     }
     catch (LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: Variant does not contain a string value:\n"
-                  "    boost::bad_get: failed value get using boost::get",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: Variant does not contain a string value:\n"
+                     "    boost::bad_get: failed value get using boost::get",
+                     e.what());
     }
 
     try
@@ -217,9 +217,9 @@ TEST(Variant, exceptions)
     }
     catch (LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: Variant does not contain an int value:\n"
-                  "    boost::bad_get: failed value get using boost::get",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: Variant does not contain an int value:\n"
+                     "    boost::bad_get: failed value get using boost::get",
+                     e.what());
     }
 
 }
