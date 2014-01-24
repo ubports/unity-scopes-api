@@ -16,6 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+// You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
 #include <condition_variable>
