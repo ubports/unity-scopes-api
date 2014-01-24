@@ -16,15 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/Annotation.h>
+// You may also include individual headers if you prefer.
+#include <unity-scopes.h>
 
 #include <iostream>
 

@@ -74,7 +74,7 @@ TEST(DynamicLoader, flags)
     catch (unity::ResourceException const& e)
     {
         boost::regex r("unity::ResourceException: .*/libbadtestlib.so: undefined symbol: foo");
-        EXPECT_TRUE(boost::regex_match(e.to_string(), r));
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
 }
 
@@ -87,8 +87,8 @@ TEST(DynamicLoader, exceptions)
         }
         catch (unity::ResourceException const& e)
         {
-            EXPECT_EQ("unity::ResourceException: no_such_lib: cannot open shared object file: No such file or directory",
-                      e.to_string());
+            EXPECT_STREQ("unity::ResourceException: no_such_lib: cannot open shared object file: No such file or directory",
+                         e.what());
         }
     }
 
@@ -101,7 +101,7 @@ TEST(DynamicLoader, exceptions)
         catch (unity::ResourceException const& e)
         {
             boost::regex r("unity::ResourceException: .*/libtestlib.so: undefined symbol: no_such_symbol");
-            EXPECT_TRUE(boost::regex_match(e.to_string(), r));
+            EXPECT_TRUE(boost::regex_match(e.what(), r));
         }
     }
 }

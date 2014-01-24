@@ -169,11 +169,6 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
             it->second.t.join();
             it->second.f.get();             // This will throw if the thread terminated due to an exception
         }
-        catch (unity::Exception const& e)
-        {
-            error(e.to_string());
-            ++num_errors;
-        }
         catch (std::exception const& e)
         {
             error(e.what());
@@ -215,10 +210,6 @@ main(int argc, char* argv[])
         }
 
         exit_status = run_scopes(runtime_config, config_files);
-    }
-    catch (unity::Exception const& e)
-    {
-        error(e.to_string());
     }
     catch (std::exception const& e)
     {

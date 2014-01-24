@@ -64,7 +64,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = art)", e.to_string());
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = art)", e.what());
     }
 
     try
@@ -74,7 +74,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = icon)", e.to_string());
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = icon)", e.what());
     }
 
     try
@@ -84,7 +84,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = search_hint)", e.to_string());
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = search_hint)", e.what());
     }
 
     try
@@ -94,7 +94,7 @@ TEST(ScopeMetadataImpl, basic)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.to_string());
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.what());
     }
 
     // Check that the copy has the same values as the original
@@ -235,8 +235,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'scope_name' is empty",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'scope_name' is empty",
+                     e.what());
     }
 
     try
@@ -247,8 +247,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadataImpl::serialize(): required attribute 'proxy' is null",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadataImpl::serialize(): required attribute 'proxy' is null",
+                      e.what());
     }
 
     try
@@ -260,8 +260,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'display_name' is empty",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'display_name' is empty",
+                      e.what());
     }
 
     try
@@ -272,8 +272,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'description' is empty",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'description' is empty",
+                     e.what());
     }
 }
 
@@ -291,9 +291,9 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
-                  "'scope_name' is missing",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
+                     "'scope_name' is missing",
+                     e.what());
     }
 
     m["scope_name"] = "scope_name";
@@ -305,9 +305,9 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
-                  "'proxy' is missing",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
+                     "'proxy' is missing",
+                     e.what());
     }
 
     VariantMap proxy;
@@ -320,8 +320,8 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadataImpl::deserialize(): missing 'proxy.identity'",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadataImpl::deserialize(): missing 'proxy.identity'",
+                     e.what());
     }
 
     proxy["identity"] = "identity";
@@ -334,8 +334,8 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadataImpl::deserialize(): missing 'proxy.endpoint'",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadataImpl::deserialize(): missing 'proxy.endpoint'",
+                     e.what());
     }
 
     proxy["endpoint"] = "endpoint";
@@ -348,9 +348,9 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
-                  "'display_name' is missing",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
+                     "'display_name' is missing",
+                     e.what());
     }
 
     m["display_name"] = "display_name";
@@ -362,9 +362,9 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     }
     catch (InvalidArgumentException const&e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
-                  "'description' is missing",
-                   e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
+                     "'description' is missing",
+                     e.what());
     }
     m["description"] = "description";
 

@@ -197,8 +197,8 @@ TEST(Reaper, exceptions)
     }
     catch (unity::InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Reaper: invalid reap_interval (0). Interval must be > 0.",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Reaper: invalid reap_interval (0). Interval must be > 0.",
+                     e.what());
     }
 
     try
@@ -208,8 +208,8 @@ TEST(Reaper, exceptions)
     }
     catch (unity::LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: Reaper: reap_interval (2) must be <= expiry_interval (1).",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: Reaper: reap_interval (2) must be <= expiry_interval (1).",
+                     e.what());
     }
 
     try
@@ -220,8 +220,8 @@ TEST(Reaper, exceptions)
     }
     catch (unity::InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Reaper: invalid null callback passed to add().",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Reaper: invalid null callback passed to add().",
+                     e.what());
     }
 
     // Make sure that if a callback throws an exception, this does no harm.

@@ -16,6 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+
+// In this demo we include individual headers. You may also,
+// if you prefer, include just the unity-scopes.h convenience
+// header.
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>

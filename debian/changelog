@@ -1,12 +1,22 @@
 unity-scopes-api (0.2.5-0ubuntu1) UNRELEASED; urgency=low
 
   [ Michi Henning ]
+  * More default servant support.
+
+ -- michi <michi.henning@canonical.com>  Fri, 24 Jan 2014 12:24:50 +1000
+
+unity-scopes-api (0.2.4+14.04.20140124-0ubuntu1) trusty; urgency=low
+
+  [ Michi Henning ]
   * Added ability for scope to push an exception (as an exception_ptr). On the client side,
     the exception is delivered as the what() string (if the exception is a std::exception) and
     as "unknown exception", otherwise.
+  * Added abstract bases for all the *Object classes.
+  * Remove redundant noexcept specifications from destructors.
 
   [ Jussi Pakkanen ]
   * Version bump due to namespace peeling.
+  * Forward doxygen warnings into a file.
 
   [ Michal Hruby ]
   * Added preview and activation APIs.
@@ -17,10 +27,16 @@ unity-scopes-api (0.2.5-0ubuntu1) UNRELEASED; urgency=low
   [ Pawel Stolowski ]
   * Added set_category to CategorisedResult, removed Variant-based ctor.
 
-  [ Michi Henning ]
-  * More default servant support.
+  [ Marcus Tomlinson ]
+  * Ensure that manager_ and reply_ objects are created and destroyed
+    from within the same Qt thread. (LP: #1267917)
+  * Added valgrind suppressions for memory leak false positives in Qt.
+    (LP: #1262496)
 
- -- michi <michi.henning@canonical.com>  Fri, 24 Jan 2014 12:24:50 +1000
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 151
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 24 Jan 2014 10:03:35 +0000
 
 unity-scopes-api (0.2.0+14.04.20140120-0ubuntu1) trusty; urgency=low
 

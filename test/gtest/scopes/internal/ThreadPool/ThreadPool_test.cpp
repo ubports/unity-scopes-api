@@ -92,7 +92,7 @@ TEST(ThreadPool, exception)
     }
     catch (unity::InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ThreadPool(): invalid pool size: 0", e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ThreadPool(): invalid pool size: 0", e.what());
     }
 
     try
@@ -101,6 +101,6 @@ TEST(ThreadPool, exception)
     }
     catch (unity::InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ThreadPool(): invalid pool size: -1", e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ThreadPool(): invalid pool size: -1", e.what());
     }
 }
