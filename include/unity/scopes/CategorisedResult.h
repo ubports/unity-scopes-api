@@ -46,15 +46,15 @@ public:
      */
     explicit CategorisedResult(Category::SCPtr category);
 
-    /**
-       \brief Creates a CategorisedResult instance assigned to given category and using values of all base attributes from a variant_map dictionary.
-    */
-    CategorisedResult(Category::SCPtr category, const VariantMap &variant_map);
-
     CategorisedResult(CategorisedResult const& other);
     CategorisedResult& operator=(CategorisedResult const& other);
     CategorisedResult(CategorisedResult&&);
     CategorisedResult& operator=(CategorisedResult&&);
+
+    /**
+     \brief Set category of this result.
+     */
+    void set_category(Category::SCPtr category);
 
     /**
      \brief Return category of this result.
