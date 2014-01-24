@@ -71,86 +71,6 @@ string strip_suffix(string const& s, string const& suffix)
     return s;
 }
 
-// Scan group config dir for .ini files. Each file is assumed to define a single scope group, in a group with key "ScopeGroup".
-// The key "Scopes" in the group is expected to contain an array of scope names.
-// For each scope group, the returned vector contains a map with the scope and .ini file names for that group.
-// If a particular scope appears in more than one group file, the first file found determines which group the scope
-// belongs too. (Subsequent mentions of a scope already in a group print a warning.)
-// all_scopes must be the map of all scopes that were originally found in config dir.
-// For any scopes not in a group, the returned vector contains a map containing just that scope. In other words,
-// the returned vector contains as many maps as there will be scoperunner processes, with each map containing
-// the scope name(s) and scope config file(s) for a process.
-
-vector<map<string, string>> create_scope_groups(string const& group_dir, map<string, string> all_scopes)
-{
-    set<string> scopes_seen;                     // Names of scopes that are in a group so far
-    vector<map<string, string>> scope_groups;    // One map per scope group
-    if (!group_dir.empty())
-    {
-        auto group_files = find_files(group_dir, ".ini");
-        for (auto file : group_files)
-        {
-            IniParser::SPtr parser;
-            try
-            {
-                parser = make_shared<IniParser>(file.c_str());
-            }
-            catch (FileException const& e)
-            {
-                error("scope group config file ignored:\n" + e.to_string());
-                continue;
-            }
-
-            vector<string> scopes;
-            try
-            {
-                scopes = parser->get_string_array("ScopeGroup", "Scopes");
-            }
-            catch (LogicException const& e)
-            {
-                error("group file \"" + file + ": file ignored:\n" + e.to_string());
-                continue;
-            }
-
-            // For each scope name in the group, push an element onto the vector of scope groups, but only if we have
-            // not seen that scope name in an earlier group.
-            bool once = false;
-            for (auto scope : scopes)
-            {
-                if (scopes_seen.find(scope) != scopes_seen.end())
-                {
-                    error("ignoring scope \"" + scope + "\" in group file " + file + ": scope is already part of a group");
-                    continue;
-                }
-                auto it = all_scopes.find(scope);
-                if (it == all_scopes.end())
-                {
-                    error("ignoring scope \"" + scope + "\" in group file " + file + ": cannot find configuration for this scope");
-                    continue;
-                }
-                scopes_seen.insert(scope);
-                if (!once)
-                {
-                    once = true;
-                    scope_groups.push_back(map<string, string>());
-                }
-                scope_groups.rbegin()->insert(make_pair(scope, it->second));
-                all_scopes.erase(it);                // Any scope in a group is removed from all_scopes.
-            }
-        }
-    }
-
-    // Any scopes remaining in all_scopes at this point were not part of a group and therefore are in a map by themselves.
-    for (auto pair : all_scopes)
-    {
-        map<string, string> s;
-        s.insert(pair);
-        scope_groups.push_back(s);
-    }
-
-    return scope_groups;
-}
-
 // For each scope, open the config file for each scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
@@ -217,6 +137,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
         }
     }
 }
+
 // Not needed any more. Remove once registry spawner works.
 void run_scopes(SignalThread& sigthread,
                 string const& scoperunner_path,
@@ -356,10 +277,6 @@ main(int argc, char* argv[])
         // Clear memory for original maps.
         map<string, string>().swap(fixed_scopes);
         map<string, string>().swap(overrideable_scopes);
-
-        // Create the set of scope groups for Canonical and OEM scopes.
-        auto canonical_groups = create_scope_groups(scope_group_configdir, all_scopes);
-        auto oem_groups = create_scope_groups(oem_group_configdir, all_scopes);
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
