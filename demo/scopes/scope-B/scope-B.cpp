@@ -50,6 +50,7 @@ public:
         cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
         try
         {
+            result.set_category(upstream_->lookup_category("catB"));
             upstream_->push(std::move(result));
         }
         catch (const unity::InvalidArgumentException &e)
@@ -104,7 +105,7 @@ public:
         try
         {
             CategoryRenderer rdr;
-            upstream_reply->register_category("cat1", "title", "icon", rdr);
+            upstream_reply->register_category("catB", "title", "icon", rdr);
         }
         catch (const unity::InvalidArgumentException &e) // this shouldn't happen
         {
