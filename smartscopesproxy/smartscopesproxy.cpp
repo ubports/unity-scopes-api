@@ -35,7 +35,7 @@ static void error(std::string const& msg)
 }
 
 int main(int argc, char* argv[])
-{  
+{
   int exit_status = 1;
 
   std::string server_url_env;
