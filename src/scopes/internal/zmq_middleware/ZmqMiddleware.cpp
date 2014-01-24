@@ -242,7 +242,6 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
 {
     assert(ctrl);
 
-    MWQueryCtrlProxy proxy;
     try
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
@@ -281,6 +280,24 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     return proxy;
 }
 
+void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
+{
+    assert(query);
+
+    try
+    {
+        shared_ptr<QueryI> qi(make_shared<QueryI>(query));
+        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
+        auto df = safe_dflt_add(adapter, "Query", qi);
+        query->set_disconnect_function(df);
+    }
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    {
+        // TODO: log this
+        cerr << "unexpected exception in add_dflt_query_object(): " << e.what() << endl;
+        throw;
+    }
+}
 
 MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, RegistryObjectBase::SPtr const& registry)
 {
@@ -357,7 +374,6 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
 {
     assert(scope);
 
-    MWScopeProxy proxy;
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));

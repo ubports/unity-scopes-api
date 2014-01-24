@@ -39,7 +39,7 @@ public:
 
     ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     virtual ~ActivationQueryObject();
-    void run(MWReplyProxy const& reply) noexcept override;
+    virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
 private:
     std::shared_ptr<ActivationBase> act_base_;
