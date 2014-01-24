@@ -26,7 +26,7 @@ def check_headers(subdirs):
             for f in files:
                 if f.endswith('.h'):
                     fname = os.path.join(root, f)
-                    if 'unity-scopes.h' in open(fname).read():
+                    if 'unity-scopes.h' in open(fname, encoding='utf-8').read():
                         print("Global header included in", fname)
                         errors += 1
     return errors
