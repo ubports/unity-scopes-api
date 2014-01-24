@@ -34,7 +34,7 @@ namespace internal
 class MWQuery : public virtual MWObjectProxy
 {
 public:
-    virtual ~MWQuery() noexcept;
+    virtual ~MWQuery();
 
     virtual void run(MWReplyProxy const& r) = 0;
 

@@ -35,7 +35,7 @@ AbstractObject::AbstractObject()
 {
 }
 
-AbstractObject::~AbstractObject() noexcept
+AbstractObject::~AbstractObject()
 {
 }
 

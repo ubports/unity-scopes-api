@@ -30,7 +30,7 @@ SearchListener::SearchListener()
 {
 }
 
-SearchListener::~SearchListener() noexcept
+SearchListener::~SearchListener()
 {
 }
 

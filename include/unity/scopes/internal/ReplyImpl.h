@@ -56,7 +56,7 @@ class ReplyImpl : public virtual ObjectProxyImpl
 {
 public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
-    virtual ~ReplyImpl() noexcept;
+    virtual ~ReplyImpl();
 
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     void register_category(Category::SCPtr category);

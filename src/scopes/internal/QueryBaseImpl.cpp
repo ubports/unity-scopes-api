@@ -38,7 +38,7 @@ QueryBaseImpl::QueryBaseImpl()
 {
 }
 
-QueryBaseImpl::~QueryBaseImpl() noexcept
+QueryBaseImpl::~QueryBaseImpl()
 {
 }
 

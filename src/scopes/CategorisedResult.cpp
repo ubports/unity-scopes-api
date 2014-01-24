@@ -38,11 +38,6 @@ CategorisedResult::CategorisedResult(std::shared_ptr<internal::ResultImpl> impl)
 {
 }
 
-CategorisedResult::CategorisedResult(Category::SCPtr category, const VariantMap &variant_map)
-    : Result(new internal::CategorisedResultImpl(category, variant_map))
-{
-}
-
 CategorisedResult::CategorisedResult(CategorisedResult&&) = default;
 CategorisedResult& CategorisedResult::operator=(CategorisedResult&&) = default;
 
@@ -61,6 +56,11 @@ CategorisedResult& CategorisedResult::operator=(CategorisedResult const& other)
 }
 
 //! @endcond
+
+void CategorisedResult::set_category(Category::SCPtr category)
+{
+    fwd()->set_category(category);
+}
 
 Category::SCPtr CategorisedResult::category() const
 {

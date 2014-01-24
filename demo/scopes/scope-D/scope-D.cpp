@@ -135,7 +135,7 @@ public:
         cerr << "query instance for \"" << scope_name_ << ":" << query.query_string() << "\" created" << endl;
     }
 
-    virtual ~MyQuery() noexcept
+    virtual ~MyQuery()
     {
         cerr << "query instance for \"" << scope_name_ << ":" << query_.query_string() << "\" destroyed" << endl;
     }

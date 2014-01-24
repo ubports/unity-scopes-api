@@ -39,7 +39,7 @@ QueryCtrlObject::QueryCtrlObject() :
 {
 }
 
-QueryCtrlObject::~QueryCtrlObject() noexcept
+QueryCtrlObject::~QueryCtrlObject()
 {
 }
 

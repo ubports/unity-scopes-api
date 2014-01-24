@@ -76,7 +76,7 @@ void CategorisedResultImpl::set_category(Category::SCPtr category)
 {
     if (category == nullptr)
     {
-        throw InvalidArgumentException("Category must not be null");
+        throw InvalidArgumentException("CategorisedResult::set_category(): Category must not be null");
     }
     category_ = category;
 }

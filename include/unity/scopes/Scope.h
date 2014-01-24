@@ -50,10 +50,11 @@ class UNITY_API Scope : public virtual ObjectProxy
 public:
     /**
     \brief Initiates a query.
-    The query() method expects an instance derived from ListenerBase, which it uses to return
-    the results for the query. query() is an asynchronous method, that is, it returns immediately;
-    results for the query typically will arrive only after the query() method completes (but may
-    also arrive while the query() method is still running.
+    The create_query() method expects a SearchListener, which it uses to return
+    the results for the query. create_query() may block for some time, for example,
+    if the target scope is not running and needs to be started first.
+    Results for the query may arrive only after create_query() completes (but may
+    also arrive while create_query() is still running).
     */
     QueryCtrlProxy create_query(std::string const& query_string, VariantMap const& hints, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const;
@@ -69,7 +70,7 @@ public:
     \brief Destroys a Scope.
     Destroying a Scope has no effect on any query that might still be in progress.
     */
-    virtual ~Scope() noexcept;
+    virtual ~Scope();
 
 protected:
     Scope(internal::ScopeImpl* impl);          // Instantiated only by ScopeImpl

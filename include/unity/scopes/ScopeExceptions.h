@@ -42,7 +42,7 @@ public:
     //! @cond
     MiddlewareException(MiddlewareException const&);
     MiddlewareException& operator=(MiddlewareException const&);
-    virtual ~MiddlewareException() noexcept;
+    virtual ~MiddlewareException();
     //! @endcond
 
     /**
@@ -86,6 +86,30 @@ private:
 };
 
 /**
+\brief Exception to indicate that a twoway request timed out.
+*/
+
+class UNITY_API TimeoutException : public virtual MiddlewareException
+{
+public:
+    /**
+    \brief Constructs the exception.
+    \param reason Further details about the cause of the exception.
+    */
+    explicit TimeoutException(std::string const& reason);
+    //! @cond
+    TimeoutException(TimeoutException const&);
+    TimeoutException& operator=(TimeoutException const&);
+    virtual ~TimeoutException() noexcept;
+    //! @endcond
+
+    /**
+    \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    */
+    virtual std::exception_ptr self() const override;
+};
+
+/**
 \brief Exception to indicate that something went wrong with the contents of configuration files.
 */
 
@@ -100,7 +124,7 @@ public:
     //! @cond
     ConfigException(ConfigException const&);
     ConfigException& operator=(ConfigException const&);
-    virtual ~ConfigException() noexcept;
+    virtual ~ConfigException();
     //! @endcond
 
     /**
@@ -125,7 +149,7 @@ public:
     //! @cond
     NotFoundException(NotFoundException const&);
     NotFoundException& operator=(NotFoundException const&);
-    virtual ~NotFoundException() noexcept;
+    virtual ~NotFoundException();
     //! @endcond
 
     /**

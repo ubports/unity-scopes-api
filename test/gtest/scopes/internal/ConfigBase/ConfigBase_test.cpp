@@ -65,7 +65,7 @@ TEST(ConfigBase, non_optional_string)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal empty value for Empty", e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal empty value for Empty", e.what());
     }
 }
 
@@ -81,9 +81,9 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
-                  "legal values are \"Zmq\" and \"REST\"",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
+                     "legal values are \"Zmq\" and \"REST\"",
+                     e.what());
     }
     try
     {
@@ -92,9 +92,9 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
-                  "legal values are \"Zmq\" and \"REST\"",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
+                     "legal values are \"Zmq\" and \"REST\"",
+                     e.what());
     }
 }
 
@@ -109,7 +109,7 @@ TEST(ConfigBase, throw_ex)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: \"Test.ini\": error", e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": error", e.what());
     }
 }
 
@@ -121,7 +121,7 @@ TEST(ConfigBase, FileException)
     }
     catch (FileException const& e)
     {
-        EXPECT_EQ("unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
-                  e.to_string());
+        EXPECT_STREQ("unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
+                     e.what());
     }
 }

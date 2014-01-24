@@ -32,7 +32,7 @@ SearchQuery::SearchQuery() : QueryBase()
 {
 }
 
-SearchQuery::~SearchQuery() noexcept
+SearchQuery::~SearchQuery()
 {
 }
 

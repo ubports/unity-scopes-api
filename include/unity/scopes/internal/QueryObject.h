@@ -49,7 +49,7 @@ public:
     UNITY_DEFINES_PTRS(QueryObject);
 
     QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~QueryObject() noexcept;
+    virtual ~QueryObject();
 
     // Remote operation implementations
     void run(MWReplyProxy const& reply) noexcept override;

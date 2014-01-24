@@ -40,7 +40,7 @@ class ConfigBase
 public:
     ConfigBase();
     ConfigBase(std::string const& configfile);
-    virtual ~ConfigBase() noexcept;
+    virtual ~ConfigBase();
 
     unity::util::IniParser::SPtr parser() const noexcept;
 

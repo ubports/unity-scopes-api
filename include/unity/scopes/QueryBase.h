@@ -55,7 +55,7 @@ public:
     virtual void cancelled() = 0;                          // Originator cancelled the query
 
     /// @cond
-    virtual ~QueryBase() noexcept;
+    virtual ~QueryBase();
     /// @endcond
 
 protected:

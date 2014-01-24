@@ -74,7 +74,7 @@ public:
                                    SearchListener::SPtr const& reply);
 
     /// @cond
-    virtual ~SearchQuery() noexcept;
+    virtual ~SearchQuery();
     /// @endcond
 
 protected:

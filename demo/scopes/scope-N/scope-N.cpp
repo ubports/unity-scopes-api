@@ -36,7 +36,7 @@ public:
     {
     }
 
-    ~MyQuery() noexcept
+    ~MyQuery()
     {
     }
 

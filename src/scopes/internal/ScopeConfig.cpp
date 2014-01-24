@@ -94,7 +94,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
 }
 
-ScopeConfig::~ScopeConfig() noexcept
+ScopeConfig::~ScopeConfig()
 {
 }
 

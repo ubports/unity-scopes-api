@@ -16,16 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/QueryCtrl.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/ActivationResponse.h>
-#include <unity/scopes/OptionSelectorFilter.h>
-#include <unity/UnityExceptions.h>
+// You may also include individual headers if you prefer.
+#include <unity-scopes.h>
 
 #include <condition_variable>
 #include <cstdlib>
@@ -368,7 +360,7 @@ int main(int argc, char* argv[])
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply);     // Returns (almost) immediately
+        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

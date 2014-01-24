@@ -54,7 +54,7 @@ public:
     \brief Destroys a Reply.
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
-    virtual ~PreviewReply() noexcept;
+    virtual ~PreviewReply();
 
 protected:
     PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl

@@ -52,15 +52,11 @@ class ZmqMiddleware final : public MiddlewareBase
 {
 public:
     ZmqMiddleware(std::string const& server_name, std::string const& configfile, RuntimeImpl* runtime);
-    virtual ~ZmqMiddleware() noexcept;
+    virtual ~ZmqMiddleware();
 
     virtual void start() override;
     virtual void stop() override;
     virtual void wait_for_shutdown() override;
-
-    virtual MWProxy create_proxy(std::string const& identity,
-                                 std::string const& endpoint,
-                                 std::string const& category) override;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
@@ -76,6 +72,7 @@ public:
 
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool();
+    int64_t locate_timeout() const noexcept;
 
 private:
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
@@ -106,6 +103,8 @@ private:
     mutable std::mutex state_mutex_;            // Protects state_
 
     ZmqConfig config_;
+    const int64_t twoway_timeout_;              // Default timeout for twoway invocations
+    int64_t locate_timeout_;                    // Timeout for registry locate()
 };
 
 } // namespace zmq_middleware

@@ -35,7 +35,7 @@ SearchReply::SearchReply(internal::ReplyImpl* impl) :
 {
 }
 
-SearchReply::~SearchReply() noexcept
+SearchReply::~SearchReply()
 {
 }
 

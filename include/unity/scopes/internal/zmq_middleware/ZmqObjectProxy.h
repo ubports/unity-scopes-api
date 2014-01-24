@@ -21,7 +21,7 @@
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
-#include <unity/scopes/internal/zmq_middleware/RequestType.h>
+#include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
@@ -50,20 +50,18 @@ public:
     ZmqObjectProxy(ZmqMiddleware* mw_base,
                    std::string const& endpoint,
                    std::string const& identity,
-                   std::string const& category);
-    ZmqObjectProxy(ZmqMiddleware* mw_base,
-                   std::string const& endpoint,
-                   std::string const& identity,
-                   RequestType t,
-                   std::string const& category);
-    virtual ~ZmqObjectProxy() noexcept;
+                   std::string const& category,
+                   RequestMode mode,
+                   int64_t timeout = -1);
+    virtual ~ZmqObjectProxy();
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
     std::string category() const;
-    RequestType type() const;
+    RequestMode mode() const;
+    virtual int64_t timeout() const noexcept override;
 
     // Remote operation
     virtual void ping() override;
@@ -71,12 +69,14 @@ public:
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
     ZmqReceiver invoke_(capnp::MessageBuilder& out_params);
+    ZmqReceiver invoke_(capnp::MessageBuilder& out_params, int64_t timeout);
 
 private:
     std::string endpoint_;
     std::string identity_;
     std::string category_;
-    RequestType type_;
+    RequestMode mode_;
+    int64_t timeout_;
 };
 
 } // namespace zmq_middleware

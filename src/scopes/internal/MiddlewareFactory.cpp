@@ -41,7 +41,7 @@ MiddlewareFactory::MiddlewareFactory(RuntimeImpl* runtime) :
     assert(runtime);
 }
 
-MiddlewareFactory::~MiddlewareFactory() noexcept
+MiddlewareFactory::~MiddlewareFactory()
 {
 }
 

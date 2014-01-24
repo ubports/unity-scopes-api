@@ -54,7 +54,7 @@ public:
     Reaper::SPtr reply_reaper() const;
     void run_scope(ScopeBase *const scope_base);
 
-    ~RuntimeImpl() noexcept;
+    ~RuntimeImpl();
 
 private:
     RuntimeImpl(std::string const& scope_name, std::string const& configfile);

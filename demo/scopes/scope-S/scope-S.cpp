@@ -43,7 +43,7 @@ public:
         cerr << "MyQuery/" << query.query_string() << " created" << endl;
     }
 
-    ~MyQuery() noexcept
+    ~MyQuery()
     {
         cerr << "MyQuery/" << query_.query_string() << " destroyed" << endl;
     }

@@ -74,7 +74,7 @@ ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
 {
 }
 
-ScopeI::~ScopeI() noexcept
+ScopeI::~ScopeI()
 {
 }
 

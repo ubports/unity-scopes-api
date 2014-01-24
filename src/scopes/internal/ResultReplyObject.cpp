@@ -49,7 +49,7 @@ ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, Runti
 {
 }
 
-ResultReplyObject::~ResultReplyObject() noexcept
+ResultReplyObject::~ResultReplyObject()
 {
 }
 

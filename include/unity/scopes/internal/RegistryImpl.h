@@ -38,7 +38,7 @@ class RegistryImpl : public virtual ObjectProxyImpl
 {
 public:
     RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
-    ~RegistryImpl() noexcept;
+    ~RegistryImpl();
 
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();

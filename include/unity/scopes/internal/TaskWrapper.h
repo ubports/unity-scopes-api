@@ -68,7 +68,7 @@ private:
     {
         virtual void call() = 0;
         virtual bool valid() const = 0;
-        virtual ~WrapperBase() noexcept {};
+        virtual ~WrapperBase() {};
     };
 
     template<typename F>
@@ -81,7 +81,7 @@ private:
         {
         }
 
-        virtual ~WrapperType() noexcept {};
+        virtual ~WrapperType() {};
 
         void call()
         {

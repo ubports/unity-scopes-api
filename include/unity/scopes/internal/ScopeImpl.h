@@ -48,7 +48,7 @@ class ScopeImpl : public virtual ObjectProxyImpl
 {
 public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
-    virtual ~ScopeImpl() noexcept;
+    virtual ~ScopeImpl();
 
     QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const;

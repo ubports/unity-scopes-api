@@ -41,8 +41,9 @@ public:
     ZmqScope(ZmqMiddleware* mw_base,
              std::string const& endpoint,
              std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqScope() noexcept;
+             std::string const& category,
+             int64_t timeout);
+    virtual ~ZmqScope();
 
     virtual QueryCtrlProxy create_query(Query const& query,
                                         VariantMap const& hints,

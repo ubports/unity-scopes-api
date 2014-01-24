@@ -31,7 +31,7 @@ class EXPORT MyScope : public unity::scopes::ScopeBase
 {
 public:
     MyScope() {}
-    virtual ~MyScope() noexcept {}
+    virtual ~MyScope() {}
 
     virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override
     {

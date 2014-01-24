@@ -50,7 +50,7 @@ public:
     NONCOPYABLE(ListenerBase);
     UNITY_DEFINES_PTRS(ListenerBase);
 
-    virtual ~ListenerBase() noexcept;
+    virtual ~ListenerBase();
     /// @endcond
 
     /**

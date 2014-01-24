@@ -32,7 +32,7 @@ PreviewQuery::PreviewQuery() : QueryBase()
 {
 }
 
-PreviewQuery::~PreviewQuery() noexcept
+PreviewQuery::~PreviewQuery()
 {
 }
 

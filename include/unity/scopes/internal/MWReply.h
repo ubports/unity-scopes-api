@@ -38,7 +38,7 @@ namespace internal
 class MWReply : public virtual MWObjectProxy
 {
 public:
-    virtual ~MWReply() noexcept;
+    virtual ~MWReply();
 
     virtual void push(VariantMap const& result) = 0;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;

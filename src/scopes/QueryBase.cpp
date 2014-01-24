@@ -33,7 +33,7 @@ QueryBase::QueryBase() :
 {
 }
 
-QueryBase::~QueryBase() noexcept
+QueryBase::~QueryBase()
 {
 }
 

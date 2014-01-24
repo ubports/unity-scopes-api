@@ -58,7 +58,7 @@ public:
     // TODO: Add a method for subpreview request?
 
     /// @cond
-    virtual ~PreviewQuery() noexcept;
+    virtual ~PreviewQuery();
     /// @endcond
 
 protected:

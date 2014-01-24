@@ -51,7 +51,7 @@ public:
     UNITY_DEFINES_PTRS(ScopeObject);
 
     ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
-    virtual ~ScopeObject() noexcept;
+    virtual ~ScopeObject();
 
     // Remote operation implementations
     virtual MWQueryCtrlProxy create_query(Query const& q,

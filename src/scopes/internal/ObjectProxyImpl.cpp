@@ -37,7 +37,7 @@ ObjectProxyImpl::ObjectProxyImpl(MWProxy const& mw_proxy) :
 {
 }
 
-ObjectProxyImpl::~ObjectProxyImpl() noexcept
+ObjectProxyImpl::~ObjectProxyImpl()
 {
 }
 
@@ -54,6 +54,11 @@ string ObjectProxyImpl::identity() const
 string ObjectProxyImpl::endpoint() const
 {
     return mw_proxy_->endpoint();
+}
+
+int64_t ObjectProxyImpl::timeout() const
+{
+    return mw_proxy_->timeout();
 }
 
 void ObjectProxyImpl::ping()

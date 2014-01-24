@@ -35,7 +35,7 @@ Runtime::Runtime(string const& scope_name, string const& configfile) :
 {
 }
 
-Runtime::~Runtime() noexcept
+Runtime::~Runtime()
 {
 }
 

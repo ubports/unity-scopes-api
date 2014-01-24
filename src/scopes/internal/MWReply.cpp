@@ -34,7 +34,7 @@ MWReply::MWReply(MiddlewareBase* mw_base) :
 {
 }
 
-MWReply::~MWReply() noexcept
+MWReply::~MWReply()
 {
 }
 

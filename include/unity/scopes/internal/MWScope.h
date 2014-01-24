@@ -39,7 +39,7 @@ namespace internal
 class MWScope : public virtual MWObjectProxy
 {
 public:
-    virtual ~MWScope() noexcept;
+    virtual ~MWScope();
 
     virtual QueryCtrlProxy create_query(Query const& query, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
