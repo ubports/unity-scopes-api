@@ -36,34 +36,34 @@ namespace smartscopes
 {
 
 SSQueryObject::SSQueryObject(shared_ptr<QueryBase> const& query_base,
-                             MWReplyProxy const& reply,
-                             MWQueryCtrlProxy const& ctrl) :
+                             MWReplyProxy const& reply) :
   QueryObjectBase(),
   query_base_(query_base),
   reply_(reply),
-  ctrl_(ctrl),
   pushable_(true)
 {
   assert(query_base);
   assert(reply);
-  assert(ctrl);
 }
 
 SSQueryObject::~SSQueryObject() noexcept
 {
 }
 
-void SSQueryObject::run(MWReplyProxy const& reply) noexcept
+void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
   (void)reply;
+  (void)info;
 }
 
-void SSQueryObject::cancel()
+void SSQueryObject::cancel(InvokeInfo const& info)
 {
+  (void)info;
 }
 
-bool SSQueryObject::pushable() const noexcept
+bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 {
+  (void)info;
   return pushable_;
 }
 
