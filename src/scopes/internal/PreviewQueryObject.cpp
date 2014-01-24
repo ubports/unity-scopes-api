@@ -47,12 +47,12 @@ PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQuery> const& prev
     assert(preview_base);
 }
 
-PreviewQueryObject::~PreviewQueryObject() noexcept
+PreviewQueryObject::~PreviewQueryObject()
 {
     // parent destructor will call ctrl_->destroy()
 }
 
-void PreviewQueryObject::run(MWReplyProxy const& reply) noexcept
+void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
     assert(self_);
 

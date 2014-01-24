@@ -52,7 +52,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     reap_item_ = runtime->reply_reaper()->add([this] { this->disconnect(); });
 }
 
-ReplyObject::~ReplyObject() noexcept
+ReplyObject::~ReplyObject()
 {
     try
     {

@@ -55,7 +55,7 @@ QueryI::QueryI(QueryObjectBase::SPtr const& qo) :
 {
 }
 
-QueryI::~QueryI() noexcept
+QueryI::~QueryI()
 {
 }
 
@@ -72,7 +72,7 @@ void QueryI::run_(Current const& current,
     assert(del());
     auto delegate = dynamic_pointer_cast<QueryObjectBase>(del());
     assert(delegate);
-    delegate->run(reply_proxy);
+    delegate->run(reply_proxy, to_info(current));
 }
 
 } // namespace zmq_middleware

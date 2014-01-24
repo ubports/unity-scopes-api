@@ -35,10 +35,11 @@ class ObjectProxyImpl
 {
 public:
     ObjectProxyImpl(MWProxy const& mw_proxy);
-    virtual ~ObjectProxyImpl() noexcept;
+    virtual ~ObjectProxyImpl();
 
     virtual std::string identity() const;
     virtual std::string endpoint() const;
+    virtual int64_t timeout() const;
 
     // Remote operation
     virtual void ping();

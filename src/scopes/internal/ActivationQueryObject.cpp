@@ -42,12 +42,12 @@ ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> con
 {
 }
 
-ActivationQueryObject::~ActivationQueryObject() noexcept
+ActivationQueryObject::~ActivationQueryObject()
 {
     // parent destructor will call ctrl_->destroy()
 }
 
-void ActivationQueryObject::run(MWReplyProxy const& reply) noexcept
+void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
     assert(self_);
 

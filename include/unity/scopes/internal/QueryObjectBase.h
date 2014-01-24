@@ -20,8 +20,9 @@
 #define UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/util/DefinesPtrs.h>
+#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -37,8 +38,10 @@ class QueryObjectBase : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(QueryObjectBase);
     // Remote operation implementation
-    virtual void run(MWReplyProxy const& reply) noexcept = 0;
-    virtual void cancel() = 0;
+    virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept = 0;
+
+    virtual void cancel(InvokeInfo const& info) = 0;                  // Called locally, by QueryCtrlObject
+    virtual bool pushable(InvokeInfo const& info) const noexcept = 0; // Called locally, by ReplyImpl
 
     // Used to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.

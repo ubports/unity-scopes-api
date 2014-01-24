@@ -55,7 +55,7 @@ ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
 {
 }
 
-ReplyI::~ReplyI() noexcept
+ReplyI::~ReplyI()
 {
 }
 

@@ -65,7 +65,9 @@ try :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Stopped),
-    config_(configfile)
+    config_(configfile),
+    twoway_timeout_(400),  // TODO: get timeout from config
+    locate_timeout_(1500)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
 }
@@ -74,7 +76,7 @@ catch (zmqpp::exception const& e)
     rethrow_zmq_ex(e);
 }
 
-ZmqMiddleware::~ZmqMiddleware() noexcept
+ZmqMiddleware::~ZmqMiddleware()
 {
     try
     {
@@ -170,26 +172,12 @@ void ZmqMiddleware::wait_for_shutdown()
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
-MWProxy ZmqMiddleware::create_proxy(string const& identity, string const& endpoint, string const& category)
-{
-    MWProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqObjectProxy(this, endpoint, identity, category));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
-}
-
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
 {
     MWRegistryProxy proxy;
     try
     {
-        proxy.reset(new ZmqRegistry(this, endpoint, identity, "Registry"));
+        proxy.reset(new ZmqRegistry(this, endpoint, identity, "Registry", twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -204,7 +192,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
     try
     {
         string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
-        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope"));
+        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope", twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -218,7 +206,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     MWScopeProxy proxy;
     try
     {
-        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope"));
+        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope", twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -254,7 +242,6 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
 {
     assert(ctrl);
 
-    MWQueryCtrlProxy proxy;
     try
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
@@ -293,6 +280,24 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     return proxy;
 }
 
+void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
+{
+    assert(query);
+
+    try
+    {
+        shared_ptr<QueryI> qi(make_shared<QueryI>(query));
+        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
+        auto df = safe_dflt_add(adapter, "Query", qi);
+        query->set_disconnect_function(df);
+    }
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    {
+        // TODO: log this
+        cerr << "unexpected exception in add_dflt_query_object(): " << e.what() << endl;
+        throw;
+    }
+}
 
 MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, RegistryObjectBase::SPtr const& registry)
 {
@@ -307,7 +312,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
-        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry"));
+        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry", twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -354,7 +359,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         function<void()> df;
         auto proxy = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
-        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope"));
+        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope", twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -369,7 +374,6 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
 {
     assert(scope);
 
-    MWScopeProxy proxy;
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
@@ -406,6 +410,11 @@ ThreadPool* ZmqMiddleware::invoke_pool()
     return invokers_.get();
 }
 
+int64_t ZmqMiddleware::locate_timeout() const noexcept
+{
+    return locate_timeout_;
+}
+
 namespace
 {
 
@@ -434,33 +443,33 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
 
     // We don't have the requested adapter yet, so we create it on the fly.
     int pool_size;
-    RequestType type;
+    RequestMode mode;
     if (has_suffix(name, query_suffix))
     {
         // The query adapter is single or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
-        type = RequestType::Oneway;
+        mode = RequestMode::Oneway;
     }
     else if (has_suffix(name, ctrl_suffix))
     {
         // The ctrl adapter is single-threaded and supports oneway operations only.
         pool_size = 1;
-        type = RequestType::Oneway;
+        mode = RequestMode::Oneway;
     }
     else if (has_suffix(name, reply_suffix))
     {
         // The reply adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
-        type = RequestType::Oneway;
+        mode = RequestMode::Oneway;
     }
     else
     {
         // The normal adapter is single- or multi-threaded and supports twoway operations only.
         // TODO: get pool size from config
         pool_size = 1;
-        type = RequestType::Twoway;
+        mode = RequestMode::Twoway;
     }
 
     // The query adapter is always inproc.
@@ -474,7 +483,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         endpoint = "ipc://" + endpoint_dir + "/" + name;
     }
 
-    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, type, pool_size));
+    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size));
     a->activate();
     am_[name] = a;
     return a;

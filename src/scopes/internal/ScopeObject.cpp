@@ -54,10 +54,9 @@ ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
     assert(scope_base);
 }
 
-ScopeObject::~ScopeObject() noexcept
+ScopeObject::~ScopeObject()
 {
 }
-
 
 MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
         std::function<QueryBase::SPtr()> const& query_factory_fun,

@@ -39,7 +39,7 @@ class QueryI : public ServantBase
 {
 public:
     QueryI(QueryObjectBase::SPtr const& qo);
-    virtual ~QueryI() noexcept;
+    virtual ~QueryI();
 
 private:
     virtual void run_(Current const& current,

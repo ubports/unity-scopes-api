@@ -98,7 +98,7 @@ Variant::Variant(char const* val)
 {
 }
 
-Variant::~Variant() noexcept
+Variant::~Variant()
 {
 }
 

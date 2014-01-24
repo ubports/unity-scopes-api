@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 
-#include <unity/scopes/internal/zmq_middleware/RequestType.h>
+#include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/util/NonCopyable.h>
 
 #include <zmqpp/socket.hpp>
@@ -52,14 +52,15 @@ public:
     NONCOPYABLE(ConnectionPool);
     ConnectionPool(zmqpp::context& context);
     ~ConnectionPool();
-    zmqpp::socket& find(std::string const& endpoint, RequestType t);
-    void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestType t);
+    zmqpp::socket& find(std::string const& endpoint, RequestMode m);
+    void remove(std::string const& endpoint);
+    void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m);
 
 private:
     struct Connection
     {
         zmqpp::socket socket;
-        RequestType type;
+        RequestMode mode;
     };
 
     typedef std::unordered_map<std::string, Connection> CPool;

@@ -46,7 +46,7 @@ public:
     }
 
 protected:
-    virtual ~MyScope() noexcept {}
+    virtual ~MyScope() {}
 };
 
 EXPORT

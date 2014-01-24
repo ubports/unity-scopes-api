@@ -50,7 +50,7 @@ class UNITY_API Registry : public virtual ObjectProxy
 {
 public:
     /// @cond
-    virtual ~Registry() noexcept;
+    virtual ~Registry();
     /// @endcond
 
     /**

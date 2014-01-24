@@ -30,7 +30,7 @@ PreviewListener::PreviewListener()
 {
 }
 
-PreviewListener::~PreviewListener() noexcept
+PreviewListener::~PreviewListener()
 {
 }
 

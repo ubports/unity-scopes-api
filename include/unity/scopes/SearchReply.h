@@ -75,7 +75,7 @@ public:
     \brief Destroys a Reply.
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
-    virtual ~SearchReply() noexcept;
+    virtual ~SearchReply();
 
 protected:
     SearchReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl

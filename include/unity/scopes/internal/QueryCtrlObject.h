@@ -40,11 +40,11 @@ public:
     UNITY_DEFINES_PTRS(QueryCtrlObject);
 
     QueryCtrlObject();
-    virtual ~QueryCtrlObject() noexcept;
+    virtual ~QueryCtrlObject();
 
     // Remote operation implementations
-    virtual void cancel() override;
-    virtual void destroy() override;
+    virtual void cancel(InvokeInfo const& info) override;
+    virtual void destroy(InvokeInfo const& info) override;
 
     // Called by create_query() after instantiation to tell this ctrl what its corresponding
     // query facade is.

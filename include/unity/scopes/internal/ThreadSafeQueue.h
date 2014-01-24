@@ -48,7 +48,7 @@ public:
     typedef T value_type;
 
     ThreadSafeQueue();
-    ~ThreadSafeQueue() noexcept;
+    ~ThreadSafeQueue();
 
     void destroy() noexcept;
     void push(T const& item);
@@ -74,7 +74,7 @@ ThreadSafeQueue<T>::ThreadSafeQueue() :
 }
 
 template<typename T>
-ThreadSafeQueue<T>::~ThreadSafeQueue() noexcept
+ThreadSafeQueue<T>::~ThreadSafeQueue()
 {
     destroy();
 

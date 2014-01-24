@@ -36,7 +36,7 @@ public:
     explicit RegistryException(std::string const& reason);
     RegistryException(RegistryException const&);
     RegistryException& operator=(RegistryException const&);
-    virtual ~RegistryException() noexcept;
+    virtual ~RegistryException();
 
     virtual std::exception_ptr self() const override;
 };

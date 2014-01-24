@@ -46,7 +46,7 @@ ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
 {
 }
 
-ObjectProxy::~ObjectProxy() noexcept
+ObjectProxy::~ObjectProxy()
 {
 }
 
@@ -58,6 +58,11 @@ string ObjectProxy::identity() const
 string ObjectProxy::endpoint() const
 {
     return p->endpoint();
+}
+
+int64_t ObjectProxy::timeout() const
+{
+    return p->timeout();
 }
 
 internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept

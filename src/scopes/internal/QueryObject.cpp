@@ -59,7 +59,7 @@ QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
     assert(ctrl);
 }
 
-QueryObject::~QueryObject() noexcept
+QueryObject::~QueryObject()
 {
     assert(ctrl_);
     try
@@ -72,7 +72,7 @@ QueryObject::~QueryObject() noexcept
     }
 }
 
-void QueryObject::run(MWReplyProxy const& reply) noexcept
+void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
     assert(self_);
 
@@ -111,7 +111,7 @@ void QueryObject::run(MWReplyProxy const& reply) noexcept
     }
 }
 
-void QueryObject::cancel()
+void QueryObject::cancel(InvokeInfo const& /* info */)
 {
     pushable_ = false;
     auto rp = reply_proxy_.lock();
@@ -128,7 +128,7 @@ void QueryObject::cancel()
     query_base_->cancel();
 }
 
-bool QueryObject::pushable() const noexcept
+bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept
 {
     return pushable_;
 }

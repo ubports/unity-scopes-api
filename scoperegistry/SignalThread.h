@@ -36,7 +36,7 @@ public:
     NONCOPYABLE(SignalThread);
 
     SignalThread();
-    ~SignalThread() noexcept;
+    ~SignalThread();
 
     void add_child(pid_t pid, char const* argv[]);
     void reset_sigs();

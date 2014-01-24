@@ -242,7 +242,7 @@ RegistryObject::RegistryObject() : p(new RegistryObjectPrivate())
 {
 }
 
-RegistryObject::~RegistryObject() noexcept
+RegistryObject::~RegistryObject()
 {
     delete p;
 }
