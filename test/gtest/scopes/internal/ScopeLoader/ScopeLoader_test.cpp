@@ -92,8 +92,8 @@ TEST(ScopeLoader, null_registry)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Cannot load scope testScope: null registry proxy",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Cannot load scope testScope: null registry proxy",
+                     e.what());
     }
 }
 
@@ -114,7 +114,7 @@ TEST(ScopeLoader, version_mismatch)
                        "    unity::ResourceException: Scope testScope was compiled with major version 666 of the "
                        "Unity scopes run time. This version is incompatible with the current major version "
                        "\\([0-9]+\\)\\.");
-        EXPECT_TRUE(boost::regex_match(e.to_string(), r)) << e.to_string();
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -190,8 +190,8 @@ TEST(ScopeLoader, no_library)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: no_such_lib: cannot open shared object file: No such file or directory",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: no_such_lib: cannot open shared object file: No such file or directory",
+                     e.what());
         EXPECT_EQ(0, num_create());
         EXPECT_EQ(0, num_destroy());
     }
@@ -211,7 +211,7 @@ TEST(ScopeLoader, no_load)
     catch (unity::Exception const& e)
     {
         boost::regex r("unity::ResourceException: .*/libNoDestroy.so: undefined symbol: unity_scope_destroy");
-        EXPECT_TRUE(boost::regex_match(e.to_string(), r));
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
         EXPECT_EQ(0, num_create());
         EXPECT_EQ(0, num_destroy());
     }
@@ -230,8 +230,8 @@ TEST(ScopeLoader, null_return)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+                     e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
     }
@@ -251,8 +251,8 @@ TEST(ScopeLoader, null_return_unload)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+                     e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
     }
@@ -273,9 +273,9 @@ TEST(ScopeLoader, throw_unity_exception_from_start)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
-                      "    unity::LogicException: start failure",
-                      e.to_string());
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+                         "    unity::LogicException: start failure",
+                         e.what());
         }
     }
     EXPECT_EQ(0, num_stop());
@@ -297,9 +297,9 @@ TEST(ScopeLoader, throw_unity_exception_from_start_no_unload)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
-                      "    unity::LogicException: start failure",
-                      e.to_string());
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+                         "    unity::LogicException: start failure",
+                         e.what());
         }
     }
     EXPECT_EQ(0, num_stop());
@@ -323,9 +323,9 @@ TEST(ScopeLoader, throw_unknown_exception_from_start)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
-                      "    unknown exception",
-                      e.to_string());
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+                         "    unknown exception",
+                         e.what());
         }
     }
     EXPECT_EQ(0, num_stop());
@@ -353,9 +353,9 @@ TEST(ScopeLoader, throw_unity_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
-                  "    unity::LogicException: stop failure",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+                     "    unity::LogicException: stop failure",
+                     e.what());
     }
 }
 
@@ -379,9 +379,9 @@ TEST(ScopeLoader, throw_std_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
-                  "    stop failure",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+                     "    stop failure",
+                     e.what());
     }
 }
 
@@ -404,9 +404,9 @@ TEST(ScopeLoader, throw_unknown_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
-                  "    unknown exception",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+                     "    unknown exception",
+                     e.what());
     }
 }
 
@@ -443,9 +443,9 @@ TEST(ScopeLoader, unload_stop_exception)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
-                  "    unity::LogicException: stop failure",
-                  e.to_string());
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+                     "    unity::LogicException: stop failure",
+                     e.what());
     }
 
     // Call unload again to make sure that the second time, it doesn't throw.
@@ -475,7 +475,7 @@ TEST(ScopeLoader, restart_exception)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::LogicException: Cannot start scope testScope in Finished state", e.to_string());
+        EXPECT_STREQ("unity::LogicException: Cannot start scope testScope in Finished state", e.what());
     }
 }
 
@@ -495,7 +495,7 @@ TEST(ScopeLoader, stop_after_unload_exception)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::LogicException: Cannot stop scope testScope in Finished state", e.to_string());
+        EXPECT_STREQ("unity::LogicException: Cannot stop scope testScope in Finished state", e.what());
     }
 }
 
@@ -522,7 +522,7 @@ TEST(ScopeLoader, restart_failed)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::LogicException: Cannot start scope testScope in Failed state", e.to_string());
+        EXPECT_STREQ("unity::LogicException: Cannot start scope testScope in Failed state", e.what());
     }
 
     try
@@ -531,7 +531,7 @@ TEST(ScopeLoader, restart_failed)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_EQ("unity::LogicException: Cannot stop scope testScope in Failed state", e.to_string());
+        EXPECT_STREQ("unity::LogicException: Cannot stop scope testScope in Failed state", e.what());
     }
 }
 

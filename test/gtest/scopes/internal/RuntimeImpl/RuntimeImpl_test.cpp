@@ -44,8 +44,8 @@ TEST(RuntimeImpl, basic)
     }
     catch (LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: registry(): Cannot obtain registry for already destroyed run time",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: registry(): Cannot obtain registry for already destroyed run time",
+                     e.what());
     }
 
     rt->destroy();
@@ -56,8 +56,8 @@ TEST(RuntimeImpl, basic)
     }
     catch (LogicException const& e)
     {
-        EXPECT_EQ("unity::LogicException: factory(): Cannot obtain factory for already destroyed run time",
-                  e.to_string());
+        EXPECT_STREQ("unity::LogicException: factory(): Cannot obtain factory for already destroyed run time",
+                     e.what());
     }
 }
 
@@ -69,9 +69,9 @@ TEST(RuntimeImpl, error)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_EQ("unity::scopes::ConfigException: Cannot instantiate run time for testscope, "
-                  "config file: NoSuchFile.ini:\n"
-                  "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::ConfigException: Cannot instantiate run time for testscope, "
+                     "config file: NoSuchFile.ini:\n"
+                     "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
+                     e.what());
     }
 }

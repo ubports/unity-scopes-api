@@ -97,7 +97,7 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
             }
             catch (FileException const& e)
             {
-                error("scope group config file ignored:\n" + e.to_string());
+                error(string("scope group config file ignored:\n") + e.what());
                 continue;
             }
 
@@ -108,7 +108,7 @@ vector<map<string, string>> create_scope_groups(string const& group_dir, map<str
             }
             catch (LogicException const& e)
             {
-                error("group file \"" + file + ": file ignored:\n" + e.to_string());
+                error("group file \"" + file + ": file ignored:\n" + e.what());
                 continue;
             }
 
@@ -213,7 +213,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.to_string());
+            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.what());
         }
     }
 }
@@ -323,7 +323,7 @@ main(int argc, char* argv[])
             }
             catch (unity::Exception const& e)
             {
-                error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.to_string());
+                error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.what());
             }
         }
 
@@ -378,10 +378,6 @@ main(int argc, char* argv[])
         // Wait until we are done.
         middleware->wait_for_shutdown();
         exit_status = 0;
-    }
-    catch (unity::Exception const& e)
-    {
-        error(e.to_string());
     }
     catch (std::exception const& e)
     {
