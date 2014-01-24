@@ -41,6 +41,8 @@ namespace internal
 class UNITY_API CategorisedResult: public Result
 {
 public:
+    UNITY_DEFINES_PTRS(CategorisedResult);
+
     /**
      \brief Creates a CategorisedResult instance assigned to given category, with all base attributes initially empty.
      */
