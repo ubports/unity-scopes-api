@@ -56,7 +56,29 @@ ScopeImpl::~ScopeImpl() noexcept
 {
 }
 
-QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const
+{
+    Query query(scope_name_, query_string, department_id);
+    query.set_filter_state(filter_state);
+    return create_query(query, hints, reply);
+}
+
+QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const
+{
+    Query query(scope_name_);
+    query.set_query_string(query_string);
+    query.set_filter_state(filter_state);
+    return create_query(query, hints, reply);
+}
+
+QueryCtrlProxy ScopeImpl::create_query(string const& query_string, VariantMap const& hints, SearchListener::SPtr const& reply) const
+{
+    Query query(scope_name_);
+    query.set_query_string(query_string);
+    return create_query(query, hints, reply);
+}
+
+QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     try
@@ -72,7 +94,6 @@ QueryCtrlProxy ScopeImpl::create_query(string const& q, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        const Query query(scope_name_, q, ""); //FIXME depatment id
         ctrl = fwd()->create_query(query, hints, rp);
         assert(ctrl);
     }
