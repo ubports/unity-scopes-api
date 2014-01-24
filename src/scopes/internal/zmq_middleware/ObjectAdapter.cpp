@@ -48,11 +48,11 @@ namespace internal
 namespace zmq_middleware
 {
 
-ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestType t, int pool_size) :
+ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m, int pool_size) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
-    type_(t),
+    mode_(m),
     pool_size_(pool_size),
     state_(Inactive)
 {
@@ -143,7 +143,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         s << "ObjectAdapter::add(): " << "cannot add id \"" << id << "\": id already in use (adapter: " << name_  << ")";
         throw MiddlewareException(s.str());
     }
-    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, type_, ""));
+    return ZmqProxy(new ZmqObjectProxy(&mw_, endpoint_, id, "", mode_));
 }
 
 void ObjectAdapter::remove(std::string const& id)
@@ -580,10 +580,10 @@ void ObjectAdapter::broker_thread()
         auto ctrl = subscribe_to_ctrl_socket();
 
         // Set up message pump. Router-dealer for twoway adapter, pull-push for oneway adapter.
-        auto socket_type = type_ == RequestType::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
+        auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
         zmqpp::socket frontend(*mw_.context(), socket_type);
 
-        socket_type = type_ == RequestType::Twoway ? zmqpp::socket_type::dealer : zmqpp::socket_type::push;
+        socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::dealer : zmqpp::socket_type::push;
         zmqpp::socket backend(*mw_.context(), socket_type);
 
         zmqpp::poller poller;
@@ -644,7 +644,7 @@ void ObjectAdapter::broker_thread()
                     backend.send(message, flag);
                 }
                 while (flag == zmqpp::socket::send_more);
-                if (type_ == RequestType::Twoway)
+                if (mode_ == RequestMode::Twoway)
                 {
                     ++pending_requests; // Only twoway requests require us to wait for replies
                 }
@@ -698,7 +698,7 @@ void ObjectAdapter::worker_thread()
         auto ctrl = subscribe_to_ctrl_socket();
         poller.add(ctrl);
 
-        auto socket_type = type_ == RequestType::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
+        auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
         zmqpp::socket s(*mw_.context(), socket_type);
         s.set(zmqpp::socket_option::linger, 0);
         s.connect("inproc://" + name_ + "-worker");
@@ -752,7 +752,7 @@ void ObjectAdapter::worker_thread()
                     if (current.id.empty() || current.op_name.empty() ||
                         (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))
                     {
-                        if (type_ == RequestType::Twoway)
+                        if (mode_ == RequestMode::Twoway)
                         {
                             capnp::MallocMessageBuilder b;
                             auto exr = create_unknown_response(b, "Invalid message header");
@@ -766,10 +766,10 @@ void ObjectAdapter::worker_thread()
                         }
                         continue;
                     }
-                    auto expected_mode = type_ == RequestType::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
+                    auto expected_mode = mode_ == RequestMode::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
                     if (mode != expected_mode) // Can't do oneway on a twoway adapter and vice-versa.
                     {
-                        if (type_ == RequestType::Twoway)
+                        if (mode_ == RequestMode::Twoway)
                         {
                             ostringstream s;
                             s << "ObjectAdapter: oneway invocation sent to twoway adapter "
@@ -793,7 +793,7 @@ void ObjectAdapter::worker_thread()
                     ostringstream s;
                     s << "ObjectAdapter: error unmarshaling request header "
                       << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
-                    if (type_ == RequestType::Twoway)
+                    if (mode_ == RequestMode::Twoway)
                     {
                         capnp::MallocMessageBuilder b;
                         auto exr = create_unknown_response(b, s.str());
@@ -811,7 +811,7 @@ void ObjectAdapter::worker_thread()
                 auto servant = find_servant(current.id, current.category);
                 if (!servant)
                 {
-                    if (type_ == RequestType::Twoway)
+                    if (mode_ == RequestMode::Twoway)
                     {
                         capnp::MallocMessageBuilder b;
                         auto exr = create_object_not_exist_response(b, current);
@@ -826,7 +826,7 @@ void ObjectAdapter::worker_thread()
                 capnp::MallocMessageBuilder b;
                 auto r = b.initRoot<capnproto::Response>();
                 servant->safe_dispatch_(current, in_params, r); // noexcept
-                if (type_ == RequestType::Twoway)
+                if (mode_ == RequestMode::Twoway)
                 {
                     sender.send(b.getSegmentsForOutput());
                 }

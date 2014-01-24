@@ -60,10 +60,6 @@ public:
     virtual void stop() = 0;
     virtual void wait_for_shutdown() = 0;
 
-    virtual MWProxy create_proxy(std::string const& identity,
-                                 std::string const& endpoint,
-                                 std::string const& category) = 0;
-
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;

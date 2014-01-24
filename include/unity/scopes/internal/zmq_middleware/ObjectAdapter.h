@@ -56,7 +56,7 @@ public:
     ObjectAdapter(ZmqMiddleware& mw,
                   std::string const& name,
                   std::string const& endpoint,
-                  RequestType t,
+                  RequestMode m,
                   int pool_size);
     ~ObjectAdapter();
 
@@ -112,7 +112,7 @@ private:
     ZmqMiddleware& mw_;
     std::string name_;
     std::string endpoint_;
-    RequestType type_;
+    RequestMode mode_;
     int pool_size_;
     std::unique_ptr<zmqpp::socket> ctrl_;       // PUB socket to signal when to deactivate
     std::mutex ctrl_mutex_;                     // Synchronizes access to ctrl_ when sending

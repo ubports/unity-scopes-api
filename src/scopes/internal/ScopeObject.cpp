@@ -58,7 +58,6 @@ ScopeObject::~ScopeObject()
 {
 }
 
-
 MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
         std::function<QueryBase::SPtr()> const& query_factory_fun,
         std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun)

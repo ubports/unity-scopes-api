@@ -44,7 +44,7 @@ interface QueryCtrl
 
 ZmqQueryCtrl::ZmqQueryCtrl(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Oneway, category),
+    ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Oneway),
     MWQueryCtrl(mw_base)
 {
 }

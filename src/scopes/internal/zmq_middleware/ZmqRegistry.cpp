@@ -63,9 +63,13 @@ interface Registry
 
 */
 
-ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
+ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base,
+                         string const& endpoint,
+                         string const& identity,
+                         string const& category,
+                         int64_t timeout) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway, category),
+    ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Twoway, timeout),
     MWRegistry(mw_base)
 {
 }
@@ -145,7 +149,9 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
     auto in_params = request.initInParams().getAs<capnproto::Registry::LocateRequest>();
     in_params.setName(scope_name.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    // locate uses a custom timeout because it needs to potentially fork/exec the scope.
+    int64_t timeout = 1000; // TODO: get timeout from config
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -160,7 +166,11 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
             auto proxy = locate_response.getReturnValue();
             auto mw = dynamic_cast<ZmqMiddleware*>(mw_base());
             assert(mw);
-            auto zmq_proxy = make_shared<ZmqScope>(mw, proxy.getEndpoint(), proxy.getIdentity(), proxy.getCategory());
+            auto zmq_proxy = make_shared<ZmqScope>(mw,
+                                                   proxy.getEndpoint(),
+                                                   proxy.getIdentity(),
+                                                   proxy.getCategory(),
+                                                   proxy.getTimeout());
             return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_name);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:

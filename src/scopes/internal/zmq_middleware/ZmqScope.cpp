@@ -57,9 +57,13 @@ interface Scope
 
 */
 
-ZmqScope::ZmqScope(ZmqMiddleware* mw_base, string const& endpoint, string const& identity, string const& category) :
+ZmqScope::ZmqScope(ZmqMiddleware* mw_base,
+                   string const& endpoint,
+                   string const& identity,
+                   string const& category,
+                   int64_t timeout) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, RequestType::Twoway, category),
+    ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Twoway, timeout),
     MWScope(mw_base)
 {
 }
@@ -117,7 +121,6 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
     }
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -184,7 +187,6 @@ QueryCtrlProxy ZmqScope::preview(Result const& result, VariantMap const& hints, 
     }
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
 
     auto receiver = future.get();
     auto segments = receiver.receive();

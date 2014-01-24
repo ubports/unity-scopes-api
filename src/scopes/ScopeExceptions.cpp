@@ -77,6 +77,28 @@ string ObjectNotExistException::id() const
     return id_;
 }
 
+TimeoutException::TimeoutException(string const& reason) :
+    Exception("unity::scopes::TimeoutException", reason),
+    MiddlewareException(reason)
+{
+}
+
+TimeoutException::TimeoutException(TimeoutException const&) = default;
+
+//! @cond
+
+TimeoutException& TimeoutException::operator=(TimeoutException const&) = default;
+
+
+TimeoutException::~TimeoutException() noexcept = default;
+
+//! @endcond
+
+exception_ptr TimeoutException::self() const
+{
+    return make_exception_ptr(*this);
+}
+
 ConfigException::ConfigException(string const& reason) :
     Exception("unity::scopes::ConfigException", reason)
 {
