@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/QueryBase.h>
 
 #include <string>
@@ -71,12 +72,12 @@ public:
                            InvokeInfo const& info) override;
 
 private:
-  MWQueryCtrlProxy query(MWReplyProxy const& reply,
+  MWQueryCtrlProxy query(std::string const& id, MWReplyProxy const& reply,
       std::function<QueryBase::SPtr(void)> const& query_factory_fun);
 
 private:
   QueryCtrlObject::SPtr co_;
-  QueryObjectBase::SPtr qo_;
+  SSQueryObject::SPtr qo_;
 
   std::unique_ptr<SmartScope> const smartscope_;
 };

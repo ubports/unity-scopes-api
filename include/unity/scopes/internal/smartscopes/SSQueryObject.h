@@ -24,7 +24,7 @@
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
-#include <atomic>
+#include <map>
 
 namespace unity
 {
@@ -39,6 +39,14 @@ namespace internal
 
 namespace smartscopes
 {
+
+struct SSQuery
+{
+  std::shared_ptr<QueryBase> q_base;
+  MWReplyProxy q_reply;
+  std::weak_ptr<ReplyBase> q_reply_proxy;
+  bool q_pushable;
+};
 
 class SSQueryObject : public QueryObjectBase
 {
@@ -59,12 +67,12 @@ public:
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
+    void add_query(std::string const& scope_id, std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply);
+
 protected:
-    std::shared_ptr<QueryBase> query_base_;
-    MWReplyProxy reply_;
-    std::weak_ptr<ReplyBase> reply_proxy_;
-    std::atomic_bool pushable_;
     QueryObjectBase::SPtr self_;
+
+    std::map<std::string, SSQuery> queries_;
 };
 
 } // namespace smartscopes
