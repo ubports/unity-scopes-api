@@ -47,9 +47,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
     mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
     scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
-    scope_group_configdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "Scope.GroupConfigDir");
     oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
-    oem_group_configdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.GroupConfigDir");
     scoperunner_path_ = get_string(REGISTRY_CONFIG_GROUP, "Scoperunner.Path");
     if (scoperunner_path_[0] != '/')
     {
@@ -91,19 +89,9 @@ string RegistryConfig::scope_installdir() const
     return scope_installdir_;
 }
 
-string RegistryConfig::scope_group_configdir() const
-{
-    return scope_group_configdir_;
-}
-
 string RegistryConfig::oem_installdir() const
 {
     return oem_installdir_;
-}
-
-string RegistryConfig::oem_group_configdir() const
-{
-    return oem_group_configdir_;
 }
 
 string RegistryConfig::scoperunner_path() const

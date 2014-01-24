@@ -138,46 +138,6 @@ void populate_registry(RegistryObject::SPtr const& registry,
     }
 }
 
-// Not needed any more. Remove once registry spawner works.
-void run_scopes(SignalThread& sigthread,
-                string const& scoperunner_path,
-                string const& config_file,
-                vector<map<string, string>> const& groups)
-{
-    // Cobble together an argv for each scope group so we can fork/exec the scope runner for the group.
-    for (auto group : groups)
-    {
-        unique_ptr<char const* []> argv(new char const*[groups.size() + 3]);    // Includes room for final NULL element.
-        argv[0] = scoperunner_path.c_str();
-        argv[1] = config_file.c_str();
-        int i = 2;
-        for (auto it = group.begin(); it != group.end(); ++it)
-        {
-            argv[i++] = it->second.c_str();
-        }
-        argv[i] = NULL;
-
-        // Fork/exec the scoperunner.
-        pid_t pid;
-        switch (pid = fork())
-        {
-            case -1:
-            {
-                throw SyscallException("cannot fork", errno);
-            }
-            case 0: // child
-            {
-                sigthread.reset_sigs(); // Need default signal mask in the new process
-                execv(argv[0], const_cast<char* const*>(argv.get()));
-                throw SyscallException("cannot exec " + scoperunner_path, errno);
-            }
-        }
-
-        // Parent
-        sigthread.add_child(pid, argv.get());
-    }
-}
-
 } // namespace
 
 int
@@ -201,9 +161,7 @@ main(int argc, char* argv[])
         string mw_endpoint;
         string mw_configfile;
         string scope_installdir;
-        string scope_group_configdir;
         string oem_installdir;
-        string oem_group_configdir;
         string scoperunner_path;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
@@ -211,9 +169,7 @@ main(int argc, char* argv[])
             mw_endpoint = c.endpoint();
             mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
-            scope_group_configdir = c.scope_group_configdir();
             oem_installdir = c.oem_installdir();
-            oem_group_configdir = c.oem_group_configdir();
             scoperunner_path = c.scoperunner_path();
         } // Release memory for config parser
 
