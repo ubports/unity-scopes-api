@@ -53,6 +53,8 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw ConfigException(configfile + ": Scoperunner.Path must be an absolute path");
     }
+    ss_registry_identity_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Identity");
+    ss_registry_endpoint_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Endpoint");
 }
 
 RegistryConfig::~RegistryConfig() noexcept
@@ -97,6 +99,16 @@ string RegistryConfig::oem_installdir() const
 string RegistryConfig::scoperunner_path() const
 {
     return scoperunner_path_;
+}
+
+string RegistryConfig::ss_registry_identity() const
+{
+    return ss_registry_identity_;
+}
+
+string RegistryConfig::ss_registry_endpoint() const
+{
+    return ss_registry_endpoint_;
 }
 
 } // namespace internal

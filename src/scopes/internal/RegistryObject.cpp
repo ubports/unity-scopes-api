@@ -55,9 +55,10 @@ public:
     ~RegistryObjectPrivate();
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
-    bool add(std::string const& scope_name, ScopeMetadata const& metadata,
-             std::vector<std::string> const& spawn_command);
-    bool remove(std::string const& scope_name);
+    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
+                         std::vector<std::string> const& spawn_command);
+    bool remove_local_scope(std::string const& scope_name);
+    void set_remote_scopes(MetadataMap&& scopes);
     ScopeProxy locate(std::string const& scope_name);
 
 private:
@@ -65,6 +66,7 @@ private:
     MetadataMap scopes;
     std::map<std::string, pid_t> scope_processes;
     std::map<std::string, std::vector<std::string>> commands;
+    MetadataMap remote_scopes;
 
     void spawn_scope(std::string const& scope_name);
     int kill_process(pid_t pid);
@@ -78,7 +80,7 @@ RegistryObjectPrivate::~RegistryObjectPrivate()
     {
         shutdown();
     }
-    catch (const Exception &e)
+    catch (std::exception const& e)
     {
         fprintf(stderr, "Error when shutting down registry: %s\n", e.what());
     }
@@ -118,13 +120,18 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
     }
 
+    // Look for the scope in both the local and the remote map.
     auto const& it = scopes.find(scope_name);
     if (it == scopes.end())
     {
-        throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
+        auto const& rit = remote_scopes.find(scope_name);
+        if (rit == remote_scopes.end())
+        {
+            throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
+        }
+        return rit->second;
     }
     return it->second;
-
 }
 
 void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
@@ -176,11 +183,14 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
 
 MetadataMap RegistryObjectPrivate::list()
 {
-    return scopes;
+    MetadataMap all_scopes(scopes);  // Local scopes
+    all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
+    return all_scopes;
 }
 
-bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata const& metadata,
-                                std::vector<std::string> const& spawn_command)
+bool RegistryObjectPrivate::add_local_scope(std::string const& scope_name,
+                                            ScopeMetadata const& metadata,
+                                            std::vector<std::string> const& spawn_command)
 {
     bool return_value = true;
     if (scope_name.empty())
@@ -208,7 +218,7 @@ bool RegistryObjectPrivate::add(std::string const& scope_name, ScopeMetadata con
     return return_value;
 }
 
-bool RegistryObjectPrivate::remove(std::string const& scope_name)
+bool RegistryObjectPrivate::remove_local_scope(std::string const& scope_name)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
@@ -218,6 +228,11 @@ bool RegistryObjectPrivate::remove(std::string const& scope_name)
 
     commands.erase(scope_name);
     return scopes.erase(scope_name) == 1;
+}
+
+void RegistryObjectPrivate::set_remote_scopes(MetadataMap&& scopes)
+{
+    remote_scopes = scopes;
 }
 
 ScopeProxy RegistryObjectPrivate::locate(std::string const& scope_name)
@@ -259,17 +274,23 @@ MetadataMap RegistryObject::list()
     return p->list();
 }
 
-bool RegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata,
-                         std::vector<std::string> const& spawn_command)
+bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
+                                     std::vector<std::string> const& spawn_command)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    return p->add(scope_name, metadata, spawn_command);
+    return p->add_local_scope(scope_name, metadata, spawn_command);
 }
 
-bool RegistryObject::remove(std::string const& scope_name)
+bool RegistryObject::remove_local_scope(std::string const& scope_name)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    return p->remove(scope_name);
+    return p->remove_local_scope(scope_name);
+}
+
+void RegistryObject::set_remote_scopes(MetadataMap&& remote_scopes)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    p->set_remote_scopes(move(remote_scopes));
 }
 
 ScopeProxy RegistryObject::locate(std::string const& scope_name)

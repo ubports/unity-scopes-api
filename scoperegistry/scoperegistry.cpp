@@ -20,6 +20,7 @@
 #include "SignalThread.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
@@ -71,14 +72,77 @@ string strip_suffix(string const& s, string const& suffix)
     return s;
 }
 
-// For each scope, open the config file for each scope, create the metadata info from the config,
+// Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
+// If a Canonical scope is overrideable and the OEM has configured a scope with the
+// same name, the OEM scope overrides the Canonical one.
+
+map<string, string> find_local_scopes(string const& scope_installdir, string const& oem_installdir)
+{
+    // Look in scope_installdir for scope configuration files.
+    // Scopes that do not permit themselves to be overridden are collected in fixed_scopes.
+    // Scopes that can be overridden are collected in overrideable_scopes.
+    // Each set contains file names (including the ".ini" suffix).
+
+    map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
+    map<string, string> overrideable_scopes;    // Scopes that the OEM can override
+
+    auto config_files = find_scope_config_files(scope_installdir, ".ini");
+    for (auto path : config_files)
+    {
+        string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
+        string scope_name = strip_suffix(file_name, ".ini");
+        try
+        {
+            ScopeConfig config(path);
+            if (config.overrideable())
+            {
+                overrideable_scopes[scope_name] = path;
+            }
+            else
+            {
+                fixed_scopes[scope_name] = path;
+            }
+        }
+        catch (unity::Exception const& e)
+        {
+            error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.what());
+        }
+    }
+
+    map<string, string> oem_scopes;             // Additional scopes provided by the OEM (including overriding ones)
+    if (!oem_installdir.empty())
+    {
+        auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
+        for (auto path : oem_paths)
+        {
+            string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
+            string scope_name = strip_suffix(file_name, ".ini");
+            if (fixed_scopes.find(scope_name) == fixed_scopes.end())
+            {
+                overrideable_scopes.erase(scope_name);                // Only keep scopes that are not overridden by OEM
+                oem_scopes[scope_name] = path;
+            }
+            else
+            {
+                error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
+            }
+        }
+    }
+
+    // Combine fixed_scopes and overrideable scopes now.
+    // overrideable_scopes only contains scopes that were *not* overridden by the OEM.
+    fixed_scopes.insert(overrideable_scopes.begin(), overrideable_scopes.end());
+    return fixed_scopes;
+}
+
+// For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
-void populate_registry(RegistryObject::SPtr const& registry,
-                       map<string, string> const& all_scopes,
-                       MiddlewareBase::SPtr const& mw,
-                       string const& scoperunner_path,
-                       string const& config_file)
+void add_local_scopes(RegistryObject::SPtr const& registry,
+                      map<string, string> const& all_scopes,
+                      MiddlewareBase::SPtr const& mw,
+                      string const& scoperunner_path,
+                      string const& config_file)
 {
     for (auto pair : all_scopes)
     {
@@ -124,7 +188,7 @@ void populate_registry(RegistryObject::SPtr const& registry,
             spawn_command.push_back(scoperunner_path);
             spawn_command.push_back(config_file);
             spawn_command.push_back(pair.second);
-            registry->add(pair.first, move(meta), spawn_command);
+            registry->add_local_scope(pair.first, move(meta), spawn_command);
             // FIXME, HACK HACK HACK HACK
             // The middleware should spawn scope processes with lookup() on demand.
             // Because it currently does not have the plumbing, we start every scope immediately.
@@ -133,9 +197,20 @@ void populate_registry(RegistryObject::SPtr const& registry,
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.to_string());
+            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.what());
         }
     }
+}
+
+// Overwrite any remote scopes loaded previously with the current ones.
+
+void load_remote_scopes(RegistryObject::SPtr const& registry,
+                        MiddlewareBase::SPtr const& mw,
+                        string const& ss_reg_id,
+                        string const& ss_reg_endpoint)
+{
+    auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
+    registry->set_remote_scopes(ss_reg->list());
 }
 
 } // namespace
@@ -163,6 +238,8 @@ main(int argc, char* argv[])
         string scope_installdir;
         string oem_installdir;
         string scoperunner_path;
+        string ss_reg_id;
+        string ss_reg_endpoint;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
@@ -171,90 +248,37 @@ main(int argc, char* argv[])
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
             scoperunner_path = c.scoperunner_path();
+            ss_reg_id = c.ss_registry_identity();
+            ss_reg_endpoint = c.ss_registry_endpoint();
         } // Release memory for config parser
-
-        // Look in scope_installdir for scope configuration files.
-        // Scopes that do not permit themselves to be overridden are collected in fixed_scopes.
-        // Scopes that can be overridden are collected in overrideable_scopes.
-        // Each set contains file names (including the ".ini" suffix).
-
-        map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
-        map<string, string> overrideable_scopes;    // Scopes that the OEM can override
-
-        auto config_files = find_scope_config_files(scope_installdir, ".ini");
-        for (auto path : config_files)
-        {
-            string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-            string scope_name = strip_suffix(file_name, ".ini");
-            try
-            {
-                ScopeConfig config(path);
-                if (config.overrideable())
-                {
-                    overrideable_scopes[scope_name] = path;
-                }
-                else
-                {
-                    fixed_scopes[scope_name] = path;
-                }
-            }
-            catch (unity::Exception const& e)
-            {
-                error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.to_string());
-            }
-        }
-
-        map<string, string> oem_scopes;             // Additional scopes provided by the OEM (including overriding ones)
-        if (!oem_installdir.empty())
-        {
-            auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
-            for (auto path : oem_paths)
-            {
-                string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-                string scope_name = strip_suffix(file_name, ".ini");
-                if (fixed_scopes.find(scope_name) == fixed_scopes.end())
-                {
-                    overrideable_scopes.erase(scope_name);                // Only keep scopes that are not overridden by OEM
-                    oem_scopes[scope_name] = path;
-                }
-                else
-                {
-                    error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
-                }
-            }
-        }
-
-        // Combine fixed_scopes and overrideable scopes now.
-        // overrideable_scopes only contains scopes that were *not* overridden by the OEM.
-        map<string, string> all_scopes;
-        all_scopes.insert(overrideable_scopes.begin(), overrideable_scopes.end());
-        all_scopes.insert(fixed_scopes.begin(), fixed_scopes.end());
-
-        // Clear memory for original maps.
-        map<string, string>().swap(fixed_scopes);
-        map<string, string>().swap(overrideable_scopes);
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-        // Add the registry implementation to the middleware.
+        // The registry object stores the local and remote scopes
         RegistryObject::SPtr registry(new RegistryObject);
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
         // they look for another scope in the registry.
-        populate_registry(registry, all_scopes, middleware, scoperunner_path, config_file);
+        auto local_scopes = find_local_scopes(scope_installdir, oem_installdir);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file);
+        if (ss_reg_id.empty() || ss_reg_endpoint.empty())
+        {
+            error("no remote registry configured, only local scopes will be available");
+        }
+        else
+        {
+            load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
+        }
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
 
-        // Wait until we are done.
+        // Wait until we are done (never, really, because the registry has no way to shut down other than
+        // being killed by signal).
         middleware->wait_for_shutdown();
         exit_status = 0;
-    }
-    catch (unity::Exception const& e)
-    {
-        error(e.to_string());
     }
     catch (std::exception const& e)
     {

@@ -49,9 +49,11 @@ public:
     virtual MetadataMap list() override;
     virtual ScopeProxy locate(std::string const& scope_name) override;
 
-    bool add(std::string const& scope_name, ScopeMetadata const& scope,
-             std::vector<std::string> const& spawn_command);
-    bool remove(std::string const& scope_name);
+    // Local methods
+    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
+                         std::vector<std::string> const& spawn_command);
+    bool remove_local_scope(std::string const& scope_name);
+    void set_remote_scopes(MetadataMap&& remote_scopes);
 
 private:
     RegistryObjectPrivate* p;
