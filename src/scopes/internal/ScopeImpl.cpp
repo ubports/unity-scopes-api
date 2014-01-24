@@ -165,7 +165,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->preview(result, hints, rp);
+        ctrl = fwd()->preview(result.p->activation_target(), hints, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

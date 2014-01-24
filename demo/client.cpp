@@ -364,7 +364,15 @@ int main(int argc, char* argv[])
             {
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
-                meta.proxy()->preview(*result, vm, preview_reply);
+                auto target_scope = result->activation_scope_name();
+                ScopeProxy proxy;
+                if (target_scope != meta.scope_name()) // if activation scope is different than current, get the right proxy
+                {
+                    meta = r->get_metadata(target_scope);
+                }
+                proxy = meta.proxy();
+                cout << "\tactivation scope name: " << target_scope << endl;
+                proxy->preview(*result, vm, preview_reply);
                 preview_reply->wait_until_finished();
             }
         }

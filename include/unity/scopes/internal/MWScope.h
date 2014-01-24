@@ -23,7 +23,6 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/Result.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -31,7 +30,6 @@ namespace unity
 
 namespace scopes
 {
-class Result;
 
 namespace internal
 {
@@ -44,7 +42,7 @@ public:
     virtual QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy activate_preview_action(VariantMap const& result, VariantMap const& hints, std::string const& action_id, MWReplyProxy const& reply) = 0;
-    virtual QueryCtrlProxy preview(Result const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual QueryCtrlProxy preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
 
 protected:
     MWScope(MiddlewareBase* mw_base);
