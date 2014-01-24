@@ -69,6 +69,7 @@ Query (returned by serialize())
  'scope'         : string
  'query_string'  : string
  'department_id' : string
+ 'filter_state'  : dictionary (serialized FilterState)
  
 Link (returned by serialize())
 ==============================
