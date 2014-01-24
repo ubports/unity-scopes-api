@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     middleware->add_registry_object(runtime->registry_identity(), registry);
 
     // Instantiate a SS scope object
-    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(runtime.get(), registry));
+    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(middleware, registry));
 
     // Add the SS scope object to the middleware
     middleware->add_dflt_scope_object(std::move(scope));

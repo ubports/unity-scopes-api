@@ -45,7 +45,7 @@ class SSQueryObject : public QueryObjectBase
 public:
     UNITY_DEFINES_PTRS(SSQueryObject);
 
-    SSQueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply);
+    SSQueryObject();
     virtual ~SSQueryObject() noexcept;
 
     // Remote operation implementations

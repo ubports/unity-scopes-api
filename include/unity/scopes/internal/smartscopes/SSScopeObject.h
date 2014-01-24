@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 
+#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/QueryBase.h>
@@ -44,7 +45,7 @@ class SSScopeObject final : public ScopeObjectBase
 public:
   UNITY_DEFINES_PTRS(SSScopeObject);
 
-  SSScopeObject(RuntimeImpl* runtime, SSRegistryObject::SPtr registry);
+  SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
   virtual ~SSScopeObject() noexcept;
 
   // Remote operation implementations
@@ -70,13 +71,13 @@ public:
                            InvokeInfo const& info) override;
 
 private:
-  MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
-      std::function<QueryBase::SPtr(void)> const& query_factory_fun,
-      std::function<QueryObjectBase::SPtr(QueryBase::SPtr)> const& query_object_factory_fun);
+  MWQueryCtrlProxy query(MWReplyProxy const& reply,
+      std::function<QueryBase::SPtr(void)> const& query_factory_fun);
 
 private:
-  RuntimeImpl* const runtime_;
-  SSRegistryObject::SPtr registry_;
+  QueryCtrlObject::SPtr co_;
+  QueryObjectBase::SPtr qo_;
+
   std::unique_ptr<SmartScope> const smartscope_;
 };
 

@@ -38,12 +38,23 @@ namespace internal
 namespace smartscopes
 {
 
-SSScopeObject::SSScopeObject(RuntimeImpl* runtime, SSRegistryObject::SPtr registry) :
-  runtime_(runtime),
-  registry_(registry),
-  smartscope_(new SmartScope(registry_))
+SSScopeObject::SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry) :
+  co_(std::make_shared<QueryCtrlObject>()),
+  qo_(std::make_shared<SSQueryObject>()),
+  smartscope_(new SmartScope(registry))
 {
-  assert(runtime);
+  // Connect the query ctrl to the middleware.
+  middleware->add_dflt_query_ctrl_object(co_);
+
+  // Connect the query object to the middleware.
+  middleware->add_dflt_query_object(qo_);
+
+  // We tell the ctrl what the query facade is
+  co_->set_query(qo_);
+
+  // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
+  // count high until the run() request arrives in the query via the middleware.
+  qo_->set_self(qo_);
 }
 
 SSScopeObject::~SSScopeObject() noexcept
@@ -55,12 +66,9 @@ MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
-  return query(reply, info.mw,
+  return query(reply,
                [&q, &hints, &info, this]() -> QueryBase::SPtr {
                  return this->smartscope_->create_query(info.id, q, hints);
-               },
-               [&reply](QueryBase::SPtr query_base) -> QueryObjectBase::SPtr {
-                 return std::make_shared<SSQueryObject>(query_base, reply);
                });
 }
 
@@ -102,9 +110,8 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
   return MWQueryCtrlProxy();
 }
 
-MWQueryCtrlProxy SSScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
-                                      std::function<QueryBase::SPtr()> const& query_factory_fun,
-                                      std::function<QueryObjectBase::SPtr(QueryBase::SPtr)> const& query_object_factory_fun)
+MWQueryCtrlProxy SSScopeObject::query(MWReplyProxy const& reply,
+                                      std::function<QueryBase::SPtr()> const& query_factory_fun)
 {
   if (!reply)
   {
@@ -130,25 +137,7 @@ MWQueryCtrlProxy SSScopeObject::query(MWReplyProxy const& reply, MiddlewareBase*
 
   try
   {
-    // Instantiate the query ctrl and connect it to the middleware.
-    QueryCtrlObject::SPtr co(std::make_shared<QueryCtrlObject>());
-    mw_base->add_dflt_query_ctrl_object(co);
-
-    // Instantiate the query. We tell it what the ctrl is so,
-    // when the query completes, it can tell the ctrl object
-    // to destroy itself.
-    QueryObjectBase::SPtr qo(query_object_factory_fun(query_base));
-    mw_base->add_dflt_query_object(qo);
-
-    // We tell the ctrl what the query facade is so, when cancel() is sent
-    // to the ctrl, it can forward it to the facade.
-    co->set_query(qo);
-
-    // Start the query. We call via the middleware, which calls
-    // the run() implementation in a different thread, so we cannot block here.
-    // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-    // count high until the run() request arrives in the query via the middleware.
-    qo->set_self(qo);
+    ///! add query base and reply to QO
   }
   catch (std::exception const& e)
   {
