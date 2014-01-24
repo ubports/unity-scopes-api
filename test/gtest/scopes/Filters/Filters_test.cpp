@@ -77,7 +77,6 @@ void scope_thread()
     rt->run_scope(&scope);
 }
 
-// does actual activation with a test scope
 TEST(Filters, scope)
 {
     // parent: connect to scope and run a query

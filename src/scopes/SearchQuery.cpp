@@ -44,6 +44,25 @@ QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
     return p->create_subquery(scope, query_string, hints, reply);
 }
 
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            std::string const& query_string,
+                                            FilterState const& filter_state,
+                                            VariantMap const& hints,
+                                            SearchListener::SPtr const& reply)
+{
+    return p->create_subquery(scope, query_string, filter_state, hints, reply);
+}
+
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            std::string const& query_string,
+                                            std::string const& department_id,
+                                            FilterState const& filter_state,
+                                            VariantMap const& hints,
+                                            SearchListener::SPtr const& reply)
+{
+    return p->create_subquery(scope, query_string, department_id, filter_state, hints, reply);
+}
+
 } // namespace scopes
 
 } // namespace unity
