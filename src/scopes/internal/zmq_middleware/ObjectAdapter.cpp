@@ -61,7 +61,7 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     assert(pool_size >= 1);
 }
 
-ObjectAdapter::~ObjectAdapter() noexcept
+ObjectAdapter::~ObjectAdapter()
 {
     try
     {

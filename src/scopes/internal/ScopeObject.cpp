@@ -54,7 +54,7 @@ ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
     assert(scope_base);
 }
 
-ScopeObject::~ScopeObject() noexcept
+ScopeObject::~ScopeObject()
 {
 }
 

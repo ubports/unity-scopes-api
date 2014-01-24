@@ -42,7 +42,7 @@ ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> con
 {
 }
 
-ActivationQueryObject::~ActivationQueryObject() noexcept
+ActivationQueryObject::~ActivationQueryObject()
 {
     // parent destructor will call ctrl_->destroy()
 }

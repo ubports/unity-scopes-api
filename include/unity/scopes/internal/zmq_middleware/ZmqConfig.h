@@ -36,7 +36,7 @@ public:
     static const char* ZMQ_CONFIG_GROUP;
 
     ZmqConfig(std::string const& configfile);
-    ~ZmqConfig() noexcept;
+    ~ZmqConfig();
 
     std::string public_dir() const;
     std::string private_dir() const;

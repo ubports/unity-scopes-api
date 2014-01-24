@@ -129,7 +129,7 @@ class UNITY_API ScopeBase
 public:
     /// @cond
     NONCOPYABLE(ScopeBase);
-    virtual ~ScopeBase() noexcept;
+    virtual ~ScopeBase();
     /// @endcond
 
     /**

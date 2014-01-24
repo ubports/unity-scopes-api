@@ -62,7 +62,7 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(timeout >= -1);
 }
 
-ZmqObjectProxy::~ZmqObjectProxy() noexcept
+ZmqObjectProxy::~ZmqObjectProxy()
 {
 }
 

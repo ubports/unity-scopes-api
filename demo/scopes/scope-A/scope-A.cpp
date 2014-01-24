@@ -43,7 +43,7 @@ public:
     {
     }
 
-    ~MyQuery() noexcept
+    ~MyQuery()
     {
     }
 
@@ -82,7 +82,7 @@ public:
     {
     }
 
-    ~MyPreview() noexcept
+    ~MyPreview()
     {
     }
 

@@ -37,7 +37,7 @@ class UNITY_API ObjectProxy
 {
 public:
     ObjectProxy();
-    virtual ~ObjectProxy() noexcept;
+    virtual ~ObjectProxy();
 
     std::string endpoint() const;
     std::string identity() const;

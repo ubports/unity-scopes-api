@@ -31,7 +31,7 @@ ScopeBase::ScopeBase()
 {
 }
 
-ScopeBase::~ScopeBase() noexcept
+ScopeBase::~ScopeBase()
 {
 }
 

@@ -73,7 +73,7 @@ RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
 {
 }
 
-RegistryI::~RegistryI() noexcept
+RegistryI::~RegistryI()
 {
 }
 

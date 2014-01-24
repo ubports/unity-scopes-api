@@ -53,7 +53,7 @@ public:
                    std::string const& category,
                    RequestMode mode,
                    int64_t timeout = -1);
-    virtual ~ZmqObjectProxy() noexcept;
+    virtual ~ZmqObjectProxy();
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 

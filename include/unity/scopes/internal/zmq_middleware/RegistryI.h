@@ -45,7 +45,7 @@ class RegistryI : public ServantBase
 {
 public:
     RegistryI(RegistryObjectBase::SPtr const& ro);
-    virtual ~RegistryI() noexcept;
+    virtual ~RegistryI();
 
 private:
     virtual void get_metadata_(Current const& current,

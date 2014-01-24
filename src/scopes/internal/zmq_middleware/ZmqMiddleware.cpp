@@ -76,7 +76,7 @@ catch (zmqpp::exception const& e)
     rethrow_zmq_ex(e);
 }
 
-ZmqMiddleware::~ZmqMiddleware() noexcept
+ZmqMiddleware::~ZmqMiddleware()
 {
     try
     {

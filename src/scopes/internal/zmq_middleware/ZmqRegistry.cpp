@@ -74,7 +74,7 @@ ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base,
 {
 }
 
-ZmqRegistry::~ZmqRegistry() noexcept
+ZmqRegistry::~ZmqRegistry()
 {
 }
 

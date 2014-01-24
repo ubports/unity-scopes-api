@@ -46,7 +46,7 @@ public:
                 std::string const& identity,
                 std::string const& category,
                 int64_t timeout);
-    virtual ~ZmqRegistry() noexcept;
+    virtual ~ZmqRegistry();
 
     // Remote operations.
     virtual ScopeMetadata get_metadata(std::string const& scope_name) override;

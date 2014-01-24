@@ -41,7 +41,7 @@ RegistryException::RegistryException(RegistryException const&) = default;
 RegistryException& RegistryException::operator=(RegistryException const&) = default;
 
 
-RegistryException::~RegistryException() noexcept = default;
+RegistryException::~RegistryException() = default;
 
 //! @endcond
 

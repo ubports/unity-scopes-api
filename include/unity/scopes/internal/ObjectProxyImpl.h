@@ -35,7 +35,7 @@ class ObjectProxyImpl
 {
 public:
     ObjectProxyImpl(MWProxy const& mw_proxy);
-    virtual ~ObjectProxyImpl() noexcept;
+    virtual ~ObjectProxyImpl();
 
     virtual std::string identity() const;
     virtual std::string endpoint() const;

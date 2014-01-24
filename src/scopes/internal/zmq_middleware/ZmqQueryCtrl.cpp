@@ -49,7 +49,7 @@ ZmqQueryCtrl::ZmqQueryCtrl(ZmqMiddleware* mw_base, string const& endpoint, strin
 {
 }
 
-ZmqQueryCtrl::~ZmqQueryCtrl() noexcept
+ZmqQueryCtrl::~ZmqQueryCtrl()
 {
 }
 

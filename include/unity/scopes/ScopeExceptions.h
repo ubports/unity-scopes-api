@@ -42,7 +42,7 @@ public:
     //! @cond
     MiddlewareException(MiddlewareException const&);
     MiddlewareException& operator=(MiddlewareException const&);
-    virtual ~MiddlewareException() noexcept;
+    virtual ~MiddlewareException();
     //! @endcond
 
     /**
@@ -124,7 +124,7 @@ public:
     //! @cond
     ConfigException(ConfigException const&);
     ConfigException& operator=(ConfigException const&);
-    virtual ~ConfigException() noexcept;
+    virtual ~ConfigException();
     //! @endcond
 
     /**
@@ -149,7 +149,7 @@ public:
     //! @cond
     NotFoundException(NotFoundException const&);
     NotFoundException& operator=(NotFoundException const&);
-    virtual ~NotFoundException() noexcept;
+    virtual ~NotFoundException();
     //! @endcond
 
     /**

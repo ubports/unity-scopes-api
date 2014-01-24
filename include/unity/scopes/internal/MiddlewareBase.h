@@ -54,7 +54,7 @@ public:
     UNITY_DEFINES_PTRS(MiddlewareBase);
 
     MiddlewareBase(RuntimeImpl* runtime);
-    virtual ~MiddlewareBase() noexcept;
+    virtual ~MiddlewareBase();
 
     virtual void start() = 0;
     virtual void stop() = 0;

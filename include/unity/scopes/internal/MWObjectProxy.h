@@ -38,7 +38,7 @@ class MiddlewareBase;
 class MWObjectProxy
 {
 public:
-    virtual ~MWObjectProxy() noexcept;
+    virtual ~MWObjectProxy();
 
     virtual MiddlewareBase* mw_base() const noexcept = 0;
 

@@ -34,7 +34,7 @@ MWRegistry::MWRegistry(MiddlewareBase* mw_base) :
 {
 }
 
-MWRegistry::~MWRegistry() noexcept
+MWRegistry::~MWRegistry()
 {
 }
 

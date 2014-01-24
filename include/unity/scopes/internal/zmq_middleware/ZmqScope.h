@@ -43,7 +43,7 @@ public:
              std::string const& identity,
              std::string const& category,
              int64_t timeout);
-    virtual ~ZmqScope() noexcept;
+    virtual ~ZmqScope();
 
     virtual QueryCtrlProxy create_query(std::string const& q,
                                         VariantMap const& hints,

@@ -67,7 +67,7 @@ public:
     \brief Destroys a Scope.
     Destroying a Scope has no effect on any query that might still be in progress.
     */
-    virtual ~Scope() noexcept;
+    virtual ~Scope();
 
 protected:
     Scope(internal::ScopeImpl* impl);          // Instantiated only by ScopeImpl

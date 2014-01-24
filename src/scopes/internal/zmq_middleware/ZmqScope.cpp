@@ -68,7 +68,7 @@ ZmqScope::ZmqScope(ZmqMiddleware* mw_base,
 {
 }
 
-ZmqScope::~ZmqScope() noexcept
+ZmqScope::~ZmqScope()
 {
 }
 

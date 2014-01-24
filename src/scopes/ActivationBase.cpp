@@ -31,7 +31,7 @@ ActivationBase::ActivationBase() :
 {
 }
 
-ActivationBase::~ActivationBase() noexcept
+ActivationBase::~ActivationBase()
 {
 }
 
