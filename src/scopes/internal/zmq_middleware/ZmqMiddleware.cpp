@@ -66,7 +66,7 @@ try :
     server_name_(server_name),
     state_(Stopped),
     config_(configfile),
-    twoway_timeout_(400),  // TODO: get timeout from config
+    twoway_timeout_(300),  // TODO: get timeout from config
     locate_timeout_(1500)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
