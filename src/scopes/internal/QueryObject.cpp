@@ -59,7 +59,7 @@ QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
     assert(ctrl);
 }
 
-QueryObject::~QueryObject() noexcept
+QueryObject::~QueryObject()
 {
     assert(ctrl_);
     try

@@ -64,7 +64,7 @@ public:
                                    std::shared_ptr<SearchListener> const& reply);
 
     /// @cond
-    virtual ~SearchQuery() noexcept;
+    virtual ~SearchQuery();
     /// @endcond
 
 protected:

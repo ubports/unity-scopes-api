@@ -42,7 +42,7 @@ public:
                  std::string const& endpoint,
                  std::string const& identity,
                  std::string const& category);
-    virtual ~ZmqQueryCtrl() noexcept;
+    virtual ~ZmqQueryCtrl();
 
     virtual void cancel() override;
     virtual void destroy() override;

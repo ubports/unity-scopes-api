@@ -33,7 +33,7 @@ Scope::Scope(internal::ScopeImpl* impl) :
 {
 }
 
-Scope::~Scope() noexcept
+Scope::~Scope()
 {
 }
 

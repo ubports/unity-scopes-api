@@ -38,7 +38,7 @@ MWObjectProxy::MWObjectProxy(MiddlewareBase* mw_base) :
     assert(mw_base);
 }
 
-MWObjectProxy::~MWObjectProxy() noexcept
+MWObjectProxy::~MWObjectProxy()
 {
 }
 

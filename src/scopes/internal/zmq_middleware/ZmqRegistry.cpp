@@ -70,7 +70,7 @@ ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base, string const& endpoint, string 
 {
 }
 
-ZmqRegistry::~ZmqRegistry() noexcept
+ZmqRegistry::~ZmqRegistry()
 {
 }
 

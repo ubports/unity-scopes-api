@@ -34,7 +34,7 @@ MWScope::MWScope(MiddlewareBase* mw_base) :
 {
 }
 
-MWScope::~MWScope() noexcept
+MWScope::~MWScope()
 {
 }
 

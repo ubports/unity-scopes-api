@@ -45,7 +45,7 @@ public:
     /// @cond
     UNITY_DEFINES_PTRS(ActivationBase);
     ActivationBase();
-    virtual ~ActivationBase() noexcept;
+    virtual ~ActivationBase();
     /// @endcond
 
     /**

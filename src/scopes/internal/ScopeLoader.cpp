@@ -60,7 +60,7 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
     }
 }
 
-ScopeLoader::~ScopeLoader() noexcept
+ScopeLoader::~ScopeLoader()
 {
     try
     {

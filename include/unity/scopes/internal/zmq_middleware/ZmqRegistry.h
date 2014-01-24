@@ -45,7 +45,7 @@ public:
                 std::string const& endpoint,
                 std::string const& identity,
                 std::string const& category);
-    virtual ~ZmqRegistry() noexcept;
+    virtual ~ZmqRegistry();
 
     // Remote operations.
     virtual ScopeMetadata get_metadata(std::string const& scope_name) override;

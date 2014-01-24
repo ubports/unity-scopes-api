@@ -42,7 +42,7 @@ public:
         cerr << "MyQuery/" << query << " created" << endl;
     }
 
-    ~MyQuery() noexcept
+    ~MyQuery()
     {
         cerr << "MyQuery/" << query_ << " destroyed" << endl;
     }

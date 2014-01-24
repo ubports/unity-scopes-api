@@ -39,7 +39,7 @@ public:
     NONCOPYABLE(ActivationListener);
     UNITY_DEFINES_PTRS(ActivationListener);
 
-    ~ActivationListener() noexcept;
+    ~ActivationListener();
     /// @endcond
 
     /**

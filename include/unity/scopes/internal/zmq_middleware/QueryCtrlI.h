@@ -39,7 +39,7 @@ class QueryCtrlI : public ServantBase
 {
 public:
     QueryCtrlI(QueryCtrlObjectBase::SPtr const& qo);
-    virtual ~QueryCtrlI() noexcept;
+    virtual ~QueryCtrlI();
 
 private:
     virtual void cancel_(Current const& current,

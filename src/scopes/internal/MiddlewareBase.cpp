@@ -37,7 +37,7 @@ MiddlewareBase::MiddlewareBase(RuntimeImpl* runtime) :
     assert(runtime);
 }
 
-MiddlewareBase::~MiddlewareBase() noexcept
+MiddlewareBase::~MiddlewareBase()
 {
 }
 

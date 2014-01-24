@@ -108,7 +108,7 @@ public:
     The destructor implicitly calls destroy() if the application code does not explicitly destroy the instance.
     You _must not_ permit a Runtime instance to persist beyond the end of `main()`; doing so has undefined behavior.
     */
-    ~Runtime() noexcept;
+    ~Runtime();
 
 private:
     Runtime(std::string const& scope_name, std::string const& configfile); // Instantiation only via create()

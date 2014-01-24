@@ -41,7 +41,7 @@ PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, Ru
 {
 }
 
-PreviewReplyObject::~PreviewReplyObject() noexcept
+PreviewReplyObject::~PreviewReplyObject()
 {
 }
 

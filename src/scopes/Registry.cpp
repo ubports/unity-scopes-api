@@ -33,7 +33,7 @@ Registry::Registry(internal::RegistryImpl* impl) :
 {
 }
 
-Registry::~Registry() noexcept
+Registry::~Registry()
 {
 }
 

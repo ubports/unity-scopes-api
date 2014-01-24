@@ -46,7 +46,7 @@ ConfigBase::ConfigBase(string const& configfile) :
     }
 }
 
-ConfigBase::~ConfigBase() noexcept
+ConfigBase::~ConfigBase()
 {
 }
 

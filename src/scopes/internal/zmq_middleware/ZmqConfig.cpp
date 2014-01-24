@@ -52,7 +52,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     }
 }
 
-ZmqConfig::~ZmqConfig() noexcept
+ZmqConfig::~ZmqConfig()
 {
 }
 

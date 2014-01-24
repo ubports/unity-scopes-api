@@ -45,7 +45,7 @@ public:
     UNITY_DEFINES_PTRS(MiddlewareFactory);
 
     MiddlewareFactory(RuntimeImpl* runtime);
-    ~MiddlewareFactory() noexcept;
+    ~MiddlewareFactory();
 
     // Returns the middleware with the given name and kind. If that middleware hasn't been created yet,
     // it is created first.

@@ -52,7 +52,7 @@ ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::st
     assert(runtime);
 }
 
-ScopeImpl::~ScopeImpl() noexcept
+ScopeImpl::~ScopeImpl()
 {
 }
 

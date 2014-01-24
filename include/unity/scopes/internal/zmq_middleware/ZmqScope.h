@@ -42,7 +42,7 @@ public:
              std::string const& endpoint,
              std::string const& identity,
              std::string const& category);
-    virtual ~ZmqScope() noexcept;
+    virtual ~ZmqScope();
 
     virtual QueryCtrlProxy create_query(std::string const& q,
                                         VariantMap const& hints,

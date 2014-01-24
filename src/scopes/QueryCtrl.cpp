@@ -33,7 +33,7 @@ QueryCtrl::QueryCtrl(internal::QueryCtrlImpl* impl)
 {
 }
 
-QueryCtrl::~QueryCtrl() noexcept
+QueryCtrl::~QueryCtrl()
 {
 }
 

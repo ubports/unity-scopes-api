@@ -44,7 +44,7 @@ ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::ite
 {
 }
 
-ReapItem::~ReapItem() noexcept
+ReapItem::~ReapItem()
 {
     // If we go out of scope, we remove ourselves from the reaper list. This
     // ensures that no more callbacks will be sent.
@@ -128,7 +128,7 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
     }
 }
 
-Reaper::~Reaper() noexcept
+Reaper::~Reaper()
 {
     destroy();
 }

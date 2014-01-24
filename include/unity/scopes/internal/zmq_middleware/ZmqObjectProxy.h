@@ -56,7 +56,7 @@ public:
                    std::string const& identity,
                    RequestType t,
                    std::string const& category);
-    virtual ~ZmqObjectProxy() noexcept;
+    virtual ~ZmqObjectProxy();
 
     virtual ZmqMiddleware* mw_base() const noexcept;
 

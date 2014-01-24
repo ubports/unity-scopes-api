@@ -42,7 +42,7 @@ public:
              std::string const& endpoint,
              std::string const& identity,
              std::string const& category);
-    virtual ~ZmqReply() noexcept;
+    virtual ~ZmqReply();
 
     virtual void push(VariantMap const& result) override;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
