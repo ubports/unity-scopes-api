@@ -16,12 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_INVOKEINFO_H
+#define UNITY_SCOPES_INTERNAL_INVOKEINFO_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
-#include <unity/scopes/internal/MWReply.h>
+#include <string>
 
 namespace unity
 {
@@ -32,23 +30,17 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
-{
+class MiddlewareBase;
 
-class ZmqReply : public virtual ZmqObjectProxy, public virtual MWReply
-{
-public:
-    ZmqReply(ZmqMiddleware* mw_base,
-             std::string const& endpoint,
-             std::string const& identity,
-             std::string const& category);
-    virtual ~ZmqReply() noexcept;
+// InvokeInfo is passed to all server-side implementation objects. It is intended
+// mainly for the implementation of default servants, which need to incarnate
+// different middleware object (that is, conceptual object) on a per-request basis.
 
-    virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+struct InvokeInfo
+{
+    std::string const& id;       // Identity of invocation target
+    MiddlewareBase*    mw;       // Middleware for this request
 };
-
-} // namespace zmq_middleware
 
 } // namespace internal
 

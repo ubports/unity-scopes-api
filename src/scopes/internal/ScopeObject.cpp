@@ -124,7 +124,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         catch (...)
         {
         }
-        cerr << "create_query(): " << e.what() << endl;
+        cerr << "query(): " << e.what() << endl;
         // TODO: log error
         throw;
     }
@@ -137,7 +137,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         catch (...)
         {
         }
-        cerr << "create_query(): unknown exception" << endl;
+        cerr << "query(): unknown exception" << endl;
         // TODO: log error
         throw;
     }
@@ -147,9 +147,9 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
-                                           MiddlewareBase* mw_base)
+                                           InvokeInfo const& info)
 {
-    return query(reply, mw_base,
+    return query(reply, info.mw,
             [&q, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->create_query(q, hints);
             },
@@ -162,9 +162,9 @@ MWQueryCtrlProxy ScopeObject::create_query(std::string const& q,
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                                            VariantMap const& hints,
                                            MWReplyProxy const& reply,
-                                           MiddlewareBase* mw_base)
+                                           InvokeInfo const& info)
 {
-    return query(reply, mw_base,
+    return query(reply, info.mw,
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->activate(result, hints);
             },
@@ -180,9 +180,9 @@ MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
                               VariantMap const& hints,
                               std::string const& action_id,
                               MWReplyProxy const &reply,
-                              MiddlewareBase* mw_base)
+                              InvokeInfo const& info)
 {
-    return query(reply, mw_base,
+    return query(reply, info.mw,
             [&result, &hints, &action_id, this]() -> QueryBase::SPtr {
                 return this->scope_base_->activate_preview_action(result, hints, action_id);
             },
@@ -197,9 +197,9 @@ MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                                       VariantMap const& hints,
                                       MWReplyProxy const& reply,
-                                      MiddlewareBase* mw_base)
+                                      InvokeInfo const& info)
 {
-    return query(reply, mw_base,
+    return query(reply, info.mw,
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->preview(result, hints);
             },

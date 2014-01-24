@@ -50,6 +50,7 @@ public:
     ZmqObjectProxy(ZmqMiddleware* mw_base,
                    std::string const& endpoint,
                    std::string const& identity,
+                   std::string const& category,
                    RequestMode mode,
                    int64_t timeout = -1);
     virtual ~ZmqObjectProxy() noexcept;
@@ -58,8 +59,9 @@ public:
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
-    virtual int64_t timeout() const override;
+    std::string category() const;
     RequestMode mode() const;
+    virtual int64_t timeout() const noexcept override;
 
     // Remote operation
     virtual void ping() override;
@@ -72,8 +74,9 @@ protected:
 private:
     std::string endpoint_;
     std::string identity_;
-    int64_t timeout_;
+    std::string category_;
     RequestMode mode_;
+    int64_t timeout_;
 };
 
 } // namespace zmq_middleware

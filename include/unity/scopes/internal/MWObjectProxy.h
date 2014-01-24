@@ -44,7 +44,7 @@ public:
 
     virtual std::string identity() const = 0;
     virtual std::string endpoint() const = 0;
-    virtual int64_t timeout() const = 0;
+    virtual int64_t timeout() const noexcept = 0;
 
     // Remote operation
     virtual void ping() = 0;

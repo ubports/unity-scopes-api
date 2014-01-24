@@ -46,18 +46,20 @@ namespace zmq_middleware
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
                                string const& endpoint,
                                string const& identity,
+                               string const& category,
                                RequestMode m,
                                int64_t timeout) :
     MWObjectProxy(mw_base),
     endpoint_(endpoint),
     identity_(identity),
-    timeout_(timeout),
-    mode_(m)
+    category_(category),
+    mode_(m),
+    timeout_(timeout)
 {
     assert(!endpoint.empty());
     assert(!identity.empty());
-    assert(timeout >= -1);
     assert(m != Unknown);
+    assert(timeout >= -1);
 }
 
 ZmqObjectProxy::~ZmqObjectProxy() noexcept
@@ -79,7 +81,12 @@ string ZmqObjectProxy::identity() const
     return identity_;
 }
 
-int64_t ZmqObjectProxy::timeout() const
+string ZmqObjectProxy::category() const
+{
+    return category_;
+}
+
+int64_t ZmqObjectProxy::timeout() const noexcept
 {
     return timeout_;
 }

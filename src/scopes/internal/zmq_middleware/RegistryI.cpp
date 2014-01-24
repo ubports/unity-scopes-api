@@ -131,6 +131,7 @@ void RegistryI::locate_(Current const&,
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
         auto proxy = locate_response.initReturnValue();
         proxy.setIdentity(scope_proxy->identity());
+        proxy.setCategory("Scope");
         proxy.setEndpoint(scope_proxy->endpoint());
         proxy.setTimeout(scope_proxy->timeout());
     }

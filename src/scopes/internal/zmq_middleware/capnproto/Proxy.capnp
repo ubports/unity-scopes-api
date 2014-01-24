@@ -31,10 +31,14 @@ $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto");
 #
 # The identity can be anything. It must be unique withing the corresponding endpoint. The identity
 # determines the target object of a message sent via the proxy.
+#
+# The category is normally empty. For default servants, the category is used to identify the type
+# of the target object, such as "Scope", "Reply", etc.
 
 struct Proxy
 {
     endpoint @0 : Text;
     identity @1 : Text;
-    timeout  @2 : Int64;  # timeout for twoway proxies in milliseconds, -1 == wait forever
+    category @2 : Text;
+    timeout  @3 : Int64;  # timeout for twoway proxies in milliseconds, -1 == wait forever
 }

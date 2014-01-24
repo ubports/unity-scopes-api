@@ -68,6 +68,10 @@ public:
     void remove(std::string const& id);
     std::shared_ptr<ServantBase> find(std::string const& id) const;
 
+    void add_dflt_servant(std::string const& category, std::shared_ptr<ServantBase> const& obj);
+    void remove_dflt_servant(std::string const& category);
+    std::shared_ptr<ServantBase> find_dflt_servant(std::string const& id) const;
+
     void activate();
     void shutdown();
     void wait_for_shutdown();
@@ -93,6 +97,8 @@ private:
     void stop_workers() noexcept;
 
     void safe_bind(zmqpp::socket& s, std::string const& endpoint);
+
+    std::shared_ptr<ServantBase> find_servant(std::string const& id, std::string const& category);
 
     // Thread start functions
     void broker_thread();
@@ -125,6 +131,7 @@ private:
     // Map of object identity and servant pairs
     typedef std::unordered_map<std::string, std::shared_ptr<ServantBase>> ServantMap;
     ServantMap servants_;
+    ServantMap dflt_servants_;
     mutable std::mutex map_mutex_;
 };
 

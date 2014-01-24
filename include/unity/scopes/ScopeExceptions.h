@@ -52,6 +52,40 @@ public:
 };
 
 /**
+\brief Exception to indicate that a (twoway) request was sent to an
+       object with an unknown identity.
+*/
+
+class UNITY_API ObjectNotExistException : public virtual MiddlewareException
+{
+public:
+    /**
+    \brief Constructs the exception.
+    \param reason Further details about the cause of the exception.
+    \param id The identity of the unknown object.
+    */
+    explicit ObjectNotExistException(std::string const& reason, std::string const& id);
+    //! @cond
+    ObjectNotExistException(ObjectNotExistException const&);
+    ObjectNotExistException& operator=(ObjectNotExistException const&);
+    virtual ~ObjectNotExistException() noexcept;
+    //! @endcond
+
+    /**
+    \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    */
+    virtual std::exception_ptr self() const override;
+
+    /**
+    \brief Returns the identity of the non-existent object.
+    */
+    virtual std::string id() const;
+
+private:
+    std::string id_;
+};
+
+/**
 \brief Exception to indicate that a twoway request timed out.
 */
 
@@ -79,7 +113,7 @@ public:
 \brief Exception to indicate that something went wrong with the contents of configuration files.
 */
 
-class UNITY_API ConfigException : public unity::Exception
+class UNITY_API ConfigException : public virtual unity::Exception
 {
 public:
     /**
@@ -103,7 +137,7 @@ public:
 \brief Exception to indicate that an object wasn't found by a lookup function.
 */
 
-class UNITY_API NotFoundException : public unity::Exception
+class UNITY_API NotFoundException : public virtual unity::Exception
 {
 public:
     /**

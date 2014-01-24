@@ -63,10 +63,12 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
+    virtual void add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
     virtual MWQueryProxy add_query_object(QueryObjectBase::SPtr const& query) override;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) override;
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) override;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) override;
+    virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
 
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool();
@@ -79,6 +81,10 @@ private:
                       std::shared_ptr<ObjectAdapter> const& adapter,
                       std::string const& identity,
                       std::shared_ptr<ServantBase> const& servant);
+
+    std::function<void()> safe_dflt_add(std::shared_ptr<ObjectAdapter> const& adapter,
+                                        std::string const& category,
+                                        std::shared_ptr<ServantBase> const& servant);
 
     std::string server_name_;
     zmqpp::context context_;
