@@ -20,19 +20,24 @@
 from glob import glob
 import sys, os
 
-def build_header(inc_root, outfile):
+def build_header(outfile, incroots):
     ofile = open(outfile, 'w')
-    headers = glob(os.path.join(inc_root, 'unity/scopes', '*.h'))
+    headers = []
+    for r in incroots:
+        headers += glob(os.path.join(r, 'unity/scopes', '*.h'))
+    headers = [os.path.split(f)[1] for f in headers]
     headers.sort()
+    ofile.write("#ifndef UNITY_SCOPES_H\n")
+    ofile.write("#define UNITY_SCOPES_H\n")
     for f in headers:
-        base = os.path.split(f)[1]
-        line = '#include<unity/scopes/%s>\n' % base
+        line = '#include<unity/scopes/%s>\n' % f
         ofile.write(line)
+    ofile.write("#endif\n")
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print(sys.argv[0], 'include_root outfile')
+    if len(sys.argv) <= 3:
+        print(sys.argv[0], 'outfile include_roots')
         sys.exit(1)
-    incroot = sys.argv[1]
-    outfile = sys.argv[2]
-    build_header(incroot, outfile)
+    outfile = sys.argv[1]
+    incroots = sys.argv[2:]
+    build_header(outfile, incroots)
