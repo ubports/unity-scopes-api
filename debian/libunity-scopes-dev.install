@@ -1,3 +1,4 @@
 usr/include/unity-scopes-0/unity/scopes/*
+usr/include/unity-scopes-0/unity-scopes.h
 usr/lib/*/libunity-scopes.so
 usr/lib/*/pkgconfig/*.pc
