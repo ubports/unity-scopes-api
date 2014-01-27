@@ -28,22 +28,40 @@ using namespace unity::scopes::internal;
 
 TEST(PreviewWidget, basic)
 {
+    {
+        PreviewWidget w("i1", "image");
+        w.add_attribute("foo", Variant(10));
+        w.add_component("boo", "bar");
+
+        EXPECT_EQ("i1", w.id());
+        EXPECT_EQ("image", w.widget_type());
+        EXPECT_EQ(1, w.attributes().size());
+        EXPECT_EQ(10, w.attributes()["foo"].get_int());
+        EXPECT_EQ(1, w.components().size());
+        EXPECT_EQ("bar", w.components()["boo"]);
+    }
+}
+
+TEST(PreviewWidget, to_json)
+{
     PreviewWidget w("i1", "image");
     w.add_attribute("foo", Variant(10));
     w.add_component("boo", "bar");
-
-    EXPECT_EQ("i1", w.id());
-    EXPECT_EQ("image", w.widget_type());
-    EXPECT_EQ(1, w.attributes().size());
-    EXPECT_EQ(10, w.attributes()["foo"].get_int());
-    EXPECT_EQ(1, w.components().size());
-    EXPECT_EQ("bar", w.components()["boo"]);
 
     internal::JsonCppNode node(w.data());
     EXPECT_EQ("i1", node.get_node("id")->as_string());
     EXPECT_EQ("image", node.get_node("type")->as_string());
     EXPECT_EQ(10, node.get_node("foo")->as_int());
     EXPECT_EQ("bar", node.get_node("components")->get_node("boo")->as_string());
+}
+
+TEST(PreviewWidget, from_json)
+{
+    PreviewWidget w(R"({"id": "i1", "type": "header", "title": "foo", "components": {"rating": "boo"}})"); // from json
+    EXPECT_EQ("i1", w.id());
+    EXPECT_EQ("header", w.widget_type());
+    EXPECT_EQ("foo", w.attributes()["title"].get_string());
+    EXPECT_EQ("boo", w.components()["rating"]);
 }
 
 TEST(PreviewWidget, exceptions)
