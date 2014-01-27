@@ -14,14 +14,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-
-#include <unity/scopes/Variant.h>
-#include <string>
-#include <tuple>
+#include <unity/scopes/VariantBuilder.h>
+#include <unity/scopes/internal/VariantBuilderImpl.h>
 
 namespace unity
 {
@@ -29,27 +25,28 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+VariantBuilder::VariantBuilder()
+    : p(new internal::VariantBuilderImpl())
 {
+}
 
-class VariantMapBuilderImpl final
+VariantBuilder::~VariantBuilder() = default;
+
+void VariantBuilder::add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {
-public:
-    VariantMapBuilderImpl() = default;
-    ~VariantMapBuilderImpl() = default;
-    void add_attribute(std::string const& key, Variant const& value);
-    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
-    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
-    VariantMap variant_map() const;
+    p->add_tuple(tuple);
+}
 
-private:
-    VariantMap variant_;
-};
+void VariantBuilder::add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple)
+{
+    p->add_tuple(tuple);
+}
 
-} // namespace internal
+VariantArray VariantBuilder::to_variant_array() const
+{
+    return p->to_variant_array();
+}
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

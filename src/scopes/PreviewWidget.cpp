@@ -18,7 +18,6 @@
 
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
-#include <unity/scopes/VariantMapBuilder.h>
 
 namespace unity
 {

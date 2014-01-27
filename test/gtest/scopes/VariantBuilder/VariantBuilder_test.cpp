@@ -16,27 +16,21 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <unity/scopes/VariantMapBuilder.h>
+#include <unity/scopes/VariantBuilder.h>
 #include <gtest/gtest.h>
 
 using namespace unity;
 using namespace unity::scopes;
 
-TEST(VariantMapBuilder, basic)
+TEST(VariantBuilder, basic)
 {
-    VariantMapBuilder builder;
-    // {
-    //    "foo" : "bar",
-    //    "mykey" : [{"a" : 1, b : 2}, {"c" : null, "d" : "xyz"}]
-    // }
-    builder.add_attribute("foo", Variant("bar"));
-    builder.add_tuple("mykey", {{"a", Variant(1)}, {"b", Variant(2)}});
-    builder.add_tuple("mykey", {{"c", Variant::null()}, {"d", Variant("xyz")}});
+    VariantBuilder builder;
+    // create an array of tuples:
+    //   [{"a" : 1, b : 2}, {"c" : null, "d" : "xyz"}]
+    builder.add_tuple({{"a", Variant(1)}, {"b", Variant(2)}});
+    builder.add_tuple({{"c", Variant::null()}, {"d", Variant("xyz")}});
 
-    auto var = builder.variant_map();
-    EXPECT_EQ(2, var.size());
-    EXPECT_EQ("bar", var["foo"].get_string());
-    auto arr = var["mykey"].get_array();
+    auto arr = builder.to_variant_array();
     EXPECT_EQ(2, arr.size());
     EXPECT_EQ(1, arr[0].get_dict()["a"].get_int());
     EXPECT_EQ(2, arr[0].get_dict()["b"].get_int());
