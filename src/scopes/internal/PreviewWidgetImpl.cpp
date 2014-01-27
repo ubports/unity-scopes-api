@@ -74,6 +74,8 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& id, std::string const &w
     : id_(id),
       type_(widget_type)
 {
+    throw_on_empty("id", id_);
+    throw_on_empty("widget_type", type_);
 }
 
 PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
@@ -83,28 +85,34 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'id'");
     }
-    id_ = it->second.get_string();
+    set_id(it->second.get_string());
 
     it = var.find("type");
     if (it == var.end())
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'type'");
     }
-    type_ = it->second.get_string();
+    set_widget_type(it->second.get_string());
 
     it = var.find("attributes");
     if (it == var.end())
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'attributes'");
     }
-    attributes_ = it->second.get_dict();
+    for (auto kv: it->second.get_dict())
+    {
+        add_attribute(kv.first, kv.second);
+    }
 
     it = var.find("components");
     if (it == var.end())
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'components'");
     }
-    components_ = it->second.get_dict();
+    for (auto kv: it->second.get_dict())
+    {
+        add_component(kv.first, kv.second.get_string());
+    }
 }
 
 PreviewWidget PreviewWidgetImpl::create(VariantMap const& var)
@@ -114,16 +122,22 @@ PreviewWidget PreviewWidgetImpl::create(VariantMap const& var)
 
 void PreviewWidgetImpl::set_id(std::string const& id)
 {
+    throw_on_empty("id", id);
     id_ = id;
 }
 
-void PreviewWidgetImpl::set_widget_type(std::string const &widget_type)
+void PreviewWidgetImpl::set_widget_type(std::string const& widget_type)
 {
+    throw_on_empty("widget_type", widget_type);
     type_ = widget_type;
 }
 
 void PreviewWidgetImpl::add_attribute(std::string const& key, Variant const& value)
 {
+    if (key == "id" || key == "type")
+    {
+        throw InvalidArgumentException("PreviewWidget::add_attribute(): Can't override attribute '" + key + "'");
+    }
     attributes_[key] = value;
 }
 
@@ -154,6 +168,14 @@ VariantMap PreviewWidgetImpl::components() const
 VariantMap PreviewWidgetImpl::attributes() const
 {
     return attributes_;
+}
+
+void PreviewWidgetImpl::throw_on_empty(std::string const& name, std::string const& value)
+{
+    if (value.empty())
+    {
+        throw InvalidArgumentException("PreviewWidget: required attribute " + name + " is empty");
+    }
 }
 
 VariantMap PreviewWidgetImpl::serialize() const

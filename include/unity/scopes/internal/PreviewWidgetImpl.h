@@ -36,7 +36,7 @@ class PreviewWidgetImpl
 {
 public:
     PreviewWidgetImpl(std::string const& json_text);
-    PreviewWidgetImpl(std::string const& id, std::string const &widget_type);
+    PreviewWidgetImpl(std::string const& id, std::string const& widget_type);
     PreviewWidgetImpl(VariantMap const& var);
 
     void set_id(std::string const& id);
@@ -53,6 +53,7 @@ public:
     static PreviewWidget create(VariantMap const& var);
 
 private:
+    static void throw_on_empty(std::string const& name, std::string const& value);
     std::string id_;
     std::string type_;
     VariantMap attributes_;
