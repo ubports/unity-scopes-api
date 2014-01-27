@@ -53,8 +53,6 @@ public:
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
 
-    void set_id(std::string const& id);
-    void set_widget_type(std::string const &id);
     void add_attribute(std::string const& key, Variant const& value);
     void add_component(std::string const& key, std::string const& field_name);
 

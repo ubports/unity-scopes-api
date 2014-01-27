@@ -49,9 +49,20 @@ TEST(PreviewWidget, basic)
 TEST(PreviewWidget, exceptions)
 {
     {
-        PreviewWidget w("a", "image");
-        EXPECT_THROW(w.set_id(""), unity::InvalidArgumentException);
-        EXPECT_THROW(w.set_widget_type(""), unity::InvalidArgumentException);
+        try
+        {
+            PreviewWidget w("", "image");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const&) {}
+    }
+    {
+        try
+        {
+            PreviewWidget w("id", "");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const&) {}
     }
     {
         PreviewWidget w("a", "image");
@@ -60,6 +71,8 @@ TEST(PreviewWidget, exceptions)
         EXPECT_THROW(w.add_component("id", "x"), unity::InvalidArgumentException);
         EXPECT_THROW(w.add_component("type", "x"), unity::InvalidArgumentException);
     }
+    VariantMap v;
+    v["af"] =m;
 }
 
 TEST(PreviewWidget, serialize)

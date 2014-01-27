@@ -65,16 +65,6 @@ VariantMap PreviewWidget::serialize() const
     return p->serialize();
 }
 
-void PreviewWidget::set_id(std::string const& id)
-{
-    p->set_id(id);
-}
-
-void PreviewWidget::set_widget_type(std::string const &widget_type)
-{
-    p->set_widget_type(widget_type);
-}
-
 void PreviewWidget::add_attribute(std::string const& key, Variant const& value)
 {
     p->add_attribute(key, value);
