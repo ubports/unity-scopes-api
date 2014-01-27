@@ -105,6 +105,11 @@ VariantMap PreviewWidget::attributes() const
     return p->attributes();
 }
 
+std::string PreviewWidget::data() const
+{
+    return p->data();
+}
+
 //! @endcond
 
 } // namespace scopes

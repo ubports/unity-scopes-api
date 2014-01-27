@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <gtest/gtest.h>
 
 using namespace unity::scopes;
@@ -37,6 +38,12 @@ TEST(PreviewWidget, basic)
     EXPECT_EQ(10, w.attributes()["foo"].get_int());
     EXPECT_EQ(1, w.components().size());
     EXPECT_EQ("bar", w.components()["boo"].get_string());
+
+    internal::JsonCppNode node(w.data());
+    EXPECT_EQ("i1", node.get_node("id")->as_string());
+    EXPECT_EQ("image", node.get_node("type")->as_string());
+    EXPECT_EQ(10, node.get_node("foo")->as_int());
+    EXPECT_EQ("bar", node.get_node("components")->get_node("boo")->as_string());
 }
 
 TEST(PreviewWidget, exceptions)

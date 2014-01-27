@@ -170,6 +170,22 @@ VariantMap PreviewWidgetImpl::attributes() const
     return attributes_;
 }
 
+std::string PreviewWidgetImpl::data() const
+{
+    VariantMap var;
+    var["id"] = id_;
+    var["type"] = type_;
+    var["components"] = components_;
+    for (auto kv: attributes_)
+    {
+        var[kv.first] = kv.second;
+    }
+
+    const Variant outer(var);
+    const internal::JsonCppNode node(outer);
+    return node.to_json_string();
+}
+
 void PreviewWidgetImpl::throw_on_empty(std::string const& name, std::string const& value)
 {
     if (value.empty())

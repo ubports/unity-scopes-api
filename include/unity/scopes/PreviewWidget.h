@@ -62,6 +62,7 @@ public:
     std::string widget_type() const;
     VariantMap components() const;
     VariantMap attributes() const;
+    std::string data() const;
 
     VariantMap serialize() const;
 
