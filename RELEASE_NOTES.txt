@@ -1,7 +1,7 @@
 Release Notes for unity-scopes-api
 ==================================
 
-Changes in version 0.2.5
+Changes in version 0.3.0
 ========================
 - Preliminary API for filters has been added via OptionSelectorFilter and
   FilterState classes. This part of the API is not yet supported by Unity shell
