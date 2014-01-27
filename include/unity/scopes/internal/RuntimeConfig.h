@@ -37,7 +37,7 @@ public:
     static const char* RUNTIME_CONFIG_GROUP;
 
     RuntimeConfig(std::string const& configfile);
-    ~RuntimeConfig() noexcept;
+    ~RuntimeConfig();
 
     std::string registry_identity() const;
     std::string registry_configfile() const;

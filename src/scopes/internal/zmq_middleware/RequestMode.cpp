@@ -16,10 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REQUESTTYPE_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REQUESTTYPE_H
+#include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 
-#include <string>
+using namespace std;
 
 namespace unity
 {
@@ -33,9 +32,10 @@ namespace internal
 namespace zmq_middleware
 {
 
-enum RequestType { Unknown, Oneway, Twoway };
-
-std::string to_string(RequestType);
+string to_string(RequestMode m)
+{
+    return m == RequestMode::Oneway ? "oneway" : "twoway";
+}
 
 } // namespace zmq_middleware
 
@@ -44,5 +44,3 @@ std::string to_string(RequestType);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/internal/PreviewWidgetImpl.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -41,7 +42,7 @@ PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, Ru
 {
 }
 
-PreviewReplyObject::~PreviewReplyObject() noexcept
+PreviewReplyObject::~PreviewReplyObject()
 {
 }
 
@@ -54,12 +55,7 @@ void PreviewReplyObject::process_data(VariantMap const& data)
         PreviewWidgetList list;
         for (unsigned i = 0; i < arr.size(); i++)
         {
-            if (arr[i].which() != Variant::Type::Dict) continue;
-            VariantMap inner(arr[i].get_dict());
-            auto json_it = inner.find("data");
-            if (json_it->second.which() != Variant::Type::String) continue;
-
-            list.emplace_back(PreviewWidget(json_it->second.get_string()));
+            list.emplace_back(PreviewWidgetImpl::create(arr[i].get_dict()));
         }
         receiver_->push(list);
     }

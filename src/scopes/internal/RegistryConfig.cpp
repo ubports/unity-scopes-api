@@ -57,7 +57,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     ss_registry_endpoint_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Endpoint");
 }
 
-RegistryConfig::~RegistryConfig() noexcept
+RegistryConfig::~RegistryConfig()
 {
 }
 

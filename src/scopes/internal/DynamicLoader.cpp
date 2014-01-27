@@ -71,7 +71,7 @@ DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
     }
 }
 
-DynamicLoader::~DynamicLoader() noexcept
+DynamicLoader::~DynamicLoader()
 {
     if (unload_ == Unload::automatic)
     {

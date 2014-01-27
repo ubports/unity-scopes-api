@@ -34,7 +34,7 @@ namespace internal
 class MWQueryCtrl : public virtual MWObjectProxy
 {
 public:
-    virtual ~MWQueryCtrl() noexcept;
+    virtual ~MWQueryCtrl();
 
     virtual void cancel() = 0;
     virtual void destroy() = 0;

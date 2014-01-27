@@ -35,7 +35,7 @@ ListenerBase::ListenerBase()
 {
 }
 
-ListenerBase::~ListenerBase() noexcept
+ListenerBase::~ListenerBase()
 {
 }
 

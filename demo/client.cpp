@@ -16,16 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/QueryCtrl.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/ActivationResponse.h>
-#include <unity/UnityExceptions.h>
+// You may also include individual headers if you prefer.
+#include <unity-scopes.h>
 
 #include <condition_variable>
 #include <cstdlib>
@@ -54,7 +46,7 @@ std::string to_string(Variant const& var)
             str << "null";
             break;
         case Variant::Type::Bool:
-            str << var.get_bool();
+            str << std::boolalpha << var.get_bool();
             break;
         case Variant::Type::String:
             str << "\"" << var.get_string() << "\"";
@@ -66,7 +58,7 @@ std::string to_string(Variant const& var)
             str << "{";
             for (auto kv: var.get_dict())
             {
-                str << "\"" << kv.first << "\":" << to_string(kv.second);
+                str << "\"" << kv.first << "\":" << to_string(kv.second) << ", ";
             }
             str << "}";
             break;
@@ -206,8 +198,14 @@ public:
         cout << "\tGot preview widgets:" << endl;
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
-            cout << "\t\t" << it->data();
-            cout << endl;
+            cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
+                 << "\t\t attributes: " << to_string(Variant(it->attributes())) << endl
+                 << "\t\t components: {";
+            for (const auto kv: it->components())
+            {
+                cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
+            }
+            cout << "}" << endl;
         }
     }
 
@@ -334,7 +332,7 @@ int main(int argc, char* argv[])
         VariantMap vm;
         vm["cardinality"] = 10;
         vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply);     // Returns (almost) immediately
+        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

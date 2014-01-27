@@ -95,7 +95,7 @@ public:
 
     std::string path() const;
 
-    ~DynamicLoader() noexcept;
+    ~DynamicLoader();
 
 private:
     DynamicLoader(std::string const& path, Binding b, Unload ul);

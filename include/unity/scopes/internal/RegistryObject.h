@@ -42,7 +42,7 @@ public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
     RegistryObject();
-    virtual ~RegistryObject() noexcept;
+    virtual ~RegistryObject();
 
     // Remote operation implementations
     virtual ScopeMetadata get_metadata(std::string const& scope_name) override;

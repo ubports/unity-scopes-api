@@ -86,7 +86,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     }
 }
 
-RuntimeImpl::~RuntimeImpl() noexcept
+RuntimeImpl::~RuntimeImpl()
 {
     try
     {

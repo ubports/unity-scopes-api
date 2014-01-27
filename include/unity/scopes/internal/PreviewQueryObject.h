@@ -39,8 +39,8 @@ public:
     UNITY_DEFINES_PTRS(PreviewQueryObject);
 
     PreviewQueryObject(std::shared_ptr<PreviewQuery> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~PreviewQueryObject() noexcept;
-    void run(MWReplyProxy const& reply) noexcept override;
+    virtual ~PreviewQueryObject();
+    void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
 private:
     std::shared_ptr<PreviewQuery> preview_base_;

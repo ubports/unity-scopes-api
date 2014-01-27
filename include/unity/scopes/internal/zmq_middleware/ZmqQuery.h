@@ -42,7 +42,7 @@ public:
              std::string const& endpoint,
              std::string const& identity,
              std::string const& category);
-    virtual ~ZmqQuery() noexcept;
+    virtual ~ZmqQuery();
 
     virtual void run(MWReplyProxy const& reply) override;
 };

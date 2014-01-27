@@ -73,7 +73,7 @@ RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
 {
 }
 
-RegistryI::~RegistryI() noexcept
+RegistryI::~RegistryI()
 {
 }
 
@@ -133,6 +133,7 @@ void RegistryI::locate_(Current const&,
         proxy.setIdentity(scope_proxy->identity());
         proxy.setCategory("Scope");
         proxy.setEndpoint(scope_proxy->endpoint());
+        proxy.setTimeout(scope_proxy->timeout());
     }
     catch (NotFoundException const& e)
     {

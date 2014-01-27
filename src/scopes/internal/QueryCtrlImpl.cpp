@@ -49,7 +49,7 @@ QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy co
     // inform the reply object belonging to this query that the query is finished.
 }
 
-QueryCtrlImpl::~QueryCtrlImpl() noexcept
+QueryCtrlImpl::~QueryCtrlImpl()
 {
 }
 

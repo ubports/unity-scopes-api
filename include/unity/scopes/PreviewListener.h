@@ -40,7 +40,7 @@ public:
     NONCOPYABLE(PreviewListener);
     UNITY_DEFINES_PTRS(PreviewListener);
 
-    virtual ~PreviewListener() noexcept;
+    virtual ~PreviewListener();
     /// @endcond
 
     /**

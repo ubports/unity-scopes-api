@@ -53,7 +53,6 @@
 {
     DynLinker
     Memcheck:Leak
-    match-leak-kinds: definite
     fun:calloc
     obj:*
     fun:_Z24__tracepoints__ptrs_initv
@@ -65,7 +64,6 @@
 {
     DynLinker2
     Memcheck:Leak
-    match-leak-kinds: definite
     fun:calloc
     obj:*
     fun:__tracepoints__ptrs_init

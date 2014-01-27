@@ -39,11 +39,11 @@ QueryCtrlObject::QueryCtrlObject() :
 {
 }
 
-QueryCtrlObject::~QueryCtrlObject() noexcept
+QueryCtrlObject::~QueryCtrlObject()
 {
 }
 
-void QueryCtrlObject::cancel()
+void QueryCtrlObject::cancel(InvokeInfo const& info)
 {
     if (destroyed_.exchange(true))
     {
@@ -53,12 +53,12 @@ void QueryCtrlObject::cancel()
     QueryObjectBase::SPtr qo = qo_.lock();
     if (qo)
     {
-        qo->cancel();
+        qo->cancel(info);
     }
     disconnect();
 }
 
-void QueryCtrlObject::destroy()
+void QueryCtrlObject::destroy(InvokeInfo const& /* info */)
 {
     if (destroyed_.exchange(true))
     {

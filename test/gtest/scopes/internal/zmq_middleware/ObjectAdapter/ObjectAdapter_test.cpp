@@ -58,50 +58,50 @@ TEST(ObjectAdapter, basic)
 
     // Instantiate and destroy oneway and twoway adapters with single and multiple threads.
     {
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         EXPECT_EQ(&mw, a.mw());
         EXPECT_EQ("testscope", a.name());
         EXPECT_EQ("ipc://testscope", a.endpoint());
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 10);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
     }
 
     // Same thing, but with activation.
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         a.activate();
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
         a.activate();
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
         a.activate();
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 10);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
         a.activate();
     }
 
     // Again, with explicit deactivation and waiting.
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         a.activate();
         a.shutdown();
         a.wait_for_shutdown();
@@ -109,21 +109,21 @@ TEST(ObjectAdapter, basic)
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
         a.activate();
         a.shutdown();
         a.wait_for_shutdown();
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
         a.activate();
         a.shutdown();
         a.wait_for_shutdown();
     }
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 10);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
         a.activate();
         a.shutdown();
         a.wait_for_shutdown();
@@ -137,7 +137,7 @@ TEST(ObjectAdapter, state_change)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 2);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 2);
         // We fire a bunch of activate requests in a loop, in the hope that we end up
         // getting coverage for the transition to the Active state.
         for (auto i = 0; i < 500; ++i)
@@ -150,7 +150,7 @@ TEST(ObjectAdapter, state_change)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 2);
         // We fire a bunch of activate requests in a loop, in the hope that we end up
         // getting coverage for the transition to the Active state.
         for (auto i = 0; i < 500; ++i)
@@ -163,7 +163,7 @@ TEST(ObjectAdapter, state_change)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 2);
 
         // Try to reactivate after shutdown
         a.activate();
@@ -176,30 +176,30 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
-                      "state (adapter: testscope)",
-                      e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+                         "state (adapter: testscope)",
+                         e.what());
         }
     }
 
     {
         // Two adapters on the same endpoint. Second one must enter failed state.
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 2);
         a.activate();
-        ObjectAdapter b(mw, "testscope", "ipc://testscope", RequestType::Oneway, 2);
+        ObjectAdapter b(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 2);
         try
         {
             b.activate();
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
-                      "failure (adapter: testscope):\n"
-                      "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                      "(adapter: testscope):\n"
-                      "        Address already in use",
-                      e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+                         "failure (adapter: testscope):\n"
+                         "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "(adapter: testscope):\n"
+                         "        Address already in use",
+                         e.what());
         }
         try
         {
@@ -207,13 +207,13 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                      "    Exception history:\n"
-                      "        Exception #1:\n"
-                      "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                      "(adapter: testscope):\n"
-                      "                Address already in use",
-                      e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+                         "    Exception history:\n"
+                         "        Exception #1:\n"
+                         "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                         "(adapter: testscope):\n"
+                         "                Address already in use",
+                         e.what());
         }
         try
         {
@@ -221,13 +221,13 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                       "    Exception history:\n"
-                       "        Exception #1:\n"
-                       "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                       "(adapter: testscope):\n"
-                       "                Address already in use",
-                       e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
+                          "    Exception history:\n"
+                          "        Exception #1:\n"
+                          "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
+                          "(adapter: testscope):\n"
+                          "                Address already in use",
+                          e.what());
         }
     }
 }
@@ -241,7 +241,7 @@ TEST(ObjectAdapter, wait_for_shutdown)
     // shutdown to complete. We check that the shutdown happens after at least the delay that was specified,
     // so we can be sure that wait_for_shutdown() actually waits.
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
     a.activate();
     int delay_millisecs = 100;
 
@@ -285,7 +285,7 @@ TEST(ObjectAdapter, add_remove_find)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
     try
     {
@@ -294,8 +294,8 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ObjectAdapter::add(): invalid empty id (adapter: testscope)",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ObjectAdapter::add(): invalid empty id (adapter: testscope)",
+                     e.what());
     }
 
     try
@@ -305,8 +305,8 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ObjectAdapter::add(): invalid nullptr object (adapter: testscope)",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ObjectAdapter::add(): invalid nullptr object (adapter: testscope)",
+                     e.what());
     }
 
     shared_ptr<MyServant> o(new MyServant);
@@ -321,9 +321,9 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
-                  " id already in use (adapter: testscope)",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::add(): cannot add id \"fred\":"
+                     " id already in use (adapter: testscope)",
+                     e.what());
     }
 
     a.remove("fred");
@@ -333,9 +333,9 @@ TEST(ObjectAdapter, add_remove_find)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
-                  " id not present (adapter: testscope)",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): cannot remove id \"fred\":"
+                     " id not present (adapter: testscope)",
+                     e.what());
     }
 
     EXPECT_EQ(nullptr, a.find("fred").get());
@@ -347,7 +347,7 @@ TEST(ObjectAdapter, dispatch_oneway_to_twoway)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -383,7 +383,7 @@ TEST(ObjectAdapter, dispatch_twoway_to_oneway)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
@@ -410,7 +410,7 @@ TEST(ObjectAdapter, dispatch_not_exist)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     // No servant registered, check that we get an ObjectNotExistException
@@ -453,7 +453,7 @@ TEST(ObjectAdapter, bad_header)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         a.activate();
 
         zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -484,7 +484,7 @@ TEST(ObjectAdapter, bad_header)
     // Invalid message header a second time, with oneway adapter (for coverage)
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
         a.activate();
 
         zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
@@ -514,7 +514,7 @@ TEST(ObjectAdapter, corrupt_header)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         a.activate();
 
         zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -545,7 +545,7 @@ TEST(ObjectAdapter, corrupt_header)
     // Malformed message header a second time, with oneway adapter (for coverage)
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, 1);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
         a.activate();
 
         zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
@@ -572,7 +572,7 @@ TEST(ObjectAdapter, invoke_ok)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -624,7 +624,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -669,7 +669,7 @@ TEST(ObjectAdapter, invoke_operation_not_exist)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -754,23 +754,23 @@ private:
     int delay_;
 };
 
-void invoke_thread(ZmqMiddleware* mw, RequestType t)
+void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 {
-    zmqpp::socket s(*mw->context(), t == RequestType::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push);
+    zmqpp::socket s(*mw->context(), t == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push);
     s.connect("ipc://testscope");
     ZmqSender sender(s);
     ZmqReceiver receiver(s);
 
     capnp::MallocMessageBuilder b;
     auto request = b.initRoot<capnproto::Request>();
-    request.setMode(t == RequestType::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
+    request.setMode(t == RequestMode::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
     request.setId("some_id");
     request.setCat("some_cat");
     request.setOpName("count_op");
 
     auto segments = b.getSegmentsForOutput();
     sender.send(segments);
-    if (t == RequestType::Twoway)
+    if (t == RequestMode::Twoway)
     {
         auto reply_segments = receiver.receive();
         capnp::SegmentArrayMessageReader reader(reply_segments);
@@ -794,7 +794,7 @@ TEST(ObjectAdapter, twoway_threading)
     const int num_threads = 5;
     const int num_requests = 20;
     {
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, num_threads);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, num_threads);
         a.activate();
 
         a.add("some_id", o);
@@ -803,7 +803,7 @@ TEST(ObjectAdapter, twoway_threading)
         vector<thread> invokers;
         for (auto i = 0; i < num_requests; ++i)
         {
-            invokers.push_back(thread(invoke_thread, &mw, RequestType::Twoway));
+            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway));
         }
         for (auto& i : invokers)
         {
@@ -828,7 +828,7 @@ TEST(ObjectAdapter, oneway_threading)
     const int num_threads = 5;
     const int num_requests = 20;
     {
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Oneway, num_threads);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, num_threads);
         a.activate();
 
         a.add("some_id", o);
@@ -837,7 +837,7 @@ TEST(ObjectAdapter, oneway_threading)
         vector<thread> invokers;
         for (auto i = 0; i < num_requests; ++i)
         {
-            invokers.push_back(thread(invoke_thread, &mw, RequestType::Oneway));
+            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Oneway));
         }
         for (auto& i : invokers)
         {
@@ -895,7 +895,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Servant calls remove on itself from its destructor after adapter is destroyed
         auto test_func = [&]()
@@ -907,8 +907,8 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
-                          e.to_string());
+                EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                             e.what());
             }
         };
         a.add("fred", make_shared<UpdaterServant>(test_func));
@@ -916,7 +916,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Servant calls remove on itself from its destructor while adapter is inactive
         auto test_func = [&]()
@@ -928,9 +928,9 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
-                          "cannot remove id \"fred\": id not present (adapter: testscope)",
-                          e.to_string());
+                EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                             "cannot remove id \"fred\": id not present (adapter: testscope)",
+                             e.what());
             }
         };
         auto servant = make_shared<UpdaterServant>(test_func);
@@ -940,7 +940,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Servant calls remove on itself from its destructor while adapter is active
         auto test_func = [&]()
@@ -952,9 +952,9 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_EQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
-                          "cannot remove id \"fred\": id not present (adapter: testscope)",
-                          e.to_string());
+                EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::remove(): "
+                             "cannot remove id \"fred\": id not present (adapter: testscope)",
+                             e.what());
             }
         };
         auto servant = make_shared<UpdaterServant>(test_func);
@@ -965,7 +965,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Servant removes another servant from its destructor while adapter is active
         auto test_func = [&]()
@@ -980,7 +980,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Destroy active adapter with a bunch of servants in it
         a.add("fred", make_shared<MyServant>());
@@ -991,7 +991,7 @@ TEST(ObjectAdapter, servant_map_destructor)
 
     {
         wait();
-        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 5);
+        ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
 
         // Try adding and finding servant after adapter is destroyed
         a.add("fred", make_shared<MyServant>());
@@ -1005,9 +1005,9 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
-                      "state (adapter: testscope)",
-                      e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+                         "state (adapter: testscope)",
+                         e.what());
         }
         try
         {
@@ -1016,9 +1016,9 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_EQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
-                      "state (adapter: testscope)",
-                      e.to_string());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+                         "state (adapter: testscope)",
+                         e.what());
         }
     }
 }
@@ -1066,7 +1066,7 @@ TEST(ObjectAdapter, double_bind)
         wait();
         try
         {
-            ObjectAdapter a(mw, "testscope", endpoint, RequestType::Twoway, 5);
+            ObjectAdapter a(mw, "testscope", endpoint, RequestMode::Twoway, 5);
             a.activate();
             a.shutdown();
             FAIL();
@@ -1103,7 +1103,7 @@ TEST(ObjectAdapter, double_bind)
         wait();
         try
         {
-            ObjectAdapter a(mw, "testscope", endpoint, RequestType::Twoway, 5);
+            ObjectAdapter a(mw, "testscope", endpoint, RequestMode::Twoway, 5);
             a.activate();
             a.shutdown();
             FAIL();
@@ -1131,7 +1131,7 @@ TEST(ObjectAdapter, dflt_servant)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     zmqpp::socket s(*mw.context(), zmqpp::socket_type::request);
@@ -1186,7 +1186,7 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
                      (RuntimeImpl*)0x1);
 
     wait();
-    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestType::Twoway, 1);
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     a.activate();
 
     try
@@ -1196,12 +1196,12 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: ObjectAdapter::add_dflt_servant(): "
-                  "invalid nullptr object (adapter: testscope)",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: ObjectAdapter::add_dflt_servant(): "
+                     "invalid nullptr object (adapter: testscope)",
+                     e.what());
     }
 
-    ObjectAdapter b(mw, "testscope2", "ipc://testscope", RequestType::Oneway, 2);
+    ObjectAdapter b(mw, "testscope2", "ipc://testscope", RequestMode::Oneway, 2);
     EXPECT_THROW(b.activate(), MiddlewareException);
 
     try

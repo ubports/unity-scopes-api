@@ -40,7 +40,7 @@ class QueryBaseImpl final
 {
 public:
     QueryBaseImpl();
-    ~QueryBaseImpl() noexcept;
+    ~QueryBaseImpl();
 
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,

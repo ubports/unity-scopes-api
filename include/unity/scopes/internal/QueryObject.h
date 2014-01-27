@@ -49,14 +49,14 @@ public:
     UNITY_DEFINES_PTRS(QueryObject);
 
     QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
-    virtual ~QueryObject() noexcept;
+    virtual ~QueryObject();
 
     // Remote operation implementations
-    void run(MWReplyProxy const& reply) noexcept override;
+    virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
     // Local methods
-    void cancel() override;         // Called locally only, by QueryCtrlObject.
-    bool pushable() const noexcept; // Called locally only, by ReplyImpl
+    virtual void cancel(InvokeInfo const& info) override;                   // Called locally, by QueryCtrlObject.
+    virtual bool pushable(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.

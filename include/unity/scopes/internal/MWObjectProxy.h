@@ -38,12 +38,13 @@ class MiddlewareBase;
 class MWObjectProxy
 {
 public:
-    virtual ~MWObjectProxy() noexcept;
+    virtual ~MWObjectProxy();
 
     virtual MiddlewareBase* mw_base() const noexcept = 0;
 
     virtual std::string identity() const = 0;
     virtual std::string endpoint() const = 0;
+    virtual int64_t timeout() const noexcept = 0;
 
     // Remote operation
     virtual void ping() = 0;

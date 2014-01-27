@@ -36,7 +36,7 @@ public:
     static constexpr char const* REGISTRY_CONFIG_GROUP = "Registry";
 
     RegistryConfig(std::string const& identity, std::string const& configfile);
-    ~RegistryConfig() noexcept;
+    ~RegistryConfig();
 
     std::string identity() const;
     std::string mw_kind() const;

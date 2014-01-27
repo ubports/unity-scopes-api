@@ -61,7 +61,7 @@ public:
     // Returns the actual implementation provided by the scope.
     unity::scopes::ScopeBase* scope_base() const;
 
-    ~ScopeLoader() noexcept;
+    ~ScopeLoader();
 
 private:
     ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);

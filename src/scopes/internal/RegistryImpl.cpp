@@ -38,7 +38,7 @@ RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
 {
 }
 
-RegistryImpl::~RegistryImpl() noexcept
+RegistryImpl::~RegistryImpl()
 {
 }
 
