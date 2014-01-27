@@ -47,6 +47,11 @@ public:
 
     PreviewWidget(std::string const& id, std::string const &widget_type);
     PreviewWidget(std::string const& definition);
+    PreviewWidget(PreviewWidget const& other);
+    PreviewWidget(PreviewWidget&& other);
+
+    PreviewWidget& operator=(PreviewWidget const& other);
+    PreviewWidget& operator=(PreviewWidget&& other);
 
     void set_id(std::string const& id);
     void set_widget_type(std::string const &id);

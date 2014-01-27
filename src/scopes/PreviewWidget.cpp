@@ -43,6 +43,23 @@ PreviewWidget::PreviewWidget(internal::PreviewWidgetImpl *impl)
 {
 }
 
+PreviewWidget::PreviewWidget(PreviewWidget const& other)
+    : p(new internal::PreviewWidgetImpl(*(other.p)))
+{
+}
+
+PreviewWidget::PreviewWidget(PreviewWidget&&) = default;
+PreviewWidget& PreviewWidget::operator=(PreviewWidget&&) = default;
+
+PreviewWidget& PreviewWidget::operator=(PreviewWidget const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::PreviewWidgetImpl(*(other.p)));
+    }
+    return *this;
+}
+
 VariantMap PreviewWidget::serialize() const
 {
     return p->serialize();
