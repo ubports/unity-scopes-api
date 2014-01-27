@@ -59,20 +59,20 @@ QueryCtrlI::~QueryCtrlI()
 {
 }
 
-void QueryCtrlI::cancel_(Current const&,
+void QueryCtrlI::cancel_(Current const& current,
                          capnp::AnyPointer::Reader&,
                          capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<QueryCtrlObjectBase>(del());
-    delegate->cancel();
+    delegate->cancel(to_info(current));
 }
 
-void QueryCtrlI::destroy_(Current const&,
+void QueryCtrlI::destroy_(Current const& current,
                           capnp::AnyPointer::Reader&,
                           capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<QueryCtrlObjectBase>(del());
-    delegate->destroy();
+    delegate->destroy(to_info(current));
 }
 
 } // namespace zmq_middleware

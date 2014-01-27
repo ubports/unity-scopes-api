@@ -1,3 +1,10 @@
+unity-scopes-api (0.2.5-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Michi Henning ]
+  * More default servant support.
+
+ -- michi <michi.henning@canonical.com>  Fri, 24 Jan 2014 12:24:50 +1000
+
 unity-scopes-api (0.2.4+14.04.20140124-0ubuntu1) trusty; urgency=low
 
   [ Michi Henning ]
