@@ -132,7 +132,7 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
     }
 }
 
-Variant JsonCppNode::to_variant()
+Variant JsonCppNode::to_variant() const
 {
     return to_variant(root_);
 }

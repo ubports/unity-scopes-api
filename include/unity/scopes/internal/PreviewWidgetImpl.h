@@ -36,14 +36,27 @@ class PreviewWidgetImpl
 {
 public:
     PreviewWidgetImpl(std::string const& json_text);
-    PreviewWidgetImpl(VariantMap const& definition);
+    PreviewWidgetImpl(std::string const& id, std::string const &widget_type);
+    PreviewWidgetImpl(VariantMap const& var);
 
-    std::string data() const;
+    void set_id(std::string const& id);
+    void set_widget_type(std::string const &widget_type);
+    void add_attribute(std::string const& key, Variant const& value);
+    void add_component(std::string const& key, std::string const& field_name);
+
+    std::string id() const;
+    std::string widget_type() const;
+    VariantMap components() const;
+    VariantMap attributes() const;
 
     VariantMap serialize() const;
+    static PreviewWidget create(VariantMap const& var);
 
 private:
-    std::string data_; // json template converted to a variant map
+    std::string id_;
+    std::string type_;
+    VariantMap attributes_;
+    VariantMap components_;
 };
 
 } // namespace internal

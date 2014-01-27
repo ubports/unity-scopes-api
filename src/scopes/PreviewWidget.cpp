@@ -33,19 +33,59 @@ PreviewWidget::PreviewWidget(std::string const& definition)
 {
 }
 
-PreviewWidget::PreviewWidget(VariantMap const& definition)
-    : p(new internal::PreviewWidgetImpl(definition))
+PreviewWidget::PreviewWidget(std::string const& id, std::string const &widget_type)
+    : p(new internal::PreviewWidgetImpl(id, widget_type))
 {
 }
 
-std::string PreviewWidget::data() const
+PreviewWidget::PreviewWidget(internal::PreviewWidgetImpl *impl)
+    : p(impl)
 {
-    return p->data();
 }
 
 VariantMap PreviewWidget::serialize() const
 {
     return p->serialize();
+}
+
+void PreviewWidget::set_id(std::string const& id)
+{
+    p->set_id(id);
+}
+
+void PreviewWidget::set_widget_type(std::string const &widget_type)
+{
+    p->set_widget_type(widget_type);
+}
+
+void PreviewWidget::add_attribute(std::string const& key, Variant const& value)
+{
+    p->add_attribute(key, value);
+}
+
+void PreviewWidget::add_component(std::string const& key, std::string const& field_name)
+{
+    p->add_component(key, field_name);
+}
+
+std::string PreviewWidget::id() const
+{
+    return p->id();
+}
+
+std::string PreviewWidget::widget_type() const
+{
+    return p->widget_type();
+}
+
+VariantMap PreviewWidget::components() const
+{
+    return p->components();
+}
+
+VariantMap PreviewWidget::attributes() const
+{
+    return p->attributes();
 }
 
 //! @endcond

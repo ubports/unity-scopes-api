@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -33,28 +34,136 @@ namespace internal
 //! @cond
 
 PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
-    : data_(json_text)
 {
     //TODO: json validation
+    const internal::JsonCppNode node(json_text);
+    auto var = node.to_variant().get_dict();
+
+    //
+    // the JSON representation of preview widget keeps all the attributes at the top level of the dict,
+    // and has "components" sub-dictionary; split it into components and attributes and extract id & type.
+
+    auto it = var.find("components");
+    if (it != var.end()) // components are optional
+    {
+        components_ = it->second.get_dict();
+    }
+
+    // iterate over top-level attributes, skip 'components' key
+    for (auto kv: var)
+    {
+        if (kv.first != "components")
+        {
+            if (kv.first == "id")
+            {
+                set_id(kv.second.get_string());
+            }
+            else if (kv.first == "type")
+            {
+                set_widget_type(kv.second.get_string());
+            }
+            else
+            {
+                add_attribute(kv.first, kv.second);
+            }
+        }
+    }
 }
 
-PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& definition)
+PreviewWidgetImpl::PreviewWidgetImpl(std::string const& id, std::string const &widget_type)
+    : id_(id),
+      type_(widget_type)
 {
-    const Variant var(definition);
-    const internal::JsonCppNode node(var);
-    data_ = node.to_json_string();
-    //TODO: json validation
 }
 
-std::string PreviewWidgetImpl::data() const
+PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
 {
-    return data_;
+    auto it = var.find("id");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'id'");
+    }
+    id_ = it->second.get_string();
+
+    it = var.find("type");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'type'");
+    }
+    type_ = it->second.get_string();
+
+    it = var.find("attributes");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'attributes'");
+    }
+    attributes_ = it->second.get_dict();
+
+    it = var.find("components");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'components'");
+    }
+    components_ = it->second.get_dict();
+}
+
+PreviewWidget PreviewWidgetImpl::create(VariantMap const& var)
+{
+    return PreviewWidget(new PreviewWidgetImpl(var));
+}
+
+void PreviewWidgetImpl::set_id(std::string const& id)
+{
+    id_ = id;
+}
+
+void PreviewWidgetImpl::set_widget_type(std::string const &widget_type)
+{
+    type_ = widget_type;
+}
+
+void PreviewWidgetImpl::add_attribute(std::string const& key, Variant const& value)
+{
+    attributes_[key] = value;
+}
+
+void PreviewWidgetImpl::add_component(std::string const& key, std::string const& field_name)
+{
+    if (key == "id" || key == "type")
+    {
+        throw InvalidArgumentException("PreviewWidget::add_component(): Can't override component '" + key + "'");
+    }
+    components_[key] = field_name;
+}
+
+std::string PreviewWidgetImpl::id() const
+{
+    return id_;
+}
+
+std::string PreviewWidgetImpl::widget_type() const
+{
+    return type_;
+}
+
+VariantMap PreviewWidgetImpl::components() const
+{
+    return components_;
+}
+
+VariantMap PreviewWidgetImpl::attributes() const
+{
+    return attributes_;
 }
 
 VariantMap PreviewWidgetImpl::serialize() const
 {
+    // note: the internal on-wire serialization doesn't exactly match the json definition
     VariantMap vm;
-    vm["data"] = data_;
+    vm["id"] = id_;
+    vm["type"] = type_;
+    vm["attributes"] = attributes_;
+    vm["components"] = components_;
     return vm;
 }
 

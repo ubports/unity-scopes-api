@@ -83,6 +83,13 @@ Annotation (returned by serialize())
  'cat_id'     : string, optional
  'links'      : array of Links
 
+PreviewResult (returned by serialize())
+=======================================
+ 'id'         : string
+ 'type'       : string
+ 'attributes' : dict
+ 'components' : dict
+
 PushRequest (capnproto structure)
 =================================
  result : ValueDict with "category" and/or "result" or "annotation" key and

@@ -45,14 +45,25 @@ public:
     UNITY_DEFINES_PTRS(PreviewWidget);
 /// @endcond
 
+    PreviewWidget(std::string const& id, std::string const &widget_type);
     PreviewWidget(std::string const& definition);
-    PreviewWidget(VariantMap const& definition);
 
-    std::string data() const;
+    void set_id(std::string const& id);
+    void set_widget_type(std::string const &id);
+    void add_attribute(std::string const& key, Variant const& value);
+    void add_component(std::string const& key, std::string const& field_name);
+
+    std::string id() const;
+    std::string widget_type() const;
+    VariantMap components() const;
+    VariantMap attributes() const;
+
     VariantMap serialize() const;
 
 private:
     std::shared_ptr<internal::PreviewWidgetImpl> p;
+    PreviewWidget(internal::PreviewWidgetImpl *impl);
+    friend class internal::PreviewWidgetImpl;
 };
 
 typedef std::list<PreviewWidget> PreviewWidgetList;
