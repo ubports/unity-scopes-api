@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_RESULT_H
 
 #include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
 
@@ -45,6 +46,8 @@ class ScopeImpl;
 class UNITY_API Result
 {
 public:
+    UNITY_DEFINES_PTRS(Result);
+
     /**
        \brief Creates a Result that is a copy of another Result.
     */
