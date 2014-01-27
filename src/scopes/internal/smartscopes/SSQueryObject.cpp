@@ -60,47 +60,65 @@ SSQueryObject::~SSQueryObject() noexcept
 
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
-  assert(self_);
-  assert(queries_.find(info.id) != end(queries_));
+  QueryBase::SPtr q_base;
+  MWReplyProxy q_reply;
+  SearchReplyProxy q_reply_proxy;
 
-  QueryBase::SPtr const& q_base = queries_[info.id].q_base;
-  MWReplyProxy const& q_reply = queries_[info.id].q_reply;
+  {
+    std::lock_guard<std::mutex> lock(queries_mutex_);
 
-  // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
-  // if cancel() is called later.
-  auto reply_proxy = ReplyImpl::create(reply, self_);
-  assert(reply_proxy);
-  queries_[info.id].q_reply_proxy = reply_proxy;
+    assert(self_);
+    assert(queries_.find(info.id) != end(queries_));
+
+    q_base = queries_[info.id].q_base;
+    q_reply = queries_[info.id].q_reply;
+
+    // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
+    // if cancel() is called later.
+    q_reply_proxy = ReplyImpl::create(reply, self_);
+    assert(q_reply_proxy);
+    queries_[info.id].q_reply_proxy = q_reply_proxy;
+  }
 
   // Synchronous call into scope implementation.
   // On return, replies for the query may still be outstanding.
   try
   {
-      auto search_query = dynamic_pointer_cast<SearchQuery>(q_base);
-      assert(search_query);
-      search_query->run(reply_proxy);
+    auto search_query = dynamic_pointer_cast<SearchQuery>(q_base);
+    assert(search_query);
+    search_query->run(q_reply_proxy);
   }
   catch (std::exception const& e)
   {
-      queries_[info.id].q_pushable = false;
-      // TODO: log error
-      q_reply->finished(ListenerBase::Error, e.what());     // Oneway, can't block
-      cerr << "ScopeBase::run(): " << e.what() << endl;
+    std::lock_guard<std::mutex> lock(queries_mutex_);
+
+    queries_[info.id].q_pushable = false;
+    // TODO: log error
+    q_reply->finished(ListenerBase::Error, e.what());     // Oneway, can't block
+    cerr << "ScopeBase::run(): " << e.what() << endl;
   }
   catch (...)
   {
-      queries_[info.id].q_pushable = false;
-      // TODO: log error
-      q_reply->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
-      cerr << "ScopeBase::run(): unknown exception" << endl;
+    std::lock_guard<std::mutex> lock(queries_mutex_);
+
+    queries_[info.id].q_pushable = false;
+    // TODO: log error
+    q_reply->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
+    cerr << "ScopeBase::run(): unknown exception" << endl;
   }
 
-  queries_.erase(info.id);
-  replies_.erase(reply->identity());
+  {
+    std::lock_guard<std::mutex> lock(queries_mutex_);
+
+    queries_.erase(info.id);
+    replies_.erase(reply->identity());
+  }
 }
 
 void SSQueryObject::cancel(InvokeInfo const& info)
 {
+  std::lock_guard<std::mutex> lock(queries_mutex_);
+
   assert(queries_.find(info.id) != end(queries_));
 
   QueryBase::SPtr const& q_base = queries_[info.id].q_base;
@@ -110,10 +128,10 @@ void SSQueryObject::cancel(InvokeInfo const& info)
   auto rp = queries_[info.id].q_reply_proxy.lock();
   if (rp)
   {
-      // Send finished() to up-stream client to tell him the query is done.
-      // We send via the MWReplyProxy here because that allows passing
-      // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-      q_reply->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
+    // Send finished() to up-stream client to tell him the query is done.
+    // We send via the MWReplyProxy here because that allows passing
+    // a ListenerBase::Reason (whereas the public ReplyProxy does not).
+    q_reply->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
   }
 
   // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
@@ -123,6 +141,8 @@ void SSQueryObject::cancel(InvokeInfo const& info)
 
 bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 {
+  std::lock_guard<std::mutex> lock(queries_mutex_);
+
   assert(replies_.find(info.id) != end(replies_));
   std::string scope_id = replies_.at(info.id);
 
@@ -139,6 +159,8 @@ void SSQueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
 
 void SSQueryObject::add_query(std::string const& scope_id, QueryBase::SPtr const& query_base, MWReplyProxy const& reply)
 {
+  std::lock_guard<std::mutex> lock(queries_mutex_);
+
   queries_[scope_id] = SSQuery{query_base, reply, std::weak_ptr<ReplyBase>(), true};
   replies_[reply->identity()] = scope_id;
 }

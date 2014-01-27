@@ -25,6 +25,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <map>
+#include <mutex>
 
 namespace unity
 {
@@ -71,6 +72,8 @@ public:
 
 protected:
     QueryObjectBase::SPtr self_;
+
+    mutable std::mutex queries_mutex_;
 
     std::map<std::string, SSQuery> queries_;
     std::map<std::string, std::string> replies_;

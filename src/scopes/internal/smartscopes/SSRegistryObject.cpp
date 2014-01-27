@@ -85,6 +85,8 @@ ScopeProxy SSRegistryObject::locate(std::string const& scope_name) {
 
 std::string SSRegistryObject::get_base_url(std::string const& scope_name)
 {
+  std::lock_guard<std::mutex> lock(scopes_mutex_);
+
   if (base_urls_.find(scope_name) != end(base_urls_)) {
     return base_urls_[scope_name];
   }
