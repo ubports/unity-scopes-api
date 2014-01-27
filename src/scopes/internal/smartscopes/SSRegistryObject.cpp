@@ -134,7 +134,7 @@ void SSRegistryObject::get_remote_scopes() {
     metadata->set_search_hint("");
     metadata->set_hot_key("");
 
-    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc://tmp/" + ss_scope_id_),
+    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc:///tmp/" + ss_scope_id_),
                                          middleware_->runtime(), scope.name);
 
     metadata->set_proxy(proxy);
