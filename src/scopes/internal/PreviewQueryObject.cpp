@@ -52,7 +52,7 @@ PreviewQueryObject::~PreviewQueryObject()
     // parent destructor will call ctrl_->destroy()
 }
 
-void PreviewQueryObject::run(MWReplyProxy const& reply) noexcept
+void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
     assert(self_);
 

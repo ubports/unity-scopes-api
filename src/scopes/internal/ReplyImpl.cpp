@@ -19,7 +19,7 @@
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryObject.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategorisedResult.h>
@@ -165,9 +165,9 @@ bool ReplyImpl::push(std::string const& key, Variant const& value)
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
-    auto qo = dynamic_pointer_cast<QueryObject>(qo_);
+    auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
     assert(qo);
-    if (!qo->pushable())
+    if (!qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
     {
         return false; // Query was cancelled or had an error.
     }
