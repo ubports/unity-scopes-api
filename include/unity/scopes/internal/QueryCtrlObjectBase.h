@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_QUERYCTRLOBJECTBASE_H
 
 #include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/InvokeInfo.h>
 
 namespace unity
 {
@@ -35,8 +36,8 @@ class QueryCtrlObjectBase : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(QueryCtrlObjectBase);
 
-    virtual void cancel() = 0;
-    virtual void destroy() = 0;
+    virtual void cancel(InvokeInfo const& info) = 0;
+    virtual void destroy(InvokeInfo const& info) = 0;
 };
 
 } // namespace internal
