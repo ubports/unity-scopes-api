@@ -6,3 +6,5 @@ Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Scope.InstallDir = @CMAKE_CURRENT_BINARY_DIR@/scopes
 Scope.GroupConfigDir = @CMAKE_CURRENT_BINARY_DIR@/scope-groups
 Scoperunner.Path = @CMAKE_BINARY_DIR@/scoperunner/scoperunner
+SS.Registry.Identity = SSRegistry
+SS.Registry.Endpoint = ipc:///tmp/SSRegistry

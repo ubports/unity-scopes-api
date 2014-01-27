@@ -72,7 +72,7 @@ public:
                            InvokeInfo const& info) override;
 
 private:
-  MWQueryCtrlProxy query(std::string const& id, MWReplyProxy const& reply,
+  MWQueryCtrlProxy query(InvokeInfo const& info, MWReplyProxy const& reply,
       std::function<QueryBase::SPtr(void)> const& query_factory_fun);
 
 private:

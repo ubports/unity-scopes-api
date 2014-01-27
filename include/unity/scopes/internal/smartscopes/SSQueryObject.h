@@ -73,6 +73,7 @@ protected:
     QueryObjectBase::SPtr self_;
 
     std::map<std::string, SSQuery> queries_;
+    std::map<std::string, std::string> replies_;
 };
 
 } // namespace smartscopes

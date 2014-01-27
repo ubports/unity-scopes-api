@@ -47,30 +47,47 @@ int main(int argc, char* argv[])
 
   try
   {
+    std::string reg_id = "SSRegistry";
+    std::string scope_id = "SmartScope";
+
+    // SMART SCOPES REGISTRY
+    // =====================
+
     // Instantiate a runtime
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+    RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(reg_id, SS_RUNTIME_PATH);
 
-    // Get middleware handle from runtime
-    std::string identity = runtime->registry_identity();
-    RegistryConfig c(identity, runtime->registry_configfile());
-    std::string mw_kind = c.mw_kind();
+    // Get registry config
+    RegistryConfig reg_conf(reg_id, reg_rt->registry_configfile());
+    std::string mw_kind = reg_conf.mw_kind();
+    std::string mw_configfile = reg_conf.mw_configfile();
 
-    MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+    // Get registry middleware handle from runtime
+    MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(reg_id, mw_kind);
 
     // Instantiate a SS registry object
-    SSRegistryObject::SPtr registry(new SSRegistryObject(middleware));
+    SSRegistryObject::SPtr registry(new SSRegistryObject(reg_mw, scope_id));
 
     // Add the SS registry object to the middleware
-    middleware->add_registry_object(runtime->registry_identity(), registry);
+    reg_mw->add_registry_object(reg_rt->registry_identity(), registry);
+
+    // SMART SCOPES SCOPE
+    // ==================
+
+    // Instantiate a runtime
+    RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(scope_id, SS_RUNTIME_PATH);
+
+    // Get scope middleware handle from runtime
+    MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(scope_id, mw_kind, mw_configfile);
 
     // Instantiate a SS scope object
-    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(middleware, registry));
+    SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(scope_mw, registry));
 
     // Add the SS scope object to the middleware
-    middleware->add_dflt_scope_object(std::move(scope));
+    scope_mw->add_dflt_scope_object(std::move(scope));
 
     // Wait until shutdown
-    middleware->wait_for_shutdown();
+    scope_mw->wait_for_shutdown();
+    reg_mw->wait_for_shutdown();
 
     exit_status = 0;
   }

@@ -66,7 +66,7 @@ MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
-  return query(info.id, reply,
+  return query(info, reply,
                [&q, &hints, &info, this]() -> QueryBase::SPtr {
                  return this->smartscope_->create_query(info.id, q, hints);
                });
@@ -110,7 +110,7 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
   return MWQueryCtrlProxy();
 }
 
-MWQueryCtrlProxy SSScopeObject::query(const std::string &id, MWReplyProxy const& reply,
+MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info, MWReplyProxy const& reply,
                                       std::function<QueryBase::SPtr()> const& query_factory_fun)
 {
   if (!reply)
@@ -137,7 +137,8 @@ MWQueryCtrlProxy SSScopeObject::query(const std::string &id, MWReplyProxy const&
 
   try
   {
-    qo_->add_query(id, query_base, reply);
+    qo_->add_query(info.id, query_base, reply);
+    qo_->run(reply, info);
   }
   catch (std::exception const& e)
   {

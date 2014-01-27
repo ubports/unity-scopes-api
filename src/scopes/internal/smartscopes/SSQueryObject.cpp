@@ -54,6 +54,8 @@ SSQueryObject::SSQueryObject() :
 
 SSQueryObject::~SSQueryObject() noexcept
 {
+  self_ = nullptr;
+  disconnect();
 }
 
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
@@ -69,11 +71,6 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
   auto reply_proxy = ReplyImpl::create(reply, self_);
   assert(reply_proxy);
   queries_[info.id].q_reply_proxy = reply_proxy;
-
-  // The reply proxy now holds our reference count high, so
-  // we can drop our own smart pointer and disconnect from the middleware.
-  self_ = nullptr;
-  disconnect();
 
   // Synchronous call into scope implementation.
   // On return, replies for the query may still be outstanding.
@@ -97,6 +94,9 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
       q_reply->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
       cerr << "ScopeBase::run(): unknown exception" << endl;
   }
+
+  queries_.erase(info.id);
+  replies_.erase(reply->identity());
 }
 
 void SSQueryObject::cancel(InvokeInfo const& info)
@@ -123,9 +123,11 @@ void SSQueryObject::cancel(InvokeInfo const& info)
 
 bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 {
-  assert(queries_.find(info.id) != end(queries_));
+  assert(replies_.find(info.id) != end(replies_));
+  std::string scope_id = replies_.at(info.id);
 
-  return queries_.at(info.id).q_pushable;
+  assert(queries_.find(scope_id) != end(queries_));
+  return queries_.at(scope_id).q_pushable;
 }
 
 void SSQueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
@@ -138,6 +140,7 @@ void SSQueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
 void SSQueryObject::add_query(std::string const& scope_id, QueryBase::SPtr const& query_base, MWReplyProxy const& reply)
 {
   queries_[scope_id] = SSQuery{query_base, reply, std::weak_ptr<ReplyBase>(), true};
+  replies_[reply->identity()] = scope_id;
 }
 
 } // namespace smartscopes

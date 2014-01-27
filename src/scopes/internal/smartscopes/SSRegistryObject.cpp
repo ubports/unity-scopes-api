@@ -33,12 +33,14 @@ namespace internal {
 
 namespace smartscopes {
 
-SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware)
+SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
+                                   std::string const& ss_scope_id)
   : ssclient_(std::make_shared<SmartScopesClient>(
                 std::make_shared<HttpClientQt>(4),
                 std::make_shared<JsonCppNode>())),
     refresh_stopped_(false),
-    middleware_(middleware) {
+    middleware_(middleware),
+    ss_scope_id_(ss_scope_id) {
   get_remote_scopes();
   refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
@@ -132,7 +134,7 @@ void SSRegistryObject::get_remote_scopes() {
     metadata->set_search_hint("");
     metadata->set_hot_key("");
 
-    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name),
+    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc://tmp/" + ss_scope_id_),
                                          middleware_->runtime(), scope.name);
 
     metadata->set_proxy(proxy);

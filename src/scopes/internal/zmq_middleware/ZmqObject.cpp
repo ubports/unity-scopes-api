@@ -113,6 +113,7 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
     request.setMode(mode_ == RequestMode::Oneway ? capnproto::RequestMode::ONEWAY : capnproto::RequestMode::TWOWAY);
     request.setOpName(operation_name.c_str());
     request.setId(identity_.c_str());
+    request.setCat(category_.c_str());
     return request;
 }
 

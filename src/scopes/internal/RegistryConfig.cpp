@@ -47,14 +47,14 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
     mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
     scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
-    scope_group_configdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "Scope.GroupConfigDir");
     oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
-    oem_group_configdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.GroupConfigDir");
     scoperunner_path_ = get_string(REGISTRY_CONFIG_GROUP, "Scoperunner.Path");
     if (scoperunner_path_[0] != '/')
     {
         throw ConfigException(configfile + ": Scoperunner.Path must be an absolute path");
     }
+    ss_registry_identity_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Identity");
+    ss_registry_endpoint_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Endpoint");
 }
 
 RegistryConfig::~RegistryConfig()
@@ -91,24 +91,24 @@ string RegistryConfig::scope_installdir() const
     return scope_installdir_;
 }
 
-string RegistryConfig::scope_group_configdir() const
-{
-    return scope_group_configdir_;
-}
-
 string RegistryConfig::oem_installdir() const
 {
     return oem_installdir_;
 }
 
-string RegistryConfig::oem_group_configdir() const
-{
-    return oem_group_configdir_;
-}
-
 string RegistryConfig::scoperunner_path() const
 {
     return scoperunner_path_;
+}
+
+string RegistryConfig::ss_registry_identity() const
+{
+    return ss_registry_identity_;
+}
+
+string RegistryConfig::ss_registry_endpoint() const
+{
+    return ss_registry_endpoint_;
 }
 
 } // namespace internal
