@@ -46,7 +46,11 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
     auto it = var.find("components");
     if (it != var.end()) // components are optional
     {
-        components_ = it->second.get_dict();
+        // convert VariantMap to map<string,string>
+        for (const auto kv: it->second.get_dict())
+        {
+            add_component(kv.first, kv.second.get_string());
+        }
     }
 
     // iterate over top-level attributes, skip 'components' key
@@ -134,9 +138,9 @@ void PreviewWidgetImpl::set_widget_type(std::string const& widget_type)
 
 void PreviewWidgetImpl::add_attribute(std::string const& key, Variant const& value)
 {
-    if (key == "id" || key == "type")
+    if (key == "id" || key == "type" || key == "components")
     {
-        throw InvalidArgumentException("PreviewWidget::add_attribute(): Can't override attribute '" + key + "'");
+        throw InvalidArgumentException("PreviewWidget::add_attribute(): Can't override '" + key + "'");
     }
     attributes_[key] = value;
 }
@@ -160,7 +164,7 @@ std::string PreviewWidgetImpl::widget_type() const
     return type_;
 }
 
-VariantMap PreviewWidgetImpl::components() const
+std::map<std::string, std::string> PreviewWidgetImpl::components() const
 {
     return components_;
 }
@@ -172,10 +176,17 @@ VariantMap PreviewWidgetImpl::attributes() const
 
 std::string PreviewWidgetImpl::data() const
 {
+    // convert from map<string,string> to VariantMap
+    VariantMap cm;
+    for (const auto kv: components_)
+    {
+        cm[kv.first] = Variant(kv.second);
+    }
+
     VariantMap var;
     var["id"] = id_;
     var["type"] = type_;
-    var["components"] = components_;
+    var["components"] = Variant(cm);
     for (auto kv: attributes_)
     {
         var[kv.first] = kv.second;
@@ -196,12 +207,19 @@ void PreviewWidgetImpl::throw_on_empty(std::string const& name, std::string cons
 
 VariantMap PreviewWidgetImpl::serialize() const
 {
+    // convert from map<string,string> to VariantMap
+    VariantMap cm;
+    for (const auto kv: components_)
+    {
+        cm[kv.first] = Variant(kv.second);
+    }
+
     // note: the internal on-wire serialization doesn't exactly match the json definition
     VariantMap vm;
     vm["id"] = id_;
     vm["type"] = type_;
     vm["attributes"] = attributes_;
-    vm["components"] = components_;
+    vm["components"] = Variant(cm);
     return vm;
 }
 

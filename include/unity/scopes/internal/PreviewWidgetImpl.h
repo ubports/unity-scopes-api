@@ -47,7 +47,7 @@ public:
 
     std::string id() const;
     std::string widget_type() const;
-    VariantMap components() const;
+    std::map<std::string, std::string> components() const;
     VariantMap attributes() const;
     std::string data() const;
 
@@ -59,7 +59,7 @@ private:
     std::string id_;
     std::string type_;
     VariantMap attributes_;
-    VariantMap components_;
+    std::map<std::string, std::string> components_;
 };
 
 } // namespace internal

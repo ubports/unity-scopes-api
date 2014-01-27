@@ -200,7 +200,12 @@ public:
         {
             cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
                  << "\t\t attributes: " << to_string(Variant(it->attributes())) << endl
-                 << "\t\t components: " << to_string(Variant(it->components())) <<  endl;
+                 << "\t\t components: {";
+            for (const auto kv: it->components())
+            {
+                cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
+            }
+            cout << "}" << endl;
         }
     }
 

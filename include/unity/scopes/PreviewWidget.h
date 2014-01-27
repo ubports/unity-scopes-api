@@ -58,7 +58,7 @@ public:
 
     std::string id() const;
     std::string widget_type() const;
-    VariantMap components() const;
+    std::map<std::string, std::string> components() const;
     VariantMap attributes() const;
     std::string data() const;
 

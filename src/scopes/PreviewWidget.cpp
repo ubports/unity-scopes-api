@@ -85,7 +85,7 @@ std::string PreviewWidget::widget_type() const
     return p->widget_type();
 }
 
-VariantMap PreviewWidget::components() const
+std::map<std::string, std::string> PreviewWidget::components() const
 {
     return p->components();
 }

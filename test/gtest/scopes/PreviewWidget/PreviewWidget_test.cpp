@@ -37,7 +37,7 @@ TEST(PreviewWidget, basic)
     EXPECT_EQ(1, w.attributes().size());
     EXPECT_EQ(10, w.attributes()["foo"].get_int());
     EXPECT_EQ(1, w.components().size());
-    EXPECT_EQ("bar", w.components()["boo"].get_string());
+    EXPECT_EQ("bar", w.components()["boo"]);
 
     internal::JsonCppNode node(w.data());
     EXPECT_EQ("i1", node.get_node("id")->as_string());
@@ -71,8 +71,6 @@ TEST(PreviewWidget, exceptions)
         EXPECT_THROW(w.add_component("id", "x"), unity::InvalidArgumentException);
         EXPECT_THROW(w.add_component("type", "x"), unity::InvalidArgumentException);
     }
-    VariantMap v;
-    v["af"] =m;
 }
 
 TEST(PreviewWidget, serialize)
@@ -109,6 +107,6 @@ TEST(PreviewWidget, deserialize)
         EXPECT_EQ(1, w.attributes().size());
         EXPECT_EQ("bar", w.attributes()["foo"].get_string());
         EXPECT_EQ(1, w.components().size());
-        EXPECT_EQ("cee", w.components()["bee"].get_string());
+        EXPECT_EQ("cee", w.components()["bee"]);
     }
 }
