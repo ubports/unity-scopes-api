@@ -10,19 +10,19 @@ include_directories(
 )
 
 add_executable(
-    SSRegistryObject_test
+    smartscopesproxy_test
 
-    SSRegistryObject_test.cpp
+    smartscopesproxy_test.cpp
 )
 
 target_link_libraries(
-    SSRegistryObject_test
+    smartscopesproxy_test
 
     ${TESTLIBS}
 )
 
 add_test(
-    SSRegistryObject
+    smartscopesproxy
 
-    SSRegistryObject_test
+    smartscopesproxy_test
 )

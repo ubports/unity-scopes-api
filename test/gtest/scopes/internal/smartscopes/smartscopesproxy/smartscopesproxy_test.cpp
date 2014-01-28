@@ -31,7 +31,7 @@ using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 
-TEST(SSRegistryObject, basic)
+TEST(smartscopesproxy, basic)
 {
   RaiiServer test_server(FAKE_SSS_PATH);
 

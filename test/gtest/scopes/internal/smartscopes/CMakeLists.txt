@@ -1,4 +1,3 @@
 add_subdirectory(HttpClient)
 add_subdirectory(SmartScopesClient)
-add_subdirectory(SSRegistryObject)
-add_subdirectory(SSScopeObject)
+add_subdirectory(smartscopesproxy)
