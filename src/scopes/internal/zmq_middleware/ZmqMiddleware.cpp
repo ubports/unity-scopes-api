@@ -54,9 +54,9 @@ namespace zmq_middleware
 namespace
 {
 
-char const* query_suffix = "-query";  // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-ctrl";    // Appended to server_name_ to create control adapter name
-char const* reply_suffix = "-reply";  // Appended to server_name_ to create reply adapter name
+char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
+char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 
 } // namespace
 
