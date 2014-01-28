@@ -287,7 +287,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("Runtime.ini");
+        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
         auto meta = r->get_metadata(scope_name);
