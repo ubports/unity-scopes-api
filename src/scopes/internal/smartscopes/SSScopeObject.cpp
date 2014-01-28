@@ -38,7 +38,8 @@ namespace internal
 namespace smartscopes
 {
 
-SSScopeObject::SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware,
+SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
+                             MiddlewareBase::SPtr middleware,
                              SSRegistryObject::SPtr registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<QueryCtrlObject>())
@@ -143,7 +144,6 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         qo_->add_query(info.id, query_base, reply);
 
         MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, "inproc://" + ss_scope_id_ + "-q");
-
         query_proxy->run(reply);
     }
     catch (std::exception const& e)

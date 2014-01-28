@@ -93,7 +93,7 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
 
     if (!reply_.empty())
     {
-      return;
+        return;
     }
 
     if (!reply)
