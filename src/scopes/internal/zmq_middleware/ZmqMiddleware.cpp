@@ -215,6 +215,34 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     return proxy;
 }
 
+MWQueryProxy ZmqMiddleware::create_query_proxy(string const& identity, string const& endpoint)
+{
+    MWQueryProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqQuery(this, endpoint, identity, "Query"));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
+MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, string const& endpoint)
+{
+    MWQueryCtrlProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqQueryCtrl(this, endpoint, identity, "QueryCtrl"));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
 {
     assert(ctrl);
