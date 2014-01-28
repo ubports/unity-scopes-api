@@ -42,7 +42,7 @@ dos2unix="@DOS2UNIX_COMMAND@"
 [ $# -eq 0 ] && {
     tmp=`mktemp`
     cat >$tmp
-    "$astyle" -q --options=/home/michi/src/format-tool/astyle-config -n $tmp
+    "$astyle" -q --options=@CMAKE_SOURCE_DIR@/astyle-config -n $tmp
     "$dos2unix" -q $tmp
     "$format" -i -style=file $tmp
     cat $tmp
