@@ -106,6 +106,13 @@ Filters + FilterState
  'filter'       : array of filters (implementations of FilterBase)
  'filter_state' : FilterState
 
+PreviewResult (returned by serialize())
+=======================================
+ 'id'         : string
+ 'type'       : string
+ 'attributes' : dict
+ 'components' : dict
+
 PushRequest (capnproto structure)
 =================================
  result : ValueDict with "category" and/or "result" or "annotation" key and

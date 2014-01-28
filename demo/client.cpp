@@ -71,7 +71,7 @@ std::string to_string(Variant const& var)
             str << "null";
             break;
         case Variant::Type::Bool:
-            str << var.get_bool();
+            str << std::boolalpha << var.get_bool();
             break;
         case Variant::Type::String:
             str << "\"" << var.get_string() << "\"";
@@ -83,7 +83,7 @@ std::string to_string(Variant const& var)
             str << "{";
             for (auto kv: var.get_dict())
             {
-                str << "\"" << kv.first << "\":" << to_string(kv.second);
+                str << "\"" << kv.first << "\":" << to_string(kv.second) << ", ";
             }
             str << "}";
             break;
@@ -232,8 +232,14 @@ public:
         cout << "\tGot preview widgets:" << endl;
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
-            cout << "\t\t" << it->data();
-            cout << endl;
+            cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
+                 << "\t\t attributes: " << to_string(Variant(it->attributes())) << endl
+                 << "\t\t components: {";
+            for (const auto kv: it->components())
+            {
+                cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
+            }
+            cout << "}" << endl;
         }
     }
 
