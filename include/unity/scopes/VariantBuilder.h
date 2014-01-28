@@ -60,7 +60,12 @@ class UNITY_API VariantBuilder
 {
 public:
     VariantBuilder();
+    VariantBuilder(VariantBuilder const& other);
+    VariantBuilder(VariantBuilder&& other);
     virtual ~VariantBuilder();
+
+    VariantBuilder& operator=(VariantBuilder const& other);
+    VariantBuilder& operator=(VariantBuilder&& other);
 
     /**
     \brief Adds a tuple of key-value pairs to an array.

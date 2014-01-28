@@ -36,6 +36,7 @@ class VariantBuilderImpl final
 {
 public:
     VariantBuilderImpl() = default;
+    VariantBuilderImpl(VariantBuilderImpl const& other) = default;
     ~VariantBuilderImpl() = default;
     void add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple);
     void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
