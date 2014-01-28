@@ -41,12 +41,17 @@ SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPt
 
 SearchHandle::~SearchHandle()
 {
-    ssc_->cancel_search(session_id_);
+    cancel_search();
 }
 
 std::vector<SearchResult> SearchHandle::get_search_results()
 {
     return ssc_->get_search_results(session_id_);
+}
+
+void SearchHandle::cancel_search()
+{
+    ssc_->cancel_search(session_id_);
 }
 
 //-- SmartScopesClient
@@ -172,19 +177,19 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url, std::s
 
     if (!locale.empty())
     {
-        search_uri << "&locale=\"" << locale << "\"";
+        search_uri << "&locale=" << locale;
     }
     if (!country.empty())
     {
-        search_uri << "&country=\"" << country << "\"";
+        search_uri << "&country=" << country;
     }
     if (!latitude.empty())
     {
-        search_uri << "&latitude=\"" << latitude << "\"";
+        search_uri << "&latitude=" << latitude;
     }
     if (!longitude.empty())
     {
-        search_uri << "&longitude=\"" << longitude << "\"";
+        search_uri << "&longitude=" << longitude;
     }
     if (limit != 0)
     {

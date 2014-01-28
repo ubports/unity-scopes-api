@@ -26,6 +26,8 @@
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Annotation.h>
 
+#include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+
 #include <iostream>
 
 namespace unity
@@ -45,9 +47,13 @@ class SmartQuery : public SearchQuery
 public:
   SmartQuery(std::string const& id, SSRegistryObject::SPtr reg, std::string const& query) :
     scope_id_(id),
-    registry_(reg),
     query_(query)
   {
+    SmartScopesClient::SPtr ss_client = reg->get_ssclient();
+    std::string base_url = reg->get_base_url(scope_id_);
+
+    search_handle_ = ss_client->search(base_url, query_, "session_id", 0,
+                                       "platform", "en", "US", "0", "0", 10);
   }
 
   ~SmartQuery() noexcept
@@ -56,31 +62,40 @@ public:
 
   virtual void cancelled() override
   {
+    search_handle_->cancel_search();
   }
 
   virtual void run(SearchReplyProxy const& reply) override
   {
-    CategoryRenderer rdr;
-    auto cat = reply->register_category("cat1", "Category 1", "", rdr);
-    CategorisedResult res(cat);
-    res.set_uri("uri");
-    res.set_title("SmartScope: result 1 for \"" + scope_id_ + "\": query \"" + query_ + "\"");
-    res.set_art("icon");
-    res.set_dnd_uri("dnd_uri");
-    reply->push(res);
+    std::vector<SearchResult> results = search_handle_->get_search_results();
+    std::map<std::string, Category::SCPtr> categories;
 
-    Query q("SmartScope", query_, "");
-    Annotation annotation(Annotation::Type::Link);
-    annotation.add_link("More...", q);
-    reply->push(annotation);
+    for( auto& result : results )
+    {
+      if (categories.find(result.category->id) == end(categories))
+      {
+        CategoryRenderer rdr(result.category->renderer_template);
+        Category::SCPtr cat = reply->register_category(result.category->id, result.category->title,
+                                                       result.category->icon, rdr);
+        categories[result.category->id] = cat;
+      }
+
+      Category::SCPtr cat = categories[result.category->id];
+      CategorisedResult res(cat);
+      res.set_uri(result.uri);
+      res.set_title(result.title);
+      res.set_art(result.art);
+      res.set_dnd_uri(result.dnd_uri);
+      reply->push(res);
+    }
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_ << "\" complete" << std::endl;
   }
 
 private:
   std::string scope_id_;
-  SSRegistryObject::SPtr registry_;
   std::string query_;
+  SearchHandle::UPtr search_handle_;
 };
 
 class SmartScope

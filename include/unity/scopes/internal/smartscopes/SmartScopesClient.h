@@ -78,6 +78,7 @@ public:
     ~SearchHandle();
 
     std::vector<SearchResult> get_search_results();
+    void cancel_search();
 
 private:
     friend class SmartScopesClient;
