@@ -22,8 +22,6 @@
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
-#include <unity/scopes/internal/zmq_middleware/RethrowException.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -35,8 +33,6 @@ namespace scopes
 
 namespace internal
 {
-
-using namespace zmq_middleware;
 
 namespace smartscopes
 {
@@ -154,17 +150,8 @@ void SSRegistryObject::get_remote_scopes()
         metadata->set_search_hint("");
         metadata->set_hot_key("");
 
-        ScopeProxy proxy;
-        try
-        {
-          MWScopeProxy scope_proxy(new ZmqScope(static_cast<ZmqMiddleware*>(middleware_.get()),
-                                                "ipc:///tmp/" + ss_scope_id_, scope.name, "Scope", no_reply_timeout_));
-          proxy = ScopeImpl::create(scope_proxy, middleware_->runtime(), scope.name);
-        }
-        catch (zmqpp::exception const& e)
-        {
-            rethrow_zmq_ex(e);
-        }
+        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc:///tmp/" + ss_scope_id_),
+                                             middleware_->runtime(), scope.name);
 
         metadata->set_proxy(proxy);
 
