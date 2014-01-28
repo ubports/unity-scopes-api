@@ -42,7 +42,7 @@ class SSRegistryObject final : public RegistryObjectBase
 public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id, uint no_reply_timeout);
+    SSRegistryObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, uint no_reply_timeout);
     virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name) override;

@@ -37,7 +37,7 @@ namespace internal
 namespace smartscopes
 {
 
-SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id, uint no_reply_timeout)
+SSRegistryObject::SSRegistryObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, uint no_reply_timeout)
     : ssclient_(std::make_shared<SmartScopesClient>(
                   std::make_shared<HttpClientQt>(4, no_reply_timeout), std::make_shared<JsonCppNode>()))
     , refresh_stopped_(false)

@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
+#include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/QueryBase.h>
 
 #include <string>
@@ -46,7 +47,7 @@ class SSScopeObject final : public ScopeObjectBase
 public:
     UNITY_DEFINES_PTRS(SSScopeObject);
 
-    SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
+    SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
     virtual ~SSScopeObject() noexcept;
 
     // Remote operation implementations
@@ -77,10 +78,13 @@ private:
                            std::function<QueryBase::SPtr(void)> const& query_factory_fun);
 
 private:
+    std::string ss_scope_id_;
+
     QueryCtrlObject::SPtr co_;
     SSQueryObject::SPtr qo_;
 
     std::unique_ptr<SmartScope> const smartscope_;
+    UniqueID unique_id_;
 };
 
 }  // namespace smartscopes
