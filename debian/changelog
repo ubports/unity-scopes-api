@@ -8,30 +8,6 @@ unity-scopes-api (0.2.6-0ubuntu1) UNRELEASED; urgency=low
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Mon, 27 Jan 2014 15:42:18 +0100
 
-unity-scopes-api (0.2.5-0ubuntu1) UNRELEASED; urgency=low
-
-  [ Michi Henning ]
-  * Added ability for scope to push an exception (as an exception_ptr). On the client side,
-    the exception is delivered as the what() string (if the exception is a std::exception) and
-    as "unknown exception", otherwise.
-
-  [ Jussi Pakkanen ]
-  * Version bump due to namespace peeling.
-
-  [ Michal Hruby ]
-  * Added preview and activation APIs.
-
-  [ Michi Henning ]
-  * Added default servants for Scope and QueryCtrl interfaces.
-
-  [ Pawel Stolowski ]
-  * Added set_category to CategorisedResult, removed Variant-based ctor.
-
-  [ Michi Henning ]
-  * More default servant support.
-
- -- michi <michi.henning@canonical.com>  Fri, 24 Jan 2014 12:24:50 +1000
-
 unity-scopes-api (0.2.4+14.04.20140124-0ubuntu1) trusty; urgency=low
 
   [ Michi Henning ]
