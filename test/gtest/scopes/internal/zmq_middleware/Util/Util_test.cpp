@@ -39,7 +39,6 @@ TEST(Util, basic)
     const string max_endpoint = schema + string(maxlen, 'x');
     const string max_endpoint_plus_one = schema + string(maxlen + 1, 'x');
 
-cerr << "max: " << maxlen << endl;
     throw_if_bad_endpoint(short_endpoint);         // Must not throw
     throw_if_bad_endpoint(max_endpoint);           // Must throw
     try
@@ -49,7 +48,6 @@ cerr << "max: " << maxlen << endl;
     }
     catch (MiddlewareException const& e)
     {
-        cerr << e.what() << endl;
         boost::regex r("unity::scopes::MiddlewareException: Socket path name too long \\(max = [0-9]+\\)\\: x+");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
