@@ -59,9 +59,9 @@ void VariantBuilder::add_tuple(std::vector<std::pair<std::string, Variant>> cons
     p->add_tuple(tuple);
 }
 
-VariantArray VariantBuilder::to_variant_array() const
+Variant VariantBuilder::end()
 {
-    return p->to_variant_array();
+    return p->end();
 }
 
 } // namespace scopes

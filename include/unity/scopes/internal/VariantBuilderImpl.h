@@ -36,14 +36,17 @@ class VariantBuilderImpl final
 {
 public:
     VariantBuilderImpl() = default;
-    VariantBuilderImpl(VariantBuilderImpl const& other) = default;
+    VariantBuilderImpl(VariantBuilderImpl const& other);
+    VariantBuilderImpl(VariantBuilderImpl&&) = default;
     ~VariantBuilderImpl() = default;
+    VariantBuilderImpl& operator=(VariantBuilderImpl const& other) = delete;
+    VariantBuilderImpl& operator=(VariantBuilderImpl&&) = default;
     void add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple);
     void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
-    VariantArray to_variant_array() const;
+    Variant end();
 
 private:
-    Variant variant_;
+    std::unique_ptr<Variant> variant_;
 };
 
 } // namespace internal
