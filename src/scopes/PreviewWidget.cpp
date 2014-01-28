@@ -32,19 +32,71 @@ PreviewWidget::PreviewWidget(std::string const& definition)
 {
 }
 
-PreviewWidget::PreviewWidget(VariantMap const& definition)
-    : p(new internal::PreviewWidgetImpl(definition))
+PreviewWidget::PreviewWidget(std::string const& id, std::string const &widget_type)
+    : p(new internal::PreviewWidgetImpl(id, widget_type))
 {
 }
 
-std::string PreviewWidget::data() const
+PreviewWidget::PreviewWidget(internal::PreviewWidgetImpl *impl)
+    : p(impl)
 {
-    return p->data();
+}
+
+PreviewWidget::PreviewWidget(PreviewWidget const& other)
+    : p(new internal::PreviewWidgetImpl(*(other.p)))
+{
+}
+
+PreviewWidget::PreviewWidget(PreviewWidget&&) = default;
+PreviewWidget& PreviewWidget::operator=(PreviewWidget&&) = default;
+
+PreviewWidget& PreviewWidget::operator=(PreviewWidget const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::PreviewWidgetImpl(*(other.p)));
+    }
+    return *this;
 }
 
 VariantMap PreviewWidget::serialize() const
 {
     return p->serialize();
+}
+
+void PreviewWidget::add_attribute(std::string const& key, Variant const& value)
+{
+    p->add_attribute(key, value);
+}
+
+void PreviewWidget::add_component(std::string const& key, std::string const& field_name)
+{
+    p->add_component(key, field_name);
+}
+
+std::string PreviewWidget::id() const
+{
+    return p->id();
+}
+
+std::string PreviewWidget::widget_type() const
+{
+    return p->widget_type();
+}
+
+std::map<std::string, std::string> PreviewWidget::components() const
+{
+    return p->components();
+}
+
+VariantMap PreviewWidget::attributes() const
+{
+    return p->attributes();
+}
+
+std::string PreviewWidget::data() const
+{
+    return p->data();
 }
 
 //! @endcond

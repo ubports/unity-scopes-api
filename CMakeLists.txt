@@ -74,13 +74,19 @@ find_program(ASTYLE_COMMAND NAMES astyle)
 if (NOT ASTYLE_COMMAND)
     message(WARNING "Cannot find astyle: formatcode target will not be available")
 else()
-    find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.5)
-    if (NOT CLANG_FORMAT_COMMAND)
-        message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
+    # astyle 2.03 creates DOS line endings, so we need to fix its output
+    find_program(DOS2UNIX_COMMAND NAMES dos2unix)
+    if (NOT DOS2UNIX_COMMAND)
+        message(WARNING "Cannot find dos2unix: formatcode target will not be available")
+    else()
+        find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.5)
+        if (NOT CLANG_FORMAT_COMMAND)
+            message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
+        endif()
     endif()
 endif()
 
-if (ASTYLE_COMMAND AND CLANG_FORMAT_COMMAND)
+if (ASTYLE_COMMAND AND DOS2UNIX_COMMAND AND CLANG_FORMAT_COMMAND)
 set(UNITY_SCOPES_LIB_HDRS ${UNITY_SCOPES_LIB_HDRS} ${fmt_h})
     add_custom_target(formatcode
                       ${PROJECT_SOURCE_DIR}/tools/format-files.sh ${PROJECT_SOURCE_DIR} ${ASTYLE_COMMAND} ${CLANG_FORMAT_COMMAND})
@@ -178,7 +184,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 2)
-set(UNITY_SCOPES_MICRO 5)
+set(UNITY_SCOPES_MICRO 6)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -259,6 +265,7 @@ add_subdirectory(scoperunner)
 add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
+add_subdirectory(tools)
 
 # Custom rules to compile .capnp files
 foreach(file ${CAPNPROTO_FILES})
