@@ -58,34 +58,26 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
 
 TEST(RegistryI, get_metadata)
 {
-    try
-    {
-        vector<string> dummy_spawn_command;
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-            "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    vector<string> dummy_spawn_command;
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
+        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
 
-        string identity = runtime->registry_identity();
-        RegistryConfig c(identity, runtime->registry_configfile());
-        string mw_kind = c.mw_kind();
-        string mw_endpoint = c.endpoint();
-        string mw_configfile = c.mw_configfile();
+    string identity = runtime->registry_identity();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    string mw_kind = c.mw_kind();
+    string mw_endpoint = c.endpoint();
+    string mw_configfile = c.mw_configfile();
 
-        MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-        RegistryObject::SPtr ro(make_shared<RegistryObject>());
-        auto registry = middleware->add_registry_object(identity, ro);
-        auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", p, middleware)),
-                dummy_spawn_command));
+    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+    RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    auto registry = middleware->add_registry_object(identity, ro);
+    auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
+    EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", p, middleware)),
+            dummy_spawn_command));
 
-        auto r = runtime->registry();
-        auto scope = r->get_metadata("scope1");
-        EXPECT_EQ("scope1", scope.scope_name());
-    }
-    catch (unity::Exception const& e)
-    {
-        cerr << e.to_string() << endl;
-        FAIL();
-    }
+    auto r = runtime->registry();
+    auto scope = r->get_metadata("scope1");
+    EXPECT_EQ("scope1", scope.scope_name());
 }
 
 TEST(RegistryI, list)
@@ -216,8 +208,8 @@ TEST(RegistryI, exceptions)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_EQ("unity::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::get_metadata(): no such scope (name = fred)",
+                     e.what());
     }
 
     try
@@ -227,9 +219,9 @@ TEST(RegistryI, exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_EQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
-                  "Registry: Cannot search for scope with empty name",
-                  e.to_string());
+        EXPECT_STREQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
+                     "Registry: Cannot search for scope with empty name",
+                     e.what());
     }
 
     try
@@ -240,8 +232,8 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+                     e.what());
     }
 
     try
@@ -251,8 +243,8 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+                     e.what());
     }
 }
 
@@ -325,28 +317,27 @@ TEST(RegistryI, locate)
         EXPECT_STREQ("unity::scopes::RegistryException: Couldn't start error_scope", e.what());
     }
 
-#if 0
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        ro->add("", move(make_meta("blah", proxy, middleware)));
+        mro->add_local_scope("", move(make_meta("blah", proxy, middleware)),
+                 dummy_spawn_command);
         FAIL();
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+                     e.what());
     }
 
     try
     {
-        ro->remove("");
+        mro->remove_local_scope("");
         FAIL();
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_EQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
-                  e.to_string());
+        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+                     e.what());
     }
-#endif
 }
