@@ -94,22 +94,13 @@ void ScopeI::create_query_(Current const& current,
                                                                                 hints,
                                                                                 reply_proxy,
                                                                                 to_info(current)));
+    assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
-
-    if (ctrl_proxy)
-    {
-        p.setEndpoint(ctrl_proxy->endpoint().c_str());
-        p.setIdentity(ctrl_proxy->identity().c_str());
-        p.setCategory(ctrl_proxy->category().c_str());
-    }
-    else
-    {
-        p.setEndpoint(current.adapter->endpoint());
-        p.setIdentity(current.id);
-        p.setCategory("QueryCtrl");
-    }
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
 }
 
 void ScopeI::activate_(Current const& current,
@@ -130,22 +121,13 @@ void ScopeI::activate_(Current const& current,
                                                                             hints,
                                                                             reply_proxy,
                                                                             to_info(current)));
+    assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
-
-    if (ctrl_proxy)
-    {
-        p.setEndpoint(ctrl_proxy->endpoint().c_str());
-        p.setIdentity(ctrl_proxy->identity().c_str());
-        p.setCategory(ctrl_proxy->category().c_str());
-    }
-    else
-    {
-        p.setEndpoint(current.adapter->endpoint());
-        p.setIdentity(current.id);
-        p.setCategory("QueryCtrl");
-    }
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
 }
 
 void ScopeI::activate_preview_action_(Current const& current,
@@ -167,22 +149,13 @@ void ScopeI::activate_preview_action_(Current const& current,
                                                                                            action_id,
                                                                                            reply_proxy,
                                                                                            to_info(current)));
+    assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
-
-    if (ctrl_proxy)
-    {
-        p.setEndpoint(ctrl_proxy->endpoint().c_str());
-        p.setIdentity(ctrl_proxy->identity().c_str());
-        p.setCategory(ctrl_proxy->category().c_str());
-    }
-    else
-    {
-        p.setEndpoint(current.adapter->endpoint());
-        p.setIdentity(current.id);
-        p.setCategory("QueryCtrl");
-    }
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
 }
 
 void ScopeI::preview_(Current const& current,
@@ -203,22 +176,13 @@ void ScopeI::preview_(Current const& current,
                                                                            hints,
                                                                            reply_proxy,
                                                                            to_info(current)));
+    assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto create_query_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = create_query_response.initReturnValue();
-
-    if (ctrl_proxy)
-    {
-        p.setEndpoint(ctrl_proxy->endpoint().c_str());
-        p.setIdentity(ctrl_proxy->identity().c_str());
-        p.setCategory(ctrl_proxy->category().c_str());
-    }
-    else
-    {
-        p.setEndpoint(current.adapter->endpoint());
-        p.setIdentity(current.id);
-        p.setCategory("QueryCtrl");
-    }
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->category().c_str());
 }
 
 } // namespace zmq_middleware

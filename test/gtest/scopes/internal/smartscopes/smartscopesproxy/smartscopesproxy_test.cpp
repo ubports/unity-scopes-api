@@ -47,7 +47,7 @@ TEST(smartscopesproxy, basic)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-    SSRegistryObject::SPtr reg(new SSRegistryObject(middleware, "SmartScope"));
+    SSRegistryObject::SPtr reg(new SSRegistryObject(middleware, "SmartScope", 2000));
 
     // list scopes
     MetadataMap scopes = reg->list();

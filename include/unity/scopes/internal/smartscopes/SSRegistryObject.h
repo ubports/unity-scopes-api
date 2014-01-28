@@ -42,7 +42,7 @@ class SSRegistryObject final : public RegistryObjectBase
 public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id);
+    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id, uint no_reply_timeout);
     virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name) override;
@@ -73,6 +73,7 @@ private:
 
     MiddlewareBase::SPtr middleware_;
     std::string ss_scope_id_;
+    uint const no_reply_timeout_;
 };
 
 }  // namespace smartscopes
