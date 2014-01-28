@@ -24,10 +24,10 @@
 #include <QTimer>
 
 HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
-    : QThread(),
-      url_(url),
-      timeout_(timeout),
-      success_(false)
+    : QThread()
+    , url_(url)
+    , timeout_(timeout)
+    , success_(false)
 {
 }
 
@@ -59,7 +59,7 @@ void HttpClientQtThread::run()
 
     QTimer timeout;
     timeout.singleShot(timeout_, this, SLOT(timeout()));
-    QThread::exec(); // enter event loop
+    QThread::exec();  // enter event loop
 
     delete reply;
     delete manager;

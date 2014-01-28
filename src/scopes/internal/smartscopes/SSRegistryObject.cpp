@@ -25,151 +25,164 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-namespace unity {
+namespace unity
+{
 
-namespace scopes {
+namespace scopes
+{
 
-namespace internal {
+namespace internal
+{
 
-namespace smartscopes {
+namespace smartscopes
+{
 
-SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
-                                   std::string const& ss_scope_id)
-  : ssclient_(std::make_shared<SmartScopesClient>(
-                std::make_shared<HttpClientQt>(4),
-                std::make_shared<JsonCppNode>())),
-    refresh_stopped_(false),
-    middleware_(middleware),
-    ss_scope_id_(ss_scope_id) {
-  get_remote_scopes();
-  refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
+SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id)
+    : ssclient_(std::make_shared<SmartScopesClient>(std::make_shared<HttpClientQt>(4), std::make_shared<JsonCppNode>()))
+    , refresh_stopped_(false)
+    , middleware_(middleware)
+    , ss_scope_id_(ss_scope_id)
+{
+    get_remote_scopes();
+    refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
 
-SSRegistryObject::~SSRegistryObject() noexcept {
-  {
-    std::lock_guard<std::mutex> lock(refresh_mutex_);
+SSRegistryObject::~SSRegistryObject() noexcept
+{
+    {
+        std::lock_guard<std::mutex> lock(refresh_mutex_);
 
-    refresh_stopped_ = true;
-    refresh_cond_.notify_all();
-  }
+        refresh_stopped_ = true;
+        refresh_cond_.notify_all();
+    }
 
-  refresh_thread_.join();
+    refresh_thread_.join();
 }
 
-ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_name) {
-  // If the name is empty, it was sent as empty by the remote client.
-  if (scope_name.empty()) {
-    throw unity::InvalidArgumentException(
-          "SSRegistryObject: Cannot search for scope with empty name");
-  }
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_name)
+{
+    // If the name is empty, it was sent as empty by the remote client.
+    if (scope_name.empty())
+    {
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty name");
+    }
 
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
 
-  auto const &it = scopes_.find(scope_name);
-  if (it == scopes_.end()) {
-    throw NotFoundException("SSRegistryObject::get_metadata(): no such scope",
-                            scope_name);
-  }
-  return it->second;
+    auto const& it = scopes_.find(scope_name);
+    if (it == scopes_.end())
+    {
+        throw NotFoundException("SSRegistryObject::get_metadata(): no such scope", scope_name);
+    }
+    return it->second;
 }
 
-MetadataMap SSRegistryObject::list() {
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
-  return scopes_;
+MetadataMap SSRegistryObject::list()
+{
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
+    return scopes_;
 }
 
-ScopeProxy SSRegistryObject::locate(std::string const& scope_name) {
-  (void)scope_name;
-  return ScopeProxy();
+ScopeProxy SSRegistryObject::locate(std::string const& scope_name)
+{
+    (void)scope_name;
+    return ScopeProxy();
 }
 
 std::string SSRegistryObject::get_base_url(std::string const& scope_name)
 {
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
 
-  if (base_urls_.find(scope_name) != end(base_urls_)) {
-    return base_urls_[scope_name];
-  }
-  else {
-    throw NotFoundException("SSRegistryObject::get_base_url(): no such scope",
-                            scope_name);
-  }
+    if (base_urls_.find(scope_name) != end(base_urls_))
+    {
+        return base_urls_[scope_name];
+    }
+    else
+    {
+        throw NotFoundException("SSRegistryObject::get_base_url(): no such scope", scope_name);
+    }
 }
 
 SmartScopesClient::SPtr SSRegistryObject::get_ssclient()
 {
-  return ssclient_;
+    return ssclient_;
 }
 
-void SSRegistryObject::refresh_thread() {
-  std::lock_guard<std::mutex> lock(refresh_mutex_);
+void SSRegistryObject::refresh_thread()
+{
+    std::lock_guard<std::mutex> lock(refresh_mutex_);
 
-  while (!refresh_stopped_) {
-    refresh_cond_.wait_for(refresh_mutex_, std::chrono::hours(24));
-
-    if (!refresh_stopped_) {
-      get_remote_scopes();
-    }
-  }
-}
-
-void SSRegistryObject::get_remote_scopes() {
-  std::vector<RemoteScope> remote_scopes = ssclient_->get_remote_scopes();
-
-  std::lock_guard<std::mutex> lock(scopes_mutex_);
-  base_urls_.clear();
-  scopes_.clear();
-
-  for (RemoteScope const &scope : remote_scopes) {
-    if (scope.invisible)
+    while (!refresh_stopped_)
     {
-      continue;
+        refresh_cond_.wait_for(refresh_mutex_, std::chrono::hours(24));
+
+        if (!refresh_stopped_)
+        {
+            get_remote_scopes();
+        }
+    }
+}
+
+void SSRegistryObject::get_remote_scopes()
+{
+    std::vector<RemoteScope> remote_scopes = ssclient_->get_remote_scopes();
+
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
+    base_urls_.clear();
+    scopes_.clear();
+
+    for (RemoteScope const& scope : remote_scopes)
+    {
+        if (scope.invisible)
+        {
+            continue;
+        }
+
+        std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
+
+        metadata->set_scope_name(scope.name);
+        metadata->set_display_name(scope.name);
+        metadata->set_description(scope.description);
+        metadata->set_art("");
+        metadata->set_icon("");
+        metadata->set_search_hint("");
+        metadata->set_hot_key("");
+
+        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc:///tmp/" + ss_scope_id_),
+                                             middleware_->runtime(),
+                                             scope.name);
+
+        metadata->set_proxy(proxy);
+
+        auto meta = ScopeMetadataImpl::create(move(metadata));
+        add(scope.name, std::move(meta), scope);
+    }
+}
+
+bool SSRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata, RemoteScope const& remotedata)
+{
+    if (scope_name.empty())
+    {
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty name");
     }
 
-    std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
+    base_urls_[scope_name] = remotedata.base_url;
 
-    metadata->set_scope_name(scope.name);
-    metadata->set_display_name(scope.name);
-    metadata->set_description(scope.description);
-    metadata->set_art("");
-    metadata->set_icon("");
-    metadata->set_search_hint("");
-    metadata->set_hot_key("");
-
-    ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc:///tmp/" + ss_scope_id_),
-                                         middleware_->runtime(), scope.name);
-
-    metadata->set_proxy(proxy);
-
-    auto meta = ScopeMetadataImpl::create(move(metadata));
-    add(scope.name, std::move(meta), scope);
-  }
+    auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
+    if (!pair.second)
+    {
+        // Replace already existing entry with this one
+        scopes_.erase(pair.first);
+        scopes_.insert(make_pair(scope_name, metadata));
+        return false;
+    }
+    return true;
 }
 
-bool SSRegistryObject::add(std::string const& scope_name,
-                           ScopeMetadata const& metadata,
-                           RemoteScope const& remotedata) {
-  if (scope_name.empty()) {
-    throw unity::InvalidArgumentException(
-          "SSRegistryObject: Cannot add scope with empty name");
-  }
+}  // namespace smartscopes
 
-  base_urls_[scope_name] = remotedata.base_url;
+}  // namespace internal
 
-  auto const &pair = scopes_.insert(make_pair(scope_name, metadata));
-  if (!pair.second) {
-    // Replace already existing entry with this one
-    scopes_.erase(pair.first);
-    scopes_.insert(make_pair(scope_name, metadata));
-    return false;
-  }
-  return true;
-}
+}  // namespace scopes
 
-} // namespace smartscopes
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
+}  // namespace unity

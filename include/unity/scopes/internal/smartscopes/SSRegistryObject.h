@@ -25,57 +25,62 @@
 
 #include <mutex>
 
-namespace unity {
+namespace unity
+{
 
-namespace scopes {
+namespace scopes
+{
 
-namespace internal {
+namespace internal
+{
 
-namespace smartscopes {
+namespace smartscopes
+{
 
-class SSRegistryObject final : public RegistryObjectBase {
+class SSRegistryObject final : public RegistryObjectBase
+{
 public:
-  UNITY_DEFINES_PTRS(SSRegistryObject);
+    UNITY_DEFINES_PTRS(SSRegistryObject);
 
-  SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id);
-  virtual ~SSRegistryObject() noexcept;
+    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_id);
+    virtual ~SSRegistryObject() noexcept;
 
-  ScopeMetadata get_metadata(std::string const& scope_name) override;
-  MetadataMap list() override;
+    ScopeMetadata get_metadata(std::string const& scope_name) override;
+    MetadataMap list() override;
 
-  ScopeProxy locate(std::string const& scope_name) override;
+    ScopeProxy locate(std::string const& scope_name) override;
 
-  std::string get_base_url(std::string const& scope_name);
-  SmartScopesClient::SPtr get_ssclient();
-
-private:
-  void refresh_thread();
-
-  void get_remote_scopes();
-  bool add(std::string const& scope_name, ScopeMetadata const& scope, RemoteScope const& remotedata);
+    std::string get_base_url(std::string const& scope_name);
+    SmartScopesClient::SPtr get_ssclient();
 
 private:
-  SmartScopesClient::SPtr ssclient_;
+    void refresh_thread();
 
-  MetadataMap scopes_;
-  std::map<std::string, std::string> base_urls_;
-  std::mutex scopes_mutex_;
+    void get_remote_scopes();
+    bool add(std::string const& scope_name, ScopeMetadata const& scope, RemoteScope const& remotedata);
 
-  std::thread refresh_thread_;
-  std::mutex refresh_mutex_;
-  std::condition_variable_any refresh_cond_;
-  bool refresh_stopped_;
+private:
+    SmartScopesClient::SPtr ssclient_;
 
-  MiddlewareBase::SPtr middleware_;
-  std::string ss_scope_id_;
+    MetadataMap scopes_;
+    std::map<std::string, std::string> base_urls_;
+    std::mutex scopes_mutex_;
+
+    std::thread refresh_thread_;
+    std::mutex refresh_mutex_;
+    std::condition_variable_any refresh_cond_;
+    bool refresh_stopped_;
+
+    MiddlewareBase::SPtr middleware_;
+    std::string ss_scope_id_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H

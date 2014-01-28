@@ -43,10 +43,10 @@ namespace smartscopes
 
 struct SSQuery
 {
-  std::shared_ptr<QueryBase> q_base;
-  MWReplyProxy q_reply;
-  std::weak_ptr<ReplyBase> q_reply_proxy;
-  bool q_pushable;
+    std::shared_ptr<QueryBase> q_base;
+    MWReplyProxy q_reply;
+    std::weak_ptr<ReplyBase> q_reply_proxy;
+    bool q_pushable;
 };
 
 class SSQueryObject : public QueryObjectBase
@@ -64,11 +64,14 @@ public:
     virtual void cancel(InvokeInfo const& info) override;                   // Called locally, by QueryCtrlObject.
     virtual bool pushable(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
-    // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
+    // Called by create_query(), to hold the reference count high until the run
+    // call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
-    void add_query(std::string const& scope_id, std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply);
+    void add_query(std::string const& scope_id,
+                   std::shared_ptr<QueryBase> const& query_base,
+                   MWReplyProxy const& reply);
 
 protected:
     QueryObjectBase::SPtr self_;
@@ -79,12 +82,12 @@ protected:
     std::map<std::string, std::string> replies_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H

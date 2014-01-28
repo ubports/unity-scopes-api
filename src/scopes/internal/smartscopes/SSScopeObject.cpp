@@ -38,23 +38,23 @@ namespace internal
 namespace smartscopes
 {
 
-SSScopeObject::SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry) :
-  co_(std::make_shared<QueryCtrlObject>()),
-  qo_(std::make_shared<SSQueryObject>()),
-  smartscope_(new SmartScope(registry))
+SSScopeObject::SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry)
+    : co_(std::make_shared<QueryCtrlObject>())
+    , qo_(std::make_shared<SSQueryObject>())
+    , smartscope_(new SmartScope(registry))
 {
-  // Connect the query ctrl to the middleware.
-  middleware->add_dflt_query_ctrl_object(co_);
+    // Connect the query ctrl to the middleware.
+    middleware->add_dflt_query_ctrl_object(co_);
 
-  // Connect the query object to the middleware.
-  middleware->add_dflt_query_object(qo_);
+    // Connect the query object to the middleware.
+    middleware->add_dflt_query_object(qo_);
 
-  // We tell the ctrl what the query facade is
-  co_->set_query(qo_);
+    // We tell the ctrl what the query facade is
+    co_->set_query(qo_);
 
-  // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-  // count high until the run() request arrives in the query via the middleware.
-  qo_->set_self(qo_);
+    // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
+    // count high until the run() request arrives in the query via the middleware.
+    qo_->set_self(qo_);
 }
 
 SSScopeObject::~SSScopeObject() noexcept
@@ -66,10 +66,10 @@ MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
-  return query(info, reply,
-               [&q, &hints, &info, this]() -> QueryBase::SPtr {
-                 return this->smartscope_->create_query(info.id, q, hints);
-               });
+    return query(info,
+                 reply,
+                 [&q, &hints, &info, this ]()->QueryBase::SPtr
+                 { return this->smartscope_->create_query(info.id, q, hints); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
@@ -77,25 +77,25 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
                                          MWReplyProxy const& reply,
                                          InvokeInfo const& info)
 {
-  (void)result;
-  (void)hints;
-  (void)reply;
-  (void)info;
-  return MWQueryCtrlProxy();
+    (void)result;
+    (void)hints;
+    (void)reply;
+    (void)info;
+    return MWQueryCtrlProxy();
 }
 
 MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
                                                         VariantMap const& hints,
                                                         std::string const& action_id,
-                                                        MWReplyProxy const &reply,
+                                                        MWReplyProxy const& reply,
                                                         InvokeInfo const& info)
 {
-  (void)result;
-  (void)hints;
-  (void)action_id;
-  (void)reply;
-  (void)info;
-  return MWQueryCtrlProxy();
+    (void)result;
+    (void)hints;
+    (void)action_id;
+    (void)reply;
+    (void)info;
+    return MWQueryCtrlProxy();
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
@@ -103,77 +103,78 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {
-  (void)result;
-  (void)hints;
-  (void)reply;
-  (void)info;
-  return MWQueryCtrlProxy();
+    (void)result;
+    (void)hints;
+    (void)reply;
+    (void)info;
+    return MWQueryCtrlProxy();
 }
 
-MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info, MWReplyProxy const& reply,
+MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
+                                      MWReplyProxy const& reply,
                                       std::function<QueryBase::SPtr()> const& query_factory_fun)
 {
-  if (!reply)
-  {
-    // TODO: log error about incoming request containing an invalid reply proxy.
-    throw LogicException("SSScopeObject: query() called with null reply proxy");
-  }
-
-  // Ask scope to instantiate a new query.
-  QueryBase::SPtr query_base;
-  try
-  {
-    query_base = query_factory_fun();
-    if (!query_base)
+    if (!reply)
     {
-      // TODO: log error, scope returned null pointer.
-      throw ResourceException("SmartScope returned nullptr from query_factory_fun()");
+        // TODO: log error about incoming request containing an invalid reply proxy.
+        throw LogicException("SSScopeObject: query() called with null reply proxy");
     }
-  }
-  catch (...)
-  {
-    throw ResourceException("SmartScope threw an exception from query_factory_fun()");
-  }
 
-  try
-  {
-    qo_->add_query(info.id, query_base, reply);
-    qo_->run(reply, info);
-  }
-  catch (std::exception const& e)
-  {
+    // Ask scope to instantiate a new query.
+    QueryBase::SPtr query_base;
     try
     {
-      reply->finished(ListenerBase::Error, e.what());
+        query_base = query_factory_fun();
+        if (!query_base)
+        {
+            // TODO: log error, scope returned null pointer.
+            throw ResourceException("SmartScope returned nullptr from query_factory_fun()");
+        }
     }
     catch (...)
     {
+        throw ResourceException("SmartScope threw an exception from query_factory_fun()");
     }
-    std::cerr << "query(): " << e.what() << std::endl;
-    // TODO: log error
-    throw;
-  }
-  catch (...)
-  {
+
     try
     {
-      reply->finished(ListenerBase::Error, "unknown exception");
+        qo_->add_query(info.id, query_base, reply);
+        qo_->run(reply, info);
+    }
+    catch (std::exception const& e)
+    {
+        try
+        {
+            reply->finished(ListenerBase::Error, e.what());
+        }
+        catch (...)
+        {
+        }
+        std::cerr << "query(): " << e.what() << std::endl;
+        // TODO: log error
+        throw;
     }
     catch (...)
     {
+        try
+        {
+            reply->finished(ListenerBase::Error, "unknown exception");
+        }
+        catch (...)
+        {
+        }
+        std::cerr << "query(): unknown exception" << std::endl;
+        // TODO: log error
+        throw;
     }
-    std::cerr << "query(): unknown exception" << std::endl;
-    // TODO: log error
-    throw;
-  }
 
-  return MWQueryCtrlProxy();
+    return MWQueryCtrlProxy();
 }
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity

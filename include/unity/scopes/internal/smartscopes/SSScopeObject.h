@@ -44,50 +44,51 @@ class SmartScope;
 class SSScopeObject final : public ScopeObjectBase
 {
 public:
-  UNITY_DEFINES_PTRS(SSScopeObject);
+    UNITY_DEFINES_PTRS(SSScopeObject);
 
-  SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
-  virtual ~SSScopeObject() noexcept;
+    SSScopeObject(MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
+    virtual ~SSScopeObject() noexcept;
 
-  // Remote operation implementations
-  MWQueryCtrlProxy create_query(std::string const& q,
-                                VariantMap const& hints,
-                                MWReplyProxy const& reply,
-                                InvokeInfo const& info) override;
+    // Remote operation implementations
+    MWQueryCtrlProxy create_query(std::string const& q,
+                                  VariantMap const& hints,
+                                  MWReplyProxy const& reply,
+                                  InvokeInfo const& info) override;
 
-  MWQueryCtrlProxy activate(Result const& result,
-                            VariantMap const& hints,
-                            MWReplyProxy const &reply,
-                            InvokeInfo const& info) override;
+    MWQueryCtrlProxy activate(Result const& result,
+                              VariantMap const& hints,
+                              MWReplyProxy const& reply,
+                              InvokeInfo const& info) override;
 
-  MWQueryCtrlProxy activate_preview_action(Result const& result,
-                                           VariantMap const& hints,
-                                           std::string const& action_id,
-                                           MWReplyProxy const &reply,
-                                           InvokeInfo const& info) override;
+    MWQueryCtrlProxy activate_preview_action(Result const& result,
+                                             VariantMap const& hints,
+                                             std::string const& action_id,
+                                             MWReplyProxy const& reply,
+                                             InvokeInfo const& info) override;
 
-  MWQueryCtrlProxy preview(Result const& result,
-                           VariantMap const& hints,
+    MWQueryCtrlProxy preview(Result const& result,
+                             VariantMap const& hints,
+                             MWReplyProxy const& reply,
+                             InvokeInfo const& info) override;
+
+private:
+    MWQueryCtrlProxy query(InvokeInfo const& info,
                            MWReplyProxy const& reply,
-                           InvokeInfo const& info) override;
+                           std::function<QueryBase::SPtr(void)> const& query_factory_fun);
 
 private:
-  MWQueryCtrlProxy query(InvokeInfo const& info, MWReplyProxy const& reply,
-      std::function<QueryBase::SPtr(void)> const& query_factory_fun);
+    QueryCtrlObject::SPtr co_;
+    SSQueryObject::SPtr qo_;
 
-private:
-  QueryCtrlObject::SPtr co_;
-  SSQueryObject::SPtr qo_;
-
-  std::unique_ptr<SmartScope> const smartscope_;
+    std::unique_ptr<SmartScope> const smartscope_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H

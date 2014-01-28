@@ -36,8 +36,10 @@ using namespace unity::scopes::internal::smartscopes;
 //-- SearchHandle
 
 SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id),
-      ssc_(ssc) {}
+    : session_id_(session_id)
+    , ssc_(ssc)
+{
+}
 
 SearchHandle::~SearchHandle()
 {
@@ -56,12 +58,14 @@ void SearchHandle::cancel_search()
 
 //-- SmartScopesClient
 
-SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
-                                     std::string const& url, uint port)
-    : http_client_(http_client),
-      json_node_(json_node),
-      url_(url),
-      port_(port)
+SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
+                                     JsonNodeInterface::SPtr json_node,
+                                     std::string const& url,
+                                     uint port)
+    : http_client_(http_client)
+    , json_node_(json_node)
+    , url_(url)
+    , port_(port)
 {
     if (url_.empty())
     {
@@ -141,8 +145,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             scope.description = child_node->get_node("description")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
-            scope.invisible = child_node->has_node("invisible") ?
-                              child_node->get_node("invisible")->as_bool() : false;
+            scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);
         }
@@ -157,10 +160,15 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
     }
 }
 
-SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url, std::string const& query,
-                                             std::string const& session_id, uint query_id, std::string const& platform,
-                                             std::string const& locale, std::string const& country,
-                                             std::string const& latitude, std::string const& longitude,
+SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
+                                             std::string const& query,
+                                             std::string const& session_id,
+                                             uint query_id,
+                                             std::string const& platform,
+                                             std::string const& locale,
+                                             std::string const& country,
+                                             std::string const& latitude,
+                                             std::string const& longitude,
                                              uint limit)
 {
     std::ostringstream search_uri;
@@ -246,14 +254,12 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("category");
                 auto category = std::make_shared<SearchCategory>();
 
-                category->icon = child_node->has_node("icon") ?
-                                 child_node->get_node("icon")->as_string() : "";
-                category->id = child_node->has_node("id") ?
-                               child_node->get_node("id")->as_string() : "";
+                category->icon = child_node->has_node("icon") ? child_node->get_node("icon")->as_string() : "";
+                category->id = child_node->has_node("id") ? child_node->get_node("id")->as_string() : "";
                 category->renderer_template = child_node->has_node("renderer_template") ?
-                                              child_node->get_node("renderer_template")->as_string() : "";
-                category->title = child_node->has_node("title") ?
-                                  child_node->get_node("title")->as_string() : "";
+                                                  child_node->get_node("renderer_template")->as_string() :
+                                                  "";
+                category->title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
                 categories[category->id] = category;
             }
             else if (root_node->has_node("result"))
@@ -261,20 +267,15 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("result");
                 SearchResult result;
 
-                result.art = child_node->has_node("art") ?
-                             child_node->get_node("art")->as_string() : "";
-                result.dnd_uri = child_node->has_node("dnd_uri") ?
-                                 child_node->get_node("dnd_uri")->as_string() : "";
-                result.title = child_node->has_node("title") ?
-                               child_node->get_node("title")->as_string() : "";
-                result.uri = child_node->has_node("uri") ?
-                             child_node->get_node("uri")->as_string() : "";
+                result.art = child_node->has_node("art") ? child_node->get_node("art")->as_string() : "";
+                result.dnd_uri = child_node->has_node("dnd_uri") ? child_node->get_node("dnd_uri")->as_string() : "";
+                result.title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
+                result.uri = child_node->has_node("uri") ? child_node->get_node("uri")->as_string() : "";
 
-                std::string category = child_node->has_node("cat_id") ?
-                                       child_node->get_node("cat_id")->as_string() : "";
+                std::string category =
+                    child_node->has_node("cat_id") ? child_node->get_node("cat_id")->as_string() : "";
 
-                result.category = categories.find(category) != categories.end() ?
-                                  categories[category] : nullptr;
+                result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
 
                 results.push_back(result);
             }

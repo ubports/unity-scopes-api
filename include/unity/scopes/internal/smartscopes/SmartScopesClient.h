@@ -104,10 +104,15 @@ public:
 
     std::vector<RemoteScope> get_remote_scopes(std::string const& locale = "");
 
-    SearchHandle::UPtr search(std::string const& base_url, std::string const& query,
-                              std::string const& session_id, uint query_id, std::string const& platform,
-                              std::string const& locale = "", std::string const& country = "",
-                              std::string const& latitude = "", std::string const& longitude = "",
+    SearchHandle::UPtr search(std::string const& base_url,
+                              std::string const& query,
+                              std::string const& session_id,
+                              uint query_id,
+                              std::string const& platform,
+                              std::string const& locale = "",
+                              std::string const& country = "",
+                              std::string const& latitude = "",
+                              std::string const& longitude = "",
                               const uint limit = 0);
 
 private:
@@ -130,12 +135,12 @@ private:
     std::mutex search_results_mutex_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H

@@ -33,32 +33,32 @@ using namespace unity::test::scopes::internal::smartscopes;
 
 TEST(smartscopesproxy, basic)
 {
-  RaiiServer test_server(FAKE_SSS_PATH);
+    RaiiServer test_server(FAKE_SSS_PATH);
 
-  std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(test_server.port_);
-  ::putenv((char*)server_env.c_str());
+    std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(test_server.port_);
+    ::putenv((char*)server_env.c_str());
 
-  RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
 
-  std::string identity = runtime->registry_identity();
+    std::string identity = runtime->registry_identity();
 
-  RegistryConfig c(identity, runtime->registry_configfile());
-  std::string mw_kind = c.mw_kind();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    std::string mw_kind = c.mw_kind();
 
-  MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+    MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
 
-  SSRegistryObject::SPtr reg(new SSRegistryObject(middleware, "SmartScope"));
+    SSRegistryObject::SPtr reg(new SSRegistryObject(middleware, "SmartScope"));
 
-  // list scopes
-  MetadataMap scopes = reg->list();
-  EXPECT_EQ(scopes.size(), 1);
+    // list scopes
+    MetadataMap scopes = reg->list();
+    EXPECT_EQ(scopes.size(), 1);
 
-  // visible scope
-  ScopeMetadata meta = reg->get_metadata("Dummy Demo Scope");
-  EXPECT_EQ("Dummy Demo Scope",meta.scope_name());
-  EXPECT_EQ("Dummy Demo Scope",meta.display_name());
-  EXPECT_EQ("Dummy demo scope.", meta.description());
+    // visible scope
+    ScopeMetadata meta = reg->get_metadata("Dummy Demo Scope");
+    EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
+    EXPECT_EQ("Dummy Demo Scope", meta.display_name());
+    EXPECT_EQ("Dummy demo scope.", meta.description());
 
-  // invisible scope
-  EXPECT_THROW(reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
+    // invisible scope
+    EXPECT_THROW(reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
 }

@@ -77,12 +77,12 @@ private:
     std::unique_ptr<QCoreApplication> app_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQT_H
