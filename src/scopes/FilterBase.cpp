@@ -16,13 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <scopes/FilterBase.h>
-#include <scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
@@ -51,7 +48,5 @@ VariantMap FilterBase::serialize() const
 FilterBase::~FilterBase() = default;
 
 } // namespace scopes
-
-} // namespace api
 
 } // namespace unity
