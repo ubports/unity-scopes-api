@@ -49,7 +49,8 @@ int main(int argc, char* argv[])
     {
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        int const no_reply_timeout = 10000;
+        uint const max_sessions = 4;          ///! TODO: get from config
+        uint const no_reply_timeout = 10000;  ///! TODO: get from config
 
         // SMART SCOPES REGISTRY
         // =====================
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr registry(new SSRegistryObject(ss_scope_id, reg_mw, no_reply_timeout));
+        SSRegistryObject::SPtr registry(new SSRegistryObject(ss_scope_id, reg_mw, max_sessions, no_reply_timeout));
 
         // Add the SS registry object to the middleware
         reg_mw->add_registry_object(reg_rt->registry_identity(), registry);
