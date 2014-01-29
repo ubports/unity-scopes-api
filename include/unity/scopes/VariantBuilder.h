@@ -60,7 +60,12 @@ class UNITY_API VariantBuilder
 {
 public:
     VariantBuilder();
+    VariantBuilder(VariantBuilder const& other);
+    VariantBuilder(VariantBuilder&& other);
     virtual ~VariantBuilder();
+
+    VariantBuilder& operator=(VariantBuilder const& other);
+    VariantBuilder& operator=(VariantBuilder&& other);
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
@@ -84,7 +89,13 @@ public:
     */
     void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
 
-    VariantArray to_variant_array() const;
+    /**
+     \brief Retrieves created Variant.
+     Returns created Variant and resets the builder, so that it can be reused for creating a new Variant. Throw unity::LogicException if
+     no Variant has been created.
+     \return created variant
+    */
+    Variant end();
 
 private:
     std::shared_ptr<internal::VariantBuilderImpl> p;

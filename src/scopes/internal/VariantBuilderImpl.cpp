@@ -28,41 +28,61 @@ namespace scopes
 namespace internal
 {
 
+VariantBuilderImpl::VariantBuilderImpl(VariantBuilderImpl const& other)
+{
+    if (other.variant_)
+    {
+        variant_.reset(new Variant(*(other.variant_)));
+    }
+}
+
 void VariantBuilderImpl::add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {
     VariantArray va;
-    if (variant_.which() == Variant::Type::Array)
+    if (variant_ != nullptr)
     {
-        va = variant_.get_array();
-    }
-    else if (!variant_.is_null()) // if null (the initial type of the internal variant), then init it with an array, otherwise throw
-    {
-        throw unity::LogicException("Can only add tuple to a variant of array type");
+        if (variant_->which() == Variant::Type::Array)
+        {
+            va = variant_->get_array();
+        }
+        else if (!variant_->is_null()) // if null (the initial type of the internal variant), then init it with an array, otherwise throw
+        {
+            throw unity::LogicException("Can only add tuple to a variant of array type");
+        }
     }
 
     va.push_back(Variant(VariantMap(tuple.begin(), tuple.end())));
-    variant_ = Variant(std::move(va));
+    variant_.reset(new Variant(std::move(va)));
 }
 
 void VariantBuilderImpl::add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple)
 {
     VariantArray va;
-    if (variant_.which() == Variant::Type::Array)
+    if (variant_ != nullptr)
     {
-        va = variant_.get_array();
-    }
-    else if (!variant_.is_null()) // if null (the initial type of the internal variant), then init it with an array, otherwise throw
-    {
-        throw unity::LogicException("Can only add tuple to a variant of array type");
+        if (variant_->which() == Variant::Type::Array)
+        {
+            va = variant_->get_array();
+        }
+        else if (!variant_->is_null()) // if null (the initial type of the internal variant), then init it with an array, otherwise throw
+        {
+            throw unity::LogicException("Can only add tuple to a variant of array type");
+        }
     }
 
     va.push_back(Variant(VariantMap(tuple.begin(), tuple.end())));
-    variant_ = Variant(std::move(va));
+    variant_.reset(new Variant(std::move(va)));
 }
 
-VariantArray VariantBuilderImpl::to_variant_array() const
+Variant VariantBuilderImpl::end()
 {
-    return variant_.get_array();
+    if (variant_ == nullptr)
+    {
+        throw unity::LogicException("VariantBuilder::end(): no Variant has been constructed");
+    }
+    Variant v(std::move(*variant_));
+    variant_.reset();
+    return std::move(v);
 }
 
 } // namespace internal
