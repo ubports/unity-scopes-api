@@ -153,12 +153,20 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 
     // find corresponding scope ID to the reply ID requested
     auto reply = replies_.find(info.id);
-    assert(reply != end(replies_));
+    if (reply == end(replies_))
+    {
+        return false;
+    }
+
     std::string scope_id = reply->second;
 
     // find query in queries_ from scope ID
     auto query = queries_.find(scope_id);
-    assert(query != end(queries_));
+    if (query == end(queries_))
+    {
+        return false;
+    }
+
     return query->second.q_pushable;
 }
 
