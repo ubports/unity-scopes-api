@@ -80,6 +80,7 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
                                          MWReplyProxy const& reply,
                                          InvokeInfo const& info)
 {
+    ///! TODO
     (void)result;
     (void)hints;
     (void)reply;
@@ -93,6 +94,7 @@ MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
                                                         MWReplyProxy const& reply,
                                                         InvokeInfo const& info)
 {
+    ///! TODO
     (void)result;
     (void)hints;
     (void)action_id;
@@ -106,6 +108,7 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {
+    ///! TODO
     (void)result;
     (void)hints;
     (void)reply;
@@ -141,8 +144,10 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
 
     try
     {
+        // add new query to SS query object
         qo_->add_query(info.id, query_base, reply);
 
+        // Start the query via the middleware (calling run() in a different thread)
         MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, "inproc://" + ss_scope_id_ + "-q");
         query_proxy->run(reply);
     }

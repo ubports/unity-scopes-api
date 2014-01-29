@@ -70,6 +70,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
+        // find the targeted query according to InvokeInfo
         query = queries_.find(info.id);
         assert(query != end(queries_));
 
@@ -113,6 +114,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
+        // the query is complete so it is no longer needed
         queries_.erase(query);
         replies_.erase(reply->identity());
     }
@@ -122,12 +124,14 @@ void SSQueryObject::cancel(InvokeInfo const& info)
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
+    // find the targeted query according to InvokeInfo
     auto query = queries_.find(info.id);
     assert(query != end(queries_));
 
     QueryBase::SPtr const& q_base = query->second.q_base;
     MWReplyProxy const& q_reply = query->second.q_reply;
 
+    // this query is cancelled so replies are no longer pushable
     query->second.q_pushable = false;
     auto rp = query->second.q_reply_proxy.lock();
     if (rp)
@@ -147,10 +151,12 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
+    // find corresponding scope ID to the reply ID requested
     auto reply = replies_.find(info.id);
     assert(reply != end(replies_));
     std::string scope_id = reply->second;
 
+    // find query in queries_ from scope ID
     auto query = queries_.find(scope_id);
     assert(query != end(queries_));
     return query->second.q_pushable;
@@ -167,7 +173,10 @@ void SSQueryObject::add_query(std::string const& scope_id, QueryBase::SPtr const
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
+    // add the new query struct to queries_
     queries_[scope_id] = SSQuery{query_base, reply, std::weak_ptr<ReplyBase>(), true};
+
+    // ...as well as a mapping of reply ID to scope ID in replies_
     replies_[reply->identity()] = scope_id;
 }
 

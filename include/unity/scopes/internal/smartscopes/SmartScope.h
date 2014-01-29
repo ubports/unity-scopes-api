@@ -52,6 +52,7 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
+        ///! TODO: session_id, query_id, platform, locale, country, lat, long, limit
         search_handle_ = ss_client->search(base_url, query_, "session_id", 0, "platform", "en", "US", "0", "0", 10);
     }
 
@@ -71,15 +72,20 @@ public:
 
         for (auto& result : results)
         {
-            if (categories.find(result.category->id) == end(categories))
+            Category::SCPtr cat;
+
+            auto cat_it = categories.find(result.category->id);
+            if (cat_it == end(categories))
             {
                 CategoryRenderer rdr(result.category->renderer_template);
-                Category::SCPtr cat =
-                    reply->register_category(result.category->id, result.category->title, result.category->icon, rdr);
+                cat = reply->register_category(result.category->id, result.category->title, result.category->icon, rdr);
                 categories[result.category->id] = cat;
             }
+            else
+            {
+              cat = cat_it->second;
+            }
 
-            Category::SCPtr cat = categories[result.category->id];
             CategorisedResult res(cat);
             res.set_uri(result.uri);
             res.set_title(result.title);
