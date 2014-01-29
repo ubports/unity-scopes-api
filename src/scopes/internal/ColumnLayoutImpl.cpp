@@ -38,6 +38,27 @@ ColumnLayoutImpl::ColumnLayoutImpl(unsigned num_of_columns)
     }
 }
 
+ColumnLayoutImpl::ColumnLayoutImpl(VariantMap const& var)
+{
+    auto it = var.find("column_data");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("ColumnLayoutImpl(): missing column_data");
+    }
+
+    auto const& outerarr = it->second.get_array();
+    num_of_columns_ = outerarr.size();
+    for (auto const& arr: outerarr)
+    {
+        std::vector<std::string> widgets;
+        for (auto const& w: arr.get_array())
+        {
+            widgets.push_back(w.get_string());
+        }
+        columns_.push_back(widgets);
+    }
+}
+
 void ColumnLayoutImpl::add_column(std::vector<std::string> widget_ids)
 {
     if (columns_.size() > num_of_columns_)
@@ -70,7 +91,24 @@ std::vector<std::string> ColumnLayoutImpl::column(unsigned index) const
 
 VariantMap ColumnLayoutImpl::serialize() const
 {
-    //TODO
+    VariantArray outerarr;
+    for (auto const& col: columns_)
+    {
+        VariantArray arr;
+        for (auto const& w: col)
+        {
+            arr.push_back(Variant(w));
+        }
+        outerarr.push_back(Variant(arr));
+    }
+    VariantMap vm;
+    vm["column_data"] = Variant(outerarr);
+    return vm;
+}
+
+ColumnLayout ColumnLayoutImpl::create(VariantMap const& var)
+{
+    return ColumnLayout(new ColumnLayoutImpl(var));
 }
 
 } // namespace internal

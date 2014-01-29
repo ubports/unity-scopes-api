@@ -84,7 +84,9 @@ public:
 /// @endcond
 
 private:
+    ColumnLayout(internal::ColumnLayoutImpl *impl);
     std::shared_ptr<internal::ColumnLayoutImpl> p;
+    friend class internal::ColumnLayoutImpl;
 };
 
 typedef std::list<ColumnLayout> ColumnLayoutList;

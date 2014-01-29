@@ -19,6 +19,7 @@
 #ifndef UNITY_INTERNAL_COLUMNLAYOUTIMPL_H
 #define UNITY_INTERNAL_COLUMNLAYOUTIMPL_H
 
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <vector>
@@ -36,11 +37,14 @@ class ColumnLayoutImpl
 {
 public:
     explicit ColumnLayoutImpl(unsigned num_of_columns);
+    explicit ColumnLayoutImpl(VariantMap const& var);
     void add_column(std::vector<std::string> widget_ids);
     unsigned size() const noexcept;
     unsigned number_of_columns() const noexcept;
     std::vector<std::string> column(unsigned index) const;
     VariantMap serialize() const;
+
+    static ColumnLayout create(VariantMap const& var);
 
 private:
     unsigned num_of_columns_;

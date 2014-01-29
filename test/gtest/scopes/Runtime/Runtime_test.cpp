@@ -96,6 +96,9 @@ public:
         EXPECT_TRUE(key == "author" || key == "rating");
         data_pushes_++;
     }
+    virtual void push(ColumnLayoutList const&) override
+    {
+    }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);

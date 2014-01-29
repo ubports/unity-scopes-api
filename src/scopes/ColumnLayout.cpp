@@ -30,6 +30,11 @@ ColumnLayout::ColumnLayout(unsigned int num_of_columns)
 {
 }
 
+ColumnLayout::ColumnLayout(internal::ColumnLayoutImpl *impl)
+    : p(impl)
+{
+}
+
 void ColumnLayout::add_column(std::vector<std::string> widget_ids)
 {
     return p->add_column(widget_ids);
