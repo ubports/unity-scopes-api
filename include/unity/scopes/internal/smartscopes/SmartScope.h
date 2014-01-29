@@ -83,7 +83,7 @@ public:
             }
             else
             {
-              cat = cat_it->second;
+                cat = cat_it->second;
             }
 
             CategorisedResult res(cat);

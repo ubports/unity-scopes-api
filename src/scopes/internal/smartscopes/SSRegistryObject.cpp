@@ -91,19 +91,19 @@ MetadataMap SSRegistryObject::list()
 
 ScopeProxy SSRegistryObject::locate(std::string const& scope_name)
 {
-  // If the name is empty, it was sent as empty by the remote client.
-  if (scope_name.empty())
-  {
-    throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
-  }
+    // If the name is empty, it was sent as empty by the remote client.
+    if (scope_name.empty())
+    {
+        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+    }
 
-  auto metadata = scopes_.find(scope_name);
-  if (metadata == scopes_.end())
-  {
-      throw NotFoundException("Tried to obtain unknown scope", scope_name);
-  }
+    auto metadata = scopes_.find(scope_name);
+    if (metadata == scopes_.end())
+    {
+        throw NotFoundException("Tried to obtain unknown scope", scope_name);
+    }
 
-  return metadata->second.proxy();
+    return metadata->second.proxy();
 }
 
 std::string SSRegistryObject::get_base_url(std::string const& scope_name)
