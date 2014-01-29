@@ -97,7 +97,19 @@ ScopeProxy SSRegistryObject::locate(std::string const& /*scope_name*/)
     throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
 
-std::string SSRegistryObject::get_base_url(std::string const& scope_name)
+bool SSRegistryObject::has_scope(std::string const& scope_name) const
+{
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
+
+    auto const& it = scopes_.find(scope_name);
+    if (it == scopes_.end())
+    {
+        return false;
+    }
+    return true;
+}
+
+std::string SSRegistryObject::get_base_url(std::string const& scope_name) const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
 
@@ -112,7 +124,7 @@ std::string SSRegistryObject::get_base_url(std::string const& scope_name)
     }
 }
 
-SmartScopesClient::SPtr SSRegistryObject::get_ssclient()
+SmartScopesClient::SPtr SSRegistryObject::get_ssclient() const
 {
     return ssclient_;
 }

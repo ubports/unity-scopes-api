@@ -69,11 +69,11 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr registry(new SSRegistryObject(reg_mw, ss_scope_ep, max_sessions,
+        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, ss_scope_ep, max_sessions,
                                                              no_reply_timeout, refresh_rate_in_min));
 
         // Add the SS registry object to the middleware
-        reg_mw->add_registry_object(reg_rt->registry_identity(), registry);
+        reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
 
         // SMART SCOPES SCOPE
         // ==================
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
         // Instantiate a SS scope object
-        SSScopeObject::UPtr scope = SSScopeObject::UPtr(new SSScopeObject(ss_scope_id, scope_mw, registry));
+        SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
 
         // Add the SS scope object to the middleware
         scope_mw->add_dflt_scope_object(std::move(scope));

@@ -47,7 +47,7 @@ class SSScopeObject final : public ScopeObjectBase
 public:
     UNITY_DEFINES_PTRS(SSScopeObject);
 
-    SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr registry);
+    SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr ss_registry);
     virtual ~SSScopeObject() noexcept;
 
     // Remote operation implementations
@@ -84,6 +84,7 @@ private:
     SSQueryObject::SPtr qo_;
 
     std::unique_ptr<SmartScope> const smartscope_;
+    SSRegistryObject::SPtr ss_registry_;
     UniqueID unique_id_;
 };
 

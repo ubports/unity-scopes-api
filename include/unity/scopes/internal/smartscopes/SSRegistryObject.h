@@ -51,8 +51,9 @@ public:
 
     ScopeProxy locate(std::string const& scope_name) override;
 
-    std::string get_base_url(std::string const& scope_name);
-    SmartScopesClient::SPtr get_ssclient();
+    bool has_scope(std::string const& scope_name) const;
+    std::string get_base_url(std::string const& scope_name) const;
+    SmartScopesClient::SPtr get_ssclient() const;
 
 private:
     void refresh_thread();
@@ -65,7 +66,7 @@ private:
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;
-    std::mutex scopes_mutex_;
+    mutable std::mutex scopes_mutex_;
 
     std::thread refresh_thread_;
     std::mutex refresh_mutex_;

@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -40,11 +41,12 @@ namespace smartscopes
 
 SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              MiddlewareBase::SPtr middleware,
-                             SSRegistryObject::SPtr registry)
+                             SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<QueryCtrlObject>())
     , qo_(std::make_shared<SSQueryObject>())
-    , smartscope_(new SmartScope(registry))
+    , smartscope_(new SmartScope(ss_registry))
+    , ss_registry_(ss_registry)
 {
     // Connect the query ctrl to the middleware.
     middleware->add_dflt_query_ctrl_object(co_);
@@ -120,6 +122,11 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
                                       MWReplyProxy const& reply,
                                       std::function<QueryBase::SPtr()> const& query_factory_fun)
 {
+    if (!ss_registry_->has_scope(info.id))
+    {
+        throw ObjectNotExistException("SSScopeObject::query(): Remote scope does not exist", info.id);
+    }
+
     if (!reply)
     {
         // TODO: log error about incoming request containing an invalid reply proxy.
