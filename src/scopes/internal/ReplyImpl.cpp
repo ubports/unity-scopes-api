@@ -32,9 +32,9 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/ColumnLayoutImpl.h>
 
 #include <sstream>
-#include <unordered_set>
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -137,24 +137,14 @@ bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
         throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
     }
 
-    std::unordered_set<unsigned> layout_number_lut;
-
     // basic check for consistency of layouts
-    for (auto const& layout: layouts)
+    try
     {
-        if (layout.size() != layout.number_of_columns())
-        {
-            std::ostringstream str;
-            str << "Reply::register_layout(): expected " << layout.number_of_columns() << " but only " << layout.size() << " defined";
-            throw LogicException(str.str());
-        }
-        if (layout_number_lut.find(layout.number_of_columns()) != layout_number_lut.end())
-        {
-            std::ostringstream str;
-            str << "Reply::register_layout(): duplicate definition of layout with " << layout.number_of_columns() << " number of columns";
-            throw LogicException(str.str());
-        }
-        layout_number_lut.insert(layout.size());
+        ColumnLayoutImpl::validate_layouts(layouts);
+    }
+    catch (unity::LogicException const &e)
+    {
+        throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
     }
 
     VariantMap vm;

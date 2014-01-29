@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
+#include <unity/UnityExceptions.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -59,6 +60,16 @@ void PreviewReplyObject::process_data(VariantMap const& data)
         {
             list.emplace_back(ColumnLayoutImpl::create(pl.get_dict()));
         }
+        // basic check for consistency of layouts
+        try
+        {
+            ColumnLayoutImpl::validate_layouts(list);
+        }
+        catch (unity::LogicException const &e)
+        {
+            throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
+        }
+
         receiver_->push(list);
     }
 

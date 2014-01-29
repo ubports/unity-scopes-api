@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/UnityExceptions.h>
+#include <unordered_set>
 #include <sstream>
 
 namespace unity
@@ -109,6 +110,29 @@ VariantMap ColumnLayoutImpl::serialize() const
 ColumnLayout ColumnLayoutImpl::create(VariantMap const& var)
 {
     return ColumnLayout(new ColumnLayoutImpl(var));
+}
+
+void ColumnLayoutImpl::validate_layouts(ColumnLayoutList const& layouts)
+{
+    std::unordered_set<unsigned> layout_number_lut;
+
+    // basic check for consistency of layouts
+    for (auto const& layout: layouts)
+    {
+        if (layout.size() != layout.number_of_columns())
+        {
+            std::ostringstream str;
+            str << "ColumnLayout::validate_layouts(): expected " << layout.number_of_columns() << " but only " << layout.size() << " defined";
+            throw LogicException(str.str());
+        }
+        if (layout_number_lut.find(layout.number_of_columns()) != layout_number_lut.end())
+        {
+            std::ostringstream str;
+            str << "ColumnLayout::validate_layouts(): duplicate definition of layout with " << layout.number_of_columns() << " number of columns";
+            throw LogicException(str.str());
+        }
+        layout_number_lut.insert(layout.size());
+    }
 }
 
 } // namespace internal

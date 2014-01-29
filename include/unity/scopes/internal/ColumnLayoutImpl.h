@@ -45,6 +45,7 @@ public:
     VariantMap serialize() const;
 
     static ColumnLayout create(VariantMap const& var);
+    static void validate_layouts(ColumnLayoutList const& layouts);
 
 private:
     unsigned num_of_columns_;
