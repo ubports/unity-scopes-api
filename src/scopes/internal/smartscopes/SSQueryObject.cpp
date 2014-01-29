@@ -54,14 +54,11 @@ SSQueryObject::SSQueryObject()
 
 SSQueryObject::~SSQueryObject() noexcept
 {
-    self_ = nullptr;
     disconnect();
 }
 
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
-    assert(self_);
-
     QueryBase::SPtr q_base;
     MWReplyProxy q_reply;
     SearchReplyProxy q_reply_proxy;
@@ -79,7 +76,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
 
         // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
         // if cancel() is called later.
-        q_reply_proxy = ReplyImpl::create(reply, self_);
+        q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
         assert(q_reply_proxy);
         query->second.q_reply_proxy = q_reply_proxy;
     }
@@ -170,11 +167,8 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
     return query->second.q_pushable;
 }
 
-void SSQueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
+void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
 {
-    assert(self);
-    assert(!self_);
-    self_ = self;
 }
 
 void SSQueryObject::add_query(std::string const& scope_id, QueryBase::SPtr const& query_base, MWReplyProxy const& reply)

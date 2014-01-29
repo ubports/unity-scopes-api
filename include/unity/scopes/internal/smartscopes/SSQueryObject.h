@@ -49,7 +49,7 @@ struct SSQuery
     bool q_pushable;
 };
 
-class SSQueryObject : public QueryObjectBase
+class SSQueryObject : public QueryObjectBase, public std::enable_shared_from_this<SSQueryObject>
 {
 public:
     UNITY_DEFINES_PTRS(SSQueryObject);
@@ -64,9 +64,6 @@ public:
     virtual void cancel(InvokeInfo const& info) override;                   // Called locally, by QueryCtrlObject.
     virtual bool pushable(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
-    // Called by create_query(), to hold the reference count high until the run
-    // call arrives via the middleware,
-    // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
     void add_query(std::string const& scope_id,
@@ -74,8 +71,6 @@ public:
                    MWReplyProxy const& reply);
 
 protected:
-    QueryObjectBase::SPtr self_;
-
     mutable std::mutex queries_mutex_;
 
     std::map<std::string, SSQuery> queries_;      // scope ID : query

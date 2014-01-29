@@ -56,10 +56,6 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
 
     // We tell the ctrl what the query facade is
     co_->set_query(qo_);
-
-    // We pass a shared_ptr to the qo to the qo itself, so the qo can hold the reference
-    // count high until the run() request arrives in the query via the middleware.
-    qo_->set_self(qo_);
 }
 
 SSScopeObject::~SSScopeObject() noexcept
