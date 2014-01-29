@@ -151,7 +151,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         qo_->add_query(info.id, query_base, reply);
 
         // Start the query via the middleware (calling run() in a different thread)
-        MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, "inproc://" + ss_scope_id_ + "-q");
+        MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, info.mw->get_query_endpoint());
         query_proxy->run(reply);
     }
     catch (std::exception const& e)
@@ -181,7 +181,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         throw;
     }
 
-    return info.mw->create_query_ctrl_proxy(unique_id_.gen(), "ipc:///tmp/" + ss_scope_id_ + "-c");
+    return info.mw->create_query_ctrl_proxy(unique_id_.gen(), info.mw->get_query_ctrl_endpoint());
 }
 
 }  // namespace smartscopes
