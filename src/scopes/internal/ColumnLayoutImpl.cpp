@@ -61,7 +61,7 @@ ColumnLayoutImpl::ColumnLayoutImpl(VariantMap const& var)
 
 void ColumnLayoutImpl::add_column(std::vector<std::string> widget_ids)
 {
-    if (columns_.size() > num_of_columns_)
+    if (columns_.size() >= num_of_columns_)
     {
         std::ostringstream str;
         str << "ColumnLayout::add_column(): excessive column, exepcting " << num_of_columns_ << " columns";
