@@ -92,7 +92,7 @@ MetadataMap SSRegistryObject::list()
     return scopes_;
 }
 
-ScopeProxy SSRegistryObject::locate(std::string const& scope_name)
+ScopeProxy SSRegistryObject::locate(std::string const& /*scope_name*/)
 {
     throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
