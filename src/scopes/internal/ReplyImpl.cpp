@@ -34,6 +34,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 
 #include <sstream>
+#include <unordered_set>
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -52,7 +53,8 @@ ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBa
     ObjectProxyImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
-    finished_(false)
+    finished_(false),
+    layouts_push_disallowed_(false)
 {
     assert(mw_proxy);
     assert(qo);
@@ -128,8 +130,47 @@ bool ReplyImpl::push(unity::scopes::Annotation const& annotation)
     return push(var);
 }
 
+bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
+{
+    if (layouts_push_disallowed_)
+    {
+        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
+    }
+
+    std::unordered_set<unsigned> layout_number_lut;
+
+    // basic check for consistency of layouts
+    for (auto const& layout: layouts)
+    {
+        if (layout.size() != layout.number_of_columns())
+        {
+            std::ostringstream str;
+            str << "Reply::register_layout(): expected " << layout.number_of_columns() << " but only " << layout.size() << " defined";
+            throw LogicException(str.str());
+        }
+        if (layout_number_lut.find(layout.number_of_columns()) != layout_number_lut.end())
+        {
+            std::ostringstream str;
+            str << "Reply::register_layout(): duplicate definition of layout with " << layout.number_of_columns() << " number of columns";
+            throw LogicException(str.str());
+        }
+        layout_number_lut.insert(layout.size());
+    }
+
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& layout: layouts)
+    {
+        arr.push_back(Variant(layout.serialize()));
+    }
+    vm["columns"] = arr;
+    return layouts_push_disallowed_ = push(vm);
+}
+
 bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
 {
+    layouts_push_disallowed_ = true;
+
     VariantMap vm;
     VariantArray arr;
     for (auto const& widget : widgets)
