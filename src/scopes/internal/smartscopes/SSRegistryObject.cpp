@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
@@ -37,16 +38,17 @@ namespace internal
 namespace smartscopes
 {
 
-SSRegistryObject::SSRegistryObject(std::string const& ss_scope_id,
-                                   MiddlewareBase::SPtr middleware,
-                                   uint max_sessions,
-                                   uint no_reply_timeout)
-    : ssclient_(std::make_shared<SmartScopesClient>(std::make_shared<HttpClientQt>(max_sessions, no_reply_timeout),
+SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
+                                   std::string const& ss_scope_endpoint,
+                                   uint max_http_sessions,
+                                   uint no_reply_timeout,
+                                   uint refresh_rate_in_min)
+    : ssclient_(std::make_shared<SmartScopesClient>(std::make_shared<HttpClientQt>(max_http_sessions, no_reply_timeout),
                                                     std::make_shared<JsonCppNode>()))
     , refresh_stopped_(false)
     , middleware_(middleware)
-    , ss_scope_id_(ss_scope_id)
-    , no_reply_timeout_(no_reply_timeout)
+    , ss_scope_endpoint_(ss_scope_endpoint)
+    , refresh_rate_in_min_(refresh_rate_in_min)
 {
     // get remote scopes then start the auto-refresh background thread
     get_remote_scopes();
@@ -92,19 +94,7 @@ MetadataMap SSRegistryObject::list()
 
 ScopeProxy SSRegistryObject::locate(std::string const& scope_name)
 {
-    // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
-    {
-        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
-    }
-
-    auto metadata = scopes_.find(scope_name);
-    if (metadata == scopes_.end())
-    {
-        throw NotFoundException("Tried to obtain unknown scope", scope_name);
-    }
-
-    return metadata->second.proxy();
+    throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
 
 std::string SSRegistryObject::get_base_url(std::string const& scope_name)
@@ -133,8 +123,7 @@ void SSRegistryObject::refresh_thread()
 
     while (!refresh_stopped_)
     {
-        ///! TODO: get timeout from config
-        refresh_cond_.wait_for(refresh_mutex_, std::chrono::hours(24));
+        refresh_cond_.wait_for(refresh_mutex_, std::chrono::minutes(refresh_rate_in_min_));
 
         if (!refresh_stopped_)
         {
@@ -168,12 +157,8 @@ void SSRegistryObject::get_remote_scopes()
         metadata->set_scope_name(scope.name);
         metadata->set_display_name(scope.name);
         metadata->set_description(scope.description);
-        metadata->set_art("");
-        metadata->set_icon("");
-        metadata->set_search_hint("");
-        metadata->set_hot_key("");
 
-        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, "ipc:///tmp/" + ss_scope_id_),
+        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, ss_scope_endpoint_),
                                              middleware_->runtime(),
                                              scope.name);
 

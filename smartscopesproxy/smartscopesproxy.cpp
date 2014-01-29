@@ -20,7 +20,6 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
-#include <unity/UnityExceptions.h>
 
 #include <cassert>
 #include <iostream>
@@ -47,10 +46,13 @@ int main(int argc, char* argv[])
 
     try
     {
+        ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        uint const max_sessions = 4;          ///! TODO: get from config
-        uint const no_reply_timeout = 10000;  ///! TODO: get from config
+        std::string ss_scope_ep = "ipc:///tmp/" + ss_scope_id;
+        uint const max_sessions = 4;
+        uint const no_reply_timeout = 10000;
+        uint const refresh_rate_in_min = 60 * 24; // 24 hour refresh
 
         // SMART SCOPES REGISTRY
         // =====================
@@ -67,7 +69,8 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr registry(new SSRegistryObject(ss_scope_id, reg_mw, max_sessions, no_reply_timeout));
+        SSRegistryObject::SPtr registry(new SSRegistryObject(reg_mw, ss_scope_ep, max_sessions,
+                                                             no_reply_timeout, refresh_rate_in_min));
 
         // Add the SS registry object to the middleware
         reg_mw->add_registry_object(reg_rt->registry_identity(), registry);
@@ -92,10 +95,6 @@ int main(int argc, char* argv[])
         reg_mw->wait_for_shutdown();
 
         exit_status = 0;
-    }
-    catch (unity::Exception const& e)
-    {
-        error(e.to_string());
     }
     catch (std::exception const& e)
     {
