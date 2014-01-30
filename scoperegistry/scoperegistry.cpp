@@ -276,6 +276,10 @@ main(int argc, char* argv[])
             load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
         }
 
+        // Now that the registry table is populated, we can add the registry to the middleware, so
+        // it starts processing incoming requests.
+        middleware->add_registry_object(runtime->registry_identity(), registry);
+
         // FIXME, HACK HACK HACK HACK
         // The middleware should spawn scope processes with lookup() on demand.
         // Because it currently does not have the plumbing, we start every scope immediately.
@@ -284,10 +288,6 @@ main(int argc, char* argv[])
         {
             registry->locate(pair.first);
         }
-
-        // Now that the registry table is populated, we can add the registry to the middleware, so
-        // it starts processing incoming requests.
-        middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Wait until we are done (never, really, because the registry has no way to shut down other than
         // being killed by signal).
