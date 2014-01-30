@@ -72,7 +72,7 @@ TEST(RegistryI, get_metadata)
     RegistryObject::SPtr ro(make_shared<RegistryObject>());
     auto registry = middleware->add_registry_object(identity, ro);
     auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", p, middleware)),
+    EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", p, middleware)),
             dummy_spawn_command));
 
     auto r = runtime->registry();
@@ -101,13 +101,13 @@ TEST(RegistryI, list)
 
     vector<string> dummy_spawn_command;
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+    EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
 
-    ro->remove("scope1");
+    ro->remove_local_scope("scope1");
     scopes = r->list();
     EXPECT_EQ(0, scopes.size());
 
@@ -115,7 +115,7 @@ TEST(RegistryI, list)
     for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        EXPECT_TRUE(ro->add(long_id, move(make_meta(long_id, proxy, middleware)),
+        EXPECT_TRUE(ro->add_local_scope(long_id, move(make_meta(long_id, proxy, middleware)),
                 dummy_spawn_command));
         ids.insert(long_id);
     }
@@ -150,24 +150,24 @@ TEST(RegistryI, add_remove)
 
     vector<string> dummy_spawn_command;
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    EXPECT_TRUE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+    EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
     EXPECT_EQ(1, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
-    EXPECT_FALSE(ro->add("scope1", move(make_meta("scope1", proxy, middleware)),
+    EXPECT_FALSE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
 
-    EXPECT_TRUE(ro->remove("scope1"));
+    EXPECT_TRUE(ro->remove_local_scope("scope1"));
     scopes = r->list();
     EXPECT_EQ(0, scopes.size());
-    EXPECT_FALSE(ro->remove("scope1"));
+    EXPECT_FALSE(ro->remove_local_scope("scope1"));
 
     set<string> ids;
     for (int i = 0; i < 10; ++i)
     {
         string long_id = "0000000000000000000000000000000000000000000000" + to_string(i);
-        ro->add(long_id, move(make_meta(long_id, proxy, middleware)),
+        ro->add_local_scope(long_id, move(make_meta(long_id, proxy, middleware)),
                 dummy_spawn_command);
         ids.insert(long_id);
     }
@@ -197,7 +197,7 @@ TEST(RegistryI, exceptions)
     vector<string> dummy_spawn_command;
     auto registry = middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    ro->add("scope1", move(make_meta("scope1", proxy, middleware)), dummy_spawn_command);
+    ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)), dummy_spawn_command);
 
     auto r = runtime->registry();
 
@@ -227,7 +227,7 @@ TEST(RegistryI, exceptions)
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        ro->add("", move(make_meta("blah", proxy, middleware)), dummy_spawn_command);
+        ro->add_local_scope("", move(make_meta("blah", proxy, middleware)), dummy_spawn_command);
         FAIL();
     }
     catch (InvalidArgumentException const& e)
@@ -238,7 +238,7 @@ TEST(RegistryI, exceptions)
 
     try
     {
-        ro->remove("");
+        ro->remove_local_scope("");
         FAIL();
     }
     catch (InvalidArgumentException const& e)
@@ -289,8 +289,8 @@ TEST(RegistryI, locate)
     auto r = middleware->add_registry_object(identity, mro);
     auto r_proxy = dynamic_pointer_cast<ZmqRegistry>(r);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-    mro->add("scope1", move(make_meta("scope1", proxy, middleware)),
-             dummy_spawn_command);
+    mro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
+            dummy_spawn_command);
 
     auto p = r_proxy->locate("scope1");
     EXPECT_EQ("scope1", p->identity());
@@ -320,7 +320,7 @@ TEST(RegistryI, locate)
     try
     {
         auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
-        mro->add("", move(make_meta("blah", proxy, middleware)),
+        mro->add_local_scope("", move(make_meta("blah", proxy, middleware)),
                  dummy_spawn_command);
         FAIL();
     }
@@ -332,7 +332,7 @@ TEST(RegistryI, locate)
 
     try
     {
-        mro->remove("");
+        mro->remove_local_scope("");
         FAIL();
     }
     catch (InvalidArgumentException const& e)

@@ -42,5 +42,8 @@ files=`find "$dir" -name '*.h' -o -name '*.cpp' -o -name '*.c' \
 "$astyle" --options="$dir"/astyle-config -n $files
 [ $? -ne 0 ] && exit $?
 
+# astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
+dos2unix -q $files
+
 "$format" -i -style=file $files
 exit $?

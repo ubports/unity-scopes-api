@@ -56,7 +56,7 @@ public:
     {
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
-        widgets.emplace_back(PreviewWidget(R"({"type": "image", "art": "screenshot-url"})"));
+        widgets.emplace_back(PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
         reply->push(widgets);
         reply->push("author", Variant("Foo"));
         reply->push("rating", Variant("Bar"));
