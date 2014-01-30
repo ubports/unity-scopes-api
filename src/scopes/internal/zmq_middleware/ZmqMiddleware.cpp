@@ -55,7 +55,7 @@ namespace
 {
 
 char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-c";    // Appended to server_name_ to create control adapter name
+char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
 char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 
 } // namespace
