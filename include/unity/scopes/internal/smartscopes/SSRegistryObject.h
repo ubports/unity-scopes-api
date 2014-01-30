@@ -75,7 +75,8 @@ private:
 
     MiddlewareBase::SPtr middleware_;
     std::string ss_scope_endpoint_;
-    uint const refresh_rate_in_min_;
+    uint const regular_refresh_timeout_;
+    uint next_refresh_timeout_;
 };
 
 }  // namespace smartscopes

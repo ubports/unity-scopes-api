@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
         uint const max_sessions = 4;
-        uint const no_reply_timeout = 10000;
+        uint const no_reply_timeout = 2000;
         uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
 
         // Instantiate SS registry and scopes runtimes

@@ -48,7 +48,8 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     , refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
-    , refresh_rate_in_min_(refresh_rate_in_min)
+    , regular_refresh_timeout_(refresh_rate_in_min)
+    , next_refresh_timeout_(refresh_rate_in_min)
 {
     // get remote scopes then start the auto-refresh background thread
     get_remote_scopes();
@@ -135,7 +136,7 @@ void SSRegistryObject::refresh_thread()
 
     while (!refresh_stopped_)
     {
-        refresh_cond_.wait_for(refresh_mutex_, std::chrono::minutes(refresh_rate_in_min_));
+        refresh_cond_.wait_for(refresh_mutex_, std::chrono::minutes(next_refresh_timeout_));
 
         if (!refresh_stopped_)
         {
@@ -146,8 +147,19 @@ void SSRegistryObject::refresh_thread()
 
 void SSRegistryObject::get_remote_scopes()
 {
-    // request remote scopes from smart scopes client
-    std::vector<RemoteScope> remote_scopes = ssclient_->get_remote_scopes();
+    std::vector<RemoteScope> remote_scopes;
+
+    try
+    {
+        // request remote scopes from smart scopes client
+        remote_scopes = ssclient_->get_remote_scopes();
+    }
+    catch (unity::Exception const&)
+    {
+        // refresh again soon as get_remote_scopes failed
+        next_refresh_timeout_ = 1;  ///! TODO config?
+        return;
+    }
 
     std::lock_guard<std::mutex> lock(scopes_mutex_);
 
@@ -181,6 +193,8 @@ void SSRegistryObject::get_remote_scopes()
         // add scope info to collection
         add(scope.name, std::move(meta), scope);
     }
+
+    next_refresh_timeout_ = regular_refresh_timeout_;
 }
 
 bool SSRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata, RemoteScope const& remotedata)

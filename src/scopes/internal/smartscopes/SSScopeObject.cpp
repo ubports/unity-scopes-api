@@ -21,11 +21,8 @@
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-
-#include <cassert>
 
 namespace unity
 {

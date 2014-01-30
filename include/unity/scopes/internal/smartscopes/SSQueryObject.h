@@ -20,8 +20,6 @@
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H
 
 #include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <map>

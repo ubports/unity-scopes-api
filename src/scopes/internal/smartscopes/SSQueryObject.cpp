@@ -18,16 +18,11 @@
 
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 
-#include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/SearchQuery.h>
-#include <unity/scopes/PreviewQuery.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/SearchQuery.h>
-#include <unity/Exception.h>
 
 #include <iostream>
 #include <cassert>
@@ -59,32 +54,35 @@ SSQueryObject::~SSQueryObject() noexcept
 
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
-    QueryBase::SPtr q_base;
-    MWReplyProxy q_reply;
-    SearchReplyProxy q_reply_proxy;
     decltype(queries_.begin()) query;
 
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
-
-        // find the targeted query according to InvokeInfo
-        query = queries_.find(info.id);
-        assert(query != end(queries_));
-
-        q_base = query->second.q_base;
-        q_reply = query->second.q_reply;
-
-        // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
-        // if cancel() is called later.
-        q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
-        assert(q_reply_proxy);
-        query->second.q_reply_proxy = q_reply_proxy;
-    }
-
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
     try
     {
+        QueryBase::SPtr q_base;
+        SearchReplyProxy q_reply_proxy;
+
+        {
+            std::lock_guard<std::mutex> lock(queries_mutex_);
+
+            // find the targeted query according to InvokeInfo
+            query = queries_.find(info.id);
+
+            if (query == end(queries_))
+            {
+                throw ObjectNotExistException("Query does not exist", info.id);
+            }
+
+            q_base = query->second.q_base;
+
+            // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
+            // if cancel() is called later.
+            q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
+            assert(q_reply_proxy);
+            query->second.q_reply_proxy = q_reply_proxy;
+        }
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the query may still be outstanding.
         auto search_query = dynamic_pointer_cast<SearchQuery>(q_base);
         assert(search_query);
         search_query->run(q_reply_proxy);
@@ -95,8 +93,8 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
 
         query->second.q_pushable = false;
         // TODO: log error
-        q_reply->finished(ListenerBase::Error, e.what());  // Oneway, can't block
-        cerr << "ScopeBase::run(): " << e.what() << endl;
+        reply->finished(ListenerBase::Error, e.what());  // Oneway, can't block
+        cerr << "SSQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
     {
@@ -104,7 +102,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
 
         query->second.q_pushable = false;
         // TODO: log error
-        q_reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
+        reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
         cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 
@@ -123,7 +121,11 @@ void SSQueryObject::cancel(InvokeInfo const& info)
 
     // find the targeted query according to InvokeInfo
     auto query = queries_.find(info.id);
-    assert(query != end(queries_));
+
+    if (query == end(queries_))
+    {
+        throw ObjectNotExistException("Query does not exist", info.id);
+    }
 
     QueryBase::SPtr const& q_base = query->second.q_base;
     MWReplyProxy const& q_reply = query->second.q_reply;
@@ -169,6 +171,7 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 
 void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
 {
+    ///! TODO: remove
 }
 
 void SSQueryObject::add_query(std::string const& scope_id, QueryBase::SPtr const& query_base, MWReplyProxy const& reply)

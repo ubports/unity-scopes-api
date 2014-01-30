@@ -70,7 +70,7 @@ void HttpClientQtThread::cancel()
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
     success_ = false;
-    reply_ = "Request cancelled: " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+    reply_ = "Request cancelled: " + url_.url().toStdString();
 
     emit abort();
     quit();
@@ -81,7 +81,7 @@ void HttpClientQtThread::timeout()
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
     success_ = false;
-    reply_ = "Request timed out: " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+    reply_ = "Request timed out: " + url_.url().toStdString();
 
     emit abort();
     quit();
@@ -100,13 +100,13 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     {
         // no reply
         success_ = false;
-        reply_ = "No reply from " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+        reply_ = "No reply from " + url_.url().toStdString();
     }
     else if (!reply->isFinished())
     {
         // incomplete reply
         success_ = false;
-        reply_ = "Incomplete reply from " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+        reply_ = "Incomplete reply from " + url_.url().toStdString();
     }
     else if (reply->error() != QNetworkReply::NoError)
     {

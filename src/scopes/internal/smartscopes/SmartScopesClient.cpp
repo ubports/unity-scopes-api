@@ -155,8 +155,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
     catch (unity::Exception const& e)
     {
         std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
-        std::cout << "error:" << e.what() << std::endl;
-        return std::vector<RemoteScope>();
+        throw;
     }
 }
 
@@ -286,8 +285,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
     catch (unity::Exception const& e)
     {
         std::cout << "failed to retrieve search results for session: " << session_id << std::endl;
-        std::cout << "error:" << e.what() << std::endl;
-        return std::vector<SearchResult>();
+        throw;
     }
 }
 
