@@ -49,7 +49,6 @@ SSQueryObject::SSQueryObject()
 
 SSQueryObject::~SSQueryObject() noexcept
 {
-    disconnect();
 }
 
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
@@ -103,7 +102,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
         query->second.q_pushable = false;
         // TODO: log error
         reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
-        cerr << "ScopeBase::run(): unknown exception" << endl;
+        cerr << "SSQueryObject::run(): unknown exception" << endl;
     }
 
     {

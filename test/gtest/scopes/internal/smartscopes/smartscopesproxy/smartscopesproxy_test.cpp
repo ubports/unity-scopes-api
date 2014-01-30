@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+#include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include "../RaiiServer.h"
@@ -40,16 +41,29 @@ TEST(smartscopesproxy, basic)
     std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(test_server.port_);
     ::putenv((char*)server_env.c_str());
 
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+    // Instantiate SS registry and scopes runtimes
+    RuntimeImpl::UPtr reg_rt = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+    RuntimeImpl::UPtr scope_rt = RuntimeImpl::create("SmartScope", SS_RUNTIME_PATH);
 
-    std::string identity = runtime->registry_identity();
+    // Get registry config
+    RegistryConfig reg_conf("SSRegistry", reg_rt->registry_configfile());
+    std::string mw_kind = reg_conf.mw_kind();
+    std::string mw_configfile = reg_conf.mw_configfile();
 
-    RegistryConfig c(identity, runtime->registry_configfile());
-    std::string mw_kind = c.mw_kind();
+    // Get middleware handles from runtimes
+    MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find("SSRegistry", mw_kind);
+    MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create("SmartScope", mw_kind, mw_configfile);
 
-    MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+    // Instantiate a SS registry object
+    SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
+                                                    2, 2000, 60));
 
-    SSRegistryObject::SPtr reg(new SSRegistryObject(middleware, "SmartScope", 2, 2000, 60));
+    // Instantiate a SS scope object
+    SSScopeObject::UPtr scope(new SSScopeObject("SmartScope", scope_mw, reg));
+
+    // Add objects to the middlewares
+    reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
+    scope_mw->add_dflt_scope_object(std::move(scope));
 
     // list scopes
     MetadataMap scopes = reg->list();
@@ -63,4 +77,10 @@ TEST(smartscopesproxy, basic)
 
     // invisible scope
     EXPECT_THROW(reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
+
+    scope_mw->stop();
+    scope_mw->wait_for_shutdown();
+
+    reg_mw->stop();
+    reg_mw->wait_for_shutdown();
 }

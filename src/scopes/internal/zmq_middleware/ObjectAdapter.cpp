@@ -856,6 +856,7 @@ void ObjectAdapter::cleanup()
 {
     join_with_all_threads();
     servants_.clear();
+    dflt_servants_.clear();
 }
 
 void ObjectAdapter::join_with_all_threads()
