@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
 #include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
+#include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -60,6 +61,7 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(!identity.empty());
     assert(m != Unknown);
     assert(timeout >= -1);
+    throw_if_bad_endpoint(endpoint);
 }
 
 ZmqObjectProxy::~ZmqObjectProxy()
