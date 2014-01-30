@@ -27,6 +27,7 @@
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
+using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
@@ -34,53 +35,76 @@ using namespace unity::test::scopes::internal::smartscopes;
 
 ///! TODO: more tests
 
-TEST(smartscopesproxy, basic)
+namespace
 {
-    RaiiServer test_server(FAKE_SSS_PATH);
 
-    std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(test_server.port_);
-    ::putenv((char*)server_env.c_str());
+class smartscopesproxytest : public Test
+{
+public:
+    smartscopesproxytest()
+        : server_(FAKE_SSS_PATH)
+    {
+        std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(server_.port_);
+        ::putenv((char*)server_env.c_str());
 
-    // Instantiate SS registry and scopes runtimes
-    RuntimeImpl::UPtr reg_rt = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
-    RuntimeImpl::UPtr scope_rt = RuntimeImpl::create("SmartScope", SS_RUNTIME_PATH);
+        // Instantiate SS registry and scopes runtimes
+        reg_rt_ = RuntimeImpl::create("SSRegistry", SS_RUNTIME_PATH);
+        scope_rt_ = RuntimeImpl::create("SmartScope", SS_RUNTIME_PATH);
 
-    // Get registry config
-    RegistryConfig reg_conf("SSRegistry", reg_rt->registry_configfile());
-    std::string mw_kind = reg_conf.mw_kind();
-    std::string mw_configfile = reg_conf.mw_configfile();
+        // Get registry config
+        RegistryConfig reg_conf("SSRegistry", reg_rt_->registry_configfile());
+        std::string mw_kind = reg_conf.mw_kind();
+        std::string mw_configfile = reg_conf.mw_configfile();
 
-    // Get middleware handles from runtimes
-    MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find("SSRegistry", mw_kind);
-    MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create("SmartScope", mw_kind, mw_configfile);
+        // Get middleware handles from runtimes
+        reg_mw_ = reg_rt_->factory()->find("SSRegistry", mw_kind);
+        scope_mw_ = scope_rt_->factory()->create("SmartScope", mw_kind, mw_configfile);
 
-    // Instantiate a SS registry object
-    SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
-                                                    2, 2000, 60));
+        // Instantiate a SS registry and scope objects
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60));
+        scope_ = SSScopeObject::UPtr(new SSScopeObject("SmartScope", scope_mw_, reg_));
 
-    // Instantiate a SS scope object
-    SSScopeObject::UPtr scope(new SSScopeObject("SmartScope", scope_mw, reg));
+        // Add objects to the middlewares
+        reg_mw_->add_registry_object(reg_rt_->registry_identity(), reg_);
+        scope_mw_->add_dflt_scope_object(std::move(scope_));
+    }
 
-    // Add objects to the middlewares
-    reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
-    scope_mw->add_dflt_scope_object(std::move(scope));
+    ~smartscopesproxytest()
+    {
+        scope_mw_->stop();
+        scope_mw_->wait_for_shutdown();
 
+        reg_mw_->stop();
+        reg_mw_->wait_for_shutdown();
+    }
+
+protected:
+    RuntimeImpl::UPtr reg_rt_;
+    RuntimeImpl::UPtr scope_rt_;
+
+    MiddlewareBase::SPtr reg_mw_;
+    MiddlewareBase::SPtr scope_mw_;
+
+    SSRegistryObject::SPtr reg_;
+    SSScopeObject::UPtr scope_;
+
+    RaiiServer server_;
+};
+
+TEST_F(smartscopesproxytest, basic)
+{
     // list scopes
-    MetadataMap scopes = reg->list();
+    MetadataMap scopes = reg_->list();
     EXPECT_EQ(scopes.size(), 1);
 
     // visible scope
-    ScopeMetadata meta = reg->get_metadata("Dummy Demo Scope");
+    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
     EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
 
     // invisible scope
-    EXPECT_THROW(reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
-
-    scope_mw->stop();
-    scope_mw->wait_for_shutdown();
-
-    reg_mw->stop();
-    reg_mw->wait_for_shutdown();
+    EXPECT_THROW(reg_->get_metadata("Dummy Demo Scope 2"), NotFoundException);
 }
+
+} // namespace
