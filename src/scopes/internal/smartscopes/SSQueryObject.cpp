@@ -55,11 +55,11 @@ SSQueryObject::~SSQueryObject() noexcept
 void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     decltype(queries_.begin()) query;
+    SearchReplyProxy q_reply_proxy;
 
     try
     {
         QueryBase::SPtr q_base;
-        SearchReplyProxy q_reply_proxy;
 
         {
             std::lock_guard<std::mutex> lock(queries_mutex_);

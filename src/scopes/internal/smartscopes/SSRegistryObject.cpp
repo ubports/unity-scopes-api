@@ -43,8 +43,9 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    uint max_http_sessions,
                                    uint no_reply_timeout,
                                    uint refresh_rate_in_min)
-    : ssclient_(std::make_shared<SmartScopesClient>(std::make_shared<HttpClientQt>(max_http_sessions, no_reply_timeout),
-                                                    std::make_shared<JsonCppNode>()))
+    : ssclient_(std::make_shared<SmartScopesClient>(
+                    std::make_shared<HttpClientQt>(max_http_sessions, no_reply_timeout),
+                    std::make_shared<JsonCppNode>()))
     , refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
