@@ -5,15 +5,31 @@ unity-scopes-api (0.3.0-0ubuntu1) UNRELEASED; urgency=low
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 24 Jan 2014 14:24:19 +0100
 
-unity-scopes-api (0.2.6-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.2.6+14.04.20140128-0ubuntu1) trusty; urgency=low
 
   [ Michi Henning ]
   * More default servant support.
+  * Removed 3.9-specific suppression directive that breaks valgrind
+    3.8.x.
+  * Added formatcode script to build/tools to make it easy to format
+    individual source files.
+  * Added support for remote scopes by querying the smart scopes proxy
+    server. Registry.ini now has two new keys, SS.Registry.Identity and
+    SS.Registry.Endpoint, which is where the smart scopes proxy server
+    is expected to provide its registry object. If these keys are not
+    set, the registry still runs, but prints a warning to say that
+    remote scopes won't be available. Still missing: we don't have a
+    refresh policy yet. The remote scopes are read only once, on start-
+    up. If the smart scopes registry changes, the local registry
+    currently will not notice this until it is re-started.
+  * Added create_query_proxy() and create_query_ctrl_proxy() for the SS
+    proxy server.
 
   [ Pawel Stolowski ]
   * Additions to the PreviewWidget API.
+  * Define Result and CategorisedResult SPtr and SCPtr.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Mon, 27 Jan 2014 15:42:18 +0100
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 28 Jan 2014 15:40:37 +0000
 
 unity-scopes-api (0.2.4+14.04.20140124-0ubuntu1) trusty; urgency=low
 
