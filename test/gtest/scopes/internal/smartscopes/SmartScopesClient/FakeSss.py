@@ -35,8 +35,8 @@ def response(environ, start_response):
     return ''
 
 remote_scopes_response = '\
-[{"base_url": "https://productsearch.ubuntu.com/demo", "name": "Dummy Demo Scope", "description": "Dummy demo scope." },\
-{"base_url": "https://productsearch.ubuntu.com/demo2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "invisible": true }]'
+[{"base_url": "http://127.0.0.1/demo", "name": "Dummy Demo Scope", "description": "Dummy demo scope." },\
+{"base_url": "http://127.0.0.1/demo2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "invisible": true }]'
 
 search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\

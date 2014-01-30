@@ -16,6 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryException.h>
@@ -23,9 +25,11 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/SearchListener.h>
 
 #include "../RaiiServer.h"
 
+#include <memory>
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
@@ -98,7 +102,7 @@ protected:
     SSScopeObject::UPtr scope_;
 };
 
-TEST_F(smartscopesproxytest, SSRegistry)
+TEST_F(smartscopesproxytest, ss_registry)
 {
     // locate should throw (direct)
     EXPECT_THROW(reg_->locate("Dummy Demo Scope"), RegistryException);
@@ -132,6 +136,71 @@ TEST_F(smartscopesproxytest, SSRegistry)
 
     // invisible scope (via mw)
     EXPECT_THROW(mw_reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
+}
+
+class Receiver : public SearchListener
+{
+public:
+    virtual void push(CategorisedResult result) override
+    {
+        if (count_ == 0)
+        {
+            EXPECT_EQ("URI", result.uri());
+            EXPECT_EQ("Stuff", result.title());
+            EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", result.art());
+            EXPECT_EQ("", result.dnd_uri());
+            EXPECT_EQ("cat1", result.category()->id());
+            EXPECT_EQ("Category 1", result.category()->title());
+            EXPECT_EQ("", result.category()->icon());
+            EXPECT_EQ("", result.category()->renderer_template().data());
+        }
+        else if (count_ == 1)
+        {
+            EXPECT_EQ("URI2", result.uri());
+            EXPECT_EQ("Things", result.title());
+            EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", result.art());
+            EXPECT_EQ("", result.dnd_uri());
+            EXPECT_EQ("cat1", result.category()->id());
+            EXPECT_EQ("Category 1", result.category()->title());
+            EXPECT_EQ("", result.category()->icon());
+            EXPECT_EQ("", result.category()->renderer_template().data());
+        }
+
+        count_++;
+    }
+
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
+        EXPECT_EQ(2, count_);
+
+        // signal wait_until_finished
+        std::unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    int count_ = 0;
+    bool query_complete_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+};
+
+TEST_F(smartscopesproxytest, ss_scope)
+{
+    auto reply = std::make_shared<Receiver>();
+
+    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    reply->wait_until_finished();
 }
 
 } // namespace
