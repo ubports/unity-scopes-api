@@ -54,9 +54,9 @@ namespace zmq_middleware
 namespace
 {
 
-char const* query_suffix = "-query";  // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-ctrl";    // Appended to server_name_ to create control adapter name
-char const* reply_suffix = "-reply";  // Appended to server_name_ to create reply adapter name
+char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
+char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 
 } // namespace
 
@@ -207,6 +207,34 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     try
     {
         proxy.reset(new ZmqScope(this, endpoint, identity, "Scope", twoway_timeout_));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
+MWQueryProxy ZmqMiddleware::create_query_proxy(string const& identity, string const& endpoint)
+{
+    MWQueryProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqQuery(this, endpoint, identity, "Query"));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
+MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, string const& endpoint)
+{
+    MWQueryCtrlProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqQueryCtrl(this, endpoint, identity, "QueryCtrl"));
     }
     catch (zmqpp::exception const& e)
     {
