@@ -82,7 +82,7 @@ Variant VariantBuilderImpl::end()
     }
     Variant v(std::move(*variant_));
     variant_.reset();
-    return std::move(v);
+    return v;
 }
 
 } // namespace internal
