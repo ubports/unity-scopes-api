@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#ifndef UNITY_INTERNAL_VARIANTBUILDER_H
+#define UNITY_INTERNAL_VARIANTBUILDER_H
 
 #include <unity/scopes/Variant.h>
 #include <string>
@@ -32,18 +32,21 @@ namespace scopes
 namespace internal
 {
 
-class VariantMapBuilderImpl final
+class VariantBuilderImpl final
 {
 public:
-    VariantMapBuilderImpl() = default;
-    ~VariantMapBuilderImpl() = default;
-    void add_attribute(std::string const& key, Variant const& value);
-    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
-    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
-    VariantMap variant_map() const;
+    VariantBuilderImpl() = default;
+    VariantBuilderImpl(VariantBuilderImpl const& other);
+    VariantBuilderImpl(VariantBuilderImpl&&) = default;
+    ~VariantBuilderImpl() = default;
+    VariantBuilderImpl& operator=(VariantBuilderImpl const& other) = delete;
+    VariantBuilderImpl& operator=(VariantBuilderImpl&&) = default;
+    void add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+    void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
+    Variant end();
 
 private:
-    VariantMap variant_;
+    std::unique_ptr<Variant> variant_;
 };
 
 } // namespace internal
