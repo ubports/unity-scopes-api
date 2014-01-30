@@ -67,7 +67,7 @@ void PreviewReplyObject::process_data(VariantMap const& data)
         }
         catch (unity::LogicException const &e)
         {
-            throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
+            throw unity::LogicException("PreviewReplyObject::process_data(): Failed to validate layouts");
         }
 
         receiver_->push(list);

@@ -85,7 +85,9 @@ std::vector<std::string> ColumnLayoutImpl::column(unsigned index) const
 {
     if (index >= columns_.size())
     {
-        throw unity::InvalidArgumentException("ColumnLayout::column(): invalid column index");
+        std::ostringstream str;
+        str << "ColumnLayout::column(): invalid column index " << index << ", layout size is " << columns_.size();
+        throw unity::InvalidArgumentException(str.str());
     }
     return columns_[index];
 }
