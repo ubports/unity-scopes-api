@@ -189,11 +189,6 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             spawn_command.push_back(config_file);
             spawn_command.push_back(pair.second);
             registry->add_local_scope(pair.first, move(meta), spawn_command);
-            // FIXME, HACK HACK HACK HACK
-            // The middleware should spawn scope processes with lookup() on demand.
-            // Because it currently does not have the plumbing, we start every scope immediately.
-            // When the plumbing appears, remove this.
-            registry->locate(pair.first);
         }
         catch (unity::Exception const& e)
         {
@@ -209,8 +204,18 @@ void load_remote_scopes(RegistryObject::SPtr const& registry,
                         string const& ss_reg_id,
                         string const& ss_reg_endpoint)
 {
-    auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
-    registry->set_remote_scopes(ss_reg->list());
+    try
+    {
+        auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
+        registry->set_remote_scopes(ss_reg->list());
+    }
+    catch (MiddlewareException const& e)
+    {
+        // TODO: we need a refresh policy, to deal with re-started SS proxy,
+        // as well as changes in the SS registry.
+        error(e.what());
+        error("cannot load remote scopes, skipping");
+    }
 }
 
 } // namespace
@@ -269,6 +274,15 @@ main(int argc, char* argv[])
         else
         {
             load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
+        }
+
+        // FIXME, HACK HACK HACK HACK
+        // The middleware should spawn scope processes with lookup() on demand.
+        // Because it currently does not have the plumbing, we start every scope immediately.
+        // When the plumbing appears, remove this.
+        for (auto pair : local_scopes)
+        {
+            registry->locate(pair.first);
         }
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
