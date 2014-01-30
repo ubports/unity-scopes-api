@@ -49,7 +49,14 @@ public:
     \brief Creates a layout definition which expects num_of_columns columns to be added with ColumnLayout::add_column.
     The number of columns needs to be greater than 0. Throws unity::InvalidArgumentException on invalid number.
     */
-    explicit ColumnLayout(unsigned num_of_columns);
+    explicit ColumnLayout(int num_of_columns);
+
+/// @cond
+    ColumnLayout(ColumnLayout const& other);
+    ColumnLayout(ColumnLayout&&);
+    ColumnLayout& operator=(ColumnLayout const& other);
+    ColumnLayout& operator=(ColumnLayout&&);
+/// @endcond
 
     /**
     \brief Adds new column and assigns widgets to it.
@@ -64,20 +71,20 @@ public:
     Note, this is can be smaller than number of columns passed to the constructor and available via number_of_columns().
     \return number of columns added with add_column().
      */
-    unsigned size() const noexcept;
+    int size() const noexcept;
 
     /**
     \brief Get number of columns expected by this layout and passed to the constructor.
     \return number of columns expected by this layout
     */
-    unsigned number_of_columns() const noexcept;
+    int number_of_columns() const noexcept;
 
     /**
     \brief Retrieve list of widgets for given column. This can throw unity::InvalidArgumentException if the index is invalid.
     \param column index
     \return widget identifiers for given column index
     */
-    std::vector<std::string> column(unsigned index) const;
+    std::vector<std::string> column(int index) const;
 
 /// @cond
     VariantMap serialize() const;

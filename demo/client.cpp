@@ -199,7 +199,7 @@ public:
         for (auto const& col: columns)
         {
             cout << "\t\tLayout for " << col.size() << " column(s):" << endl;
-            for (unsigned i = 0; i<col.size(); i++)
+            for (int i = 0; i<col.size(); i++)
             {
                 cout << "\t\t\tColumn #" << i << ": ";
                 for (auto const& w: col.column(i))

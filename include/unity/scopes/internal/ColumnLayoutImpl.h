@@ -36,20 +36,22 @@ namespace internal
 class ColumnLayoutImpl
 {
 public:
-    explicit ColumnLayoutImpl(unsigned num_of_columns);
+    explicit ColumnLayoutImpl(int num_of_columns);
     explicit ColumnLayoutImpl(VariantMap const& var);
+    ColumnLayoutImpl(ColumnLayoutImpl const& other) = default;
     void add_column(std::vector<std::string> widget_ids);
-    unsigned size() const noexcept;
-    unsigned number_of_columns() const noexcept;
-    std::vector<std::string> column(unsigned index) const;
+    int size() const noexcept;
+    int number_of_columns() const noexcept;
+    std::vector<std::string> column(int index) const;
     VariantMap serialize() const;
 
     static ColumnLayout create(VariantMap const& var);
     static void validate_layouts(ColumnLayoutList const& layouts);
 
 private:
-    unsigned num_of_columns_;
+    int num_of_columns_;
     std::vector<std::vector<std::string>> columns_;
+    static const int max_number_of_columns_ = 1024;
 };
 
 } // namespace internal

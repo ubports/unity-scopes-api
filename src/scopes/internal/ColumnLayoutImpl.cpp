@@ -30,12 +30,14 @@ namespace scopes
 namespace internal
 {
 
-ColumnLayoutImpl::ColumnLayoutImpl(unsigned num_of_columns)
+ColumnLayoutImpl::ColumnLayoutImpl(int num_of_columns)
     : num_of_columns_(num_of_columns)
 {
-    if (num_of_columns_ == 0)
+    if (num_of_columns_ <= 0 || num_of_columns_ > max_number_of_columns_)
     {
-        throw unity::InvalidArgumentException("ColumnLayout(): the number of columns must be greater than 0");
+        // don't print allowed range since max_number_of_columns_ is an internal safeguard
+        // and we don't really have a hardcoded limit defined for the API and shell.
+        throw unity::InvalidArgumentException("ColumnLayout(): invalid number of columns");
     }
 }
 
@@ -62,7 +64,7 @@ ColumnLayoutImpl::ColumnLayoutImpl(VariantMap const& var)
 
 void ColumnLayoutImpl::add_column(std::vector<std::string> widget_ids)
 {
-    if (columns_.size() >= num_of_columns_)
+    if (static_cast<int>(columns_.size()) >= num_of_columns_)
     {
         std::ostringstream str;
         str << "ColumnLayout::add_column(): excessive column, exepcting " << num_of_columns_ << " columns";
@@ -71,19 +73,19 @@ void ColumnLayoutImpl::add_column(std::vector<std::string> widget_ids)
     columns_.push_back(widget_ids);
 }
 
-unsigned ColumnLayoutImpl::size() const noexcept
+int ColumnLayoutImpl::size() const noexcept
 {
     return columns_.size();
 }
 
-unsigned ColumnLayoutImpl::number_of_columns() const noexcept
+int ColumnLayoutImpl::number_of_columns() const noexcept
 {
     return num_of_columns_;
 }
 
-std::vector<std::string> ColumnLayoutImpl::column(unsigned index) const
+std::vector<std::string> ColumnLayoutImpl::column(int index) const
 {
-    if (index >= columns_.size())
+    if (index >= static_cast<int>(columns_.size()))
     {
         std::ostringstream str;
         str << "ColumnLayout::column(): invalid column index " << index << ", layout size is " << columns_.size();
@@ -116,7 +118,7 @@ ColumnLayout ColumnLayoutImpl::create(VariantMap const& var)
 
 void ColumnLayoutImpl::validate_layouts(ColumnLayoutList const& layouts)
 {
-    std::unordered_set<unsigned> layout_number_lut;
+    std::unordered_set<int > layout_number_lut; // lookup for number of columns to ensure we have only one layout for each column setup
 
     // basic check for consistency of layouts
     for (auto const& layout: layouts)

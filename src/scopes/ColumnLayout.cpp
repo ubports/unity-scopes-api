@@ -25,7 +25,7 @@ namespace unity
 namespace scopes
 {
 
-ColumnLayout::ColumnLayout(unsigned int num_of_columns)
+ColumnLayout::ColumnLayout(int num_of_columns)
     : p(new internal::ColumnLayoutImpl(num_of_columns))
 {
 }
@@ -35,22 +35,40 @@ ColumnLayout::ColumnLayout(internal::ColumnLayoutImpl *impl)
 {
 }
 
+ColumnLayout::ColumnLayout(ColumnLayout const& other)
+    : p(new internal::ColumnLayoutImpl(*(other.p)))
+{
+}
+
+ColumnLayout::ColumnLayout(ColumnLayout&&) = default;
+
+ColumnLayout& ColumnLayout::operator=(ColumnLayout const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::ColumnLayoutImpl(*(other.p)));
+    }
+    return *this;
+}
+
+ColumnLayout& ColumnLayout::operator=(ColumnLayout&&) = default;
+
 void ColumnLayout::add_column(std::vector<std::string> widget_ids)
 {
     return p->add_column(widget_ids);
 }
 
-unsigned ColumnLayout::size() const noexcept
+int ColumnLayout::size() const noexcept
 {
     return p->size();
 }
 
-unsigned ColumnLayout::number_of_columns() const noexcept
+int ColumnLayout::number_of_columns() const noexcept
 {
     return p->number_of_columns();
 }
 
-std::vector<std::string> ColumnLayout::column(unsigned index) const
+std::vector<std::string> ColumnLayout::column(int index) const
 {
     return p->column(index);
 }
