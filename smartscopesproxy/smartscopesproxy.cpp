@@ -49,45 +49,32 @@ int main(int argc, char* argv[])
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        std::string ss_scope_ep = "ipc:///tmp/" + ss_scope_id;
         uint const max_sessions = 4;
         uint const no_reply_timeout = 10000;
-        uint const refresh_rate_in_min = 60 * 24; // 24 hour refresh
+        uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
 
-        // SMART SCOPES REGISTRY
-        // =====================
-
-        // Instantiate a runtime
+        // Instantiate SS registry and scopes runtimes
         RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, SS_RUNTIME_PATH);
+        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, SS_RUNTIME_PATH);
 
         // Get registry config
         RegistryConfig reg_conf(ss_reg_id, reg_rt->registry_configfile());
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
-        // Get registry middleware handle from runtime
+        // Get middleware handles from runtimes
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
+        MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, ss_scope_ep, max_sessions,
-                                                             no_reply_timeout, refresh_rate_in_min));
-
-        // Add the SS registry object to the middleware
-        reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
-
-        // SMART SCOPES SCOPE
-        // ==================
-
-        // Instantiate a runtime
-        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, SS_RUNTIME_PATH);
-
-        // Get scope middleware handle from runtime
-        MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
+        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(), max_sessions,
+                                                        no_reply_timeout, ss_reg_refresh_rate));
 
         // Instantiate a SS scope object
         SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
 
-        // Add the SS scope object to the middleware
+        // Add objects to the middlewares
+        reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
         scope_mw->add_dflt_scope_object(std::move(scope));
 
         // Wait until shutdown
