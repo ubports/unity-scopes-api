@@ -19,8 +19,11 @@
 #include <unity/scopes/internal/PreviewReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
+#include <unity/UnityExceptions.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -48,7 +51,29 @@ PreviewReplyObject::~PreviewReplyObject()
 
 void PreviewReplyObject::process_data(VariantMap const& data)
 {
-    auto it = data.find("widgets");
+    auto it = data.find("columns");
+    if (it != data.end())
+    {
+        ColumnLayoutList list;
+        const VariantArray arr = it->second.get_array();
+        for (auto const& pl: arr)
+        {
+            list.emplace_back(ColumnLayoutImpl::create(pl.get_dict()));
+        }
+        // basic check for consistency of layouts
+        try
+        {
+            ColumnLayoutImpl::validate_layouts(list);
+        }
+        catch (unity::LogicException const &e)
+        {
+            throw unity::LogicException("PreviewReplyObject::process_data(): Failed to validate layouts");
+        }
+
+        receiver_->push(list);
+    }
+
+    it = data.find("widgets");
     if (it != data.end() && it->second.which() == Variant::Type::Array)
     {
         VariantArray arr = it->second.get_array();
