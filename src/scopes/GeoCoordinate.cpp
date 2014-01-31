@@ -76,6 +76,11 @@ bool GeoCoordinate::has_altitude() const
     return p->has_altitude();
 }
 
+VariantMap GeoCoordinate::serialize() const
+{
+    return p->serialize();
+}
+
 } // namespace scopes
 
 } // namespace unity

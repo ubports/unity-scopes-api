@@ -67,6 +67,16 @@ bool GeoCoordinateImpl::has_altitude() const
     return has_alt_;
 }
 
+VariantMap GeoCoordinateImpl::serialize() const
+{
+    VariantMap vm;
+    vm["lat"] = Variant(lat_);
+    vm["lon"] = Variant(lon_);
+    vm["alt"] = Variant(alt_);
+    vm["has_alt"] = Variant(has_alt_);
+    return vm;
+}
+
 } // namespace internal
 
 } // namespace scopes

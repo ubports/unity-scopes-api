@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_QUERYMETADATAIMPL_H
 
 #include <unity/scopes/GeoCoordinate.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 
 namespace unity
@@ -39,6 +40,11 @@ public:
     std::string locale() const;
     std::string form_factor() const;
     GeoCoordinate location() const;
+    VariantMap serialize() const;
+
+protected:
+    virtual void serialize(VariantMap &var) const;
+    virtual std::string metadata_type() const;
 
 private:
     std::string locale_;

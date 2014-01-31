@@ -44,7 +44,7 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(50, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
-        EXPECT_TRUE(abs(meta.location().latitude()) - 10.0f <= 0.0000001f);
+        EXPECT_TRUE(abs(meta.location().latitude() - 10.0f) <= 0.0000001f);
         EXPECT_TRUE(abs(meta.location().longitude() - 20.0f) <= 0.0000001f);
         EXPECT_FALSE(meta.location().has_altitude());
         EXPECT_TRUE(abs(meta.location().altitude()) <= 0.0000001f);
@@ -55,6 +55,23 @@ TEST(SearchMetadata, basic)
 
         meta.set_cardinality(100);
         EXPECT_EQ(100, meta.cardinality());
+    }
+}
+
+TEST(SearchMetadata, serialize)
+{
+    {
+        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
+        SearchMetadata meta("pl", "phone", coord);
+
+        auto var = meta.serialize();
+        EXPECT_EQ("search_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ(true, var["location"].get_dict()["has_alt"].get_bool());
+        EXPECT_TRUE(abs(var["location"].get_dict()["lat"].get_double() - 10.0f) <= 0.000001f);
+        EXPECT_TRUE(abs(var["location"].get_dict()["lon"].get_double() - 20.0f) <= 0.000001f);
+        EXPECT_TRUE(abs(var["location"].get_dict()["alt"].get_double() - 100.0f) <= 0.000001f);
     }
 }
 

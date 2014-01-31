@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_GEOCOORDINATE_H
 
 #include <unity/SymbolExport.h>
+#include <unity/scopes/Variant.h>
 #include <memory>
 
 namespace unity
@@ -34,7 +35,7 @@ class GeoCoordinateImpl;
 }
 
 /**
-\brief
+\brief Hold geographical coordinates (latitude, longitude and optional altitude).
 */
 class UNITY_API GeoCoordinate final
 {
@@ -52,6 +53,8 @@ public:
     double longitude() const;
     double altitude() const;
     bool has_altitude() const;
+
+    VariantMap serialize() const;
 
 private:
     std::unique_ptr<internal::GeoCoordinateImpl> p;

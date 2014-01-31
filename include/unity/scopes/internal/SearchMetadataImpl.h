@@ -40,6 +40,10 @@ public:
     void set_cardinality(int cardinality);
     int cardinality() const;
 
+protected:
+    std::string metadata_type() const override;
+    void serialize(VariantMap &var) const override;
+
 private:
     int cardinality_;
 };

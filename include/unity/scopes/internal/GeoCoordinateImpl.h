@@ -19,6 +19,8 @@
 #ifndef UNITY_INTERNAL_GEOCOORDINATEIMPL_H
 #define UNITY_INTERNAL_GEOCOORDINATEIMPL_H
 
+#include <unity/scopes/Variant.h>
+
 namespace unity
 {
 
@@ -40,6 +42,7 @@ public:
     double longitude() const;
     double altitude() const;
     bool has_altitude() const;
+    VariantMap serialize() const;
 
 private:
     double lat_;

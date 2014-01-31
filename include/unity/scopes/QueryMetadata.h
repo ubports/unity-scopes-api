@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/GeoCoordinate.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
 
@@ -43,12 +44,16 @@ class QueryMetadataImpl;
 class UNITY_API QueryMetadata
 {
 public:
-    QueryMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
     virtual ~QueryMetadata();
 
     std::string locale() const;
     std::string form_factor() const;
     GeoCoordinate location() const;
+
+    VariantMap serialize() const;
+
+protected:
+    QueryMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
 
 private:
     QueryMetadata(internal::QueryMetadataImpl *impl);

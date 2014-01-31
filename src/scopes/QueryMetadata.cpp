@@ -54,6 +54,11 @@ GeoCoordinate QueryMetadata::location() const
     return p->location();
 }
 
+VariantMap QueryMetadata::serialize() const
+{
+    return p->serialize();
+}
+
 } // namespace scopes
 
 } // namespace unity

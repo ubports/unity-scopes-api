@@ -49,6 +49,18 @@ int SearchMetadataImpl::cardinality() const
     return cardinality_;
 }
 
+std::string SearchMetadataImpl::metadata_type() const
+{
+    static const std::string t("search_metadata");
+    return t;
+}
+
+void SearchMetadataImpl::serialize(VariantMap &var) const
+{
+    QueryMetadataImpl::serialize(var);
+    var["cardinality"] = Variant(cardinality_);
+}
+
 } // namespace internal
 
 } // namespace scopes

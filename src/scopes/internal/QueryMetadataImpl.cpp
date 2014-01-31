@@ -49,6 +49,27 @@ GeoCoordinate QueryMetadataImpl::location() const
     return location_;
 }
 
+void QueryMetadataImpl::serialize(VariantMap &var) const
+{
+    var["type"] = metadata_type();
+    var["locale"] = locale_;
+    var["form_factor"] = form_factor_;
+    var["location"] = Variant(location_.serialize());
+}
+
+VariantMap QueryMetadataImpl::serialize() const
+{
+    VariantMap vm;
+    serialize(vm);
+    return vm;
+}
+
+std::string QueryMetadataImpl::metadata_type() const
+{
+    static const std::string t("query_metadata");
+    return t;
+}
+
 } // namespace internal
 
 } // namespace scopes
