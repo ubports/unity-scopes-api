@@ -41,10 +41,12 @@ SearchMetadataImpl::SearchMetadataImpl(int cardinality, std::string const& local
 
 void SearchMetadataImpl::set_cardinality(int cardinality)
 {
+    cardinality_ = cardinality;
 }
 
 int SearchMetadataImpl::cardinality() const
 {
+    return cardinality_;
 }
 
 } // namespace internal
