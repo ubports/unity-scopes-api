@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/internal/GeoCoordinateImpl.h>
+#include <unity/scopes/internal/Utils.h>
 
 namespace unity
 {
@@ -26,6 +27,25 @@ namespace scopes
 
 namespace internal
 {
+
+GeoCoordinateImpl::GeoCoordinateImpl()
+    : lat_(0.0f),
+      lon_(0.0f),
+      alt_(0.0f),
+      has_alt_(false)
+{
+}
+
+GeoCoordinateImpl::GeoCoordinateImpl(VariantMap const& var)
+{
+    static const std::string context("GeoCoordinateImpl()");
+    auto it = find_or_throw(context, var, "lat");
+    lat_ = it->second.get_double();
+    it = find_or_throw(context, var, "lon");
+    lon_ = it->second.get_double();
+    it = find_or_throw(context, var, "alt");
+    alt_ = it->second.get_double();
+}
 
 GeoCoordinateImpl::GeoCoordinateImpl(double lat, double lon)
     : lat_(lat),
@@ -75,6 +95,11 @@ VariantMap GeoCoordinateImpl::serialize() const
     vm["alt"] = Variant(alt_);
     vm["has_alt"] = Variant(has_alt_);
     return vm;
+}
+
+GeoCoordinate GeoCoordinateImpl::create(VariantMap const& var)
+{
+    return GeoCoordinate(new GeoCoordinateImpl(var));
 }
 
 } // namespace internal

@@ -75,6 +75,28 @@ TEST(SearchMetadata, serialize)
     }
 }
 
+TEST(SearchMetadata, copy)
+{
+    {
+        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
+        SearchMetadata meta(100, "pl", "phone", coord);
+        auto meta2 = meta;
+
+        meta.set_cardinality(0);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+    }
+    {
+        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
+        SearchMetadata meta(100, "pl", "phone", coord);
+        SearchMetadata meta2(meta);
+        meta.set_cardinality(0);
+
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+    }
+}
+
 namespace unity
 {
 

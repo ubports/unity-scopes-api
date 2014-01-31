@@ -44,7 +44,11 @@ class QueryMetadataImpl;
 class UNITY_API QueryMetadata
 {
 public:
+    QueryMetadata(QueryMetadata const& other);
+    QueryMetadata(QueryMetadata&&);
     virtual ~QueryMetadata();
+
+    QueryMetadata& operator=(QueryMetadata&&);
 
     std::string locale() const;
     std::string form_factor() const;

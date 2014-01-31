@@ -25,6 +25,16 @@ namespace unity
 namespace scopes
 {
 
+GeoCoordinate::GeoCoordinate()
+    : p(new internal::GeoCoordinateImpl())
+{
+}
+
+GeoCoordinate::GeoCoordinate(internal::GeoCoordinateImpl* impl)
+    : p(impl)
+{
+}
+
 GeoCoordinate::GeoCoordinate(double lat, double lon)
     : p(new internal::GeoCoordinateImpl(lat, lon))
 {

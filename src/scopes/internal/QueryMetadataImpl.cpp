@@ -17,6 +17,8 @@
 */
 
 #include <unity/scopes/internal/QueryMetadataImpl.h>
+#include <unity/scopes/internal/GeoCoordinateImpl.h>
+#include <unity/scopes/internal/Utils.h>
 
 namespace unity
 {
@@ -32,6 +34,17 @@ QueryMetadataImpl::QueryMetadataImpl(std::string const& locale, std::string cons
       form_factor_(form_factor),
       location_(location)
 {
+}
+
+QueryMetadataImpl::QueryMetadataImpl(VariantMap const& var)
+{
+    static const std::string context("QueryMetadataImpl()");
+    auto it = find_or_throw(context, var, "locale");
+    locale_ = it->second.get_string();
+    it = find_or_throw(context, var, "form_factor");
+    form_factor_ = it->second.get_string();
+    it = find_or_throw(context, var, "location");
+    location_ = internal::GeoCoordinateImpl::create(it->second.get_dict());
 }
 
 std::string QueryMetadataImpl::locale() const

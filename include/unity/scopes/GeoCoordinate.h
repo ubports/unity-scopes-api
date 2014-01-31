@@ -40,6 +40,7 @@ class GeoCoordinateImpl;
 class UNITY_API GeoCoordinate final
 {
 public:
+    GeoCoordinate();
     GeoCoordinate(double lat, double lon);
     GeoCoordinate(double lat, double lon, double alt);
     ~GeoCoordinate();
@@ -57,7 +58,9 @@ public:
     VariantMap serialize() const;
 
 private:
+    GeoCoordinate(internal::GeoCoordinateImpl* impl);
     std::unique_ptr<internal::GeoCoordinateImpl> p;
+    friend class internal::GeoCoordinateImpl;
 };
 
 } // namespace scopes

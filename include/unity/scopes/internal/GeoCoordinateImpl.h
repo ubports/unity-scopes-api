@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_GEOCOORDINATEIMPL_H
 
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/GeoCoordinate.h>
 
 namespace unity
 {
@@ -33,6 +34,8 @@ namespace internal
 class GeoCoordinateImpl final
 {
 public:
+    GeoCoordinateImpl();
+    GeoCoordinateImpl(VariantMap const& var);
     GeoCoordinateImpl(double lat, double lon);
     GeoCoordinateImpl(double lat, double lon, double alt);
     GeoCoordinateImpl(GeoCoordinateImpl const& other) = default;
@@ -43,6 +46,7 @@ public:
     double altitude() const;
     bool has_altitude() const;
     VariantMap serialize() const;
+    static GeoCoordinate create(VariantMap const& var);
 
 private:
     double lat_;

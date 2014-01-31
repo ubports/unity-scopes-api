@@ -41,13 +41,20 @@ class UNITY_API SearchMetadata : public QueryMetadata
 public:
     SearchMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
     SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    SearchMetadata(SearchMetadata const& other);
+    SearchMetadata(SearchMetadata&&);
     ~SearchMetadata();
+
+    SearchMetadata& operator=(SearchMetadata const &other);
+    SearchMetadata& operator=(SearchMetadata&&);
 
     void set_cardinality(int cardinality);
     int cardinality() const;
 
 private:
+    SearchMetadata(internal::SearchMetadataImpl *impl);
     internal::SearchMetadataImpl* fwd() const;
+    friend class internal::SearchMetadataImpl;
 };
 
 } // namespace scopes

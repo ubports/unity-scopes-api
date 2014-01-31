@@ -25,6 +25,11 @@ namespace unity
 namespace scopes
 {
 
+SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
+    : QueryMetadata(impl)
+{
+}
+
 SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
     : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor, location))
 {
@@ -34,6 +39,24 @@ SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::
     : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor, location))
 {
 }
+
+SearchMetadata::SearchMetadata(SearchMetadata const& other)
+    : QueryMetadata(new internal::SearchMetadataImpl(*(other.fwd())))
+{
+}
+
+SearchMetadata::SearchMetadata(SearchMetadata&&) = default;
+
+SearchMetadata& SearchMetadata::operator=(SearchMetadata const &other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::SearchMetadataImpl(*(other.fwd())));
+    }
+    return *this;
+}
+
+SearchMetadata& SearchMetadata::operator=(SearchMetadata&&) = default;
 
 SearchMetadata::~SearchMetadata()
 {

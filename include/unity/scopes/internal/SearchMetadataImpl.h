@@ -20,6 +20,7 @@
 #define UNITY_INTERNAL_SEARCHMETADATAIMPL_H
 
 #include <unity/scopes/internal/QueryMetadataImpl.h>
+#include <unity/scopes/SearchMetadata.h>
 
 namespace unity
 {
@@ -35,10 +36,13 @@ class SearchMetadataImpl : public QueryMetadataImpl
 public:
     SearchMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
     SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    SearchMetadataImpl(VariantMap const& var);
     ~SearchMetadataImpl() = default;
 
     void set_cardinality(int cardinality);
     int cardinality() const;
+
+    static SearchMetadata create(VariantMap const& var);
 
 protected:
     std::string metadata_type() const override;

@@ -36,6 +36,7 @@ class QueryMetadataImpl
 {
 public:
     QueryMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    QueryMetadataImpl(VariantMap const& var);
     virtual ~QueryMetadataImpl() = default;
     std::string locale() const;
     std::string form_factor() const;
