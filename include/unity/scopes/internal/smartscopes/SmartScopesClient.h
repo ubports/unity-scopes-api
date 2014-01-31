@@ -47,7 +47,8 @@ class SmartScopesClient;
 struct RemoteScope
 {
     std::string name;
-    std::string search_url;
+    std::string description;
+    std::string base_url;
     bool invisible = false;
 };
 
@@ -77,6 +78,7 @@ public:
     ~SearchHandle();
 
     std::vector<SearchResult> get_search_results();
+    void cancel_search();
 
 private:
     friend class SmartScopesClient;
@@ -100,12 +102,17 @@ public:
 
     virtual ~SmartScopesClient();
 
-    std::vector<RemoteScope> get_remote_scopes();
+    std::vector<RemoteScope> get_remote_scopes(std::string const& locale = "");
 
-    SearchHandle::UPtr search(std::string const& search_url, std::string const& query,
-                              std::string const& session_id, uint query_id, std::string const& platform,
-                              std::string const& locale = "", std::string const& country = "",
-                              std::string const& latitude = "", std::string const& longitude = "",
+    SearchHandle::UPtr search(std::string const& base_url,
+                              std::string const& query,
+                              std::string const& session_id,
+                              uint query_id,
+                              std::string const& platform,
+                              std::string const& locale = "",
+                              std::string const& country = "",
+                              std::string const& latitude = "",
+                              std::string const& longitude = "",
                               const uint limit = 0);
 
 private:
@@ -128,12 +135,12 @@ private:
     std::mutex search_results_mutex_;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H

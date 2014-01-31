@@ -1,0 +1,3 @@
+[Zmq]
+EndpointDir.Public = /tmp
+EndpointDir.Private = /tmp

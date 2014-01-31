@@ -75,6 +75,10 @@ public:
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
 
+    virtual std::string get_scope_endpoint() = 0;
+    virtual std::string get_query_endpoint() = 0;
+    virtual std::string get_query_ctrl_endpoint() = 0;
+
     RuntimeImpl* runtime() const noexcept;
 
 private:

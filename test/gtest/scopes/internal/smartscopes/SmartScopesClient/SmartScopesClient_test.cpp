@@ -41,7 +41,7 @@ class SmartScopesClientTest : public Test
 {
 public:
     SmartScopesClientTest()
-        : http_client_(new HttpClientQt(2)),
+        : http_client_(new HttpClientQt(2, 2000)),
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH)
     {
@@ -62,17 +62,19 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     ASSERT_EQ(2, scopes.size());
 
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo", scopes[0].search_url);
+    EXPECT_EQ("Dummy demo scope.", scopes[0].description);
+    EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
     EXPECT_FALSE(scopes[0].invisible);
 
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", scopes[1].search_url);
-    EXPECT_EQ(true, scopes[1].invisible);
+    EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
+    EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
+    EXPECT_TRUE(scopes[1].invisible);
 }
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2, results.size());
@@ -91,21 +93,20 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", results[1].art);
     EXPECT_EQ("", results[1].dnd_uri);
     EXPECT_EQ("cat1", results[1].category->id);
-    EXPECT_EQ("Category 1", results[0].category->title);
+    EXPECT_EQ("Category 1", results[1].category->title);
     EXPECT_EQ("", results[1].category->icon);
     EXPECT_EQ("", results[1].category->renderer_template);
 }
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
-    auto search_handle2 = ssc_->search("http://127.0.0.1/smartscopes/v2/search/demo", "stuff", "1234", 0, "");
+    auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
+    auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());
 
-    results = search_handle2->get_search_results();
-    EXPECT_EQ(0, results.size());
+    EXPECT_THROW(search_handle2->get_search_results(), unity::Exception);
 }
 
 } // namespace
