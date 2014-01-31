@@ -33,15 +33,15 @@ using namespace unity::scopes::internal::smartscopes;
 //-- HttpClientQt
 
 HttpClientQt::HttpClientQt(uint max_sessions, uint no_reply_timeout)
-    : session_index_(0),
-      max_sessions_(max_sessions > 0 ? max_sessions : 1),
-      no_reply_timeout_(no_reply_timeout),
-      app_(nullptr)
+    : session_index_(0)
+    , max_sessions_(max_sessions > 0 ? max_sessions : 1)
+    , no_reply_timeout_(no_reply_timeout)
+    , app_(nullptr)
 {
     if (!QCoreApplication::instance())
     {
         int argc = 0;
-        app_ = std::unique_ptr<QCoreApplication> (new QCoreApplication(argc, nullptr));
+        app_ = std::unique_ptr<QCoreApplication>(new QCoreApplication(argc, nullptr));
     }
 }
 
@@ -88,36 +88,37 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 //-- HttpClientQt::HttpSession
 
 HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port, uint timeout)
-    : promise_(nullptr),
-      get_qt_thread_(nullptr)
+    : promise_(nullptr)
+    , get_qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
-    get_thread_ = std::thread([this, request_url, port, timeout]()
-    {
-        QUrl url(request_url.c_str());
-        url.setPort(port);
-        get_qt_thread_ = std::unique_ptr<HttpClientQtThread> (new HttpClientQtThread(url, timeout));
+    get_thread_ =
+        std::thread([this, request_url, port, timeout]()
+                    {
+                        QUrl url(request_url.c_str());
+                        url.setPort(port);
+                        get_qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
 
-        QEventLoop loop;
-        QObject::connect(get_qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
+                        QEventLoop loop;
+                        QObject::connect(get_qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
 
-        get_qt_thread_->start();
-        loop.exec();
+                        get_qt_thread_->start();
+                        loop.exec();
 
-        std::string reply;
-        bool success = get_qt_thread_->get_reply(reply);
+                        std::string reply;
+                        bool success = get_qt_thread_->get_reply(reply);
 
-        if (!success)
-        {
-            unity::ResourceException e(reply);
-            promise_->set_exception(e.self());
-        }
-        else
-        {
-            promise_->set_value(reply);
-        }
-    });
+                        if (!success)
+                        {
+                            unity::ResourceException e(reply);
+                            promise_->set_exception(e.self());
+                        }
+                        else
+                        {
+                            promise_->set_value(reply);
+                        }
+                    });
 
     while (!get_qt_thread_)
     {

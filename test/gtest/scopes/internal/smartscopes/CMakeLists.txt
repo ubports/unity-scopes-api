@@ -1,2 +1,3 @@
 add_subdirectory(HttpClient)
 add_subdirectory(SmartScopesClient)
+add_subdirectory(smartscopesproxy)

@@ -54,9 +54,9 @@ namespace zmq_middleware
 namespace
 {
 
-char const* query_suffix = "-query";  // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-ctrl";    // Appended to server_name_ to create control adapter name
-char const* reply_suffix = "-reply";  // Appended to server_name_ to create reply adapter name
+char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
+char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 
 } // namespace
 
@@ -415,6 +415,21 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
         cerr << "unexpected exception in add_dflt_scope_object(): " << e.what() << endl;
         throw;
     }
+}
+
+std::string ZmqMiddleware::get_scope_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_;
+}
+
+std::string ZmqMiddleware::get_query_endpoint()
+{
+    return "inproc://" + server_name_ + query_suffix;
+}
+
+std::string ZmqMiddleware::get_query_ctrl_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_ + ctrl_suffix;
 }
 
 zmqpp::context* ZmqMiddleware::context() const noexcept

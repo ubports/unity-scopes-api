@@ -184,7 +184,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 2)
-set(UNITY_SCOPES_MICRO 6)
+set(UNITY_SCOPES_MICRO 8)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -262,6 +262,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(scoperegistry)
 add_subdirectory(scoperunner)
+add_subdirectory(smartscopesproxy)
 add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)

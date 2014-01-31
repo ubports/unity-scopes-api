@@ -22,6 +22,8 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
+#include <mutex>
+
 namespace unity
 {
 
@@ -51,6 +53,7 @@ protected:
 
 private:
     std::function<void()> disconnect_func_;
+    std::mutex mutex_;
 };
 
 } // namespace internal

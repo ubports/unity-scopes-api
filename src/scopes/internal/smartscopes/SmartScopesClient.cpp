@@ -26,8 +26,9 @@
 #include <sstream>
 #include <cstring>
 
-static const std::string c_base_url = "https://productsearch.ubuntu.com";
-static const std::string c_remote_scopes_resource = "/smartscopes/v2/remote-scopes";
+static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
+static const std::string c_remote_scopes_resource = "/remote-scopes";
+static const std::string c_search_resource = "/search";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -35,12 +36,14 @@ using namespace unity::scopes::internal::smartscopes;
 //-- SearchHandle
 
 SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id),
-      ssc_(ssc) {}
+    : session_id_(session_id)
+    , ssc_(ssc)
+{
+}
 
 SearchHandle::~SearchHandle()
 {
-    ssc_->cancel_search(session_id_);
+    cancel_search();
 }
 
 std::vector<SearchResult> SearchHandle::get_search_results()
@@ -48,34 +51,42 @@ std::vector<SearchResult> SearchHandle::get_search_results()
     return ssc_->get_search_results(session_id_);
 }
 
+void SearchHandle::cancel_search()
+{
+    ssc_->cancel_search(session_id_);
+}
+
 //-- SmartScopesClient
 
-SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, JsonNodeInterface::SPtr json_node,
-                                     std::string const& url, uint port)
-    : http_client_(http_client),
-      json_node_(json_node),
-      url_(url),
-      port_(port)
+SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
+                                     JsonNodeInterface::SPtr json_node,
+                                     std::string const& url,
+                                     uint port)
+    : http_client_(http_client)
+    , json_node_(json_node)
+    , url_(url)
+    , port_(port)
 {
     if (url_.empty())
     {
-        std::string base_url_env = ::getenv("SMART_SCOPES_SERVER");
-        if (!base_url_env.empty())
+        char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
+        std::string base_url = base_url_env ? base_url_env : "";
+        if (!base_url.empty())
         {
             // find the last occurrence of ':' in the url in order to extract the port number
             // * ignore the colon after "http"/"https"
 
             const size_t hier_pos = strlen("https");
 
-            uint64_t found = base_url_env.find_last_of(':');
+            uint64_t found = base_url.find_last_of(':');
             if (found != std::string::npos && found > hier_pos)
             {
-                url_ = base_url_env.substr(0, found);
-                port_ = std::stoi(base_url_env.substr(found + 1));
+                url_ = base_url.substr(0, found);
+                port_ = std::stoi(base_url.substr(found + 1));
             }
             else
             {
-                url_ = base_url_env;
+                url_ = base_url;
             }
         }
         else
@@ -87,15 +98,24 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client, Json
 
 SmartScopesClient::~SmartScopesClient()
 {
-
 }
 
-std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
+std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
 {
     try
     {
+        std::ostringstream remote_scopes_uri;
+        remote_scopes_uri << url_ << c_remote_scopes_resource << "?";
+
+        // optional parameters
+
+        if (!locale.empty())
+        {
+            remote_scopes_uri << "&locale=\"" << locale << "\"";
+        }
+
         std::string response_str;
-        HttpResponseHandle::SPtr response = http_client_->get(url_ + c_remote_scopes_resource, port_);
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
@@ -115,42 +135,48 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes()
         {
             child_node = root_node->get_node(i);
 
-            if (!child_node->has_node("name") || !child_node->has_node("search_url"))
+            if (!child_node->has_node("name") || !child_node->has_node("base_url") ||
+                !child_node->has_node("description"))
             {
                 break;
             }
 
             scope.name = child_node->get_node("name")->as_string();
-            scope.search_url = child_node->get_node("search_url")->as_string();
+            scope.description = child_node->get_node("description")->as_string();
+            scope.base_url = child_node->get_node("base_url")->as_string();
 
-            scope.invisible = child_node->has_node("invisible") ?
-                              child_node->get_node("invisible")->as_bool() : false;
+            scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);
         }
 
+        std::cout << "Retrieved remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
         return remote_scopes;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
-        std::cout << "error:" << e.what() << std::endl;
-        return std::vector<RemoteScope>();
+        std::cout << "Failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
+        throw;
     }
 }
 
-SearchHandle::UPtr SmartScopesClient::search(std::string const& search_url, std::string const& query,
-                                             std::string const& session_id, uint query_id, std::string const& platform,
-                                             std::string const& locale, std::string const& country,
-                                             std::string const& latitude, std::string const& longitude,
+SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
+                                             std::string const& query,
+                                             std::string const& session_id,
+                                             uint query_id,
+                                             std::string const& platform,
+                                             std::string const& locale,
+                                             std::string const& country,
+                                             std::string const& latitude,
+                                             std::string const& longitude,
                                              uint limit)
 {
     std::ostringstream search_uri;
-    search_uri << search_url << "?";
+    search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
 
-    search_uri << "query=\"" << http_client_->to_percent_encoding(query) << "\"";
+    search_uri << "q=\"" << http_client_->to_percent_encoding(query) << "\"";
     search_uri << "&session_id=\"" << session_id << "\"";
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=\"" << platform << "\"";
@@ -159,19 +185,19 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& search_url, std:
 
     if (!locale.empty())
     {
-        search_uri << "&locale=\"" << locale << "\"";
+        search_uri << "&locale=" << locale;
     }
     if (!country.empty())
     {
-        search_uri << "&country=\"" << country << "\"";
+        search_uri << "&country=" << country;
     }
     if (!latitude.empty())
     {
-        search_uri << "&latitude=\"" << latitude << "\"";
+        search_uri << "&latitude=" << latitude;
     }
     if (!longitude.empty())
     {
-        search_uri << "&longitude=\"" << longitude << "\"";
+        search_uri << "&longitude=" << longitude;
     }
     if (limit != 0)
     {
@@ -228,14 +254,12 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("category");
                 auto category = std::make_shared<SearchCategory>();
 
-                category->icon = child_node->has_node("icon") ?
-                                 child_node->get_node("icon")->as_string() : "";
-                category->id = child_node->has_node("id") ?
-                               child_node->get_node("id")->as_string() : "";
+                category->icon = child_node->has_node("icon") ? child_node->get_node("icon")->as_string() : "";
+                category->id = child_node->has_node("id") ? child_node->get_node("id")->as_string() : "";
                 category->renderer_template = child_node->has_node("renderer_template") ?
-                                              child_node->get_node("renderer_template")->as_string() : "";
-                category->title = child_node->has_node("title") ?
-                                  child_node->get_node("title")->as_string() : "";
+                                                  child_node->get_node("renderer_template")->as_string() :
+                                                  "";
+                category->title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
                 categories[category->id] = category;
             }
             else if (root_node->has_node("result"))
@@ -243,32 +267,27 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("result");
                 SearchResult result;
 
-                result.art = child_node->has_node("art") ?
-                             child_node->get_node("art")->as_string() : "";
-                result.dnd_uri = child_node->has_node("dnd_uri") ?
-                                 child_node->get_node("dnd_uri")->as_string() : "";
-                result.title = child_node->has_node("title") ?
-                               child_node->get_node("title")->as_string() : "";
-                result.uri = child_node->has_node("uri") ?
-                             child_node->get_node("uri")->as_string() : "";
+                result.art = child_node->has_node("art") ? child_node->get_node("art")->as_string() : "";
+                result.dnd_uri = child_node->has_node("dnd_uri") ? child_node->get_node("dnd_uri")->as_string() : "";
+                result.title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
+                result.uri = child_node->has_node("uri") ? child_node->get_node("uri")->as_string() : "";
 
-                std::string category = child_node->has_node("cat_id") ?
-                                       child_node->get_node("cat_id")->as_string() : "";
+                std::string category =
+                    child_node->has_node("cat_id") ? child_node->get_node("cat_id")->as_string() : "";
 
-                result.category = categories.find(category) != categories.end() ?
-                                  categories[category] : nullptr;
+                result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
 
                 results.push_back(result);
             }
         }
 
+        std::cout << "Retrieved search results for session: " << session_id << std::endl;
         return results;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "failed to retrieve search results for session: " << session_id << std::endl;
-        std::cout << "error:" << e.what() << std::endl;
-        return std::vector<SearchResult>();
+        std::cout << "Failed to retrieve search results for session: " << session_id << std::endl;
+        throw;
     }
 }
 

@@ -20,8 +20,9 @@
 #define UNITY_API_TEST_SCOPES_INTERNAL_SMARTSCOPES_RAIISERVER_H
 
 #include <signal.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {

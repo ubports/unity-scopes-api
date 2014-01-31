@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,12 +16,13 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#ifndef UNITY_INTERNAL_COLUMNLAYOUTIMPL_H
+#define UNITY_INTERNAL_COLUMNLAYOUTIMPL_H
 
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/Variant.h>
 #include <string>
-#include <tuple>
+#include <vector>
 
 namespace unity
 {
@@ -32,18 +33,25 @@ namespace scopes
 namespace internal
 {
 
-class VariantMapBuilderImpl final
+class ColumnLayoutImpl
 {
 public:
-    VariantMapBuilderImpl() = default;
-    ~VariantMapBuilderImpl() = default;
-    void add_attribute(std::string const& key, Variant const& value);
-    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
-    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
-    VariantMap variant_map() const;
+    explicit ColumnLayoutImpl(int num_of_columns);
+    explicit ColumnLayoutImpl(VariantMap const& var);
+    ColumnLayoutImpl(ColumnLayoutImpl const& other) = default;
+    void add_column(std::vector<std::string> widget_ids);
+    int size() const noexcept;
+    int number_of_columns() const noexcept;
+    std::vector<std::string> column(int index) const;
+    VariantMap serialize() const;
+
+    static ColumnLayout create(VariantMap const& var);
+    static void validate_layouts(ColumnLayoutList const& layouts);
 
 private:
-    VariantMap variant_;
+    int num_of_columns_;
+    std::vector<std::vector<std::string>> columns_;
+    static const int max_number_of_columns_ = 1024;
 };
 
 } // namespace internal

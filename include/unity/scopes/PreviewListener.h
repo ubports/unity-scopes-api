@@ -23,6 +23,7 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/Variant.h>
 
 #include <string>
@@ -42,6 +43,11 @@ public:
 
     virtual ~PreviewListener();
     /// @endcond
+
+    /**
+    \brief Called by the scopes runtime for each columns layout definition returned by preview().
+    */
+    virtual void push(ColumnLayoutList const& layouts) = 0;
 
     /**
     \brief Called by the scopes runtime for each preview chunk that is returned by preview().
