@@ -14,7 +14,7 @@ find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
 add_library(
-    smartscopes SHARED
+    smartscopes STATIC
 
     HttpClientQt.cpp
 
