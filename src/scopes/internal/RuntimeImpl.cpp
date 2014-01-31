@@ -74,7 +74,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         {
             cerr << "Warning: no registry configured, registry proxy set to nullptr" << endl;
             registry_identity_ = "";
-            registry_endpoint_ = "";
         }
         else
         {
