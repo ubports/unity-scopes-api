@@ -1,4 +1,11 @@
-add_subdirectory(remotescope)
+set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSRegistryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSScopeObject.cpp
+)
+set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
+
+# -- libsmartscopes --
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -7,7 +14,7 @@ find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
 add_library(
-    smartscopes SHARED
+    smartscopes STATIC
 
     HttpClientQt.cpp
 
