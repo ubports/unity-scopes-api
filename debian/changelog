@@ -1,3 +1,26 @@
+unity-scopes-api (0.2.8-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Michi Henning ]
+  * More default servant support.
+
+  [ Pawel Stolowski ]
+  * Additions to the PreviewWidget API.
+  * Changed VariantMapBuilder to VariantBuilder, with a ne API.
+  * Added support for ColumnLayout.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 29 Jan 2014 18:51:31 +0100
+
+unity-scopes-api (0.2.7-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Michi Henning ]
+  * More default servant support.
+
+  [ Pawel Stolowski ]
+  * Additions to the PreviewWidget API.
+  * Changed VariantMapBuilder to VariantBuilder, with a new API.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Tue, 28 Jan 2014 17:09:38 +0100
+
 unity-scopes-api (0.2.6+14.04.20140128-0ubuntu1) trusty; urgency=low
 
   [ Michi Henning ]

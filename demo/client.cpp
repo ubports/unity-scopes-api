@@ -193,6 +193,25 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    void push(ColumnLayoutList const& columns) override
+    {
+        cout << "\tGot column layouts:" << endl;
+        for (auto const& col: columns)
+        {
+            cout << "\t\tLayout for " << col.size() << " column(s):" << endl;
+            for (int i = 0; i<col.size(); i++)
+            {
+                cout << "\t\t\tColumn #" << i << ": ";
+                for (auto const& w: col.column(i))
+                {
+                    cout << w << ", ";
+                }
+                cout << endl;
+            }
+
+        }
+    }
+
     void push(PreviewWidgetList const& widgets) override
     {
         cout << "\tGot preview widgets:" << endl;

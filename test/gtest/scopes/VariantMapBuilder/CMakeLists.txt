@@ -1,4 +1,0 @@
-add_executable(VariantMapBuilder_test VariantMapBuilder_test.cpp)
-target_link_libraries(VariantMapBuilder_test ${TESTLIBS})
-
-add_test(VariantMapBuilder VariantMapBuilder_test)

@@ -13,16 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ABSTRACTOBJECT_H
-#define UNITY_SCOPES_INTERNAL_ABSTRACTOBJECT_H
+#ifndef UNITY_INTERNAL_VARIANTBUILDER_H
+#define UNITY_INTERNAL_VARIANTBUILDER_H
 
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/NonCopyable.h>
-
-#include <mutex>
+#include <unity/scopes/Variant.h>
+#include <string>
+#include <tuple>
 
 namespace unity
 {
@@ -33,27 +32,21 @@ namespace scopes
 namespace internal
 {
 
-class AbstractObject
+class VariantBuilderImpl final
 {
 public:
-    NONCOPYABLE(AbstractObject);
-
-    UNITY_DEFINES_PTRS(AbstractObject);
-
-    virtual ~AbstractObject();
-
-    // Sets callback to allow this facade to disconnect itself from the middleware.
-    // Called by disconnect().
-    void set_disconnect_function(std::function<void()> func) noexcept;
-
-protected:
-    AbstractObject();
-
-    void disconnect() noexcept; // Disconnect self from middleware
+    VariantBuilderImpl() = default;
+    VariantBuilderImpl(VariantBuilderImpl const& other);
+    VariantBuilderImpl(VariantBuilderImpl&&) = default;
+    ~VariantBuilderImpl() = default;
+    VariantBuilderImpl& operator=(VariantBuilderImpl const& other) = delete;
+    VariantBuilderImpl& operator=(VariantBuilderImpl&&) = default;
+    void add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple);
+    void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
+    Variant end();
 
 private:
-    std::function<void()> disconnect_func_;
-    std::mutex mutex_;
+    std::unique_ptr<Variant> variant_;
 };
 
 } // namespace internal
