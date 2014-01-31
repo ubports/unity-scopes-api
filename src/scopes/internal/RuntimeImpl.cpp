@@ -66,19 +66,26 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
-        assert(!registry_identity_.empty());
 
         middleware_ = middleware_factory_->create(scope_name_, default_middleware, middleware_configfile);
         middleware_->start();
 
-        // Create the registry proxy.
-        RegistryConfig reg_config(registry_identity_, registry_configfile_);
-        string reg_mw_configfile = reg_config.mw_configfile();
-        registry_endpoint_ = reg_config.endpoint();
-        registry_endpointdir_ = reg_config.endpointdir();
-
-        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
-        registry_ = RegistryImpl::create(registry_mw_proxy, this);
+        if (registry_configfile_.empty() || registry_identity_.empty())
+        {
+            cerr << "Warning: no registry configured, registry proxy set to nullptr" << endl;
+            registry_identity_ = "";
+            registry_endpoint_ = "";
+        }
+        else
+        {
+            // Create the registry proxy.
+            RegistryConfig reg_config(registry_identity_, registry_configfile_);
+            string reg_mw_configfile = reg_config.mw_configfile();
+            registry_endpoint_ = reg_config.endpoint();
+            registry_endpointdir_ = reg_config.endpointdir();
+            auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
+            registry_ = RegistryImpl::create(registry_mw_proxy, this);
+        }
     }
     catch (unity::Exception const& e)
     {

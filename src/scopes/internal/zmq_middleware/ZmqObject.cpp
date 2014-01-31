@@ -57,8 +57,6 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     mode_(m),
     timeout_(timeout)
 {
-    assert(!endpoint.empty());
-    assert(!identity.empty());
     assert(m != Unknown);
     assert(timeout >= -1);
     throw_if_bad_endpoint(endpoint);
