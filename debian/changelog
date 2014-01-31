@@ -1,4 +1,4 @@
-unity-scopes-api (0.2.8-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.2.10-0ubuntu1) UNRELEASED; urgency=low
 
   [ Michi Henning ]
   * More default servant support.
@@ -7,8 +7,9 @@ unity-scopes-api (0.2.8-0ubuntu1) UNRELEASED; urgency=low
   * Additions to the PreviewWidget API.
   * Changed VariantMapBuilder to VariantBuilder, with a new API.
   * Added support for ColumnLayout.
+  * Added SearchMetadata class.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 29 Jan 2014 18:51:31 +0100
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 31 Jan 2014 14:55:10 +0100
 
 unity-scopes-api (0.2.6+14.04.20140128-0ubuntu1) trusty; urgency=low
 
