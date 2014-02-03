@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ThreadPool.h>
 #include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 
@@ -85,6 +86,12 @@ public:
     int64_t locate_timeout() const noexcept;
 
 private:
+    ZmqProxy make_typed_proxy(std::string const& endpoint,
+                              std::string const& identity,
+                              std::string const& category,
+                              RequestMode mode,
+                              int64_t timeout);
+
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,

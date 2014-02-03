@@ -18,10 +18,15 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
+#include <unity/scopes/ScopeExceptions.h>
+
 #include <gtest/gtest.h>
 #include <scope-api-testconfig.h>
 
 using namespace std;
+using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
@@ -42,4 +47,305 @@ TEST(ZmqMiddleware, string_to_proxy)
     ZmqMiddleware mw("testscope",
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
+
+    MWProxy p;
+    ZmqProxy zp;
+
+    p = mw.string_to_proxy("nullproxy:");
+    EXPECT_EQ(nullptr, p);
+
+    p = mw.string_to_proxy("ipc://path#id");
+    EXPECT_EQ("ipc://path", p->endpoint());
+    EXPECT_EQ("id", p->identity());
+    EXPECT_EQ(-1, p->timeout());
+    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
+    ASSERT_NE(nullptr, zp);
+    EXPECT_EQ("Scope", zp->category());
+    EXPECT_EQ(RequestMode::Twoway, zp->mode());
+
+    p = mw.string_to_proxy("ipc://path#id!t=-1");
+    EXPECT_EQ("ipc://path", p->endpoint());
+    EXPECT_EQ("id", p->identity());
+    EXPECT_EQ(-1, p->timeout());
+
+    p = mw.string_to_proxy("ipc://path#id!t=500");
+    EXPECT_EQ("ipc://path", p->endpoint());
+    EXPECT_EQ("id", p->identity());
+    EXPECT_EQ(500, p->timeout());
+
+    p = mw.string_to_proxy("ipc://path#id!t=500!c=Registry");
+    EXPECT_EQ("ipc://path", p->endpoint());
+    EXPECT_EQ("id", p->identity());
+    EXPECT_EQ(500, p->timeout());
+    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
+    ASSERT_NE(nullptr, zp);
+    EXPECT_EQ("Registry", zp->category());
+
+    p = mw.string_to_proxy("ipc://path#id!t=500!c=Scope!m=t");
+    EXPECT_EQ("ipc://path", p->endpoint());
+    EXPECT_EQ("id", p->identity());
+    EXPECT_EQ(500, p->timeout());
+    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
+    ASSERT_NE(nullptr, zp);
+    EXPECT_EQ("Scope", zp->category());
+    EXPECT_EQ(RequestMode::Twoway, zp->mode());
+}
+
+TEST(ZmqMiddleware, proxy_to_string)
+{
+    ZmqMiddleware mw("testscope",
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    MWProxy p;
+
+    p = mw.string_to_proxy("nullproxy:");
+    EXPECT_EQ("nullproxy:", mw.proxy_to_string(p));
+
+    p = mw.string_to_proxy("ipc://path#id");
+    EXPECT_EQ("ipc://path#id!c=Scope", mw.proxy_to_string(p));
+}
+
+TEST(ZmqMiddleware, string_to_proxy_ex)
+{
+    ZmqMiddleware mw("testscope",
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
+                     (RuntimeImpl*)0x1);
+
+    try
+    {
+        mw.string_to_proxy("");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): proxy string cannot be empty", e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("x");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy scheme prefix: "
+                     "\"x\" (expected \"ipc://\")",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://abc");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: missing # separator: "
+                     "ipc://abc",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://#abc");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: empty endpoint path: "
+                     "ipc://#abc",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: empty identity: "
+                     "ipc://path#",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#!");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: empty identity: "
+                     "ipc://path#!",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: invalid empty "
+                     "field specification: ipc://path#id!",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=1!");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: invalid empty "
+                     "field specification: ipc://path#id!t=1!",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!!t=1!");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: invalid empty "
+                     "field specification: ipc://path#id!!t=1!",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=1!!");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: invalid empty "
+                     "field specification: ipc://path#id!t=1!!",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad field "
+                     "specification (\"t\"): ipc://path#id!t",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!tt");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad field "
+                     "specification (\"tt\"): ipc://path#id!tt",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!x=1");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: invalid field "
+                     "identifier (\"x=1\"): ipc://path#id!x=1",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=1!t=1");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: duplicate "
+                     "field specification (\"t=\"): ipc://path#id!t=1!t=1",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!m=");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad mode "
+                     "(\"m=\"): ipc://path#id!m=",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad timeout "
+                     "value (\"t=\"): ipc://path#id!t=",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=x");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad timeout "
+                     "value (\"t=x\"): ipc://path#id!t=x",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=1x");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad timeout "
+                     "value (\"t=1x\"): ipc://path#id!t=1x",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=-2");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: string_to_proxy(): invalid proxy: bad timeout "
+                     "value (\"t=-2\"): ipc://path#id!t=-2",
+                     e.what());
+    }
+
+    try
+    {
+        mw.string_to_proxy("ipc://path#id!t=500!c=Scope!m=o");
+        FAIL();
+    }
+    catch (MiddlewareException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::MiddlewareException: make_typed_proxy(): cannot create oneway proxies",
+                     e.what());
+    }
 }

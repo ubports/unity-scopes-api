@@ -101,13 +101,12 @@ int64_t ZmqObjectProxy::timeout() const noexcept
 
 string ZmqObjectProxy::to_string() const
 {
-    string s = "ipc://";
     if (endpoint_.empty() || identity_.empty())
     {
-        return s;   // null proxy
+        return "nullproxy:";
     }
     assert(!endpoint_.empty() && !identity_.empty());
-    s += endpoint_ + "#" + identity_;
+    string s = endpoint_ + "#" + identity_;
     if (!category_.empty())
     {
         s += "!c=" + category_;
