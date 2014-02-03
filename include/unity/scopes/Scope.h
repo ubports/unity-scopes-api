@@ -34,6 +34,7 @@ namespace scopes
 {
 
 class Result;
+class FilterState;
 
 namespace internal
 {
@@ -55,7 +56,9 @@ public:
     Results for the query may arrive only after create_query() completes (but may
     also arrive while create_query() is still running).
     */
-    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, VariantMap const& hints, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const;
 
     QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
 

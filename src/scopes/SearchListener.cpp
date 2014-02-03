@@ -39,6 +39,11 @@ void SearchListener::push(DepartmentList const& /* departments */, std::string c
     // Intentionally empty: "do nothing" default implementation.
 }
 
+void SearchListener::push(Filters const& /* filters */, FilterState const& /* filter_state */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
 void SearchListener::push(Category::SCPtr /* category */)
 {
     // Intentionally empty: "do nothing" default implementation.

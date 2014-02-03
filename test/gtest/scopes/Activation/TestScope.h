@@ -90,7 +90,7 @@ public:
 
     virtual void run() override {}
 
-    virtual QueryBase::UPtr create_query(std::string const &, VariantMap const &) override
+    virtual QueryBase::UPtr create_query(Query const &, VariantMap const &) override
     {
         return QueryBase::UPtr(new TestQuery());
     }

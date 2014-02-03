@@ -69,6 +69,11 @@ bool SearchReply::push(Annotation const& annotation) const
     return fwd()->push(annotation);
 }
 
+bool SearchReply::push(Filters const& filters, FilterState const& filter_state) const
+{
+    return fwd()->push(filters, filter_state);
+}
+
 //! @endcond
 
 } // namespace scopes

@@ -24,6 +24,10 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/UnityExceptions.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -52,7 +56,40 @@ ResultReplyObject::~ResultReplyObject()
 
 void ResultReplyObject::process_data(VariantMap const& data)
 {
-    auto it = data.find("category");
+    auto it = data.find("filters");
+    if (it != data.end())
+    {
+        auto filters_var = it->second.get_array();
+        it = data.find("filter_state");
+        if (it != data.end())
+        {
+            Filters filters;
+            for (auto const& f: filters_var)
+            {
+                filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
+            }
+            try
+            {
+                auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
+                receiver_->push(filters, filter_state);
+            }
+            catch (std::exception const& e)
+            {
+                // TODO: log this
+                cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
+                finished(ListenerBase::Error, e.what());
+            }
+        }
+        else
+        {
+            // TODO: log this
+            const std::string msg("ReplyObject::push(): filters present but missing filter_state data");
+            cerr << msg << endl;
+            finished(ListenerBase::Error, msg);
+        }
+    }
+
+    it = data.find("category");
     if (it != data.end())
     {
         auto cat = cat_registry_->register_category(it->second.get_dict());

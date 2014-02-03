@@ -28,6 +28,8 @@
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Department.h>
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterState.h>
 
 #include <atomic>
 
@@ -68,6 +70,8 @@ public:
     bool register_layout(unity::scopes::ColumnLayoutList const& layouts);
     bool push(unity::scopes::PreviewWidgetList const& widgets);
     bool push(std::string const& key, Variant const& value);
+    bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state);
+
     void finished();
     void finished(unity::scopes::ListenerBase::Reason reason);
     void error(std::exception_ptr ex);
