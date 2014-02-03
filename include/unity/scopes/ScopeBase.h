@@ -62,7 +62,7 @@ namespace unity
 namespace scopes
 {
 
-class ResultItem;
+class Query;
 
 /**
 \file ScopeBase.h
@@ -186,7 +186,7 @@ public:
     /param q The query string to be executed by the returned object instance.
     /param hints TODO, complete doc
     */
-    virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr create_query(Query const& query, VariantMap const& hints) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.

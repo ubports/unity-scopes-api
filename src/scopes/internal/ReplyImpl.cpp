@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/internal/ReplyImpl.h>
-
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
@@ -32,6 +31,7 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
 
 #include <sstream>
@@ -127,6 +127,20 @@ bool ReplyImpl::push(unity::scopes::Annotation const& annotation)
 {
     VariantMap var;
     var["annotation"] = annotation.serialize();
+    return push(var);
+}
+
+bool ReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
+{
+    VariantMap var;
+    VariantArray filters_var;
+
+    for (auto const& f: filters)
+    {
+        filters_var.push_back(Variant(f->serialize()));
+    }
+    var["filters"] = filters_var;
+    var["filter_state"] = filter_state.serialize();
     return push(var);
 }
 

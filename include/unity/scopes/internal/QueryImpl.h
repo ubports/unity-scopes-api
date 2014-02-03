@@ -41,7 +41,7 @@ class QueryImpl
 public:
     explicit QueryImpl(std::string const& scope_name);
     QueryImpl(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
-    explicit QueryImpl(VariantMap const& variant);
+    QueryImpl(VariantMap const& variant);
     QueryImpl(QueryImpl const &other) = default;
     QueryImpl(QueryImpl&&) = default;
     QueryImpl& operator=(QueryImpl const& other) = default;
@@ -57,6 +57,7 @@ public:
     VariantMap serialize() const;
     std::string to_string() const;
     static Query from_string();
+    static Query create(VariantMap const& var);
 
 private:
     std::string scope_name_;

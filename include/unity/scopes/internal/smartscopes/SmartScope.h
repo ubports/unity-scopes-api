@@ -20,6 +20,7 @@
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/Query.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/PreviewWidget.h>
@@ -45,7 +46,7 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& id, SSRegistryObject::SPtr reg, std::string const& query)
+    SmartQuery(std::string const& id, SSRegistryObject::SPtr reg, Query const& query)
         : scope_id_(id)
         , query_(query)
     {
@@ -53,7 +54,7 @@ public:
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, query_id, platform, locale, country, lat, long, limit
-        search_handle_ = ss_client->search(base_url, query_, "session_id", 0, "platform", "en", "US", "0", "0", 10);
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "0", "0", 10);
     }
 
     ~SmartQuery() noexcept
@@ -94,12 +95,12 @@ public:
             reply->push(res);
         }
 
-        std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_ << "\" complete" << std::endl;
+        std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
     }
 
 private:
     std::string scope_id_;
-    std::string query_;
+    Query query_;
     SearchHandle::UPtr search_handle_;
 };
 
@@ -111,10 +112,10 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& id, std::string const& q, VariantMap const&)
+    QueryBase::UPtr create_query(std::string const& id, Query const& q, VariantMap const&)
     {
         QueryBase::UPtr query(new SmartQuery(id, reg_, q));
-        std::cout << "SmartScope: created query for \"" << id << "\": \"" << q << "\"" << std::endl;
+        std::cout << "SmartScope: created query for \"" << id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
     }
 

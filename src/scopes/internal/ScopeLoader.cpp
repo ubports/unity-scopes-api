@@ -128,9 +128,9 @@ void ScopeLoader::start()
             {
             }
             throw unity::ResourceException("Scope " + scope_name_ + " was compiled with major version " +
-                                           to_string(s_version) + " of the Unity scopes run time. This " +
+                                           std::to_string(s_version) + " of the Unity scopes run time. This " +
                                            "version is incompatible with the current major " +
-                                           "version (" + to_string(maj_version) + ").");
+                                           "version (" + std::to_string(maj_version) + ").");
         }
     }
     catch (...)

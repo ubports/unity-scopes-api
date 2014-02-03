@@ -43,7 +43,7 @@ using ValueDict = import "ValueDict.capnp";
 
 struct CreateQueryRequest
 {
-    query @0      : Text;
+    query @0      : ValueDict.ValueDict;
     hints @1      : ValueDict.ValueDict;
     replyProxy @2 : Proxy.Proxy;
 }

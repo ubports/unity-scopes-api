@@ -59,11 +59,6 @@ public:
      */
     Query(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
 
-    /**
-     * \brief Restores a Query object from a variant created by Query::serialize().
-     */
-    explicit Query(VariantMap const& variant);
-
     /// @cond
     Query(Query const &other);
     Query(Query&&);
@@ -123,7 +118,9 @@ public:
     static Query from_string();
 
 private:
+    Query(internal::QueryImpl *impl);
     std::shared_ptr<internal::QueryImpl> p;
+    friend class internal::QueryImpl;
 };
 
 } // namespace scopes
