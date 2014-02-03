@@ -56,17 +56,17 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
-std::string to_string(Department const& dep)
+std::string to_string(Department const& dep, std::string const& indent = "")
 {
     std::ostringstream str;
-    str << "department id=" << dep.id() << ", name=" << dep.label() << endl;
+    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
     auto const subdeps = dep.subdepartments();
     if (subdeps.size() > 0)
     {
-        str << "subdepartments:" << endl;
+        str << indent << "\tsubdepartments:" << endl;
         for (auto const& d: subdeps)
         {
-            str << to_string(d) << endl;
+            str << indent << to_string(d, indent + "\t\t");
         }
     }
     return str.str();

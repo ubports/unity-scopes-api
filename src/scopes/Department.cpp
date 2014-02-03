@@ -41,6 +41,11 @@ Department::Department(Department const& other)
 {
 }
 
+Department::Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
+    : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
+{
+}
+
 Department::Department(Department&&) = default;
 
 Department::~Department() = default;

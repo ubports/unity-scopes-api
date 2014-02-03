@@ -46,7 +46,8 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-        DepartmentList departments({{"news", query_, "News"}, {"sport", query_, "Sport"}});
+        DepartmentList departments({{"news", query_, "News", {{"news-world", query_, "World"}, {"news-europe", query_, "Europe"}}},
+                                    {"sport", query_, "Sport"}});
         reply->register_departments(departments);
 
         Filters filters;

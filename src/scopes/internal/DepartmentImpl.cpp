@@ -42,6 +42,14 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, Query const& qu
     query_.set_department_id(department_id);
 }
 
+DepartmentImpl::DepartmentImpl(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
+    : query_(query),
+      label_(label),
+      departments_(subdepartments)
+{
+    query_.set_department_id(department_id);
+}
+
 void DepartmentImpl::add_subdepartments(DepartmentList const& departments)
 {
     departments_ = departments;

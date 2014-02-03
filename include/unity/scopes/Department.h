@@ -50,7 +50,7 @@ public:
     \brief Create deparment with given search Query and name.
     The identifier of this department instance will be that of Query instance (\link unity::scopes::Query::department_id()\endlink).
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
-
+    \param label name of this department to be displayed in the UI
      */
     Department(Query const& query, std::string const& label);
 
@@ -59,8 +59,19 @@ public:
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
+    \param label name of this department to be displayed in the UI
      */
     Department(std::string const& department_id, Query const& query, std::string const& label);
+
+    /**
+    \brief Create deparment with given department identifier, search Query, name and subdepartments.
+    The query object passed to the ctor will have its target department identifier updated with department_id.
+    This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
+    \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
+    \param label name of this department to be displayed in the UI
+    \param subdepartments sub-departments of this department
+     */
+    Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments);
 
     /// @cond
     Department(Department const& other);
