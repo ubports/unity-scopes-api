@@ -11,6 +11,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
