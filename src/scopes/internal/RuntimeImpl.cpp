@@ -146,13 +146,13 @@ MiddlewareFactory const* RuntimeImpl::factory() const
 
 RegistryProxy RuntimeImpl::registry() const
 {
-    if (!registry_)
-    {
-        throw ConfigException("registry(): no registry configured");
-    }
     if (destroyed_.load())
     {
         throw LogicException("registry(): Cannot obtain registry for already destroyed run time");
+    }
+    if (!registry_)
+    {
+        throw ConfigException("registry(): no registry configured");
     }
     return registry_;
 }

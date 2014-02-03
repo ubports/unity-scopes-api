@@ -83,7 +83,7 @@ int main()
 
         // Create a proxy to scope-A from a string.
         // Syntax: ipc://<endpoint>#<identity>!<timeout>!<category>
-        // 
+        //
         // "ipc://"         - prefix for all proxies
         // "/tmp/scope-A    - endpoint at which the scope listens
         // "scope-A         - scope name (must be the same as last component of endpoint path)

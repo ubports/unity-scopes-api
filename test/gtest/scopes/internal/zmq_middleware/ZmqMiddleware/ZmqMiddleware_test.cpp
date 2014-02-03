@@ -48,7 +48,7 @@ TEST(ZmqMiddleware, string_to_proxy)
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    MWProxy p;
+    Proxy p;
     ZmqProxy zp;
 
     p = mw.string_to_proxy("nullproxy:");
@@ -89,21 +89,6 @@ TEST(ZmqMiddleware, string_to_proxy)
     ASSERT_NE(nullptr, zp);
     EXPECT_EQ("Scope", zp->category());
     EXPECT_EQ(RequestMode::Twoway, zp->mode());
-}
-
-TEST(ZmqMiddleware, proxy_to_string)
-{
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
-
-    MWProxy p;
-
-    p = mw.string_to_proxy("nullproxy:");
-    EXPECT_EQ("nullproxy:", mw.proxy_to_string(p));
-
-    p = mw.string_to_proxy("ipc://path#id");
-    EXPECT_EQ("ipc://path#id!c=Scope", mw.proxy_to_string(p));
 }
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
