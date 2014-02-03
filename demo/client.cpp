@@ -85,6 +85,11 @@ public:
     {
     }
 
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        cout << "received departments:" << endl;
+    }
+
     virtual void push(Category::SCPtr category) override
     {
         cout << "received category: id=" << category->id()

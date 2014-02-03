@@ -50,6 +50,7 @@ public:
     DepartmentList departments() const;
     VariantMap serialize() const;
 
+    static Department create(VariantMap const& var);
     static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
 
 private:

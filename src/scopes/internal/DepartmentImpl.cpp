@@ -86,6 +86,23 @@ VariantMap DepartmentImpl::serialize() const
     return vm;
 }
 
+Department DepartmentImpl::create(VariantMap const& var)
+{
+    auto it = var.find("label");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("DepartmentImpl::create(): missing 'label'");
+    }
+    auto label = it->second.get_string();
+    it = var.find("query");
+    if (it == var.end())
+    {
+        throw unity::InvalidArgumentException("DepartmentImpl::create(): missing 'query'");
+    }
+    //TODO deserialize query and subdepartments
+
+}
+
 void DepartmentImpl::validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup)
 {
     for (auto const& dep: departments)

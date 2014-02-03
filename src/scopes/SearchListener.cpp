@@ -34,6 +34,11 @@ SearchListener::~SearchListener()
 {
 }
 
+void SearchListener::push(DepartmentList const& /* departments */, std::string const& /* current_department_id */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
 void SearchListener::push(Category::SCPtr /* category */)
 {
     // Intentionally empty: "do nothing" default implementation.

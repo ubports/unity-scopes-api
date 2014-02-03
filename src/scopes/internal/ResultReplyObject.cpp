@@ -23,6 +23,7 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/DepartmentImpl.h>
 
 #include <iostream> // TODO: remove this once logging is added
 
@@ -56,6 +57,22 @@ void ResultReplyObject::process_data(VariantMap const& data)
     {
         auto cat = cat_registry_->register_category(it->second.get_dict());
         receiver_->push(cat);
+    }
+
+    it = data.find("departments");
+    if (it != data.end())
+    {
+        auto const deparr = it->second.get_array();
+        DepartmentList departments;
+        for (auto const& dep: deparr)
+        {
+            departments.push_back(DepartmentImpl::create(dep.get_dict()));
+        }
+        it = data.find("current_department");
+        if (it == data.end())
+        {
+        }
+        receiver_->push(departments, it->second.get_string());
     }
 
     it = data.find("annotation");
