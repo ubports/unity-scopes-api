@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <sstream>
 
 namespace unity
@@ -61,7 +62,7 @@ Query DepartmentImpl::query() const
     return query_;
 }
 
-DepartmentList DepartmentImpl::departments() const
+DepartmentList DepartmentImpl::subdepartments() const
 {
     return departments_;
 }
@@ -99,8 +100,21 @@ Department DepartmentImpl::create(VariantMap const& var)
     {
         throw unity::InvalidArgumentException("DepartmentImpl::create(): missing 'query'");
     }
-    //TODO deserialize query and subdepartments
+    auto query = QueryImpl::create(it->second.get_dict());
 
+    Department department(query, label);
+
+    it = var.find("departments");
+    if (it != var.end())
+    {
+        DepartmentList subdeps;
+        for (auto const dep: it->second.get_array())
+        {
+            subdeps.push_back(create(dep.get_dict()));
+        }
+        department.add_subdepartments(subdeps);
+    }
+    return department;
 }
 
 void DepartmentImpl::validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup)
@@ -114,7 +128,7 @@ void DepartmentImpl::validate_departments(DepartmentList const& departments, std
             throw unity::LogicException(str.str());
         }
         lookup.insert(dep.id());
-        validate_departments(dep.departments(), lookup);
+        validate_departments(dep.subdepartments(), lookup);
     }
 }
 

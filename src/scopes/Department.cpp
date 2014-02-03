@@ -76,9 +76,9 @@ Query Department::query() const
     return p->query();
 }
 
-DepartmentList Department::departments() const
+DepartmentList Department::subdepartments() const
 {
-    return p->departments();
+    return p->subdepartments();
 }
 
 VariantMap Department::serialize() const

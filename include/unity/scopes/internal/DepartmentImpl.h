@@ -47,7 +47,7 @@ public:
     std::string id() const;
     std::string label() const;
     Query query() const;
-    DepartmentList departments() const;
+    DepartmentList subdepartments() const;
     VariantMap serialize() const;
 
     static Department create(VariantMap const& var);

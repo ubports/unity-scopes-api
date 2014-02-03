@@ -76,7 +76,7 @@ public:
     std::string id() const;
     std::string label() const;
     Query query() const;
-    DepartmentList departments() const;
+    DepartmentList subdepartments() const;
 
     /// @cond
     VariantMap serialize() const;
