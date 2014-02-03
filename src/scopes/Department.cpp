@@ -25,7 +25,7 @@ namespace unity
 
 namespace scopes
 {
-   
+
 Department::Department(Query const& query, std::string const& label)
     : p(new internal::DepartmentImpl(query, label))
 {
@@ -44,7 +44,7 @@ Department::Department(Department const& other)
 Department::Department(Department&&) = default;
 
 Department::~Department() = default;
-    
+
 Department& Department::operator=(Department const& other)
 {
     if (this != &other)
@@ -53,12 +53,17 @@ Department& Department::operator=(Department const& other)
     }
     return *this;
 }
-    
+
 Department& Department::operator=(Department&&) = default;
 
 void Department::add_subdepartments(DepartmentList const& departments)
 {
     p->add_subdepartments(departments);
+}
+
+std::string Department::id() const
+{
+    return p->id();
 }
 
 std::string Department::label() const
@@ -74,6 +79,11 @@ Query Department::query() const
 DepartmentList Department::departments() const
 {
     return p->departments();
+}
+
+VariantMap Department::serialize() const
+{
+    return p->serialize();
 }
 
 } // namespace scopes

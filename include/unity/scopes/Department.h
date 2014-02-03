@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_DEPARTMENT_H
 
 #include <unity/SymbolExport.h>
+#include <unity/scopes/Variant.h>
 #include <list>
 #include <string>
 #include <memory>
@@ -72,9 +73,14 @@ public:
 
     void add_subdepartments(DepartmentList const& departments);
 
+    std::string id() const;
     std::string label() const;
     Query query() const;
     DepartmentList departments() const;
+
+    /// @cond
+    VariantMap serialize() const;
+    /// @endcond
 
 private:
     std::unique_ptr<internal::DepartmentImpl> p;

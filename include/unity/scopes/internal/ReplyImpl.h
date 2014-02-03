@@ -27,6 +27,7 @@
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/Department.h>
 
 #include <atomic>
 
@@ -57,6 +58,7 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~ReplyImpl();
 
+    void register_departments(DepartmentList const& departments, std::string current_department_id);
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     void register_category(Category::SCPtr category);
     Category::SCPtr lookup_category(std::string const& id) const;

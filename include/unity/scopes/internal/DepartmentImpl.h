@@ -21,6 +21,7 @@
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/Query.h>
+#include <unordered_set>
 
 namespace unity
 {
@@ -43,11 +44,16 @@ public:
 
     void add_subdepartments(DepartmentList const& departments);
 
+    std::string id() const;
     std::string label() const;
     Query query() const;
     DepartmentList departments() const;
+    VariantMap serialize() const;
+
+    static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
 
 private:
+    static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);
     Query query_;
     std::string label_;
     DepartmentList departments_;
