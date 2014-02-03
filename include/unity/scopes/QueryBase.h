@@ -40,6 +40,13 @@ namespace internal
 class QueryBaseImpl;
 class QueryObject;
 
+namespace smartscopes
+{
+
+class SSQueryObject;
+
+} // namespace smartscopes
+
 } // namespace internal
 
 // Abstract server-side base interface for a query that is executed inside a scope.
@@ -64,7 +71,8 @@ protected:
     /// @endcond
 
     void cancel();
-    friend class internal::QueryObject;       // So QueryObject can call cancel()
+    friend class internal::QueryObject;                    // So QueryObject can call cancel()
+    friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
 
     std::unique_ptr<internal::QueryBaseImpl> p;
 };

@@ -102,6 +102,19 @@ public:
         w.add_component("art", "screenshot-url");
         widgets.emplace_back(w);
 
+        ColumnLayout layout1col(1);
+        layout1col.add_column({"header", "title"});
+
+        ColumnLayout layout2col(2);
+        layout2col.add_column({"header", "title"});
+        layout2col.add_column({"author", "rating"});
+
+        ColumnLayout layout3col(3);
+        layout3col.add_column({"header", "title"});
+        layout3col.add_column({"author"});
+        layout3col.add_column({"rating"});
+
+        reply->register_layout({layout1col, layout2col, layout3col});
         reply->push(widgets);
         reply->push("author", Variant("Foo"));
         reply->push("rating", Variant("4 blah"));

@@ -25,6 +25,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
@@ -64,6 +65,7 @@ public:
 
     bool push(unity::scopes::CategorisedResult const& result);
     bool push(unity::scopes::Annotation const& annotation);
+    bool register_layout(unity::scopes::ColumnLayoutList const& layouts);
     bool push(unity::scopes::PreviewWidgetList const& widgets);
     bool push(std::string const& key, Variant const& value);
     bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state);
@@ -85,6 +87,7 @@ private:
     std::shared_ptr<QueryObjectBase> qo_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
+    bool layouts_push_disallowed_;
 };
 
 } // namespace internal

@@ -39,6 +39,11 @@ PreviewReply::~PreviewReply()
 {
 }
 
+bool PreviewReply::register_layout(ColumnLayoutList const& layouts) const
+{
+    return fwd()->register_layout(layouts);
+}
+
 bool PreviewReply::push(PreviewWidgetList const& widgets) const
 {
     return fwd()->push(widgets);

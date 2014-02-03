@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
@@ -59,6 +60,7 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     assert(!name.empty());
     assert(!endpoint.empty());
     assert(pool_size >= 1);
+    throw_if_bad_endpoint(endpoint);
 }
 
 ObjectAdapter::~ObjectAdapter()
@@ -538,7 +540,7 @@ void ObjectAdapter::safe_bind(zmqpp::socket& s, string const& endpoint)
         struct sockaddr_un addr;
         memset(&addr, 0, sizeof(addr));
         addr.sun_family = AF_UNIX;
-        strncpy(addr.sun_path, path.c_str(), path.size());
+        strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
         int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
         if (fd == -1)
         {
@@ -856,6 +858,7 @@ void ObjectAdapter::cleanup()
 {
     join_with_all_threads();
     servants_.clear();
+    dflt_servants_.clear();
 }
 
 void ObjectAdapter::join_with_all_threads()

@@ -227,6 +227,25 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    void push(ColumnLayoutList const& columns) override
+    {
+        cout << "\tGot column layouts:" << endl;
+        for (auto const& col: columns)
+        {
+            cout << "\t\tLayout for " << col.size() << " column(s):" << endl;
+            for (int i = 0; i<col.size(); i++)
+            {
+                cout << "\t\t\tColumn #" << i << ": ";
+                for (auto const& w: col.column(i))
+                {
+                    cout << w << ", ";
+                }
+                cout << endl;
+            }
+
+        }
+    }
+
     void push(PreviewWidgetList const& widgets) override
     {
         cout << "\tGot preview widgets:" << endl;
@@ -288,7 +307,7 @@ int main(int argc, char* argv[])
         print_usage();
     }
 
-    string scope_name = string("scope-") + argv[1];
+    string scope_name = argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
@@ -321,7 +340,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("Runtime.ini");
+        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
         auto meta = r->get_metadata(scope_name);

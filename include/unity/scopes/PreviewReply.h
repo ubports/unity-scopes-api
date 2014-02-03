@@ -24,6 +24,7 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/ColumnLayout.h>
 
 namespace unity
 {
@@ -45,6 +46,13 @@ class UNITY_API PreviewReply : public virtual ReplyBase
 {
 public:
     PreviewReply(PreviewReply const&) = delete;
+
+    /**
+     \brief Registers a list of column layouts for current preview.
+     Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
+     This method throws unity::LogicException if this constrains are violated.
+     */
+    bool register_layout(ColumnLayoutList const& layouts) const;
 
     bool push(PreviewWidgetList const& widget_list) const;
 
