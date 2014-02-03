@@ -540,6 +540,21 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     }
 }
 
+std::string ZmqMiddleware::get_scope_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_;
+}
+
+std::string ZmqMiddleware::get_query_endpoint()
+{
+    return "inproc://" + server_name_ + query_suffix;
+}
+
+std::string ZmqMiddleware::get_query_ctrl_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_ + ctrl_suffix;
+}
+
 zmqpp::context* ZmqMiddleware::context() const noexcept
 {
     return const_cast<zmqpp::context*>(&context_);

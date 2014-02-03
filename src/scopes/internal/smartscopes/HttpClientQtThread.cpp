@@ -24,10 +24,10 @@
 #include <QTimer>
 
 HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
-    : QThread(),
-      url_(url),
-      timeout_(timeout),
-      success_(false)
+    : QThread()
+    , url_(url)
+    , timeout_(timeout)
+    , success_(false)
 {
 }
 
@@ -59,7 +59,7 @@ void HttpClientQtThread::run()
 
     QTimer timeout;
     timeout.singleShot(timeout_, this, SLOT(timeout()));
-    QThread::exec(); // enter event loop
+    QThread::exec();  // enter event loop
 
     delete reply;
     delete manager;
@@ -70,7 +70,7 @@ void HttpClientQtThread::cancel()
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
     success_ = false;
-    reply_ = "Request to " + url_.url().toStdString() + ":" + std::to_string(url_.port()) + " cancelled";
+    reply_ = "Request cancelled: " + url_.url().toStdString();
 
     emit abort();
     quit();
@@ -81,7 +81,7 @@ void HttpClientQtThread::timeout()
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
     success_ = false;
-    reply_ = "Request to " + url_.url().toStdString() + ":" + std::to_string(url_.port()) + " timed out";
+    reply_ = "Request timed out: " + url_.url().toStdString();
 
     emit abort();
     quit();
@@ -91,17 +91,22 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
 {
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
+    if (!reply_.empty())
+    {
+        return;
+    }
+
     if (!reply)
     {
         // no reply
         success_ = false;
-        reply_ = "No reply from " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+        reply_ = "No reply from " + url_.url().toStdString();
     }
     else if (!reply->isFinished())
     {
         // incomplete reply
         success_ = false;
-        reply_ = "Incomplete reply from " + url_.url().toStdString() + ":" + std::to_string(url_.port());
+        reply_ = "Incomplete reply from " + url_.url().toStdString();
     }
     else if (reply->error() != QNetworkReply::NoError)
     {

@@ -76,6 +76,10 @@ public:
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) override;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
 
+    virtual std::string get_scope_endpoint() override;
+    virtual std::string get_query_endpoint() override;
+    virtual std::string get_query_ctrl_endpoint() override;
+
     zmqpp::context* context() const noexcept;
     ThreadPool* invoke_pool();
     int64_t locate_timeout() const noexcept;

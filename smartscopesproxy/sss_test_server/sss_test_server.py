@@ -29,30 +29,15 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/remote-scopes':
         return [remote_scopes_response]
 
-    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
-        return [search_response]
-
     return ''
 
 remote_scopes_response = '\
-[{"base_url": "http://127.0.0.1/demo", "name": "Dummy Demo Scope", "description": "Dummy demo scope." },\
-{"base_url": "http://127.0.0.1/demo2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "invisible": true }]'
+[{"base_url": "https://productsearch.ubuntu.com/demo", "name": "DummyScope", "description": "Dummy scope." },\
+{"base_url": "https://productsearch.ubuntu.com/demo2", "name": "DummyScope2", "description": "Dummy scope 2.", "invisible": false },\
+{"base_url": "https://productsearch.ubuntu.com/demo3", "name": "DummyScope3", "description": "Dummy scope 3.", "invisible": true },\
+{"base_url": "https://productsearch.ubuntu.com/demo4", "name": "DummyScope4", "description": "Dummy scope 4." },\
+{"base_url": "https://productsearch.ubuntu.com/demo5", "name": "DummyScope5", "description": "Dummy scope 5.", "invisible": true }]'
 
-search_response = '\
-{"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\
-{"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
-{"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
-
-serving = False
-port = 1024
-while serving == False:
-    try:
-        httpd = make_server('127.0.0.1', port, response)
-        serving = True
-    except:
-        port += 1
-
-print(str(port))
-sys.stdout.flush()
-
+httpd = make_server('127.0.0.1', 8000, response)
+print('Serving on http://127.0.0.1:8000')
 httpd.serve_forever()
