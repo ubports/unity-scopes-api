@@ -205,6 +205,22 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
     run_future.get();
 }
 
+Proxy RuntimeImpl::string_to_proxy(string const& s) const
+{
+    auto mw = middleware_factory_->find(s);
+    assert(mw);
+    return ObjectProxyImpl::create(mw->string_to_proxy(s));
+}
+
+string RuntimeImpl::proxy_to_string(Proxy const& proxy) const
+{
+    if (proxy == nullptr)
+    {
+        return "nullproxy:";
+    }
+    return proxy->to_string();
+}
+
 } // namespace internal
 
 } // namespace scopes

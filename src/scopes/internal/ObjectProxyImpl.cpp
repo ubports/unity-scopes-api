@@ -61,6 +61,11 @@ int64_t ObjectProxyImpl::timeout() const
     return mw_proxy_->timeout();
 }
 
+string ObjectProxyImpl::to_string() const
+{
+    return mw_proxy_->to_string();
+}
+
 void ObjectProxyImpl::ping()
 {
     mw_proxy_->ping();

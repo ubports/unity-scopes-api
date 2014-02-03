@@ -29,10 +29,17 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ZmqMiddleware, basic)
 {
-    ZmqMiddleware im("testscope",
+    ZmqMiddleware mw("testscope",
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
-    im.start();
+    mw.start();
     sleep(1);
-    im.stop();
+    mw.stop();
+}
+
+TEST(ZmqMiddleware, string_to_proxy)
+{
+    ZmqMiddleware mw("testscope",
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
+                     (RuntimeImpl*)0x1);
 }

@@ -172,6 +172,129 @@ void ZmqMiddleware::wait_for_shutdown()
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
+// Poor man's URI parser
+
+namespace
+{
+
+void bad_proxy_string(string const& msg)
+{
+    throw MiddlewareException("string_to_proxy(): " + msg);
+}
+
+}
+
+MWProxy ZmqMiddleware::string_to_proxy(string const& s)
+{
+    if (s == "nullproxy:")
+    {
+        return nullptr;
+    }
+    if (s.empty())
+    {
+        bad_proxy_string("proxy string cannot be empty");
+    }
+    static const string scheme = "ipc://";
+    if (s.substr(0, scheme.size()) != scheme)
+    {
+        bad_proxy_string("invalid proxy scheme prefix: \"" + s + "\" (expected \"" + scheme + "\")");
+    }
+    auto fragment_pos = s.find_first_of('#');
+    if (fragment_pos == string::npos)
+    {
+        bad_proxy_string("invalid proxy: missing # separator: " + s);
+    }
+
+    string path(s.begin() + scheme.size(), s.begin() + fragment_pos);  // Everything up to the '#'
+    if (path.empty())
+    {
+        bad_proxy_string("invalid proxy: empty endpoint path: " + s);
+    }
+    string endpoint = scheme + path;
+
+    string fields(string(s.begin() + fragment_pos + 1, s.end()));      // Everything following the '#'
+    auto excl_pos = fields.find_first_of('!');
+
+    string identity(fields.begin(), fields.begin() + excl_pos);
+    if (identity.empty())
+    {
+        bad_proxy_string("invalid proxy: empty identity: " + s);
+    }
+
+    // Remaining fields are optional
+    string category;
+    RequestMode mode;
+    int64_t timeout;
+    vector<string> fvals;
+    while (excl_pos != string::npos)
+    {
+        fields = string(fields.begin() + excl_pos + 1, fields.end());     // Discard already consumed portion
+        excl_pos = fields.find_first_of('!');
+        fvals.push_back(string(fields.begin(), fields.begin() + excl_pos));
+    }
+    for (auto const& v : fvals)
+    {
+        if (v.size() < 2 || v[1] != '=')
+        {
+            bad_proxy_string("invalid proxy: bad field specification (\"" + v + "\"):" + s);
+        }
+        switch (v[0])
+        {
+            case 'c':
+            {
+                category = string(v.begin() + 2, v.end());  // Empty category is OK
+                break;
+            }
+            case 'm':
+            {
+                if (v.size() != 3 || !(v[2] == 'o' || v[2] == 't'))
+                {
+                    bad_proxy_string("invalid proxy: bad mode specification (\"" + v + "\"):" + s);
+                }
+                mode = v[2] == 'o' ? RequestMode::Oneway : RequestMode::Twoway;
+                break;
+            }
+            case 't':
+            {
+                size_t pos;
+                timeout = std::stol(string(v.begin() + 2, v.end()).c_str(), &pos);
+                if (v[pos] != '\0')  // The timeout didn't parse as a number
+                {
+                    bad_proxy_string("invalid proxy: bad timeout value (\"" + v + "\"):" + s);
+                }
+                break;
+            }
+            default:
+            {
+                bad_proxy_string("invalid field id ('" + string(1, v[0]) + "'): " + s);
+            }
+        }
+    }
+    MWProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqObjectProxy(this, endpoint, identity, category, mode, timeout));
+    }
+    catch (unity::Exception const&)
+    {
+        throw MiddlewareException("string_to_proxy(): proxy creation failed");
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
+}
+
+string ZmqMiddleware::proxy_to_string(MWProxy const& proxy)
+{
+    if (!proxy)
+    {
+        return "nullproxy:";
+    }
+    return proxy->to_string();
+}
+
 MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
 {
     MWRegistryProxy proxy;

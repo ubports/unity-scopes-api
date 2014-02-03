@@ -49,7 +49,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         registry_identity_ = "Registry";
         registry_configfile_ = "Registry.ini";
         default_middleware_ = "Zmq";
-        default_middleware_configfile_ = "";
+        default_middleware_configfile_ = "Zmq.ini";
     }
     else
     {
@@ -61,10 +61,10 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                      "\": identity cannot contain '" + registry_identity_[pos] + "'");
         }
         registry_configfile_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
+        default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
+        default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
+                                                    default_middleware_ + "." + default_middleware_configfile_str);
     }
-    default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
-    default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
-                                                default_middleware_ + "." + default_middleware_configfile_str);
 }
 
 RuntimeConfig::~RuntimeConfig()

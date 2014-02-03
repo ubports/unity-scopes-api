@@ -81,22 +81,6 @@ TEST(ScopeLoader, basic)
     EXPECT_EQ(0, num_stop());
 }
 
-// Check that we get an exception for a null registry proxy.
-
-TEST(ScopeLoader, null_registry)
-{
-    try
-    {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, nullptr);
-        FAIL();
-    }
-    catch (unity::Exception const& e)
-    {
-        EXPECT_STREQ("unity::InvalidArgumentException: Cannot load scope testScope: null registry proxy",
-                     e.what());
-    }
-}
-
 TEST(ScopeLoader, version_mismatch)
 {
     reset_counters();

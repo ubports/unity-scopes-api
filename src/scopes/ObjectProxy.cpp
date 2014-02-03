@@ -65,6 +65,11 @@ int64_t ObjectProxy::timeout() const
     return p->timeout();
 }
 
+string ObjectProxy::to_string() const
+{
+    return p->to_string();
+}
+
 internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
 {
     return p.get();

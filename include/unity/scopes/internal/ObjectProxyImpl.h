@@ -41,6 +41,8 @@ public:
     virtual std::string endpoint() const;
     virtual int64_t timeout() const;
 
+    std::string to_string() const;
+
     // Remote operation
     virtual void ping();
 
@@ -51,6 +53,7 @@ protected:
 
 private:
     static Proxy create(MWProxy const& mw_proxy);
+    friend class RuntimeImpl;   // So RuntimeImpl can call create() from string_to_proxy()
 
     MWProxy mw_proxy_;
 };

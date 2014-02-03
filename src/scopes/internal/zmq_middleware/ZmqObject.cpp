@@ -60,6 +60,14 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(m != Unknown);
     assert(timeout >= -1);
     throw_if_bad_endpoint(endpoint);
+
+    // Make sure that fields have consistent settings for null proxies.
+    if (endpoint.empty() || identity.empty())
+    {
+        endpoint_ = "";
+        identity_ = "";
+        category_ = "";
+    }
 }
 
 ZmqObjectProxy::~ZmqObjectProxy()
@@ -89,6 +97,30 @@ string ZmqObjectProxy::category() const
 int64_t ZmqObjectProxy::timeout() const noexcept
 {
     return timeout_;
+}
+
+string ZmqObjectProxy::to_string() const
+{
+    string s = "ipc://";
+    if (endpoint_.empty() || identity_.empty())
+    {
+        return s;   // null proxy
+    }
+    assert(!endpoint_.empty() && !identity_.empty());
+    s += endpoint_ + "#" + identity_;
+    if (!category_.empty())
+    {
+        s += "!c=" + category_;
+    }
+    if (mode_ == RequestMode::Oneway)
+    {
+        s += "!m=o";
+    }
+    if (timeout_ != -1)
+    {
+        s += "!t=" + std::to_string(timeout_);
+    }
+    return s;
 }
 
 void ZmqObjectProxy::ping()
