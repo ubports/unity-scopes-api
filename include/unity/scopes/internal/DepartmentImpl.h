@@ -43,7 +43,7 @@ public:
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
-    void add_subdepartments(DepartmentList const& departments);
+    void set_subdepartments(DepartmentList const& departments);
 
     std::string id() const;
     std::string label() const;

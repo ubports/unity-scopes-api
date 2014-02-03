@@ -50,7 +50,7 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, Query const& qu
     query_.set_department_id(department_id);
 }
 
-void DepartmentImpl::add_subdepartments(DepartmentList const& departments)
+void DepartmentImpl::set_subdepartments(DepartmentList const& departments)
 {
     departments_ = departments;
 }
@@ -120,7 +120,7 @@ Department DepartmentImpl::create(VariantMap const& var)
         {
             subdeps.push_back(create(dep.get_dict()));
         }
-        department.add_subdepartments(subdeps);
+        department.set_subdepartments(subdeps);
     }
     return department;
 }

@@ -61,9 +61,9 @@ Department& Department::operator=(Department const& other)
 
 Department& Department::operator=(Department&&) = default;
 
-void Department::add_subdepartments(DepartmentList const& departments)
+void Department::set_subdepartments(DepartmentList const& departments)
 {
-    p->add_subdepartments(departments);
+    p->set_subdepartments(departments);
 }
 
 std::string Department::id() const
