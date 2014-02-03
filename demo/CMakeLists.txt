@@ -1,4 +1,5 @@
 add_subdirectory(scopes)
+add_subdirectory(stand-alone)
 
 configure_file(Runtime.ini.in Runtime.ini)
 configure_file(Registry.ini.in Registry.ini)

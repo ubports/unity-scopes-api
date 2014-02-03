@@ -19,6 +19,8 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/RegistryImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/QueryI.h>
@@ -184,7 +186,7 @@ void bad_proxy_string(string const& msg)
 
 // Poor man's URI parser (no boost)
 
-MWProxy ZmqMiddleware::string_to_proxy(string const& s)
+Proxy ZmqMiddleware::string_to_proxy(string const& s)
 {
     if (s == "nullproxy:")
     {
@@ -617,11 +619,11 @@ int64_t ZmqMiddleware::locate_timeout() const noexcept
     return locate_timeout_;
 }
 
-ZmqProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
-                                         string const& identity,
-                                         string const& category,
-                                         RequestMode mode,
-                                         int64_t timeout)
+Proxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
+                                      string const& identity,
+                                      string const& category,
+                                      RequestMode mode,
+                                      int64_t timeout)
 {
     // For the time being we only support Scope and Registry types for proxy creation,
     // both of which are twoway interfaces.
@@ -631,11 +633,13 @@ ZmqProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     }
     if (category == "Scope")
     {
-        return make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
+        auto p = make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
+        return ScopeImpl::create(p, runtime(), identity);
     }
     else if (category == "Registry")
     {
-        return make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
+        auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
+        return RegistryImpl::create(p, runtime());
     }
     else
     {
