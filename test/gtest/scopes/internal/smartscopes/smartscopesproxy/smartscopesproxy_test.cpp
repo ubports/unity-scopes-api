@@ -52,9 +52,6 @@ public:
         , reg_id_("SSRegistry")
         , scope_id_("SmartScope")
     {
-        std::string server_env = "SMART_SCOPES_SERVER=http://127.0.0.1:" + std::to_string(server_.port_);
-        ::putenv((char*)server_env.c_str());
-
         // Instantiate SS registry and scopes runtimes
         reg_rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
         scope_rt_ = RuntimeImpl::create(scope_id_, SS_RUNTIME_PATH);
@@ -69,7 +66,8 @@ public:
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60));
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60,
+                                                           "http://127.0.0.1", server_.port_));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
         // Add objects to the middlewares
@@ -199,8 +197,12 @@ TEST_F(smartscopesproxytest, ss_scope)
     auto reply = std::make_shared<Receiver>();
 
     ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+
+    auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
+
     meta.proxy()->create_query("search_string", VariantMap(), reply);
-    reply->wait_until_finished();
+
+    wait_thread.join();
 }
 
 } // namespace
