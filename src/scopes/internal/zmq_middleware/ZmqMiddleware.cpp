@@ -19,6 +19,8 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/RegistryImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/QueryI.h>
@@ -118,7 +120,7 @@ void ZmqMiddleware::start()
         }
         default:
         {
-            assert(false);
+            assert(false);  // LCOV_EXCL_LINE
         }
     }
 }
@@ -172,8 +174,6 @@ void ZmqMiddleware::wait_for_shutdown()
     state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
 }
 
-// Poor man's URI parser
-
 namespace
 {
 
@@ -184,7 +184,9 @@ void bad_proxy_string(string const& msg)
 
 }
 
-MWProxy ZmqMiddleware::string_to_proxy(string const& s)
+// Poor man's URI parser (no boost)
+
+Proxy ZmqMiddleware::string_to_proxy(string const& s)
 {
     if (s == "nullproxy:")
     {
@@ -205,85 +207,121 @@ MWProxy ZmqMiddleware::string_to_proxy(string const& s)
         bad_proxy_string("invalid proxy: missing # separator: " + s);
     }
 
-    string path(s.begin() + scheme.size(), s.begin() + fragment_pos);  // Everything up to the '#'
-    if (path.empty())
+    string endpoint(s.begin(), s.begin() + fragment_pos);  // Everything up to the '#'
+    if (endpoint.size() == scheme.size())
     {
         bad_proxy_string("invalid proxy: empty endpoint path: " + s);
     }
-    string endpoint = scheme + path;
 
-    string fields(string(s.begin() + fragment_pos + 1, s.end()));      // Everything following the '#'
+    string fields(s.substr(fragment_pos + 1));      // Everything following the '#'
+
     auto excl_pos = fields.find_first_of('!');
+    auto end_it = excl_pos == string::npos ? fields.end() : fields.begin() + excl_pos;
 
-    string identity(fields.begin(), fields.begin() + excl_pos);
+    string identity(fields.begin(), end_it);
     if (identity.empty())
     {
         bad_proxy_string("invalid proxy: empty identity: " + s);
     }
 
-    // Remaining fields are optional
-    string category;
-    RequestMode mode;
-    int64_t timeout;
+    fields = fields.substr(identity.size());
+
+    // Remaining fields are optional. Field assignments are separated by '!'
+    // Collect field assignments in fvals.
     vector<string> fvals;
-    while (excl_pos != string::npos)
+    while (!fields.empty())
     {
-        fields = string(fields.begin() + excl_pos + 1, fields.end());     // Discard already consumed portion
+        if (fields[0] == '!')
+        {
+            fields = fields.substr(1);
+        }
         excl_pos = fields.find_first_of('!');
-        fvals.push_back(string(fields.begin(), fields.begin() + excl_pos));
+        end_it = excl_pos == string::npos ? fields.end() : fields.begin() + excl_pos;
+        string val(fields.begin(), end_it);
+        if (val.empty())
+        {
+            bad_proxy_string("invalid proxy: invalid empty field specification: " + s);
+        }
+        fvals.push_back(val);
+        fields = fields.substr(val.size());
     }
+
+    // fvals now contains field assignments. Insert each assignment into a map, so we
+    // check for duplicate fields.
+    map<char, string> fmap;
+    const string valid_fields = "cmt";
     for (auto const& v : fvals)
     {
         if (v.size() < 2 || v[1] != '=')
         {
-            bad_proxy_string("invalid proxy: bad field specification (\"" + v + "\"):" + s);
+            bad_proxy_string("invalid proxy: bad field specification (\"" + v + "\"): " + s);
         }
-        switch (v[0])
+        if (valid_fields.find(v[0]) == string::npos)
+        {
+            bad_proxy_string("invalid proxy: invalid field identifier (\"" + v + "\"): " + s);
+        }
+        if (fmap.find(v[0]) != fmap.end())
+        {
+            bad_proxy_string("invalid proxy: duplicate field specification (\"" + string(1, v[0]) + "=\"): " + s);
+        }
+        fmap[v[0]] = string(v.begin() + 2, v.end());
+    }
+
+    // Now run over the map and check each value
+    string category = "Scope";
+    RequestMode mode = RequestMode::Twoway;
+    int64_t timeout = -1;
+    for (auto const& pair : fmap)
+    {
+        switch (pair.first)
         {
             case 'c':
             {
-                category = string(v.begin() + 2, v.end());  // Empty category is OK
+                category = pair.second;  // Empty category is OK
                 break;
             }
             case 'm':
             {
-                if (v.size() != 3 || !(v[2] == 'o' || v[2] == 't'))
+                if (pair.second.empty() || (pair.second != "o" && pair.second != "t"))
                 {
-                    bad_proxy_string("invalid proxy: bad mode specification (\"" + v + "\"):" + s);
+                    bad_proxy_string("invalid proxy: bad mode (\"m=" + pair.second + "\"): " + s);
                 }
-                mode = v[2] == 'o' ? RequestMode::Oneway : RequestMode::Twoway;
+                mode = pair.second == "o" ? RequestMode::Oneway : RequestMode::Twoway;
                 break;
             }
             case 't':
             {
-                size_t pos;
-                timeout = std::stol(string(v.begin() + 2, v.end()).c_str(), &pos);
-                if (v[pos] != '\0')  // The timeout didn't parse as a number
+                if (pair.second.empty())
                 {
-                    bad_proxy_string("invalid proxy: bad timeout value (\"" + v + "\"):" + s);
+                    bad_proxy_string("invalid proxy: bad timeout value (\"t=" + pair.second + "\"): " + s);
+                }
+                size_t pos;
+                try
+                {
+                    timeout = std::stol(pair.second, &pos);
+                }
+                catch (std::exception const&)
+                {
+                    pos = 0;
+                }
+                if (pair.second[pos] != '\0')  // Did not consume all of the assignment
+                {
+                    bad_proxy_string("invalid proxy: bad timeout value (\"t=" + pair.second + "\"): " + s);
+                }
+                if (timeout < -1)
+                {
+                    bad_proxy_string("invalid proxy: bad timeout value (\"t=" + pair.second + "\"): " + s);
                 }
                 break;
             }
             default:
             {
-                bad_proxy_string("invalid field id ('" + string(1, v[0]) + "'): " + s);
+                assert(false);  // LCOV_EXCL_LINE
             }
         }
     }
-    MWProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqObjectProxy(this, endpoint, identity, category, mode, timeout));
-    }
-    catch (unity::Exception const&)
-    {
-        throw MiddlewareException("string_to_proxy(): proxy creation failed");
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+
+    return make_typed_proxy(endpoint, identity, category, mode, timeout);
 }
 
 string ZmqMiddleware::proxy_to_string(MWProxy const& proxy)
@@ -540,6 +578,21 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     }
 }
 
+std::string ZmqMiddleware::get_scope_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_;
+}
+
+std::string ZmqMiddleware::get_query_endpoint()
+{
+    return "inproc://" + server_name_ + query_suffix;
+}
+
+std::string ZmqMiddleware::get_query_ctrl_endpoint()
+{
+    return "ipc://" + config_.private_dir() + "/" +  server_name_ + ctrl_suffix;
+}
+
 zmqpp::context* ZmqMiddleware::context() const noexcept
 {
     return const_cast<zmqpp::context*>(&context_);
@@ -564,6 +617,34 @@ ThreadPool* ZmqMiddleware::invoke_pool()
 int64_t ZmqMiddleware::locate_timeout() const noexcept
 {
     return locate_timeout_;
+}
+
+Proxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
+                                      string const& identity,
+                                      string const& category,
+                                      RequestMode mode,
+                                      int64_t timeout)
+{
+    // For the time being we only support Scope and Registry types for proxy creation,
+    // both of which are twoway interfaces.
+    if (mode != RequestMode::Twoway)
+    {
+        throw MiddlewareException("make_typed_proxy(): cannot create oneway proxies");
+    }
+    if (category == "Scope")
+    {
+        auto p = make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
+        return ScopeImpl::create(p, runtime(), identity);
+    }
+    else if (category == "Registry")
+    {
+        auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
+        return RegistryImpl::create(p, runtime());
+    }
+    else
+    {
+        throw MiddlewareException("make_typed_proxy(): unknown category: " + category);
+    }
 }
 
 namespace

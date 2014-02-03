@@ -101,13 +101,12 @@ int64_t ZmqObjectProxy::timeout() const noexcept
 
 string ZmqObjectProxy::to_string() const
 {
-    string s = "ipc://";
     if (endpoint_.empty() || identity_.empty())
     {
-        return s;   // null proxy
+        return "nullproxy:";
     }
     assert(!endpoint_.empty() && !identity_.empty());
-    s += endpoint_ + "#" + identity_;
+    string s = endpoint_ + "#" + identity_;
     if (!category_.empty())
     {
         s += "!c=" + category_;
@@ -145,6 +144,7 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
     request.setMode(mode_ == RequestMode::Oneway ? capnproto::RequestMode::ONEWAY : capnproto::RequestMode::TWOWAY);
     request.setOpName(operation_name.c_str());
     request.setId(identity_.c_str());
+    request.setCat(category_.c_str());
     return request;
 }
 

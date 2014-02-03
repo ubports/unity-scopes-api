@@ -60,7 +60,7 @@ public:
     virtual void stop() = 0;
     virtual void wait_for_shutdown() = 0;
 
-    virtual MWProxy string_to_proxy(std::string const& s) = 0;
+    virtual Proxy string_to_proxy(std::string const& s) = 0;
     virtual std::string proxy_to_string(MWProxy const& proxy) = 0;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
@@ -77,6 +77,10 @@ public:
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) = 0;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
+
+    virtual std::string get_scope_endpoint() = 0;
+    virtual std::string get_query_endpoint() = 0;
+    virtual std::string get_query_ctrl_endpoint() = 0;
 
     RuntimeImpl* runtime() const noexcept;
 

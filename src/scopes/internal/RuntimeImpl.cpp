@@ -72,7 +72,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            cerr << "Warning: no registry configured, registry proxy set to nullptr" << endl;
+            cerr << "Warning: no registry configured" << endl;
             registry_identity_ = "";
         }
         else
@@ -146,6 +146,10 @@ MiddlewareFactory const* RuntimeImpl::factory() const
 
 RegistryProxy RuntimeImpl::registry() const
 {
+    if (!registry_)
+    {
+        throw ConfigException("registry(): no registry configured");
+    }
     if (destroyed_.load())
     {
         throw LogicException("registry(): Cannot obtain registry for already destroyed run time");
@@ -209,7 +213,7 @@ Proxy RuntimeImpl::string_to_proxy(string const& s) const
 {
     auto mw = middleware_factory_->find(s);
     assert(mw);
-    return ObjectProxyImpl::create(mw->string_to_proxy(s));
+    return mw->string_to_proxy(s);
 }
 
 string RuntimeImpl::proxy_to_string(Proxy const& proxy) const

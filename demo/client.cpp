@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
         print_usage();
     }
 
-    string scope_name = string("scope-") + argv[1];
+    string scope_name = argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("Runtime.ini");
+        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
         auto meta = r->get_metadata(scope_name);

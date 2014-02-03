@@ -43,8 +43,10 @@ public:
     UNITY_DEFINES_PTRS(HttpResponseHandle);
 
     HttpResponseHandle(uint session_id, std::shared_future<std::string> future)
-        : session_id_(session_id),
-          future_(future) {}
+        : session_id_(session_id)
+        , future_(future)
+    {
+    }
 
     void wait()
     {
@@ -81,12 +83,12 @@ public:
     virtual std::string to_percent_encoding(std::string const& string) = 0;
 };
 
-} // namespace smartscopes
+}  // namespace smartscopes
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
+#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
