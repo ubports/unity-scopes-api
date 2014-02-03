@@ -49,7 +49,7 @@ TEST(ZmqMiddleware, string_to_proxy)
                      (RuntimeImpl*)0x1);
 
     Proxy p;
-    ZmqProxy zp;
+    ScopeProxy sp;
 
     p = mw.string_to_proxy("nullproxy:");
     EXPECT_EQ(nullptr, p);
@@ -58,10 +58,8 @@ TEST(ZmqMiddleware, string_to_proxy)
     EXPECT_EQ("ipc://path", p->endpoint());
     EXPECT_EQ("id", p->identity());
     EXPECT_EQ(-1, p->timeout());
-    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
-    ASSERT_NE(nullptr, zp);
-    EXPECT_EQ("Scope", zp->category());
-    EXPECT_EQ(RequestMode::Twoway, zp->mode());
+    sp = dynamic_pointer_cast<Scope>(p);
+    ASSERT_NE(nullptr, sp);
 
     p = mw.string_to_proxy("ipc://path#id!t=-1");
     EXPECT_EQ("ipc://path", p->endpoint());
@@ -77,18 +75,11 @@ TEST(ZmqMiddleware, string_to_proxy)
     EXPECT_EQ("ipc://path", p->endpoint());
     EXPECT_EQ("id", p->identity());
     EXPECT_EQ(500, p->timeout());
-    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
-    ASSERT_NE(nullptr, zp);
-    EXPECT_EQ("Registry", zp->category());
 
     p = mw.string_to_proxy("ipc://path#id!t=500!c=Scope!m=t");
     EXPECT_EQ("ipc://path", p->endpoint());
     EXPECT_EQ("id", p->identity());
     EXPECT_EQ(500, p->timeout());
-    zp = dynamic_pointer_cast<ZmqObjectProxy>(p);
-    ASSERT_NE(nullptr, zp);
-    EXPECT_EQ("Scope", zp->category());
-    EXPECT_EQ(RequestMode::Twoway, zp->mode());
 }
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
