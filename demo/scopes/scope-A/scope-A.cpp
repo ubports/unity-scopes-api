@@ -31,7 +31,7 @@ using namespace unity::scopes;
 class MyQuery : public SearchQuery
 {
 public:
-    MyQuery(string const& query) :
+    MyQuery(Query const& query) :
         query_(query)
     {
     }
@@ -46,25 +46,33 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        Filters filters;
+        auto filter = OptionSelectorFilter::create("f1", "Options");
+        filter->add_option("1", "Option 1");
+        filter->add_option("2", "Option 2");
+        filters.push_back(filter);
+        FilterState filter_state; // TODO: push real state from query obj
+        reply->push(filters, filter_state);
+
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
         CategorisedResult res(cat);
         res.set_uri("uri");
-        res.set_title("scope-A: result 1 for query \"" + query_ + "\"");
+        res.set_title("scope-A: result 1 for query \"" + query_.query_string() + "\"");
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        Query q("scope-A", query_, "");
+        Query q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
         reply->push(annotation);
 
-        cout << "scope-A: query \"" << query_ << "\" complete" << endl;
+        cout << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
     }
 
 private:
-    string query_;
+    Query query_;
 };
 
 class MyPreview : public PreviewQuery
@@ -127,10 +135,10 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const&) override
     {
         QueryBase::UPtr query(new MyQuery(q));
-        cout << "scope-A: created query: \"" << q << "\"" << endl;
+        cout << "scope-A: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 

@@ -22,6 +22,8 @@
 #include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterState.h>
 
 namespace unity
 {
@@ -70,6 +72,12 @@ public:
     bool push(CategorisedResult const& result) const;
 
     bool push(Annotation const& annotation) const;
+
+    /**
+    \brief Sends all filters and their state to the source of a query.
+    \return true if the filters were accepted, false otherwise.
+    */
+    bool push(Filters const& filters, FilterState const& filter_state) const;
 
     /**
     \brief Destroys a Reply.

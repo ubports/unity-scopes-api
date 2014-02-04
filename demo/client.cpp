@@ -31,6 +31,31 @@
 using namespace std;
 using namespace unity::scopes;
 
+// conver filter to a string
+std::string to_string(FilterBase const& filter)
+{
+    std::ostringstream str;
+    auto const ftype = filter.filter_type();
+    cout << "filter id=" << filter.id() << endl;
+    if (ftype == "option_selector")
+    {
+        auto const& selfilter = dynamic_cast<OptionSelectorFilter const&>(filter);
+        str << "OptionSelectorFilter" << endl;
+        str << " label: " << selfilter.label() << endl;
+        str << " multi-select: " << selfilter.multi_select() << endl;
+        str << " options:" << endl;
+        for (auto op: selfilter.options())
+        {
+            str << "    id: " << op->id() << ", label: " << op->label() << endl;
+        }
+    }
+    else
+    {
+        str << "Unknown filter type: " << ftype;
+    }
+    return str.str();
+}
+
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
@@ -117,6 +142,15 @@ public:
         for (auto link: links)
         {
             cout << "  " << link->query().to_string() << endl;
+        }
+    }
+
+    void push(Filters const& filters, FilterState const& /* filter_state */) override
+    {
+        cout << "received " << filters.size() << " filters" << endl;
+        for (auto f: filters)
+        {
+            cout << to_string(*f) << endl;
         }
     }
 

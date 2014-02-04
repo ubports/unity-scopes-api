@@ -23,6 +23,7 @@
 #include "Counters.h"
 
 #include <unity/scopes/internal/ScopeLoader.h>
+#include <unity/scopes/Query.h>
 
 #include <iostream>
 
@@ -43,7 +44,7 @@ public:
         inc_stop();
     }
 
-    virtual unity::scopes::QueryBase::UPtr create_query(std::string const&,
+    virtual unity::scopes::QueryBase::UPtr create_query(unity::scopes::Query const&,
                                                              unity::scopes::VariantMap const&) override
     {
         return nullptr;
