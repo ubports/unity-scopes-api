@@ -146,7 +146,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
 {
     if (reply == nullptr)
     {
-        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+        throw unity::InvalidArgumentException("Scope::activate_preview_action(): invalid ActivationListener (nullptr)");
     }
 
     QueryCtrlProxy ctrl;
