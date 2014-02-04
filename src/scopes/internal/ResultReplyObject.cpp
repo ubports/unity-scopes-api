@@ -28,6 +28,7 @@
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
@@ -47,6 +48,7 @@ ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, Runti
     receiver_(receiver),
     cat_registry_(new CategoryRegistry())
 {
+    assert(receiver_);
 }
 
 ResultReplyObject::~ResultReplyObject()
