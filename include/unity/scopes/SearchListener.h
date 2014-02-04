@@ -24,6 +24,7 @@
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Annotation.h>
+#include <unity/scopes/FilterBase.h>
 
 #include <string>
 
@@ -34,6 +35,7 @@ namespace scopes
 {
 
 class CategorisedResult;
+class FilterState;
 
 class UNITY_API SearchListener : public ListenerBase
 {
@@ -65,6 +67,12 @@ public:
     If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
     */
     virtual void push(Category::SCPtr category);
+
+    /**
+     \brief Called once by the scopes to send all the filters and their state.
+     The default implementation does nothing.
+     */
+    virtual void push(Filters const& filters, FilterState const& filter_state);
 
 protected:
     /// @cond

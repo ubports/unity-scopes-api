@@ -45,12 +45,35 @@ QueryBaseImpl::~QueryBaseImpl()
 QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               string const& query_string,
                                               VariantMap const& hints,
-                                              shared_ptr<SearchListener> const& reply)
+                                              SearchListener::SPtr const& reply)
 {
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries
     // without intervention from the scope application code.
     QueryCtrlProxy qcp = scope->create_query(query_string, hints, reply);
+    subqueries_.push_back(qcp);
+    return qcp;
+}
+
+QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+                                              std::string const& query_string,
+                                              FilterState const& filter_state,
+                                              VariantMap const& hints,
+                                              SearchListener::SPtr const& reply)
+{
+    QueryCtrlProxy qcp = scope->create_query(query_string, filter_state, hints, reply);
+    subqueries_.push_back(qcp);
+    return qcp;
+}
+
+QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+                                              std::string const& query_string,
+                                              std::string const& department_id,
+                                              FilterState const& filter_state,
+                                              VariantMap const& hints,
+                                              SearchListener::SPtr const& reply)
+{
+    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, hints, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }

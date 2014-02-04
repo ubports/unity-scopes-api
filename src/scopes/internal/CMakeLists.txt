@@ -17,6 +17,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/GeoCoordinateImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonCppNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
@@ -28,6 +31,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp

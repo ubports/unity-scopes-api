@@ -1,0 +1,4 @@
+add_executable(OptionSelectorFilter_test OptionSelectorFilter_test.cpp)
+target_link_libraries(OptionSelectorFilter_test ${TESTLIBS})
+
+add_test(OptionSelectorFilter OptionSelectorFilter_test)

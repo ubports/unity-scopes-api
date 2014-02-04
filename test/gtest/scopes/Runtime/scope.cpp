@@ -22,6 +22,7 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Query.h>
 
 #include "scope.h"
 
@@ -76,7 +77,7 @@ void TestScope::run()
 {
 }
 
-QueryBase::UPtr TestScope::create_query(string const &, VariantMap const &)
+QueryBase::UPtr TestScope::create_query(Query const &, VariantMap const &)
 {
     return QueryBase::UPtr(new TestQuery());
 }

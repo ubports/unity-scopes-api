@@ -59,7 +59,7 @@ SSScopeObject::~SSScopeObject() noexcept
 {
 }
 
-MWQueryCtrlProxy SSScopeObject::create_query(std::string const& q,
+MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
                                              VariantMap const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
