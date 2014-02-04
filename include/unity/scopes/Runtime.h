@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_RUNTIME_H
 #define UNITY_SCOPES_RUNTIME_H
 
+#include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -101,6 +102,35 @@ public:
     \param scope_base The scope implementation
     */
     void run_scope(ScopeBase *const scope_base);
+
+    // TODO: Flesh out documentation for this, especially syntax.
+    /**
+    \brief Convert a string to a proxy.
+
+    This method is intended for testing purposes. Do not use string_to_proxy() in production code!
+    string_to_proxy() converts a string to a proxy. The returned proxy must be down-cast using
+    `dynamic_pointer_cast` to the correct type before it can be used.
+
+    \param s The string to convert into a proxy.
+    \return The converted proxy. It is possible for the return value to be `nullptr`, but only
+    if the passed string represents a null proxy. Otherwise, the return value is a non-null proxy,
+    or an exception (for example, if the proxy string did not parse correctly, or if the proxy
+    could not be instantiated due to incorrect values inside the string).
+    */
+    Proxy string_to_proxy(std::string const& s) const;
+
+    /**
+    \brief Converts a proxy to a string.
+
+    proxy_to_string() converts the passed proxy to a string. Note that it is typically easier
+    to call the Proxy::to_string() method to achieve the same thing. However, proxy_to_string()
+    is needed in order to obtain a string for a null proxy (because it is not possible to invoke
+    a member function on a null proxy).
+
+    \param p The proxy to convert to a string.
+    \return The string representation of the proxy.
+    */
+    std::string proxy_to_string(Proxy const& proxy) const;
 
     /**
     \brief Destroys a Runtime instance.
