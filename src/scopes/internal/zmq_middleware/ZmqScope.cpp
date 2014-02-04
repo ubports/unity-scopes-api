@@ -138,7 +138,8 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
     return QueryCtrlImpl::create(p, reply_proxy);
 }
 
-QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result, VariantMap const& hints, std::string const& action_id, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result,
+        VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
@@ -149,7 +150,8 @@ QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result, Varia
         to_value_dict(result, res);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
-        in_params.setAction(action_id);
+        in_params.setWidgetId(widget_id);
+        in_params.setActionId(action_id);
         auto p = in_params.initReplyProxy();
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());

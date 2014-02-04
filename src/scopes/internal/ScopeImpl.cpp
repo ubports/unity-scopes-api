@@ -147,7 +147,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
@@ -163,7 +163,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate_preview_action(result.p->activation_target(), hints, action_id, rp);
+        ctrl = fwd()->activate_preview_action(result.p->activation_target(), hints, widget_id, action_id, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

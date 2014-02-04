@@ -55,6 +55,7 @@ public:
 
     virtual QueryCtrlProxy activate_preview_action(VariantMap const& result,
                                     VariantMap const& hints,
+                                    std::string const& widget_id,
                                     std::string const& action_id,
                                     MWReplyProxy const& reply) override;
 

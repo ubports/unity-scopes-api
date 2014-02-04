@@ -63,6 +63,7 @@ public:
 
     MWQueryCtrlProxy activate_preview_action(Result const& result,
                                              VariantMap const& hints,
+                                             std::string const& widget_id,
                                              std::string const& action_id,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info) override;

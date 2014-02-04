@@ -85,6 +85,7 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
 
 MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
                                                         VariantMap const& hints,
+                                                        std::string const& widget_id,
                                                         std::string const& action_id,
                                                         MWReplyProxy const& reply,
                                                         InvokeInfo const& info)
@@ -92,6 +93,7 @@ MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
     ///! TODO
     (void)result;
     (void)hints;
+    (void)widget_id;
     (void)action_id;
     (void)reply;
     (void)info;
