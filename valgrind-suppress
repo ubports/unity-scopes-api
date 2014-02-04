@@ -76,7 +76,7 @@
 # False positives for memory leaks in Qt
 
 {
-   QNetworkConfigurationManagerInit
+   QNetworkConfigurationManager
    Memcheck:Leak
    fun:*alloc
    ...
@@ -85,10 +85,27 @@
 }
 
 {
-   QCoreApplicationNotifyRealloc
+   QCoreApplication
    Memcheck:Leak
    fun:realloc
    ...
    fun:_ZN7QObject5eventEP6QEvent
    fun:_ZN16QCoreApplication6notifyEP7QObjectP6QEvent
+}
+
+{
+   QNetworkAccessManager
+   Memcheck:Leak
+   ...
+   fun:_ZN21QNetworkAccessManager13createRequestENS_9OperationERK15QNetworkRequestP9QIODevice
+   fun:_ZN21QNetworkAccessManager3getERK15QNetworkRequest
+   fun:_ZN18HttpClientQtThread3runEv
+}
+
+{
+   QFactoryLoader
+   Memcheck:Leak
+   fun:*alloc
+   ...
+   fun:_ZNK14QFactoryLoader8instanceEi
 }
