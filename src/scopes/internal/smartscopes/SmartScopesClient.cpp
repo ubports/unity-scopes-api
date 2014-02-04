@@ -115,10 +115,12 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         }
 
         std::string response_str;
+        std::cout << "SmartScopesClient: GET " << remote_scopes_uri.str() << std::endl;
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
+        std::cout << "SmartScopesClient: Remote scopes:" << std::endl << response_str << std::endl;
 
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
@@ -150,12 +152,12 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes.push_back(scope);
         }
 
-        std::cout << "Retrieved remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
+        std::cout << "SmartScopesClient: Retrieved remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
         return remote_scopes;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "Failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
+        std::cout << "SmartScopesClient: Failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
         throw;
     }
 }
@@ -207,6 +209,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     cancel_search(session_id);
 
     std::lock_guard<std::mutex> lock(search_results_mutex_);
+    std::cout << "SmartScopesClient: GET " << search_uri.str() << std::endl;
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
 
     return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
@@ -230,6 +233,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             search_results_[session_id]->wait();
 
             response_str = search_results_[session_id]->get();
+            std::cout << "SmartScopesClient: Search:" << std::endl << response_str << std::endl;
             search_results_.erase(it);
         }
 
@@ -256,8 +260,8 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
 
                 category->icon = child_node->has_node("icon") ? child_node->get_node("icon")->as_string() : "";
                 category->id = child_node->has_node("id") ? child_node->get_node("id")->as_string() : "";
-                category->renderer_template = child_node->has_node("renderer_template") ?
-                                                  child_node->get_node("renderer_template")->as_string() :
+                category->renderer_template = child_node->has_node("render_template") ?
+                                                  child_node->get_node("render_template")->as_string() :
                                                   "";
                 category->title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
                 categories[category->id] = category;
@@ -281,12 +285,12 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             }
         }
 
-        std::cout << "Retrieved search results for session: " << session_id << std::endl;
+        std::cout << "SmartScopesClient: Retrieved search results for session: " << session_id << std::endl;
         return results;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "Failed to retrieve search results for session: " << session_id << std::endl;
+        std::cout << "SmartScopesClient: Failed to retrieve search results for session: " << session_id << std::endl;
         throw;
     }
 }
