@@ -43,7 +43,8 @@ public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
-                     uint max_http_sessions, uint no_reply_timeout, uint refresh_rate_in_min);
+                     uint max_http_sessions, uint no_reply_timeout, uint refresh_rate_in_min,
+                     std::string const& sss_url = "" /*detect url*/, uint sss_port = 80);
     virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name) override;

@@ -33,6 +33,7 @@ namespace scopes
 {
 
 class ScopeBase;
+class Query;
 
 namespace internal
 {
@@ -45,7 +46,7 @@ class ScopeObjectBase : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ScopeObjectBase);
 
-    virtual MWQueryCtrlProxy create_query(std::string const& q,
+    virtual MWQueryCtrlProxy create_query(Query const& query,
                                           VariantMap const& hints,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) = 0;
