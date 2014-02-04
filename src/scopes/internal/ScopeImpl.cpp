@@ -80,6 +80,11 @@ QueryCtrlProxy ScopeImpl::create_query(string const& query_string, VariantMap co
 
 QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::create_query(): invalid SearchListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
     try
@@ -183,6 +188,11 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
 
 QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
     try
