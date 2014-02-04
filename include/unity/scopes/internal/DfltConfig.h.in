@@ -25,7 +25,12 @@ namespace unity
 namespace scopes
 {
 
+namespace internal
+{
+
 static constexpr const char* DFLT_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini";
+
+} // namespace internal
 
 } // namespace scopes
 

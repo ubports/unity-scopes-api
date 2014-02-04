@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeConfig.h>
 
-#include <unity/scopes/DfltConfig.h>
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;

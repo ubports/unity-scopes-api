@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
-#include <unity/scopes/DfltConfig.h>
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
