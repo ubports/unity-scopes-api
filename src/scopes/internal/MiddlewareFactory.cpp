@@ -92,7 +92,7 @@ MiddlewareBase::SPtr MiddlewareFactory::find(string const& server_name, string c
 MiddlewareBase::SPtr MiddlewareFactory::find(string const& proxy_string) const
 {
     static const string zmq_scheme = "ipc:";
-    static const string rest_scheme = "http:";
+    static const string rest_scheme = "rest:";
     string kind;
     if (proxy_string.substr(0, zmq_scheme.size()) == zmq_scheme)
     {
