@@ -62,7 +62,7 @@ public:
 
     virtual ActivationResponse activate() override
     {
-        ActivationResponse resp(ActivationResponse::Status::Handled);
+        ActivationResponse resp(ActivationResponse::Status::ShowDash);
         VariantMap var;
         var[hint_key_] = hint_val_;
         var["received_hints"] = recv_hints_; // send received hints back for testing

@@ -1,6 +1,11 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.3.1
+========================
+- The 'Handled' state was remvoed from ActivationResponse::Status and two new
+  values were added instead: ShowDash and HideDash.
+
 Changes in version 0.3.0
 ========================
 - Preliminary API for filters has been added via OptionSelectorFilter and

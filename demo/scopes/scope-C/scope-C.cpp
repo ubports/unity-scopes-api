@@ -166,7 +166,7 @@ class MyActivation : public ActivationBase
 {
     ActivationResponse activate() override
     {
-        return ActivationResponse(ActivationResponse::Status::Handled);
+        return ActivationResponse(ActivationResponse::Status::ShowDash);
     }
 };
 

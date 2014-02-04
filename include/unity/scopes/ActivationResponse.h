@@ -43,7 +43,8 @@ public:
     enum Status
     {
         NotHandled, //<! Activation of this result wasn't handled by the scope
-        Handled, //<! Activation of this result was handled.
+        ShowDash,   //<! Activation of this result was handled, show the Dash
+        HideDash,   //<! Activation of this result was handled, hide the Dash
         ShowPreview //<! Preview should be requested for this result.
     };
 
