@@ -20,6 +20,9 @@ $ ../scoperegistry/scoperegistry Runtime.ini
 
 You do not need to run the registry from the current directory. Just adjust the path to Runtime.ini to point at the Runtime.ini file in *this* directory.
 
+Note that, for testing purposes, you may want to run a scope without having to configure a registry.
+See the stand-alone directory for details.
+
 To send a query to a scope, run
 
 $ ./client <scope-letter> <query-string>

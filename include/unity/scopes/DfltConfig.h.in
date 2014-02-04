@@ -16,10 +16,20 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
  */
 
-#ifndef SCOPES_CONFIG_H
-#define SCOPES_CONFIG_H
+#ifndef UNITY_SCOPES_DFLTCONFIG_H
+#define UNITY_SCOPES_DFLTCONFIG_H
 
-#define DEFAULT_RUNTIME "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini"
-#define DEFAULT_SS_RUNTIME "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/SSRuntime.ini"
+namespace unity
+{
+
+namespace scopes
+{
+
+static constexpr const char* DFLT_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini";
+static constexpr const char* DFLT_SS_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/SSRuntime.ini";
+
+} // namespace scopes
+
+} // namespace unity
 
 #endif

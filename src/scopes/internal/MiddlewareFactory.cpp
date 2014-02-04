@@ -89,6 +89,35 @@ MiddlewareBase::SPtr MiddlewareFactory::find(string const& server_name, string c
     return find_unlocked(server_name, kind);
 }
 
+MiddlewareBase::SPtr MiddlewareFactory::find(string const& proxy_string) const
+{
+    static const string zmq_scheme = "ipc:";
+    static const string rest_scheme = "http:";
+    string kind;
+    if (proxy_string.substr(0, zmq_scheme.size()) == zmq_scheme)
+    {
+        kind = "Zmq";
+    }
+    else if (proxy_string.substr(0, rest_scheme.size()) == rest_scheme)
+    {
+        kind = "REST";
+    }
+    else
+    {
+        throw MiddlewareException("Unknown scheme name for proxy: " + proxy_string);
+    }
+
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    for (auto const& pair : mw_map_)
+    {
+        if (pair.first.kind == kind)
+        {
+            return pair.second;
+        }
+    }
+    throw MiddlewareException("Cannot find middleware for proxy: " + proxy_string);
+}
+
 MiddlewareBase::SPtr MiddlewareFactory::find_unlocked(string const& server_name, string const& kind) const
 {
     MiddlewareData d = { server_name, kind };

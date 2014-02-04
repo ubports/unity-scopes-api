@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_OPTIONSELECTORFILTERIMPL_H
-#define UNITY_INTERNAL_OPTIONSELECTORFILTERIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
+#define UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>

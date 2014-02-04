@@ -21,11 +21,12 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
-#include <unity/config.h>
+#include <unity/scopes/DfltConfig.h>
 
 #include <cassert>
 #include <iostream>
 
+using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
         uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
 
         // Instantiate SS registry and scopes runtimes
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DEFAULT_SS_RUNTIME);
+        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DFLT_SS_RUNTIME_INI);
         RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, config_file);
 
         // Get registry config

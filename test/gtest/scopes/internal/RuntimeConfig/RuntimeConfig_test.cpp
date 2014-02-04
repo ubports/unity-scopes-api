@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
@@ -29,22 +30,8 @@ TEST(RuntimeConfig, basic)
 {
     RuntimeConfig c("");
     EXPECT_EQ("Registry", c.registry_identity());
-    EXPECT_EQ("Registry.ini", c.registry_configfile());
+    EXPECT_EQ(DFLT_RUNTIME_INI, c.registry_configfile());
     EXPECT_EQ("Zmq", c.default_middleware());
-}
-
-TEST(RuntimeConfig, RegistryIDEmpty)
-{
-    try
-    {
-        RuntimeConfig c("RegIDEmpty.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"RegIDEmpty.ini\": Illegal empty value for Registry.Identity",
-                     e.what());
-    }
 }
 
 TEST(RuntimeConfig, BadRegistryID)
@@ -58,20 +45,6 @@ TEST(RuntimeConfig, BadRegistryID)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"BadRegID.ini\": Illegal character in value for "
                      "Registry.Identity: \"Regi/stry\": identity cannot contain '/'",
-                     e.what());
-    }
-}
-
-TEST(RuntimeConfig, RegistryFileEmpty)
-{
-    try
-    {
-        RuntimeConfig c("RegFileEmpty.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"RegFileEmpty.ini\": Illegal empty value for Registry.ConfigFile",
                      e.what());
     }
 }

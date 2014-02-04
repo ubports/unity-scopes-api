@@ -18,6 +18,9 @@
 
 #include <unity/scopes/internal/RuntimeConfig.h>
 
+#include <unity/scopes/DfltConfig.h>
+#include <unity/UnityExceptions.h>
+
 using namespace std;
 
 namespace unity
@@ -45,20 +48,20 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     if (configfile.empty())  // Default config
     {
         registry_identity_ = "Registry";
-        registry_configfile_ = "Registry.ini";
+        registry_configfile_ = DFLT_RUNTIME_INI;
         default_middleware_ = "Zmq";
-        default_middleware_configfile_ = "";
+        default_middleware_configfile_ = "Zmq.ini";
     }
     else
     {
-        registry_identity_ = get_string(RUNTIME_CONFIG_GROUP, registry_identity_str);
+        registry_identity_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_identity_str);
         auto pos = registry_identity_.find_first_of("@:/");
         if (pos != string::npos)
         {
             throw_ex("Illegal character in value for " + registry_identity_str + ": \"" + registry_identity_ +
                      "\": identity cannot contain '" + registry_identity_[pos] + "'");
         }
-        registry_configfile_ = get_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
+        registry_configfile_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
         default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
         default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
                                                     default_middleware_ + "." + default_middleware_configfile_str);
