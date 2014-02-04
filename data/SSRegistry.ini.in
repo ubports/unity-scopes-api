@@ -5,6 +5,6 @@ Registry.Identity = SSRegistry
 Middleware = Zmq
 Zmq.Endpoint = ipc:///tmp/SSRegistry
 Zmq.EndpointDir = /tmp
-Zmq.ConfigFile = Zmq.ini
+Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Scope.InstallDir = /tmp
 Scoperunner.Path = /tmp

@@ -21,6 +21,8 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
+#include <unity/config.h>
+
 #include <cassert>
 #include <iostream>
 
@@ -37,12 +39,16 @@ int main(int argc, char* argv[])
 {
     int exit_status = 1;
 
+    // argv[1]: server_url_env
     std::string server_url_env;
     if (argc > 1)
     {
         server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
         ::putenv(const_cast<char*>(server_url_env.c_str()));
     }
+
+    // argv[2]: config_file
+    char const* const config_file = argc > 2 ? argv[2] : "";
 
     try
     {
@@ -54,8 +60,8 @@ int main(int argc, char* argv[])
         uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
 
         // Instantiate SS registry and scopes runtimes
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, SS_RUNTIME_PATH);
-        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, SS_RUNTIME_PATH);
+        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DEFAULT_SS_RUNTIME);
+        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, config_file);
 
         // Get registry config
         RegistryConfig reg_conf(ss_reg_id, reg_rt->registry_configfile());
