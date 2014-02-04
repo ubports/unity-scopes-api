@@ -25,7 +25,7 @@
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/Result.h>
-#include <unity/Exception.h>
+#include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/PreviewReplyObject.h>
@@ -109,6 +109,11 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
 
 QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
     try
@@ -139,6 +144,11 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
 
 QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     try
     {
