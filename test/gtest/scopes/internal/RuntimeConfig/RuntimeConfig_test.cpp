@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
@@ -29,7 +30,7 @@ TEST(RuntimeConfig, basic)
 {
     RuntimeConfig c("");
     EXPECT_EQ("Registry", c.registry_identity());
-    EXPECT_EQ("Registry.ini", c.registry_configfile());
+    EXPECT_EQ(DFLT_RUNTIME_INI, c.registry_configfile());
     EXPECT_EQ("Zmq", c.default_middleware());
 }
 
