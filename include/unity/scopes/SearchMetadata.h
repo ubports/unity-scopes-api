@@ -34,19 +34,22 @@ class SearchMetadataImpl;
 }
 
 /**
-\brief
+\brief Metadata passed with search requests.
 */
 class UNITY_API SearchMetadata : public QueryMetadata
 {
 public:
     SearchMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
     SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+
+    /// @cond
     SearchMetadata(SearchMetadata const& other);
     SearchMetadata(SearchMetadata&&);
     ~SearchMetadata();
 
     SearchMetadata& operator=(SearchMetadata const &other);
     SearchMetadata& operator=(SearchMetadata&&);
+    /// @endcond
 
     void set_cardinality(int cardinality);
     int cardinality() const;

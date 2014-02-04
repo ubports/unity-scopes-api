@@ -43,19 +43,24 @@ public:
     GeoCoordinate();
     GeoCoordinate(double lat, double lon);
     GeoCoordinate(double lat, double lon, double alt);
+
+    /// @cond
     ~GeoCoordinate();
 
     GeoCoordinate(GeoCoordinate const& other);
     GeoCoordinate(GeoCoordinate&&);
     GeoCoordinate& operator=(GeoCoordinate const& other);
     GeoCoordinate& operator=(GeoCoordinate&&);
+    /// @endcond
 
     double latitude() const;
     double longitude() const;
     double altitude() const;
     bool has_altitude() const;
 
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 private:
     GeoCoordinate(internal::GeoCoordinateImpl* impl);
