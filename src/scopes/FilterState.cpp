@@ -18,6 +18,7 @@
 
 #include <unity/scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 
 namespace unity
 {
@@ -25,16 +26,46 @@ namespace unity
 namespace scopes
 {
 
-void FilterState::store(FilterBase const& /* filter */, Variant const& /* value */)
+FilterState::FilterState()
+    : p(new internal::FilterStateImpl())
 {
-    // TODO
-    throw LogicException("Not implemented");
 }
 
-Variant FilterState::get(FilterBase const& /* filter */) const
+FilterState::FilterState(FilterState const& other)
+    : p(new internal::FilterStateImpl(*(other.p)))
 {
-    // TODO
-    throw LogicException("Not implemented");
+}
+
+FilterState::FilterState(internal::FilterStateImpl *pimpl)
+    : p(pimpl)
+{
+}
+
+FilterState::FilterState(FilterState &&) = default;
+FilterState& FilterState::operator=(FilterState &&) = default;
+
+FilterState& FilterState::operator=(FilterState const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::FilterStateImpl(*(other.p)));
+    }
+    return *this;
+}
+
+VariantMap FilterState::serialize() const
+{
+    return p->serialize();
+}
+
+bool FilterState::has_filter(std::string const& id) const
+{
+    return p->has_filter(id);
+}
+
+void FilterState::remove(std::string const& id)
+{
+    p->remove(id);
 }
 
 } // namespace scopes

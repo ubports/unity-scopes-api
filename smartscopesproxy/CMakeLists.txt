@@ -1,0 +1,10 @@
+configure_file(SSRegistry.ini.in ${CMAKE_CURRENT_BINARY_DIR}/SSRegistry.ini)
+configure_file(Runtime.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini)
+configure_file(Zmq.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini)
+
+add_definitions(-DSS_RUNTIME_PATH="${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini")
+
+set(SRC smartscopesproxy.cpp)
+
+add_executable(smartscopesproxy ${SRC})
+target_link_libraries(smartscopesproxy ${UNITY_SCOPES_LIB} ${OTHER_LIBS})

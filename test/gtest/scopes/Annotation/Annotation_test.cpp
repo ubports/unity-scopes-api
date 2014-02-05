@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/Query.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
@@ -171,7 +172,7 @@ TEST(Annotation, serialize)
         EXPECT_EQ(1, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
-        Query qout(linkvm["query"].get_dict());
+        Query qout = internal::QueryImpl::create(linkvm["query"].get_dict());
         EXPECT_EQ("scope-A", qout.scope_name());
         EXPECT_EQ("foo", qout.query_string());
         EXPECT_EQ("dep1", qout.department_id());

@@ -25,6 +25,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/Query.h>
 
 using namespace std;
 
@@ -72,14 +73,15 @@ ZmqScope::~ZmqScope()
 {
 }
 
-QueryCtrlProxy ZmqScope::create_query(std::string const& q, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::create_query(Query const& query, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
     {
         auto request = make_request_(request_builder, "create_query");
         auto in_params = request.initInParams().getAs<capnproto::Scope::CreateQueryRequest>();
-        in_params.setQuery(q.c_str());
+        auto q = in_params.initQuery();
+        to_value_dict(query.serialize(), q);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
         auto p = in_params.initReplyProxy();

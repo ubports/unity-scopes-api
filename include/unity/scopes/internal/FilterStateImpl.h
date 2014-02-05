@@ -16,12 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
-#define UNITY_INTERNAL_PREVIEWWIDGETDEFINITIONBUILDER_H
+#ifndef UNITY_INTERNAL_FILTERSTATEIMPL_H
+#define UNITY_INTERNAL_FILTERSTATEIMPL_H
 
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterState.h>
 #include <string>
-#include <tuple>
 
 namespace unity
 {
@@ -32,18 +32,23 @@ namespace scopes
 namespace internal
 {
 
-class VariantMapBuilderImpl final
+class FilterStateImpl final
 {
 public:
-    VariantMapBuilderImpl() = default;
-    ~VariantMapBuilderImpl() = default;
-    void add_attribute(std::string const& key, Variant const& value);
-    void add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple);
-    void add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple);
-    VariantMap variant_map() const;
+    FilterStateImpl() = default;
+    FilterStateImpl(VariantMap const& var);
+    ~FilterStateImpl() = default;
+    FilterStateImpl(FilterStateImpl const& other) = default;
+
+    bool has_filter(std::string const& id) const;
+    void remove(std::string const& id);
+    Variant get(std::string const& filter_id) const;
+    VariantMap& get();
+    VariantMap serialize() const;
+    static FilterState deserialize(VariantMap const& var);
 
 private:
-    VariantMap variant_;
+    VariantMap state_;
 };
 
 } // namespace internal

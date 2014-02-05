@@ -26,17 +26,17 @@ def response(environ, start_response):
     response_headers = [('Content-Type', 'application/json')]
     start_response(status, response_headers)
 
-    if environ['PATH_INFO'] == '/smartscopes/v2/remote-scopes':
+    if environ['PATH_INFO'] == '/remote-scopes':
         return [remote_scopes_response]
 
-    if environ['PATH_INFO'] == '/smartscopes/v2/search/demo' and environ['QUERY_STRING'] != '':
+    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
     return ''
 
 remote_scopes_response = '\
-[{"search_url": "https://productsearch.ubuntu.com/smartscopes/v2/search/demo", "name": "Dummy Demo Scope" },\
-{"search_url": "https://productsearch.ubuntu.com/smartscopes/v2/search/demo2", "name": "Dummy Demo Scope 2", "invisible": true }]'
+[{"base_url": "http://127.0.0.1/demo", "name": "Dummy Demo Scope", "description": "Dummy demo scope." },\
+{"base_url": "http://127.0.0.1/demo2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "invisible": true }]'
 
 search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\

@@ -14,10 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ */
 
-#include <unity/scopes/VariantMapBuilder.h>
-#include <unity/scopes/internal/VariantMapBuilderImpl.h>
+#ifndef UNITY_INTERNAL_FILTEROPTIONIMPL_H
+#define UNITY_INTERNAL_FILTEROPTIONIMPL_H
+
+#include <unity/SymbolExport.h>
+#include <string>
 
 namespace unity
 {
@@ -25,33 +28,25 @@ namespace unity
 namespace scopes
 {
 
-VariantMapBuilder::VariantMapBuilder()
-    : p(new internal::VariantMapBuilderImpl())
+namespace internal
 {
-}
 
-VariantMapBuilder::~VariantMapBuilder() = default;
-
-void VariantMapBuilder::add_attribute(std::string const& key, Variant const& value)
+class UNITY_API FilterOptionImpl
 {
-    p->add_attribute(key, value);
-}
+public:
+    FilterOptionImpl(std::string const& id, std::string const& label);
+    std::string id() const;
+    std::string label() const;
 
-void VariantMapBuilder::add_tuple(std::string const& array_key, std::initializer_list<std::pair<std::string, Variant>> const& tuple)
-{
-    p->add_tuple(array_key, tuple);
-}
+private:
+    std::string id_;
+    std::string label_;
+};
 
-void VariantMapBuilder::add_tuple(std::string const& array_key, std::vector<std::pair<std::string, Variant>> const& tuple)
-{
-    p->add_tuple(array_key, tuple);
-}
-
-VariantMap VariantMapBuilder::variant_map() const
-{
-    return p->variant_map();
-}
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

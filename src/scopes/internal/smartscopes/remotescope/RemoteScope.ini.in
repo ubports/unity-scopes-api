@@ -1,7 +1,0 @@
-[ScopeConfig]
-DisplayName = RemoteScope.DisplayName
-Description = RemoteScope.Description
-Art = RemoteScope.Art
-Icon = RemoteScope.Icon
-SearchHint = RemoteScope.SearchHint
-HotKey = RemoteScope.HotKey

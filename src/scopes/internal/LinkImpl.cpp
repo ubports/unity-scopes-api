@@ -16,6 +16,7 @@
  */
 
 #include <unity/scopes/internal/LinkImpl.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -48,7 +49,7 @@ LinkImpl::LinkImpl(VariantMap const& variant_map)
         throw InvalidArgumentException("Invalid variant, 'query' is missing");
     }
 
-    query_.reset(new Query(it->second.get_dict()));
+    query_.reset(new Query(internal::QueryImpl::create(it->second.get_dict())));
 }
 
 std::string LinkImpl::label() const

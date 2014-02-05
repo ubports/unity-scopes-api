@@ -10,14 +10,18 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/VariantMapBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp

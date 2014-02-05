@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/internal/ReplyImpl.h>
-
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
@@ -32,6 +31,8 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/ColumnLayoutImpl.h>
 
 #include <sstream>
 #include <cassert>
@@ -52,7 +53,8 @@ ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBa
     ObjectProxyImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
-    finished_(false)
+    finished_(false),
+    layouts_push_disallowed_(false)
 {
     assert(mw_proxy);
     assert(qo);
@@ -128,8 +130,51 @@ bool ReplyImpl::push(unity::scopes::Annotation const& annotation)
     return push(var);
 }
 
+bool ReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
+{
+    VariantMap var;
+    VariantArray filters_var;
+
+    for (auto const& f: filters)
+    {
+        filters_var.push_back(Variant(f->serialize()));
+    }
+    var["filters"] = filters_var;
+    var["filter_state"] = filter_state.serialize();
+    return push(var);
+}
+
+bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
+{
+    if (layouts_push_disallowed_)
+    {
+        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
+    }
+
+    // basic check for consistency of layouts
+    try
+    {
+        ColumnLayoutImpl::validate_layouts(layouts);
+    }
+    catch (unity::LogicException const &e)
+    {
+        throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
+    }
+
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& layout: layouts)
+    {
+        arr.push_back(Variant(layout.serialize()));
+    }
+    vm["columns"] = arr;
+    return layouts_push_disallowed_ = push(vm);
+}
+
 bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
 {
+    layouts_push_disallowed_ = true;
+
     VariantMap vm;
     VariantArray arr;
     for (auto const& widget : widgets)

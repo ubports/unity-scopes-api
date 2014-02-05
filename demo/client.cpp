@@ -31,6 +31,31 @@
 using namespace std;
 using namespace unity::scopes;
 
+// conver filter to a string
+std::string to_string(FilterBase const& filter)
+{
+    std::ostringstream str;
+    auto const ftype = filter.filter_type();
+    cout << "filter id=" << filter.id() << endl;
+    if (ftype == "option_selector")
+    {
+        auto const& selfilter = dynamic_cast<OptionSelectorFilter const&>(filter);
+        str << "OptionSelectorFilter" << endl;
+        str << " label: " << selfilter.label() << endl;
+        str << " multi-select: " << selfilter.multi_select() << endl;
+        str << " options:" << endl;
+        for (auto op: selfilter.options())
+        {
+            str << "    id: " << op->id() << ", label: " << op->label() << endl;
+        }
+    }
+    else
+    {
+        str << "Unknown filter type: " << ftype;
+    }
+    return str.str();
+}
+
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
@@ -120,6 +145,15 @@ public:
         }
     }
 
+    void push(Filters const& filters, FilterState const& /* filter_state */) override
+    {
+        cout << "received " << filters.size() << " filters" << endl;
+        for (auto f: filters)
+        {
+            cout << to_string(*f) << endl;
+        }
+    }
+
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         cout << "query complete, status: " << to_string(reason);
@@ -193,6 +227,25 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    void push(ColumnLayoutList const& columns) override
+    {
+        cout << "\tGot column layouts:" << endl;
+        for (auto const& col: columns)
+        {
+            cout << "\t\tLayout for " << col.size() << " column(s):" << endl;
+            for (int i = 0; i<col.size(); i++)
+            {
+                cout << "\t\t\tColumn #" << i << ": ";
+                for (auto const& w: col.column(i))
+                {
+                    cout << w << ", ";
+                }
+                cout << endl;
+            }
+
+        }
+    }
+
     void push(PreviewWidgetList const& widgets) override
     {
         cout << "\tGot preview widgets:" << endl;
@@ -254,7 +307,7 @@ int main(int argc, char* argv[])
         print_usage();
     }
 
-    string scope_name = string("scope-") + argv[1];
+    string scope_name = argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
@@ -287,7 +340,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create("Runtime.ini");
+        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
         auto meta = r->get_metadata(scope_name);
