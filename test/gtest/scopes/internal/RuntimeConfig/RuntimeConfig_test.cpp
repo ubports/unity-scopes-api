@@ -17,7 +17,8 @@
  */
 
 #include <unity/scopes/internal/RuntimeConfig.h>
-#include <unity/scopes/DfltConfig.h>
+
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
