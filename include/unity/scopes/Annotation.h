@@ -90,9 +90,9 @@ public:
     void add_link(std::string const& label, Query const& query);
 
     /**
-     * \brief Assigns this annotation to a category. Depending on the Type set, it
-     * get be displayed among results of that category (for Type::Card) or
-     * below it (for remaing annotation types).
+     * \brief Assigns this annotation to a category. This is required and makes sense for
+     * annotations of Type::Card. Such annotation will be appended to the search results of
+     * that category.
      */
     void set_category(Category::SCPtr category);
 

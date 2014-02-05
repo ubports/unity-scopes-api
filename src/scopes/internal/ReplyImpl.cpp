@@ -123,7 +123,7 @@ bool ReplyImpl::push(Category::SCPtr category)
     return push(var);
 }
 
-bool ReplyImpl::push(unity::scopes::Annotation const& annotation)
+bool ReplyImpl::register_annotation(unity::scopes::Annotation const& annotation)
 {
     VariantMap var;
     var["annotation"] = annotation.serialize();

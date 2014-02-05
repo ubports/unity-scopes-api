@@ -71,7 +71,7 @@ public:
     */
     bool push(CategorisedResult const& result) const;
 
-    bool push(Annotation const& annotation) const;
+    bool register_annotation(Annotation const& annotation) const;
 
     /**
     \brief Sends all filters and their state to the source of a query.

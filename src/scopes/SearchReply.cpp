@@ -59,9 +59,9 @@ bool SearchReply::push(CategorisedResult const& result) const
     return fwd()->push(result);
 }
 
-bool SearchReply::push(Annotation const& annotation) const
+bool SearchReply::register_annotation(Annotation const& annotation) const
 {
-    return fwd()->push(annotation);
+    return fwd()->register_annotation(annotation);
 }
 
 bool SearchReply::push(Filters const& filters, FilterState const& filter_state) const

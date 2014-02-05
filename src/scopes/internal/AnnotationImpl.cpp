@@ -129,11 +129,19 @@ void AnnotationImpl::add_link(std::string const& label, Query const& query)
 
 void AnnotationImpl::set_category(Category::SCPtr category)
 {
+    if (annotation_type_ != Annotation::Type::Card)
+    {
+        throw InvalidArgumentException("Annotation::set_category(): only Card annotations can be added to a category");
+    }
     category_ = category;
 }
 
 Category::SCPtr AnnotationImpl::category() const
 {
+    if (annotation_type_ != Annotation::Type::Card)
+    {
+        throw InvalidArgumentException("Annotation::category(): only Card annotations can be belong to a category");
+    }
     return category_;
 }
 
