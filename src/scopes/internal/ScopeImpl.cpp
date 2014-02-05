@@ -81,7 +81,7 @@ QueryCtrlProxy ScopeImpl::create_query(string const& query_string, VariantMap co
 QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
-    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -110,7 +110,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
 QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
-    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -144,7 +144,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
@@ -174,7 +174,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
 QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
-    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
+    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
     try
     {
         // Create a middleware server-side object that can receive incoming

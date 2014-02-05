@@ -32,12 +32,14 @@ namespace internal
 {
 
 ResultImpl::ResultImpl()
-    : flags_(Flags::ActivationNotHandled)
+    : flags_(Flags::ActivationNotHandled),
+      runtime_(nullptr)
 {
 }
 
 ResultImpl::ResultImpl(VariantMap const& variant_map)
-    : flags_(Flags::ActivationNotHandled)
+    : flags_(Flags::ActivationNotHandled),
+      runtime_(nullptr)
 {
     deserialize(variant_map);
 }
@@ -45,7 +47,8 @@ ResultImpl::ResultImpl(VariantMap const& variant_map)
 ResultImpl::ResultImpl(ResultImpl const& other)
     : attrs_(other.attrs_),
       origin_(other.origin_),
-      flags_(other.flags_)
+      flags_(other.flags_),
+      runtime_(other.runtime_)
 {
     if (other.stored_result_)
     {
@@ -60,6 +63,7 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
         attrs_ = other.attrs_;
         flags_ = other.flags_;
         origin_ = other.origin_;
+        runtime_ = other.runtime_;
         if (other.stored_result_)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
@@ -93,6 +97,12 @@ Result ResultImpl::retrieve() const
         throw InvalidArgumentException("Result: no result has been stored");
     }
     return Result(*stored_result_);
+}
+
+void ResultImpl::set_runtime(RuntimeImpl const* runtime)
+{
+    assert(runtime);
+    runtime_ = runtime;
 }
 
 void ResultImpl::set_origin(std::string const& scope_name)
@@ -186,7 +196,7 @@ bool ResultImpl::direct_activation() const
                 [](VariantMap const&) {}); // do nothing if doesn't match
 }
 
-std::string ResultImpl::activation_scope_name() const
+ScopeProxy ResultImpl::activation_scope() const
 {
     std::string target;
     if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
@@ -225,11 +235,13 @@ std::string ResultImpl::activation_scope_name() const
                     });
     }
 
-    if (target.empty())
+    // runtime can be null if this instance wasn't passed through middleware, in which case activation scope cannot be determined yet
+    if (target.empty() || runtime_ == nullptr)
     {
-        throw LogicException("Result::activation_scope_name(): undefined target scope");
+        throw LogicException("Result::activation_scope(): undefined target scope");
     }
-    return target;
+
+    return std::dynamic_pointer_cast<Scope>(runtime_->string_to_proxy(target));
 }
 
 VariantMap ResultImpl::activation_target() const

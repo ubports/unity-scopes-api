@@ -23,6 +23,8 @@
 #include <memory>
 #include <functional>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 
 namespace unity
 {
@@ -55,6 +57,7 @@ public:
     void store(Result const& other, bool intercept_activation);
     bool has_stored_result() const;
     Result retrieve() const;
+    void set_runtime(RuntimeImpl const* runtime);
     void set_origin(std::string const& scope_name);
 
     void set_uri(std::string const& uri);
@@ -64,7 +67,7 @@ public:
     void set_intercept_activation();
     bool direct_activation() const;
     int flags() const;
-    std::string activation_scope_name() const;
+    ScopeProxy activation_scope() const;
     VariantMap activation_target() const;
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;
@@ -103,6 +106,7 @@ private:
     std::shared_ptr<VariantMap> stored_result_;
     std::string origin_;
     int flags_;
+    RuntimeImpl const* runtime_;
 };
 
 } // namespace internal
