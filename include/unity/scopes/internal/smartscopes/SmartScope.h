@@ -92,6 +92,13 @@ public:
             res.set_title(result.title);
             res.set_art(result.art);
             res.set_dnd_uri(result.dnd_uri);
+
+            auto other_params = result.other_params;
+            for (auto& param : other_params)
+            {
+                res[param.first] = param.second->to_variant();
+            }
+
             reply->push(res);
         }
 

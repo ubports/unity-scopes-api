@@ -254,12 +254,27 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("category");
                 auto category = std::make_shared<SearchCategory>();
 
-                category->icon = child_node->has_node("icon") ? child_node->get_node("icon")->as_string() : "";
-                category->id = child_node->has_node("id") ? child_node->get_node("id")->as_string() : "";
-                category->renderer_template = child_node->has_node("renderer_template") ?
-                                                  child_node->get_node("renderer_template")->as_string() :
-                                                  "";
-                category->title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
+                std::vector<std::string> members = child_node->member_names();
+                for (auto& member : members)
+                {
+                    if (member == "icon")
+                    {
+                        category->icon = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "id")
+                    {
+                        category->id = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "render_template")
+                    {
+                        category->renderer_template = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "title")
+                    {
+                        category->title = child_node->get_node(member)->as_string();
+                    }
+                }
+
                 categories[category->id] = category;
             }
             else if (root_node->has_node("result"))
@@ -267,15 +282,35 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                 child_node = root_node->get_node("result");
                 SearchResult result;
 
-                result.art = child_node->has_node("art") ? child_node->get_node("art")->as_string() : "";
-                result.dnd_uri = child_node->has_node("dnd_uri") ? child_node->get_node("dnd_uri")->as_string() : "";
-                result.title = child_node->has_node("title") ? child_node->get_node("title")->as_string() : "";
-                result.uri = child_node->has_node("uri") ? child_node->get_node("uri")->as_string() : "";
-
-                std::string category =
-                    child_node->has_node("cat_id") ? child_node->get_node("cat_id")->as_string() : "";
-
-                result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
+                std::vector<std::string> members = child_node->member_names();
+                for (auto& member : members)
+                {
+                    if (member == "art")
+                    {
+                        result.art = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "dnd_uri")
+                    {
+                        result.dnd_uri = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "title")
+                    {
+                        result.title = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "uri")
+                    {
+                        result.uri = child_node->get_node(member)->as_string();
+                    }
+                    else if (member == "cat_id")
+                    {
+                        std::string category = child_node->get_node(member)->as_string();
+                        result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
+                    }
+                    else
+                    {
+                        result.other_params[member] = child_node;
+                    }
+                }
 
                 results.push_back(result);
             }
