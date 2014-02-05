@@ -530,13 +530,16 @@ TEST(Activation, scope)
     EXPECT_FALSE(result->direct_activation());
     EXPECT_EQ("uri", result->uri());
     EXPECT_EQ("dnd_uri", result->dnd_uri());
-    EXPECT_TRUE(result->target_scope_proxy()->to_string().find("TestScope") != std::string::npos);
+
+    auto target = result->target_scope_proxy();
+    EXPECT_TRUE(target != nullptr);
+    EXPECT_TRUE(target->to_string().find("TestScope") != std::string::npos);
 
     // activate result
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = scope->activate(*result, hints, act_receiver);
+        ctrl = target->activate(*result, hints, act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
@@ -551,7 +554,7 @@ TEST(Activation, scope)
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = scope->activate_preview_action(*result, hints, "action1", act_receiver);
+        ctrl = target->activate_preview_action(*result, hints, "action1", act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
