@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <signal.h>
+#include <libgen.h>
 #include <iostream>
 #include <unistd.h>
 
@@ -40,6 +41,13 @@ static void error(std::string const& msg)
 
 int main(int argc, char* argv[])
 {
+    if (argc > 1 && (std::string("-h") == argv[1] || std::string("--help") == argv[1]))
+    {
+        char const* prog_name = basename(argv[0]);
+        std::cout << "usage: " << prog_name << " [sss_url] [runtime.ini]" << std::endl;
+        return 0;
+    }
+
     int exit_status = 1;
 
     bool sig_upstart = false;
