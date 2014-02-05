@@ -43,11 +43,6 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
-    if (!registry)
-    {
-        throw InvalidArgumentException("Cannot load scope " + name + ": null registry proxy");
-    }
-
     // Look for the scope create function in the plug-in and call it.
     // instance. If anything goes wrong below, scope_base_ takes care of destroying it again.
     CreateFunction create_func = reinterpret_cast<CreateFunction>(

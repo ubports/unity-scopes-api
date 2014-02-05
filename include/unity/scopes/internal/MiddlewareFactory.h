@@ -56,6 +56,9 @@ public:
     // Find the middleware with the given name and kind. Returns nullptr if that middleware doesn't exist.
     MiddlewareBase::SPtr find(std::string const& server_name, std::string const& kind) const;
 
+    // Find any middleware that understands the scheme of the stringified proxy.
+    MiddlewareBase::SPtr find(std::string const& proxy_string) const;
+
 private:
     MiddlewareBase::SPtr find_unlocked(std::string const& server_name, std::string const& kind) const;
 
