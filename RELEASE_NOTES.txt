@@ -1,6 +1,13 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.3.1
+========================
+- Annotation API changes: annotations of 'Card' type were removed and Annotation
+  doesn't support category attribute anymore. SearchReply::push() method for
+  annotations was renamed to register_annotation(). Annotations are now going to
+  be displayed in the order they were registered by scopes.
+
 Changes in version 0.3.0
 ========================
 - Preliminary API for filters has been added via OptionSelectorFilter and
