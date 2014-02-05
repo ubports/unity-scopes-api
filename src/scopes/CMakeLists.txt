@@ -14,7 +14,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/GeoCoordinate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp

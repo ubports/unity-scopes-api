@@ -17,7 +17,6 @@
 */
 
 #include <unity/scopes/internal/QueryMetadataImpl.h>
-#include <unity/scopes/internal/GeoCoordinateImpl.h>
 #include <unity/scopes/internal/Utils.h>
 
 namespace unity
@@ -29,10 +28,9 @@ namespace scopes
 namespace internal
 {
 
-QueryMetadataImpl::QueryMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
+QueryMetadataImpl::QueryMetadataImpl(std::string const& locale, std::string const& form_factor)
     : locale_(locale),
-      form_factor_(form_factor),
-      location_(location)
+      form_factor_(form_factor)
 {
 }
 
@@ -43,8 +41,6 @@ QueryMetadataImpl::QueryMetadataImpl(VariantMap const& var)
     locale_ = it->second.get_string();
     it = find_or_throw(context, var, "form_factor");
     form_factor_ = it->second.get_string();
-    it = find_or_throw(context, var, "location");
-    location_ = internal::GeoCoordinateImpl::create(it->second.get_dict());
 }
 
 std::string QueryMetadataImpl::locale() const
@@ -57,17 +53,11 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
-GeoCoordinate QueryMetadataImpl::location() const
-{
-    return location_;
-}
-
 void QueryMetadataImpl::serialize(VariantMap &var) const
 {
     var["type"] = metadata_type();
     var["locale"] = locale_;
     var["form_factor"] = form_factor_;
-    var["location"] = Variant(location_.serialize());
 }
 
 VariantMap QueryMetadataImpl::serialize() const

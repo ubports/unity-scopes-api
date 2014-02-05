@@ -16,7 +16,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayoutImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/GeoCoordinateImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp

@@ -26,32 +26,21 @@ using namespace unity::scopes;
 TEST(SearchMetadata, basic)
 {
     {
-        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
-        SearchMetadata meta("pl", "phone", coord);
+        SearchMetadata meta("pl", "phone");
 
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
-        EXPECT_TRUE(abs(meta.location().latitude() - 10.0f) <= 0.0000001f);
-        EXPECT_TRUE(abs(meta.location().longitude() - 20.0f) <= 0.0000001f);
-        EXPECT_TRUE(meta.location().has_altitude());
-        EXPECT_TRUE(abs(meta.location().altitude() - 100.f) <= 0.0000001f);
     }
     {
-        GeoCoordinate coord(10.0f, 20.0f);
-        SearchMetadata meta(50, "pl", "phone", coord);
+        SearchMetadata meta(50, "pl", "phone");
 
         EXPECT_EQ(50, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
-        EXPECT_TRUE(abs(meta.location().latitude() - 10.0f) <= 0.0000001f);
-        EXPECT_TRUE(abs(meta.location().longitude() - 20.0f) <= 0.0000001f);
-        EXPECT_FALSE(meta.location().has_altitude());
-        EXPECT_TRUE(abs(meta.location().altitude()) <= 0.0000001f);
     }
     {
-        GeoCoordinate coord(10.0f, 20.0f);
-        SearchMetadata meta(50, "pl", "phone", coord);
+        SearchMetadata meta(50, "pl", "phone");
 
         meta.set_cardinality(100);
         EXPECT_EQ(100, meta.cardinality());
@@ -61,25 +50,19 @@ TEST(SearchMetadata, basic)
 TEST(SearchMetadata, serialize)
 {
     {
-        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
-        SearchMetadata meta("pl", "phone", coord);
+        SearchMetadata meta("pl", "phone");
 
         auto var = meta.serialize();
         EXPECT_EQ("search_metadata", var["type"].get_string());
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
-        EXPECT_EQ(true, var["location"].get_dict()["has_alt"].get_bool());
-        EXPECT_TRUE(abs(var["location"].get_dict()["lat"].get_double() - 10.0f) <= 0.000001f);
-        EXPECT_TRUE(abs(var["location"].get_dict()["lon"].get_double() - 20.0f) <= 0.000001f);
-        EXPECT_TRUE(abs(var["location"].get_dict()["alt"].get_double() - 100.0f) <= 0.000001f);
     }
 }
 
 TEST(SearchMetadata, copy)
 {
     {
-        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
-        SearchMetadata meta(100, "pl", "phone", coord);
+        SearchMetadata meta(100, "pl", "phone");
         auto meta2 = meta;
 
         meta.set_cardinality(0);
@@ -87,8 +70,7 @@ TEST(SearchMetadata, copy)
         EXPECT_EQ(100, meta2.cardinality());
     }
     {
-        GeoCoordinate coord(10.0f, 20.0f, 100.0f);
-        SearchMetadata meta(100, "pl", "phone", coord);
+        SearchMetadata meta(100, "pl", "phone");
         SearchMetadata meta2(meta);
         meta.set_cardinality(0);
 

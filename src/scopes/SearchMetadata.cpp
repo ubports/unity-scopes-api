@@ -30,13 +30,13 @@ SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
 {
 }
 
-SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
-    : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor, location))
+SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor)
+    : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor))
 {
 }
 
-SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
-    : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor, location))
+SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor)
+    : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
 {
 }
 

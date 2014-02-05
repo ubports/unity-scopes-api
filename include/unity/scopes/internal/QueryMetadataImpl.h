@@ -19,7 +19,6 @@
 #ifndef UNITY_INTERNAL_QUERYMETADATAIMPL_H
 #define UNITY_INTERNAL_QUERYMETADATAIMPL_H
 
-#include <unity/scopes/GeoCoordinate.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 
@@ -35,12 +34,11 @@ namespace internal
 class QueryMetadataImpl
 {
 public:
-    QueryMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    QueryMetadataImpl(std::string const& locale, std::string const& form_factor);
     QueryMetadataImpl(VariantMap const& var);
     virtual ~QueryMetadataImpl() = default;
     std::string locale() const;
     std::string form_factor() const;
-    GeoCoordinate location() const;
     VariantMap serialize() const;
 
 protected:
@@ -50,7 +48,6 @@ protected:
 private:
     std::string locale_;
     std::string form_factor_;
-    GeoCoordinate location_;
 };
 
 } // namespace internal

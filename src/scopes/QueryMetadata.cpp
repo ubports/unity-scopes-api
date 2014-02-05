@@ -35,8 +35,8 @@ QueryMetadata::QueryMetadata(internal::QueryMetadataImpl *impl)
 {
 }
 
-QueryMetadata::QueryMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
-    : p(new internal::QueryMetadataImpl(locale, form_factor, location))
+QueryMetadata::QueryMetadata(std::string const& locale, std::string const& form_factor)
+    : p(new internal::QueryMetadataImpl(locale, form_factor))
 {
 }
 
@@ -56,11 +56,6 @@ std::string QueryMetadata::locale() const
 std::string QueryMetadata::form_factor() const
 {
     return p->form_factor();
-}
-
-GeoCoordinate QueryMetadata::location() const
-{
-    return p->location();
 }
 
 VariantMap QueryMetadata::serialize() const

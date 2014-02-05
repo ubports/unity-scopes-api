@@ -28,14 +28,14 @@ namespace scopes
 namespace internal
 {
 
-SearchMetadataImpl::SearchMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
-    : QueryMetadataImpl(locale, form_factor, location),
+SearchMetadataImpl::SearchMetadataImpl(std::string const& locale, std::string const& form_factor)
+    : QueryMetadataImpl(locale, form_factor),
       cardinality_(0)
 {
 }
 
-SearchMetadataImpl::SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location)
-    : QueryMetadataImpl(locale, form_factor, location),
+SearchMetadataImpl::SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor)
+    : QueryMetadataImpl(locale, form_factor),
       cardinality_(cardinality)
 {
 }

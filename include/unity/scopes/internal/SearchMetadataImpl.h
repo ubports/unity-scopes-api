@@ -34,8 +34,8 @@ namespace internal
 class SearchMetadataImpl : public QueryMetadataImpl
 {
 public:
-    SearchMetadataImpl(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
-    SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    SearchMetadataImpl(std::string const& locale, std::string const& form_factor);
+    SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor);
     SearchMetadataImpl(VariantMap const& var);
     ~SearchMetadataImpl() = default;
 

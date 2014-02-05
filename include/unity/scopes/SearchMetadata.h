@@ -39,8 +39,8 @@ class SearchMetadataImpl;
 class UNITY_API SearchMetadata : public QueryMetadata
 {
 public:
-    SearchMetadata(std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
-    SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor, GeoCoordinate const& location);
+    SearchMetadata(std::string const& locale, std::string const& form_factor);
+    SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor);
 
     /// @cond
     SearchMetadata(SearchMetadata const& other);
