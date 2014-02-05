@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
-#define UNITY_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#define UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
 
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
