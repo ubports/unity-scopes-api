@@ -29,7 +29,7 @@ import sys
 import capnp
 from datetime import datetime
 
-schema_base_dir = "../src/internal/zmq_middleware/capnproto/"
+schema_base_dir = "../src/scopes/internal/zmq_middleware/capnproto/"
 # location of c++.capnp
 import_dirs = ["/usr/include", "/usr/local/include"]
 
