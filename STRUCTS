@@ -81,7 +81,6 @@ Annotation (returned by serialize())
  'type'       : string
  'label'      : string, optional
  'icon'       : string, optional
- 'cat_id'     : string, optional
  'links'      : array of Links
 
 FilterState (returned by serialize())
