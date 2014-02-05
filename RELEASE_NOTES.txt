@@ -1,6 +1,13 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.3.1
+========================
+- Result::activation_scope_name() method was renamed to activation_scope() and
+  it now returns ScopeProxy instead of a string. Client code can now use that
+  proxy for result activation or preview calls, instead of having to do an extra
+  registry lookup.
+
 Changes in version 0.3.0
 ========================
 - Preliminary API for filters has been added via OptionSelectorFilter and
