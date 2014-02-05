@@ -21,7 +21,7 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
-#include <unity/scopes/DfltConfig.h>
+#include <unity/scopes/internal/DfltConfig.h>
 
 #include <cassert>
 #include <iostream>
