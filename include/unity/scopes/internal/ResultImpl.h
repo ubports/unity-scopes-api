@@ -67,7 +67,7 @@ public:
     void set_intercept_activation();
     bool direct_activation() const;
     int flags() const;
-    ScopeProxy activation_scope() const;
+    ScopeProxy target_scope_proxy() const;
     VariantMap activation_target() const;
     Variant& operator[](std::string const& key);
     Variant const& operator[](std::string const& key) const;

@@ -128,7 +128,7 @@ TEST(Activation, exceptions)
         result.set_intercept_activation();
 
         EXPECT_FALSE(result.direct_activation());
-        EXPECT_THROW(result.activation_scope(), unity::LogicException);
+        EXPECT_THROW(result.target_scope_proxy(), unity::LogicException);
     }
 }
 
@@ -194,7 +194,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_TRUE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("ipc:///tmp/scope-foo#scope-foo!c=Scope") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("ipc:///tmp/scope-foo#scope-foo!c=Scope") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -213,7 +213,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_TRUE(agg_received_result->direct_activation());
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
 
@@ -246,7 +246,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_TRUE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -271,7 +271,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
         EXPECT_TRUE(agg_received_result->has_stored_result());
         EXPECT_TRUE(agg_received_result->direct_activation());
         // activation_scope_name points to the leaf scope
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
 
@@ -305,7 +305,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_FALSE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -325,7 +325,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
         // activation_scope_name unchanged since aggregator doesn't intercept activation
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
 
@@ -359,7 +359,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_FALSE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -380,7 +380,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
         // activation_scope_name changed since aggregator intercepts activation
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-bar") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-bar") != std::string::npos);
     }
 }
 
@@ -414,7 +414,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_FALSE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -439,7 +439,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
         EXPECT_TRUE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
         // activation_scope_name unchanged since aggregator doesn't intercept activation
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
 
@@ -473,7 +473,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_FALSE(received_result->direct_activation());
-        EXPECT_TRUE(received_result->activation_scope()->to_string().find("scope-foo") != std::string::npos);
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
 
         // simulate aggregator scope
         std::shared_ptr<CategorisedResult> agg_received_result;
@@ -499,7 +499,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
         EXPECT_TRUE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
         // scope changed to agg scope because it intercepts activation
-        EXPECT_TRUE(agg_received_result->activation_scope()->to_string().find("scope-bar") != std::string::npos);
+        EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-bar") != std::string::npos);
     }
 }
 
@@ -530,7 +530,7 @@ TEST(Activation, scope)
     EXPECT_FALSE(result->direct_activation());
     EXPECT_EQ("uri", result->uri());
     EXPECT_EQ("dnd_uri", result->dnd_uri());
-    EXPECT_TRUE(result->activation_scope()->to_string().find("TestScope") != std::string::npos);
+    EXPECT_TRUE(result->target_scope_proxy()->to_string().find("TestScope") != std::string::npos);
 
     // activate result
     {

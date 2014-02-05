@@ -110,9 +110,9 @@ bool Result::direct_activation() const
     return p->direct_activation();
 }
 
-ScopeProxy Result::activation_scope() const
+ScopeProxy Result::target_scope_proxy() const
 {
-    return p->activation_scope();
+    return p->target_scope_proxy();
 }
 
 Variant& Result::operator[](std::string const& key)

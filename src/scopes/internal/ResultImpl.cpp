@@ -196,7 +196,7 @@ bool ResultImpl::direct_activation() const
                 [](VariantMap const&) {}); // do nothing if doesn't match
 }
 
-ScopeProxy ResultImpl::activation_scope() const
+ScopeProxy ResultImpl::target_scope_proxy() const
 {
     std::string target;
     if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
@@ -215,9 +215,9 @@ ScopeProxy ResultImpl::activation_scope() const
                 {
                     return it->second.get_string();
                 }
-                throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
+                throw unity::LogicException("Result::target_scope_proxy(): 'origin' element missing");
             }
-            throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
+            throw unity::LogicException("Result::target_scope_proxy(): 'internal' element missing");
         };
 
         // visit stored results recursively,
@@ -226,7 +226,7 @@ ScopeProxy ResultImpl::activation_scope() const
         find_stored_result(
                     [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
                     [&target, &get_origin](VariantMap const& var) {                        // if found
-                        // target becomes the actual return value from activation_scope_name(), since find_stored_result stops at this point.
+                        // target becomes the actual return value from target_scope_proxy(), since find_stored_result stops at this point.
                         target = get_origin(var);
                     },
                     [&target, &get_origin](VariantMap const& var) {                    // if not found
@@ -238,7 +238,7 @@ ScopeProxy ResultImpl::activation_scope() const
     // runtime can be null if this instance wasn't passed through middleware, in which case activation scope cannot be determined yet
     if (target.empty() || runtime_ == nullptr)
     {
-        throw LogicException("Result::activation_scope(): undefined target scope");
+        throw LogicException("Result::target_scope_proxy(): undefined target scope");
     }
 
     return std::dynamic_pointer_cast<Scope>(runtime_->string_to_proxy(target));

@@ -97,7 +97,7 @@ public:
      Note that activation request should only be sent to a scope returned by this method if direct_activation() is false.
      \return scope proxy
      */
-    ScopeProxy activation_scope() const;
+    ScopeProxy target_scope_proxy() const;
 
     /**
        \brief Returns reference of a Result attribute.

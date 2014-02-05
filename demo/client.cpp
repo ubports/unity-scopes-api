@@ -407,7 +407,7 @@ int main(int argc, char* argv[])
                 cout << "\tdirect activation: " << direct_activation << endl;
                 if (!direct_activation)
                 {
-                    auto target_scope = result->activation_scope();
+                    auto target_scope = result->target_scope_proxy();
                     cout << "\tactivation scope: " << target_scope->to_string() << endl;
                     target_scope->activate(*result, vm, act_reply);
                     act_reply->wait_until_finished();
@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
             {
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
-                auto target_scope = result->activation_scope();
+                auto target_scope = result->target_scope_proxy();
                 cout << "\tactivation scope name: " << target_scope->to_string() << endl;
                 target_scope->preview(*result, vm, preview_reply);
                 preview_reply->wait_until_finished();
