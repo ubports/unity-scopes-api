@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/QueryImpl.h>
+#include <cassert>
 
 namespace unity
 {
@@ -28,8 +30,18 @@ namespace scopes
 namespace internal
 {
 
-ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status):
-    status_(status)
+ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status)
+    : status_(status)
+{
+    if (status == ActivationResponse::Status::Search)
+    {
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::Search allowed only with Query object");
+    }
+}
+
+ActivationResponseImpl::ActivationResponseImpl(Query const& query)
+    : status_(ActivationResponse::Status::Search),
+      query_(std::make_shared<Query>(query))
 {
 }
 
@@ -48,6 +60,16 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
         throw LogicException("ActivationResponseImpl(): Invalid data, missing 'status'");
     }
     status_ = static_cast<ActivationResponse::Status>(it->second.get_int());
+
+    if (status_ == ActivationResponse::Status::Search)
+    {
+        it = var.find("query");
+        if (it == var.end())
+        {
+            throw LogicException("ActivationResponseImpl(): Invalid data, missing 'query'");
+        }
+        query_ = std::make_shared<Query>(QueryImpl::create(it->second.get_dict()));
+    }
 }
 
 ActivationResponse::Status ActivationResponseImpl::status() const
@@ -65,11 +87,25 @@ VariantMap ActivationResponseImpl::hints() const
     return hints_;
 }
 
+Query ActivationResponseImpl::query() const
+{
+    if (query_)
+    {
+        assert(status_ == ActivationResponse::Status::Search);
+        return *query_;
+    }
+    throw LogicException("ActivationResponse::query(): query is only available for status of Status::Search");
+}
+
 VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
     vm["status"] = static_cast<int>(status_);
     vm["hints"] = Variant(hints_);
+    if (query_)
+    {
+        vm["query"] = query_->serialize();
+    }
     return vm;
 }
 

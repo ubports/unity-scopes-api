@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/Query.h>
 #include <memory>
 
 namespace unity
@@ -45,11 +46,26 @@ public:
         NotHandled, //<! Activation of this result wasn't handled by the scope
         ShowDash,   //<! Activation of this result was handled, show the Dash
         HideDash,   //<! Activation of this result was handled, hide the Dash
-        ShowPreview //<! Preview should be requested for this result.
+        ShowPreview,//<! Preview should be requested for this result.
+        Search      //<! Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise
     };
 
-    /// @cond
+    /**
+    \brief Creates ActivationResponse with given status.
+    Throws unity::InvalidArgumentException if status is Status::Search - to
+    create ActivationResponse of that type, use ActivationResponse(Query const&)
+    constructor.
+    \param status activation status
+    */
     ActivationResponse(Status status);
+
+    /**
+    \brief Creates ActivationResponse with activation status of Status::Search and a search query to be executed.
+    \param query search query to be execute by client
+     */
+    ActivationResponse(Query const& query);
+
+    /// @cond
     ~ActivationResponse();
     ActivationResponse(ActivationResponse const& other);
     ActivationResponse(ActivationResponse&& other);
@@ -73,6 +89,8 @@ public:
      \return hints
      */
     VariantMap hints() const;
+
+    Query query() const;
 
     /// @cond
     VariantMap serialize() const;

@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/ActivationResponse.h>
+#include <unity/scopes/Query.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 
 namespace unity
@@ -27,6 +28,11 @@ namespace scopes
 
 ActivationResponse::ActivationResponse(Status status)
     : p(new internal::ActivationResponseImpl(status))
+{
+}
+
+ActivationResponse::ActivationResponse(Query const& query)
+    : p(new internal::ActivationResponseImpl(query))
 {
 }
 
@@ -68,6 +74,11 @@ ActivationResponse::Status ActivationResponse::status() const
 VariantMap ActivationResponse::hints() const
 {
     return p->hints();
+}
+
+Query ActivationResponse::query() const
+{
+    return p->query();
 }
 
 VariantMap ActivationResponse::serialize() const
