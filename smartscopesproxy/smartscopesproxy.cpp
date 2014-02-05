@@ -24,7 +24,9 @@
 #include <unity/scopes/internal/DfltConfig.h>
 
 #include <cassert>
+#include <signal.h>
 #include <iostream>
+#include <unistd.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -40,16 +42,27 @@ int main(int argc, char* argv[])
 {
     int exit_status = 1;
 
-    // argv[1]: server_url_env
-    std::string server_url_env;
-    if (argc > 1)
-    {
-        server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
-        ::putenv(const_cast<char*>(server_url_env.c_str()));
-    }
+    bool sig_upstart = false;
+    std::string config_file;
 
-    // argv[2]: config_file
-    char const* const config_file = argc > 2 ? argv[2] : "";
+    // check for "upstart" as first arg
+    if (argc > 1 && std::string(argv[1]) == "upstart")
+    {
+        sig_upstart = true;
+    }
+    else
+    {
+        // argv[1]: server_url_env
+        std::string server_url_env;
+        if (argc > 1)
+        {
+            server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
+            ::putenv(const_cast<char*>(server_url_env.c_str()));
+        }
+
+        // argv[2]: config_file
+        config_file = argc > 2 ? argv[2] : "";
+    }
 
     try
     {
@@ -83,6 +96,12 @@ int main(int argc, char* argv[])
         // Add objects to the middlewares
         reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
         scope_mw->add_dflt_scope_object(std::move(scope));
+
+        if (sig_upstart)
+        {
+            // signal to upstart that we are ready
+            kill(getpid(), SIGSTOP);
+        }
 
         // Wait until shutdown
         scope_mw->wait_for_shutdown();
