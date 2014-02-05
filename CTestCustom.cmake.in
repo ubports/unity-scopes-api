@@ -4,6 +4,7 @@
 
 SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     cleanincludes
+    noglobalincludes
     stand-alone-unity-scopes-headers
     stand-alone-unity-scopes-internal-headers
     clean-public-unity-scopes-headers
