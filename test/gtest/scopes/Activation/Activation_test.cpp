@@ -147,7 +147,7 @@ TEST(Activation, direct_activation)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "scope-foo");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
         reply.set_disconnect_function(df);
 
         {
@@ -161,7 +161,7 @@ TEST(Activation, direct_activation)
 
         EXPECT_TRUE(received_result != nullptr);
         EXPECT_TRUE(received_result->direct_activation());
-//        EXPECT_EQ("scope-foo", received_result->activation_scope_name()); // direct activation, but name is still available
+        EXPECT_TRUE(received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos); // direct activation, but name is still available
     }
 }
 
