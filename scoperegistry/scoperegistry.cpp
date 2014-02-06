@@ -220,13 +220,30 @@ void load_remote_scopes(RegistryObject::SPtr const& registry,
 
 } // namespace
 
+// Usage: scoperegistry [runtime.ini] [scope.ini]...
+//
+// If no runtime config file is specified, the default location (/usr/share/unity-scopes-api/Runtime.ini)
+// is assumed.
+// If additional scope configuration files are specified, the corresponding scopes will be added
+// to the registry (overriding any scopes that are found via config files reached via Runtime.ini).
+
+void
+usage(ostream& s = cerr)
+{
+    s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
+}
+
 int
 main(int argc, char* argv[])
 {
     prog_name = basename(argv[0]);
+    if (argc > 1 && (string("-h") == argv[1] || string("--help") == argv[1]))
+    {
+        usage(cout);
+        exit(0);
+    }
 
     char const* const config_file = argc > 1 ? argv[1] : "";
-
     int exit_status = 1;
 
     try
@@ -265,7 +282,20 @@ main(int argc, char* argv[])
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
         // they look for another scope in the registry.
+
         auto local_scopes = find_local_scopes(scope_installdir, oem_installdir);
+
+        // Before we add the local scopes, we check whether any scopes were explicitly specified
+        // on the command line. If so, scopes on the command line override scopes in
+        // configuration files.
+        for (auto i = 2; i < argc; ++i)
+        {
+            string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
+            string scope_name = strip_suffix(file_name, ".ini");
+            local_scopes[scope_name] = argv[i];                   // operator[] overwrites pre-existing entries
+            cerr << "extra: " << argv[i] << endl;
+        }
+
         add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file);
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
@@ -286,7 +316,15 @@ main(int argc, char* argv[])
         // When the plumbing appears, remove this.
         for (auto pair : local_scopes)
         {
-            registry->locate(pair.first);
+            try
+            {
+                registry->locate(pair.first);
+            }
+            catch (NotFoundException const&)
+            {
+                // We ignore this. If the scope config couldn't be found, add_local_scopes()
+                // has already printed an error message.
+            }
         }
 
         // Wait until we are done (never, really, because the registry has no way to shut down other than

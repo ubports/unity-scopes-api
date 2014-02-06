@@ -3,12 +3,25 @@ Release Notes for unity-scopes-api
 
 Changes in version 0.3.0
 ========================
+
 - Preliminary API for filters has been added via OptionSelectorFilter and
   FilterState classes. This part of the API is not yet supported by Unity shell
   and should be considered highly experimental. 
+
 - ScopeBase::create_query() method now takes Query object instance instead of
   just a search query string. Search query string is now encapsulated in the
   Query class and can be retrieved via Query::query_string().
+
 - ScopeProxy class provides overloaded create_query methods for passing filter
   state and department id. Note: departments are not yet supported across the
   API.
+
+- The scoperegistry allows extra scopes to be added on the command line now:
+
+    $ scoperegistry some/path/Runtime.ini some/other/path/Fred.ini Joe.ini
+
+  This loads Fred and Joe scopes in addition to any scopes picked up
+  via the normal configuration. If Fred or Joe appear in configuration
+  as well as on the command line, the config file on the command line
+  takes precedence. The .so for additional scopes is expected to be
+  in the same directory as the corresponding .ini file.

@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
-#define UNITY_INTERNAL_ACTIVATIONBASEIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONBASEIMPL_H
+#define UNITY_SCOPES_INTERNAL_ACTIVATIONBASEIMPL_H
 
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/util/NonCopyable.h>
