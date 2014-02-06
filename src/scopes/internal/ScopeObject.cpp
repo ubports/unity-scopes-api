@@ -153,8 +153,10 @@ MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> QueryBase::SPtr {
-                return this->scope_base_->create_query(q, hints);
+            [&q, &hints, this]() -> QueryBase::UPtr {
+                 auto search_query = this->scope_base_->create_query(q, hints);
+                 search_query->set_metadata(hints);
+                 return search_query;
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 return make_shared<QueryObject>(query_base, reply, ctrl_proxy);

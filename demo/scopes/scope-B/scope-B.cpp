@@ -118,10 +118,9 @@ public:
             assert(0);
         }
 
-        SearchMetadata metadata("C", "desktop"); //FIXME
         SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
-        create_subquery(scope_c_, query_.query_string(), metadata, reply);
-        create_subquery(scope_d_, query_.query_string(), metadata, reply);
+        create_subquery(scope_c_, query_.query_string(), reply);
+        create_subquery(scope_d_, query_.query_string(), reply);
     }
 
 private:

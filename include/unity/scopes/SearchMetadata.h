@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/QueryMetadata.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -39,6 +40,10 @@ class SearchMetadataImpl;
 class UNITY_API SearchMetadata : public QueryMetadata
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(SearchMetadata);
+    /// @endcond
+
     SearchMetadata(std::string const& locale, std::string const& form_factor);
     SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor);
 

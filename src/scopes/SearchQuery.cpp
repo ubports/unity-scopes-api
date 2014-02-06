@@ -39,19 +39,26 @@ SearchQuery::~SearchQuery()
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             string const& query_string,
-                                            SearchMetadata const& hints,
                                             shared_ptr<SearchListener> const& reply)
 {
-    return p->create_subquery(scope, query_string, hints, reply);
+    return p->create_subquery(scope, query_string, reply);
 }
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             FilterState const& filter_state,
-                                            SearchMetadata const& hints,
                                             SearchListener::SPtr const& reply)
 {
-    return p->create_subquery(scope, query_string, filter_state, hints, reply);
+    return p->create_subquery(scope, query_string, filter_state, reply);
+}
+
+QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+                                            std::string const& query_string,
+                                            std::string const& department_id,
+                                            FilterState const& filter_state,
+                                            SearchListener::SPtr const& reply)
+{
+    return p->create_subquery(scope, query_string, department_id, filter_state, reply);
 }
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,

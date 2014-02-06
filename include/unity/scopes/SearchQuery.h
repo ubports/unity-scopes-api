@@ -61,12 +61,15 @@ public:
     // Create a sub-query.
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   SearchMetadata const& hints,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   SearchMetadata const& hints,
+                                   SearchListener::SPtr const& reply);
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
