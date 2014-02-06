@@ -100,9 +100,9 @@ public:
         return nullptr;
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints) override
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& hints) override
     {
-        return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), Variant(hints)));
+        return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints.scope_data()));
     }
 
     virtual ActivationBase::UPtr activate_preview_action(Result const& result, ActionMetadata const& hints, std::string const& action_id) override

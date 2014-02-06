@@ -59,7 +59,7 @@ public:
                                   InvokeInfo const& info) override;
 
     MWQueryCtrlProxy activate(Result const& result,
-                              VariantMap const& hints,
+                              ActionMetadata const& hints,
                               MWReplyProxy const& reply,
                               InvokeInfo const& info) override;
 

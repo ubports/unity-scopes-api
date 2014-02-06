@@ -165,7 +165,7 @@ MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
 }
 
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
-                                           VariantMap const& hints,
+                                           ActionMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {

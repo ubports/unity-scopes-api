@@ -415,8 +415,8 @@ int main(int argc, char* argv[])
                     }
                     proxy = meta.proxy();
                     cout << "\tactivation scope name: " << target_scope << endl;
-                    VariantMap vm;
-                    proxy->activate(*result, vm, act_reply);
+                    ActionMetadata const metadata("en", "desktop");
+                    proxy->activate(*result, metadata, act_reply);
                     act_reply->wait_until_finished();
                 }
             }

@@ -54,7 +54,7 @@ public:
                                           InvokeInfo const& info) = 0;
 
     virtual MWQueryCtrlProxy activate(Result const& result,
-                                      VariantMap const& hints,
+                                      ActionMetadata const& hints,
                                       MWReplyProxy const &reply,
                                       InvokeInfo const& info) = 0;
 

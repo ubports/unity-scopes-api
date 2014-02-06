@@ -52,9 +52,9 @@ QueryCtrlProxy Scope::create_query(std::string const& query_string, std::string 
     return fwd()->create_query(query_string, department_id, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
 {
-    return fwd()->activate(result, hints, reply);
+    return fwd()->activate(result, metadata, reply);
 }
 
 QueryCtrlProxy Scope::activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const

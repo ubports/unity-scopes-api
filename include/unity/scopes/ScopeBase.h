@@ -201,7 +201,7 @@ public:
     \param result The result that should be activated.
     \param hints arbitrary hints sent by the client
      */
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
     virtual ActivationBase::UPtr activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id);
 

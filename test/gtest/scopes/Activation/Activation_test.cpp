@@ -537,7 +537,9 @@ TEST(Activation, scope)
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = scope->activate(*result, hints, act_receiver);
+        ActionMetadata metadata("C", "phone");
+        metadata.set_scope_data(Variant(hints));
+        ctrl = scope->activate(*result, metadata, act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;

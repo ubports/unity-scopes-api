@@ -62,7 +62,7 @@ public:
     QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
 
-    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const;
 
     QueryCtrlProxy activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const;
 

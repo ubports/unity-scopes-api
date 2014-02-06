@@ -109,7 +109,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const&
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
@@ -118,7 +118,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate(result.p->activation_target(), hints, rp);
+        ctrl = fwd()->activate(result.p->activation_target(), metadata.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

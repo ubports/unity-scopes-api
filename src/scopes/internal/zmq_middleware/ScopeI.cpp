@@ -113,7 +113,7 @@ void ScopeI::activate_(Current const& current,
 {
     auto req = in_params.getAs<capnproto::Scope::ActivationRequest>();
     auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
-    auto hints = to_variant_map(req.getHints());
+    auto metadata = ActionMetadataImpl::create(to_variant_map(req.getHints()));
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
                                            proxy.getEndpoint().cStr(),
@@ -122,7 +122,7 @@ void ScopeI::activate_(Current const& current,
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate(result,
-                                                                            hints,
+                                                                            metadata,
                                                                             reply_proxy,
                                                                             to_info(current)));
     assert(ctrl_proxy);
