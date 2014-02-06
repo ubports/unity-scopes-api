@@ -67,7 +67,9 @@ MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
     return query(info,
                  reply,
                  [&q, &hints, &info, this ]()->QueryBase::SPtr
-                 { return this->smartscope_->create_query(info.id, q, hints); });
+                     { return this->smartscope_->create_query(info.id, q, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(info.id, SSQuery::Query, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
@@ -113,7 +115,8 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
 
 MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
                                       MWReplyProxy const& reply,
-                                      std::function<QueryBase::SPtr()> const& query_factory_fun)
+                                      std::function<QueryBase::SPtr()> const& query_factory_fun,
+                                      std::function<void(QueryBase::SPtr)> const& query_object_fun)
 {
     if (!ss_registry_->has_scope(info.id))
     {
@@ -145,7 +148,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     try
     {
         // add new query to SS query object
-        qo_->add_query(info.id, SSQuery::Query, query_base, reply);
+        query_object_fun(query_base);
 
         // Start the query via the middleware (calling run() in a different thread)
         MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, info.mw->get_query_endpoint());
