@@ -113,6 +113,7 @@ The video widget displays a still from a video and allows playing the video.
 List of attributes:
 
 \arg \c source A uri pointing to the video
+\arg \c screenshot A uri pointing to a screenshot of the video (optional)
 
 \code{.cpp}
 {
