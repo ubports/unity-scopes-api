@@ -35,6 +35,28 @@ ActionMetadata::ActionMetadata(std::string const& locale, std::string const& for
 {
 }
 
+ActionMetadata::ActionMetadata(ActionMetadata const& other)
+    : QueryMetadata(new internal::ActionMetadataImpl(*(other.fwd())))
+{
+}
+
+ActionMetadata::ActionMetadata(ActionMetadata&&) = default;
+
+ActionMetadata::~ActionMetadata()
+{
+}
+
+ActionMetadata& ActionMetadata::operator=(ActionMetadata const &other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::ActionMetadataImpl(*(other.fwd())));
+    }
+    return *this;
+}
+
+ActionMetadata& ActionMetadata::operator=(ActionMetadata&&) = default;
+
 void ActionMetadata::set_scope_data(Variant const& data)
 {
     fwd()->set_scope_data(data);

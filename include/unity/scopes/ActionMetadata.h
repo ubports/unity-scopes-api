@@ -43,6 +43,15 @@ public:
     void set_scope_data(Variant const& data);
     Variant scope_data() const;
 
+    /// @cond
+    ActionMetadata(ActionMetadata const& other);
+    ActionMetadata(ActionMetadata&&);
+    ~ActionMetadata();
+
+    ActionMetadata& operator=(ActionMetadata const &other);
+    ActionMetadata& operator=(ActionMetadata&&);
+    /// @endcond
+
 private:
     ActionMetadata(internal::ActionMetadataImpl *impl);
     internal::ActionMetadataImpl* fwd() const;
