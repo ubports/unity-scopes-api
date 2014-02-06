@@ -17,6 +17,8 @@
 */
 
 #include <unity/scopes/SearchMetadata.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/internal/ActionMetadataImpl.h>
 #include <gtest/gtest.h>
 #include <unity/UnityExceptions.h>
 
@@ -79,12 +81,60 @@ TEST(SearchMetadata, copy)
     }
 }
 
-namespace unity
+TEST(ActionMetadata, basic)
 {
+    {
+        VariantMap var;
+        var["foo"] = "bar";
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(var));
 
-namespace scopes
+        EXPECT_EQ("pl", meta.locale());
+        EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ("bar", meta.scope_data().get_dict()["foo"].get_string());
+    }
+}
+
+TEST(ActionMetadata, serialize_and_deserialize)
 {
+    {
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(1234));
 
-} // namespace scopes
+        auto var = meta.serialize();
+        EXPECT_EQ("action_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ(1234, var["scope_data"].get_int());
 
-} // namespace unity
+        // deserialize
+        auto meta2 = internal::ActionMetadataImpl::create(var);
+        EXPECT_EQ("pl", meta2.locale());
+        EXPECT_EQ("phone", meta2.form_factor());
+        EXPECT_EQ(1234, meta2.scope_data().get_int());
+    }
+}
+
+TEST(ActionMetadata, copy)
+{
+    {
+        ActionMetadata meta("pl", "phone");
+        auto meta2 = meta;
+
+        Variant var("foo");
+        meta.set_scope_data(var);
+
+        EXPECT_TRUE(meta2.scope_data().is_null());
+        EXPECT_EQ("foo", meta.scope_data().get_string());
+    }
+    {
+        ActionMetadata meta("pl", "phone");
+        ActionMetadata meta2(meta);
+
+        Variant var(10);
+        meta.set_scope_data(var);
+
+        EXPECT_TRUE(meta2.scope_data().is_null());
+        EXPECT_EQ(10, meta.scope_data().get_int());
+    }
+}
