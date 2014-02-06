@@ -111,6 +111,37 @@ private:
     SearchHandle::UPtr search_handle_;
 };
 
+class SmartPreview : public PreviewQuery
+{
+public:
+    SmartPreview(std::string const& id, SSRegistryObject::SPtr reg, Result const& result)
+        : scope_id_(id)
+        , result_(result)
+    {
+        SmartScopesClient::SPtr ss_client = reg->get_ssclient();
+        std::string base_url = reg->get_base_url(scope_id_);
+
+        //search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "0", "0", 10);
+    }
+
+    ~SmartPreview()
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const& reply) override
+    {
+        (void)reply;
+    }
+
+private:
+    std::string scope_id_;
+    Result result_;
+};
+
 class SmartScope
 {
 public:
@@ -124,6 +155,13 @@ public:
         QueryBase::UPtr query(new SmartQuery(id, reg_, q));
         std::cout << "SmartScope: created query for \"" << id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
+    }
+
+    QueryBase::UPtr preview(std::string const& id, Result const& result, VariantMap const&)
+    {
+        QueryBase::UPtr preview(new SmartPreview(id, reg_, result));
+        std::cout << "SmartScope: created preview for \"" << id << "\": \"" << result.uri() << "\"" << std::endl;
+        return preview;
     }
 
     ActivationBase::UPtr activate(std::string const& id, Result const& result, VariantMap const& hints)
@@ -143,15 +181,6 @@ public:
         (void)hints;
         (void)action_id;
         return ActivationBase::UPtr();
-    }
-
-    QueryBase::UPtr preview(std::string const& id, Result const& result, VariantMap const& hints)
-    {
-        ///! TODO
-        (void)id;
-        (void)result;
-        (void)hints;
-        return QueryBase::UPtr();
     }
 
 private:

@@ -77,8 +77,8 @@ public:
 
 private:
     void run_query(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
-    void run_activation(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
     void run_preview(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
+    void run_activation(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
 
 private:
     mutable std::mutex queries_mutex_;
