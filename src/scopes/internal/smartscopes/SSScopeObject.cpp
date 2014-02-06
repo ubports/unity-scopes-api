@@ -145,7 +145,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     try
     {
         // add new query to SS query object
-        qo_->add_query(info.id, query_base, reply);
+        qo_->add_query(info.id, SSQuery::Query, query_base, reply);
 
         // Start the query via the middleware (calling run() in a different thread)
         MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, info.mw->get_query_endpoint());

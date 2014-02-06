@@ -41,6 +41,12 @@ namespace smartscopes
 
 struct SSQuery
 {
+    enum QueryType
+    {
+        Query, Activation, Preview
+    };
+
+    QueryType q_type;
     std::shared_ptr<QueryBase> q_base;
     MWReplyProxy q_reply;
     std::weak_ptr<ReplyBase> q_reply_proxy;
@@ -65,10 +71,16 @@ public:
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
     void add_query(std::string const& scope_id,
+                   SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    MWReplyProxy const& reply);
 
-protected:
+private:
+    void run_query(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
+    void run_activation(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
+    void run_preview(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply);
+
+private:
     mutable std::mutex queries_mutex_;
 
     std::map<std::string, SSQuery> queries_;      // scope ID : query
