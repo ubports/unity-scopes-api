@@ -53,7 +53,21 @@ public:
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
 
+    /**
+     \brief Adds an attribute definition and its value.
+     */
     void add_attribute(std::string const& key, Variant const& value);
+    /**
+     \brief Adds an attribute definition by using component mapping.
+
+     If an attribute value is either not known, or the value is already present
+     in a result field, this method will create a mapping between the attribute
+     name and given field name.
+
+     In the former case you'll be expected to push the attribute value using
+     unity::scopes::PreviewReply::push(), otherwise the value is automatically
+     mapped from the result.
+     */
     void add_component(std::string const& key, std::string const& field_name);
 
     std::string id() const;
