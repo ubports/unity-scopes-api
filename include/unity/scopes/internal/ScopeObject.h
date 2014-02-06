@@ -33,6 +33,7 @@ namespace scopes
 {
 
 class ScopeBase;
+class ActionMetadata;
 class Result;
 
 namespace internal
@@ -65,13 +66,13 @@ public:
                               InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
-                                                     VariantMap const& hints,
+                                                     ActionMetadata const& hints,
                                                      std::string const& action_id,
                                                      MWReplyProxy const &reply,
                                                      InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy preview(Result const& result,
-                                     VariantMap const& hints,
+                                     ActionMetadata const& hints,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) override;
 

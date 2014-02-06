@@ -68,7 +68,7 @@ public:
         return QueryBase::UPtr(new MyQuery);
     }
 
-    virtual QueryBase::UPtr preview(Result const&, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
     }

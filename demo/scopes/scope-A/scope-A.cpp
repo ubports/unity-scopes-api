@@ -142,7 +142,7 @@ public:
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         QueryBase::UPtr preview(new MyPreview(result.uri()));
         cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;

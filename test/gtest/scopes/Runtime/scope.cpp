@@ -82,7 +82,7 @@ QueryBase::UPtr TestScope::create_query(Query const &, VariantMap const &)
     return QueryBase::UPtr(new TestQuery());
 }
 
-QueryBase::UPtr TestScope::preview(Result const&, VariantMap const &)
+QueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
 {
     return QueryBase::UPtr(new TestPreview());
 }

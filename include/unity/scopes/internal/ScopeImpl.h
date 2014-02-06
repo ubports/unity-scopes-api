@@ -38,6 +38,7 @@ namespace scopes
 
 class Result;
 class FilterState;
+class ActionMetadata;
 
 namespace internal
 {
@@ -55,8 +56,8 @@ public:
     QueryCtrlProxy create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
-    QueryCtrlProxy activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const;
-    QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy activate_preview_action(Result const& result, ActionMetadata const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
 

@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
@@ -550,8 +551,10 @@ TEST(Activation, scope)
     // activate action
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
+        ActionMetadata meta("en", "phone");
         hints["iron"] = "maiden";
-        ctrl = scope->activate_preview_action(*result, hints, "action1", act_receiver);
+        meta.set_scope_data(Variant(hints));
+        ctrl = scope->activate_preview_action(*result, meta, "action1", act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;

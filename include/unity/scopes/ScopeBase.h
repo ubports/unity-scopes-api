@@ -25,6 +25,7 @@
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -201,12 +202,12 @@ public:
      */
     virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
 
-    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id);
+    virtual ActivationBase::UPtr activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id);
 
     /*
      * FIXME: doc string
      */
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

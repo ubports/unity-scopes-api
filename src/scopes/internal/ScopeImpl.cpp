@@ -25,6 +25,7 @@
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/Exception.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
@@ -137,7 +138,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     try
@@ -148,7 +149,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate_preview_action(result.p->activation_target(), hints, action_id, rp);
+        ctrl = fwd()->activate_preview_action(result.p->activation_target(), metadata.serialize(), action_id, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
@@ -171,7 +172,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const
 {
     QueryCtrlProxy ctrl;
     PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
@@ -187,7 +188,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->preview(result, hints, rp);
+        ctrl = fwd()->preview(result, hints.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

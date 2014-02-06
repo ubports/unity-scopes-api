@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/Scope.h>
-
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
 namespace unity
@@ -57,14 +57,14 @@ QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, Ac
     return fwd()->activate(result, hints, reply);
 }
 
-QueryCtrlProxy Scope::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
-    return fwd()->activate_preview_action(result, hints, action_id, reply);
+    return fwd()->activate_preview_action(result, metadata, action_id, reply);
 }
 
-QueryCtrlProxy Scope::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const
 {
-    return fwd()->preview(result, hints, reply);
+    return fwd()->preview(result, metadata, reply);
 }
 
 internal::ScopeImpl* Scope::fwd() const

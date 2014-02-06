@@ -31,5 +31,5 @@ public:
     virtual void run() override;
 
     virtual QueryBase::UPtr create_query(Query const &, VariantMap const &) override;
-    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override;
+    virtual QueryBase::UPtr preview(Result const&, ActionMetadata const &) override;
 };

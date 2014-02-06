@@ -35,6 +35,7 @@ namespace scopes
 
 class Result;
 class FilterState;
+class ActionMetadata;
 
 namespace internal
 {
@@ -62,9 +63,9 @@ public:
 
     QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
 
-    QueryCtrlProxy activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const;
 
-    QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

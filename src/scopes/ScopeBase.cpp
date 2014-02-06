@@ -47,7 +47,7 @@ ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, VariantMap 
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }
 
-ActivationBase::UPtr ScopeBase::activate_preview_action(Result const& /* result */, VariantMap const& /* hints */, std::string const& /* action_id */)
+ActivationBase::UPtr ScopeBase::activate_preview_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* action_id */)
 {
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }

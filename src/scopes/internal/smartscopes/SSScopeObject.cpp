@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -84,7 +85,7 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
 }
 
 MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
-                                                        VariantMap const& hints,
+                                                        ActionMetadata const& hints,
                                                         std::string const& action_id,
                                                         MWReplyProxy const& reply,
                                                         InvokeInfo const& info)
@@ -99,7 +100,7 @@ MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
-                                        VariantMap const& hints,
+                                        ActionMetadata const& hints,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {

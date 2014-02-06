@@ -49,7 +49,7 @@ public:
     }
 
     virtual unity::scopes::QueryBase::UPtr preview(unity::scopes::Result const&,
-                                                   unity::scopes::VariantMap const&) override
+                                                   unity::scopes::ActionMetadata const&) override
     {
         return nullptr;
     }

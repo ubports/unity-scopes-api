@@ -34,6 +34,8 @@ namespace unity
 namespace scopes
 {
 
+class ActionMetadata;
+
 namespace internal
 {
 
@@ -62,13 +64,13 @@ public:
                               InvokeInfo const& info) override;
 
     MWQueryCtrlProxy activate_preview_action(Result const& result,
-                                             VariantMap const& hints,
+                                             ActionMetadata const& hints,
                                              std::string const& action_id,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info) override;
 
     MWQueryCtrlProxy preview(Result const& result,
-                             VariantMap const& hints,
+                             ActionMetadata const& hints,
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 

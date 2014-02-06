@@ -28,6 +28,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -156,7 +157,7 @@ TEST(Runtime, preview)
     EXPECT_TRUE(result.get() != nullptr);
 
     auto previewer = make_shared<PreviewReceiver>();
-    auto preview_ctrl = scope->preview(*(result.get()), hints, previewer);
+    auto preview_ctrl = scope->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
     previewer->wait_until_finished();
 }
 

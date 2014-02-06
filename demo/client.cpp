@@ -421,9 +421,10 @@ int main(int argc, char* argv[])
             }
             else if (result_op == ResultOperation::Preview)
             {
+                ActionMetadata const metadata("en", "desktop");
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
-                meta.proxy()->preview(*result, vm, preview_reply);
+                meta.proxy()->preview(*result, metadata, preview_reply);
                 preview_reply->wait_until_finished();
             }
         }

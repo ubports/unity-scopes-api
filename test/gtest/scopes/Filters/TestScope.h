@@ -79,7 +79,7 @@ public:
         return QueryBase::UPtr(new TestQuery(q));
     }
 
-    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override
+    virtual QueryBase::UPtr preview(Result const&, ActionMetadata const &) override
     {
         return nullptr;
     }

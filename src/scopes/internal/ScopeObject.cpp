@@ -27,6 +27,7 @@
 #include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
@@ -178,7 +179,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
 }
 
 MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
-                              VariantMap const& hints,
+                              ActionMetadata const& hints,
                               std::string const& action_id,
                               MWReplyProxy const &reply,
                               InvokeInfo const& info)
@@ -196,7 +197,7 @@ MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
 }
 
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
-                                      VariantMap const& hints,
+                                      ActionMetadata const& hints,
                                       MWReplyProxy const& reply,
                                       InvokeInfo const& info)
 {
