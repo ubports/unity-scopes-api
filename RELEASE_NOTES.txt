@@ -1,6 +1,12 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.3.1
+========================
+- Added SearchMetadata and ActionMetadata classes; these classes are now passed
+  to create_query(), activate(), activate_preview_action(), preview() methods of
+  ScopeBase and Scope (ScopeProxy) instead of a plain VariantMap.
+
 Changes in version 0.3.0
 ========================
 
