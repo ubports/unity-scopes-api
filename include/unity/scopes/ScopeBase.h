@@ -190,6 +190,7 @@ public:
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
+    
     This method must return an instance that is derived from ActivationBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. That call to activate() is made
@@ -203,8 +204,13 @@ public:
 
     virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id);
 
-    /*
-     * FIXME: doc string
+    /**
+    \brief Invoked when a scope is requested to create a preview for a particular result.
+
+    This method must return an instance that is derived from PreviewQuery. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly.
+    \param result The result that should be previewed.
      */
     virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
 
