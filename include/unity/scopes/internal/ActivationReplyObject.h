@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
-#define UNITY_INTERNAL_ACTIVATIONREPLYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
+#define UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/ActivationListener.h>

@@ -1,4 +1,4 @@
-configure_file(SSRegistry.ini.in ${CMAKE_CURRENT_BINARY_DIR}/SSRegistry.ini)
+configure_file(SSRegistryTest.ini.in ${CMAKE_CURRENT_BINARY_DIR}/SSRegistryTest.ini)
 configure_file(Runtime.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini)
 configure_file(Zmq.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini)
 

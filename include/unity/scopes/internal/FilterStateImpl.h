@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_FILTERSTATEIMPL_H
-#define UNITY_INTERNAL_FILTERSTATEIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_FILTERSTATEIMPL_H
+#define UNITY_SCOPES_INTERNAL_FILTERSTATEIMPL_H
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterState.h>

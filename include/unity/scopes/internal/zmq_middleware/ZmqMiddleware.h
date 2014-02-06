@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ThreadPool.h>
 #include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 
@@ -58,6 +59,9 @@ public:
     virtual void stop() override;
     virtual void wait_for_shutdown() override;
 
+    virtual Proxy string_to_proxy(std::string const& s) override;
+    virtual std::string proxy_to_string(MWProxy const& proxy) override;
+
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
@@ -82,6 +86,12 @@ public:
     int64_t locate_timeout() const noexcept;
 
 private:
+    Proxy make_typed_proxy(std::string const& endpoint,
+                           std::string const& identity,
+                           std::string const& category,
+                           RequestMode mode,
+                           int64_t timeout);
+
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,
