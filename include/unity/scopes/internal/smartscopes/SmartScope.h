@@ -53,8 +53,8 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, query_id, platform, locale, country, lat, long, limit
-        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "0", "0", 10);
+        ///! TODO: session_id, query_id, platform, locale, country, limit
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "", "", 10);
     }
 
     ~SmartQuery() noexcept
@@ -121,7 +121,7 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        //search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "0", "0", 10);
+        //search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "", "", 10);
     }
 
     ~SmartPreview()
