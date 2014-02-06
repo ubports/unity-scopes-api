@@ -65,5 +65,3 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)
-
-configure_file(config.h.in ${CMAKE_BINARY_DIR}/include/unity/config.h @ONLY)

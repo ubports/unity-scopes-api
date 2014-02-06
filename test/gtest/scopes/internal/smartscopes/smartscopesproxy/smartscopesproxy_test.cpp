@@ -50,8 +50,8 @@ class smartscopesproxytest : public Test
 public:
     smartscopesproxytest()
         : server_(FAKE_SSS_PATH)
-        , reg_id_("SSRegistry")
-        , scope_id_("SmartScope")
+        , reg_id_("SSRegistryTest")
+        , scope_id_("SmartScopeTest")
     {
         // Instantiate SS registry and scopes runtimes
         reg_rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);

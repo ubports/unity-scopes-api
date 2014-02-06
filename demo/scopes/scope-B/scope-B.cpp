@@ -25,6 +25,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchQuery.h>
 #include <unity/UnityExceptions.h>
 
@@ -139,6 +140,10 @@ public:
     {
         scope_name_ = scope_name;
 
+        if (!registry)
+        {
+            throw ConfigException(scope_name + ": No registry available, cannot locate child scopes");
+        }
         // Lock up scopes C and D in the registry and remember their proxies.
         auto meta_c = registry->get_metadata("scope-C");
         scope_c_ = meta_c.proxy();
