@@ -45,7 +45,7 @@ public:
     }
 
     virtual unity::scopes::QueryBase::UPtr create_query(unity::scopes::Query const&,
-                                                             unity::scopes::VariantMap const&) override
+                                                             unity::scopes::SearchMetadata const&) override
     {
         return nullptr;
     }

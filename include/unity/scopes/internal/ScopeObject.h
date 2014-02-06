@@ -34,6 +34,7 @@ namespace scopes
 
 class ScopeBase;
 class ActionMetadata;
+class SearchMetadata;
 class Result;
 
 namespace internal
@@ -56,7 +57,7 @@ public:
 
     // Remote operation implementations
     virtual MWQueryCtrlProxy create_query(Query const& q,
-                                          VariantMap const& hints,
+                                          SearchMetadata const& hints,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) override;
 

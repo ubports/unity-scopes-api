@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
@@ -38,7 +39,7 @@ SearchQuery::~SearchQuery()
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             string const& query_string,
-                                            VariantMap const& hints,
+                                            SearchMetadata const& hints,
                                             shared_ptr<SearchListener> const& reply)
 {
     return p->create_subquery(scope, query_string, hints, reply);
@@ -47,7 +48,7 @@ QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             FilterState const& filter_state,
-                                            VariantMap const& hints,
+                                            SearchMetadata const& hints,
                                             SearchListener::SPtr const& reply)
 {
     return p->create_subquery(scope, query_string, filter_state, hints, reply);
@@ -57,7 +58,7 @@ QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             std::string const& department_id,
                                             FilterState const& filter_state,
-                                            VariantMap const& hints,
+                                            SearchMetadata const& hints,
                                             SearchListener::SPtr const& reply)
 {
     return p->create_subquery(scope, query_string, department_id, filter_state, hints, reply);

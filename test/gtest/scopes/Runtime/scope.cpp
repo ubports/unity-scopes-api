@@ -77,7 +77,7 @@ void TestScope::run()
 {
 }
 
-QueryBase::UPtr TestScope::create_query(Query const &, VariantMap const &)
+QueryBase::UPtr TestScope::create_query(Query const &, SearchMetadata const &)
 {
     return QueryBase::UPtr(new TestQuery());
 }

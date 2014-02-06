@@ -28,6 +28,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
@@ -147,7 +148,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 }
 
 MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
-                                           VariantMap const& hints,
+                                           SearchMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {

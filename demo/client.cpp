@@ -382,10 +382,10 @@ int main(int argc, char* argv[])
         {
         }
         shared_ptr<Receiver> reply(new Receiver(result_index));
-        VariantMap vm;
-        vm["cardinality"] = 10;
-        vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
+
+        SearchMetadata metadata("C", "desktop");
+        metadata.set_cardinality(10);
+        auto ctrl = meta.proxy()->create_query(search_string, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
@@ -415,6 +415,7 @@ int main(int argc, char* argv[])
                     }
                     proxy = meta.proxy();
                     cout << "\tactivation scope name: " << target_scope << endl;
+                    VariantMap vm;
                     proxy->activate(*result, vm, act_reply);
                     act_reply->wait_until_finished();
                 }

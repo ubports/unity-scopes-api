@@ -32,6 +32,8 @@ namespace unity
 namespace scopes
 {
 
+class SearchMetadata;
+
 namespace internal
 {
 
@@ -43,18 +45,18 @@ public:
 
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   VariantMap const& hints,
+                                   SearchMetadata const& metadata,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   VariantMap const& hints,
+                                   SearchMetadata const& metadata,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                     std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   VariantMap const& hints,
+                                   SearchMetadata const& metadata,
                                    SearchListener::SPtr const& reply);
 
     void cancel();

@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -61,7 +62,7 @@ SSScopeObject::~SSScopeObject() noexcept
 }
 
 MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
-                                             VariantMap const& hints,
+                                             SearchMetadata const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {

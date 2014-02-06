@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/QueryImpl.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/ActionMetadataImpl.h>
+#include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
@@ -85,7 +86,7 @@ void ScopeI::create_query_(Current const& current,
 {
     auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
     auto query = internal::QueryImpl::create(to_variant_map(req.getQuery()));
-    auto hints = to_variant_map(req.getHints());
+    auto metadata = SearchMetadataImpl::create(to_variant_map(req.getHints()));
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
                               proxy.getEndpoint().cStr(),
@@ -94,7 +95,7 @@ void ScopeI::create_query_(Current const& current,
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->create_query(query,
-                                                                                hints,
+                                                                                metadata,
                                                                                 reply_proxy,
                                                                                 to_info(current)));
     assert(ctrl_proxy);

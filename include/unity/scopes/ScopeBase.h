@@ -26,6 +26,7 @@
 #include <unity/scopes/Version.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -187,7 +188,7 @@ public:
     /param q The query string to be executed by the returned object instance.
     /param hints TODO, complete doc
     */
-    virtual QueryBase::UPtr create_query(Query const& query, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.

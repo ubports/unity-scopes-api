@@ -29,6 +29,7 @@
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -134,7 +135,7 @@ TEST(Runtime, create_query)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", VariantMap(), receiver);
+    auto ctrl = scope->create_query("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
 
@@ -148,9 +149,8 @@ TEST(Runtime, preview)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     // run a query first, so we have a result to preview
-    VariantMap hints;
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", hints, receiver);
+    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
