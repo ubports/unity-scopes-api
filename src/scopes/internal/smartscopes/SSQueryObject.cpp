@@ -207,6 +207,7 @@ void SSQueryObject::run_query(std::string const& scope_id, SSQuery& query, MWRep
 
 void SSQueryObject::run_activation(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply)
 {
+    ///! TODO
     (void)scope_id;
     (void)query;
     (void)reply;
@@ -214,6 +215,7 @@ void SSQueryObject::run_activation(std::string const& scope_id, SSQuery& query, 
 
 void SSQueryObject::run_preview(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply)
 {
+    ///! TODO
     (void)scope_id;
     (void)query;
     (void)reply;

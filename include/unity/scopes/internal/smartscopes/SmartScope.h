@@ -126,6 +126,34 @@ public:
         return query;
     }
 
+    ActivationBase::UPtr activate(std::string const& id, Result const& result, VariantMap const& hints)
+    {
+        ///! TODO
+        (void)id;
+        (void)result;
+        (void)hints;
+        return ActivationBase::UPtr();
+    }
+
+    ActivationBase::UPtr activate_preview_action(std::string const& id, Result const& result, VariantMap const& hints, std::string const& action_id)
+    {
+        ///! TODO
+        (void)id;
+        (void)result;
+        (void)hints;
+        (void)action_id;
+        return ActivationBase::UPtr();
+    }
+
+    QueryBase::UPtr preview(std::string const& id, Result const& result, VariantMap const& hints)
+    {
+        ///! TODO
+        (void)id;
+        (void)result;
+        (void)hints;
+        return QueryBase::UPtr();
+    }
+
 private:
     SSRegistryObject::SPtr reg_;
 };

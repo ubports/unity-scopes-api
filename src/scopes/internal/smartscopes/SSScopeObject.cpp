@@ -77,12 +77,12 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
                                          MWReplyProxy const& reply,
                                          InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->activate(info.id, result, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(info.id, SSQuery::Activation, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
@@ -91,13 +91,12 @@ MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
                                                         MWReplyProxy const& reply,
                                                         InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)action_id;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, &action_id, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->activate_preview_action(info.id, result, hints, action_id); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(info.id, SSQuery::Activation, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
@@ -105,12 +104,12 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->preview(info.id, result, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(info.id, SSQuery::Preview, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
