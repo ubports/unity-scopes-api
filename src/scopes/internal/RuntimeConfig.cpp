@@ -48,7 +48,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     if (configfile.empty())  // Default config
     {
         registry_identity_ = "Registry";
-        registry_configfile_ = DFLT_RUNTIME_INI;
+        registry_configfile_ = DFLT_REGISTRY_INI;
         default_middleware_ = "Zmq";
         default_middleware_configfile_ = "Zmq.ini";
     }

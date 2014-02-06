@@ -373,7 +373,11 @@ void ResultImpl::serialize_internal(VariantMap& var) const
 VariantMap ResultImpl::serialize() const
 {
     throw_on_empty("uri");
-    throw_on_empty("dnd_uri");
+    auto it = attrs_.find("dnd_uri");
+    if (it != attrs_.end())
+    {
+        throw_on_non_string("dnd_uri", it->second.which());
+    }
 
     VariantMap outer;
     outer["attrs"] = Variant(attrs_);
@@ -424,10 +428,6 @@ void ResultImpl::deserialize(VariantMap const& var)
     it = attrs.find("uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'uri'");
-
-    it = attrs.find("dnd_uri");
-    if (it == attrs.end())
-        throw InvalidArgumentException("Missing 'dnd_uri'");
 
     for (auto const& kv: attrs)
     {

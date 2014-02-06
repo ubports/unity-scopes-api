@@ -1,9 +1,9 @@
 [Runtime]
-Registry.Identity = SSRegistry
+Registry.Identity = SSRegistryTest
 
 [Registry]
 Middleware = Zmq
-Zmq.Endpoint = ipc:///tmp/SSRegistry
+Zmq.Endpoint = ipc:///tmp/SSRegistryTest
 Zmq.EndpointDir = /tmp
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /tmp
