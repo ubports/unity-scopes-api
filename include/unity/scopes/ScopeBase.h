@@ -190,7 +190,7 @@ public:
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
-    
+
     This method must return an instance that is derived from ActivationBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. That call to activate() is made
