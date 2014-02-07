@@ -172,7 +172,7 @@ QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result, Varia
     return QueryCtrlImpl::create(p, reply_proxy);
 }
 
-QueryCtrlProxy ZmqScope::preview(Result const& result, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
@@ -180,7 +180,7 @@ QueryCtrlProxy ZmqScope::preview(Result const& result, VariantMap const& hints, 
         auto request = make_request_(request_builder, "preview");
         auto in_params = request.initInParams().getAs<capnproto::Scope::PreviewRequest>();
         auto res = in_params.initResult();
-        to_value_dict(result.serialize(), res);
+        to_value_dict(result, res);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
         auto p = in_params.initReplyProxy();

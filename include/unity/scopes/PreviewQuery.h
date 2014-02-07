@@ -53,6 +53,7 @@ public:
     NONCOPYABLE(PreviewQuery);
     UNITY_DEFINES_PTRS(PreviewQuery);
 
+    /// Invoked when a PreviewQuery is run, use the provided proxy to push data
     virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // TODO: Add a method for subpreview request?
