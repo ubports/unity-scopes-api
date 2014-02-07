@@ -83,12 +83,12 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
     return MWQueryCtrlProxy();
 }
 
-MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
-                                                        VariantMap const& hints,
-                                                        std::string const& widget_id,
-                                                        std::string const& action_id,
-                                                        MWReplyProxy const& reply,
-                                                        InvokeInfo const& info)
+MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
+                                               VariantMap const& hints,
+                                               std::string const& widget_id,
+                                               std::string const& action_id,
+                                               MWReplyProxy const& reply,
+                                               InvokeInfo const& info)
 {
     ///! TODO
     (void)result;

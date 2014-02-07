@@ -105,7 +105,7 @@ public:
         return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints));
     }
 
-    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id) override
+    virtual ActivationBase::UPtr perform_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id) override
     {
         return ActivationBase::UPtr(new TestActivation("activated action", widget_id + action_id, result.uri(), hints));
     }

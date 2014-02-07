@@ -5,10 +5,9 @@ Changes in version 0.3.1
 ========================
 - The 'Handled' state was remvoed from ActivationResponse::Status and two new
   values were added instead: ShowDash and HideDash.
-- Preview action activation method was changed to support widget identifier
-  along with action id and hints. Widget identifier parameter is now required by
-  Scope::activate_preview_action() and ScopeBase::activate_preview_action()
-  methods.
+- Scope::activate_preview_action() and ScopeBase::activate_preview_action() were
+  renamed to perform_action(). They now also require widget identifier
+  along with action id and hints.
 
 Changes in version 0.3.0
 ========================

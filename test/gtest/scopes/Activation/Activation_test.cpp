@@ -551,7 +551,7 @@ TEST(Activation, scope)
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = scope->activate_preview_action(*result, hints, "widget1", "action1", act_receiver);
+        ctrl = scope->perform_action(*result, hints, "widget1", "action1", act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
