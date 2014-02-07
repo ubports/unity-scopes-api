@@ -51,6 +51,12 @@ Category (returned by serialize()):
  'icon' : string
  'renderer_template' : string
 
+Department (returned by serialize()):
+=====================================
+  'query'       : dictionary (serialized Query)
+  'label'       : string
+  'departments' : array of dictionaries (serialized Departments), optional
+
 ScopeMetadata (returned by serialize()):
 =====================================
  'scope_name'   : string
@@ -114,8 +120,14 @@ PreviewResult (returned by serialize())
 
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" or "annotation" key and
-  serialized Category / CategorisedResult / Annotation respectively.
+ result : dictionary with:
+                "category" and/or
+                "result" or
+                "annotation" or
+                "departments" and "current_department" or
+                "columns"
+                key and
+  serialized Category / CategorisedResult / Annotation / DepartmentList / ColumnLayoutList respectively.
 
 ActivationResponse (returned by serialize())
 ============================================

@@ -47,6 +47,21 @@ TEST(Runtime, basic)
 class Receiver : public SearchListener
 {
 public:
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        EXPECT_EQ(current_department_id, "news");
+        EXPECT_EQ(1, departments.size());
+        auto subdeps = departments.front().subdepartments();
+        EXPECT_EQ(2, subdeps.size());
+        EXPECT_EQ("subdep1", subdeps.front().id());
+        EXPECT_EQ("Europe", subdeps.front().label());
+        EXPECT_EQ("test", subdeps.front().query().query_string());
+        EXPECT_EQ("subdep2", subdeps.back().id());
+        EXPECT_EQ("US", subdeps.back().label());
+        EXPECT_EQ("test", subdeps.back().query().query_string());
+        dep_count_++;
+    }
+
     virtual void push(CategorisedResult result) override
     {
         EXPECT_EQ("uri", result.uri());
@@ -61,6 +76,7 @@ public:
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
+        EXPECT_EQ(1, dep_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
@@ -80,6 +96,7 @@ private:
     mutex mutex_;
     condition_variable cond_;
     int count_;
+    int dep_count_;
     std::shared_ptr<Result> last_result_;
 };
 
