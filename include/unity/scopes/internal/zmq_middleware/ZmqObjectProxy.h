@@ -47,6 +47,7 @@ class ZmqReceiver;
 class ZmqObjectProxy : public virtual MWObjectProxy
 {
 public:
+
     ZmqObjectProxy(ZmqMiddleware* mw_base,
                    std::string const& endpoint,
                    std::string const& identity,
@@ -62,6 +63,8 @@ public:
     std::string category() const;
     RequestMode mode() const;
     virtual int64_t timeout() const noexcept override;
+
+    virtual std::string to_string() const override;
 
     // Remote operation
     virtual void ping() override;

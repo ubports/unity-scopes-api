@@ -1,0 +1,18 @@
+This is a very simple demo to show how, for testing purposes, you can run a scope without adding the scope
+to the registry.
+
+The Runtime.ini file does *not* define where to find the registry. Calling Runtime::registry() throws a
+ConfigException in this case.
+
+To reach the scope, the client uses a stringified proxy and calls Runtime::string_to_proxy() to turn
+the string back into a scope proxy.
+
+To run this demo (from the build/demo/stand-alone directory):
+
+In one terminal:
+
+    $ ../../scoperunner/scoperunner Runtime.ini ../scopes/scope-A/scope-A.ini
+
+in another terminal:
+
+    $ ./stand-alone-client

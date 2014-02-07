@@ -1,0 +1,12 @@
+description "Smart scopes proxy"
+author "Marcus Tomlinson <marcus.tomlinson@canonical.com>"
+
+start on started dbus
+stop on desktop-end
+
+respawn
+respawn limit 10 60
+
+expect stop
+
+exec @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/smartscopesproxy/smartscopesproxy upstart

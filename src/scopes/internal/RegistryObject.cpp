@@ -20,6 +20,7 @@
 
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
 #include <signal.h>
 #include <cassert>
 #include <sys/wait.h>
@@ -82,11 +83,11 @@ RegistryObjectPrivate::~RegistryObjectPrivate()
     }
     catch (std::exception const& e)
     {
-        fprintf(stderr, "Error when shutting down registry: %s\n", e.what());
+        fprintf(stderr, "scoperegistry: shutdown error: %s\n", e.what());
     }
     catch (...)
     {
-        fprintf(stderr, "Unknown error when shutting down registry.\n");
+        fprintf(stderr, "scoperegistry: unknown exception during shutdown\n");
     }
 }
 
@@ -121,6 +122,9 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
     }
 
     // Look for the scope in both the local and the remote map.
+    // Local scopes take precedence over remote ones of the same
+    // name. (Ideally, this will never happen, except maybe
+    // during development.)
     auto const& it = scopes.find(scope_name);
     if (it == scopes.end())
     {
@@ -148,8 +152,7 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         waitpid(process->second, &status, 0);
         if (status != 0)
         {
-            fprintf(stderr, "Scope %s has exited with nonzero error status %d.\n",
-                    scope_name.c_str(), status);
+            printf("scope %s has exited with nonzero error status %d.\n", scope_name.c_str(), status);
         }
         scope_processes.erase(scope_name);
     }
@@ -176,14 +179,17 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
         }
     }
     const vector<string>& cmd = commands[scope_name];
-    fprintf(stderr, "Spawning scope %s to process number %d with command line %s %s %s.\n",
-            scope_name.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
+    printf("spawning scope %s to process number %d with command line %s %s %s.\n",
+           scope_name.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
     scope_processes[scope_name] = pid;
 }
 
 MetadataMap RegistryObjectPrivate::list()
 {
     MetadataMap all_scopes(scopes);  // Local scopes
+    // If a remote scope has the same name as a local one,
+    // this will not overwrite a local scope with a remote
+    // one if they have the same name.
     all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
     return all_scopes;
 }
