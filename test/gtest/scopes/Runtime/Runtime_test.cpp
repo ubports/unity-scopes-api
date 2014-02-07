@@ -71,12 +71,23 @@ public:
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
+    virtual void push(Annotation annotation) override
+    {
+        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ("Link1", annotation.links().front()->label());
+        auto query = annotation.links().front()->query();
+        EXPECT_EQ("scope-A", query.scope_name());
+        EXPECT_EQ("foo", query.query_string());
+        EXPECT_EQ("dep1", query.department_id());
+        annotation_count_++;
+    }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
+        EXPECT_EQ(1, annotation_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
@@ -97,6 +108,7 @@ private:
     condition_variable cond_;
     int count_;
     int dep_count_;
+    int annotation_count_;
     std::shared_ptr<Result> last_result_;
 };
 
