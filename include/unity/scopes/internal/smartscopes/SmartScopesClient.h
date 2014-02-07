@@ -90,6 +90,29 @@ private:
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
+class PreviewHandle
+{
+public:
+    NONCOPYABLE(PreviewHandle);
+    UNITY_DEFINES_PTRS(PreviewHandle);
+
+    ~PreviewHandle();
+
+    using Layouts = std::vector< std::vector< std::string > >;
+    using Widgets = std::vector< std::string >;
+
+    std::pair<Layouts, Widgets> get_preview_results();
+    void cancel_preview();
+
+private:
+    friend class SmartScopesClient;
+    PreviewHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
+
+private:
+    std::string session_id_;
+    std::shared_ptr<SmartScopesClient> ssc_;
+};
+
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
 {
 public:
@@ -114,12 +137,25 @@ public:
                               std::string const& country = "",
                               const uint limit = 0);
 
+    PreviewHandle::UPtr preview(std::string const& base_url,
+                                std::string const& result,
+                                std::string const& session_id,
+                                std::string const& platform,
+                                const uint widgets_api_version,
+                                std::string const& locale = "",
+                                std::string const& country = "");
+
 private:
     friend class SearchHandle;
+    friend class PreviewHandle;
+
     std::vector<SearchResult> get_search_results(std::string const& session_id);
-    void cancel_search(std::string const& session_id);
+    std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> get_preview_results(std::string const& session_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
+
+    void cancel_search(std::string const& session_id);
+    void cancel_preview(std::string const& session_id);
 
 private:
     HttpClientInterface::SPtr http_client_;
@@ -129,9 +165,11 @@ private:
     uint port_;
 
     std::map<std::string, HttpResponseHandle::SPtr> search_results_;
+    std::map<std::string, HttpResponseHandle::SPtr> preview_results_;
 
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;
+    std::mutex preview_results_mutex_;
 };
 
 }  // namespace smartscopes

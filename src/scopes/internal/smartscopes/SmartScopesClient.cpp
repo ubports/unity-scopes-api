@@ -29,6 +29,7 @@
 static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
 static const std::string c_search_resource = "/search";
+static const std::string c_preview_resource = "/preview";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -54,6 +55,29 @@ std::vector<SearchResult> SearchHandle::get_search_results()
 void SearchHandle::cancel_search()
 {
     ssc_->cancel_search(session_id_);
+}
+
+//-- PreviewHandle
+
+PreviewHandle::PreviewHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
+    : session_id_(session_id)
+    , ssc_(ssc)
+{
+}
+
+PreviewHandle::~PreviewHandle()
+{
+    cancel_preview();
+}
+
+std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
+{
+    return ssc_->get_preview_results(session_id_);
+}
+
+void PreviewHandle::cancel_preview()
+{
+    ssc_->cancel_preview(session_id_);
 }
 
 //-- SmartScopesClient
@@ -205,6 +229,44 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
 }
 
+PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
+                                               std::string const& result,
+                                               std::string const& session_id,
+                                               std::string const& platform,
+                                               const uint widgets_api_version,
+                                               std::string const& locale,
+                                               std::string const& country)
+{
+    std::ostringstream preview_uri;
+    preview_uri << base_url << c_preview_resource << "?";
+
+    // mandatory parameters
+
+    preview_uri << "&result=\"" << result << "\"";
+    preview_uri << "&session_id=\"" << session_id << "\"";
+    preview_uri << "&platform=\"" << platform << "\"";
+    preview_uri << "&widgets_api_version=" << std::to_string(widgets_api_version);
+
+    // optional parameters
+
+    if (!locale.empty())
+    {
+        preview_uri << "&locale=" << locale;
+    }
+    if (!country.empty())
+    {
+        preview_uri << "&country=" << country;
+    }
+
+    cancel_preview(session_id);
+
+    std::lock_guard<std::mutex> lock(preview_results_mutex_);
+    std::cout << "SmartScopesClient: GET " << preview_uri.str() << std::endl;
+    preview_results_[session_id] = http_client_->get(preview_uri.str(), port_);
+
+    return PreviewHandle::UPtr(new PreviewHandle(session_id, shared_from_this()));
+}
+
 std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& session_id)
 {
     try
@@ -320,6 +382,12 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
     }
 }
 
+std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& session_id)
+{
+    (void)session_id;
+    return std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets>();
+}
+
 std::vector<std::string> SmartScopesClient::extract_json_stream(std::string const& json_stream)
 {
     std::vector<std::string> jsons;
@@ -351,5 +419,17 @@ void SmartScopesClient::cancel_search(std::string const& session_id)
     {
         http_client_->cancel_get(search_results_[session_id]);
         search_results_.erase(it);
+    }
+}
+
+void SmartScopesClient::cancel_preview(std::string const& session_id)
+{
+    std::lock_guard<std::mutex> lock(preview_results_mutex_);
+
+    auto it = preview_results_.find(session_id);
+    if (it != preview_results_.end())
+    {
+        http_client_->cancel_get(preview_results_[session_id]);
+        preview_results_.erase(it);
     }
 }
