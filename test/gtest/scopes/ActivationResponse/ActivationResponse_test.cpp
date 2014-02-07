@@ -50,14 +50,14 @@ TEST(ActivationResponse, basic)
     {
         Query const query("scope-foo");
         ActivationResponse resp(query);
-        EXPECT_EQ(ActivationResponse::Status::Search, resp.status());
+        EXPECT_EQ(ActivationResponse::Status::PerformQuery, resp.status());
     }
 
     // Search only allowed with Query
     {
         try
         {
-            ActivationResponse resp(ActivationResponse::Status::Search);
+            ActivationResponse resp(ActivationResponse::Status::PerformQuery);
             FAIL();
         }
         catch (unity::InvalidArgumentException const&) {}
@@ -81,7 +81,7 @@ TEST(ActivationResponse, serialize)
         Query const query("scope-foo");
         ActivationResponse resp(query);
         auto var = resp.serialize();
-        EXPECT_EQ(ActivationResponse::Status::Search, static_cast<ActivationResponse::Status>(var["status"].get_int()));
+        EXPECT_EQ(ActivationResponse::Status::PerformQuery, static_cast<ActivationResponse::Status>(var["status"].get_int()));
         EXPECT_EQ("scope-foo", var["query"].get_dict()["scope"].get_string());
     }
 }
@@ -121,7 +121,7 @@ TEST(ActivationResponse, deserialize)
         hints["foo"] = "bar";
         VariantMap var;
         var["hints"] = hints;
-        var["status"] = static_cast<int>(ActivationResponse::Status::Search);
+        var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
         try
         {
             internal::ActivationResponseImpl res(var);
@@ -154,12 +154,12 @@ TEST(ActivationResponse, deserialize)
         Query query("scope-foo");
         VariantMap var;
         var["hints"] = VariantMap();
-        var["status"] = static_cast<int>(ActivationResponse::Status::Search);
+        var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
         var["query"] = query.serialize();
         try
         {
             internal::ActivationResponseImpl res(var);
-            EXPECT_EQ(ActivationResponse::Status::Search, res.status());
+            EXPECT_EQ(ActivationResponse::Status::PerformQuery, res.status());
             EXPECT_EQ("scope-foo", res.query().scope_name());
         }
         catch (unity::LogicException const &e)

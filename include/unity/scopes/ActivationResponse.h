@@ -43,16 +43,16 @@ class UNITY_API ActivationResponse final
 public:
     enum Status
     {
-        NotHandled, //<! Activation of this result wasn't handled by the scope
-        ShowDash,   //<! Activation of this result was handled, show the Dash
-        HideDash,   //<! Activation of this result was handled, hide the Dash
-        ShowPreview,//<! Preview should be requested for this result.
-        Search      //<! Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise
+        NotHandled,  //<! Activation of this result wasn't handled by the scope
+        ShowDash,    //<! Activation of this result was handled, show the Dash
+        HideDash,    //<! Activation of this result was handled, hide the Dash
+        ShowPreview, //<! Preview should be requested for this result.
+        PerformQuery //<! Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise
     };
 
     /**
     \brief Creates ActivationResponse with given status.
-    Throws unity::InvalidArgumentException if status is Status::Search - to
+    Throws unity::InvalidArgumentException if status is Status::PerformQuery - to
     create ActivationResponse of that type, use ActivationResponse(Query const&)
     constructor.
     \param status activation status
@@ -60,8 +60,8 @@ public:
     ActivationResponse(Status status);
 
     /**
-    \brief Creates ActivationResponse with activation status of Status::Search and a search query to be executed.
-    \param query search query to be execute by client
+    \brief Creates ActivationResponse with activation status of Status::PerformQuery and a search query to be executed.
+    \param query search query to be executed by client
      */
     ActivationResponse(Query const& query);
 

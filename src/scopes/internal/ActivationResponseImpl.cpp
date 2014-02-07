@@ -33,14 +33,14 @@ namespace internal
 ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status)
     : status_(status)
 {
-    if (status == ActivationResponse::Status::Search)
+    if (status == ActivationResponse::Status::PerformQuery)
     {
-        throw unity::InvalidArgumentException("ActivationResponse(): Status::Search allowed only with Query object");
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::PerformQuery allowed only with Query object");
     }
 }
 
 ActivationResponseImpl::ActivationResponseImpl(Query const& query)
-    : status_(ActivationResponse::Status::Search),
+    : status_(ActivationResponse::Status::PerformQuery),
       query_(std::make_shared<Query>(query))
 {
 }
@@ -61,7 +61,7 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
     }
     status_ = static_cast<ActivationResponse::Status>(it->second.get_int());
 
-    if (status_ == ActivationResponse::Status::Search)
+    if (status_ == ActivationResponse::Status::PerformQuery)
     {
         it = var.find("query");
         if (it == var.end())
@@ -91,10 +91,10 @@ Query ActivationResponseImpl::query() const
 {
     if (query_)
     {
-        assert(status_ == ActivationResponse::Status::Search);
+        assert(status_ == ActivationResponse::Status::PerformQuery);
         return *query_;
     }
-    throw LogicException("ActivationResponse::query(): query is only available for status of Status::Search");
+    throw LogicException("ActivationResponse::query(): query is only available for status of Status::PerformQuery");
 }
 
 VariantMap ActivationResponseImpl::serialize() const
