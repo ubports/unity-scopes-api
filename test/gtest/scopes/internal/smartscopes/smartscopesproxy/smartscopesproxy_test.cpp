@@ -192,7 +192,7 @@ private:
     std::condition_variable cond_;
 };
 
-TEST_F(smartscopesproxytest, ss_scope)
+TEST_F(smartscopesproxytest, create_query)
 {
     auto reply = std::make_shared<Receiver>();
 
@@ -203,6 +203,10 @@ TEST_F(smartscopesproxytest, ss_scope)
     meta.proxy()->create_query("search_string", VariantMap(), reply);
 
     wait_thread.join();
+}
+
+TEST_F(smartscopesproxytest, preview)
+{
 }
 
 } // namespace

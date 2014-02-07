@@ -146,7 +146,7 @@ public:
         for (auto& column : columns)
         {
             ColumnLayout layout(column.size());
-            for( auto& widget_lo : column )
+            for (auto& widget_lo : column)
             {
                 layout.add_column(widget_lo);
             }

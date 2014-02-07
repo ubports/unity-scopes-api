@@ -32,6 +32,9 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
+    if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
+        return [preview_response]
+
     return ''
 
 remote_scopes_response = '\
@@ -42,6 +45,12 @@ search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
+
+preview_response = '\
+{"columns": [[["widget_id_A", "widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B"], ["widget_id_C"]]]}\r\n\
+{"widget": {"id": "widget_id_A", "type": "text", "title": "Widget A", "text": "First widget."}}\r\n\
+{"widget": {"id": "widget_id_B", "type": "text", "title": "Widget B", "text": "Second widget."}}\r\n\
+{"widget": {"id": "widget_id_C", "type": "text", "title": "Widget C", "text": "Third widget."}}'
 
 serving = False
 port = 1024
