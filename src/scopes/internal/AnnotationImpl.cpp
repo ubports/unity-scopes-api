@@ -63,7 +63,7 @@ AnnotationImpl::AnnotationImpl(const VariantMap &variant_map)
     {
         set_icon(it->second.get_string());
     }
-    
+
     it = variant_map.find("links");
     if (it != variant_map.end())
     {
