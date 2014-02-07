@@ -165,6 +165,7 @@ public:
         }
 
         count_++;
+        last_result_ = std::make_shared<Result>(result);
     }
 
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
@@ -185,11 +186,17 @@ public:
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
 
+    std::shared_ptr<Result> last_result()
+    {
+        return last_result_;
+    }
+
 private:
     int count_ = 0;
     bool query_complete_;
     std::mutex mutex_;
     std::condition_variable cond_;
+    std::shared_ptr<Result> last_result_;
 };
 
 TEST_F(smartscopesproxytest, create_query)
@@ -205,8 +212,120 @@ TEST_F(smartscopesproxytest, create_query)
     wait_thread.join();
 }
 
+class PreviewReceiver : public PreviewListener
+{
+public:
+    virtual void push(PreviewWidgetList const& widget_list) override
+    {
+        EXPECT_EQ(3, widget_list.size());
+
+        // widget 1
+        auto it = widget_list.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+
+        // widget 3
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_C", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget C", it->attributes()["title"].get_string());
+        EXPECT_EQ("Third widget.", it->attributes()["text"].get_string());
+
+        widget_pushes_++;
+    }
+
+    virtual void push(std::string const&, Variant const&) override {}
+
+    virtual void push(ColumnLayoutList const& column_list) override
+    {
+        ASSERT_EQ(3, column_list.size());
+
+        // column 1
+        auto it = column_list.begin();
+        ASSERT_EQ(1, it->number_of_columns());
+        ASSERT_EQ(3, it->column(0).size());
+        EXPECT_EQ("widget_id_A", it->column(0)[0]);
+        EXPECT_EQ("widget_id_B", it->column(0)[1]);
+        EXPECT_EQ("widget_id_C", it->column(0)[2]);
+
+        // column 2
+        std::advance(it, 1);
+        ASSERT_EQ(2, it->number_of_columns());
+        ASSERT_EQ(1, it->column(0).size());
+        EXPECT_EQ("widget_id_A", it->column(0)[0]);
+
+        ASSERT_EQ(2, it->column(1).size());
+        EXPECT_EQ("widget_id_B", it->column(1)[0]);
+        EXPECT_EQ("widget_id_C", it->column(1)[1]);
+
+        // column 3
+        std::advance(it, 1);
+        ASSERT_EQ(3, it->number_of_columns());
+        ASSERT_EQ(1, it->column(0).size());
+        EXPECT_EQ("widget_id_A", it->column(0)[0]);
+
+        ASSERT_EQ(1, it->column(1).size());
+        EXPECT_EQ("widget_id_B", it->column(1)[0]);
+
+        ASSERT_EQ(1, it->column(2).size());
+        EXPECT_EQ("widget_id_C", it->column(2)[0]);
+
+        col_pushes_++;
+    }
+
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
+        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(1, col_pushes_);
+
+        // Signal wait_until_finished
+        std::unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    int widget_pushes_ = 0;
+    int col_pushes_ = 0;
+    bool query_complete_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+};
+
 TEST_F(smartscopesproxytest, preview)
 {
+    auto reply = std::make_shared<Receiver>();
+    auto previewer = std::make_shared<PreviewReceiver>();
+
+    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+
+    auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
+    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    wait_thread.join();
+
+    auto result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    wait_thread = std::thread([&previewer](){previewer->wait_until_finished();});
+    meta.proxy()->preview(*(result.get()), VariantMap(), previewer);
+    wait_thread.join();
 }
 
 } // namespace
