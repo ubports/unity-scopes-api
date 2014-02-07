@@ -66,7 +66,7 @@ public:
     Category::SCPtr lookup_category(std::string const& id) const;
 
     bool push(unity::scopes::CategorisedResult const& result);
-    bool push(unity::scopes::Annotation const& annotation);
+    bool register_annotation(unity::scopes::Annotation const& annotation);
     bool register_layout(unity::scopes::ColumnLayoutList const& layouts);
     bool push(unity::scopes::PreviewWidgetList const& widgets);
     bool push(std::string const& key, Variant const& value);

@@ -16,7 +16,6 @@
  */
 
 #include <unity/scopes/internal/AnnotationImpl.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 #include <iostream>
@@ -36,7 +35,7 @@ AnnotationImpl::AnnotationImpl(Annotation::Type annotation_type)
 {
 }
 
-AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
+AnnotationImpl::AnnotationImpl(const VariantMap &variant_map)
 {
     auto it = variant_map.find("type");
     if (it == variant_map.end())
@@ -52,10 +51,6 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
     {
         annotation_type_ = Annotation::Type::GroupedLink;
     }
-    else if (typestr == "card")
-    {
-        annotation_type_ = Annotation::Type::Card;
-    }
 
     it = variant_map.find("label");
     if (it != variant_map.end())
@@ -67,19 +62,6 @@ AnnotationImpl::AnnotationImpl(internal::CategoryRegistry const& reg, const Vari
     if (it != variant_map.end())
     {
         set_icon(it->second.get_string());
-    }
-
-    it = variant_map.find("cat_id");
-    if (it != variant_map.end())
-    {
-        auto cat_id = it->second.get_string();
-        category_ = reg.lookup_category(cat_id);
-        if (category_ == nullptr)
-        {
-            std::ostringstream s;
-            s << "Annotation(): Category '" << cat_id << "' not found in the registry";
-            throw InvalidArgumentException(s.str());
-        }
     }
 
     it = variant_map.find("links");
@@ -110,10 +92,9 @@ void AnnotationImpl::set_label(std::string const& label)
 
 void AnnotationImpl::set_icon(std::string const& icon)
 {
-    if (annotation_type_ != Annotation::Type::Link &&
-        annotation_type_ != Annotation::Type::Card)
+    if (annotation_type_ != Annotation::Type::Link)
     {
-        std::cerr << "Annotation::set_icon(): icon is allowed in Link and Card annotations only" << std::endl;
+        std::cerr << "Annotation::set_icon(): icon is allowed in Link annotations only" << std::endl;
     }
     icon_ = icon;
 }
@@ -127,16 +108,6 @@ void AnnotationImpl::add_link(std::string const& label, Query const& query)
     links_.push_back(std::shared_ptr<Link>(new Link(label, query)));
 }
 
-void AnnotationImpl::set_category(Category::SCPtr category)
-{
-    category_ = category;
-}
-
-Category::SCPtr AnnotationImpl::category() const
-{
-    return category_;
-}
-
 std::string AnnotationImpl::label() const
 {
     if (annotation_type_ != Annotation::Type::GroupedLink)
@@ -148,10 +119,9 @@ std::string AnnotationImpl::label() const
 
 std::string AnnotationImpl::icon() const
 {
-    if (annotation_type_ != Annotation::Type::Link &&
-        annotation_type_ != Annotation::Type::Card)
+    if (annotation_type_ != Annotation::Type::Link)
     {
-        std::cerr << "Annotation::icon(): icon is allowed in Link and Card annotations only" << std::endl;
+        std::cerr << "Annotation::icon(): icon is allowed in Link annotations only" << std::endl;
     }
     return icon_;
 }
@@ -184,16 +154,6 @@ void AnnotationImpl::throw_if_inconsistent() const
                 throw InvalidArgumentException("Label must not be empty for GroupedLink annotation");
             }
             break;
-        case Annotation::Type::Card:
-            if (category_ == nullptr)
-            {
-                throw InvalidArgumentException("Category must be set for Card annotation");
-            }
-            if (icon_.empty())
-            {
-                throw InvalidArgumentException("Icon must not be empty for Card annotation");
-            }
-            break;
         default:
             throw InvalidArgumentException("Unknown annotation type");
     }
@@ -212,17 +172,10 @@ VariantMap AnnotationImpl::serialize() const
         case Annotation::Type::GroupedLink:
             vm["type"] = "groupedlink";
             break;
-        case Annotation::Type::Card:
-            vm["type"] = "card";
-            break;
         default:
             assert(0); // should never happen
     }
 
-    if (category_)
-    {
-        vm["cat_id"] = category_->id();
-    }
     if (!label_.empty())
     {
         vm["label"] = label_;

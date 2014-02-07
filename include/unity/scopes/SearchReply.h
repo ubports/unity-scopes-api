@@ -81,7 +81,14 @@ public:
     */
     bool push(CategorisedResult const& result) const;
 
-    bool push(Annotation const& annotation) const;
+    /**
+    \brief Register Annotation.
+    Annotation will get displayed at a next available spot below category registered before.
+    Register annotations first before categories to get them displayed
+    at the top annotation area. Note: Unity shell can ignore some or all annotations, depending
+    on available screen estate.
+    */
+    bool register_annotation(Annotation const& annotation) const;
 
     /**
     \brief Sends all filters and their state to the source of a query.

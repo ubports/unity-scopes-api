@@ -70,7 +70,7 @@ public:
         Query q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
-        reply->push(annotation);
+        reply->register_annotation(annotation);
 
         cout << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
     }
