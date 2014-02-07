@@ -270,7 +270,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_TRUE(agg_received_result->has_stored_result());
         EXPECT_TRUE(agg_received_result->direct_activation());
-        // activation_scope_name points to the leaf scope
+        // target_scope_proxy points to the leaf scope
         EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
@@ -324,7 +324,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
-        // activation_scope_name unchanged since aggregator doesn't intercept activation
+        // target_scope_proxy unchanged since aggregator doesn't intercept activation
         EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
@@ -379,7 +379,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_FALSE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
-        // activation_scope_name changed since aggregator intercepts activation
+        // target_scope_proxy changed since aggregator intercepts activation
         EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-bar") != std::string::npos);
     }
 }
@@ -438,7 +438,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
         EXPECT_TRUE(agg_received_result != nullptr);
         EXPECT_TRUE(agg_received_result->has_stored_result());
         EXPECT_FALSE(agg_received_result->direct_activation());
-        // activation_scope_name unchanged since aggregator doesn't intercept activation
+        // target_scope_proxy unchanged since aggregator doesn't intercept activation
         EXPECT_TRUE(agg_received_result->target_scope_proxy()->to_string().find("scope-foo") != std::string::npos);
     }
 }
