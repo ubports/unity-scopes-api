@@ -75,6 +75,9 @@ Registering a category has the following effects:
 - a space for registered category is removed (collapsed) by the Dash if category
   turns out to be empty at the end of the search.
 
+When creating a category, one of its parameters is a \link unity::scopes::CategoryRenderer \endlink instance,
+which specifies how will a particular category be rendered. See the unity::scopes::CategoryRenderer documentation for more on that subject.
+
 The actual search results have to be wrapped inside \link unity::scopes::CategorisedResult CategorisedResult\endlink objects and
 passed to \link unity::scopes::SearchReply::push push\endlink.
 
@@ -83,7 +86,7 @@ A typical implementation of run may look like this:
 \code{.cpp}
 void MyQuery::run(SearchReplyProxy const& reply)
 {
-    auto category = reply->register_category("recommended", "Recommended", icon, "");
+    auto category = reply->register_category("recommended", "Recommended", icon);
     //... query a local or remote backend
 
     for (auto res: backend.get_results(search_query)) // for every result returned by a backend

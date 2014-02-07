@@ -21,6 +21,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
+#include <unity/scopes/ScopeProxyFwd.h>
 #include <string>
 #include <memory>
 
@@ -39,8 +40,10 @@ class ScopeImpl;
 }
 
 /**
-   \brief Result encapsulates the basic attributes of any result
-   returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
+   \brief Result encapsulates attributes of any result returned by the Scope.
+   Result API provides convienience methods for some typical attributes (title,
+   art) but scopes are free to add and use any custom attributes by means of []
+   operator. The only required attribute is 'uri' and it must not be empty before
    calling Reply::push.
 */
 class UNITY_API Result
@@ -67,7 +70,17 @@ public:
     Result retrieve() const;
 
     void set_uri(std::string const& uri);
+    /**
+     \brief Set "title" property of this result.
+
+     Equivalent to calling result["title"] = title;
+     */
     void set_title(std::string const& title);
+    /**
+     \brief Set "art" property of this result.
+
+     Equivalent to calling result["art"] = image;
+     */
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
 
@@ -91,12 +104,12 @@ public:
     bool direct_activation() const;
 
     /**
-     \brief Get name of a scope that handles activation and preview of this result.
-     The name is only available when receiving this result from a scope, otherwise this method throws LogicException.
+     \brief Get proxy of a scope that handles activation and preview of this result.
+     The proxy is only available when receiving this result from a scope, otherwise this method throws LogicException.
      Note that activation request should only be sent to a scope returned by this method if direct_activation() is false.
-     \return scope name
+     \return scope proxy
      */
-    std::string activation_scope_name() const;
+    ScopeProxy target_scope_proxy() const;
 
     /**
        \brief Returns reference of a Result attribute.

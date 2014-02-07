@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_FILTERBASEIMPL_H
-#define UNITY_INTERNAL_FILTERBASEIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
+#define UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>

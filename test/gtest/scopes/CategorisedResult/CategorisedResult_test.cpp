@@ -246,11 +246,9 @@ TEST(CategorisedResult, serialize_excp)
     CategorisedResult result(cat);
 
     {
-        // throw until mandatory attributes (uri, dnd_uri) are non-empty
+        // throw until mandatory 'uri' attribute is not empty
         EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
         result.set_uri("http://ubuntu.com");
-        EXPECT_THROW(result.serialize(), unity::InvalidArgumentException);
-        result.set_dnd_uri("http://canonical.com");
         EXPECT_NO_THROW(result.serialize());
     }
     {
