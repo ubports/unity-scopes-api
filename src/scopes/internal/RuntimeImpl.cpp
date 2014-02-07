@@ -183,7 +183,7 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     lock_guard<mutex> lock(mutex_);
     if (!reply_reaper_)
     {
-        reply_reaper_ = Reaper::create(1, 5); // TODO: configurable timeouts
+        reply_reaper_ = Reaper::create(10, 45); // TODO: configurable timeouts
     }
     return reply_reaper_;
 }

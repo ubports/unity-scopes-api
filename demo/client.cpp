@@ -56,6 +56,22 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
+std::string to_string(Department const& dep, std::string const& indent = "")
+{
+    std::ostringstream str;
+    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
+    auto const subdeps = dep.subdepartments();
+    if (subdeps.size() > 0)
+    {
+        str << indent << "\tsubdepartments:" << endl;
+        for (auto const& d: subdeps)
+        {
+            str << indent << to_string(d, indent + "\t\t");
+        }
+    }
+    return str.str();
+}
+
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
@@ -108,6 +124,16 @@ public:
         : index_to_save_(index_to_save),
           push_result_count_(0)
     {
+    }
+
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        cout << "\treceived departments:" << endl;
+        for (auto const& dep: departments)
+        {
+            cout << to_string(dep);
+        }
+        cout << "\tcurrent department=" << current_department_id << endl;
     }
 
     virtual void push(Category::SCPtr category) override

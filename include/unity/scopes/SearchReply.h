@@ -22,6 +22,7 @@
 #include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
 
@@ -38,6 +39,15 @@ class UNITY_API SearchReply : public virtual ReplyBase
 {
 public:
     SearchReply(SearchReply const&) = delete;
+
+    /**
+     \brief Register departments for current search reply and hint the client about current department.
+     Current department should in most cases be the one obtained from search request Query::department_id().
+     Pass empty string for current_department_id to indicate no active department.
+     \param departments a list of departments
+     \param current_department_id a department id that should be considered as current
+     */
+    void register_departments(DepartmentList const& departments, std::string current_department_id = "");
 
     /**
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
@@ -71,7 +81,14 @@ public:
     */
     bool push(CategorisedResult const& result) const;
 
-    bool push(Annotation const& annotation) const;
+    /**
+    \brief Register Annotation.
+    Annotation will get displayed at a next available spot below category registered before.
+    Register annotations first before categories to get them displayed
+    at the top annotation area. Note: Unity shell can ignore some or all annotations, depending
+    on available screen estate.
+    */
+    bool register_annotation(Annotation const& annotation) const;
 
     /**
     \brief Sends all filters and their state to the source of a query.

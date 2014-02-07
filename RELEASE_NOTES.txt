@@ -8,6 +8,10 @@ Changes in version 0.3.1
 - Scope::activate_preview_action() and ScopeBase::activate_preview_action() were
   renamed to perform_action(). They now also require widget identifier
   along with action id and hints.
+- Annotation API changes: annotations of 'Card' type were removed and Annotation
+  doesn't support category attribute anymore. SearchReply::push() method for
+  annotations was renamed to register_annotation(). Annotations are now going to
+  be displayed in the order they were registered by scopes.
 - Result::activation_scope_name() method was renamed to target_scope_proxy() and
   it now returns ScopeProxy instead of a string. Client code can now use that
   proxy for result activation or preview calls, instead of having to do an extra
