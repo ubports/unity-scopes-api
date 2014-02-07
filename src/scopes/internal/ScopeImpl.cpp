@@ -86,7 +86,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
     }
 
     QueryCtrlProxy ctrl;
-    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -120,7 +120,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
     }
 
     QueryCtrlProxy ctrl;
-    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -159,7 +159,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result, VariantMap const&
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
@@ -194,7 +194,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
     }
 
     QueryCtrlProxy ctrl;
-    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
+    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
     try
     {
         // Create a middleware server-side object that can receive incoming
@@ -207,7 +207,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->preview(result, hints, rp);
+        ctrl = fwd()->preview(result.p->activation_target(), hints, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

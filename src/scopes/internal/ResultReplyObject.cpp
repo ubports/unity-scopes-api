@@ -46,9 +46,11 @@ namespace internal
 ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver),
-    cat_registry_(new CategoryRegistry())
+    cat_registry_(new CategoryRegistry()),
+    runtime_(runtime)
 {
     assert(receiver_);
+    assert(runtime);
 }
 
 ResultReplyObject::~ResultReplyObject()
@@ -122,10 +124,11 @@ void ResultReplyObject::process_data(VariantMap const& data)
         {
             auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
 
+            impl->set_runtime(runtime_);
             // set result origin
             if (impl->origin().empty())
             {
-                impl->set_origin(origin_scope_name());
+                impl->set_origin(origin_proxy());
             }
 
             CategorisedResult result(impl);

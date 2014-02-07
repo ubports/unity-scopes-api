@@ -59,7 +59,7 @@ public:
                                           std::string const& action_id,
                                           MWReplyProxy const& reply) override;
 
-    virtual QueryCtrlProxy preview(Result const& result,
+    virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
 };

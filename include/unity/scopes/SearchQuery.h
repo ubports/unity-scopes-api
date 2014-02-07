@@ -54,6 +54,7 @@ public:
     NONCOPYABLE(SearchQuery);
     UNITY_DEFINES_PTRS(SearchQuery);
 
+    /// Invoked when a SearchQuery is run, use the provided proxy to push results
     virtual void run(SearchReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // Create a sub-query.

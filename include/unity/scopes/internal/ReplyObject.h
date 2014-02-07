@@ -47,7 +47,7 @@ class ReplyObject : public ReplyObjectBase
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_name);
+    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy);
     virtual ~ReplyObject();
 
     virtual void process_data(VariantMap const& data) = 0;
@@ -55,7 +55,7 @@ public:
     // Remote operation implementations
     void push(VariantMap const& result) noexcept override;
     void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
-    std::string origin_scope_name() const;
+    std::string origin_proxy() const;
 
 private:
     ListenerBase::SPtr const listener_base_;
@@ -63,7 +63,7 @@ private:
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;
-    std::string origin_scope_name_;
+    std::string origin_proxy_;
     int num_push_;
 };
 
