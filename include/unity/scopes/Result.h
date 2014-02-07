@@ -69,7 +69,17 @@ public:
     Result retrieve() const;
 
     void set_uri(std::string const& uri);
+    /**
+     \brief Set "title" property of this result.
+
+     Equivalent to calling result["title"] = title;
+     */
     void set_title(std::string const& title);
+    /**
+     \brief Set "art" property of this result.
+
+     Equivalent to calling result["art"] = image;
+     */
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
 
