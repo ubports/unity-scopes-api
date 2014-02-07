@@ -136,7 +136,35 @@ public:
 
     virtual void run(PreviewReplyProxy const& reply) override
     {
-        (void)reply;
+        auto results = preview_handle_->get_preview_results();
+        PreviewHandle::Columns columns = results.first;
+        PreviewHandle::Widgets widgets = results.second;
+
+        // register layout
+        ColumnLayoutList layout_list;
+
+        for (auto& column : columns)
+        {
+            ColumnLayout layout(column.size());
+            for( auto& widget_lo : column )
+            {
+                layout.add_column(widget_lo);
+            }
+
+            layout_list.emplace_back(layout);
+        }
+
+        reply->register_layout(layout_list);
+
+        // push wigdets
+        PreviewWidgetList widget_list;
+
+        for (auto& widget_json : widgets)
+        {
+            widget_list.emplace_back(PreviewWidget(widget_json));
+        }
+
+        reply->push(widget_list);
 
         std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result_.uri() << "\" complete" << std::endl;
     }
