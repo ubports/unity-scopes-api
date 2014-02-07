@@ -112,8 +112,6 @@ public:
                               std::string const& platform,
                               std::string const& locale = "",
                               std::string const& country = "",
-                              std::string const& latitude = "",
-                              std::string const& longitude = "",
                               const uint limit = 0);
 
 private:

@@ -169,8 +169,6 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              std::string const& platform,
                                              std::string const& locale,
                                              std::string const& country,
-                                             std::string const& latitude,
-                                             std::string const& longitude,
                                              uint limit)
 {
     std::ostringstream search_uri;
@@ -192,14 +190,6 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     if (!country.empty())
     {
         search_uri << "&country=" << country;
-    }
-    if (!latitude.empty())
-    {
-        search_uri << "&latitude=" << latitude;
-    }
-    if (!longitude.empty())
-    {
-        search_uri << "&longitude=" << longitude;
     }
     if (limit != 0)
     {
