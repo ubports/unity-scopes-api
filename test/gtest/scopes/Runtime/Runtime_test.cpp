@@ -155,8 +155,11 @@ TEST(Runtime, preview)
     auto result = receiver->last_result();
     EXPECT_TRUE(result.get() != nullptr);
 
+    auto target = result->target_scope_proxy();
+    EXPECT_TRUE(target != nullptr);
+
     auto previewer = make_shared<PreviewReceiver>();
-    auto preview_ctrl = scope->preview(*(result.get()), hints, previewer);
+    auto preview_ctrl = target->preview(*(result.get()), hints, previewer);
     previewer->wait_until_finished();
 }
 

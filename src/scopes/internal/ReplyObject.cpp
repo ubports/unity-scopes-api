@@ -41,16 +41,16 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_name) :
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy) :
     listener_base_(receiver_base),
     finished_(false),
-    origin_scope_name_(scope_name),
+    origin_proxy_(scope_proxy),
     num_push_(0)
 {
     assert(receiver_base);
     assert(runtime);
     reap_item_ = runtime->reply_reaper()->add([this] {
-        cerr << "No activity on ReplyObject for scope " << this->origin_scope_name_
+        cerr << "No activity on ReplyObject for scope " << this->origin_proxy_
              << ": ReplyObject destroyed" << endl;
         this->disconnect();
     });
@@ -167,9 +167,9 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
-std::string ReplyObject::origin_scope_name() const
+std::string ReplyObject::origin_proxy() const
 {
-    return origin_scope_name_;
+    return origin_proxy_;
 }
 
 } // namespace internal

@@ -45,6 +45,7 @@ public:
 private:
     SearchListener::SPtr const receiver_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
+    RuntimeImpl const* runtime_;
 };
 
 } // namespace internal
