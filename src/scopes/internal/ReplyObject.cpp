@@ -52,7 +52,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     reap_item_ = runtime->reply_reaper()->add([this] {
         cerr << "No activity on ReplyObject for scope " << this->origin_scope_name_
              << ": ReplyObject destroyed" << endl;
-        this->disconnect(); 
+        this->disconnect();
     });
 }
 
