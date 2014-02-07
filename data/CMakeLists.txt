@@ -6,7 +6,13 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}.pc DESTINATION 
 configure_file(Runtime.ini.in Runtime.ini @ONLY)
 configure_file(Registry.ini.in Registry.ini @ONLY)
 configure_file(Zmq.ini.in Zmq.ini @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini ${CMAKE_CURRENT_BINARY_DIR}/Registry.ini ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini DESTINATION ${SCOPES_DEFAULT_CONFIGDIR})
+configure_file(SSRuntime.ini.in SSRuntime.ini @ONLY)
+configure_file(SSRegistry.ini.in SSRegistry.ini @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini ${CMAKE_CURRENT_BINARY_DIR}/Registry.ini ${CMAKE_CURRENT_BINARY_DIR}/SSRuntime.ini ${CMAKE_CURRENT_BINARY_DIR}/SSRegistry.ini ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini DESTINATION ${SCOPES_DEFAULT_CONFIGDIR})
+
+# upstart job for smart scopes proxy
+configure_file(smart-scopes-proxy.conf.in smart-scopes-proxy.conf @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/smart-scopes-proxy.conf DESTINATION ${CMAKE_INSTALL_DATADIR}/upstart/sessions)
 
 # upstart job for scope registry
 configure_file(scope-registry.conf.in scope-registry.conf @ONLY)

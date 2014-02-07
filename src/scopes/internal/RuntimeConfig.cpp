@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
 
 using namespace std;
@@ -47,7 +48,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     if (configfile.empty())  // Default config
     {
         registry_identity_ = "Registry";
-        registry_configfile_ = "Registry.ini";
+        registry_configfile_ = DFLT_REGISTRY_INI;
         default_middleware_ = "Zmq";
         default_middleware_configfile_ = "Zmq.ini";
     }

@@ -40,8 +40,10 @@ class ScopeImpl;
 }
 
 /**
-   \brief Result encapsulates the basic attributes of any result
-   returned by the Scope. The basic attributes (uri, title, icon, dnd_uri) must not be empty before
+   \brief Result encapsulates attributes of any result returned by the Scope.
+   Result API provides convienience methods for some typical attributes (title,
+   art) but scopes are free to add and use any custom attributes by means of []
+   operator. The only required attribute is 'uri' and it must not be empty before
    calling Reply::push.
 */
 class UNITY_API Result
@@ -68,7 +70,17 @@ public:
     Result retrieve() const;
 
     void set_uri(std::string const& uri);
+    /**
+     \brief Set "title" property of this result.
+
+     Equivalent to calling result["title"] = title;
+     */
     void set_title(std::string const& title);
+    /**
+     \brief Set "art" property of this result.
+
+     Equivalent to calling result["art"] = image;
+     */
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
 

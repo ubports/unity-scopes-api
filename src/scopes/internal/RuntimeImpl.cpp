@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
@@ -31,7 +32,6 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
-#include <unity/config.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -55,7 +55,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         scope_name_ = "c-" + id.gen();
     }
 
-    string config_file(configfile.empty() ? DEFAULT_RUNTIME : configfile);
+    string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
 
     try
     {
