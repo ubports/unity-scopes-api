@@ -70,7 +70,7 @@ PreviewHandle::~PreviewHandle()
     cancel_preview();
 }
 
-std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
+std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
 {
     return ssc_->get_preview_results(session_id_);
 }
@@ -139,12 +139,12 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         }
 
         std::string response_str;
-        std::cout << "SmartScopesClient: GET " << remote_scopes_uri.str() << std::endl;
+        std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
-        std::cout << "SmartScopesClient: Remote scopes:" << std::endl << response_str << std::endl;
+        std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
 
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
@@ -176,12 +176,14 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes.push_back(scope);
         }
 
-        std::cout << "SmartScopesClient: Retrieved remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
+        std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
         return remote_scopes;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "SmartScopesClient: Failed to retrieve remote scopes from uri: " << url_ << c_remote_scopes_resource << std::endl;
+        std::cout << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
         throw;
     }
 }
@@ -200,10 +202,10 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
 
     // mandatory parameters
 
-    search_uri << "q=\"" << http_client_->to_percent_encoding(query) << "\"";
-    search_uri << "&session_id=\"" << session_id << "\"";
+    search_uri << "q=" << http_client_->to_percent_encoding(query);
+    search_uri << "&session_id=" << session_id;
     search_uri << "&query_id=" << std::to_string(query_id);
-    search_uri << "&platform=\"" << platform << "\"";
+    search_uri << "&platform=" << platform;
 
     // optional parameters
 
@@ -223,7 +225,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     cancel_search(session_id);
 
     std::lock_guard<std::mutex> lock(search_results_mutex_);
-    std::cout << "SmartScopesClient: GET " << search_uri.str() << std::endl;
+    std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
     search_results_[session_id] = http_client_->get(search_uri.str(), port_);
 
     return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
@@ -242,9 +244,9 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
 
     // mandatory parameters
 
-    preview_uri << "&result=\"" << result << "\"";
-    preview_uri << "&session_id=\"" << session_id << "\"";
-    preview_uri << "&platform=\"" << platform << "\"";
+    preview_uri << "result=" << http_client_->to_percent_encoding(result);
+    preview_uri << "&session_id=" << session_id;
+    preview_uri << "&platform=" << platform;
     preview_uri << "&widgets_api_version=" << std::to_string(widgets_api_version);
 
     // optional parameters
@@ -261,7 +263,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     cancel_preview(session_id);
 
     std::lock_guard<std::mutex> lock(preview_results_mutex_);
-    std::cout << "SmartScopesClient: GET " << preview_uri.str() << std::endl;
+    std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
     preview_results_[session_id] = http_client_->get(preview_uri.str(), port_);
 
     return PreviewHandle::UPtr(new PreviewHandle(session_id, shared_from_this()));
@@ -285,7 +287,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             search_results_[session_id]->wait();
 
             response_str = search_results_[session_id]->get();
-            std::cout << "SmartScopesClient: Search:" << std::endl << response_str << std::endl;
+            std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
             search_results_.erase(it);
         }
 
@@ -372,20 +374,102 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             }
         }
 
-        std::cout << "SmartScopesClient: Retrieved search results for session: " << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for session: "
+                  << session_id << std::endl;
         return results;
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "SmartScopesClient: Failed to retrieve search results for session: " << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
+                  << session_id << std::endl;
         throw;
     }
 }
 
-std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& session_id)
+std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& session_id)
 {
-    (void)session_id;
-    return std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets>();
+    try
+    {
+        std::string response_str;
+
+        {
+            std::lock_guard<std::mutex> lock(preview_results_mutex_);
+
+            auto it = preview_results_.find(session_id);
+            if (it == preview_results_.end())
+            {
+                throw unity::LogicException("No preivew for session " + session_id + " is active");
+            }
+
+            preview_results_[session_id]->wait();
+
+            response_str = preview_results_[session_id]->get();
+            std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
+            preview_results_.erase(it);
+        }
+
+        PreviewHandle::Columns columns;
+        PreviewHandle::Widgets widgets;
+
+        std::vector<std::string> jsons = extract_json_stream(response_str);
+
+        for (std::string& json : jsons)
+        {
+            JsonNodeInterface::SPtr root_node;
+            JsonNodeInterface::SPtr child_node;
+
+            {
+                std::lock_guard<std::mutex> lock(json_node_mutex_);
+                json_node_->read_json(json);
+                root_node = json_node_->get_node();
+            }
+
+            if (root_node->has_node("columns"))
+            {
+                child_node = root_node->get_node("columns");
+
+                // for each column
+                for (int column_i = 0; column_i < child_node->size(); ++column_i)
+                {
+                    auto column_node = child_node->get_node(column_i);
+
+                    // for each widget layout within the column
+                    std::vector<std::vector<std::string>> widget_layouts;
+                    for (int widget_lo_i = 0; widget_lo_i < column_node->size(); ++widget_lo_i)
+                    {
+                        auto widget_lo_node = column_node->get_node(widget_lo_i);
+
+                        // for each widget within the widget layout
+                        std::vector<std::string> widgets;
+                        for (int widget_i = 0; widget_i < widget_lo_node->size(); ++widget_i)
+                        {
+                            auto widget_node = widget_lo_node->get_node(widget_i);
+                            widgets.push_back(widget_node->as_string());
+                        }
+
+                        widget_layouts.push_back(widgets);
+                    }
+
+                    columns.push_back(widget_layouts);
+                }
+            }
+            else if (root_node->has_node("widget"))
+            {
+                child_node = root_node->get_node("widget");
+                widgets.push_back(child_node->to_json_string());
+            }
+        }
+
+        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for session: "
+                  << session_id << std::endl;
+        return std::make_pair(columns, widgets);
+    }
+    catch (unity::Exception const& e)
+    {
+        std::cout << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
+                  << session_id << std::endl;
+        throw;
+    }
 }
 
 std::vector<std::string> SmartScopesClient::extract_json_stream(std::string const& json_stream)

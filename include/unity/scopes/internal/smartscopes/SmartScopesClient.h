@@ -98,10 +98,10 @@ public:
 
     ~PreviewHandle();
 
-    using Layouts = std::vector< std::vector< std::string > >;
-    using Widgets = std::vector< std::string >;
+    using Columns = std::vector<std::vector<std::vector<std::string>>>;
+    using Widgets = std::vector<std::string>;
 
-    std::pair<Layouts, Widgets> get_preview_results();
+    std::pair<Columns, Widgets> get_preview_results();
     void cancel_preview();
 
 private:
@@ -150,7 +150,7 @@ private:
     friend class PreviewHandle;
 
     std::vector<SearchResult> get_search_results(std::string const& session_id);
-    std::pair<PreviewHandle::Layouts, PreviewHandle::Widgets> get_preview_results(std::string const& session_id);
+    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(std::string const& session_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 

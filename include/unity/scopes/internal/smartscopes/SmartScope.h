@@ -121,7 +121,8 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        //search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", "", "", 10);
+        ///! TODO: session_id, platform, widgets_api_version, locale, country
+        preview_handle_ = ss_client->preview(base_url, "", "session_id", "platform", 0, "en", "US");
     }
 
     ~SmartPreview()
@@ -130,16 +131,20 @@ public:
 
     virtual void cancelled() override
     {
+        preview_handle_->cancel_preview();
     }
 
     virtual void run(PreviewReplyProxy const& reply) override
     {
         (void)reply;
+
+        std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result_.uri() << "\" complete" << std::endl;
     }
 
 private:
     std::string scope_id_;
     Result result_;
+    PreviewHandle::UPtr preview_handle_;
 };
 
 class SmartScope
