@@ -46,6 +46,10 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        DepartmentList departments({{"news", query_, "News", {{"news-world", query_, "World"}, {"news-europe", query_, "Europe"}}},
+                                    {"sport", query_, "Sport"}});
+        reply->register_departments(departments);
+
         Filters filters;
         auto filter = OptionSelectorFilter::create("f1", "Options");
         filter->add_option("1", "Option 1");

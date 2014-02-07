@@ -39,6 +39,11 @@ SearchReply::~SearchReply()
 {
 }
 
+void SearchReply::register_departments(DepartmentList const& departments, std::string current_department_id)
+{
+    return fwd()->register_departments(departments, current_department_id);
+}
+
 Category::SCPtr SearchReply::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
 {
     return fwd()->register_category(id, title, icon, renderer_template);

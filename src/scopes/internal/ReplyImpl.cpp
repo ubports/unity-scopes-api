@@ -33,6 +33,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
+#include <unity/scopes/internal/DepartmentImpl.h>
 
 #include <sstream>
 #include <cassert>
@@ -76,6 +77,29 @@ void ReplyImpl::register_category(Category::SCPtr category)
 {
     cat_registry_->register_category(category); // will throw if that category id has already been registered
     push(category);
+}
+
+void ReplyImpl::register_departments(DepartmentList const& departments, std::string current_department_id)
+{
+    // basic consistency check
+    try
+    {
+        DepartmentImpl::validate_departments(departments, current_department_id);
+    }
+    catch (unity::LogicException const &e)
+    {
+        throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
+    }
+
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& dep: departments)
+    {
+        arr.push_back(Variant(dep.serialize()));
+    }
+    vm["departments"] = arr;
+    vm["current_department"] = current_department_id;
+    push(vm); // ignore return value?
 }
 
 Category::SCPtr ReplyImpl::register_category(std::string const& id,
