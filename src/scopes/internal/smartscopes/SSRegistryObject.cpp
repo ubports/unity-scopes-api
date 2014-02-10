@@ -173,11 +173,6 @@ void SSRegistryObject::get_remote_scopes()
     // loop through all available scopes and add() each visible scope
     for (RemoteScope const& scope : remote_scopes)
     {
-        if (scope.invisible)
-        {
-            continue;
-        }
-
         // construct a ScopeMetadata with remote scope info
         std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
@@ -190,6 +185,7 @@ void SSRegistryObject::get_remote_scopes()
                                              scope.name);
 
         metadata->set_proxy(proxy);
+        metadata->set_invisible(scope.invisible);
 
         auto meta = ScopeMetadataImpl::create(move(metadata));
 
