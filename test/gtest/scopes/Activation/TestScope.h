@@ -62,7 +62,7 @@ public:
 
     virtual ActivationResponse activate() override
     {
-        ActivationResponse resp(ActivationResponse::Status::Handled);
+        ActivationResponse resp(ActivationResponse::Status::ShowDash);
         VariantMap var;
         var[hint_key_] = hint_val_;
         var["received_hints"] = recv_hints_; // send received hints back for testing
@@ -105,9 +105,9 @@ public:
         return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints.scope_data()));
     }
 
-    virtual ActivationBase::UPtr activate_preview_action(Result const& result, ActionMetadata const& hints, std::string const& action_id) override
+    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id) override
     {
-        return ActivationBase::UPtr(new TestActivation("activated action id", action_id, result.uri(), hints.scope_data()));
+        return ActivationBase::UPtr(new TestActivation("activated action", widget_id + action_id, result.uri(), hints.scope_data()));
     }
 };
 

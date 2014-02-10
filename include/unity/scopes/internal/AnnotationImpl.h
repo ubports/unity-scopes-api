@@ -24,7 +24,6 @@
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/Link.h>
-#include <unity/scopes/Category.h>
 #include <list>
 
 namespace unity
@@ -35,20 +34,17 @@ namespace scopes
 
 namespace internal
 {
-class CategoryRegistry;
 
 class UNITY_API AnnotationImpl
 {
 public:
     explicit AnnotationImpl(Annotation::Type annotation_type);
-    AnnotationImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map);
+    AnnotationImpl(const VariantMap &variant_map);
     virtual ~AnnotationImpl();
 
     void set_label(std::string const& label);
     void set_icon(std::string const& icon);
     void add_link(std::string const& label, Query const& query);
-    void set_category(Category::SCPtr category);
-    Category::SCPtr category() const;
     std::string label() const;
     std::string icon() const;
     std::list<Link::SCPtr> links() const;
@@ -60,7 +56,6 @@ private:
     Annotation::Type annotation_type_;
     std::string label_;
     std::string icon_;
-    Category::SCPtr category_;
     std::list<Link::SCPtr> links_;
 };
 

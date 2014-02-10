@@ -21,6 +21,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
+#include <unity/scopes/ScopeProxyFwd.h>
 #include <string>
 #include <memory>
 
@@ -69,7 +70,17 @@ public:
     Result retrieve() const;
 
     void set_uri(std::string const& uri);
+    /**
+     \brief Set "title" property of this result.
+
+     Equivalent to calling result["title"] = title;
+     */
     void set_title(std::string const& title);
+    /**
+     \brief Set "art" property of this result.
+
+     Equivalent to calling result["art"] = image;
+     */
     void set_art(std::string const& image);
     void set_dnd_uri(std::string const& dnd_uri);
 
@@ -93,12 +104,12 @@ public:
     bool direct_activation() const;
 
     /**
-     \brief Get name of a scope that handles activation and preview of this result.
-     The name is only available when receiving this result from a scope, otherwise this method throws LogicException.
+     \brief Get proxy of a scope that handles activation and preview of this result.
+     The proxy is only available when receiving this result from a scope, otherwise this method throws LogicException.
      Note that activation request should only be sent to a scope returned by this method if direct_activation() is false.
-     \return scope name
+     \return scope proxy
      */
-    std::string activation_scope_name() const;
+    ScopeProxy target_scope_proxy() const;
 
     /**
        \brief Returns reference of a Result attribute.

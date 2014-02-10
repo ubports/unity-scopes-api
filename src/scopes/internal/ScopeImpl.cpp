@@ -27,7 +27,7 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/SearchMetadata.h>
-#include <unity/Exception.h>
+#include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/PreviewReplyObject.h>
@@ -82,8 +82,13 @@ QueryCtrlProxy ScopeImpl::create_query(string const& query_string, SearchMetadat
 
 QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::create_query(): invalid SearchListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
-    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, scope_name_));
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -111,8 +116,13 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const&
 
 QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
-    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
@@ -139,24 +149,29 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& m
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, ActionMetadata const& metadata, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     try
     {
         // Create a middleware server-side object that can receive incoming
         // push() and finished() messages over the network.
-        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, scope_name_));
+        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate_preview_action(result.p->activation_target(), metadata.serialize(), action_id, rp);
+        ctrl = fwd()->perform_action(result.p->activation_target(), metadata.serialize(), widget_id, action_id, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
     {
         // TODO: log error
-        cerr << "activate_preview_action(): " << e.what() << endl;
+        cerr << "perform_action(): " << e.what() << endl;
         try
         {
             // TODO: if things go wrong, we need to make sure that the reply object
@@ -166,7 +181,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, ActionMe
         }
         catch (...)
         {
-            cerr << "activate_preview_action(): unknown exception" << endl;
+            cerr << "perform_action(): unknown exception" << endl;
         }
         throw;
     }
@@ -175,8 +190,13 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, ActionMe
 
 QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
-    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, scope_name_));
+    PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
     try
     {
         // Create a middleware server-side object that can receive incoming
@@ -189,7 +209,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hi
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->preview(result, hints.serialize(), rp);
+        ctrl = fwd()->preview(result.p->activation_target(), hints.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

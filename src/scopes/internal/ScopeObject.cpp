@@ -181,15 +181,16 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
     );
 }
 
-MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
-                              ActionMetadata const& hints,
-                              std::string const& action_id,
-                              MWReplyProxy const &reply,
-                              InvokeInfo const& info)
+MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
+                                             ActionMetadata const& hints,
+                                             std::string const& widget_id,
+                                             std::string const& action_id,
+                                             MWReplyProxy const &reply,
+                                             InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&result, &hints, &action_id, this]() -> QueryBase::SPtr {
-                return this->scope_base_->activate_preview_action(result, hints, action_id);
+            [&result, &hints, &widget_id, &action_id, this]() -> QueryBase::SPtr {
+                return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
