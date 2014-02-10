@@ -27,6 +27,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListener.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
