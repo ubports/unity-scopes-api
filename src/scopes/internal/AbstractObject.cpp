@@ -52,15 +52,19 @@ void AbstractObject::disconnect() noexcept
     {
         // Lock needed because disconnect() may be called
         // from another thread, such as the reaper.
-        lock_guard<mutex> lock(mutex_);
-        assert(disconnect_func_);
-        disconnect_func_();
+        function<void()> disconnect_func;
+        {
+            lock_guard<mutex> lock(mutex_);
+            assert(disconnect_func_);
+            disconnect_func = disconnect_func_;
+        }
+        disconnect_func();
     }
     catch (...)
     {
         // Only happens if no servant with the corresponding identity is registered.
         // If we have concurrent calls into a servant, each of which tries to disconnect
-        // the servant, only the first one succeeds; second and subsequent calls wil be ignored.
+        // the servant, only the first one succeeds; second and subsequent calls will be ignored.
     }
 }
 
