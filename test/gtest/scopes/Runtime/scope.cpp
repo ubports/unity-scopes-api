@@ -54,6 +54,11 @@ public:
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
+
+        Query query("scope-A", "foo", "dep1");
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("Link1", query);
+        reply->register_annotation(annotation);
     }
 
 private:
