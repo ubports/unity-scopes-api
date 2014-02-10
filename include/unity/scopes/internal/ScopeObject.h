@@ -64,11 +64,12 @@ public:
                               MWReplyProxy const &reply,
                               InvokeInfo const& info) override;
 
-    virtual MWQueryCtrlProxy activate_preview_action(Result const& result,
-                                                     VariantMap const& hints,
-                                                     std::string const& action_id,
-                                                     MWReplyProxy const &reply,
-                                                     InvokeInfo const& info) override;
+    virtual MWQueryCtrlProxy perform_action(Result const& result,
+                                            VariantMap const& hints,
+                                            std::string const& widget_id,
+                                            std::string const& action_id,
+                                            MWReplyProxy const &reply,
+                                            InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy preview(Result const& result,
                                      VariantMap const& hints,

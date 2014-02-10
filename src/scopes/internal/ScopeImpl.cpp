@@ -25,7 +25,7 @@
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/Result.h>
-#include <unity/Exception.h>
+#include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/PreviewReplyObject.h>
@@ -80,6 +80,11 @@ QueryCtrlProxy ScopeImpl::create_query(string const& query_string, VariantMap co
 
 QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::create_query(): invalid SearchListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string()));
     try
@@ -109,6 +114,11 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
 
 QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
     try
@@ -137,8 +147,13 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::perform_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     try
     {
@@ -148,13 +163,13 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate_preview_action(result.p->activation_target(), hints, action_id, rp);
+        ctrl = fwd()->perform_action(result.p->activation_target(), hints, widget_id, action_id, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
     {
         // TODO: log error
-        cerr << "activate_preview_action(): " << e.what() << endl;
+        cerr << "perform_action(): " << e.what() << endl;
         try
         {
             // TODO: if things go wrong, we need to make sure that the reply object
@@ -164,7 +179,7 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
         }
         catch (...)
         {
-            cerr << "activate_preview_action(): unknown exception" << endl;
+            cerr << "perform_action(): unknown exception" << endl;
         }
         throw;
     }
@@ -173,6 +188,11 @@ QueryCtrlProxy ScopeImpl::activate_preview_action(Result const& result, VariantM
 
 QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
 {
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListener (nullptr)");
+    }
+
     QueryCtrlProxy ctrl;
     PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
     try

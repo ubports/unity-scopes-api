@@ -23,6 +23,7 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
@@ -49,6 +50,7 @@ ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, Runti
     cat_registry_(new CategoryRegistry()),
     runtime_(runtime)
 {
+    assert(receiver_);
     assert(runtime);
 }
 
@@ -98,13 +100,29 @@ void ResultReplyObject::process_data(VariantMap const& data)
         receiver_->push(cat);
     }
 
+    it = data.find("departments");
+    if (it != data.end())
+    {
+        auto const deparr = it->second.get_array();
+        DepartmentList departments;
+        for (auto const& dep: deparr)
+        {
+            departments.push_back(DepartmentImpl::create(dep.get_dict()));
+        }
+        it = data.find("current_department");
+        if (it == data.end())
+        {
+        }
+        receiver_->push(departments, it->second.get_string());
+    }
+
     it = data.find("annotation");
     if (it != data.end())
     {
         auto result_var = it->second.get_dict();
         try
         {
-            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+            Annotation annotation(new internal::AnnotationImpl(result_var));
             receiver_->push(std::move(annotation));
         }
         catch (std::exception const& e)

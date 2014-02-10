@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ACTIVATIONRESPONSEIMPL_H
 
 #include <unity/scopes/ActivationResponse.h>
+#include <unity/scopes/Query.h>
 
 namespace unity
 {
@@ -34,6 +35,7 @@ class ActivationResponseImpl final
 {
 public:
     ActivationResponseImpl(ActivationResponse::Status status);
+    ActivationResponseImpl(Query const& query);
     ActivationResponseImpl(VariantMap const& var);
     ~ActivationResponseImpl() = default;
 
@@ -45,6 +47,7 @@ public:
     ActivationResponse::Status status() const;
     void setHints(VariantMap const& hints);
     VariantMap hints() const;
+    Query query() const;
 
     VariantMap serialize() const;
 
@@ -52,6 +55,7 @@ public:
 
 private:
     ActivationResponse::Status status_;
+    Query::SPtr query_;
     VariantMap hints_;
 };
 
