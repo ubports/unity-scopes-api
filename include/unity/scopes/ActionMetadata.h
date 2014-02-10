@@ -16,12 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHMETADATA_H
-#define UNITY_SCOPES_SEARCHMETADATA_H
+#ifndef UNITY_SCOPES_ACTIONMETADATA_H
+#define UNITY_SCOPES_ACTIONMETADATA_H
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/QueryMetadata.h>
-#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -31,38 +30,32 @@ namespace scopes
 
 namespace internal
 {
-class SearchMetadataImpl;
+class ActionMetadataImpl;
 }
 
 /**
-\brief Metadata passed with search requests.
+\brief
 */
-class UNITY_API SearchMetadata : public QueryMetadata
+class UNITY_API ActionMetadata : public QueryMetadata
 {
 public:
-    /// @cond
-    UNITY_DEFINES_PTRS(SearchMetadata);
-    /// @endcond
-
-    SearchMetadata(std::string const& locale, std::string const& form_factor);
-    SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor);
+    ActionMetadata(std::string const& locale, std::string const& form_factor);
+    void set_scope_data(Variant const& data);
+    Variant scope_data() const;
 
     /// @cond
-    SearchMetadata(SearchMetadata const& other);
-    SearchMetadata(SearchMetadata&&);
-    ~SearchMetadata();
+    ActionMetadata(ActionMetadata const& other);
+    ActionMetadata(ActionMetadata&&);
+    ~ActionMetadata();
 
-    SearchMetadata& operator=(SearchMetadata const &other);
-    SearchMetadata& operator=(SearchMetadata&&);
+    ActionMetadata& operator=(ActionMetadata const &other);
+    ActionMetadata& operator=(ActionMetadata&&);
     /// @endcond
-
-    void set_cardinality(int cardinality);
-    int cardinality() const;
 
 private:
-    SearchMetadata(internal::SearchMetadataImpl *impl);
-    internal::SearchMetadataImpl* fwd() const;
-    friend class internal::SearchMetadataImpl;
+    ActionMetadata(internal::ActionMetadataImpl *impl);
+    internal::ActionMetadataImpl* fwd() const;
+    friend class internal::ActionMetadataImpl;
 };
 
 } // namespace scopes

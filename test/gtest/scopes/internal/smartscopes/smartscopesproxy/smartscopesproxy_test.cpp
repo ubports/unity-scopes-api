@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include "../RaiiServer.h"
 
@@ -202,7 +203,7 @@ TEST_F(smartscopesproxytest, ss_scope)
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
 
-    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
 
     wait_thread.join();
 }

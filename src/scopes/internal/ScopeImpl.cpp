@@ -25,6 +25,8 @@
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
@@ -56,29 +58,29 @@ ScopeImpl::~ScopeImpl()
 {
 }
 
-QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_, query_string, department_id);
     query.set_filter_state(filter_state);
-    return create_query(query, hints, reply);
+    return create_query(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, FilterState const& filter_state, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_);
     query.set_query_string(query_string);
     query.set_filter_state(filter_state);
-    return create_query(query, hints, reply);
+    return create_query(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(string const& query_string, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_);
     query.set_query_string(query_string);
-    return create_query(query, hints, reply);
+    return create_query(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
@@ -95,7 +97,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
         // synchronous twoway interaction with the scope, so it can return
         // the QueryCtrlProxy. This may block for some time, for example, if
         // the scope is not running and needs to be activated by the registry first.
-        ctrl = fwd()->create_query(query, hints, rp);
+        ctrl = fwd()->create_query(query, metadata.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
@@ -112,7 +114,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, VariantMap const& hin
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
@@ -126,7 +128,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->activate(result.p->activation_target(), hints, rp);
+        ctrl = fwd()->activate(result.p->activation_target(), metadata.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
@@ -147,7 +149,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, VariantMap const& hints
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::perform_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
@@ -163,7 +165,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result, VariantMap const&
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
         // Forward the activate() method across the bus.
-        ctrl = fwd()->perform_action(result.p->activation_target(), hints, widget_id, action_id, rp);
+        ctrl = fwd()->perform_action(result.p->activation_target(), metadata.serialize(), widget_id, action_id, rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
@@ -186,7 +188,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result, VariantMap const&
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
@@ -207,7 +209,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, VariantMap const& hints,
         // thread for create_query() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
         // is called by create_query() on the server side.)
-        ctrl = fwd()->preview(result.p->activation_target(), hints, rp);
+        ctrl = fwd()->preview(result.p->activation_target(), hints.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)

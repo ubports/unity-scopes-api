@@ -16,13 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERYMETADATA_H
-#define UNITY_SCOPES_QUERYMETADATA_H
+#ifndef UNITY_INTERNAL_ACTIONMETADATAIMPL_H
+#define UNITY_INTERNAL_ACTIONMETADATAIMPL_H
 
-#include <unity/SymbolExport.h>
-#include <unity/scopes/Variant.h>
-#include <string>
-#include <memory>
+#include <unity/scopes/internal/QueryMetadataImpl.h>
+#include <unity/scopes/ActionMetadata.h>
 
 namespace unity
 {
@@ -33,37 +31,27 @@ namespace scopes
 namespace internal
 {
 
-class QueryMetadataImpl;
-
-}
-
-/**
-\brief Base class for extra metadata passed to scopes as a part of a request.
-*/
-class UNITY_API QueryMetadata
+class ActionMetadataImpl : public QueryMetadataImpl
 {
 public:
-    QueryMetadata(QueryMetadata const& other);
-    QueryMetadata(QueryMetadata&&);
-    virtual ~QueryMetadata();
+    ActionMetadataImpl(std::string const& locale, std::string const& form_factor);
+    ActionMetadataImpl(VariantMap const& var);
+    ~ActionMetadataImpl() = default;
 
-    QueryMetadata& operator=(QueryMetadata&&);
+    void set_scope_data(Variant const& data);
+    Variant scope_data() const;
 
-    std::string locale() const;
-    std::string form_factor() const;
-
-    VariantMap serialize() const;
+    static ActionMetadata create(VariantMap const& var);
 
 protected:
-    QueryMetadata(std::string const& locale, std::string const& form_factor);
+    std::string metadata_type() const override;
+    void serialize(VariantMap &var) const override;
 
 private:
-    QueryMetadata(internal::QueryMetadataImpl *impl);
-    std::unique_ptr<internal::QueryMetadataImpl> p;
-
-    friend class SearchMetadata;
-    friend class ActionMetadata;
+    Variant scope_data_;
 };
+
+} // namespace internal
 
 } // namespace scopes
 

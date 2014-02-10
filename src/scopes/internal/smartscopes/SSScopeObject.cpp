@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -60,7 +62,7 @@ SSScopeObject::~SSScopeObject() noexcept
 }
 
 MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
-                                             VariantMap const& hints,
+                                             SearchMetadata const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
@@ -71,7 +73,7 @@ MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
-                                         VariantMap const& hints,
+                                         ActionMetadata const& hints,
                                          MWReplyProxy const& reply,
                                          InvokeInfo const& info)
 {
@@ -84,7 +86,7 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
 }
 
 MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
-                                               VariantMap const& hints,
+                                               ActionMetadata const& hints,
                                                std::string const& widget_id,
                                                std::string const& action_id,
                                                MWReplyProxy const& reply,
@@ -101,7 +103,7 @@ MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
-                                        VariantMap const& hints,
+                                        ActionMetadata const& hints,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {

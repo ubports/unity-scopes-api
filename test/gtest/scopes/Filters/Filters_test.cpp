@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/FilterOption.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 #include <TestScope.h>
@@ -86,7 +87,7 @@ TEST(Filters, scope)
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
-    VariantMap hints;
+    SearchMetadata hints("pl", "phone");
     auto receiver = std::make_shared<SearchReceiver>();
     auto ctrl = scope->create_query("test", hints, receiver);
     receiver->wait_until_finished();

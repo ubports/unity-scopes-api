@@ -223,14 +223,14 @@ public:
         }
     }
 
-    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
         cerr << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << scope_name_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

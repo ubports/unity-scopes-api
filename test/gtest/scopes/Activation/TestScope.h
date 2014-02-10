@@ -52,7 +52,7 @@ public:
 class TestActivation : public ActivationBase
 {
 public:
-    TestActivation(std::string const& hint, std::string const& hint_val, std::string const &uri, VariantMap const& hints)
+    TestActivation(std::string const& hint, std::string const& hint_val, std::string const &uri, Variant const& hints)
         : hint_key_(hint),
           hint_val_(hint_val),
           uri_(uri),
@@ -75,7 +75,7 @@ private:
     std::string hint_key_;
     std::string hint_val_;
     std::string uri_;
-    VariantMap recv_hints_;
+    Variant recv_hints_;
 };
 
 class TestScope : public ScopeBase
@@ -90,24 +90,24 @@ public:
 
     virtual void run() override {}
 
-    virtual QueryBase::UPtr create_query(Query const &, VariantMap const &) override
+    virtual QueryBase::UPtr create_query(Query const &, SearchMetadata const &) override
     {
         return QueryBase::UPtr(new TestQuery());
     }
 
-    virtual QueryBase::UPtr preview(Result const&, VariantMap const &) override
+    virtual QueryBase::UPtr preview(Result const&, ActionMetadata const &) override
     {
         return nullptr;
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints) override
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& hints) override
     {
-        return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints));
+        return ActivationBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints.scope_data()));
     }
 
-    virtual ActivationBase::UPtr perform_action(Result const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id) override
+    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id) override
     {
-        return ActivationBase::UPtr(new TestActivation("activated action", widget_id + action_id, result.uri(), hints));
+        return ActivationBase::UPtr(new TestActivation("activated action", widget_id + action_id, result.uri(), hints.scope_data()));
     }
 };
 
