@@ -24,6 +24,7 @@
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Annotation.h>
+#include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 
 #include <string>
@@ -46,6 +47,12 @@ public:
 
     virtual ~SearchListener();
     /// @endcond
+
+    /**
+    \brief Called at most once by the scopes run time for a list of departments returned by a query.
+    The default implementation does nothing.
+    */
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id);
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().

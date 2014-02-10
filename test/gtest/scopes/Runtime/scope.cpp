@@ -23,6 +23,7 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/Query.h>
+#include <unity/scopes/Department.h>
 
 #include "scope.h"
 
@@ -32,11 +33,20 @@ using namespace unity::scopes;
 class TestQuery : public SearchQuery
 {
 public:
+    TestQuery(Query const& query)
+        : query_(query)
+    {
+    }
+
     virtual void cancelled() override
     {
     }
     virtual void run(SearchReplyProxy const& reply) override
     {
+        Department dep("news", query_, "News");
+        dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
+        reply->register_departments({dep}, "news");
+
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
         res.set_uri("uri");
@@ -45,6 +55,9 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
     }
+
+private:
+    Query query_;
 };
 
 class TestPreview : public PreviewQuery
@@ -77,9 +90,9 @@ void TestScope::run()
 {
 }
 
-QueryBase::UPtr TestScope::create_query(Query const &, VariantMap const &)
+QueryBase::UPtr TestScope::create_query(Query const& query, VariantMap const &)
 {
-    return QueryBase::UPtr(new TestQuery());
+    return QueryBase::UPtr(new TestQuery(query));
 }
 
 QueryBase::UPtr TestScope::preview(Result const&, VariantMap const &)

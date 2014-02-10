@@ -56,6 +56,22 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
+std::string to_string(Department const& dep, std::string const& indent = "")
+{
+    std::ostringstream str;
+    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
+    auto const subdeps = dep.subdepartments();
+    if (subdeps.size() > 0)
+    {
+        str << indent << "\tsubdepartments:" << endl;
+        for (auto const& d: subdeps)
+        {
+            str << indent << to_string(d, indent + "\t\t");
+        }
+    }
+    return str.str();
+}
+
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
@@ -108,6 +124,16 @@ public:
         : index_to_save_(index_to_save),
           push_result_count_(0)
     {
+    }
+
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        cout << "\treceived departments:" << endl;
+        for (auto const& dep: departments)
+        {
+            cout << to_string(dep);
+        }
+        cout << "\tcurrent department=" << current_department_id << endl;
     }
 
     virtual void push(Category::SCPtr category) override
@@ -407,15 +433,9 @@ int main(int argc, char* argv[])
                 cout << "\tdirect activation: " << direct_activation << endl;
                 if (!direct_activation)
                 {
-                    auto target_scope = result->activation_scope_name();
-                    ScopeProxy proxy;
-                    if (target_scope != meta.scope_name()) // if activation scope is different than current, get the right proxy
-                    {
-                        meta = r->get_metadata(target_scope);
-                    }
-                    proxy = meta.proxy();
-                    cout << "\tactivation scope name: " << target_scope << endl;
-                    proxy->activate(*result, vm, act_reply);
+                    auto target_scope = result->target_scope_proxy();
+                    cout << "\tactivation scope: " << target_scope->to_string() << endl;
+                    target_scope->activate(*result, vm, act_reply);
                     act_reply->wait_until_finished();
                 }
             }
@@ -423,7 +443,9 @@ int main(int argc, char* argv[])
             {
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
-                meta.proxy()->preview(*result, vm, preview_reply);
+                auto target_scope = result->target_scope_proxy();
+                cout << "\tactivation scope name: " << target_scope->to_string() << endl;
+                target_scope->preview(*result, vm, preview_reply);
                 preview_reply->wait_until_finished();
             }
         }

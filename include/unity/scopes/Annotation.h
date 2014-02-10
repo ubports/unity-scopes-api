@@ -22,7 +22,6 @@
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
-#include <unity/scopes/Category.h>
 #include <list>
 #include <memory>
 
@@ -51,8 +50,7 @@ public:
     enum Type
     {
         Link, //!< A simple link with just a label and/or an icon
-        GroupedLink, //!< A group of links, with a label for the group name and labels for all links inside it
-        Card //!< A link that has a label and icon and is meant to be displayed within a category (with results)
+        GroupedLink //!< A group of links, with a label for the group name and labels for all links inside it
     };
 
    /**
@@ -76,32 +74,17 @@ public:
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation. This currently makes sense for Type::Link or
-     * AnnotationType::Card types only.
+     * \brief Sets an icon for an annotation. This currently makes sense for Type::Link.
      */
     void set_icon(std::string const& icon);
 
     /**
      * \brief Adds a link to the annotation. There needs to be exactly one link
-     * added for the annotations of type Type::Link and Type::Card
+     * added for the annotations of type Type::Link
      * and at least one for Type::GroupedLink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
     void add_link(std::string const& label, Query const& query);
-
-    /**
-     * \brief Assigns this annotation to a category. Depending on the Type set, it
-     * get be displayed among results of that category (for Type::Card) or
-     * below it (for remaing annotation types).
-     */
-    void set_category(Category::SCPtr category);
-
-    /**
-     * \brief Returns category assigned to this annotation. Category can be nullptr, in which case
-     * the annotation should be displayed at the top annotation area.
-     * \return category instance or nullptr.
-     */
-    Category::SCPtr category() const;
 
     /**
      * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedLink only.
@@ -110,8 +93,7 @@ public:
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Link and
-     * Type::Card.
+     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Link.
      * \return icon associated with this annotation
      */
     std::string icon() const;
