@@ -48,7 +48,7 @@ private:
     virtual void activate_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r);
-    virtual void activate_preview_action_(Current const& current,
+    virtual void perform_action_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r);
     virtual void preview_(Current const& current,

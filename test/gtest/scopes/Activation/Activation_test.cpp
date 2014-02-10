@@ -544,7 +544,7 @@ TEST(Activation, scope)
 
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
-        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
+        EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
         EXPECT_EQ("bar", response->hints()["foo"].get_string());
         EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
@@ -554,13 +554,13 @@ TEST(Activation, scope)
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = target->activate_preview_action(*result, hints, "action1", act_receiver);
+        ctrl = target->perform_action(*result, hints, "widget1", "action1", act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
-        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
-        EXPECT_EQ("action1", response->hints()["activated action id"].get_string());
+        EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
+        EXPECT_EQ("widget1action1", response->hints()["activated action"].get_string());
         EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
     }
