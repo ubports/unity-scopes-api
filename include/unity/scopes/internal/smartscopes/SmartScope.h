@@ -46,8 +46,8 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& id, SSRegistryObject::SPtr reg, Query const& query)
-        : scope_id_(id)
+    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query)
+        : scope_id_(scope_id)
         , query_(query)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
@@ -116,8 +116,8 @@ private:
 class SmartPreview : public PreviewQuery
 {
 public:
-    SmartPreview(std::string const& id, SSRegistryObject::SPtr reg, Result const& result)
-        : scope_id_(id)
+    SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result)
+        : scope_id_(scope_id)
         , result_(result)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
