@@ -68,6 +68,10 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         hot_key_.reset(new string(*other.hot_key_));
     }
+    if (other.invisible_)
+    {
+        invisible_.reset(new bool(*other.invisible_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -82,6 +86,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         icon_.reset(rhs.icon_ ? new string(*rhs.icon_) : nullptr);
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
         hot_key_.reset(rhs.hot_key_ ? new string(*rhs.hot_key_) : nullptr);
+        invisible_.reset(rhs.invisible_ ? new bool(*rhs.invisible_) : nullptr);
     }
     return *this;
 }
@@ -142,6 +147,15 @@ std::string ScopeMetadataImpl::hot_key() const
     throw NotFoundException("attribute not set", "hot_key");
 }
 
+bool ScopeMetadataImpl::invisible() const
+{
+    if (invisible_)
+    {
+        return *invisible_;
+    }
+    return false;
+}
+
 void ScopeMetadataImpl::set_scope_name(std::string const& scope_name)
 {
     scope_name_ = scope_name;
@@ -180,6 +194,11 @@ void ScopeMetadataImpl::set_search_hint(std::string const& search_hint)
 void ScopeMetadataImpl::set_hot_key(std::string const& hot_key)
 {
     hot_key_.reset(new string(hot_key));
+}
+
+void ScopeMetadataImpl::set_invisible(bool invisible)
+{
+    invisible_.reset(new bool(invisible));
 }
 
 namespace
@@ -230,6 +249,10 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (hot_key_)
     {
         var["hot_key"] = *hot_key_;
+    }
+    if (invisible_)
+    {
+        var["invisible"] = *invisible_;
     }
 
     return var;
@@ -305,6 +328,12 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         hot_key_.reset(new string(it->second.get_string()));
+    }
+
+    it = var.find("invisible");
+    if (it != var.end())
+    {
+        invisible_.reset(new bool(it->second.get_bool()));
     }
 }
 

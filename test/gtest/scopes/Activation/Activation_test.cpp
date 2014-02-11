@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
@@ -522,7 +523,7 @@ TEST(Activation, scope)
 
     VariantMap hints;
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", hints, receiver);
+    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->result;
@@ -539,12 +540,15 @@ TEST(Activation, scope)
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
         hints["iron"] = "maiden";
-        ctrl = target->activate(*result, hints, act_receiver);
+
+        ActionMetadata metadata("C", "phone");
+        metadata.set_scope_data(Variant(hints));
+        ctrl = target->activate(*result, metadata, act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
-        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
+        EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
         EXPECT_EQ("bar", response->hints()["foo"].get_string());
         EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
@@ -553,14 +557,16 @@ TEST(Activation, scope)
     // activate action
     {
         auto act_receiver = std::make_shared<ActivationReceiver>();
+        ActionMetadata meta("en", "phone");
         hints["iron"] = "maiden";
-        ctrl = target->activate_preview_action(*result, hints, "action1", act_receiver);
+        meta.set_scope_data(Variant(hints));
+        ctrl = target->perform_action(*result, meta, "widget1", "action1", act_receiver);
         act_receiver->wait_until_finished();
 
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
-        EXPECT_EQ(ActivationResponse::Status::Handled, response->status());
-        EXPECT_EQ("action1", response->hints()["activated action id"].get_string());
+        EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
+        EXPECT_EQ("widget1action1", response->hints()["activated action"].get_string());
         EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
     }

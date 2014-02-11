@@ -3,6 +3,14 @@ Release Notes for unity-scopes-api
 
 Changes in version 0.3.1
 ========================
+- Scope::activate_preview_action() and ScopeBase::activate_preview_action() were
+  renamed to perform_action(). They now also require widget identifier
+  along with action id and hints.
+- Added SearchMetadata and ActionMetadata classes; these classes are now passed
+  to create_query(), activate(), perform_action(), preview() methods of
+  ScopeBase and Scope (ScopeProxy) instead of a plain VariantMap.
+- The 'Handled' state was removed from ActivationResponse::Status and two new
+  values were added instead: ShowDash and HideDash.
 - Annotation API changes: annotations of 'Card' type were removed and Annotation
   doesn't support category attribute anymore. SearchReply::push() method for
   annotations was renamed to register_annotation(). Annotations are now going to

@@ -25,6 +25,7 @@
 #include <unity/scopes/internal/PreviewWidgetImpl.h>
 #include <unity/UnityExceptions.h>
 
+#include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
@@ -43,6 +44,7 @@ PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, Ru
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver)
 {
+    assert(receiver_);
 }
 
 PreviewReplyObject::~PreviewReplyObject()

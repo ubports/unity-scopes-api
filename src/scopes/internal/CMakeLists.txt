@@ -4,6 +4,7 @@ add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ActionMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationBaseImpl.cpp
@@ -38,6 +39,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
@@ -56,9 +58,11 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

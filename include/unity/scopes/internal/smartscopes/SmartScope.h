@@ -183,7 +183,7 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& id, Query const& q, VariantMap const&)
+    QueryBase::UPtr create_query(std::string const& id, Query const& q, SearchMetadata const&)
     {
         QueryBase::UPtr query(new SmartQuery(id, reg_, q));
         std::cout << "SmartScope: created query for \"" << id << "\": \"" << q.query_string() << "\"" << std::endl;

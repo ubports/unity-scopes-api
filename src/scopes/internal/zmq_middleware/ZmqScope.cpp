@@ -52,7 +52,7 @@ interface Scope
 {
     QueryCtrl* create_query(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
-    QueryCtrl* activate_preview_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
+    QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
 };
 
@@ -138,18 +138,20 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
     return QueryCtrlImpl::create(p, reply_proxy);
 }
 
-QueryCtrlProxy ZmqScope::activate_preview_action(VariantMap const& result, VariantMap const& hints, std::string const& action_id, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
+        VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
     {
-        auto request = make_request_(request_builder, "activate_preview_action");
+        auto request = make_request_(request_builder, "perform_action");
         auto in_params = request.initInParams().getAs<capnproto::Scope::ActionActivationRequest>();
         auto res = in_params.initResult();
         to_value_dict(result, res);
         auto h = in_params.initHints();
         to_value_dict(hints, h);
-        in_params.setAction(action_id);
+        in_params.setWidgetId(widget_id);
+        in_params.setActionId(action_id);
         auto p = in_params.initReplyProxy();
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());

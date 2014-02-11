@@ -20,7 +20,9 @@
 
 #include <unity/scopes/QueryCtrl.h>
 #include <unity/scopes/Scope.h>
+#include <unity/scopes/SearchMetadata.h>
 
+#include <iostream>
 #include <cassert>
 
 using namespace std;
@@ -44,13 +46,14 @@ QueryBaseImpl::~QueryBaseImpl()
 
 QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               string const& query_string,
-                                              VariantMap const& hints,
                                               SearchListener::SPtr const& reply)
 {
+    assert(search_metadata_);
+
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries
     // without intervention from the scope application code.
-    QueryCtrlProxy qcp = scope->create_query(query_string, hints, reply);
+    QueryCtrlProxy qcp = scope->create_query(query_string, *search_metadata_, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -58,10 +61,24 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
 QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               FilterState const& filter_state,
-                                              VariantMap const& hints,
                                               SearchListener::SPtr const& reply)
 {
-    QueryCtrlProxy qcp = scope->create_query(query_string, filter_state, hints, reply);
+    assert(search_metadata_);
+
+    QueryCtrlProxy qcp = scope->create_query(query_string, filter_state, *search_metadata_, reply);
+    subqueries_.push_back(qcp);
+    return qcp;
+}
+
+QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   SearchListener::SPtr const& reply)
+{
+    assert(search_metadata_);
+
+    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, *search_metadata_, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -70,12 +87,27 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
-                                              VariantMap const& hints,
+                                              SearchMetadata const& metadata,
                                               SearchListener::SPtr const& reply)
 {
-    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, hints, reply);
+    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, metadata, reply);
     subqueries_.push_back(qcp);
     return qcp;
+}
+
+void QueryBaseImpl::set_metadata(QueryMetadata const& metadata)
+{
+    try
+    {
+        auto sm = dynamic_cast<SearchMetadata const&>(metadata);
+        search_metadata_.reset(new SearchMetadata(sm));
+    }
+    catch (std::bad_cast const& e) // this shouldn't really happen, if it does, that's a bug
+    {
+        // TODO: log this
+        std::cerr << "QueryBaseImpl()::set_metadata(): " << e.what() << std::endl;
+        throw;
+    }
 }
 
 void QueryBaseImpl::cancel()

@@ -42,12 +42,12 @@ void ScopeBase::run()
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, VariantMap const& /* hints */)
+ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* hints */)
 {
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }
 
-ActivationBase::UPtr ScopeBase::activate_preview_action(Result const& /* result */, VariantMap const& /* hints */, std::string const& /* action_id */)
+ActivationBase::UPtr ScopeBase::perform_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* widget_id */, std::string const& /* action_id */)
 {
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }

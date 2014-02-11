@@ -43,6 +43,11 @@ void QueryBase::cancel()
     cancelled();    // Inform this query that it was cancelled
 }
 
+void QueryBase::set_metadata(QueryMetadata const& metadata)
+{
+    p->set_metadata(metadata);
+}
+
 } // namespace scopes
 
 } // namespace unity
