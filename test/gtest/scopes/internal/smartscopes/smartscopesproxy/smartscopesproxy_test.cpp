@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include "../RaiiServer.h"
 
@@ -107,16 +108,17 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
-    EXPECT_EQ(scopes.size(), 1);
+    EXPECT_EQ(scopes.size(), 2);
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
     EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_FALSE(meta.invisible());
 
-    // invisible scope (direct)
-    EXPECT_THROW(reg_->get_metadata("Dummy Demo Scope 2"), NotFoundException);
+    // non-existant scope (direct)
+    EXPECT_THROW(reg_->get_metadata("Dummy Demo Scope 3"), NotFoundException);
 
     // locate should throw (via mw)
     MWRegistryProxy mw_reg = reg_mw_->create_registry_proxy(reg_id_, reg_mw_->get_scope_endpoint());
@@ -124,16 +126,17 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (via mw)
     scopes = mw_reg->list();
-    EXPECT_EQ(scopes.size(), 1);
+    EXPECT_EQ(scopes.size(), 2);
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("Dummy Demo Scope");
     EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_FALSE(meta.invisible());
 
-    // invisible scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("Dummy Demo Scope 2"), NotFoundException);
+    // non-existant scope (via mw)
+    EXPECT_THROW(mw_reg->get_metadata("Dummy Demo Scope 3"), NotFoundException);
 }
 
 class Receiver : public SearchListener
@@ -200,7 +203,7 @@ TEST_F(smartscopesproxytest, ss_scope)
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
 
-    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
 
     wait_thread.join();
 }

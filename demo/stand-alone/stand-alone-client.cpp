@@ -99,10 +99,9 @@ int main()
 
         // We can now use the returned proxy to create a query.
         shared_ptr<Receiver> reply(new Receiver);
-        VariantMap vm;
-        vm["cardinality"] = 10;
-        vm["locale"] = "C";
-        auto ctrl = sp->create_query("query string", vm, reply); // May raise TimeoutException
+        SearchMetadata metadata("C", "desktop");
+        metadata.set_cardinality(10);
+        auto ctrl = sp->create_query("query string", metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

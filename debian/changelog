@@ -2,10 +2,24 @@ unity-scopes-api (0.3.1-0ubuntu1) UNRELEASED; urgency=low
 
   * [ Pawel Stolowski ]
   * Added preliminary API for filters and departments.
+  * Changes to preview action activation API: support for widget id.
   * Changes to Annotation API.
   * Return ScopeProxy from Result::target_scope_proxy (replaces activation_scope_name).
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 05 Feb 2014 17:14:14 +0100
+
+unity-scopes-api (0.2.10-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Michi Henning ]
+  * More default servant support.
+
+  [ Pawel Stolowski ]
+  * Additions to the PreviewWidget API.
+  * Changed VariantMapBuilder to VariantBuilder, with a new API.
+  * Added support for ColumnLayout.
+  * Added SearchMetadata class.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 31 Jan 2014 14:55:10 +0100
 
 unity-scopes-api (0.2.8+14.04.20140131.1-0ubuntu1) trusty; urgency=low
 

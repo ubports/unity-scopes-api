@@ -119,8 +119,8 @@ public:
         }
 
         SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
-        create_subquery(scope_c_, query_.query_string(), VariantMap(), reply);
-        create_subquery(scope_d_, query_.query_string(), VariantMap(), reply);
+        create_subquery(scope_c_, query_.query_string(), reply);
+        create_subquery(scope_d_, query_.query_string(), reply);
     }
 
 private:
@@ -154,14 +154,14 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

@@ -408,10 +408,10 @@ int main(int argc, char* argv[])
         {
         }
         shared_ptr<Receiver> reply(new Receiver(result_index));
-        VariantMap vm;
-        vm["cardinality"] = 10;
-        vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
+
+        SearchMetadata metadata("C", "desktop");
+        metadata.set_cardinality(10);
+        auto ctrl = meta.proxy()->create_query(search_string, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
@@ -433,19 +433,21 @@ int main(int argc, char* argv[])
                 cout << "\tdirect activation: " << direct_activation << endl;
                 if (!direct_activation)
                 {
+                    ActionMetadata const metadata("en", "desktop");
                     auto target_scope = result->target_scope_proxy();
                     cout << "\tactivation scope: " << target_scope->to_string() << endl;
-                    target_scope->activate(*result, vm, act_reply);
+                    target_scope->activate(*result, metadata, act_reply);
                     act_reply->wait_until_finished();
                 }
             }
             else if (result_op == ResultOperation::Preview)
             {
+                ActionMetadata const metadata("en", "desktop");
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
                 auto target_scope = result->target_scope_proxy();
                 cout << "\tactivation scope name: " << target_scope->to_string() << endl;
-                target_scope->preview(*result, vm, preview_reply);
+                target_scope->preview(*result, metadata, preview_reply);
                 preview_reply->wait_until_finished();
             }
         }

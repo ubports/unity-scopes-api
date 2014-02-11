@@ -23,6 +23,7 @@
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include <vector>
 
@@ -31,6 +32,8 @@ namespace unity
 
 namespace scopes
 {
+
+class SearchMetadata;
 
 namespace internal
 {
@@ -43,23 +46,28 @@ public:
 
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   VariantMap const& hints,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   VariantMap const& hints,
                                    SearchListener::SPtr const& reply);
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
-                                    std::string const& query_string,
+                                   std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   VariantMap const& hints,
+                                   SearchListener::SPtr const& reply);
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   SearchMetadata const& metadata,
                                    SearchListener::SPtr const& reply);
 
     void cancel();
+    void set_metadata(QueryMetadata const& metadata);
 
 private:
+    SearchMetadata::UPtr search_metadata_;
     std::vector<QueryCtrlProxy> subqueries_;
 };
 

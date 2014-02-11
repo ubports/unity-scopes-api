@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
+#include <cassert>
 
 namespace unity
 {
@@ -33,6 +34,7 @@ ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& rec
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver)
 {
+    assert(receiver_);
 }
 
 void ActivationReplyObject::process_data(VariantMap const& data)

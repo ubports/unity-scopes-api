@@ -3,6 +3,7 @@ set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/ActionMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationListener.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationResponse.cpp
@@ -27,6 +28,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListener.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
