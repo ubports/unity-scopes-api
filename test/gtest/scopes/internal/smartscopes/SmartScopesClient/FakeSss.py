@@ -21,6 +21,8 @@
 from wsgiref.simple_server import make_server
 import sys
 
+preview1_complete = False
+
 def response(environ, start_response):
     status = '200 OK'
     response_headers = [('Content-Type', 'application/json')]
@@ -33,7 +35,12 @@ def response(environ, start_response):
         return [search_response]
 
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
-        return [preview_response]
+        if preview1_complete == False:
+            global preview1_complete
+            preview1_complete = True
+            return [preview_response]
+        if preview1_complete == True:
+            return [preview_response2]
 
     return ''
 
@@ -51,6 +58,10 @@ preview_response = '\
 {"widget": {"id": "widget_id_A", "type": "text", "title": "Widget A", "text": "First widget."}}\r\n\
 {"widget": {"id": "widget_id_B", "type": "text", "title": "Widget B", "text": "Second widget."}}\r\n\
 {"widget": {"id": "widget_id_C", "type": "text", "title": "Widget C", "text": "Third widget."}}'
+
+preview_response2 = '\
+{"widget": {"id": "widget_id_A", "type": "text", "title": "Widget A", "text": "First widget."}}\r\n\
+{"widget": {"id": "widget_id_B", "type": "text", "title": "Widget B", "text": "Second widget."}}'
 
 serving = False
 port = 1024

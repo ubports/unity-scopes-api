@@ -143,20 +143,23 @@ public:
         PreviewHandle::Widgets widgets = results.second;
 
         // register layout
-        ColumnLayoutList layout_list;
-
-        for (auto& column : columns)
+        if (columns.size() > 0)
         {
-            ColumnLayout layout(column.size());
-            for (auto& widget_lo : column)
+            ColumnLayoutList layout_list;
+
+            for (auto& column : columns)
             {
-                layout.add_column(widget_lo);
+                ColumnLayout layout(column.size());
+                for (auto& widget_lo : column)
+                {
+                    layout.add_column(widget_lo);
+                }
+
+                layout_list.emplace_back(layout);
             }
 
-            layout_list.emplace_back(layout);
+            reply->register_layout(layout_list);
         }
-
-        reply->register_layout(layout_list);
 
         // push wigdets
         PreviewWidgetList widget_list;

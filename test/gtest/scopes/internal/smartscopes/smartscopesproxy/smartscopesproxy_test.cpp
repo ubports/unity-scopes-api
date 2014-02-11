@@ -113,9 +113,10 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
-    EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
     // non-existant scope (direct)
@@ -131,9 +132,10 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("Dummy Demo Scope");
-    EXPECT_EQ("Dummy Demo Scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
     // non-existant scope (via mw)
@@ -216,7 +218,7 @@ TEST_F(smartscopesproxytest, create_query)
     wait_thread.join();
 }
 
-class PreviewReceiver : public PreviewListener
+class PreviewerWithCols : public PreviewListener
 {
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
@@ -247,7 +249,10 @@ public:
         widget_pushes_++;
     }
 
-    virtual void push(std::string const&, Variant const&) override {}
+    virtual void push(std::string const&, Variant const&) override
+    {
+        widget_pushes_++;
+    }
 
     virtual void push(ColumnLayoutList const& column_list) override
     {
@@ -313,10 +318,70 @@ private:
     std::condition_variable cond_;
 };
 
+class PreviewerNoCols : public PreviewListener
+{
+public:
+    virtual void push(PreviewWidgetList const& widget_list) override
+    {
+        EXPECT_EQ(2, widget_list.size());
+
+        // widget 1
+        auto it = widget_list.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+
+        widget_pushes_++;
+    }
+
+    virtual void push(std::string const&, Variant const&) override
+    {
+        widget_pushes_++;
+    }
+
+    virtual void push(ColumnLayoutList const&) override
+    {
+        col_pushes_++;
+    }
+
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
+        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(0, col_pushes_);
+
+        // Signal wait_until_finished
+        std::unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    int widget_pushes_ = 0;
+    int col_pushes_ = 0;
+    bool query_complete_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+};
+
 TEST_F(smartscopesproxytest, preview)
 {
     auto reply = std::make_shared<Receiver>();
-    auto previewer = std::make_shared<PreviewReceiver>();
 
     ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
 
@@ -327,8 +392,18 @@ TEST_F(smartscopesproxytest, preview)
     auto result = reply->last_result();
     EXPECT_TRUE(result.get() != nullptr);
 
-    wait_thread = std::thread([&previewer](){previewer->wait_until_finished();});
-    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
+    // with columns returned
+    auto previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    wait_thread = std::thread([&previewer_with_cols](){previewer_with_cols->wait_until_finished();});
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    wait_thread.join();
+
+    // without columns returned
+    auto previewer_no_cols = std::make_shared<PreviewerNoCols>();
+
+    wait_thread = std::thread([&previewer_no_cols](){previewer_no_cols->wait_until_finished();});
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     wait_thread.join();
 }
 
