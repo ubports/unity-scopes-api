@@ -190,14 +190,14 @@ public:
         return query;
     }
 
-    QueryBase::UPtr preview(std::string const& id, Result const& result, VariantMap const&)
+    QueryBase::UPtr preview(std::string const& id, Result const& result, ActionMetadata const&)
     {
         QueryBase::UPtr preview(new SmartPreview(id, reg_, result));
         std::cout << "SmartScope: created preview for \"" << id << "\": \"" << result.uri() << "\"" << std::endl;
         return preview;
     }
 
-    ActivationBase::UPtr activate(std::string const& id, Result const& result, VariantMap const& hints)
+    ActivationBase::UPtr activate(std::string const& id, Result const& result, ActionMetadata const& hints)
     {
         ///! TODO
         (void)id;
@@ -206,12 +206,13 @@ public:
         return ActivationBase::UPtr();
     }
 
-    ActivationBase::UPtr activate_preview_action(std::string const& id, Result const& result, VariantMap const& hints, std::string const& action_id)
+    ActivationBase::UPtr perform_action(std::string const& id, Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id)
     {
         ///! TODO
         (void)id;
         (void)result;
         (void)hints;
+        (void)widget_id;
         (void)action_id;
         return ActivationBase::UPtr();
     }

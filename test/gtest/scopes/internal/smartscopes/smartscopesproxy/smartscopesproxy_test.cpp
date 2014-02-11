@@ -16,6 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/MWRegistry.h>
@@ -210,7 +211,7 @@ TEST_F(smartscopesproxytest, create_query)
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
 
-    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
 
     wait_thread.join();
 }
@@ -320,14 +321,14 @@ TEST_F(smartscopesproxytest, preview)
     ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
-    meta.proxy()->create_query("search_string", VariantMap(), reply);
+    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
     wait_thread.join();
 
     auto result = reply->last_result();
     EXPECT_TRUE(result.get() != nullptr);
 
     wait_thread = std::thread([&previewer](){previewer->wait_until_finished();});
-    meta.proxy()->preview(*(result.get()), VariantMap(), previewer);
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
     wait_thread.join();
 }
 

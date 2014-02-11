@@ -96,8 +96,8 @@ MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
 {
     return query(info,
                  reply,
-                 [&result, &hints, &info, &action_id, this ]()->QueryBase::SPtr
-                     { return this->smartscope_->activate_preview_action(info.id, result, hints, action_id); },
+                 [&result, &hints, &info, &widget_id, &action_id, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->perform_action(info.id, result, hints, widget_id, action_id); },
                  [&reply, &info, this](QueryBase::SPtr query_base)
                      { qo_->add_query(info.id, SSQuery::Activation, query_base, reply); });
 }
