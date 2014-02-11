@@ -313,9 +313,10 @@ private:
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n]" << endl;
+    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
     cerr << "For example: ./client scope-B iron" << endl;
     cerr << "         or: ./client scope-B iron activate 1" << endl;
+    cerr << "         or: ./client scope-B iron preview 1" << endl;
     exit(1);
 }
 
