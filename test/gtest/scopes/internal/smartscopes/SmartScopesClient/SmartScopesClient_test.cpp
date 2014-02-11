@@ -61,14 +61,18 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     ASSERT_EQ(2, scopes.size());
 
+    EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
     EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
+    EXPECT_EQ("icon", scopes[0].icon);
     EXPECT_FALSE(scopes[0].invisible);
 
+    EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
     EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
+    EXPECT_EQ("", scopes[1].icon);
     EXPECT_TRUE(scopes[1].invisible);
 }
 

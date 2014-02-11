@@ -46,9 +46,11 @@ class SmartScopesClient;
 
 struct RemoteScope
 {
+    std::string id;
     std::string name;
     std::string description;
     std::string base_url;
+    std::string icon;
     bool invisible = false;
 };
 

@@ -179,16 +179,17 @@ void SSRegistryObject::get_remote_scopes()
         // construct a ScopeMetadata with remote scope info
         std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
-        metadata->set_scope_name(scope.name);
+        metadata->set_scope_name(scope.id);
         metadata->set_display_name(scope.name);
         metadata->set_description(scope.description);
+        metadata->set_icon(scope.icon);
+        metadata->set_invisible(scope.invisible);
 
         ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, ss_scope_endpoint_),
                                              middleware_->runtime(),
                                              scope.name);
 
         metadata->set_proxy(proxy);
-        metadata->set_invisible(scope.invisible);
 
         auto meta = ScopeMetadataImpl::create(move(metadata));
 
