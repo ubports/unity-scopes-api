@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
@@ -31,7 +32,6 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
-#include <unity/config.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -55,7 +55,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         scope_name_ = "c-" + id.gen();
     }
 
-    string config_file(configfile.empty() ? DEFAULT_RUNTIME : configfile);
+    string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
 
     try
     {
@@ -66,19 +66,25 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
-        assert(!registry_identity_.empty());
 
         middleware_ = middleware_factory_->create(scope_name_, default_middleware, middleware_configfile);
         middleware_->start();
 
-        // Create the registry proxy.
-        RegistryConfig reg_config(registry_identity_, registry_configfile_);
-        string reg_mw_configfile = reg_config.mw_configfile();
-        registry_endpoint_ = reg_config.endpoint();
-        registry_endpointdir_ = reg_config.endpointdir();
-
-        auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
-        registry_ = RegistryImpl::create(registry_mw_proxy, this);
+        if (registry_configfile_.empty() || registry_identity_.empty())
+        {
+            cerr << "Warning: no registry configured" << endl;
+            registry_identity_ = "";
+        }
+        else
+        {
+            // Create the registry proxy.
+            RegistryConfig reg_config(registry_identity_, registry_configfile_);
+            string reg_mw_configfile = reg_config.mw_configfile();
+            registry_endpoint_ = reg_config.endpoint();
+            registry_endpointdir_ = reg_config.endpointdir();
+            auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
+            registry_ = RegistryImpl::create(registry_mw_proxy, this);
+        }
     }
     catch (unity::Exception const& e)
     {
@@ -144,6 +150,10 @@ RegistryProxy RuntimeImpl::registry() const
     {
         throw LogicException("registry(): Cannot obtain registry for already destroyed run time");
     }
+    if (!registry_)
+    {
+        throw ConfigException("registry(): no registry configured");
+    }
     return registry_;
 }
 
@@ -173,7 +183,7 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     lock_guard<mutex> lock(mutex_);
     if (!reply_reaper_)
     {
-        reply_reaper_ = Reaper::create(1, 5); // TODO: configurable timeouts
+        reply_reaper_ = Reaper::create(10, 45); // TODO: configurable timeouts
     }
     return reply_reaper_;
 }
@@ -197,6 +207,22 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
 
     mw->wait_for_shutdown();
     run_future.get();
+}
+
+Proxy RuntimeImpl::string_to_proxy(string const& s) const
+{
+    auto mw = middleware_factory_->find(s);
+    assert(mw);
+    return mw->string_to_proxy(s);
+}
+
+string RuntimeImpl::proxy_to_string(Proxy const& proxy) const
+{
+    if (proxy == nullptr)
+    {
+        return "nullproxy:";
+    }
+    return proxy->to_string();
 }
 
 } // namespace internal

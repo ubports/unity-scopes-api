@@ -24,6 +24,8 @@
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Annotation.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/FilterBase.h>
 
 #include <string>
 
@@ -34,6 +36,7 @@ namespace scopes
 {
 
 class CategorisedResult;
+class FilterState;
 
 class UNITY_API SearchListener : public ListenerBase
 {
@@ -44,6 +47,12 @@ public:
 
     virtual ~SearchListener();
     /// @endcond
+
+    /**
+    \brief Called at most once by the scopes run time for a list of departments returned by a query.
+    The default implementation does nothing.
+    */
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id);
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
@@ -65,6 +74,12 @@ public:
     If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
     */
     virtual void push(Category::SCPtr category);
+
+    /**
+     \brief Called once by the scopes to send all the filters and their state.
+     The default implementation does nothing.
+     */
+    virtual void push(Filters const& filters, FilterState const& filter_state);
 
 protected:
     /// @cond

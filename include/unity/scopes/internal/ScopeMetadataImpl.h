@@ -45,12 +45,13 @@ public:
 
     std::string scope_name() const;
     ScopeProxy proxy() const;
-    std::string display_name() const; // localized
+    std::string display_name() const;   // localized
     std::string description() const;    // localized
     std::string art() const;            // optional
     std::string icon() const;           // optional
     std::string search_hint() const;    // localized, optional
     std::string hot_key() const;        // localized, optional
+    bool invisible() const;             // optional (default = false)
 
     void set_scope_name(std::string const& scope_name);
     void set_proxy(ScopeProxy const& proxy);
@@ -60,6 +61,7 @@ public:
     void set_icon(std::string const& icon);
     void set_search_hint(std::string const& search_hint);
     void set_hot_key(std::string const& hot_key);
+    void set_invisible(bool invisible);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -77,6 +79,7 @@ private:
     std::unique_ptr<std::string> icon_;         // Optional, hence a pointer
     std::unique_ptr<std::string> search_hint_;  // Optional, hence a pointer
     std::unique_ptr<std::string> hot_key_;      // Optional, hence a pointer
+    std::unique_ptr<bool> invisible_;           // Optional, hence a pointer
 };
 
 } // namespace internal

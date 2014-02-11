@@ -34,6 +34,9 @@ namespace scopes
 {
 
 class Result;
+class FilterState;
+class ActionMetadata;
+class SearchMetadata;
 
 namespace internal
 {
@@ -55,13 +58,15 @@ public:
     Results for the query may arrive only after create_query() completes (but may
     also arrive while create_query() is still running).
     */
-    QueryCtrlProxy create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
 
-    QueryCtrlProxy activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const;
 
-    QueryCtrlProxy activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const;
 
-    QueryCtrlProxy preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

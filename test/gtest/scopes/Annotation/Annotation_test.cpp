@@ -19,8 +19,7 @@
 #include <gtest/gtest.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/Query.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/UnityExceptions.h>
 
@@ -121,41 +120,6 @@ TEST(Annotation, groupedLink_exceptions)
     }
 }
 
-TEST(Annotation, card)
-{
-    {
-        Query query("scope-A", "foo", "dep1");
-
-        Annotation annotation(Annotation::Type::Card);
-        annotation.set_icon("icon");
-        annotation.add_link("Link1", query);
-
-        EXPECT_EQ("icon", annotation.icon());
-        EXPECT_EQ(1, annotation.links().size());
-        auto link = annotation.links().front();
-        EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query.scope_name(), link->query().scope_name());
-        EXPECT_EQ(query.department_id(), link->query().department_id());
-        EXPECT_EQ(query.query_string(), link->query().query_string());
-    }
-}
-
-TEST(Annotation, card_exceptions)
-{
-    {
-        Query query("scope-A", "foo", "dep1");
-
-        Annotation annotation(Annotation::Type::Card);
-        annotation.set_icon("icon");
-        annotation.add_link("Link1", query);
-
-        // label currently makes sense for group only, but we shouldn't throw
-        EXPECT_NO_THROW(annotation.set_label("Label"));
-        EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
-        EXPECT_EQ(1, annotation.links().size());
-    }
-}
-
 TEST(Annotation, serialize)
 {
     {
@@ -171,7 +135,7 @@ TEST(Annotation, serialize)
         EXPECT_EQ(1, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
-        Query qout(linkvm["query"].get_dict());
+        Query qout = internal::QueryImpl::create(linkvm["query"].get_dict());
         EXPECT_EQ("scope-A", qout.scope_name());
         EXPECT_EQ("foo", qout.query_string());
         EXPECT_EQ("dep1", qout.department_id());
@@ -180,46 +144,32 @@ TEST(Annotation, serialize)
 
 TEST(Annotation, deserialize)
 {
-    CategoryRegistry reg;
-    CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
     Query query("scope-A", "foo", "dep1");
     {
         Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Foo");
         annotation.add_link("Link1", query);
         auto var = annotation.serialize();
-        AnnotationImpl impl(reg, var);
+        AnnotationImpl impl(var);
     }
     {
         Annotation annotation(Annotation::Type::Link);
         annotation.set_icon("Icon");
         annotation.add_link("Link1", query);
         auto var = annotation.serialize();
-        AnnotationImpl impl(reg, var);
-    }
-    {
-        Annotation annotation(Annotation::Type::Card);
-        annotation.set_icon("Icon");
-        annotation.set_category(cat);
-        annotation.add_link("Link1", query);
-        auto var = annotation.serialize();
-        AnnotationImpl impl(reg, var);
+        AnnotationImpl impl(var);
     }
 }
 
 TEST(Annotation, deserialize_exceptions)
 {
     {
-        CategoryRegistry reg;
-        CategoryRenderer rdr;
         Query query("scope-A", "foo", "dep1");
-        auto cat = reg.register_category("1", "title", "icon", rdr);
         {
             VariantMap var;
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -229,7 +179,7 @@ TEST(Annotation, deserialize_exceptions)
             var["type"] = "";
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -239,7 +189,7 @@ TEST(Annotation, deserialize_exceptions)
             var["type"] = "link";
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -249,7 +199,7 @@ TEST(Annotation, deserialize_exceptions)
             var["type"] = "groupedlink";
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -259,7 +209,7 @@ TEST(Annotation, deserialize_exceptions)
             var["type"] = "card";
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -271,21 +221,7 @@ TEST(Annotation, deserialize_exceptions)
             var["cat_id"] = "unknowncat";
             try
             {
-                AnnotationImpl impl(reg, var);
-                FAIL();
-            }
-            catch (unity::InvalidArgumentException const& e) {}
-        }
-        {   // deserialize with unknown category
-            Annotation annotation(Annotation::Type::Card);
-            annotation.set_icon("Icon");
-            annotation.set_category(cat);
-            annotation.add_link("Link1", query);
-            auto var = annotation.serialize();
-            var["cat_id"] = "2";
-            try
-            {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}
@@ -297,7 +233,7 @@ TEST(Annotation, deserialize_exceptions)
             var["links"] = VariantArray();
             try
             {
-                AnnotationImpl impl(reg, var);
+                AnnotationImpl impl(var);
                 FAIL();
             }
             catch (unity::InvalidArgumentException const& e) {}

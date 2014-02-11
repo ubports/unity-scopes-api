@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/Scope.h>
-
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
 namespace unity
@@ -37,24 +37,34 @@ Scope::~Scope()
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& q, VariantMap const& hints, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    return fwd()->create_query(q, hints, reply);
+    return fwd()->create_query(query_string, metadata, reply);
 }
 
-QueryCtrlProxy Scope::activate(Result const& result, VariantMap const& hints, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    return fwd()->activate(result, hints, reply);
+    return fwd()->create_query(query_string, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    return fwd()->activate_preview_action(result, hints, action_id, reply);
+    return fwd()->create_query(query_string, department_id, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::preview(Result const& result, VariantMap const& hints, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
 {
-    return fwd()->preview(result, hints, reply);
+    return fwd()->activate(result, metadata, reply);
+}
+
+QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
+{
+    return fwd()->perform_action(result, metadata, widget_id, action_id, reply);
+}
+
+QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const
+{
+    return fwd()->preview(result, metadata, reply);
 }
 
 internal::ScopeImpl* Scope::fwd() const

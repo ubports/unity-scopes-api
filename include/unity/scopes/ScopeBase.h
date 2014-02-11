@@ -25,6 +25,8 @@
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -62,7 +64,7 @@ namespace unity
 namespace scopes
 {
 
-class ResultItem;
+class Query;
 
 /**
 \file ScopeBase.h
@@ -186,10 +188,11 @@ public:
     /param q The query string to be executed by the returned object instance.
     /param hints TODO, complete doc
     */
-    virtual QueryBase::UPtr create_query(std::string const& q, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
+
     This method must return an instance that is derived from ActivationBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. That call to activate() is made
@@ -199,14 +202,22 @@ public:
     \param result The result that should be activated.
     \param hints arbitrary hints sent by the client
      */
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
-
-    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id);
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
     /*
      * FIXME: doc string
      */
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
+    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id);
+
+    /**
+    \brief Invoked when a scope is requested to create a preview for a particular result.
+
+    This method must return an instance that is derived from PreviewQuery. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly.
+    \param result The result that should be previewed.
+     */
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

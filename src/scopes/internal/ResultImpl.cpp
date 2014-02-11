@@ -32,12 +32,14 @@ namespace internal
 {
 
 ResultImpl::ResultImpl()
-    : flags_(Flags::ActivationNotHandled)
+    : flags_(Flags::ActivationNotHandled),
+      runtime_(nullptr)
 {
 }
 
 ResultImpl::ResultImpl(VariantMap const& variant_map)
-    : flags_(Flags::ActivationNotHandled)
+    : flags_(Flags::ActivationNotHandled),
+      runtime_(nullptr)
 {
     deserialize(variant_map);
 }
@@ -45,7 +47,8 @@ ResultImpl::ResultImpl(VariantMap const& variant_map)
 ResultImpl::ResultImpl(ResultImpl const& other)
     : attrs_(other.attrs_),
       origin_(other.origin_),
-      flags_(other.flags_)
+      flags_(other.flags_),
+      runtime_(other.runtime_)
 {
     if (other.stored_result_)
     {
@@ -60,6 +63,7 @@ ResultImpl& ResultImpl::operator=(ResultImpl const& other)
         attrs_ = other.attrs_;
         flags_ = other.flags_;
         origin_ = other.origin_;
+        runtime_ = other.runtime_;
         if (other.stored_result_)
         {
             stored_result_ = std::make_shared<VariantMap>(*other.stored_result_);
@@ -93,6 +97,12 @@ Result ResultImpl::retrieve() const
         throw InvalidArgumentException("Result: no result has been stored");
     }
     return Result(*stored_result_);
+}
+
+void ResultImpl::set_runtime(RuntimeImpl const* runtime)
+{
+    assert(runtime);
+    runtime_ = runtime;
 }
 
 void ResultImpl::set_origin(std::string const& scope_name)
@@ -186,7 +196,7 @@ bool ResultImpl::direct_activation() const
                 [](VariantMap const&) {}); // do nothing if doesn't match
 }
 
-std::string ResultImpl::activation_scope_name() const
+ScopeProxy ResultImpl::target_scope_proxy() const
 {
     std::string target;
     if ((flags_ & Flags::InterceptActivation) || stored_result_ == nullptr)
@@ -205,9 +215,9 @@ std::string ResultImpl::activation_scope_name() const
                 {
                     return it->second.get_string();
                 }
-                throw unity::LogicException("Result::activation_scope_name(): 'origin' element missing");
+                throw unity::LogicException("Result::target_scope_proxy(): 'origin' element missing");
             }
-            throw unity::LogicException("Result::activation_scope_name(): 'internal' element missing");
+            throw unity::LogicException("Result::target_scope_proxy(): 'internal' element missing");
         };
 
         // visit stored results recursively,
@@ -216,7 +226,7 @@ std::string ResultImpl::activation_scope_name() const
         find_stored_result(
                     [](Flags f) -> bool { return (f & Flags::InterceptActivation) != 0; }, // condition
                     [&target, &get_origin](VariantMap const& var) {                        // if found
-                        // target becomes the actual return value from activation_scope_name(), since find_stored_result stops at this point.
+                        // target becomes the actual return value from target_scope_proxy(), since find_stored_result stops at this point.
                         target = get_origin(var);
                     },
                     [&target, &get_origin](VariantMap const& var) {                    // if not found
@@ -225,11 +235,13 @@ std::string ResultImpl::activation_scope_name() const
                     });
     }
 
-    if (target.empty())
+    // runtime can be null if this instance wasn't passed through middleware, in which case activation scope cannot be determined yet
+    if (target.empty() || runtime_ == nullptr)
     {
-        throw LogicException("Result::activation_scope_name(): undefined target scope");
+        throw LogicException("Result::target_scope_proxy(): undefined target scope");
     }
-    return target;
+
+    return std::dynamic_pointer_cast<Scope>(runtime_->string_to_proxy(target));
 }
 
 VariantMap ResultImpl::activation_target() const
@@ -373,7 +385,11 @@ void ResultImpl::serialize_internal(VariantMap& var) const
 VariantMap ResultImpl::serialize() const
 {
     throw_on_empty("uri");
-    throw_on_empty("dnd_uri");
+    auto it = attrs_.find("dnd_uri");
+    if (it != attrs_.end())
+    {
+        throw_on_non_string("dnd_uri", it->second.which());
+    }
 
     VariantMap outer;
     outer["attrs"] = Variant(attrs_);
@@ -424,10 +440,6 @@ void ResultImpl::deserialize(VariantMap const& var)
     it = attrs.find("uri");
     if (it == attrs.end())
         throw InvalidArgumentException("Missing 'uri'");
-
-    it = attrs.find("dnd_uri");
-    if (it == attrs.end())
-        throw InvalidArgumentException("Missing 'dnd_uri'");
 
     for (auto const& kv: attrs)
     {

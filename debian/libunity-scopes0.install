@@ -1,6 +1,7 @@
 usr/lib/*/libunity-scopes.so.*
 usr/lib/*/scoperegistry/*
 usr/lib/*/scoperunner/*
-usr/share/unity/*/*.ini
+usr/lib/*/smartscopesproxy/*
+usr/share/unity-scopes-api/*.ini
 usr/share/unity/scopes
 usr/share/upstart/sessions/*.conf

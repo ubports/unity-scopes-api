@@ -31,6 +31,47 @@
 using namespace std;
 using namespace unity::scopes;
 
+// conver filter to a string
+std::string to_string(FilterBase const& filter)
+{
+    std::ostringstream str;
+    auto const ftype = filter.filter_type();
+    cout << "filter id=" << filter.id() << endl;
+    if (ftype == "option_selector")
+    {
+        auto const& selfilter = dynamic_cast<OptionSelectorFilter const&>(filter);
+        str << "OptionSelectorFilter" << endl;
+        str << " label: " << selfilter.label() << endl;
+        str << " multi-select: " << selfilter.multi_select() << endl;
+        str << " options:" << endl;
+        for (auto op: selfilter.options())
+        {
+            str << "    id: " << op->id() << ", label: " << op->label() << endl;
+        }
+    }
+    else
+    {
+        str << "Unknown filter type: " << ftype;
+    }
+    return str.str();
+}
+
+std::string to_string(Department const& dep, std::string const& indent = "")
+{
+    std::ostringstream str;
+    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
+    auto const subdeps = dep.subdepartments();
+    if (subdeps.size() > 0)
+    {
+        str << indent << "\tsubdepartments:" << endl;
+        for (auto const& d: subdeps)
+        {
+            str << indent << to_string(d, indent + "\t\t");
+        }
+    }
+    return str.str();
+}
+
 // output variant in a json-like format; note, it doesn't do escaping etc.,
 // so the output is not suitable input for a json parser, it's only for
 // debugging purposes.
@@ -85,6 +126,16 @@ public:
     {
     }
 
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        cout << "\treceived departments:" << endl;
+        for (auto const& dep: departments)
+        {
+            cout << to_string(dep);
+        }
+        cout << "\tcurrent department=" << current_department_id << endl;
+    }
+
     virtual void push(Category::SCPtr category) override
     {
         cout << "received category: id=" << category->id()
@@ -117,6 +168,15 @@ public:
         for (auto link: links)
         {
             cout << "  " << link->query().to_string() << endl;
+        }
+    }
+
+    void push(Filters const& filters, FilterState const& /* filter_state */) override
+    {
+        cout << "received " << filters.size() << " filters" << endl;
+        for (auto f: filters)
+        {
+            cout << to_string(*f) << endl;
         }
     }
 
@@ -253,9 +313,10 @@ private:
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-letter> query [activate n]" << endl;
-    cerr << "For example: ./client B iron" << endl;
-    cerr << "         or: ./client B iron activate 1" << endl;
+    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "For example: ./client scope-B iron" << endl;
+    cerr << "         or: ./client scope-B iron activate 1" << endl;
+    cerr << "         or: ./client scope-B iron preview 1" << endl;
     exit(1);
 }
 
@@ -348,10 +409,10 @@ int main(int argc, char* argv[])
         {
         }
         shared_ptr<Receiver> reply(new Receiver(result_index));
-        VariantMap vm;
-        vm["cardinality"] = 10;
-        vm["locale"] = "C";
-        auto ctrl = meta.proxy()->create_query(search_string, vm, reply); // May raise TimeoutException
+
+        SearchMetadata metadata("C", "desktop");
+        metadata.set_cardinality(10);
+        auto ctrl = meta.proxy()->create_query(search_string, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
@@ -373,23 +434,21 @@ int main(int argc, char* argv[])
                 cout << "\tdirect activation: " << direct_activation << endl;
                 if (!direct_activation)
                 {
-                    auto target_scope = result->activation_scope_name();
-                    ScopeProxy proxy;
-                    if (target_scope != meta.scope_name()) // if activation scope is different than current, get the right proxy
-                    {
-                        meta = r->get_metadata(target_scope);
-                    }
-                    proxy = meta.proxy();
-                    cout << "\tactivation scope name: " << target_scope << endl;
-                    proxy->activate(*result, vm, act_reply);
+                    ActionMetadata const metadata("en", "desktop");
+                    auto target_scope = result->target_scope_proxy();
+                    cout << "\tactivation scope: " << target_scope->to_string() << endl;
+                    target_scope->activate(*result, metadata, act_reply);
                     act_reply->wait_until_finished();
                 }
             }
             else if (result_op == ResultOperation::Preview)
             {
+                ActionMetadata const metadata("en", "desktop");
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
-                meta.proxy()->preview(*result, vm, preview_reply);
+                auto target_scope = result->target_scope_proxy();
+                cout << "\tactivation scope name: " << target_scope->to_string() << endl;
+                target_scope->preview(*result, metadata, preview_reply);
                 preview_reply->wait_until_finished();
             }
         }

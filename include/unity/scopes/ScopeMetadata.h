@@ -52,6 +52,7 @@ public:
     std::string icon() const;           // optional
     std::string search_hint() const;    // localized, optional
     std::string hot_key() const;        // localized, optional
+    bool invisible() const;             // optional (default = false)
 
     /**
        \brief Returns a dictionary of all attributes of this ScopeMetadata instance.

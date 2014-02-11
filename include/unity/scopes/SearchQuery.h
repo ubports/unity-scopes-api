@@ -24,6 +24,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/SearchListener.h>
 
 #include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
@@ -35,7 +36,7 @@ namespace unity
 namespace scopes
 {
 
-class SearchListener;
+class SearchMetadata;
 
 namespace internal
 {
@@ -55,13 +56,28 @@ public:
     NONCOPYABLE(SearchQuery);
     UNITY_DEFINES_PTRS(SearchQuery);
 
+    /// Invoked when a SearchQuery is run, use the provided proxy to push results
     virtual void run(SearchReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // Create a sub-query.
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   VariantMap const& hints,
-                                   std::shared_ptr<SearchListener> const& reply);
+                                   SearchListener::SPtr const& reply);
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   FilterState const& filter_state,
+                                   SearchListener::SPtr const& reply);
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   SearchListener::SPtr const& reply);
+    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   SearchMetadata const& hints,
+                                   SearchListener::SPtr const& reply);
 
     /// @cond
     virtual ~SearchQuery();

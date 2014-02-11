@@ -28,6 +28,8 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
@@ -47,6 +49,21 @@ TEST(Runtime, basic)
 class Receiver : public SearchListener
 {
 public:
+    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    {
+        EXPECT_EQ(current_department_id, "news");
+        EXPECT_EQ(1, departments.size());
+        auto subdeps = departments.front().subdepartments();
+        EXPECT_EQ(2, subdeps.size());
+        EXPECT_EQ("subdep1", subdeps.front().id());
+        EXPECT_EQ("Europe", subdeps.front().label());
+        EXPECT_EQ("test", subdeps.front().query().query_string());
+        EXPECT_EQ("subdep2", subdeps.back().id());
+        EXPECT_EQ("US", subdeps.back().label());
+        EXPECT_EQ("test", subdeps.back().query().query_string());
+        dep_count_++;
+    }
+
     virtual void push(CategorisedResult result) override
     {
         EXPECT_EQ("uri", result.uri());
@@ -56,11 +73,23 @@ public:
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
+    virtual void push(Annotation annotation) override
+    {
+        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ("Link1", annotation.links().front()->label());
+        auto query = annotation.links().front()->query();
+        EXPECT_EQ("scope-A", query.scope_name());
+        EXPECT_EQ("foo", query.query_string());
+        EXPECT_EQ("dep1", query.department_id());
+        annotation_count_++;
+    }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
+        EXPECT_EQ(1, dep_count_);
+        EXPECT_EQ(1, annotation_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
@@ -80,6 +109,8 @@ private:
     mutex mutex_;
     condition_variable cond_;
     int count_;
+    int dep_count_;
+    int annotation_count_;
     std::shared_ptr<Result> last_result_;
 };
 
@@ -133,7 +164,7 @@ TEST(Runtime, create_query)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", VariantMap(), receiver);
+    auto ctrl = scope->create_query("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
 
@@ -147,16 +178,18 @@ TEST(Runtime, preview)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     // run a query first, so we have a result to preview
-    VariantMap hints;
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", hints, receiver);
+    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
     EXPECT_TRUE(result.get() != nullptr);
 
+    auto target = result->target_scope_proxy();
+    EXPECT_TRUE(target != nullptr);
+
     auto previewer = make_shared<PreviewReceiver>();
-    auto preview_ctrl = scope->preview(*(result.get()), hints, previewer);
+    auto preview_ctrl = target->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
     previewer->wait_until_finished();
 }
 

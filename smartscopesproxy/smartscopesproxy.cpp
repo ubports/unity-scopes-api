@@ -21,9 +21,15 @@
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
-#include <cassert>
-#include <iostream>
+#include <unity/scopes/internal/DfltConfig.h>
 
+#include <cassert>
+#include <signal.h>
+#include <libgen.h>
+#include <iostream>
+#include <unistd.h>
+
+using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -35,13 +41,35 @@ static void error(std::string const& msg)
 
 int main(int argc, char* argv[])
 {
+    if (argc > 1 && (std::string("-h") == argv[1] || std::string("--help") == argv[1]))
+    {
+        char const* prog_name = basename(argv[0]);
+        std::cout << "usage: " << prog_name << " [sss_url] [runtime.ini]" << std::endl;
+        return 0;
+    }
+
     int exit_status = 1;
 
+    bool sig_upstart = false;
+    std::string config_file;
     std::string server_url_env;
-    if (argc > 1)
+
+    // check for "upstart" as first arg
+    if (argc > 1 && std::string(argv[1]) == "upstart")
     {
-        server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
-        ::putenv(const_cast<char*>(server_url_env.c_str()));
+        sig_upstart = true;
+    }
+    else
+    {
+        // argv[1]: server_url_env
+        if (argc > 1)
+        {
+            server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
+            ::putenv(const_cast<char*>(server_url_env.c_str()));
+        }
+
+        // argv[2]: config_file
+        config_file = argc > 2 ? argv[2] : "";
     }
 
     try
@@ -54,8 +82,8 @@ int main(int argc, char* argv[])
         uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
 
         // Instantiate SS registry and scopes runtimes
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, SS_RUNTIME_PATH);
-        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, SS_RUNTIME_PATH);
+        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DFLT_SS_RUNTIME_INI);
+        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, config_file);
 
         // Get registry config
         RegistryConfig reg_conf(ss_reg_id, reg_rt->registry_configfile());
@@ -76,6 +104,12 @@ int main(int argc, char* argv[])
         // Add objects to the middlewares
         reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
         scope_mw->add_dflt_scope_object(std::move(scope));
+
+        if (sig_upstart)
+        {
+            // signal to upstart that we are ready
+            kill(getpid(), SIGSTOP);
+        }
 
         // Wait until shutdown
         scope_mw->wait_for_shutdown();

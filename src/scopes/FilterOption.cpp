@@ -13,12 +13,35 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michal Hruby <michal.hruby@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#ifndef SCOPES_CONFIG_H
-#define SCOPES_CONFIG_H
+#include <unity/scopes/FilterOption.h>
+#include <unity/scopes/internal/FilterOptionImpl.h>
 
-#define DEFAULT_RUNTIME "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini"
+namespace unity
+{
 
-#endif
+namespace scopes
+{
+
+FilterOption::FilterOption(std::string const& id, std::string const& label)
+    : p(new internal::FilterOptionImpl(id, label))
+{
+}
+
+FilterOption::~FilterOption() = default;
+
+std::string FilterOption::id() const
+{
+    return p->id();
+}
+
+std::string FilterOption::label() const
+{
+    return p->label();
+}
+
+} // namespace scopes
+
+} // namespace unity

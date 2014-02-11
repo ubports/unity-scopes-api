@@ -106,6 +106,11 @@ string ScopeMetadata::hot_key() const
     return p->hot_key();
 }
 
+bool ScopeMetadata::invisible() const
+{
+    return p->invisible();
+}
+
 VariantMap ScopeMetadata::serialize() const
 {
     return p->serialize();

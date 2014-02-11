@@ -51,6 +51,12 @@ Category (returned by serialize()):
  'icon' : string
  'renderer_template' : string
 
+Department (returned by serialize()):
+=====================================
+  'query'       : dictionary (serialized Query)
+  'label'       : string
+  'departments' : array of dictionaries (serialized Departments), optional
+
 ScopeMetadata (returned by serialize()):
 =====================================
  'scope_name'   : string
@@ -69,6 +75,7 @@ Query (returned by serialize())
  'scope'         : string
  'query_string'  : string
  'department_id' : string
+ 'filter_state'  : dictionary (serialized FilterState)
  
 Link (returned by serialize())
 ==============================
@@ -80,8 +87,29 @@ Annotation (returned by serialize())
  'type'       : string
  'label'      : string, optional
  'icon'       : string, optional
- 'cat_id'     : string, optional
  'links'      : array of Links
+
+FilterState (returned by serialize())
+=====================================
+  filter_id   : Variant (arbitrary, depends on filter type)
+
+FilterOption
+============
+ 'id'     : string
+ 'label'  : string
+
+OptionSelectorFilter
+====================
+ 'id'           : string
+ 'filter_type'  : "option_selector"
+ 'label'        : string
+ 'multi_select' : bool
+ 'options'      : array of FilterOption
+
+Filters + FilterState
+=====================
+ 'filter'       : array of filters (implementations of FilterBase)
+ 'filter_state' : FilterState
 
 PreviewResult (returned by serialize())
 =======================================
@@ -92,8 +120,14 @@ PreviewResult (returned by serialize())
 
 PushRequest (capnproto structure)
 =================================
- result : ValueDict with "category" and/or "result" or "annotation" key and
-  serialized Category / CategorisedResult / Annotation respectively.
+ result : dictionary with:
+                "category" and/or
+                "result" or
+                "annotation" or
+                "departments" and "current_department" or
+                "columns"
+                key and
+  serialized Category / CategorisedResult / Annotation / DepartmentList / ColumnLayoutList respectively.
 
 ActivationResponse (returned by serialize())
 ============================================

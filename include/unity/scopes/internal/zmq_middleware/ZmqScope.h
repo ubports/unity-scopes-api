@@ -45,7 +45,7 @@ public:
              int64_t timeout);
     virtual ~ZmqScope();
 
-    virtual QueryCtrlProxy create_query(std::string const& q,
+    virtual QueryCtrlProxy create_query(Query const& query,
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply) override;
 
@@ -53,12 +53,13 @@ public:
                                     VariantMap const& hints,
                                     MWReplyProxy const& reply) override;
 
-    virtual QueryCtrlProxy activate_preview_action(VariantMap const& result,
-                                    VariantMap const& hints,
-                                    std::string const& action_id,
-                                    MWReplyProxy const& reply) override;
+    virtual QueryCtrlProxy perform_action(VariantMap const& result,
+                                          VariantMap const& hints,
+                                          std::string const& widget_id,
+                                          std::string const& action_id,
+                                          MWReplyProxy const& reply) override;
 
-    virtual QueryCtrlProxy preview(Result const& result,
+    virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
 };

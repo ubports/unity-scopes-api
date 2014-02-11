@@ -5,7 +5,8 @@ if (NOT DEFINED CMAKE_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "" FORCE)
 endif()
 
-project(unity-scopes-api C CXX)
+set(PROJECT unity-scopes-api)
+project(${PROJECT} C CXX)
 
 if(${PROJECT_BINARY_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
    message(FATAL_ERROR "In-tree build attempt detected, aborting. Set your build dir outside your source dir, delete CMakeCache.txt from source root and try again.")
@@ -179,12 +180,12 @@ if(IPC_MONITORING)
 endif()
 
 set(SCOPES_DEFAULT_DATADIR ${CMAKE_INSTALL_DATADIR}/unity)
-set(SCOPES_DEFAULT_CONFIGDIR ${SCOPES_DEFAULT_DATADIR}/mw-config)
+set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 2)
-set(UNITY_SCOPES_MICRO 8)
+set(UNITY_SCOPES_MINOR 3)
+set(UNITY_SCOPES_MICRO 1)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -365,6 +366,8 @@ endif()
 
 option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
+set(CMAKE_INSTALL_DOCDIR doc)
+
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
@@ -376,14 +379,14 @@ else()
     else()
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     endif()
-    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html
+    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        COMMAND echo Doxygen warnings: `grep warning doxygen-warnings.txt | wc -l`
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL
-                       DEPENDS ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}/index.html)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/lib${UNITY_SCOPES_LIB}
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc)
+                       DEPENDS ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${PROJECT}
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_INSTALL_DOCDIR})
 endif()

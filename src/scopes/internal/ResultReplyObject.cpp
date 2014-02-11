@@ -23,7 +23,13 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/DepartmentImpl.h>
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/UnityExceptions.h>
 
+#include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
@@ -41,8 +47,11 @@ namespace internal
 ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver),
-    cat_registry_(new CategoryRegistry())
+    cat_registry_(new CategoryRegistry()),
+    runtime_(runtime)
 {
+    assert(receiver_);
+    assert(runtime);
 }
 
 ResultReplyObject::~ResultReplyObject()
@@ -51,11 +60,60 @@ ResultReplyObject::~ResultReplyObject()
 
 void ResultReplyObject::process_data(VariantMap const& data)
 {
-    auto it = data.find("category");
+    auto it = data.find("filters");
+    if (it != data.end())
+    {
+        auto filters_var = it->second.get_array();
+        it = data.find("filter_state");
+        if (it != data.end())
+        {
+            Filters filters;
+            for (auto const& f: filters_var)
+            {
+                filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
+            }
+            try
+            {
+                auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
+                receiver_->push(filters, filter_state);
+            }
+            catch (std::exception const& e)
+            {
+                // TODO: log this
+                cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
+                finished(ListenerBase::Error, e.what());
+            }
+        }
+        else
+        {
+            // TODO: log this
+            const std::string msg("ReplyObject::push(): filters present but missing filter_state data");
+            cerr << msg << endl;
+            finished(ListenerBase::Error, msg);
+        }
+    }
+
+    it = data.find("category");
     if (it != data.end())
     {
         auto cat = cat_registry_->register_category(it->second.get_dict());
         receiver_->push(cat);
+    }
+
+    it = data.find("departments");
+    if (it != data.end())
+    {
+        auto const deparr = it->second.get_array();
+        DepartmentList departments;
+        for (auto const& dep: deparr)
+        {
+            departments.push_back(DepartmentImpl::create(dep.get_dict()));
+        }
+        it = data.find("current_department");
+        if (it == data.end())
+        {
+        }
+        receiver_->push(departments, it->second.get_string());
     }
 
     it = data.find("annotation");
@@ -64,7 +122,7 @@ void ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         try
         {
-            Annotation annotation(new internal::AnnotationImpl(*cat_registry_, result_var));
+            Annotation annotation(new internal::AnnotationImpl(result_var));
             receiver_->push(std::move(annotation));
         }
         catch (std::exception const& e)
@@ -83,10 +141,11 @@ void ResultReplyObject::process_data(VariantMap const& data)
         {
             auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
 
+            impl->set_runtime(runtime_);
             // set result origin
             if (impl->origin().empty())
             {
-                impl->set_origin(origin_scope_name());
+                impl->set_origin(origin_proxy());
             }
 
             CategorisedResult result(impl);

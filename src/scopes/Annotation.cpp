@@ -78,16 +78,6 @@ void Annotation::add_link(std::string const& label, Query const& query)
     p->add_link(label, query);
 }
 
-void Annotation::set_category(Category::SCPtr category)
-{
-    p->set_category(category);
-}
-
-Category::SCPtr Annotation::category() const
-{
-    return p->category();
-}
-
 std::string Annotation::label() const
 {
     return p->label();

@@ -43,11 +43,6 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
-    if (!registry)
-    {
-        throw InvalidArgumentException("Cannot load scope " + name + ": null registry proxy");
-    }
-
     // Look for the scope create function in the plug-in and call it.
     // instance. If anything goes wrong below, scope_base_ takes care of destroying it again.
     CreateFunction create_func = reinterpret_cast<CreateFunction>(
@@ -128,9 +123,9 @@ void ScopeLoader::start()
             {
             }
             throw unity::ResourceException("Scope " + scope_name_ + " was compiled with major version " +
-                                           to_string(s_version) + " of the Unity scopes run time. This " +
+                                           std::to_string(s_version) + " of the Unity scopes run time. This " +
                                            "version is incompatible with the current major " +
-                                           "version (" + to_string(maj_version) + ").");
+                                           "version (" + std::to_string(maj_version) + ").");
         }
     }
     catch (...)

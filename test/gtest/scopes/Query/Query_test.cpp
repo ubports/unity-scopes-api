@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <unity/scopes/Query.h>
+#include <unity/scopes/internal/QueryImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -97,6 +98,7 @@ TEST(Query, serialize)
     EXPECT_EQ("scope-A", var["scope"].get_string());
     EXPECT_EQ("dep1", var["department_id"].get_string());
     EXPECT_EQ("foo", var["query_string"].get_string());
+    EXPECT_TRUE(var.find("filter_state") != var.end());
 }
 
 TEST(Query, deserialize)
@@ -106,8 +108,9 @@ TEST(Query, deserialize)
         vm["scope"] = "scope-A";
         vm["query_string"] = "foo";
         vm["department_id"] = "dep1";
+        vm["filter_state"] = Variant(VariantMap());
 
-        Query q(vm);
+        auto q = internal::QueryImpl::create(vm);
         EXPECT_EQ("scope-A", q.scope_name());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
@@ -122,7 +125,7 @@ TEST(Query, exceptions)
         try
         {
             // missing 'scope'
-            Query q(vm);
+            internal::QueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -130,10 +133,11 @@ TEST(Query, exceptions)
         }
 
         vm["scope"] = "";
+        vm["filter_state"] = Variant(VariantMap());
         try
         {
             // empty 'scope' not allowed
-            Query q(vm);
+            internal::QueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -141,9 +145,10 @@ TEST(Query, exceptions)
         }
 
         vm["scope"] = "scope-A";
+        vm["filter_state"] = Variant(VariantMap());
         try
         {
-            Query q(vm);
+            internal::QueryImpl::create(vm);
         }
         catch (unity::InvalidArgumentException const& e)
         {

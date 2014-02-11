@@ -97,6 +97,9 @@ TEST(ScopeMetadataImpl, basic)
         EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.what());
     }
 
+    // when "invisible" is not set, false is returned
+    EXPECT_FALSE(m.invisible());
+
     // Check that the copy has the same values as the original
     EXPECT_EQ("scope_name", mi2->scope_name());
     EXPECT_EQ("identity", mi2->proxy()->identity());
@@ -109,6 +112,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_icon("icon");
     mi2->set_search_hint("search_hint");
     mi2->set_hot_key("hot_key");
+    mi2->set_invisible(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -117,6 +121,7 @@ TEST(ScopeMetadataImpl, basic)
     m = ScopeMetadataImpl::create(move(mi2));
     EXPECT_EQ("search_hint", m.search_hint());
     EXPECT_EQ("hot_key", m.hot_key());
+    EXPECT_TRUE(m.invisible());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -129,6 +134,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_icon("tmp icon");
     ti->set_search_hint("tmp search_hint");
     ti->set_hot_key("tmp hot_key");
+    ti->set_invisible(true);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -142,6 +148,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", ci.icon());
     EXPECT_EQ("tmp search_hint", ci.search_hint());
     EXPECT_EQ("tmp hot_key", ci.hot_key());
+    EXPECT_TRUE(ci.invisible());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -155,6 +162,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", m.icon());
     EXPECT_EQ("tmp search_hint", m.search_hint());
     EXPECT_EQ("tmp hot_key", m.hot_key());
+    EXPECT_TRUE(m.invisible());
 
     // Self-assignment
     tmp = tmp;
@@ -167,6 +175,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", tmp.icon());
     EXPECT_EQ("tmp search_hint", tmp.search_hint());
     EXPECT_EQ("tmp hot_key", tmp.hot_key());
+    EXPECT_TRUE(tmp.invisible());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -179,6 +188,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", tmp2.icon());
     EXPECT_EQ("tmp search_hint", tmp2.search_hint());
     EXPECT_EQ("tmp hot_key", tmp2.hot_key());
+    EXPECT_TRUE(tmp2.invisible());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -196,11 +206,12 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_icon("icon");
     mi->set_search_hint("search_hint");
     mi->set_hot_key("hot_key");
+    mi->set_invisible(false);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(8, var.size());
+    EXPECT_EQ(9, var.size());
     EXPECT_EQ("scope_name", var["scope_name"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -208,6 +219,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("icon", var["icon"].get_string());
     EXPECT_EQ("search_hint", var["search_hint"].get_string());
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
+    EXPECT_FALSE(var["invisible"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -220,6 +232,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("icon", c.icon());
     EXPECT_EQ("search_hint", c.search_hint());
     EXPECT_EQ("hot_key", c.hot_key());
+    EXPECT_FALSE(c.invisible());
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)

@@ -25,6 +25,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchQuery.h>
 #include <unity/UnityExceptions.h>
 
@@ -88,7 +89,7 @@ class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
-            string const& query,
+            Query const& query,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
         scope_name_(scope_name),
@@ -118,13 +119,13 @@ public:
         }
 
         SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
-        create_subquery(scope_c_, query_, VariantMap(), reply);
-        create_subquery(scope_d_, query_, VariantMap(), reply);
+        create_subquery(scope_c_, query_.query_string(), reply);
+        create_subquery(scope_d_, query_.query_string(), reply);
     }
 
 private:
     string scope_name_;
-    string query_;
+    Query query_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };
@@ -138,6 +139,10 @@ public:
     {
         scope_name_ = scope_name;
 
+        if (!registry)
+        {
+            throw ConfigException(scope_name + ": No registry available, cannot locate child scopes");
+        }
         // Lock up scopes C and D in the registry and remember their proxies.
         auto meta_c = registry->get_metadata("scope-C");
         scope_c_ = meta_c.proxy();
@@ -149,14 +154,14 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(string const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const&) override
     {
         QueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
-        cout << "scope-B: created query: \"" << q << "\"" << endl;
+        cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

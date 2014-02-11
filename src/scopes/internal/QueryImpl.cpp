@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
@@ -58,6 +59,13 @@ QueryImpl::QueryImpl(VariantMap const& variant)
     {
         throw InvalidArgumentException("Query(): scope name cannot be empty");
     }
+
+    it = variant.find("filter_state");
+    if (it == variant.end())
+    {
+        throw InvalidArgumentException("Query(): filter_state is missing");
+    }
+    filter_state_ = internal::FilterStateImpl::deserialize(it->second.get_dict());
 
     it = variant.find("department_id");
     if (it != variant.end())
@@ -113,7 +121,7 @@ VariantMap QueryImpl::serialize() const
     vm["scope"] = scope_name_;
     vm["query_string"] = query_string_;
     vm["department_id"] = department_id_;
-    //TODO filters
+    vm["filter_state"] = filter_state_.serialize();
     return vm;
 }
 
@@ -127,6 +135,11 @@ std::string QueryImpl::to_string() const
         s << "&department=" << department_id_;
     }
     return s.str();
+}
+
+Query QueryImpl::create(VariantMap const& var)
+{
+    return Query(new QueryImpl(var));
 }
 
 Query QueryImpl::from_string()

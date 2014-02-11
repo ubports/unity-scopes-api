@@ -34,6 +34,8 @@ namespace unity
 namespace scopes
 {
 
+class ActionMetadata;
+
 namespace internal
 {
 
@@ -51,31 +53,33 @@ public:
     virtual ~SSScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(std::string const& q,
-                                  VariantMap const& hints,
+    MWQueryCtrlProxy create_query(Query const& q,
+                                  SearchMetadata const& hints,
                                   MWReplyProxy const& reply,
                                   InvokeInfo const& info) override;
 
     MWQueryCtrlProxy activate(Result const& result,
-                              VariantMap const& hints,
+                              ActionMetadata const& hints,
                               MWReplyProxy const& reply,
                               InvokeInfo const& info) override;
 
-    MWQueryCtrlProxy activate_preview_action(Result const& result,
-                                             VariantMap const& hints,
-                                             std::string const& action_id,
-                                             MWReplyProxy const& reply,
-                                             InvokeInfo const& info) override;
+    MWQueryCtrlProxy perform_action(Result const& result,
+                                    ActionMetadata const& hints,
+                                    std::string const& widget_id,
+                                    std::string const& action_id,
+                                    MWReplyProxy const& reply,
+                                    InvokeInfo const& info) override;
 
     MWQueryCtrlProxy preview(Result const& result,
-                             VariantMap const& hints,
+                             ActionMetadata const& hints,
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 
 private:
     MWQueryCtrlProxy query(InvokeInfo const& info,
                            MWReplyProxy const& reply,
-                           std::function<QueryBase::SPtr(void)> const& query_factory_fun);
+                           std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+                           std::function<void(QueryBase::SPtr)> const& query_object_fun);
 
 private:
     std::string ss_scope_id_;
