@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
     bool sig_upstart = false;
     std::string server_url_env;
     std::string config_file;
+    std::string server_url_env;
 
     // check for "upstart" as first arg
     if (argc > 1 && std::string(argv[1]) == "upstart")

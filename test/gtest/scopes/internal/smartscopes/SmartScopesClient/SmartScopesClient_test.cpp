@@ -61,20 +61,24 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     ASSERT_EQ(2, scopes.size());
 
+    EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
     EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
+    EXPECT_EQ("icon", scopes[0].icon);
     EXPECT_FALSE(scopes[0].invisible);
 
+    EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
     EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
+    EXPECT_EQ("", scopes[1].icon);
     EXPECT_TRUE(scopes[1].invisible);
 }
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
+    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2, results.size());
@@ -98,10 +102,54 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("", results[1].category->renderer_template);
 }
 
+TEST_F(SmartScopesClientTest, preview)
+{
+    auto preview_handle = ssc_->preview("http://127.0.0.1/demo", "result", "session_id", "platform", 0);
+
+    auto results = preview_handle->get_preview_results();
+    PreviewHandle::Columns columns = results.first;
+    PreviewHandle::Widgets widgets = results.second;
+
+    ASSERT_EQ(3, columns.size());
+
+    // column 1
+    ASSERT_EQ(1, columns[0].size());
+    ASSERT_EQ(3, columns[0][0].size());
+    EXPECT_EQ("widget_id_A", columns[0][0][0]);
+    EXPECT_EQ("widget_id_B", columns[0][0][1]);
+    EXPECT_EQ("widget_id_C", columns[0][0][2]);
+
+    // column 2
+    ASSERT_EQ(2, columns[1].size());
+    ASSERT_EQ(1, columns[1][0].size());
+    EXPECT_EQ("widget_id_A", columns[1][0][0]);
+
+    ASSERT_EQ(2, columns[1][1].size());
+    EXPECT_EQ("widget_id_B", columns[1][1][0]);
+    EXPECT_EQ("widget_id_C", columns[1][1][1]);
+
+    // column 3
+    ASSERT_EQ(3, columns[2].size());
+    ASSERT_EQ(1, columns[2][0].size());
+    EXPECT_EQ("widget_id_A", columns[2][0][0]);
+
+    ASSERT_EQ(1, columns[2][1].size());
+    EXPECT_EQ("widget_id_B", columns[2][1][0]);
+
+    ASSERT_EQ(1, columns[2][2].size());
+    EXPECT_EQ("widget_id_C", columns[2][2][0]);
+
+    ASSERT_EQ(3, widgets.size());
+
+    EXPECT_EQ("{\"id\":\"widget_id_A\",\"text\":\"First widget.\",\"title\":\"Widget A\",\"type\":\"text\"}\n", widgets[0]);
+    EXPECT_EQ("{\"id\":\"widget_id_B\",\"text\":\"Second widget.\",\"title\":\"Widget B\",\"type\":\"text\"}\n", widgets[1]);
+    EXPECT_EQ("{\"id\":\"widget_id_C\",\"text\":\"Third widget.\",\"title\":\"Widget C\",\"type\":\"text\"}\n", widgets[2]);
+}
+
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
-    auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "1234", 0, "");
+    auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());

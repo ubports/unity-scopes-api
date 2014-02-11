@@ -3,5 +3,5 @@ usr/lib/*/scoperegistry/*
 usr/lib/*/scoperunner/*
 usr/lib/*/smartscopesproxy/*
 usr/share/unity-scopes-api/*.ini
-usr/share/unity-scopes-api/scopes
+usr/share/unity/scopes
 usr/share/upstart/sessions/*.conf
