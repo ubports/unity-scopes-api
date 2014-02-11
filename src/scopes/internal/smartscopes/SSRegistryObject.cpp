@@ -26,6 +26,8 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <iostream>
+
 namespace unity
 {
 
@@ -157,8 +159,9 @@ void SSRegistryObject::get_remote_scopes()
         // request remote scopes from smart scopes client
         remote_scopes = ssclient_->get_remote_scopes();
     }
-    catch (unity::Exception const&)
+    catch (unity::Exception const& e)
     {
+        std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
         next_refresh_timeout_ = 1;  ///! TODO config?
         return;
@@ -176,21 +179,22 @@ void SSRegistryObject::get_remote_scopes()
         // construct a ScopeMetadata with remote scope info
         std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
-        metadata->set_scope_name(scope.name);
+        metadata->set_scope_name(scope.id);
         metadata->set_display_name(scope.name);
         metadata->set_description(scope.description);
+        metadata->set_icon(scope.icon);
+        metadata->set_invisible(scope.invisible);
 
-        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, ss_scope_endpoint_),
+        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
                                              middleware_->runtime(),
-                                             scope.name);
+                                             scope.id);
 
         metadata->set_proxy(proxy);
-        metadata->set_invisible(scope.invisible);
 
         auto meta = ScopeMetadataImpl::create(move(metadata));
 
         // add scope info to collection
-        add(scope.name, std::move(meta), scope);
+        add(scope.id, std::move(meta), scope);
     }
 
     next_refresh_timeout_ = regular_refresh_timeout_;

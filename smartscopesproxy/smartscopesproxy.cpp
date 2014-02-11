@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
 
     bool sig_upstart = false;
     std::string config_file;
+    std::string server_url_env;
 
     // check for "upstart" as first arg
     if (argc > 1 && std::string(argv[1]) == "upstart")
@@ -61,7 +62,6 @@ int main(int argc, char* argv[])
     else
     {
         // argv[1]: server_url_env
-        std::string server_url_env;
         if (argc > 1)
         {
             server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);

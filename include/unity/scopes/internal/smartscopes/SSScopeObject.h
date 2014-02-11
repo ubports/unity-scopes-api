@@ -78,7 +78,8 @@ public:
 private:
     MWQueryCtrlProxy query(InvokeInfo const& info,
                            MWReplyProxy const& reply,
-                           std::function<QueryBase::SPtr(void)> const& query_factory_fun);
+                           std::function<QueryBase::SPtr(void)> const& query_factory_fun,
+                           std::function<void(QueryBase::SPtr)> const& query_object_fun);
 
 private:
     std::string ss_scope_id_;
