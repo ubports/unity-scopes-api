@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         std::string ss_scope_id = "SmartScope";
         uint const max_sessions = 4;
         uint const no_reply_timeout = 5000;
-        uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh
+        uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
 
         // Instantiate SS registry and scopes runtimes
         RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DFLT_SS_RUNTIME_INI);
