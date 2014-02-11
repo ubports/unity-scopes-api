@@ -339,6 +339,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             {
                 child_node = root_node->get_node("result");
                 SearchResult result;
+                result.json = child_node->to_json_string();
 
                 std::vector<std::string> members = child_node->member_names();
                 for (auto& member : members)
@@ -366,7 +367,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                     }
                     else
                     {
-                        result.other_params[member] = child_node;
+                        result.other_params[member] = child_node->get_node(member);
                     }
                 }
 

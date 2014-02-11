@@ -62,6 +62,7 @@ struct SearchCategory
 
 struct SearchResult
 {
+    std::string json;
     std::string uri;
     std::string title;
     std::string art;
