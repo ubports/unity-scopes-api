@@ -1,7 +1,7 @@
 description "Scope registry"
 author "Michal Hruby <michal.hruby@canonical.com>"
 
-start on started smart-scopes-proxy
+start on started dbus
 stop on desktop-end
 
 respawn
