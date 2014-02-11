@@ -42,7 +42,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& ss_scope_endpoint,
                                    uint max_http_sessions,
                                    uint no_reply_timeout,
-                                   uint refresh_rate_in_min,
+                                   uint refresh_rate_in_sec,
                                    std::string const& sss_url,
                                    uint sss_port)
     : ssclient_(std::make_shared<SmartScopesClient>(
@@ -51,8 +51,8 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     , refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
-    , regular_refresh_timeout_(refresh_rate_in_min)
-    , next_refresh_timeout_(refresh_rate_in_min)
+    , regular_refresh_timeout_(refresh_rate_in_sec)
+    , next_refresh_timeout_(refresh_rate_in_sec)
 {
     // get remote scopes then start the auto-refresh background thread
     get_remote_scopes();
@@ -139,7 +139,7 @@ void SSRegistryObject::refresh_thread()
 
     while (!refresh_stopped_)
     {
-        refresh_cond_.wait_for(refresh_mutex_, std::chrono::minutes(next_refresh_timeout_));
+        refresh_cond_.wait_for(refresh_mutex_, std::chrono::seconds(next_refresh_timeout_));
 
         if (!refresh_stopped_)
         {
@@ -160,7 +160,7 @@ void SSRegistryObject::get_remote_scopes()
     catch (unity::Exception const&)
     {
         // refresh again soon as get_remote_scopes failed
-        next_refresh_timeout_ = 1;  ///! TODO config?
+        next_refresh_timeout_ = 10;  ///! TODO config?
         return;
     }
 
