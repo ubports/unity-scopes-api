@@ -105,14 +105,14 @@ protected:
 TEST_F(smartscopesproxytest, ss_registry)
 {
     // locate should throw (direct)
-    EXPECT_THROW(reg_->locate("Dummy Demo Scope"), RegistryException);
+    EXPECT_THROW(reg_->locate("dummy.scope"), RegistryException);
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
     EXPECT_EQ(scopes.size(), 2);
 
     // visible scope (direct)
-    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
     EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
@@ -120,7 +120,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_FALSE(meta.invisible());
 
     // non-existant scope (direct)
-    EXPECT_THROW(reg_->get_metadata("Dummy Demo Scope 3"), NotFoundException);
+    EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
 
     // locate should throw (via mw)
     MWRegistryProxy mw_reg = reg_mw_->create_registry_proxy(reg_id_, reg_mw_->get_scope_endpoint());
@@ -131,7 +131,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ(scopes.size(), 2);
 
     // visible scope (via mw)
-    meta = mw_reg->get_metadata("Dummy Demo Scope");
+    meta = mw_reg->get_metadata("dummy.scope");
     EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
@@ -139,7 +139,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_FALSE(meta.invisible());
 
     // non-existant scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("Dummy Demo Scope 3"), NotFoundException);
+    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
 }
 
 class Receiver : public SearchListener
@@ -209,7 +209,7 @@ TEST_F(smartscopesproxytest, create_query)
 {
     auto reply = std::make_shared<Receiver>();
 
-    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
 
@@ -383,7 +383,7 @@ TEST_F(smartscopesproxytest, preview)
 {
     auto reply = std::make_shared<Receiver>();
 
-    ScopeMetadata meta = reg_->get_metadata("Dummy Demo Scope");
+    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
     auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
     meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);

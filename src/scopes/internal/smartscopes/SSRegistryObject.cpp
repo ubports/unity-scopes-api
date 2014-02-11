@@ -185,16 +185,16 @@ void SSRegistryObject::get_remote_scopes()
         metadata->set_icon(scope.icon);
         metadata->set_invisible(scope.invisible);
 
-        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.name, ss_scope_endpoint_),
+        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
                                              middleware_->runtime(),
-                                             scope.name);
+                                             scope.id);
 
         metadata->set_proxy(proxy);
 
         auto meta = ScopeMetadataImpl::create(move(metadata));
 
         // add scope info to collection
-        add(scope.name, std::move(meta), scope);
+        add(scope.id, std::move(meta), scope);
     }
 
     next_refresh_timeout_ = regular_refresh_timeout_;
