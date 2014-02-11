@@ -26,6 +26,8 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <iostream>
+
 namespace unity
 {
 
@@ -157,8 +159,9 @@ void SSRegistryObject::get_remote_scopes()
         // request remote scopes from smart scopes client
         remote_scopes = ssclient_->get_remote_scopes();
     }
-    catch (unity::Exception const&)
+    catch (unity::Exception const& e)
     {
+        std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
         next_refresh_timeout_ = 1;  ///! TODO config?
         return;

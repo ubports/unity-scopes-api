@@ -182,7 +182,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
+        std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
                   << url_ << c_remote_scopes_resource << std::endl;
         throw;
     }
@@ -381,7 +381,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
+        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
                   << session_id << std::endl;
         throw;
     }
@@ -467,7 +467,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
     }
     catch (unity::Exception const& e)
     {
-        std::cout << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
+        std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
                   << session_id << std::endl;
         throw;
     }
