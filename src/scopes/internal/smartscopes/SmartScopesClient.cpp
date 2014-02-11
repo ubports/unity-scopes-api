@@ -443,14 +443,14 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
                         auto widget_lo_node = column_node->get_node(widget_lo_i);
 
                         // for each widget within the widget layout
-                        std::vector<std::string> widgets;
+                        std::vector<std::string> widget_ids;
                         for (int widget_i = 0; widget_i < widget_lo_node->size(); ++widget_i)
                         {
                             auto widget_node = widget_lo_node->get_node(widget_i);
-                            widgets.push_back(widget_node->as_string());
+                            widget_ids.push_back(widget_node->as_string());
                         }
 
-                        widget_layouts.push_back(widgets);
+                        widget_layouts.push_back(widget_ids);
                     }
 
                     columns.push_back(widget_layouts);
