@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
+#include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
 
@@ -86,12 +87,11 @@ public:
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
+    SearchHandle(std::string const& search_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string session_id_;
+    std::string search_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
-    bool got_results_;
 };
 
 class PreviewHandle
@@ -110,12 +110,11 @@ public:
 
 private:
     friend class SmartScopesClient;
-    PreviewHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
+    PreviewHandle(std::string const& preview_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string session_id_;
+    std::string preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
-    bool got_results_;
 };
 
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
@@ -154,13 +153,13 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    std::vector<SearchResult> get_search_results(std::string const& session_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(std::string const& session_id);
+    std::vector<SearchResult> get_search_results(std::string const& search_id);
+    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(std::string const& preview_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_search(std::string const& session_id);
-    void cancel_preview(std::string const& session_id);
+    void cancel_search(std::string const& search_id);
+    void cancel_preview(std::string const& preview_id);
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
@@ -181,6 +180,8 @@ private:
 
     std::string cached_scopes_;
     bool have_latest_cache_;
+
+    UniqueID unique_id_;
 };
 
 }  // namespace smartscopes

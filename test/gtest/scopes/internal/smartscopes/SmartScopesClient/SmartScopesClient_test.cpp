@@ -150,11 +150,16 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
 {
     auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
     auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle3 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());
 
-    EXPECT_THROW(search_handle2->get_search_results(), unity::Exception);
+    results = search_handle2->get_search_results();
+    EXPECT_EQ(2, results.size());
+
+    results = search_handle3->get_search_results();
+    EXPECT_EQ(2, results.size());
 }
 
 } // namespace

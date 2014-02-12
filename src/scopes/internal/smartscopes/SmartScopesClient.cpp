@@ -41,58 +41,48 @@ using namespace unity::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
-SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id)
+SearchHandle::SearchHandle(std::string const& search_id, SmartScopesClient::SPtr ssc)
+    : search_id_(search_id)
     , ssc_(ssc)
-    , got_results_(false)
 {
 }
 
 SearchHandle::~SearchHandle()
 {
-    if (!got_results_)
-    {
-        cancel_search();
-    }
+    cancel_search();
 }
 
 std::vector<SearchResult> SearchHandle::get_search_results()
 {
-    got_results_ = true;
-    return ssc_->get_search_results(session_id_);
+    return ssc_->get_search_results(search_id_);
 }
 
 void SearchHandle::cancel_search()
 {
-    ssc_->cancel_search(session_id_);
+    ssc_->cancel_search(search_id_);
 }
 
 //-- PreviewHandle
 
-PreviewHandle::PreviewHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id)
+PreviewHandle::PreviewHandle(std::string const& preview_id, SmartScopesClient::SPtr ssc)
+    : preview_id_(preview_id)
     , ssc_(ssc)
-    , got_results_(false)
 {
 }
 
 PreviewHandle::~PreviewHandle()
 {
-    if (!got_results_)
-    {
-        cancel_preview();
-    }
+    cancel_preview();
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
 {
-    got_results_ = true;
-    return ssc_->get_preview_results(session_id_);
+    return ssc_->get_preview_results(preview_id_);
 }
 
 void PreviewHandle::cancel_preview()
 {
-    ssc_->cancel_preview(session_id_);
+    ssc_->cancel_preview(preview_id_);
 }
 
 //-- SmartScopesClient
@@ -268,13 +258,13 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
         search_uri << "&limit=" << std::to_string(limit);
     }
 
-    cancel_search(session_id);
+    std::string search_id = unique_id_.gen();
 
     std::lock_guard<std::mutex> lock(search_results_mutex_);
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    search_results_[session_id] = http_client_->get(search_uri.str(), port_);
+    search_results_[search_id] = http_client_->get(search_uri.str(), port_);
 
-    return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
+    return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
 
 PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
@@ -306,16 +296,16 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
         preview_uri << "&country=" << country;
     }
 
-    cancel_preview(session_id);
+    std::string preview_id = unique_id_.gen();
 
     std::lock_guard<std::mutex> lock(preview_results_mutex_);
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    preview_results_[session_id] = http_client_->get(preview_uri.str(), port_);
+    preview_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
 
-    return PreviewHandle::UPtr(new PreviewHandle(session_id, shared_from_this()));
+    return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& session_id)
+std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& search_id)
 {
     try
     {
@@ -324,15 +314,15 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
         {
             std::lock_guard<std::mutex> lock(search_results_mutex_);
 
-            auto it = search_results_.find(session_id);
+            auto it = search_results_.find(search_id);
             if (it == search_results_.end())
             {
-                throw unity::LogicException("No search for session " + session_id + " is active");
+                throw unity::LogicException("No search for search ID " + search_id + " is active");
             }
 
-            search_results_[session_id]->wait();
+            search_results_[search_id]->wait();
 
-            response_str = search_results_[session_id]->get();
+            response_str = search_results_[search_id]->get();
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
             search_results_.erase(it);
         }
@@ -421,19 +411,19 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             }
         }
 
-        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for session: "
-                  << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for search ID: "
+                  << search_id << std::endl;
         return results;
     }
     catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
-                  << session_id << std::endl;
+        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for search ID: "
+                  << search_id << std::endl;
         throw;
     }
 }
 
-std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& session_id)
+std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& preview_id)
 {
     try
     {
@@ -442,15 +432,15 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
         {
             std::lock_guard<std::mutex> lock(preview_results_mutex_);
 
-            auto it = preview_results_.find(session_id);
+            auto it = preview_results_.find(preview_id);
             if (it == preview_results_.end())
             {
-                throw unity::LogicException("No preivew for session " + session_id + " is active");
+                throw unity::LogicException("No preivew for preview ID " + preview_id + " is active");
             }
 
-            preview_results_[session_id]->wait();
+            preview_results_[preview_id]->wait();
 
-            response_str = preview_results_[session_id]->get();
+            response_str = preview_results_[preview_id]->get();
             std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
             preview_results_.erase(it);
         }
@@ -507,14 +497,14 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
             }
         }
 
-        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for session: "
-                  << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for preview ID: "
+                  << preview_id << std::endl;
         return std::make_pair(columns, widgets);
     }
     catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
-                  << session_id << std::endl;
+        std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for preview ID: "
+                  << preview_id << std::endl;
         throw;
     }
 }
@@ -541,26 +531,26 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     return jsons;
 }
 
-void SmartScopesClient::cancel_search(std::string const& session_id)
+void SmartScopesClient::cancel_search(std::string const& search_id)
 {
     std::lock_guard<std::mutex> lock(search_results_mutex_);
 
-    auto it = search_results_.find(session_id);
+    auto it = search_results_.find(search_id);
     if (it != search_results_.end())
     {
-        http_client_->cancel_get(search_results_[session_id]);
+        http_client_->cancel_get(search_results_[search_id]);
         search_results_.erase(it);
     }
 }
 
-void SmartScopesClient::cancel_preview(std::string const& session_id)
+void SmartScopesClient::cancel_preview(std::string const& preview_id)
 {
     std::lock_guard<std::mutex> lock(preview_results_mutex_);
 
-    auto it = preview_results_.find(session_id);
+    auto it = preview_results_.find(preview_id);
     if (it != preview_results_.end())
     {
-        http_client_->cancel_get(preview_results_[session_id]);
+        http_client_->cancel_get(preview_results_[preview_id]);
         preview_results_.erase(it);
     }
 }
