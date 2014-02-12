@@ -178,6 +178,9 @@ private:
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;
     std::mutex preview_results_mutex_;
+
+    std::string cached_scopes_;
+    bool have_latest_cache_;
 };
 
 }  // namespace smartscopes

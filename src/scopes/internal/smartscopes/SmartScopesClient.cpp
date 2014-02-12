@@ -105,7 +105,9 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
     , json_node_(json_node)
     , url_(url)
     , port_(port)
+    , have_latest_cache_(false)
 {
+    // initialise url_
     if (url_.empty())
     {
         char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
@@ -133,6 +135,9 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
             url_ = c_base_url;
         }
     }
+
+    // initialise cached_scopes_
+    read_cache();
 }
 
 SmartScopesClient::~SmartScopesClient()
@@ -572,22 +577,28 @@ void SmartScopesClient::write_cache(std::string const& scopes_json)
     {
         cache_file << scopes_json;
         cache_file.close();
+
+        have_latest_cache_ = false;
     }
 }
 
 std::string SmartScopesClient::read_cache()
 {
+    if (have_latest_cache_)
+    {
+        return cached_scopes_;
+    }
+
     // open cache for input
     std::ifstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
 
     if (!cache_file.fail())
     {
-        std::string scopes_json((std::istreambuf_iterator<char>(cache_file)),
-                                 std::istreambuf_iterator<char>());
+        cached_scopes_ = std::string((std::istreambuf_iterator<char>(cache_file)),
+                                      std::istreambuf_iterator<char>());
 
-        return scopes_json;
+        have_latest_cache_ = true;
     }
 
-    // treat as if empty
-    return "";
+    return cached_scopes_;
 }
