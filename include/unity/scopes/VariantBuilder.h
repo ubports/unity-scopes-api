@@ -39,6 +39,7 @@ class VariantBuilderImpl;
 
 /**
 \brief Helper class for creating and populating Variant containers.
+
 The main purpose of this class is to ease creation of variant containers needed for PreviewWidget
 instances or any other classes that require non-trivial variant definitions.
 

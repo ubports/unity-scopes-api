@@ -34,7 +34,8 @@ class ActionMetadataImpl;
 }
 
 /**
-\brief
+\brief Metadata passed to scopes as a part of unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate or
+unity::scopes::ScopeBase::perform_action requests.
 */
 class UNITY_API ActionMetadata : public QueryMetadata
 {
