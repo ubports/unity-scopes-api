@@ -158,8 +158,7 @@ private:
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_search(uint search_id);
-    void cancel_preview(uint preview_id);
+    void cancel_query(uint query_id);
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
@@ -171,12 +170,10 @@ private:
     std::string url_;
     uint port_;
 
-    std::map<uint, HttpResponseHandle::SPtr> search_results_;
-    std::map<uint, HttpResponseHandle::SPtr> preview_results_;
+    std::map<uint, HttpResponseHandle::SPtr> query_results_;
 
     std::mutex json_node_mutex_;
-    std::mutex search_results_mutex_;
-    std::mutex preview_results_mutex_;
+    std::mutex query_results_mutex_;
 
     std::string cached_scopes_;
     bool have_latest_cache_;

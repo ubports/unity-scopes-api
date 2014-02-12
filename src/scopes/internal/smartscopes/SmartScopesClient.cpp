@@ -59,7 +59,7 @@ std::vector<SearchResult> SearchHandle::get_search_results()
 
 void SearchHandle::cancel_search()
 {
-    ssc_->cancel_search(search_id_);
+    ssc_->cancel_query(search_id_);
 }
 
 //-- PreviewHandle
@@ -82,7 +82,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_pre
 
 void PreviewHandle::cancel_preview()
 {
-    ssc_->cancel_preview(preview_id_);
+    ssc_->cancel_query(preview_id_);
 }
 
 //-- SmartScopesClient
@@ -259,11 +259,11 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
         search_uri << "&limit=" << std::to_string(limit);
     }
 
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
     uint search_id = ++query_counter_;
 
-    std::lock_guard<std::mutex> lock(search_results_mutex_);
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    search_results_[search_id] = http_client_->get(search_uri.str(), port_);
+    query_results_[search_id] = http_client_->get(search_uri.str(), port_);
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -297,11 +297,11 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
         preview_uri << "&country=" << country;
     }
 
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
     uint preview_id = ++query_counter_;
 
-    std::lock_guard<std::mutex> lock(preview_results_mutex_);
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    preview_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
@@ -313,19 +313,19 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
         std::string response_str;
 
         {
-            std::lock_guard<std::mutex> lock(search_results_mutex_);
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-            auto it = search_results_.find(search_id);
-            if (it == search_results_.end())
+            auto it = query_results_.find(search_id);
+            if (it == query_results_.end())
             {
                 throw unity::LogicException("No search for query " + std::to_string(search_id) + " is active");
             }
 
-            search_results_[search_id]->wait();
+            query_results_[search_id]->wait();
 
-            response_str = search_results_[search_id]->get();
+            response_str = query_results_[search_id]->get();
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
-            search_results_.erase(it);
+            query_results_.erase(it);
         }
 
         std::vector<SearchResult> results;
@@ -429,19 +429,19 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
         std::string response_str;
 
         {
-            std::lock_guard<std::mutex> lock(preview_results_mutex_);
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-            auto it = preview_results_.find(preview_id);
-            if (it == preview_results_.end())
+            auto it = query_results_.find(preview_id);
+            if (it == query_results_.end())
             {
                 throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
             }
 
-            preview_results_[preview_id]->wait();
+            query_results_[preview_id]->wait();
 
-            response_str = preview_results_[preview_id]->get();
+            response_str = query_results_[preview_id]->get();
             std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
-            preview_results_.erase(it);
+            query_results_.erase(it);
         }
 
         PreviewHandle::Columns columns;
@@ -528,27 +528,15 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     return jsons;
 }
 
-void SmartScopesClient::cancel_search(uint search_id)
+void SmartScopesClient::cancel_query(uint query_id)
 {
-    std::lock_guard<std::mutex> lock(search_results_mutex_);
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-    auto it = search_results_.find(search_id);
-    if (it != search_results_.end())
+    auto it = query_results_.find(query_id);
+    if (it != query_results_.end())
     {
-        http_client_->cancel_get(search_results_[search_id]);
-        search_results_.erase(it);
-    }
-}
-
-void SmartScopesClient::cancel_preview(uint preview_id)
-{
-    std::lock_guard<std::mutex> lock(preview_results_mutex_);
-
-    auto it = preview_results_.find(preview_id);
-    if (it != preview_results_.end())
-    {
-        http_client_->cancel_get(preview_results_[preview_id]);
-        preview_results_.erase(it);
+        http_client_->cancel_get(query_results_[query_id]);
+        query_results_.erase(it);
     }
 }
 
