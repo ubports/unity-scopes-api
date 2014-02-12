@@ -20,16 +20,21 @@
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
+#include <cstring>
+#include <fstream>
 #include <future>
 #include <iostream>
 #include <map>
 #include <sstream>
-#include <cstring>
+#include <sys/stat.h>
 
 static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
 static const std::string c_search_resource = "/search";
 static const std::string c_preview_resource = "/preview";
+
+static const std::string c_scopes_cache_dir = std::string(getenv("HOME")) + "/.cache/unity-scopes/";
+static const std::string c_scopes_cache_filename = "remote-scopes.json";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -136,6 +141,9 @@ SmartScopesClient::~SmartScopesClient()
 
 std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
 {
+    std::string response_str;
+    bool using_cache = false;
+
     try
     {
         std::ostringstream remote_scopes_uri;
@@ -148,14 +156,26 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes_uri << "&locale=\"" << locale << "\"";
         }
 
-        std::string response_str;
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
 
+        std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
+
+        response_str = read_cache();
+        using_cache = true;
+    }
+
+    try
+    {
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
         JsonNodeInterface::SPtr child_node;
@@ -188,14 +208,23 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes.push_back(scope);
         }
 
-        std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
-                  << url_ << c_remote_scopes_resource << std::endl;
+        if (!using_cache)
+        {
+            write_cache(response_str);
+
+            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
+                      << url_ << c_remote_scopes_resource << std::endl;
+        }
+        else
+        {
+            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from cache" << std::endl;
+        }
+
         return remote_scopes;
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
-                  << url_ << c_remote_scopes_resource << std::endl;
+        std::cerr << "SmartScopesClient.get_remote_scopes() failed." << std::endl;
         throw;
     }
 }
@@ -391,7 +420,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
                   << session_id << std::endl;
         return results;
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
                   << session_id << std::endl;
@@ -477,7 +506,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
                   << session_id << std::endl;
         return std::make_pair(columns, widgets);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
                   << session_id << std::endl;
@@ -529,4 +558,36 @@ void SmartScopesClient::cancel_preview(std::string const& session_id)
         http_client_->cancel_get(preview_results_[session_id]);
         preview_results_.erase(it);
     }
+}
+
+void SmartScopesClient::write_cache(std::string const& scopes_json)
+{
+    // make cache directory (fails silently if already exists)
+    mkdir(c_scopes_cache_dir.c_str(), 0755);
+
+    // open cache for output
+    std::ofstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
+
+    if (!cache_file.fail())
+    {
+        cache_file << scopes_json;
+        cache_file.close();
+    }
+}
+
+std::string SmartScopesClient::read_cache()
+{
+    // open cache for input
+    std::ifstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
+
+    if (!cache_file.fail())
+    {
+        std::string scopes_json((std::istreambuf_iterator<char>(cache_file)),
+                                 std::istreambuf_iterator<char>());
+
+        return scopes_json;
+    }
+
+    // treat as if empty
+    return "";
 }

@@ -162,6 +162,9 @@ private:
     void cancel_search(std::string const& session_id);
     void cancel_preview(std::string const& session_id);
 
+    void write_cache(std::string const& scopes_json);
+    std::string read_cache();
+
 private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
