@@ -28,6 +28,8 @@
 
 #include <iostream>
 
+static const uint c_failed_refresh_timeout = 10; ///! TODO get from config
+
 namespace unity
 {
 
@@ -179,7 +181,7 @@ void SSRegistryObject::get_remote_scopes()
     {
         std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
-        next_refresh_timeout_ = 10;  ///! TODO config?
+        next_refresh_timeout_ = c_failed_refresh_timeout;
         return;
     }
 
