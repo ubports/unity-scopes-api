@@ -87,7 +87,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
     auto config_files = find_scope_config_files(scope_installdir, ".ini");
-    for (auto path : config_files)
+    for (auto&& path : config_files)
     {
         string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
         string scope_name = strip_suffix(file_name, ".ini");
@@ -109,28 +109,33 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
         }
     }
 
-    map<string, string> oem_scopes;             // Additional scopes provided by the OEM (including overriding ones)
     if (!oem_installdir.empty())
     {
-        auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
-        for (auto path : oem_paths)
+        try
         {
-            string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-            string scope_name = strip_suffix(file_name, ".ini");
-            if (fixed_scopes.find(scope_name) == fixed_scopes.end())
+            auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
+            for (auto&& path : oem_paths)
             {
-                overrideable_scopes.erase(scope_name);                // Only keep scopes that are not overridden by OEM
-                oem_scopes[scope_name] = path;
+                string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
+                string scope_name = strip_suffix(file_name, ".ini");
+                if (fixed_scopes.find(scope_name) == fixed_scopes.end())
+                {
+                    overrideable_scopes[scope_name] = path;  // Replaces scope if it was present already
+                }
+                else
+                {
+                    error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
+                }
             }
-            else
-            {
-                error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
-            }
+        }
+        catch (ResourceException const& e)
+        {
+            error(e.what());
+            error("could not open OEM installation directory, ignoring OEM scopes");
         }
     }
 
-    // Combine fixed_scopes and overrideable scopes now.
-    // overrideable_scopes only contains scopes that were *not* overridden by the OEM.
+    // Combine fixed_scopes and overrideable_scopes now.
     fixed_scopes.insert(overrideable_scopes.begin(), overrideable_scopes.end());
     return fixed_scopes;
 }
@@ -144,7 +149,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       string const& scoperunner_path,
                       string const& config_file)
 {
-    for (auto pair : all_scopes)
+    for (auto&& pair : all_scopes)
     {
         try
         {
@@ -293,7 +298,6 @@ main(int argc, char* argv[])
             string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
             string scope_name = strip_suffix(file_name, ".ini");
             local_scopes[scope_name] = argv[i];                   // operator[] overwrites pre-existing entries
-            cerr << "extra: " << argv[i] << endl;
         }
 
         add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file);
@@ -314,7 +318,7 @@ main(int argc, char* argv[])
         // The middleware should spawn scope processes with lookup() on demand.
         // Because it currently does not have the plumbing, we start every scope immediately.
         // When the plumbing appears, remove this.
-        for (auto pair : local_scopes)
+        for (auto&& pair : local_scopes)
         {
             try
             {
@@ -324,6 +328,10 @@ main(int argc, char* argv[])
             {
                 // We ignore this. If the scope config couldn't be found, add_local_scopes()
                 // has already printed an error message.
+            }
+            catch (std::exception const& e)
+            {
+                error("could not start scope " + pair.first + ": " + e.what());
             }
         }
 
