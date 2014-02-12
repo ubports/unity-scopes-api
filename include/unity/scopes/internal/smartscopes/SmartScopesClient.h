@@ -124,8 +124,8 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
-                      std::string const& url = "" /*detect url*/,
-                      uint port = 80);
+                      std::string const& url = "", // detect url
+                      uint port = 0);
 
     virtual ~SmartScopesClient();
 

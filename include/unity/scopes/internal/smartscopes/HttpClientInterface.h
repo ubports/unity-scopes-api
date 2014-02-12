@@ -77,7 +77,7 @@ public:
     HttpClientInterface() = default;
     virtual ~HttpClientInterface() = default;
 
-    virtual HttpResponseHandle::SPtr get(std::string const& request_url, int port = 80) = 0;
+    virtual HttpResponseHandle::SPtr get(std::string const& request_url, int uport) = 0;
     virtual void cancel_get(const HttpResponseHandle::SPtr& session_handle) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;
