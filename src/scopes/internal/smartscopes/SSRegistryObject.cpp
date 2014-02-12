@@ -57,7 +57,15 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     , next_refresh_timeout_(refresh_rate_in_sec)
 {
     // get remote scopes then start the auto-refresh background thread
-    get_remote_scopes();
+    try
+    {
+        get_remote_scopes();
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
+    }
+
     refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
 
@@ -145,11 +153,19 @@ void SSRegistryObject::refresh_thread()
 
         if (!refresh_stopped_)
         {
-            get_remote_scopes();
+            try
+            {
+                get_remote_scopes();
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
+            }
         }
     }
 }
 
+// Must be called with refresh_mutex_ locked
 void SSRegistryObject::get_remote_scopes()
 {
     std::vector<RemoteScope> remote_scopes;
@@ -159,7 +175,7 @@ void SSRegistryObject::get_remote_scopes()
         // request remote scopes from smart scopes client
         remote_scopes = ssclient_->get_remote_scopes();
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
         std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
@@ -176,30 +192,39 @@ void SSRegistryObject::get_remote_scopes()
     // loop through all available scopes and add() each visible scope
     for (RemoteScope const& scope : remote_scopes)
     {
-        // construct a ScopeMetadata with remote scope info
-        std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
+        try
+        {
+            // construct a ScopeMetadata with remote scope info
+            std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
-        metadata->set_scope_name(scope.id);
-        metadata->set_display_name(scope.name);
-        metadata->set_description(scope.description);
-        metadata->set_icon(scope.icon);
-        metadata->set_invisible(scope.invisible);
+            metadata->set_scope_name(scope.id);
+            metadata->set_display_name(scope.name);
+            metadata->set_description(scope.description);
+            metadata->set_icon(scope.icon);
+            metadata->set_invisible(scope.invisible);
 
-        ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
-                                             middleware_->runtime(),
-                                             scope.id);
+            ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
+                                                 middleware_->runtime(),
+                                                 scope.id);
 
-        metadata->set_proxy(proxy);
+            metadata->set_proxy(proxy);
 
-        auto meta = ScopeMetadataImpl::create(move(metadata));
+            auto meta = ScopeMetadataImpl::create(move(metadata));
 
-        // add scope info to collection
-        add(scope.id, std::move(meta), scope);
+            // add scope info to collection
+            add(scope.id, std::move(meta), scope);
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << e.what() << std::endl;
+            std::cerr << "SSRegistryObject: skipping scope \"" << scope.id << "\"" << std::endl;
+        }
     }
 
     next_refresh_timeout_ = regular_refresh_timeout_;
 }
 
+// Must be called with scopes_mutex_ locked
 bool SSRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata, RemoteScope const& remotedata)
 {
     if (scope_name.empty())
