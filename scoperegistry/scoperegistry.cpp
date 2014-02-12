@@ -246,6 +246,8 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
+    SignalThread signal_thread;
+
     try
     {
         RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
@@ -275,6 +277,10 @@ main(int argc, char* argv[])
         } // Release memory for config parser
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
+
+        // Inform the signal thread that it should shutdown the middleware
+        // if we get a termination signal.
+        signal_thread.activate([middleware]{ middleware->stop(); });
 
         // The registry object stores the local and remote scopes
         RegistryObject::SPtr registry(new RegistryObject);
@@ -327,8 +333,13 @@ main(int argc, char* argv[])
             }
         }
 
-        // Wait until we are done (never, really, because the registry has no way to shut down other than
-        // being killed by signal).
+        // Drop our shared_ptr to the RegistryObject. This means that the registry object
+        // is kept alive only via the shared_ptr held by the middleware. If the middleware
+        // shuts down, it clears out the active servant map, which destroys the registry
+        // object. The registry object kills all its child processes as part of its clean-up.
+        registry = nullptr;
+
+        // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
         exit_status = 0;
     }
