@@ -36,12 +36,6 @@ namespace internal
 class ColumnLayoutImpl;
 }
 
-/**
-\brief Carries a layout for preview widgets with given column setup.
-ColumnLayout defines how widgets should be laid out on a display with given number of columns.
-In typical use cases, scope creates ColumnLayout instances for all supported setups (number of columns),
-and then populates every layout with widget identifiers by creating columns with ColumnLayout::add_column.
-*/
 class UNITY_API ColumnLayout final
 {
 public:
