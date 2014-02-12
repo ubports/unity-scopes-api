@@ -91,6 +91,7 @@ private:
 private:
     std::string session_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
+    bool got_results_;
 };
 
 class PreviewHandle
@@ -114,6 +115,7 @@ private:
 private:
     std::string session_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
+    bool got_results_;
 };
 
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>

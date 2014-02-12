@@ -39,16 +39,21 @@ using namespace unity::scopes::internal::smartscopes;
 SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
     : session_id_(session_id)
     , ssc_(ssc)
+    , got_results_(false)
 {
 }
 
 SearchHandle::~SearchHandle()
 {
-    cancel_search();
+    if (!got_results_)
+    {
+        cancel_search();
+    }
 }
 
 std::vector<SearchResult> SearchHandle::get_search_results()
 {
+    got_results_ = true;
     return ssc_->get_search_results(session_id_);
 }
 
@@ -62,16 +67,21 @@ void SearchHandle::cancel_search()
 PreviewHandle::PreviewHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
     : session_id_(session_id)
     , ssc_(ssc)
+    , got_results_(false)
 {
 }
 
 PreviewHandle::~PreviewHandle()
 {
-    cancel_preview();
+    if (!got_results_)
+    {
+        cancel_preview();
+    }
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
 {
+    got_results_ = true;
     return ssc_->get_preview_results(session_id_);
 }
 
