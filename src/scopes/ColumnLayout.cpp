@@ -26,7 +26,7 @@ namespace scopes
 {
 
 /*!
-\class ColumnLayout 
+\class ColumnLayout
 
 \brief Defines a layout for preview widgets with given column setup.
 
