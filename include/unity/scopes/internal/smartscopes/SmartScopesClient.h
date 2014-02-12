@@ -87,10 +87,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(std::string const& search_id, std::shared_ptr<SmartScopesClient> ssc);
+    SearchHandle(uint search_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string search_id_;
+    uint search_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -110,10 +110,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    PreviewHandle(std::string const& preview_id, std::shared_ptr<SmartScopesClient> ssc);
+    PreviewHandle(uint preview_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string preview_id_;
+    uint preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -153,13 +153,13 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    std::vector<SearchResult> get_search_results(std::string const& search_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(std::string const& preview_id);
+    std::vector<SearchResult> get_search_results(uint search_id);
+    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_search(std::string const& search_id);
-    void cancel_preview(std::string const& preview_id);
+    void cancel_search(uint search_id);
+    void cancel_preview(uint preview_id);
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
@@ -171,8 +171,8 @@ private:
     std::string url_;
     uint port_;
 
-    std::map<std::string, HttpResponseHandle::SPtr> search_results_;
-    std::map<std::string, HttpResponseHandle::SPtr> preview_results_;
+    std::map<uint, HttpResponseHandle::SPtr> search_results_;
+    std::map<uint, HttpResponseHandle::SPtr> preview_results_;
 
     std::mutex json_node_mutex_;
     std::mutex search_results_mutex_;
@@ -181,7 +181,7 @@ private:
     std::string cached_scopes_;
     bool have_latest_cache_;
 
-    UniqueID unique_id_;
+    uint query_counter_;
 };
 
 }  // namespace smartscopes
