@@ -550,7 +550,7 @@ void SmartScopesClient::cancel_query(uint query_id)
     if (it != query_results_.end())
     {
         http_client_->cancel_get(it->second);
-        ///!query_results_.erase(it);
+        query_results_.erase(it);
     }
 }
 

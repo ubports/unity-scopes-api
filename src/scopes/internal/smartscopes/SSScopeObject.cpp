@@ -183,7 +183,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         throw;
     }
 
-    return info.mw->create_query_ctrl_proxy(info.id + "-c", info.mw->get_query_ctrl_endpoint());
+    return info.mw->create_query_ctrl_proxy(info.id + ".c", info.mw->get_query_ctrl_endpoint());
 }
 
 }  // namespace smartscopes
