@@ -55,8 +55,15 @@ public:
 
 TEST_F(HttpClientTest, no_server)
 {
+    int dead_port;
+    {
+        // spawn a server, so it allocates a free port
+        RaiiServer server(FAKE_SERVER_PATH);
+        dead_port = server.port_;
+        // RaiiServer goes out of scope, so it gets killed
+    }
     // no server
-    HttpResponseHandle::SPtr response = http_client_->get(test_url, 0);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url, dead_port);
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
