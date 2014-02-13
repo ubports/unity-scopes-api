@@ -25,7 +25,6 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <atomic>
-#include <mutex>
 
 namespace unity
 {

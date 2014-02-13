@@ -69,7 +69,7 @@ public:
 
         // Instantiate a SS registry and scope objects
         reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60,
-                                                           "http://127.0.0.1", server_.port_));
+                                                           "http://127.0.0.1", server_.port_, false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
         // Add objects to the middlewares
@@ -211,11 +211,8 @@ TEST_F(smartscopesproxytest, create_query)
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
-
     meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
-
-    wait_thread.join();
+    reply->wait_until_finished();
 }
 
 class PreviewerWithCols : public PreviewListener
@@ -313,7 +310,7 @@ public:
 private:
     int widget_pushes_ = 0;
     int col_pushes_ = 0;
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -374,7 +371,7 @@ public:
 private:
     int widget_pushes_ = 0;
     int col_pushes_ = 0;
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -385,9 +382,8 @@ TEST_F(smartscopesproxytest, preview)
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    auto wait_thread = std::thread([&reply](){reply->wait_until_finished();});
     meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
-    wait_thread.join();
+    reply->wait_until_finished();
 
     auto result = reply->last_result();
     EXPECT_TRUE(result.get() != nullptr);
@@ -395,16 +391,14 @@ TEST_F(smartscopesproxytest, preview)
     // with columns returned
     auto previewer_with_cols = std::make_shared<PreviewerWithCols>();
 
-    wait_thread = std::thread([&previewer_with_cols](){previewer_with_cols->wait_until_finished();});
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
-    wait_thread.join();
+    previewer_with_cols->wait_until_finished();
 
     // without columns returned
     auto previewer_no_cols = std::make_shared<PreviewerNoCols>();
 
-    wait_thread = std::thread([&previewer_no_cols](){previewer_no_cols->wait_until_finished();});
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
-    wait_thread.join();
+    previewer_no_cols->wait_until_finished();
 }
 
 } // namespace

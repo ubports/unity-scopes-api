@@ -42,7 +42,7 @@ void ScopeBase::run()
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* hints */)
+ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
     return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
 }

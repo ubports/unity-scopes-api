@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RegistryObject.h>
 
+#include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -52,14 +53,14 @@ public:
     RegistryObjectPrivate(RegistryObjectPrivate const&) = delete;
     RegistryObjectPrivate& operator=(RegistryObjectPrivate const&) = delete;
 
-    RegistryObjectPrivate() {};
+    RegistryObjectPrivate() {}
     ~RegistryObjectPrivate();
     ScopeMetadata get_metadata(std::string const& scope_name);
     MetadataMap list();
     bool add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
                          std::vector<std::string> const& spawn_command);
     bool remove_local_scope(std::string const& scope_name);
-    void set_remote_scopes(MetadataMap&& scopes);
+    void set_remote_registry(MWRegistryProxy const& registry);
     ScopeProxy locate(std::string const& scope_name);
 
 private:
@@ -67,7 +68,7 @@ private:
     MetadataMap scopes;
     std::map<std::string, pid_t> scope_processes;
     std::map<std::string, std::vector<std::string>> commands;
-    MetadataMap remote_scopes;
+    MWRegistryProxy remote_registry;
 
     void spawn_scope(std::string const& scope_name);
     int kill_process(pid_t pid);
@@ -126,16 +127,17 @@ ScopeMetadata RegistryObjectPrivate::get_metadata(std::string const& scope_name)
     // name. (Ideally, this will never happen, except maybe
     // during development.)
     auto const& it = scopes.find(scope_name);
-    if (it == scopes.end())
+    if (it != scopes.end())
     {
-        auto const& rit = remote_scopes.find(scope_name);
-        if (rit == remote_scopes.end())
-        {
-            throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
-        }
-        return rit->second;
+        return it->second;
     }
-    return it->second;
+
+    if (remote_registry)
+    {
+        return remote_registry->get_metadata(scope_name);
+    }
+
+    throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
 }
 
 void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
@@ -187,10 +189,16 @@ void RegistryObjectPrivate::spawn_scope(std::string const& scope_name)
 MetadataMap RegistryObjectPrivate::list()
 {
     MetadataMap all_scopes(scopes);  // Local scopes
+
     // If a remote scope has the same name as a local one,
     // this will not overwrite a local scope with a remote
     // one if they have the same name.
-    all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
+    if (remote_registry)
+    {
+        MetadataMap remote_scopes = remote_registry->list();
+        all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
+    }
+
     return all_scopes;
 }
 
@@ -236,9 +244,9 @@ bool RegistryObjectPrivate::remove_local_scope(std::string const& scope_name)
     return scopes.erase(scope_name) == 1;
 }
 
-void RegistryObjectPrivate::set_remote_scopes(MetadataMap&& scopes)
+void RegistryObjectPrivate::set_remote_registry(MWRegistryProxy const& registry)
 {
-    remote_scopes = scopes;
+    remote_registry = registry;
 }
 
 ScopeProxy RegistryObjectPrivate::locate(std::string const& scope_name)
@@ -293,10 +301,10 @@ bool RegistryObject::remove_local_scope(std::string const& scope_name)
     return p->remove_local_scope(scope_name);
 }
 
-void RegistryObject::set_remote_scopes(MetadataMap&& remote_scopes)
+void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    p->set_remote_scopes(move(remote_scopes));
+    p->set_remote_registry(remote_registry);
 }
 
 ScopeProxy RegistryObject::locate(std::string const& scope_name)

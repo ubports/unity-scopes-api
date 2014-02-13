@@ -25,7 +25,6 @@
 
 #include <signal.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
 using namespace std;
@@ -39,7 +38,6 @@ SignalThread::SignalThread() :
 {
     // Block signals in the caller, so they are delivered to the thread we are about to create.
     sigemptyset(&sigs_);
-    sigaddset(&sigs_, SIGCHLD);
     sigaddset(&sigs_, SIGINT);
     sigaddset(&sigs_, SIGHUP);
     sigaddset(&sigs_, SIGTERM);
@@ -54,57 +52,35 @@ SignalThread::SignalThread() :
     setpgid(0, 0);
 
     // Run a signal handling thread that waits for any of the above signals.
+    lock_guard<mutex> lock(mutex_);
     handler_thread_ = thread([this]{ this->wait_for_sigs(); });
 }
 
 SignalThread::~SignalThread()
 {
-    {
-        lock_guard<mutex> lock(mutex_);
-        if (!done_)
-        {
-            kill(getpid(), SIGUSR1);
-        }
-    }
+    stop();
     handler_thread_.join();
 }
 
-// Add the pid and supplied command line to the table of children.
-
-void SignalThread::add_child(pid_t pid, char const* argv[])
+void SignalThread::activate(function<void()> callback)
 {
     lock_guard<mutex> lock(mutex_);
-    if (done_)
-    {
-        return; // We've been told to go away already
-    }
-    string args;
-    for (int i = 0; argv[i] != nullptr; ++i)
-    {
-        if (i != 0)
-        {
-            args.append(" ");
-        }
-        args.append(argv[i]);
-    }
-    children_[pid] = args;
+    callback_ = callback;
 }
 
-// Unblock the signals we are handling. This allows the child to reset the signals
-// to their defaults before calling exec().
-
-void SignalThread::reset_sigs()
+void SignalThread::stop()
 {
-    int err = pthread_sigmask(SIG_UNBLOCK, &sigs_, nullptr);
-    if (err != 0)
+    lock_guard<mutex> lock(mutex_);
+    if (!done_)
     {
-        throw SyscallException("pthread_sigmask failed", err);
+        done_ = true;
+        kill(getpid(), SIGUSR1);
     }
 }
 
-// Wait for signals. For SIGCHLD, we check exit status and report if a child terminated abnormally.
-// The normal termination signals (SIGINT, SIGHUP, and SIGTERM) are sent to the children.
-// SIGUSR1 causes the thread to return without touching any of its children.
+// Wait for termination signals. When a termination signal arrives, we
+// invoke the callback (if set). If we receive SIGUSR1 (because
+// we are terminating ourself, we exit the thread.
 
 void SignalThread::wait_for_sigs()
 {
@@ -119,76 +95,20 @@ void SignalThread::wait_for_sigs()
         }
         switch (signo)
         {
-            case SIGCHLD:
-            {
-                for (;;)
-                {
-                    // Multiple children exiting can result in only a single SIGCHLD being received,
-                    // so we loop until there are no more exited children.
-                    int status;
-                    pid_t pid = waitpid(-1, &status, WNOHANG);
-                    if (pid == -1)
-                    {
-                        if (errno != ECHILD)
-                        {
-                            cerr << "scoperegistry: wait() failed: " << strerror(errno) << endl;
-                            _exit(1);
-                        }
-                        if (errno == ECHILD)
-                        {
-                            break;  // We don't have any sub-processes
-                        }
-                        continue; // Ignore stray SIGCHLD signals
-                    }
-                    if (pid == 0)
-                    {
-                        break;  // No more exited children remain.
-                    }
-
-                    lock_guard<mutex> lock(mutex_);
-                    auto it = children_.find(pid);
-                    if (it == children_.end())
-                    {
-                        cerr << "scoperegistry: ignoring unexpected child termination, pid = " << pid << endl;
-                        continue;
-                    }
-                    if (WIFEXITED(status))
-                    {
-                        if (WEXITSTATUS(status) != 0)
-                        {
-                            cerr << "scoperegistry: process " << pid << " exited with status " << WEXITSTATUS(status)
-                                 << ", command line: " << it->second << endl;
-                        }
-                    }
-                    else
-                    {
-                        cerr << "scoperegistry: process " << pid << " terminated by signal " << WTERMSIG(status)
-                             << ", command line: " << it->second << endl;
-                    }
-                    children_.erase(it);
-                }
-                break;
-            }
             case SIGINT:
             case SIGHUP:
             case SIGTERM:
             {
-                // Send the signal to all the children.
                 lock_guard<mutex> lock(mutex_);
-                for (auto pair : children_)
+                if (callback_)
                 {
-                    kill(pair.first, signo);
+                    callback_();
                 }
-                done_ = true;
-                // TODO: for now, until the callback is added, just exit
-                _exit(signo);
                 break;
             }
             case SIGUSR1:
             {
-                cerr << "signal thread: Got SIGUSR1" << endl;
-                // TODO: should invoke a callback here that then can shut down the run time.
-                return; // Go away without doing anything to the children.
+                return;
             }
             default:
             {

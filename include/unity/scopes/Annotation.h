@@ -44,13 +44,13 @@ class ResultReplyObject;
 class UNITY_API Annotation final
 {
 public:
-    /**
-     * \brief Enumeration of supported Annotation types
+    /*!
+     \brief Enumeration of supported Annotation types
      */
     enum Type
     {
-        Link, //!< A simple link with just a label and/or an icon
-        GroupedLink //!< A group of links, with a label for the group name and labels for all links inside it
+        Link, /**< A simple link with just a label and/or an icon */
+        GroupedLink /**< A group of links, with a label for the group name and labels for all links inside it */
     };
 
    /**
