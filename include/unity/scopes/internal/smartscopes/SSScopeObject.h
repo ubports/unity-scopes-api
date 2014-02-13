@@ -19,11 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
 
-#include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
-#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
+#include <unity/scopes/internal/smartscopes/SSQueryCtrlObject.h>
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
-#include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/QueryBase.h>
 
 #include <string>
@@ -84,12 +83,11 @@ private:
 private:
     std::string ss_scope_id_;
 
-    QueryCtrlObject::SPtr co_;
+    SSQueryCtrlObject::SPtr co_;
     SSQueryObject::SPtr qo_;
 
     std::unique_ptr<SmartScope> const smartscope_;
     SSRegistryObject::SPtr ss_registry_;
-    UniqueID unique_id_;
 };
 
 }  // namespace smartscopes

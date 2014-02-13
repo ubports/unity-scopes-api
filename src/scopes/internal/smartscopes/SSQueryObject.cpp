@@ -69,19 +69,24 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
             {
                 throw ObjectNotExistException("Query does not exist", info.id);
             }
+
+            if (!query_it->second.q_pushable)
+            {
+                return;
+            }
         }
 
         if (query_it->second.q_type == SSQuery::Query)
         {
-            run_query(info.id, query_it->second, reply);
+            run_query(query_it->second, reply);
         }
         else if (query_it->second.q_type == SSQuery::Preview)
         {
-            run_preview(info.id, query_it->second, reply);
+            run_preview(query_it->second, reply);
         }
         else if (query_it->second.q_type == SSQuery::Activation)
         {
-            run_activation(info.id, query_it->second, reply);
+            run_activation(query_it->second, reply);
         }
     }
     catch (std::exception const& e)
@@ -102,14 +107,25 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
         reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
         cerr << "SSQueryObject::run(): unknown exception" << endl;
     }
+
+    {
+        std::lock_guard<std::mutex> lock(queries_mutex_);
+
+        // the query is complete so it is no longer needed
+        queries_.erase(info.id);
+        replies_.erase(reply->identity());
+    }
 }
 
 void SSQueryObject::cancel(InvokeInfo const& info)
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
+    std::string scope_id = info.id;
+    scope_id.resize(scope_id.size() - 2);  // remove the "-c" suffix
+
     // find the targeted query according to InvokeInfo
-    auto query_it = queries_.find(info.id);
+    auto query_it = queries_.find(scope_id);
 
     if (query_it == end(queries_))
     {
@@ -175,10 +191,11 @@ void SSQueryObject::add_query(std::string const& scope_id, SSQuery::QueryType qu
     replies_[reply->identity()] = scope_id;
 }
 
-void SSQueryObject::run_query(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply)
+void SSQueryObject::run_query(SSQuery& query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     SearchReplyProxy q_reply_proxy;
+    SearchQuery::SPtr search_query;
 
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
@@ -190,27 +207,21 @@ void SSQueryObject::run_query(std::string const& scope_id, SSQuery& query, MWRep
         q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
         assert(q_reply_proxy);
         query.q_reply_proxy = q_reply_proxy;
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the query may still be outstanding.
+        search_query = dynamic_pointer_cast<SearchQuery>(q_base);
+        assert(search_query);
     }
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
-    auto search_query = dynamic_pointer_cast<SearchQuery>(q_base);
-    assert(search_query);
     search_query->run(q_reply_proxy);
-
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
-
-        // the query is complete so it is no longer needed
-        queries_.erase(scope_id);
-        replies_.erase(reply->identity());
-    }
 }
 
-void SSQueryObject::run_preview(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply)
+void SSQueryObject::run_preview(SSQuery& query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     PreviewReplyProxy q_reply_proxy;
+    PreviewQuery::SPtr preview_query;
 
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
@@ -222,27 +233,19 @@ void SSQueryObject::run_preview(std::string const& scope_id, SSQuery& query, MWR
         q_reply_proxy = ReplyImpl::create_preview_reply(reply, shared_from_this());
         assert(q_reply_proxy);
         query.q_reply_proxy = q_reply_proxy;
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the query may still be outstanding.
+        preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
+        assert(preview_query);
     }
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
-    auto preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
-    assert(preview_query);
     preview_query->run(q_reply_proxy);
-
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
-
-        // the query is complete so it is no longer needed
-        queries_.erase(scope_id);
-        replies_.erase(reply->identity());
-    }
 }
 
-void SSQueryObject::run_activation(std::string const& scope_id, SSQuery& query, MWReplyProxy const& reply)
+void SSQueryObject::run_activation(SSQuery& query, MWReplyProxy const& reply)
 {
     ///! TODO
-    (void)scope_id;
     (void)query;
     (void)reply;
 }
