@@ -74,10 +74,22 @@ QueryObject::~QueryObject()
 
 void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
-    assert(self_);
+    // It is possible for a run() to be dispatched by the middleware *after* the query
+    // was cancelled. This can happen because run() and cancel() are dispatched by different
+    // thread pools. If the scope implementation uses a synchronous run(), a later run()
+    // invocation will sit in the middleware queueing layer until an earlier run()
+    // completes, by which time the query for the later run() call may have been
+    // cancelled already.
+    // If the query was cancelled by the client before we even receive the
+    // run invocation, we never forward the run() to the implementation.
+    if (!pushable_)
+    {
+        return;
+    }
 
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
+    assert(self_);
     auto reply_proxy = ReplyImpl::create(reply, self_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
