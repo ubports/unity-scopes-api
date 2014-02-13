@@ -44,7 +44,7 @@ public:
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
                      uint max_http_sessions, uint no_reply_timeout, uint refresh_rate_in_sec,
-                     std::string const& sss_url = "", uint sss_port = 0);
+                     std::string const& sss_url = "", uint sss_port = 0, bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name) override;
@@ -78,6 +78,8 @@ private:
     std::string ss_scope_endpoint_;
     uint const regular_refresh_timeout_;
     uint next_refresh_timeout_;
+
+    bool caching_enabled_;
 };
 
 }  // namespace smartscopes
