@@ -47,14 +47,14 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
     if (it != var.end()) // components are optional
     {
         // convert VariantMap to map<string,string>
-        for (const auto kv: it->second.get_dict())
+        for (auto const& kv: it->second.get_dict())
         {
             add_component(kv.first, kv.second.get_string());
         }
     }
 
     // iterate over top-level attributes, skip 'components' key
-    for (auto kv: var)
+    for (auto const& kv: var)
     {
         if (kv.first != "components")
         {
@@ -103,7 +103,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'attributes'");
     }
-    for (auto kv: it->second.get_dict())
+    for (auto const& kv: it->second.get_dict())
     {
         add_attribute(kv.first, kv.second);
     }
@@ -113,7 +113,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     {
         throw unity::InvalidArgumentException("PreviewWidgetImpl(): missing 'components'");
     }
-    for (auto kv: it->second.get_dict())
+    for (auto const& kv: it->second.get_dict())
     {
         add_component(kv.first, kv.second.get_string());
     }
@@ -178,7 +178,7 @@ std::string PreviewWidgetImpl::data() const
 {
     // convert from map<string,string> to VariantMap
     VariantMap cm;
-    for (const auto kv: components_)
+    for (auto const& kv: components_)
     {
         cm[kv.first] = Variant(kv.second);
     }
@@ -187,7 +187,7 @@ std::string PreviewWidgetImpl::data() const
     var["id"] = id_;
     var["type"] = type_;
     var["components"] = Variant(cm);
-    for (auto kv: attributes_)
+    for (auto const& kv: attributes_)
     {
         var[kv.first] = kv.second;
     }
@@ -209,7 +209,7 @@ VariantMap PreviewWidgetImpl::serialize() const
 {
     // convert from map<string,string> to VariantMap
     VariantMap cm;
-    for (const auto kv: components_)
+    for (auto const& kv: components_)
     {
         cm[kv.first] = Variant(kv.second);
     }

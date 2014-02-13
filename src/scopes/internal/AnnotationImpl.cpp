@@ -68,7 +68,7 @@ AnnotationImpl::AnnotationImpl(const VariantMap &variant_map)
     if (it != variant_map.end())
     {
         auto links_var = it->second.get_array();
-        for (const auto h: links_var)
+        for (auto const& h: links_var)
         {
             links_.push_back(std::shared_ptr<Link>(new Link(h.get_dict())));
         }
@@ -186,7 +186,7 @@ VariantMap AnnotationImpl::serialize() const
     }
 
     VariantArray links_var;
-    for (auto link: links_)
+    for (auto const& link: links_)
     {
         links_var.push_back(Variant(link->serialize()));
     }
