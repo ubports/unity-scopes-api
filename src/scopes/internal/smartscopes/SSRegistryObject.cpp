@@ -48,7 +48,8 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    uint no_reply_timeout,
                                    uint refresh_rate_in_sec,
                                    std::string const& sss_url,
-                                   uint sss_port)
+                                   uint sss_port,
+                                   bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
                     std::make_shared<HttpClientQt>(max_http_sessions, no_reply_timeout),
                     std::make_shared<JsonCppNode>(), sss_url, sss_port))
@@ -57,6 +58,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     , ss_scope_endpoint_(ss_scope_endpoint)
     , regular_refresh_timeout_(refresh_rate_in_sec)
     , next_refresh_timeout_(refresh_rate_in_sec)
+    , caching_enabled_(caching_enabled)
 {
     // get remote scopes then start the auto-refresh background thread
     try
@@ -175,7 +177,8 @@ void SSRegistryObject::get_remote_scopes()
     try
     {
         // request remote scopes from smart scopes client
-        remote_scopes = ssclient_->get_remote_scopes();
+        ///! TODO: locale
+        remote_scopes = ssclient_->get_remote_scopes("", caching_enabled_);
     }
     catch (std::exception const& e)
     {

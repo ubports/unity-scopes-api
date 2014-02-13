@@ -135,7 +135,7 @@ SmartScopesClient::~SmartScopesClient()
 {
 }
 
-std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
+std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale, bool caching_enabled)
 {
     std::string response_str;
     bool using_cache = false;
@@ -164,10 +164,23 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
                   << url_ << c_remote_scopes_resource << std::endl;
 
-        std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
+        if (caching_enabled)
+        {
+            std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
 
-        response_str = read_cache();
-        using_cache = true;
+            response_str = read_cache();
+            if (response_str.empty())
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty" << std::endl;
+                throw;
+            }
+
+            using_cache = true;
+        }
+        else
+        {
+            throw;
+        }
     }
 
     try
@@ -206,7 +219,10 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
 
         if (!using_cache)
         {
-            write_cache(response_str);
+            if (caching_enabled)
+            {
+                write_cache(response_str);
+            }
 
             std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
                       << url_ << c_remote_scopes_resource << std::endl;
@@ -310,6 +326,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
+        HttpResponseHandle::SPtr query_result;
         std::string response_str;
 
         {
@@ -321,11 +338,17 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                 throw unity::LogicException("No search for query " + std::to_string(search_id) + " is active");
             }
 
-            query_results_[search_id]->wait();
+            query_result = it->second;
+        }
 
-            response_str = query_results_[search_id]->get();
+        query_result->wait();
+        response_str = query_result->get();
+
+        {
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
+
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(it);
+            query_results_.erase(search_id);
         }
 
         std::vector<SearchResult> results;
@@ -426,6 +449,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
 {
     try
     {
+        HttpResponseHandle::SPtr query_result;
         std::string response_str;
 
         {
@@ -437,11 +461,17 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
                 throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
             }
 
-            query_results_[preview_id]->wait();
+            query_result = it->second;
+        }
 
-            response_str = query_results_[preview_id]->get();
+        query_result->wait();
+        response_str = query_result->get();
+
+        {
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
+
             std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(it);
+            query_results_.erase(preview_id);
         }
 
         PreviewHandle::Columns columns;
@@ -535,7 +565,7 @@ void SmartScopesClient::cancel_query(uint query_id)
     auto it = query_results_.find(query_id);
     if (it != query_results_.end())
     {
-        http_client_->cancel_get(query_results_[query_id]);
+        http_client_->cancel_get(it->second);
         query_results_.erase(it);
     }
 }

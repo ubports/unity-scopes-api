@@ -69,7 +69,7 @@ public:
 
         // Instantiate a SS registry and scope objects
         reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60,
-                                                           "http://127.0.0.1", server_.port_));
+                                                           "http://127.0.0.1", server_.port_, false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
         // Add objects to the middlewares

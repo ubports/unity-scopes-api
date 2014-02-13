@@ -42,7 +42,7 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              MiddlewareBase::SPtr middleware,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
-    , co_(std::make_shared<QueryCtrlObject>())
+    , co_(std::make_shared<SSQueryCtrlObject>())
     , qo_(std::make_shared<SSQueryObject>())
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
@@ -183,7 +183,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         throw;
     }
 
-    return info.mw->create_query_ctrl_proxy(unique_id_.gen(), info.mw->get_query_ctrl_endpoint());
+    return info.mw->create_query_ctrl_proxy(info.id + ".c", info.mw->get_query_ctrl_endpoint());
 }
 
 }  // namespace smartscopes

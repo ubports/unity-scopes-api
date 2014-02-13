@@ -57,7 +57,7 @@ protected:
 
 TEST_F(SmartScopesClientTest, remote_scopes)
 {
-    std::vector<RemoteScope> scopes = ssc_->get_remote_scopes();
+    std::vector<RemoteScope> scopes = ssc_->get_remote_scopes("", false);
 
     ASSERT_EQ(2, scopes.size());
 
@@ -151,6 +151,8 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
     auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
     auto search_handle3 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle4 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle5 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2, results.size());
@@ -159,6 +161,27 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     EXPECT_EQ(2, results.size());
 
     results = search_handle3->get_search_results();
+    EXPECT_EQ(2, results.size());
+
+    results = search_handle4->get_search_results();
+    EXPECT_EQ(2, results.size());
+
+    results = search_handle5->get_search_results();
+    EXPECT_EQ(2, results.size());
+}
+
+TEST_F(SmartScopesClientTest, consecutive_cancels)
+{
+    for (int i = 0; i < 50; ++i)
+    {
+        auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+        search_handle->cancel_search();
+        EXPECT_THROW(search_handle->get_search_results(), std::exception);
+    }
+
+    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+
+    std::vector<SearchResult> results = search_handle->get_search_results();
     EXPECT_EQ(2, results.size());
 }
 
