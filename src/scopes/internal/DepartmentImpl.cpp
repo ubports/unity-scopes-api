@@ -116,7 +116,7 @@ Department DepartmentImpl::create(VariantMap const& var)
     if (it != var.end())
     {
         DepartmentList subdeps;
-        for (auto const dep: it->second.get_array())
+        for (auto const& dep: it->second.get_array())
         {
             subdeps.push_back(create(dep.get_dict()));
         }

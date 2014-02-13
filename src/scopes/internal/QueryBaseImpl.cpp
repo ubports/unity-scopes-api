@@ -112,7 +112,7 @@ void QueryBaseImpl::set_metadata(QueryMetadata const& metadata)
 
 void QueryBaseImpl::cancel()
 {
-    for (auto ctrl : subqueries_)
+    for (auto& ctrl : subqueries_)
     {
         ctrl->cancel(); // Forward the cancellation to any subqueries that might be active
     }

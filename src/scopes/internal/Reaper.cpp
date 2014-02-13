@@ -289,7 +289,7 @@ void Reaper::reap_func()
 
 void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 {
-    for (auto item : zombies)
+    for (auto& item : zombies)
     {
         assert(item.disable_reap_item);
         item.disable_reap_item();           // Calls destroy() on the ReapItem, so it removes itself from list_
