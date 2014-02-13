@@ -90,6 +90,9 @@ private:
     friend class internal::ColumnLayoutImpl;
 };
 
+/*! \typedef ColumnLayoutList
+\brief List of column layouts (see unity::scopes::ColumnLayout)
+*/
 typedef std::list<ColumnLayout> ColumnLayoutList;
 
 } // namespace scopes

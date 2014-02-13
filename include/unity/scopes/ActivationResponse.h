@@ -41,13 +41,16 @@ class ActivationResponseImpl;
 class UNITY_API ActivationResponse final
 {
 public:
+    /*!
+     \brief Status of an unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
+     */
     enum Status
     {
-        NotHandled,  //<! Activation of this result wasn't handled by the scope
-        ShowDash,    //<! Activation of this result was handled, show the Dash
-        HideDash,    //<! Activation of this result was handled, hide the Dash
-        ShowPreview, //<! Preview should be requested for this result.
-        PerformQuery //<! Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise
+        NotHandled,  /**< Activation of this result wasn't handled by the scope */
+        ShowDash,    /**< Activation of this result was handled, show the Dash */
+        HideDash,    /**< Activation of this result was handled, hide the Dash */
+        ShowPreview, /**< Preview should be requested for this result */
+        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise */
     };
 
     /**
@@ -90,6 +93,12 @@ public:
      */
     VariantMap hints() const;
 
+    /**
+     \brief Query to be executed if status is Status::PerformQuery.
+
+     This method throws unity::LogicException is status of this ActivationResponse is different than Status::PerformQuery.
+     \return query to be executed by client.
+    */
     Query query() const;
 
     /// @cond

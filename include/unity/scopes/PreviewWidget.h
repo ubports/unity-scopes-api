@@ -84,6 +84,9 @@ private:
     friend class internal::PreviewWidgetImpl;
 };
 
+/*! \typedef PreviewWidgetList
+\brief List of preview widgets (see unity::scopes::PreviewWidget)
+*/
 typedef std::list<PreviewWidget> PreviewWidgetList;
 
 } // namespace scopes
