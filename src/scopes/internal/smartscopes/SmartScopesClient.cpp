@@ -310,6 +310,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
+        HttpResponseHandle::SPtr query_result;
         std::string response_str;
 
         {
@@ -321,11 +322,17 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                 throw unity::LogicException("No search for query " + std::to_string(search_id) + " is active");
             }
 
-            query_results_[search_id]->wait();
+            query_result = it->second;
+        }
 
-            response_str = query_results_[search_id]->get();
+        query_result->wait();
+        response_str = query_result->get();
+
+        {
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
+
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(it);
+            query_results_.erase(search_id);
         }
 
         std::vector<SearchResult> results;
@@ -426,6 +433,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
 {
     try
     {
+        HttpResponseHandle::SPtr query_result;
         std::string response_str;
 
         {
@@ -437,11 +445,17 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
                 throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
             }
 
-            query_results_[preview_id]->wait();
+            query_result = it->second;
+        }
 
-            response_str = query_results_[preview_id]->get();
+        query_result->wait();
+        response_str = query_result->get();
+
+        {
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
+
             std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(it);
+            query_results_.erase(preview_id);
         }
 
         PreviewHandle::Columns columns;
@@ -535,8 +549,8 @@ void SmartScopesClient::cancel_query(uint query_id)
     auto it = query_results_.find(query_id);
     if (it != query_results_.end())
     {
-        http_client_->cancel_get(query_results_[query_id]);
-        query_results_.erase(it);
+        http_client_->cancel_get(it->second);
+        ///!query_results_.erase(it);
     }
 }
 

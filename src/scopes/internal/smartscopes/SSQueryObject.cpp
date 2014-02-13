@@ -112,8 +112,8 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         // the query is complete so it is no longer needed
-        queries_.erase(info.id);
-        replies_.erase(reply->identity());
+        ///!queries_.erase(info.id);
+        ///!replies_.erase(reply->identity());
     }
 }
 
