@@ -135,7 +135,7 @@ SmartScopesClient::~SmartScopesClient()
 {
 }
 
-std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
+std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale, bool caching_enabled)
 {
     std::string response_str;
     bool using_cache = false;
@@ -164,10 +164,23 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
                   << url_ << c_remote_scopes_resource << std::endl;
 
-        std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
+        if (caching_enabled)
+        {
+            std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
 
-        response_str = read_cache();
-        using_cache = true;
+            response_str = read_cache();
+            if (response_str.empty())
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty" << std::endl;
+                throw;
+            }
+
+            using_cache = true;
+        }
+        else
+        {
+            throw;
+        }
     }
 
     try
@@ -206,7 +219,10 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
 
         if (!using_cache)
         {
-            write_cache(response_str);
+            if (caching_enabled)
+            {
+                write_cache(response_str);
+            }
 
             std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
                       << url_ << c_remote_scopes_resource << std::endl;

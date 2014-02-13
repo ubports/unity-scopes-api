@@ -93,8 +93,8 @@ private:
 private:
     mutable std::mutex queries_mutex_;
 
-    std::map<std::string, SSQuery::SPtr> queries_;      // scope ID : query
-    std::map<std::string, std::string> replies_;  // reply ID : scope ID
+    std::map<std::string, SSQuery::SPtr> queries_;  // scope ID : query
+    std::map<std::string, std::string> replies_;    // reply ID : scope ID
 };
 
 }  // namespace smartscopes
