@@ -204,18 +204,8 @@ void load_remote_scopes(RegistryObject::SPtr const& registry,
                         string const& ss_reg_id,
                         string const& ss_reg_endpoint)
 {
-    try
-    {
-        auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
-        registry->set_remote_scopes(ss_reg->list());
-    }
-    catch (MiddlewareException const& e)
-    {
-        // TODO: we need a refresh policy, to deal with re-started SS proxy,
-        // as well as changes in the SS registry.
-        error(e.what());
-        error("cannot load remote scopes, skipping");
-    }
+    auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
+    registry->set_remote_registry(ss_reg);
 }
 
 } // namespace

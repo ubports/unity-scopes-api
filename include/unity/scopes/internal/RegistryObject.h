@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
+#include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 
 #include <mutex>
@@ -53,7 +54,7 @@ public:
     bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
                          std::vector<std::string> const& spawn_command);
     bool remove_local_scope(std::string const& scope_name);
-    void set_remote_scopes(MetadataMap&& remote_scopes);
+    void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
     RegistryObjectPrivate* p;

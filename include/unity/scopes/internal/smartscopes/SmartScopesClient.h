@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
+#include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
 
@@ -86,10 +87,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
+    SearchHandle(uint search_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string session_id_;
+    uint search_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -109,10 +110,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    PreviewHandle(std::string const& session_id, std::shared_ptr<SmartScopesClient> ssc);
+    PreviewHandle(uint preview_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    std::string session_id_;
+    uint preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -152,13 +153,15 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    std::vector<SearchResult> get_search_results(std::string const& session_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(std::string const& session_id);
+    std::vector<SearchResult> get_search_results(uint search_id);
+    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_search(std::string const& session_id);
-    void cancel_preview(std::string const& session_id);
+    void cancel_query(uint query_id);
+
+    void write_cache(std::string const& scopes_json);
+    std::string read_cache();
 
 private:
     HttpClientInterface::SPtr http_client_;
@@ -167,12 +170,15 @@ private:
     std::string url_;
     uint port_;
 
-    std::map<std::string, HttpResponseHandle::SPtr> search_results_;
-    std::map<std::string, HttpResponseHandle::SPtr> preview_results_;
+    std::map<uint, HttpResponseHandle::SPtr> query_results_;
 
     std::mutex json_node_mutex_;
-    std::mutex search_results_mutex_;
-    std::mutex preview_results_mutex_;
+    std::mutex query_results_mutex_;
+
+    std::string cached_scopes_;
+    bool have_latest_cache_;
+
+    uint query_counter_;
 };
 
 }  // namespace smartscopes

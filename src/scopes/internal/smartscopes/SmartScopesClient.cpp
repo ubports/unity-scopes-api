@@ -20,24 +20,29 @@
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
+#include <cstring>
+#include <fstream>
 #include <future>
 #include <iostream>
 #include <map>
 #include <sstream>
-#include <cstring>
+#include <sys/stat.h>
 
 static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
 static const std::string c_search_resource = "/search";
 static const std::string c_preview_resource = "/preview";
 
+static const std::string c_scopes_cache_dir = std::string(getenv("HOME")) + "/.cache/unity-scopes/";
+static const std::string c_scopes_cache_filename = "remote-scopes.json";
+
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
-SearchHandle::SearchHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id)
+SearchHandle::SearchHandle(uint search_id, SmartScopesClient::SPtr ssc)
+    : search_id_(search_id)
     , ssc_(ssc)
 {
 }
@@ -49,18 +54,18 @@ SearchHandle::~SearchHandle()
 
 std::vector<SearchResult> SearchHandle::get_search_results()
 {
-    return ssc_->get_search_results(session_id_);
+    return ssc_->get_search_results(search_id_);
 }
 
 void SearchHandle::cancel_search()
 {
-    ssc_->cancel_search(session_id_);
+    ssc_->cancel_query(search_id_);
 }
 
 //-- PreviewHandle
 
-PreviewHandle::PreviewHandle(std::string const& session_id, SmartScopesClient::SPtr ssc)
-    : session_id_(session_id)
+PreviewHandle::PreviewHandle(uint preview_id, SmartScopesClient::SPtr ssc)
+    : preview_id_(preview_id)
     , ssc_(ssc)
 {
 }
@@ -72,12 +77,12 @@ PreviewHandle::~PreviewHandle()
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
 {
-    return ssc_->get_preview_results(session_id_);
+    return ssc_->get_preview_results(preview_id_);
 }
 
 void PreviewHandle::cancel_preview()
 {
-    ssc_->cancel_preview(session_id_);
+    ssc_->cancel_query(preview_id_);
 }
 
 //-- SmartScopesClient
@@ -90,7 +95,10 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
     , json_node_(json_node)
     , url_(url)
     , port_(port)
+    , have_latest_cache_(false)
+    , query_counter_(0)
 {
+    // initialise url_
     if (url_.empty())
     {
         char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
@@ -118,6 +126,9 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
             url_ = c_base_url;
         }
     }
+
+    // initialise cached_scopes_
+    read_cache();
 }
 
 SmartScopesClient::~SmartScopesClient()
@@ -126,6 +137,9 @@ SmartScopesClient::~SmartScopesClient()
 
 std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale)
 {
+    std::string response_str;
+    bool using_cache = false;
+
     try
     {
         std::ostringstream remote_scopes_uri;
@@ -138,14 +152,26 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes_uri << "&locale=\"" << locale << "\"";
         }
 
-        std::string response_str;
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
         response->wait();
 
         response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
 
+        std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
+
+        response_str = read_cache();
+        using_cache = true;
+    }
+
+    try
+    {
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
         JsonNodeInterface::SPtr child_node;
@@ -178,14 +204,23 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             remote_scopes.push_back(scope);
         }
 
-        std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
-                  << url_ << c_remote_scopes_resource << std::endl;
+        if (!using_cache)
+        {
+            write_cache(response_str);
+
+            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
+                      << url_ << c_remote_scopes_resource << std::endl;
+        }
+        else
+        {
+            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from cache" << std::endl;
+        }
+
         return remote_scopes;
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
-                  << url_ << c_remote_scopes_resource << std::endl;
+        std::cerr << "SmartScopesClient.get_remote_scopes() failed." << std::endl;
         throw;
     }
 }
@@ -224,13 +259,13 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
         search_uri << "&limit=" << std::to_string(limit);
     }
 
-    cancel_search(session_id);
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    uint search_id = ++query_counter_;
 
-    std::lock_guard<std::mutex> lock(search_results_mutex_);
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    search_results_[session_id] = http_client_->get(search_uri.str(), port_);
+    query_results_[search_id] = http_client_->get(search_uri.str(), port_);
 
-    return SearchHandle::UPtr(new SearchHandle(session_id, shared_from_this()));
+    return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
 
 PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
@@ -262,35 +297,35 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
         preview_uri << "&country=" << country;
     }
 
-    cancel_preview(session_id);
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    uint preview_id = ++query_counter_;
 
-    std::lock_guard<std::mutex> lock(preview_results_mutex_);
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    preview_results_[session_id] = http_client_->get(preview_uri.str(), port_);
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
 
-    return PreviewHandle::UPtr(new PreviewHandle(session_id, shared_from_this()));
+    return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-std::vector<SearchResult> SmartScopesClient::get_search_results(std::string const& session_id)
+std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
         std::string response_str;
 
         {
-            std::lock_guard<std::mutex> lock(search_results_mutex_);
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-            auto it = search_results_.find(session_id);
-            if (it == search_results_.end())
+            auto it = query_results_.find(search_id);
+            if (it == query_results_.end())
             {
-                throw unity::LogicException("No search for session " + session_id + " is active");
+                throw unity::LogicException("No search for query " + std::to_string(search_id) + " is active");
             }
 
-            search_results_[session_id]->wait();
+            query_results_[search_id]->wait();
 
-            response_str = search_results_[session_id]->get();
+            response_str = query_results_[search_id]->get();
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
-            search_results_.erase(it);
+            query_results_.erase(it);
         }
 
         std::vector<SearchResult> results;
@@ -377,38 +412,36 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(std::string cons
             }
         }
 
-        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for session: "
-                  << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
         return results;
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for session: "
-                  << session_id << std::endl;
+        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << std::endl;
         throw;
     }
 }
 
-std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(std::string const& session_id)
+std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)
 {
     try
     {
         std::string response_str;
 
         {
-            std::lock_guard<std::mutex> lock(preview_results_mutex_);
+            std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-            auto it = preview_results_.find(session_id);
-            if (it == preview_results_.end())
+            auto it = query_results_.find(preview_id);
+            if (it == query_results_.end())
             {
-                throw unity::LogicException("No preivew for session " + session_id + " is active");
+                throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
             }
 
-            preview_results_[session_id]->wait();
+            query_results_[preview_id]->wait();
 
-            response_str = preview_results_[session_id]->get();
+            response_str = query_results_[preview_id]->get();
             std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
-            preview_results_.erase(it);
+            query_results_.erase(it);
         }
 
         PreviewHandle::Columns columns;
@@ -463,14 +496,12 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
             }
         }
 
-        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for session: "
-                  << session_id << std::endl;
+        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for query " << preview_id << std::endl;
         return std::make_pair(columns, widgets);
     }
-    catch (unity::Exception const& e)
+    catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for session: "
-                  << session_id << std::endl;
+        std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query " << preview_id << std::endl;
         throw;
     }
 }
@@ -497,26 +528,52 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     return jsons;
 }
 
-void SmartScopesClient::cancel_search(std::string const& session_id)
+void SmartScopesClient::cancel_query(uint query_id)
 {
-    std::lock_guard<std::mutex> lock(search_results_mutex_);
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
 
-    auto it = search_results_.find(session_id);
-    if (it != search_results_.end())
+    auto it = query_results_.find(query_id);
+    if (it != query_results_.end())
     {
-        http_client_->cancel_get(search_results_[session_id]);
-        search_results_.erase(it);
+        http_client_->cancel_get(query_results_[query_id]);
+        query_results_.erase(it);
     }
 }
 
-void SmartScopesClient::cancel_preview(std::string const& session_id)
+void SmartScopesClient::write_cache(std::string const& scopes_json)
 {
-    std::lock_guard<std::mutex> lock(preview_results_mutex_);
+    // make cache directory (fails silently if already exists)
+    mkdir(c_scopes_cache_dir.c_str(), 0755);
 
-    auto it = preview_results_.find(session_id);
-    if (it != preview_results_.end())
+    // open cache for output
+    std::ofstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
+
+    if (!cache_file.fail())
     {
-        http_client_->cancel_get(preview_results_[session_id]);
-        preview_results_.erase(it);
+        cache_file << scopes_json;
+        cache_file.close();
+
+        have_latest_cache_ = false;
     }
+}
+
+std::string SmartScopesClient::read_cache()
+{
+    if (have_latest_cache_)
+    {
+        return cached_scopes_;
+    }
+
+    // open cache for input
+    std::ifstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
+
+    if (!cache_file.fail())
+    {
+        cached_scopes_ = std::string((std::istreambuf_iterator<char>(cache_file)),
+                                      std::istreambuf_iterator<char>());
+
+        have_latest_cache_ = true;
+    }
+
+    return cached_scopes_;
 }
