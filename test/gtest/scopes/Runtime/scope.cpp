@@ -54,6 +54,11 @@ public:
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
+
+        Query query("scope-A", "foo", "dep1");
+        Annotation annotation(Annotation::Type::Link);
+        annotation.add_link("Link1", query);
+        reply->register_annotation(annotation);
     }
 
 private:
@@ -90,12 +95,12 @@ void TestScope::run()
 {
 }
 
-QueryBase::UPtr TestScope::create_query(Query const& query, VariantMap const &)
+QueryBase::UPtr TestScope::create_query(Query const& query, SearchMetadata const &)
 {
     return QueryBase::UPtr(new TestQuery(query));
 }
 
-QueryBase::UPtr TestScope::preview(Result const&, VariantMap const &)
+QueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
 {
     return QueryBase::UPtr(new TestPreview());
 }

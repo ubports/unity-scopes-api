@@ -166,7 +166,7 @@ class MyActivation : public ActivationBase
 {
     ActivationResponse activate() override
     {
-        return ActivationResponse(ActivationResponse::Status::Handled);
+        return ActivationResponse(ActivationResponse::Status::ShowDash);
     }
 };
 
@@ -218,19 +218,19 @@ public:
         }
     }
 
-    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const&) override
+    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const&) override
     {
         cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return QueryBase::UPtr(new MyQuery(q, queue));
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& /* hints */) override
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
     {
         cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
         return ActivationBase::UPtr(new MyActivation());
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

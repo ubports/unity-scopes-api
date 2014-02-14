@@ -27,6 +27,8 @@
 #include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
@@ -146,13 +148,15 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 }
 
 MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
-                                           VariantMap const& hints,
+                                           SearchMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> QueryBase::SPtr {
-                return this->scope_base_->create_query(q, hints);
+            [&q, &hints, this]() -> QueryBase::UPtr {
+                 auto search_query = this->scope_base_->create_query(q, hints);
+                 search_query->set_metadata(hints);
+                 return search_query;
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 return make_shared<QueryObject>(query_base, reply, ctrl_proxy);
@@ -161,7 +165,7 @@ MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
 }
 
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
-                                           VariantMap const& hints,
+                                           ActionMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {
@@ -177,15 +181,16 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
     );
 }
 
-MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
-                              VariantMap const& hints,
-                              std::string const& action_id,
-                              MWReplyProxy const &reply,
-                              InvokeInfo const& info)
+MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
+                                             ActionMetadata const& hints,
+                                             std::string const& widget_id,
+                                             std::string const& action_id,
+                                             MWReplyProxy const &reply,
+                                             InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&result, &hints, &action_id, this]() -> QueryBase::SPtr {
-                return this->scope_base_->activate_preview_action(result, hints, action_id);
+            [&result, &hints, &widget_id, &action_id, this]() -> QueryBase::SPtr {
+                return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
@@ -196,7 +201,7 @@ MWQueryCtrlProxy ScopeObject::activate_preview_action(Result const& result,
 }
 
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
-                                      VariantMap const& hints,
+                                      ActionMetadata const& hints,
                                       MWReplyProxy const& reply,
                                       InvokeInfo const& info)
 {

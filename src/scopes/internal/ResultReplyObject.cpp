@@ -50,6 +50,7 @@ ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, Runti
     cat_registry_(new CategoryRegistry()),
     runtime_(runtime)
 {
+    assert(receiver_);
     assert(runtime);
 }
 

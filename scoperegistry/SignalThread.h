@@ -21,7 +21,6 @@
 
 #include <unity/util/NonCopyable.h>
 
-#include <unordered_map>
 #include <mutex>
 #include <thread>
 
@@ -38,14 +37,14 @@ public:
     SignalThread();
     ~SignalThread();
 
-    void add_child(pid_t pid, char const* argv[]);
-    void reset_sigs();
+    void activate(std::function<void()> callback);
+    void stop();
 
 private:
     void wait_for_sigs();
 
-    std::unordered_map<pid_t, std::string> children_;
     std::mutex mutex_;
+    std::function<void()> callback_;
     bool done_;
     std::thread handler_thread_;
     sigset_t sigs_;

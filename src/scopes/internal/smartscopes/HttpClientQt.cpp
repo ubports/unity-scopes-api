@@ -49,7 +49,7 @@ HttpClientQt::~HttpClientQt()
 {
 }
 
-HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, int port)
+HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, uint port)
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
@@ -97,7 +97,12 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
         std::thread([this, request_url, port, timeout]()
                     {
                         QUrl url(request_url.c_str());
-                        url.setPort(port);
+
+                        if (port != 0)
+                        {
+                            url.setPort(port);
+                        }
+
                         get_qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
 
                         QEventLoop loop;

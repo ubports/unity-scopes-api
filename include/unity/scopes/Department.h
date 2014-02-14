@@ -33,6 +33,10 @@ namespace scopes
 
 class Query;
 class Department;
+
+/*! \typedef DepartmentList
+\brief List of departments (see unity::scopes::Department)
+*/
 typedef std::list<Department> DepartmentList;
 
 namespace internal
@@ -48,6 +52,7 @@ class UNITY_API Department final
 public:
     /**
     \brief Create deparment with given search Query and name.
+
     The identifier of this department instance will be that of Query instance (\link unity::scopes::Query::department_id()\endlink).
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
     \param label name of this department to be displayed in the UI
@@ -56,6 +61,7 @@ public:
 
     /**
     \brief Create deparment with given department identifier, search Query and name.
+
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
@@ -65,6 +71,7 @@ public:
 
     /**
     \brief Create deparment with given department identifier, search Query, name and subdepartments.
+
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
@@ -82,11 +89,34 @@ public:
     Department& operator=(Department&&);
     /// @endcond
 
+    /**
+    \brief Set sub-departments of this department.
+    \param departments list of sub-departments
+    */
     void set_subdepartments(DepartmentList const& departments);
 
+    /**
+     \brief Get an identifier of this department.
+     \return department identifier
+     */
     std::string id() const;
+
+    /**
+     \brief Get name of this department.
+     \return department name
+     */
     std::string label() const;
+
+    /**
+     \brief Get query associated with this department.
+     \return query for this department
+     */
     Query query() const;
+
+    /**
+     \brief Get list of sub-departments of this department.
+     \return list of sub-departments.
+    */
     DepartmentList subdepartments() const;
 
     /// @cond

@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
     int exit_status = 1;
 
     bool sig_upstart = false;
+    std::string server_url_env;
     std::string config_file;
 
     // check for "upstart" as first arg
@@ -61,7 +62,6 @@ int main(int argc, char* argv[])
     else
     {
         // argv[1]: server_url_env
-        std::string server_url_env;
         if (argc > 1)
         {
             server_url_env = "SMART_SCOPES_SERVER=" + std::string(argv[1]);
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
         uint const max_sessions = 4;
-        uint const no_reply_timeout = 5000;
-        uint const ss_reg_refresh_rate = 60 * 24; // 24 hour refresh
+        uint const no_reply_timeout = 20000;
+        uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
 
         // Instantiate SS registry and scopes runtimes
         RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DFLT_SS_RUNTIME_INI);

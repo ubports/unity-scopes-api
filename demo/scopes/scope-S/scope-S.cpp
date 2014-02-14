@@ -79,27 +79,22 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(Query const& q, VariantMap const& hints) override
+    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const& hints) override
     {
         QueryBase::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;
 
-        auto it = hints.find("cardinality");
-        if (it != hints.end())
+        if (hints.cardinality() > 0)
         {
-            cerr << "result cardinality: " << it->second.get_int() << endl;
+            cerr << "result cardinality: " << hints.cardinality() << endl;
         }
 
-        it = hints.find("locale");
-        if (it != hints.end())
-        {
-            cerr << "locale: " << it->second.get_string() << endl;
-        }
+        cerr << "locale: " << hints.locale() << endl;
 
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const&) override
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

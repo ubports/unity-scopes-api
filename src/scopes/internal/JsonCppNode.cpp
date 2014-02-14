@@ -62,7 +62,7 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
         case Variant::Type::Dict:
             {
                 Json::Value val(Json::ValueType::objectValue);
-                for (auto v: var.get_dict())
+                for (auto const& v: var.get_dict())
                 {
                     val[v.first] = from_variant(v.second);
                 }
@@ -71,7 +71,7 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
         case Variant::Type::Array:
             {
                 Json::Value val(Json::ValueType::arrayValue);
-                for (auto v: var.get_array())
+                for (auto const& v: var.get_array())
                 {
                     val.append(from_variant(v));
                 }
@@ -107,7 +107,7 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
         case Json::ValueType::objectValue:
             {
                 VariantMap var;
-                for (auto m: value.getMemberNames())
+                for (auto const& m: value.getMemberNames())
                 {
                     var[m] = to_variant(value[m]);
                 }

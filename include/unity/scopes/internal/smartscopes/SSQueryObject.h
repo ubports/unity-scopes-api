@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
+#include <condition_variable>
 #include <map>
 #include <mutex>
 
@@ -41,10 +42,23 @@ namespace smartscopes
 
 struct SSQuery
 {
+    UNITY_DEFINES_PTRS(SSQuery);
+
+    enum QueryType
+    {
+        Query, Activation, Preview
+    };
+
+    SSQuery(QueryType type, std::shared_ptr<QueryBase> base, MWReplyProxy reply)
+        : q_type(type),
+          q_base(base),
+          q_reply(reply) {}
+
+    QueryType q_type;
     std::shared_ptr<QueryBase> q_base;
     MWReplyProxy q_reply;
     std::weak_ptr<ReplyBase> q_reply_proxy;
-    bool q_pushable;
+    bool q_pushable = true;
 };
 
 class SSQueryObject : public QueryObjectBase, public std::enable_shared_from_this<SSQueryObject>
@@ -64,15 +78,19 @@ public:
 
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
-    void add_query(std::string const& scope_id,
+    void add_query(SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    MWReplyProxy const& reply);
 
-protected:
+private:
+    void run_query(SSQuery::SPtr query, MWReplyProxy const& reply);
+    void run_preview(SSQuery::SPtr query, MWReplyProxy const& reply);
+    void run_activation(SSQuery::SPtr query, MWReplyProxy const& reply);
+
+private:
     mutable std::mutex queries_mutex_;
 
-    std::map<std::string, SSQuery> queries_;      // scope ID : query
-    std::map<std::string, std::string> replies_;  // reply ID : scope ID
+    std::map<std::string, SSQuery::SPtr> queries_;  // reply ID : query
 };
 
 }  // namespace smartscopes

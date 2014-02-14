@@ -25,6 +25,8 @@
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -139,6 +141,7 @@ public:
 
     /**
     \brief Called by the scopes run time after the create function completes.
+
     If start() throws an exception, stop() will _not_ be called.
 
     The call to start() is made by the same thread that calls the create function.
@@ -156,6 +159,7 @@ public:
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
+
     A scope should deallocate as many resources as possible when stop() is called, for example,
     deallocate any caches and close network connections. In addition, if the scope implements run()
     and did not return from run(), it must return from run() in response to the call to stop().
@@ -168,6 +172,7 @@ public:
 
     /**
     \brief Called by the scopes run time after it has called start() to hand a thread of control to the scope.
+
     run() passes a thread of control to the scope to do with as it sees fit, for example, to run an event loop.
     During finalization, the scopes run time joins with the thread that called run(). This means that, if
     the scope implementation does not return from run(), it is expected to arrange for run() to complete
@@ -179,14 +184,15 @@ public:
 
     /**
     \brief Called by the scopes run time when a scope needs to instantiate a query.
+
     This method must return an instance that is derived from QueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. That call to create_query() is made
     by an arbitrary thread.
     /param q The query string to be executed by the returned object instance.
-    /param hints TODO, complete doc
+    /param metadata additional data sent by the client.
     */
-    virtual QueryBase::UPtr create_query(Query const& query, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
@@ -198,11 +204,25 @@ public:
     Default implementation returns an instance of ActivationBase that responds with
     ActivationResponse::Status::NotHandled.
     \param result The result that should be activated.
-    \param hints arbitrary hints sent by the client
+    \param metadata additional data sent by the client.
      */
-    virtual ActivationBase::UPtr activate(Result const& result, VariantMap const& hints);
+    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
-    virtual ActivationBase::UPtr activate_preview_action(Result const& result, VariantMap const& hints, std::string const& action_id);
+    /**
+    \brief Invoked when a scope is requested to handle a preview action.
+
+    This method must return an instance that is derived from ActivationBase. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly. That call to activate() is made
+    by an arbitrary thread.
+    Default implementation returns an instance of ActivationBase that responds with
+    ActivationResponse::Status::NotHandled.
+    \param result The result that was previewed.
+    \param metadata additional data sent by client.
+    \param widget_id identifier of the 'actions' widget of the activated action.
+    \param action_id identifier of the action that was activated.
+     */
+    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
@@ -211,8 +231,9 @@ public:
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly.
     \param result The result that should be previewed.
+    \param method additional data sent by the client.
      */
-    virtual QueryBase::UPtr preview(Result const& result, VariantMap const& hints) = 0;
+    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

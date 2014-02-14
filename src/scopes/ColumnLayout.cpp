@@ -25,6 +25,38 @@ namespace unity
 namespace scopes
 {
 
+/*!
+\class ColumnLayout
+
+\brief Defines a layout for preview widgets with given column setup.
+
+ColumnLayout defines how widgets should be laid out on a display with given number of columns.
+In typical use cases, scope creates ColumnLayout instances for all supported setups (number of columns),
+and then for every instance defines what widgets belong to which columns. The shell will pick up the layout
+which is appropriate for the device in use.
+Column layouts definitions are optional but highly recommended for optimal result.
+
+An example of creating two layouts - for a screen with one column and a screen with two columns.
+
+\code{.cpp}
+void MyPreview::run(PreviewReplyProxy const& reply)
+    // layout definition for a screen with just 1 column
+    ColumnLayout layout1col(1);
+    layout1col.add_column({"art", "header", "actions"}); // all widgets in a single column
+
+    // layout definition for a screen with 2 columns
+    ColumnLayout layout2col(2);
+    layout2col.add_column({"art"});  // widget in 1st column
+    layout2col.add_column({"header", "actions"}); // widgets in 2nd column
+
+    reply->register_layout({layout1col, layout2col});
+
+    // create widgets
+    PreviewWidget w1("art", "image");
+    ...
+\endcode
+*/
+
 ColumnLayout::ColumnLayout(int num_of_columns)
     : p(new internal::ColumnLayoutImpl(num_of_columns))
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -14,39 +14,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ */
 
-#include <scopes/FilterOption.h>
-#include <scopes/internal/FilterOptionImpl.h>
+#ifndef UNITY_INTERNAL_UTILS_H
+#define UNITY_INTERNAL_UTILS_H
+
+#include <unity/scopes/Variant.h>
+#include <string>
 
 namespace unity
-{
-
-namespace api
 {
 
 namespace scopes
 {
 
-FilterOption::FilterOption(std::string const& id, std::string const& label)
-    : p(new internal::FilterOptionImpl(id, label))
+namespace internal
 {
-}
 
-FilterOption::~FilterOption() = default;
+VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap const& var, std::string const& key);
 
-std::string FilterOption::id() const
-{
-    return p->id();
-}
-
-std::string FilterOption::label() const
-{
-    return p->label();
-}
+} // namespace internal
 
 } // namespace scopes
 
-} // namespace api
-
 } // namespace unity
+
+#endif

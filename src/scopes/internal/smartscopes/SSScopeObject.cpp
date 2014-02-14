@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -40,7 +42,7 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              MiddlewareBase::SPtr middleware,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
-    , co_(std::make_shared<QueryCtrlObject>())
+    , co_(std::make_shared<SSQueryCtrlObject>())
     , qo_(std::make_shared<SSQueryObject>())
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
@@ -60,60 +62,63 @@ SSScopeObject::~SSScopeObject() noexcept
 }
 
 MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
-                                             VariantMap const& hints,
+                                             SearchMetadata const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
 {
     return query(info,
                  reply,
                  [&q, &hints, &info, this ]()->QueryBase::SPtr
-                 { return this->smartscope_->create_query(info.id, q, hints); });
+                     { return this->smartscope_->create_query(info.id, q, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(SSQuery::Query, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
-                                         VariantMap const& hints,
+                                         ActionMetadata const& hints,
                                          MWReplyProxy const& reply,
                                          InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->activate(info.id, result, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(SSQuery::Activation, query_base, reply); });
 }
 
-MWQueryCtrlProxy SSScopeObject::activate_preview_action(Result const& result,
-                                                        VariantMap const& hints,
-                                                        std::string const& action_id,
-                                                        MWReplyProxy const& reply,
-                                                        InvokeInfo const& info)
+MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
+                                               ActionMetadata const& hints,
+                                               std::string const& widget_id,
+                                               std::string const& action_id,
+                                               MWReplyProxy const& reply,
+                                               InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)action_id;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, &widget_id, &action_id, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->perform_action(info.id, result, hints, widget_id, action_id); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(SSQuery::Activation, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
-                                        VariantMap const& hints,
+                                        ActionMetadata const& hints,
                                         MWReplyProxy const& reply,
                                         InvokeInfo const& info)
 {
-    ///! TODO
-    (void)result;
-    (void)hints;
-    (void)reply;
-    (void)info;
-    return MWQueryCtrlProxy();
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->preview(info.id, result, hints); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(SSQuery::Preview, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
                                       MWReplyProxy const& reply,
-                                      std::function<QueryBase::SPtr()> const& query_factory_fun)
+                                      std::function<QueryBase::SPtr()> const& query_factory_fun,
+                                      std::function<void(QueryBase::SPtr)> const& query_object_fun)
 {
     if (!ss_registry_->has_scope(info.id))
     {
@@ -145,7 +150,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     try
     {
         // add new query to SS query object
-        qo_->add_query(info.id, query_base, reply);
+        query_object_fun(query_base);
 
         // Start the query via the middleware (calling run() in a different thread)
         MWQueryProxy query_proxy = info.mw->create_query_proxy(info.id, info.mw->get_query_endpoint());
@@ -178,7 +183,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         throw;
     }
 
-    return info.mw->create_query_ctrl_proxy(unique_id_.gen(), info.mw->get_query_ctrl_endpoint());
+    return info.mw->create_query_ctrl_proxy(reply->identity() + ".c", info.mw->get_query_ctrl_endpoint());
 }
 
 }  // namespace smartscopes

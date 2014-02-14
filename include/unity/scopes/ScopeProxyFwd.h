@@ -28,6 +28,10 @@ namespace scopes
 {
 
 class Scope;
+
+/*! \typedef ScopeProxy
+\brief Pointer to unity::scopes::Scope object
+*/
 typedef std::shared_ptr<Scope> ScopeProxy;
 
 } // namespace scopes
