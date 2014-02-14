@@ -21,10 +21,11 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
 
 #include <iostream>
 #include <cassert>
@@ -191,12 +192,12 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
         assert(q_reply_proxy);
         query->q_reply_proxy = q_reply_proxy;
 
-        // Synchronous call into scope implementation.
-        // On return, replies for the query may still be outstanding.
         search_query = dynamic_pointer_cast<SearchQuery>(q_base);
         assert(search_query);
     }
 
+    // Synchronous call into scope implementation.
+    // On return, replies for the query may still be outstanding.
     search_query->run(q_reply_proxy);
 }
 
@@ -217,20 +218,35 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
         assert(q_reply_proxy);
         query->q_reply_proxy = q_reply_proxy;
 
-        // Synchronous call into scope implementation.
-        // On return, replies for the query may still be outstanding.
         preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
         assert(preview_query);
     }
 
+    // Synchronous call into scope implementation.
+    // On return, replies for the query may still be outstanding.
     preview_query->run(q_reply_proxy);
 }
 
 void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
-    ///! TODO
-    (void)query;
-    (void)reply;
+    QueryBase::SPtr q_base;
+    ActivationBase::SPtr activation_query;
+
+    {
+        std::lock_guard<std::mutex> lock(queries_mutex_);
+
+        q_base = query->q_base;
+
+        activation_query = dynamic_pointer_cast<ActivationBase>(q_base);
+        assert(activation_query);
+    }
+
+    // no need for intermediate proxy (like with ReplyImpl::create),
+    // since we get single return value from the public API
+    // and just push it ourseleves
+    auto res = activation_query->activate();
+    reply->push(res.serialize());
+    reply->finished(ListenerBase::Finished, "");
 }
 
 }  // namespace smartscopes
