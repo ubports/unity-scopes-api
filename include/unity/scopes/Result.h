@@ -144,10 +144,9 @@ public:
 
 private:
     explicit Result(const VariantMap &variant_map);
-    Result(internal::ResultImpl* impl);
-    Result(std::shared_ptr<internal::ResultImpl> impl);
+    explicit Result(internal::ResultImpl* impl);
 
-    std::shared_ptr<internal::ResultImpl> p;
+    std::unique_ptr<internal::ResultImpl> p;
 
     friend class internal::ResultImpl;
     friend class internal::ScopeImpl;
