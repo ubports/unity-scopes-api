@@ -83,9 +83,14 @@ public:
     ActivationResponse::Status status() const;
 
     /**
-     \brief Attach arbitrary hints to this response.
+     \deprecated Attach arbitrary hints to this response.  This method will be removed in version 0.4.0, please use set_hints instead.
      */
     void setHints(VariantMap const& hints);
+
+    /**
+     \brief Attach arbitrary hints to this response.
+     */
+    void set_hints(VariantMap const& hints);
 
     /**
      \brief Get hints attached to this response object.

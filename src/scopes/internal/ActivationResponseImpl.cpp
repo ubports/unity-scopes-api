@@ -77,7 +77,7 @@ ActivationResponse::Status ActivationResponseImpl::status() const
     return status_;
 }
 
-void ActivationResponseImpl::setHints(VariantMap const& hints)
+void ActivationResponseImpl::set_hints(VariantMap const& hints)
 {
     hints_ = hints;
 }
