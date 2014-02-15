@@ -77,12 +77,12 @@ ActivationResponse::Status ActivationResponseImpl::status() const
     return status_;
 }
 
-void ActivationResponseImpl::set_hints(VariantMap const& hints)
+void ActivationResponseImpl::set_hints(Variant const& hints)
 {
     hints_ = hints;
 }
 
-VariantMap ActivationResponseImpl::hints() const
+Variant ActivationResponseImpl::hints() const
 {
     return hints_;
 }
@@ -101,7 +101,7 @@ VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
     vm["status"] = static_cast<int>(status_);
-    vm["hints"] = Variant(hints_);
+    vm["hints"] = hints_;
     if (query_)
     {
         vm["query"] = query_->serialize();

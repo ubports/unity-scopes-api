@@ -63,10 +63,10 @@ ActivationResponse& ActivationResponse::operator=(ActivationResponse&&) = defaul
 
 void ActivationResponse::setHints(VariantMap const& hints)
 {
-    p->set_hints(hints);
+    p->set_hints(Variant(hints));
 }
 
-void ActivationResponse::set_hints(VariantMap const& hints)
+void ActivationResponse::set_hints(Variant const& hints)
 {
     p->set_hints(hints);
 }
@@ -76,7 +76,7 @@ ActivationResponse::Status ActivationResponse::status() const
     return p->status();
 }
 
-VariantMap ActivationResponse::hints() const
+Variant ActivationResponse::hints() const
 {
     return p->hints();
 }

@@ -549,9 +549,9 @@ TEST(Activation, scope)
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
         EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
-        EXPECT_EQ("bar", response->hints()["foo"].get_string());
-        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
-        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+        EXPECT_EQ("bar", response->hints().get_dict()["foo"].get_string());
+        EXPECT_EQ("maiden", response->hints().get_dict()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->hints().get_dict()["activated_uri"].get_string());
     }
 
     // activate action
@@ -566,9 +566,9 @@ TEST(Activation, scope)
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
         EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
-        EXPECT_EQ("widget1action1", response->hints()["activated action"].get_string());
-        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
-        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+        EXPECT_EQ("widget1action1", response->hints().get_dict()["activated action"].get_string());
+        EXPECT_EQ("maiden", response->hints().get_dict()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->hints().get_dict()["activated_uri"].get_string());
     }
 }
 

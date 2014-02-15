@@ -30,21 +30,21 @@ TEST(ActivationResponse, basic)
     {
         ActivationResponse resp(ActivationResponse::Status::NotHandled);
         EXPECT_EQ(ActivationResponse::Status::NotHandled, resp.status());
-        EXPECT_EQ(0, resp.hints().size());
+        EXPECT_TRUE(resp.hints().is_null());
     }
     {
         ActivationResponse resp(ActivationResponse::Status::ShowPreview);
         EXPECT_EQ(ActivationResponse::Status::ShowPreview, resp.status());
-        EXPECT_EQ(0, resp.hints().size());
+        EXPECT_TRUE(resp.hints().is_null());
     }
     {
         ActivationResponse resp(ActivationResponse::Status::HideDash);
         VariantMap var;
         var["foo"] = "bar";
-        resp.setHints(var);
+        resp.set_hints(Variant(var));
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
-        EXPECT_EQ(1, resp.hints().size());
-        EXPECT_EQ("bar", resp.hints()["foo"].get_string());
+        EXPECT_EQ(1, resp.hints().get_dict().size());
+        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
     }
     {
@@ -71,7 +71,7 @@ TEST(ActivationResponse, serialize)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.setHints(var);
+            resp.set_hints(Variant(var));
         }
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::HideDash, static_cast<ActivationResponse::Status>(var["status"].get_int()));
@@ -140,7 +140,7 @@ TEST(ActivationResponse, deserialize)
         try
         {
             internal::ActivationResponseImpl res(var);
-            EXPECT_EQ("bar", res.hints()["foo"].get_string());
+            EXPECT_EQ("bar", res.hints().get_dict()["foo"].get_string());
             EXPECT_EQ(ActivationResponse::Status::HideDash, res.status());
         }
         catch (unity::LogicException const &e)
@@ -177,19 +177,19 @@ TEST(ActivationResponse, copy_ctor)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.setHints(var);
+            resp.set_hints(Variant(var));
         }
         {
             VariantMap var;
             var["iron"] = "maiden";
-            copy.setHints(var);
+            copy.set_hints(Variant(var));
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.hints().size());
-        EXPECT_EQ("bar", resp.hints()["foo"].get_string());
-        EXPECT_EQ(1, copy.hints().size());
-        EXPECT_EQ("maiden", copy.hints()["iron"].get_string());
+        EXPECT_EQ(1, resp.hints().get_dict().size());
+        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
+        EXPECT_EQ(1, copy.hints().get_dict().size());
+        EXPECT_EQ("maiden", copy.hints().get_dict()["iron"].get_string());
     }
 }
 
@@ -201,18 +201,18 @@ TEST(ActivationResponse, assign_op_copy)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.setHints(var);
+            resp.set_hints(Variant(var));
         }
         {
             VariantMap var;
             var["iron"] = "maiden";
-            copy.setHints(var);
+            copy.set_hints(Variant(var));
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.hints().size());
-        EXPECT_EQ("bar", resp.hints()["foo"].get_string());
-        EXPECT_EQ(1, copy.hints().size());
-        EXPECT_EQ("maiden", copy.hints()["iron"].get_string());
+        EXPECT_EQ(1, resp.hints().get_dict().size());
+        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
+        EXPECT_EQ(1, copy.hints().get_dict().size());
+        EXPECT_EQ("maiden", copy.hints().get_dict()["iron"].get_string());
     }
 }

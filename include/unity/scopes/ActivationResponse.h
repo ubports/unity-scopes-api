@@ -90,13 +90,13 @@ public:
     /**
      \brief Attach arbitrary hints to this response.
      */
-    void set_hints(VariantMap const& hints);
+    void set_hints(Variant const& hints);
 
     /**
      \brief Get hints attached to this response object.
      \return hints
      */
-    VariantMap hints() const;
+    Variant hints() const;
 
     /**
      \brief Query to be executed if status is Status::PerformQuery.
