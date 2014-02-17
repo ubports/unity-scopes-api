@@ -111,8 +111,7 @@ VariantMap ActivationResponseImpl::serialize() const
 
 ActivationResponse ActivationResponseImpl::create(VariantMap const& var)
 {
-    auto impl = std::make_shared<ActivationResponseImpl>(var);
-    return ActivationResponse(impl);
+    return ActivationResponse(new ActivationResponseImpl(var));
 }
 
 } // namespace internal

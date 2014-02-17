@@ -36,7 +36,7 @@ ActivationResponse::ActivationResponse(Query const& query)
 {
 }
 
-ActivationResponse::ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl)
+ActivationResponse::ActivationResponse(internal::ActivationResponseImpl* pimpl)
     : p(pimpl)
 {
 }
