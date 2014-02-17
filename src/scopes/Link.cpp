@@ -36,6 +36,8 @@ Link::Link(VariantMap const& variant_map)
 {
 }
 
+Link::~Link() = default;
+
 std::string Link::label() const
 {
     return p->label();
