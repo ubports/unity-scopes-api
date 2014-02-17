@@ -63,7 +63,12 @@ ActivationResponse& ActivationResponse::operator=(ActivationResponse&&) = defaul
 
 void ActivationResponse::setHints(VariantMap const& hints)
 {
-    p->setHints(hints);
+    p->set_scope_data(Variant(hints));
+}
+
+void ActivationResponse::set_scope_data(Variant const& data)
+{
+    p->set_scope_data(data);
 }
 
 ActivationResponse::Status ActivationResponse::status() const
@@ -74,6 +79,11 @@ ActivationResponse::Status ActivationResponse::status() const
 VariantMap ActivationResponse::hints() const
 {
     return p->hints();
+}
+
+Variant ActivationResponse::scope_data() const
+{
+    return p->scope_data();
 }
 
 Query ActivationResponse::query() const

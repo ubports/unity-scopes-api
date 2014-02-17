@@ -47,12 +47,12 @@ ActivationResponseImpl::ActivationResponseImpl(Query const& query)
 
 ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
 {
-    auto it = var.find("hints");
+    auto it = var.find("scope_data");
     if (it == var.end())
     {
-        throw LogicException("ActivationResponseImpl(): Invalid data, missing 'hints'");
+        throw LogicException("ActivationResponseImpl(): Invalid data, missing 'scope_data'");
     }
-    hints_ = it->second.get_dict();
+    scope_data_ = it->second.get_dict();
 
     it = var.find("status");
     if (it == var.end())
@@ -77,14 +77,23 @@ ActivationResponse::Status ActivationResponseImpl::status() const
     return status_;
 }
 
-void ActivationResponseImpl::setHints(VariantMap const& hints)
+void ActivationResponseImpl::set_scope_data(Variant const& hints)
 {
-    hints_ = hints;
+    scope_data_ = hints;
 }
 
 VariantMap ActivationResponseImpl::hints() const
 {
-    return hints_;
+    if (scope_data_.which() == Variant::Type::Dict)
+    {
+        return scope_data_.get_dict();
+    }
+    return VariantMap();
+}
+
+Variant ActivationResponseImpl::scope_data() const
+{
+    return scope_data_;
 }
 
 Query ActivationResponseImpl::query() const
@@ -101,7 +110,7 @@ VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
     vm["status"] = static_cast<int>(status_);
-    vm["hints"] = Variant(hints_);
+    vm["scope_data"] = scope_data_;
     if (query_)
     {
         vm["query"] = query_->serialize();

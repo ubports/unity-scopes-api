@@ -132,4 +132,4 @@ PushRequest (capnproto structure)
 ActivationResponse (returned by serialize())
 ============================================
  'status'      : int (corresponds to ActivationResponse::Status enum)
- 'hints'       : dict
+ 'scope_data'  : variant
