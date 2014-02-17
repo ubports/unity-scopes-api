@@ -1,3 +1,10 @@
+unity-scopes-api (0.3.1+14.04.20140217-0ubuntu1) trusty; urgency=low
+
+  [ Tarmac ]
+  * Fix triggering of actions on previews from remote scopes.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 17 Feb 2014 12:40:37 +0000
+
 unity-scopes-api (0.3.1+14.04.20140213.1-0ubuntu1) trusty; urgency=low
 
   [ Tarmac ]
