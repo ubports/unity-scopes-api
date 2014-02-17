@@ -21,10 +21,11 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/SearchQuery.h>
 
 #include <iostream>
 #include <cassert>
@@ -54,7 +55,7 @@ SSQueryObject::~SSQueryObject() noexcept
 {
 }
 
-void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
+void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) noexcept
 {
     decltype(queries_.begin()) query_it;
 
@@ -64,11 +65,11 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
             std::lock_guard<std::mutex> lock(queries_mutex_);
 
             // find the targeted query according to InvokeInfo
-            query_it = queries_.find(info.id);
+            query_it = queries_.find(reply->identity());
 
             if (query_it == end(queries_))
             {
-                throw ObjectNotExistException("Query does not exist", info.id);
+                throw ObjectNotExistException("Query does not exist", reply->identity());
             }
         }
 
@@ -108,13 +109,10 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
     }
 
     {
-        // signal that the query is done
-        std::unique_lock<std::mutex> lock(queries_mutex_);
-        query_it->second->q_done_ = true;
-        query_it->second->q_done_cond_.notify_one();
+        std::lock_guard<std::mutex> lock(queries_mutex_);
 
         // the query is complete so this is no longer needed
-        replies_.erase(reply->identity());
+        queries_.erase(reply->identity());
     }
 }
 
@@ -122,11 +120,11 @@ void SSQueryObject::cancel(InvokeInfo const& info)
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
-    std::string scope_id = info.id;
-    scope_id.resize(scope_id.size() - 2);  // remove the ".c" suffix
+    std::string reply_id = info.id;
+    reply_id.resize(reply_id.size() - 2);  // remove the ".c" suffix
 
     // find the targeted query according to InvokeInfo
-    auto query_it = queries_.find(scope_id);
+    auto query_it = queries_.find(reply_id);
 
     if (query_it == end(queries_))
     {
@@ -156,21 +154,9 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
 {
     std::lock_guard<std::mutex> lock(queries_mutex_);
 
-    // find corresponding scope ID to the reply ID requested
-    auto reply_it = replies_.find(info.id);
-    if (reply_it == end(replies_))
-    {
-        return false;
-    }
-
-    std::string scope_id = reply_it->second;
-
-    // find query in queries_ from scope ID
-    auto query_it = queries_.find(scope_id);
-    if (query_it == end(queries_))
-    {
-        return false;
-    }
+    // find query in queries_ from reply ID
+    auto query_it = queries_.find(info.id);
+    assert(query_it != end(queries_));
 
     return query_it->second->q_pushable;
 }
@@ -180,23 +166,13 @@ void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
     ///! TODO: remove
 }
 
-void SSQueryObject::add_query(std::string const& scope_id, SSQuery::QueryType query_type,
-                              QueryBase::SPtr const& query_base, MWReplyProxy const& reply)
+void SSQueryObject::add_query(SSQuery::QueryType query_type, QueryBase::SPtr const& query_base,
+                              MWReplyProxy const& reply)
 {
     std::unique_lock<std::mutex> lock(queries_mutex_);
 
-    // if a query for this scope is still busy, wait for it to finish
-    auto query_it = queries_.find(scope_id);
-    if (query_it != end(queries_))
-    {
-        query_it->second->q_done_cond_.wait(lock, [&query_it] { return query_it->second->q_done_; });
-    }
-
     // add the new query struct to queries_
-    queries_[scope_id] = std::make_shared<SSQuery>(query_type, query_base, reply);
-
-    // ...as well as a mapping of reply ID to scope ID in replies_
-    replies_[reply->identity()] = scope_id;
+    queries_[reply->identity()] = std::make_shared<SSQuery>(query_type, query_base, reply);
 }
 
 void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
@@ -216,12 +192,12 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
         assert(q_reply_proxy);
         query->q_reply_proxy = q_reply_proxy;
 
-        // Synchronous call into scope implementation.
-        // On return, replies for the query may still be outstanding.
         search_query = dynamic_pointer_cast<SearchQuery>(q_base);
         assert(search_query);
     }
 
+    // Synchronous call into scope implementation.
+    // On return, replies for the query may still be outstanding.
     search_query->run(q_reply_proxy);
 }
 
@@ -242,20 +218,35 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
         assert(q_reply_proxy);
         query->q_reply_proxy = q_reply_proxy;
 
-        // Synchronous call into scope implementation.
-        // On return, replies for the query may still be outstanding.
         preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
         assert(preview_query);
     }
 
+    // Synchronous call into scope implementation.
+    // On return, replies for the query may still be outstanding.
     preview_query->run(q_reply_proxy);
 }
 
 void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
-    ///! TODO
-    (void)query;
-    (void)reply;
+    QueryBase::SPtr q_base;
+    ActivationBase::SPtr activation_query;
+
+    {
+        std::lock_guard<std::mutex> lock(queries_mutex_);
+
+        q_base = query->q_base;
+
+        activation_query = dynamic_pointer_cast<ActivationBase>(q_base);
+        assert(activation_query);
+    }
+
+    // no need for intermediate proxy (like with ReplyImpl::create),
+    // since we get single return value from the public API
+    // and just push it ourseleves
+    auto res = activation_query->activate();
+    reply->push(res.serialize());
+    reply->finished(ListenerBase::Finished, "");
 }
 
 }  // namespace smartscopes

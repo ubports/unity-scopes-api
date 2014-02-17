@@ -148,7 +148,8 @@ void ScopeI::perform_action_(Current const& current,
                                            proxy.getEndpoint().cStr(),
                                            proxy.getIdentity().cStr(),
                                            proxy.getCategory().cStr()));
-    auto delegate = dynamic_pointer_cast<ScopeObject>(del());
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->perform_action(result,
                                                                                   metadata,
                                                                                   widget_id,

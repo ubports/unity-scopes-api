@@ -71,7 +71,7 @@ MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
                  [&q, &hints, &info, this ]()->QueryBase::SPtr
                      { return this->smartscope_->create_query(info.id, q, hints); },
                  [&reply, &info, this](QueryBase::SPtr query_base)
-                     { qo_->add_query(info.id, SSQuery::Query, query_base, reply); });
+                     { qo_->add_query(SSQuery::Query, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
@@ -84,7 +84,7 @@ MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
                  [&result, &hints, &info, this ]()->QueryBase::SPtr
                      { return this->smartscope_->activate(info.id, result, hints); },
                  [&reply, &info, this](QueryBase::SPtr query_base)
-                     { qo_->add_query(info.id, SSQuery::Activation, query_base, reply); });
+                     { qo_->add_query(SSQuery::Activation, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
@@ -99,7 +99,7 @@ MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
                  [&result, &hints, &info, &widget_id, &action_id, this ]()->QueryBase::SPtr
                      { return this->smartscope_->perform_action(info.id, result, hints, widget_id, action_id); },
                  [&reply, &info, this](QueryBase::SPtr query_base)
-                     { qo_->add_query(info.id, SSQuery::Activation, query_base, reply); });
+                     { qo_->add_query(SSQuery::Activation, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
@@ -112,7 +112,7 @@ MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                  [&result, &hints, &info, this ]()->QueryBase::SPtr
                      { return this->smartscope_->preview(info.id, result, hints); },
                  [&reply, &info, this](QueryBase::SPtr query_base)
-                     { qo_->add_query(info.id, SSQuery::Preview, query_base, reply); });
+                     { qo_->add_query(SSQuery::Preview, query_base, reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
@@ -183,7 +183,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         throw;
     }
 
-    return info.mw->create_query_ctrl_proxy(info.id + ".c", info.mw->get_query_ctrl_endpoint());
+    return info.mw->create_query_ctrl_proxy(reply->identity() + ".c", info.mw->get_query_ctrl_endpoint());
 }
 
 }  // namespace smartscopes
