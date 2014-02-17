@@ -30,21 +30,21 @@ TEST(ActivationResponse, basic)
     {
         ActivationResponse resp(ActivationResponse::Status::NotHandled);
         EXPECT_EQ(ActivationResponse::Status::NotHandled, resp.status());
-        EXPECT_TRUE(resp.hints().is_null());
+        EXPECT_TRUE(resp.scope_data().is_null());
     }
     {
         ActivationResponse resp(ActivationResponse::Status::ShowPreview);
         EXPECT_EQ(ActivationResponse::Status::ShowPreview, resp.status());
-        EXPECT_TRUE(resp.hints().is_null());
+        EXPECT_TRUE(resp.scope_data().is_null());
     }
     {
         ActivationResponse resp(ActivationResponse::Status::HideDash);
         VariantMap var;
         var["foo"] = "bar";
-        resp.set_hints(Variant(var));
+        resp.set_scope_data(Variant(var));
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
-        EXPECT_EQ(1, resp.hints().get_dict().size());
-        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
+        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
     }
     {
@@ -71,11 +71,11 @@ TEST(ActivationResponse, serialize)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.set_hints(Variant(var));
+            resp.set_scope_data(Variant(var));
         }
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::HideDash, static_cast<ActivationResponse::Status>(var["status"].get_int()));
-        EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_EQ("bar", var["scope_data"].get_dict()["foo"].get_string());
     }
     {
         Query const query("scope-foo");
@@ -104,7 +104,7 @@ TEST(ActivationResponse, deserialize)
     // invalid variant - missing 'status'
     {
         VariantMap var;
-        var["hints"] = VariantMap();
+        var["scope_data"] = VariantMap();
         try
         {
             internal::ActivationResponseImpl::create(var);
@@ -120,7 +120,7 @@ TEST(ActivationResponse, deserialize)
         VariantMap hints;
         hints["foo"] = "bar";
         VariantMap var;
-        var["hints"] = hints;
+        var["scope_data"] = hints;
         var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
         try
         {
@@ -135,12 +135,12 @@ TEST(ActivationResponse, deserialize)
         VariantMap hints;
         hints["foo"] = "bar";
         VariantMap var;
-        var["hints"] = hints;
+        var["scope_data"] = hints;
         var["status"] = static_cast<int>(ActivationResponse::Status::HideDash);
         try
         {
             internal::ActivationResponseImpl res(var);
-            EXPECT_EQ("bar", res.hints().get_dict()["foo"].get_string());
+            EXPECT_EQ("bar", res.scope_data().get_dict()["foo"].get_string());
             EXPECT_EQ(ActivationResponse::Status::HideDash, res.status());
         }
         catch (unity::LogicException const &e)
@@ -153,7 +153,7 @@ TEST(ActivationResponse, deserialize)
     {
         Query query("scope-foo");
         VariantMap var;
-        var["hints"] = VariantMap();
+        var["scope_data"] = VariantMap();
         var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
         var["query"] = query.serialize();
         try
@@ -177,19 +177,19 @@ TEST(ActivationResponse, copy_ctor)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.set_hints(Variant(var));
+            resp.set_scope_data(Variant(var));
         }
         {
             VariantMap var;
             var["iron"] = "maiden";
-            copy.set_hints(Variant(var));
+            copy.set_scope_data(Variant(var));
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.hints().get_dict().size());
-        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
-        EXPECT_EQ(1, copy.hints().get_dict().size());
-        EXPECT_EQ("maiden", copy.hints().get_dict()["iron"].get_string());
+        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(1, copy.scope_data().get_dict().size());
+        EXPECT_EQ("maiden", copy.scope_data().get_dict()["iron"].get_string());
     }
 }
 
@@ -201,18 +201,18 @@ TEST(ActivationResponse, assign_op_copy)
         {
             VariantMap var;
             var["foo"] = "bar";
-            resp.set_hints(Variant(var));
+            resp.set_scope_data(Variant(var));
         }
         {
             VariantMap var;
             var["iron"] = "maiden";
-            copy.set_hints(Variant(var));
+            copy.set_scope_data(Variant(var));
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.hints().get_dict().size());
-        EXPECT_EQ("bar", resp.hints().get_dict()["foo"].get_string());
-        EXPECT_EQ(1, copy.hints().get_dict().size());
-        EXPECT_EQ("maiden", copy.hints().get_dict()["iron"].get_string());
+        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(1, copy.scope_data().get_dict().size());
+        EXPECT_EQ("maiden", copy.scope_data().get_dict()["iron"].get_string());
     }
 }

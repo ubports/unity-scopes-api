@@ -45,8 +45,8 @@ public:
     ActivationResponseImpl& operator=(ActivationResponseImpl && other) = default;
 
     ActivationResponse::Status status() const;
-    void set_hints(Variant const& hints);
-    Variant hints() const;
+    void set_scope_data(Variant const& hints);
+    Variant scope_data() const;
     Query query() const;
 
     VariantMap serialize() const;
@@ -56,7 +56,7 @@ public:
 private:
     ActivationResponse::Status status_;
     Query::SPtr query_;
-    Variant hints_;
+    Variant scope_data_;
 };
 
 } // namespace internal

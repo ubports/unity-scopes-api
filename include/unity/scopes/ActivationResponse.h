@@ -83,20 +83,23 @@ public:
     ActivationResponse::Status status() const;
 
     /**
-     \deprecated Attach arbitrary hints to this response.  This method will be removed in version 0.4.0, please use set_hints instead.
+     \deprecated Attach arbitrary hints to this response.  This method will be removed in version 0.4.0, please use set_scope_data instead.
      */
     void setHints(VariantMap const& hints);
 
     /**
-     \brief Attach arbitrary hints to this response.
+     \brief Attach arbitrary data to this response.
+
+     The attached data will be sent back to the scope if status of this response is Status::ShowPreview.
+     \param data arbitrary value attached to response
      */
-    void set_hints(Variant const& hints);
+    void set_scope_data(Variant const& data);
 
     /**
-     \brief Get hints attached to this response object.
-     \return hints
+     \brief Get data attached to this response object.
+     \return data attached to response
      */
-    Variant hints() const;
+    Variant scope_data() const;
 
     /**
      \brief Query to be executed if status is Status::PerformQuery.
