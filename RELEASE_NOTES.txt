@@ -3,11 +3,11 @@ Release Notes for unity-scopes-api
 
 Changes in version 0.3.2
 ========================
-- ActivationResponse::set_scope_data(Variant const&) method has been added;
-  ActivationResponse::hints() getter was renamed to scope_data() and it now
-  returns Variant instead of VariantMap.  The existing
-  ActivationResponse::setHints(VariantMap const&) method has been marked as
-  deprecated and for removal in 0.4.0.
+- ActivationResponse::set_scope_data(Variant const&) and scope_data() methods
+  have been added; they are meant to replace setHints() and hints() and use
+  Variant instead of VariantMap for arbitrary scope data.
+  The existing ActivationResponse::setHints(VariantMap const&) and hints()
+  methods have been marked as deprecated and for removal in 0.4.0.
 
 Changes in version 0.3.1
 ========================

@@ -76,6 +76,11 @@ ActivationResponse::Status ActivationResponse::status() const
     return p->status();
 }
 
+VariantMap ActivationResponse::hints() const
+{
+    return p->hints();
+}
+
 Variant ActivationResponse::scope_data() const
 {
     return p->scope_data();

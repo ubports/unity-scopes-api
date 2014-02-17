@@ -45,6 +45,7 @@ TEST(ActivationResponse, basic)
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(1, resp.scope_data().get_dict().size());
         EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ("bar", resp.hints()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
     }
     {

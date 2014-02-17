@@ -82,6 +82,15 @@ void ActivationResponseImpl::set_scope_data(Variant const& hints)
     scope_data_ = hints;
 }
 
+VariantMap ActivationResponseImpl::hints() const
+{
+    if (scope_data_.which() == Variant::Type::Dict)
+    {
+        return scope_data_.get_dict();
+    }
+    return VariantMap();
+}
+
 Variant ActivationResponseImpl::scope_data() const
 {
     return scope_data_;
