@@ -115,7 +115,7 @@ public:
 
 private:
     Annotation(internal::AnnotationImpl* impl);
-    std::shared_ptr<internal::AnnotationImpl> p;
+    std::unique_ptr<internal::AnnotationImpl> p;
 
     friend class internal::ResultReplyObject;
 };

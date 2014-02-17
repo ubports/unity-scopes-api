@@ -49,7 +49,7 @@ public:
     PreviewWidget(std::string const& definition);
     PreviewWidget(PreviewWidget const& other);
     PreviewWidget(PreviewWidget&& other);
-    ~PreviewWidget();
+    virtual ~PreviewWidget();
 
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
