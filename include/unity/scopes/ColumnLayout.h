@@ -50,6 +50,7 @@ public:
     ColumnLayout(ColumnLayout&&);
     ColumnLayout& operator=(ColumnLayout const& other);
     ColumnLayout& operator=(ColumnLayout&&);
+    ~ColumnLayout();
 /// @endcond
 
     /**
@@ -86,7 +87,7 @@ public:
 
 private:
     ColumnLayout(internal::ColumnLayoutImpl *impl);
-    std::shared_ptr<internal::ColumnLayoutImpl> p;
+    std::unique_ptr<internal::ColumnLayoutImpl> p;
     friend class internal::ColumnLayoutImpl;
 };
 

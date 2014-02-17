@@ -46,7 +46,13 @@ class UNITY_API Link final
 public:
     /// @cond
     UNITY_DEFINES_PTRS(Link);
+
+    Link(Link const& other);
+    Link(Link&&);
     ~Link();
+
+    Link& operator=(Link const& other);
+    Link& operator=(Link&&);
     /// @endcond
 
     /**

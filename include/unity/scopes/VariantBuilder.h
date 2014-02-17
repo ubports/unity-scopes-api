@@ -60,6 +60,7 @@ builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"
 class UNITY_API VariantBuilder
 {
 public:
+    /// @cond
     VariantBuilder();
     VariantBuilder(VariantBuilder const& other);
     VariantBuilder(VariantBuilder&& other);
@@ -67,6 +68,7 @@ public:
 
     VariantBuilder& operator=(VariantBuilder const& other);
     VariantBuilder& operator=(VariantBuilder&& other);
+    /// @endcond
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
@@ -99,7 +101,7 @@ public:
     Variant end();
 
 private:
-    std::shared_ptr<internal::VariantBuilderImpl> p;
+    std::unique_ptr<internal::VariantBuilderImpl> p;
 };
 
 } // namespace scopes
