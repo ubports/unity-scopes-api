@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <memory>
 
 namespace unity
@@ -46,6 +47,8 @@ class UNITY_API FilterState final
 {
 public:
 /// @cond
+    UNITY_DEFINES_PTRS(FilterState);
+
     FilterState();
     FilterState(FilterState const& other);
     FilterState(FilterState &&);
