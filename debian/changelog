@@ -1,3 +1,9 @@
+unity-scopes-api (0.3.2-0ubuntu1) UNRELEASED; urgency=low
+
+  * Added ActivationResponse::set_hints method and marked setHints as deprecated.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 14 Feb 2014 12:23:40 +0100
+
 unity-scopes-api (0.3.1+14.04.20140217-0ubuntu1) trusty; urgency=low
 
   [ Tarmac ]
