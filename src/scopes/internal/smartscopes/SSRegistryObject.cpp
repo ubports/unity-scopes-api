@@ -217,7 +217,7 @@ void SSRegistryObject::get_remote_scopes()
             auto meta = ScopeMetadataImpl::create(move(metadata));
 
             // add scope info to collection
-            add(scope.id, std::move(meta), scope);
+            add(scope, std::move(meta));
         }
         catch (std::exception const& e)
         {
@@ -230,23 +230,23 @@ void SSRegistryObject::get_remote_scopes()
 }
 
 // Must be called with scopes_mutex_ locked
-bool SSRegistryObject::add(std::string const& scope_name, ScopeMetadata const& metadata, RemoteScope const& remotedata)
+bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata)
 {
-    if (scope_name.empty())
+    if (metadata.scope_name().empty())
     {
         throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty name");
     }
 
     // store the base url under a scope name key
-    base_urls_[scope_name] = remotedata.base_url;
+    base_urls_[metadata.scope_name()] = remotedata.base_url;
 
     // store the scope metadata in scopes_
-    auto const& pair = scopes_.insert(make_pair(scope_name, metadata));
+    auto const& pair = scopes_.insert(make_pair(metadata.scope_name(), metadata));
     if (!pair.second)
     {
         // Replace already existing entry with this one
         scopes_.erase(pair.first);
-        scopes_.insert(make_pair(scope_name, metadata));
+        scopes_.insert(make_pair(metadata.scope_name(), metadata));
         return false;
     }
     return true;
