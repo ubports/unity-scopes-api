@@ -96,7 +96,7 @@ public:
     void set_scope_data(Variant const& data);
 
     /**
-     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use set_scope_data instead.
+     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use scope_data instead.
 
      This method returns data attached with setHints() or set_scope_data() call; this method returns empty VariantMap if the attached data was added with
      set_scope_data() and it is is not of VariantMap type.
