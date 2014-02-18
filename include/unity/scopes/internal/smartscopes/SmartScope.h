@@ -54,7 +54,7 @@ public:
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, query_id, platform, locale, country, limit
-        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", 10);
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "", "", 10);
     }
 
     ~SmartQuery() noexcept
