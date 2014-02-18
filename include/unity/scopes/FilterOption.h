@@ -54,7 +54,7 @@ public:
 
 private:
     FilterOption(std::string const& id, std::string const& label);
-    std::shared_ptr<internal::FilterOptionImpl> p;
+    std::unique_ptr<internal::FilterOptionImpl> p;
 
     friend class internal::OptionSelectorFilterImpl;
 };

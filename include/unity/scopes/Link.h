@@ -46,6 +46,13 @@ class UNITY_API Link final
 public:
     /// @cond
     UNITY_DEFINES_PTRS(Link);
+
+    Link(Link const& other);
+    Link(Link&&);
+    ~Link();
+
+    Link& operator=(Link const& other);
+    Link& operator=(Link&&);
     /// @endcond
 
     /**
@@ -66,7 +73,7 @@ public:
 private:
     Link(std::string const& label, Query const& query);
     Link(VariantMap const& variant_map);
-    std::shared_ptr<internal::LinkImpl> p;
+    std::unique_ptr<internal::LinkImpl> p;
 
     friend class internal::AnnotationImpl;
 };
