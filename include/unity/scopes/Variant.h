@@ -169,9 +169,9 @@ public:
     /**@name Modifiers
     */
     /**
-    \brief Swaps the contents of two Variants.
+    \brief Swaps the contents of this Variant with `other`.
     */
-    friend void swap(Variant&, Variant&) noexcept;
+    void swap(Variant& other) noexcept;
 
 private:
     Variant(internal::NullVariant const&);
@@ -179,6 +179,11 @@ private:
     std::unique_ptr<internal::VariantImpl> p;
     friend class VariantImpl;
 };
+
+/**
+\brief Swaps the contents of two Variants.
+*/
+void swap(Variant&, Variant&) noexcept;
 
 } // namespace scopes
 
