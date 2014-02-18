@@ -60,7 +60,7 @@ private:
     void refresh_thread();
 
     void get_remote_scopes();
-    bool add(std::string const& scope_name, ScopeMetadata const& scope, RemoteScope const& remotedata);
+    bool add(RemoteScope const& remotedata, ScopeMetadata const& scope);
 
 private:
     SmartScopesClient::SPtr ssclient_;

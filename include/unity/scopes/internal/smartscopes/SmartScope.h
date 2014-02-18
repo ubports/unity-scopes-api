@@ -89,10 +89,6 @@ public:
 
             CategorisedResult res(cat);
             res.set_uri(result.uri);
-            res.set_title(result.title);
-            res.set_art(result.art);
-            res.set_dnd_uri(result.dnd_uri);
-
             res["result_json"] = result.json;
 
             auto other_params = result.other_params;

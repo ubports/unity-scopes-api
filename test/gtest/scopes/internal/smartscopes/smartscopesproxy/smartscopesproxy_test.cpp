@@ -162,7 +162,7 @@ public:
         {
             EXPECT_EQ("URI2", result.uri());
             EXPECT_EQ("Things", result.title());
-            EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", result.art());
+            EXPECT_EQ("", result.art());
             EXPECT_EQ("", result.dnd_uri());
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
