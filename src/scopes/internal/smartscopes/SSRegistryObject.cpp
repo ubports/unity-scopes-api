@@ -218,6 +218,11 @@ void SSRegistryObject::get_remote_scopes()
                 metadata->set_icon(*scope.icon);
             }
 
+            if (scope.art)
+            {
+                metadata->set_art(*scope.art);
+            }
+
             metadata->set_invisible(scope.invisible);
 
             ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),

@@ -211,9 +211,14 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.description = child_node->get_node("description")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
+            if (child_node->has_node("icon"))
+            {
+                scope.icon.reset(new std::string(child_node->get_node("icon")->as_string()));
+            }
+
             if (child_node->has_node("art"))
             {
-                scope.icon.reset(new std::string(child_node->get_node("art")->as_string()));
+                scope.art.reset(new std::string(child_node->get_node("art")->as_string()));
             }
 
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;

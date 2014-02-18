@@ -45,13 +45,13 @@ def response(environ, start_response):
     return ''
 
 remote_scopes_response = '\
-[{"base_url": "http://127.0.0.1/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "art": "icon" },\
-{"base_url": "http://127.0.0.1/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "invisible": true }]'
+[{"base_url": "http://127.0.0.1/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "icon": "icon" },\
+{"base_url": "http://127.0.0.1/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "art": "art", "invisible": true }]'
 
 search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
-{"result": {"cat_id": "cat1", "uri": "URI2", "title": "Things"}}'
+{"result": {"cat_id": "cat1", "icon": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
 preview_response = '\
 {"columns": [[["widget_id_A", "widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B"], ["widget_id_C"]]]}\r\n\
