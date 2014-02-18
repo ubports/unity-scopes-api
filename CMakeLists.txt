@@ -328,18 +328,23 @@ set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
+set(ldflags "")
+
 # Clang sanitizers don't work if --no-undefined is given as a linker argument.
 if(NOT IS_CLANG)
-    set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_FLAGS "-Wl,--no-undefined")
-    set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "-Wl,--no-undefined")
+    set(ldflags "-Wl,--no-undefined")
 endif()
+
+set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "${ldflags}")
 
 # We compile with all symbols visible by default. For the shipping library, we strip
 # out all symbols that (recursively) are in the unity::scopes::internal namespace,
 # except for a few exceptions that are needed by the scoperegistry, scoperunner,
 # smartscopesproxy, and any other binaries that reach into the internal namespace.
+set(symbol_map "${CMAKE_SOURCE_DIR}/unity-scopes.map")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-                      LINK_FLAGS "-Wl,--version-script,${CMAKE_SOURCE_DIR}/unity-scopes.map")
+                      LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
 
 target_link_libraries(${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 target_link_libraries(${UNITY_SCOPES_TEST_LIB} ${OTHER_LIBS})

@@ -24,6 +24,6 @@ global:
     };
 local:
     extern "C++" {
-        unity::scopes::internal::*
+        unity::scopes::internal::*;
     };
 };
