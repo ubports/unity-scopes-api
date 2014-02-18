@@ -124,7 +124,7 @@ public:
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, platform, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "en", "US");
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "", "");
     }
 
     ~SmartPreview()
