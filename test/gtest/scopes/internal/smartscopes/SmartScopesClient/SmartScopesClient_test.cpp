@@ -58,8 +58,8 @@ protected:
 TEST_F(SmartScopesClientTest, remote_scopes)
 {
     std::vector<RemoteScope> scopes;
-    ssc_->get_remote_scopes(scopes, "", false);
 
+    EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
     ASSERT_EQ(2, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
