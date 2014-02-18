@@ -33,7 +33,7 @@ CategorisedResult::CategorisedResult(Category::SCPtr category)
 {
 }
 
-CategorisedResult::CategorisedResult(std::shared_ptr<internal::ResultImpl> impl)
+CategorisedResult::CategorisedResult(internal::ResultImpl* impl)
     : Result(impl)
 {
 }
@@ -50,7 +50,7 @@ CategorisedResult& CategorisedResult::operator=(CategorisedResult const& other)
 {
     if (this != &other)
     {
-        p = std::make_shared<internal::CategorisedResultImpl>(*(other.fwd()));
+        p.reset(new internal::CategorisedResultImpl(*(other.fwd())));
     }
     return *this;
 }

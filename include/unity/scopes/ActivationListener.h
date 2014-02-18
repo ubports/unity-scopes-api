@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_ACTIVATIONLISTENER_H
 
 #include <unity/scopes/ListenerBase.h>
+#include <unity/util/NonCopyable.h>
 
 namespace unity
 {

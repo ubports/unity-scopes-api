@@ -38,6 +38,7 @@ public:
     PreviewWidgetImpl(std::string const& id, std::string const& widget_type);
     PreviewWidgetImpl(VariantMap const& var);
     PreviewWidgetImpl(PreviewWidgetImpl const& other) = default;
+    ~PreviewWidgetImpl() = default;
 
     void set_id(std::string const& id);
     void set_widget_type(std::string const &widget_type);

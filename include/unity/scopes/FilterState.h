@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_FILTERSTATE_H
 
 #include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <memory>
 
 namespace unity
@@ -45,11 +46,14 @@ class FilterState final
 {
 public:
 /// @cond
+    UNITY_DEFINES_PTRS(FilterState);
+
     FilterState();
     FilterState(FilterState const& other);
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
+    ~FilterState();
     VariantMap serialize() const;
 /// @endcond
 
@@ -66,7 +70,7 @@ public:
 
 private:
     FilterState(internal::FilterStateImpl *pimpl);
-    std::shared_ptr<internal::FilterStateImpl> p;
+    std::unique_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
     friend class internal::FilterStateImpl;
 };

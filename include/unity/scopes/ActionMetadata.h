@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_ACTIONMETADATA_H
 
 #include <unity/scopes/QueryMetadata.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -39,6 +40,10 @@ unity::scopes::ScopeBase::perform_action requests.
 class ActionMetadata : public QueryMetadata
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(ActionMetadata);
+    /// @endcond
+
     ActionMetadata(std::string const& locale, std::string const& form_factor);
     void set_scope_data(Variant const& data);
     Variant scope_data() const;

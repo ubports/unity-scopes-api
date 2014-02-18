@@ -63,6 +63,7 @@ public:
     Query(Query&&);
     Query& operator=(Query const& other);
     Query& operator=(Query&&);
+    ~Query();
     /// @endcond
 
     /**
@@ -118,7 +119,7 @@ public:
 
 private:
     Query(internal::QueryImpl *impl);
-    std::shared_ptr<internal::QueryImpl> p;
+    std::unique_ptr<internal::QueryImpl> p;
     friend class internal::QueryImpl;
 };
 

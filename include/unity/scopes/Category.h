@@ -50,6 +50,8 @@ public:
 /// @cond
     NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
+
+    ~Category();
 /// @endcond
 
     std::string id() const;
@@ -62,7 +64,7 @@ private:
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
 
-    std::shared_ptr<internal::CategoryImpl> p;
+    std::unique_ptr<internal::CategoryImpl> p;
 
     friend class internal::CategoryRegistry;
 };

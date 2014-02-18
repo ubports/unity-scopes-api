@@ -123,8 +123,8 @@ public:
     /// @endcond
 
 private:
-    std::shared_ptr<internal::ActivationResponseImpl> p;
-    ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl);
+    std::unique_ptr<internal::ActivationResponseImpl> p;
+    ActivationResponse(internal::ActivationResponseImpl* pimpl);
     friend class internal::ActivationResponseImpl;
 };
 

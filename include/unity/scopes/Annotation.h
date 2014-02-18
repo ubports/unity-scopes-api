@@ -21,6 +21,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
+#include <unity/util/DefinesPtrs.h>
 #include <list>
 #include <memory>
 
@@ -43,6 +44,10 @@ class ResultReplyObject;
 class Annotation final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(Annotation);
+    /// @endcond
+
     /*!
      \brief Enumeration of supported Annotation types
      */
@@ -114,7 +119,7 @@ public:
 
 private:
     Annotation(internal::AnnotationImpl* impl);
-    std::shared_ptr<internal::AnnotationImpl> p;
+    std::unique_ptr<internal::AnnotationImpl> p;
 
     friend class internal::ResultReplyObject;
 };

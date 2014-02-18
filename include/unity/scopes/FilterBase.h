@@ -62,7 +62,7 @@ public:
 protected:
     FilterBase(internal::FilterBaseImpl *pimpl);
 
-    std::shared_ptr<internal::FilterBaseImpl> p;
+    std::unique_ptr<internal::FilterBaseImpl> p;
 };
 
 typedef std::list<FilterBase::SCPtr> Filters;
