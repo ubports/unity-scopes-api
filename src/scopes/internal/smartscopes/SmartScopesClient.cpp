@@ -188,7 +188,6 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
         JsonNodeInterface::SPtr child_node;
-        RemoteScope scope;
 
         {
             std::lock_guard<std::mutex> lock(json_node_mutex_);
@@ -199,6 +198,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
         for (int i = 0; i < root_node->size(); ++i)
         {
             child_node = root_node->get_node(i);
+            RemoteScope scope;
 
             if (!child_node->has_node("id") || !child_node->has_node("name") ||
                 !child_node->has_node("base_url") || !child_node->has_node("description"))
@@ -211,7 +211,11 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             scope.description = child_node->get_node("description")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
-            scope.icon = child_node->has_node("art") ? child_node->get_node("art")->as_string() : "";
+            if (child_node->has_node("art"))
+            {
+                scope.icon.reset(new std::string(child_node->get_node("art")->as_string()));
+            }
+
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);
@@ -404,19 +408,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                 std::vector<std::string> members = child_node->member_names();
                 for (auto& member : members)
                 {
-                    if (member == "art")
-                    {
-                        result.art = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "dnd_uri")
-                    {
-                        result.dnd_uri = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "title")
-                    {
-                        result.title = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "uri")
+                    if (member == "uri")
                     {
                         result.uri = child_node->get_node(member)->as_string();
                     }

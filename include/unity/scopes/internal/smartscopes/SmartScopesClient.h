@@ -51,7 +51,7 @@ struct RemoteScope
     std::string name;
     std::string description;
     std::string base_url;
-    std::string icon;
+    std::shared_ptr<std::string> icon;  // optional
     bool invisible = false;
 };
 
@@ -67,9 +67,6 @@ struct SearchResult
 {
     std::string json;
     std::string uri;
-    std::string title;
-    std::string art;
-    std::string dnd_uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
     std::shared_ptr<SearchCategory> category;
 };
