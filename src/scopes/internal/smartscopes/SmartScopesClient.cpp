@@ -412,18 +412,6 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                     {
                         result.uri = child_node->get_node(member)->as_string();
                     }
-                    else if (member == "dnd_uri")
-                    {
-                        result.dnd_uri = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "art")
-                    {
-                        result.art.reset(new std::string(child_node->get_node(member)->as_string()));
-                    }
-                    else if (member == "title")
-                    {
-                        result.title.reset(new std::string(child_node->get_node(member)->as_string()));
-                    }
                     else if (member == "cat_id")
                     {
                         std::string category = child_node->get_node(member)->as_string();

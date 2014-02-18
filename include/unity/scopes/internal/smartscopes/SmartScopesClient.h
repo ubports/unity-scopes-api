@@ -67,9 +67,6 @@ struct SearchResult
 {
     std::string json;
     std::string uri;
-    std::string dnd_uri;
-    std::shared_ptr<std::string> title;  // optional
-    std::shared_ptr<std::string> art;  // optional
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
     std::shared_ptr<SearchCategory> category;
 };

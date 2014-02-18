@@ -89,18 +89,6 @@ public:
 
             CategorisedResult res(cat);
             res.set_uri(result.uri);
-            res.set_dnd_uri(result.dnd_uri);
-
-            if (result.title)
-            {
-                res.set_title(*result.title);
-            }
-
-            if (result.art)
-            {
-                res.set_art(*result.art);
-            }
-
             res["result_json"] = result.json;
 
             auto other_params = result.other_params;
