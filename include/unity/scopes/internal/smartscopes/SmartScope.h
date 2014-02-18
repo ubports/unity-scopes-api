@@ -54,7 +54,7 @@ public:
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, query_id, platform, locale, country, limit
-        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", 10);
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "", "", 10);
     }
 
     ~SmartQuery() noexcept
@@ -120,7 +120,7 @@ public:
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, platform, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "en", "US");
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "", "");
     }
 
     ~SmartPreview()

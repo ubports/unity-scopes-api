@@ -178,7 +178,14 @@ void SSRegistryObject::get_remote_scopes()
     {
         // request remote scopes from smart scopes client
         ///! TODO: locale
-        remote_scopes = ssclient_->get_remote_scopes("", caching_enabled_);
+        if (ssclient_->get_remote_scopes(remote_scopes, "", caching_enabled_))
+        {
+            next_refresh_timeout_ = regular_refresh_timeout_;
+        }
+        else
+        {
+            next_refresh_timeout_ = c_failed_refresh_timeout;
+        }
     }
     catch (std::exception const& e)
     {
@@ -235,8 +242,6 @@ void SSRegistryObject::get_remote_scopes()
             std::cerr << "SSRegistryObject: skipping scope \"" << scope.id << "\"" << std::endl;
         }
     }
-
-    next_refresh_timeout_ = regular_refresh_timeout_;
 }
 
 // Must be called with scopes_mutex_ locked
