@@ -135,7 +135,8 @@ SmartScopesClient::~SmartScopesClient()
 {
 }
 
-std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const& locale, bool caching_enabled)
+// returns false if cache used
+bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scopes, std::string const& locale, bool caching_enabled)
 {
     std::string response_str;
     bool using_cache = false;
@@ -185,7 +186,6 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
 
     try
     {
-        std::vector<RemoteScope> remote_scopes;
         JsonNodeInterface::SPtr root_node;
         JsonNodeInterface::SPtr child_node;
         RemoteScope scope;
@@ -232,7 +232,7 @@ std::vector<RemoteScope> SmartScopesClient::get_remote_scopes(std::string const&
             std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from cache" << std::endl;
         }
 
-        return remote_scopes;
+        return !using_cache;
     }
     catch (std::exception const& e)
     {

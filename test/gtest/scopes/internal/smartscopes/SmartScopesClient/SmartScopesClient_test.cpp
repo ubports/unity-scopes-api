@@ -57,7 +57,8 @@ protected:
 
 TEST_F(SmartScopesClientTest, remote_scopes)
 {
-    std::vector<RemoteScope> scopes = ssc_->get_remote_scopes("", false);
+    std::vector<RemoteScope> scopes;
+    ssc_->get_remote_scopes(scopes, "", false);
 
     ASSERT_EQ(2, scopes.size());
 
