@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_HYPERLINKIMPL_H
 #define UNITY_SCOPES_INTERNAL_HYPERLINKIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <string>
 #include <memory>
 #include <unity/scopes/Query.h>
@@ -34,7 +33,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API LinkImpl
+class LinkImpl
 {
 public:
     LinkImpl(std::string const& label, Query const& query);

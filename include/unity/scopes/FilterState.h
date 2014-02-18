@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_FILTERSTATE_H
 #define UNITY_SCOPES_FILTERSTATE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <memory>
 
@@ -42,7 +41,7 @@ class FilterBaseImpl;
   State can be examined by passing an instance of FilterState to
   appropriate methods of filters (FilterBase implementations).
   */
-class UNITY_API FilterState final
+class FilterState final
 {
 public:
 /// @cond

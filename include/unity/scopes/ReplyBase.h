@@ -37,7 +37,7 @@ class ReplyImpl;
 /**
 \brief ReplyBase allows the results of a query to be sent to the source of the query.
 */
-class UNITY_API ReplyBase : public virtual ObjectProxy
+class ReplyBase : public virtual ObjectProxy
 {
 public:
     ReplyBase(ReplyBase const&) = delete;

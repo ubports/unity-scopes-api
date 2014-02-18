@@ -38,7 +38,7 @@ namespace scopes
 class CategorisedResult;
 class FilterState;
 
-class UNITY_API SearchListener : public ListenerBase
+class SearchListener : public ListenerBase
 {
 public:
     /// @cond

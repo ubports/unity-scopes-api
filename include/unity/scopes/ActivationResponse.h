@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_ACTIVATIONRESPONSE_H
 #define UNITY_SCOPES_ACTIVATIONRESPONSE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Query.h>
 #include <memory>
@@ -38,7 +37,7 @@ class ActivationResponseImpl;
 /**
 \brief Carries response to a Result activation request.
 */
-class UNITY_API ActivationResponse final
+class ActivationResponse final
 {
 public:
     /*!

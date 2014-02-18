@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_QUERY_H
 #define UNITY_SCOPES_QUERY_H
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
@@ -42,7 +41,7 @@ class QueryImpl;
  * Holds all parameters of search query: a target scope name, query string, department id and
  * state of the filters. Can be converted to/from scope:// uri schema string.
  */
-class UNITY_API Query final
+class Query final
 {
 public:
     /// @cond

@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_FILTEROPTIONIMPL_H
 #define UNITY_SCOPES_INTERNAL_FILTEROPTIONIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <string>
 
 namespace unity
@@ -31,7 +30,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API FilterOptionImpl
+class FilterOptionImpl
 {
 public:
     FilterOptionImpl(std::string const& id, std::string const& label);

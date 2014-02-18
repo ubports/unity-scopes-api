@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
 #define UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Annotation.h>
@@ -35,7 +34,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API AnnotationImpl
+class AnnotationImpl
 {
 public:
     explicit AnnotationImpl(Annotation::Type annotation_type);

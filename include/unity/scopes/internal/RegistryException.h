@@ -30,7 +30,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API RegistryException : public unity::Exception
+class RegistryException : public unity::Exception
 {
 public:
     explicit RegistryException(std::string const& reason);

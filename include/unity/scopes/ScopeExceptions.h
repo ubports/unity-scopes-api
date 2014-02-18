@@ -31,7 +31,7 @@ namespace scopes
 \brief Exception to indicate that something went wrong with the middleware layer.
 */
 
-class UNITY_API MiddlewareException : public virtual unity::Exception
+class MiddlewareException : public virtual unity::Exception
 {
 public:
     /**
@@ -56,7 +56,7 @@ public:
        object with an unknown identity.
 */
 
-class UNITY_API ObjectNotExistException : public virtual MiddlewareException
+class ObjectNotExistException : public virtual MiddlewareException
 {
 public:
     /**
@@ -89,7 +89,7 @@ private:
 \brief Exception to indicate that a twoway request timed out.
 */
 
-class UNITY_API TimeoutException : public virtual MiddlewareException
+class TimeoutException : public virtual MiddlewareException
 {
 public:
     /**
@@ -113,7 +113,7 @@ public:
 \brief Exception to indicate that something went wrong with the contents of configuration files.
 */
 
-class UNITY_API ConfigException : public virtual unity::Exception
+class ConfigException : public virtual unity::Exception
 {
 public:
     /**
@@ -137,7 +137,7 @@ public:
 \brief Exception to indicate that an object wasn't found by a lookup function.
 */
 
-class UNITY_API NotFoundException : public virtual unity::Exception
+class NotFoundException : public virtual unity::Exception
 {
 public:
     /**
