@@ -92,9 +92,10 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
     , get_qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
+    std::promise<void> qt_thread_ready;
 
     get_thread_ =
-        std::thread([this, request_url, port, timeout]()
+        std::thread([this, request_url, port, timeout, &qt_thread_ready]()
                     {
                         QUrl url(request_url.c_str());
 
@@ -103,12 +104,16 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
                             url.setPort(port);
                         }
 
-                        get_qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
+                        {
+                            std::lock_guard<std::mutex> lock(qt_thread_mutex_);
+                            get_qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
+                        }
 
                         QEventLoop loop;
                         QObject::connect(get_qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
 
                         get_qt_thread_->start();
+                        qt_thread_ready.set_value();
                         loop.exec();
 
                         std::string reply;
@@ -125,10 +130,7 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port,
                         }
                     });
 
-    while (!get_qt_thread_)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+    qt_thread_ready.get_future().wait();
 }
 
 HttpClientQt::HttpSession::~HttpSession()
@@ -143,7 +145,10 @@ std::future<std::string> HttpClientQt::HttpSession::get_future()
 
 void HttpClientQt::HttpSession::cancel_session()
 {
-    get_qt_thread_->cancel();
+    {
+        std::lock_guard<std::mutex> lock(qt_thread_mutex_);
+        get_qt_thread_->cancel();
+    }
 
     wait_for_session();
 }
