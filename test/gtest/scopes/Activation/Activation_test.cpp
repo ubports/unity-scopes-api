@@ -504,9 +504,8 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
-void scope_thread()
+void scope_thread(Runtime::SPtr const& rt)
 {
-    auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
     TestScope scope;
     rt->run_scope(&scope);
 }
@@ -575,7 +574,10 @@ TEST(Activation, scope)
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    std::thread scope_t(scope_thread);
-    scope_t.detach();
-    return RUN_ALL_TESTS();
+    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, rt);
+    auto rc = RUN_ALL_TESTS();
+    rt->destroy();
+    scope_t.join();
+    return rc;
 }
