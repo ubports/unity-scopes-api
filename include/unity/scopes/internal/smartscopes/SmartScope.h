@@ -46,15 +46,15 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query)
+    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query, SearchMetadata const& hints)
         : scope_id_(scope_id)
         , query_(query)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, query_id, platform, locale, country, limit
-        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "", "", 10);
+        ///! TODO: session_id, query_id, locale, country, limit
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, hints.form_factor(), "", "", 10);
     }
 
     ~SmartQuery() noexcept
@@ -112,15 +112,15 @@ private:
 class SmartPreview : public PreviewQuery
 {
 public:
-    SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result)
+    SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
         : scope_id_(scope_id)
         , result_(result)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, platform, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "", "");
+        ///! TODO: session_id, widgets_api_version, locale, country
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, "", "");
     }
 
     ~SmartPreview()
@@ -201,16 +201,16 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& scope_id, Query const& q, SearchMetadata const&)
+    QueryBase::UPtr create_query(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
     {
-        QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q));
+        QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
     }
 
-    QueryBase::UPtr preview(std::string const& scope_id, Result const& result, ActionMetadata const&)
+    QueryBase::UPtr preview(std::string const& scope_id, Result const& result, ActionMetadata const& hints)
     {
-        QueryBase::UPtr preview(new SmartPreview(scope_id, reg_, result));
+        QueryBase::UPtr preview(new SmartPreview(scope_id, reg_, result, hints));
         std::cout << "SmartScope: created preview for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return preview;
     }
