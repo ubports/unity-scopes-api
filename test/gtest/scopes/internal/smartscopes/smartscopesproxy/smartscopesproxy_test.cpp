@@ -68,7 +68,7 @@ public:
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2000, 60,
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 20000, 60,
                                                            "http://127.0.0.1", server_.port_, false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
@@ -213,6 +213,23 @@ TEST_F(smartscopesproxytest, create_query)
 
     meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
+}
+
+TEST_F(smartscopesproxytest, consecutive_queries)
+{
+    std::vector<std::shared_ptr<Receiver>> replies;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+        meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    for (int i = 0; i < 10; ++i)
+    {
+        replies[i]->wait_until_finished();
+    }
 }
 
 class PreviewerWithCols : public PreviewListener

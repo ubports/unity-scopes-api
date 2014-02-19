@@ -20,6 +20,7 @@
 
 from wsgiref.simple_server import make_server
 import sys
+import time
 
 preview1_complete = False
 
@@ -29,12 +30,15 @@ def response(environ, start_response):
     start_response(status, response_headers)
 
     if environ['PATH_INFO'] == '/remote-scopes':
+        time.sleep(1)
         return [remote_scopes_response]
 
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
+        time.sleep(1)
         return [search_response]
 
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
+        time.sleep(1)
         if preview1_complete == False:
             global preview1_complete
             preview1_complete = True
