@@ -34,7 +34,7 @@
 
 #include <gtest/gtest.h>
 
-#include "scope.h"
+#include "TestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -49,6 +49,14 @@ TEST(Runtime, basic)
 class Receiver : public SearchListener
 {
 public:
+    Receiver() :
+        query_complete_(false),
+        count_(0),
+        dep_count_(0),
+        annotation_count_(0)
+    {
+    }
+
     virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
     {
         EXPECT_EQ(current_department_id, "news");
@@ -85,6 +93,7 @@ public:
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
+cerr << error_message << endl;
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
@@ -117,6 +126,12 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    PreviewReceiver() :
+        query_complete_(false),
+        widgets_pushes_(0),
+        data_pushes_(0)
+    {
+    }
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(widgets.size(), 2);
@@ -152,6 +167,52 @@ private:
     condition_variable cond_;
     int widgets_pushes_;
     int data_pushes_;
+};
+
+class PushReceiver : public SearchListener
+{
+public:
+    PushReceiver(int pushes_expected)
+        : query_complete_(false),
+          pushes_expected_(pushes_expected),
+          count_(0)
+    {
+    cerr << "PushReceiver()" << endl;
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+    cerr << "got result" << endl;
+        if (++count_ > pushes_expected_)
+        {
+            FAIL();
+        }
+    }
+
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    {
+        EXPECT_EQ(Finished, reason);
+cerr << "reason: " << error_message << endl;
+        EXPECT_EQ(pushes_expected_, count_);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+    int pushes_expected_;
+    int count_;
+    std::shared_ptr<Result> last_result_;
 };
 
 TEST(Runtime, create_query)
@@ -191,6 +252,31 @@ TEST(Runtime, preview)
     auto previewer = make_shared<PreviewReceiver>();
     auto preview_ctrl = target->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
     previewer->wait_until_finished();
+}
+
+TEST(Runtime, cardinality)
+{
+    // connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("PusherScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "PusherScope");
+
+    // Run a query with unlimited cardinality. We check that the
+    // scope returns 100 results.
+    auto receiver = make_shared<PushReceiver>(100);
+cerr << "creating query" << endl;
+    scope->create_query("test", SearchMetadata("unused", "unused"), receiver);
+cerr << "done creating query" << endl;
+    receiver->wait_until_finished();
+cerr << "receiver finished" << endl;
+
+    // Run a query with 20 cardinality. We check that we receive only 20 results and,
+    // in the scope, check that push() returns true for the first 19, and false afterwards.
+    receiver = make_shared<PushReceiver>(20);
+    scope->create_query("test", SearchMetadata(20, "unused", "unused"), receiver);
+    receiver->wait_until_finished();
 }
 
 void scope_thread()

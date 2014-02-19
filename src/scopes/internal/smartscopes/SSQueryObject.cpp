@@ -175,13 +175,37 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
     return query_it->second->q_pushable;
 }
 
+int SSQueryObject::cardinality(InvokeInfo const& info) const noexcept
+{
+    std::lock_guard<std::mutex> lock(queries_mutex_);
+
+    // find corresponding scope ID to the reply ID requested
+    auto reply_it = replies_.find(info.id);
+    if (reply_it == end(replies_))
+    {
+        return 0;
+    }
+
+    std::string scope_id = reply_it->second;
+
+    // find query in queries_ from scope ID
+    auto query_it = queries_.find(scope_id);
+    if (query_it == end(queries_))
+    {
+        return 0;
+    }
+
+    return query_it->second->q_cardinality;
+}
+
 void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
 {
     ///! TODO: remove
 }
 
 void SSQueryObject::add_query(std::string const& scope_id, SSQuery::QueryType query_type,
-                              QueryBase::SPtr const& query_base, MWReplyProxy const& reply)
+                              QueryBase::SPtr const& query_base, int cardinality,
+                              MWReplyProxy const& reply)
 {
     std::unique_lock<std::mutex> lock(queries_mutex_);
 
@@ -193,10 +217,16 @@ void SSQueryObject::add_query(std::string const& scope_id, SSQuery::QueryType qu
     }
 
     // add the new query struct to queries_
-    queries_[scope_id] = std::make_shared<SSQuery>(query_type, query_base, reply);
+    queries_[scope_id] = std::make_shared<SSQuery>(query_type, query_base, cardinality, reply);
 
     // ...as well as a mapping of reply ID to scope ID in replies_
     replies_[reply->identity()] = scope_id;
+}
+
+void SSQueryObject::add_query(std::string const& scope_id, SSQuery::QueryType query_type,
+                              QueryBase::SPtr const& query_base, MWReplyProxy const& reply)
+{
+    add_query(scope_id, query_type, query_base, 0, reply);
 }
 
 void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)

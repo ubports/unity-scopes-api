@@ -70,8 +70,8 @@ MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
                  reply,
                  [&q, &hints, &info, this ]()->QueryBase::SPtr
                      { return this->smartscope_->create_query(info.id, q, hints); },
-                 [&reply, &info, this](QueryBase::SPtr query_base)
-                     { qo_->add_query(info.id, SSQuery::Query, query_base, reply); });
+                 [&reply, &hints, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(info.id, SSQuery::Query, query_base, hints.cardinality(), reply); });
 }
 
 MWQueryCtrlProxy SSScopeObject::activate(Result const& result,
