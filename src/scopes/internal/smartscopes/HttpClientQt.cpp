@@ -89,48 +89,47 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port, uint timeout)
     : promise_(nullptr)
-    , get_qt_thread_(nullptr)
+    , qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
-    std::promise<void> qt_thread_ready;
 
     get_thread_ =
-        std::thread([this, request_url, port, timeout, &qt_thread_ready]()
-                    {
-                        QUrl url(request_url.c_str());
+        std::thread([this, request_url, port, timeout]()
+            {
+                QUrl url(request_url.c_str());
 
-                        if (port != 0)
-                        {
-                            url.setPort(port);
-                        }
+                if (port != 0)
+                {
+                    url.setPort(port);
+                }
 
-                        {
-                            std::lock_guard<std::mutex> lock(qt_thread_mutex_);
-                            get_qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
-                        }
+                {
+                    std::lock_guard<std::mutex> lock(qt_thread_mutex_);
+                    qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
+                }
 
-                        QEventLoop loop;
-                        QObject::connect(get_qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
+                QEventLoop loop;
+                QObject::connect(qt_thread_.get(), &HttpClientQtThread::finished, &loop, &QEventLoop::quit);
 
-                        get_qt_thread_->start();
-                        qt_thread_ready.set_value();
-                        loop.exec();
+                qt_thread_->start();
+                qt_thread_ready_.set_value();
+                loop.exec();
 
-                        std::string reply;
-                        bool success = get_qt_thread_->get_reply(reply);
+                std::string reply;
+                bool success = qt_thread_->get_reply(reply);
 
-                        if (!success)
-                        {
-                            unity::ResourceException e(reply);
-                            promise_->set_exception(e.self());
-                        }
-                        else
-                        {
-                            promise_->set_value(reply);
-                        }
-                    });
+                if (!success)
+                {
+                    unity::ResourceException e(reply);
+                    promise_->set_exception(e.self());
+                }
+                else
+                {
+                    promise_->set_value(reply);
+                }
+            });
 
-    qt_thread_ready.get_future().wait();
+    qt_thread_ready_.get_future().wait();
 }
 
 HttpClientQt::HttpSession::~HttpSession()
@@ -147,7 +146,7 @@ void HttpClientQt::HttpSession::cancel_session()
 {
     {
         std::lock_guard<std::mutex> lock(qt_thread_mutex_);
-        get_qt_thread_->cancel();
+        qt_thread_->cancel();
     }
 
     wait_for_session();
