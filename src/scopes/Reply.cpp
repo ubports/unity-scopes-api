@@ -16,7 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
+
 #include <unity/scopes/internal/ReplyImpl.h>
 
 #include <cassert>
@@ -29,27 +30,26 @@ namespace scopes
 
 //! @cond
 
-ReplyBase::ReplyBase(internal::ReplyImpl* impl) :
-    ObjectProxy(impl)
+Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
 {
     assert(impl);
 }
 
-ReplyBase::~ReplyBase()
+Reply::~Reply()
 {
 }
 
-void ReplyBase::finished() const
+void Reply::finished() const
 {
     return fwd()->finished();
 }
 
-void ReplyBase::error(std::exception_ptr ex) const
+void Reply::error(std::exception_ptr ex) const
 {
     return fwd()->error(ex);
 }
 
-internal::ReplyImpl* ReplyBase::fwd() const
+internal::ReplyImpl* Reply::fwd() const
 {
     return dynamic_cast<internal::ReplyImpl*>(pimpl());
 }

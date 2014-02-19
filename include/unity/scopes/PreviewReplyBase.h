@@ -16,65 +16,48 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_REPLY_H
-#define UNITY_SCOPES_PREVIEW_REPLY_H
+#ifndef UNITY_SCOPES_PREVIEW_REPLY_BASE_H
+#define UNITY_SCOPES_PREVIEW_REPLY_BASE_H
 
-#include <unity/scopes/PreviewReplyBase.h>
-
-#include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/Reply.h>
-#include <unity/scopes/Result.h>
+#include <unity/SymbolExport.h>
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ReplyBase.h>
-#include <unity/scopes/ColumnLayout.h>
+
+#include <string>
 
 namespace unity
 {
-
 namespace scopes
 {
-
-namespace internal
-{
-class QueryObject;
-class ReplyImpl;
-}
-
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
-
-class PreviewReply : public virtual PreviewReplyBase, public Reply
+class UNITY_API PreviewReplyBase : public virtual ReplyBase
 {
 public:
-    PreviewReply(PreviewReply const&) = delete;
+    virtual ~PreviewReplyBase() = default;
+    PreviewReplyBase(PreviewReplyBase const&) = delete;
 
     /**
      \brief Registers a list of column layouts for current preview.
      Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
      This method throws unity::LogicException if this constrains are violated.
      */
-    bool register_layout(ColumnLayoutList const& layouts) const;
+    virtual bool register_layout(ColumnLayoutList const& layouts) const = 0;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
      */
-    bool push(PreviewWidgetList const& widget_list) const;
+    virtual bool push(PreviewWidgetList const& widget_list) const = 0;
+
     /**
      \brief Sends data for a preview widget attribute.
      */
-    bool push(std::string const& key, Variant const& value) const;
-
-    /**
-    \brief Destroys a Reply.
-    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
-    */
-    virtual ~PreviewReply();
+    virtual bool push(std::string const& key, Variant const& value) const = 0;
 
 protected:
-    PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
+    PreviewReplyBase() = default;
 };
 
 } // namespace scopes

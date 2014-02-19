@@ -16,25 +16,28 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLYBASE_H
-#define UNITY_SCOPES_REPLYBASE_H
+#ifndef UNITY_SCOPES_REPLY_H
+#define UNITY_SCOPES_REPLY_H
 
-#include <unity/SymbolExport.h>
-
-#include <exception>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/ReplyProxyFwd.h>
 
 namespace unity
 {
+
 namespace scopes
 {
-/**
-\brief ReplyBase allows the results of a query to be sent to the source of the query.
-*/
-class UNITY_API ReplyBase
+
+namespace internal
+{
+class QueryObject;
+class ReplyImpl;
+}
+
+class Reply : public virtual ReplyBase, protected ObjectProxy
 {
 public:
-    virtual ~ReplyBase() = default;
-    ReplyBase(ReplyBase const&) = delete;
 
     /**
     \brief Informs the source of a query that the query results are complete.
@@ -46,7 +49,7 @@ public:
     The destructor implicitly calls finished() if a Reply goes out of scope without
     a prior call to finished().
     */
-    virtual void finished() const = 0;
+    void finished() const;
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
@@ -55,12 +58,26 @@ public:
               the return value of `what()` is made available to the query source. Otherwise,
               the query source receives `"unknown exception"`.
     */
-    virtual void error(std::exception_ptr ex) const = 0;
+    void error(std::exception_ptr ex) const;
+
+    /**
+    \brief Destroys a Reply.
+    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
+    */
+    ~Reply();
 
 protected:
-    ReplyBase() = default;
+    Reply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    friend class internal::ReplyImpl;
+
+    internal::ReplyImpl* fwd() const;
+
+    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
+                                               // forward cancellation.
 };
+
 } // namespace scopes
+
 } // namespace unity
 
 #endif

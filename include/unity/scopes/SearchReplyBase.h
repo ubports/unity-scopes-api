@@ -16,17 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHREPLY_H
-#define UNITY_SCOPES_SEARCHREPLY_H
+#ifndef UNITY_SCOPES_SEARCHREPLY_BASE_H
+#define UNITY_SCOPES_SEARCHREPLY_BASE_H
 
-#include <unity/scopes/SearchReplyBase.h>
-
+#include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
-#include <unity/scopes/Reply.h>
 
 namespace unity
 {
@@ -37,10 +35,10 @@ namespace scopes
 class CategorisedResult;
 class Annotation;
 
-class SearchReply : public virtual SearchReplyBase, public Reply
+class UNITY_API SearchReplyBase : public virtual ReplyBase
 {
 public:
-    SearchReply(SearchReply const&) = delete;
+    SearchReplyBase(SearchReplyBase const&) = delete;
 
     /**
      \brief Register departments for current search reply and hint the client about current department.
@@ -49,29 +47,29 @@ public:
      \param departments a list of departments
      \param current_department_id a department id that should be considered as current
      */
-    void register_departments(DepartmentList const& departments, std::string current_department_id = "");
+    virtual void register_departments(DepartmentList const& departments, std::string current_department_id = "") = 0;
 
     /**
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
     \return Category instance
     */
-    Category::SCPtr register_category(std::string const& id,
+    virtual Category::SCPtr register_category(std::string const& id,
                                       std::string const& title,
                                       std::string const &icon,
-                                      CategoryRenderer const& renderer_template = CategoryRenderer());
+                                      CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.
     The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
     results and categories from other scope(s).
     */
-    void register_category(Category::SCPtr category);
+    virtual void register_category(Category::SCPtr category) = 0;
 
     /**
     \brief Returns an instance of previously registered category.
     \return Category instance or nullptr if category hasn't been registered.
     */
-    Category::SCPtr lookup_category(std::string const& id) const;
+    virtual Category::SCPtr lookup_category(std::string const& id) const = 0;
 
     // TODO: document return value from push()
     /**
@@ -81,7 +79,7 @@ public:
     A false return value is due to either finished() having been called earlier,
     or the client that sent the query having cancelled that query.
     */
-    bool push(CategorisedResult const& result) const;
+    virtual bool push(CategorisedResult const& result) const = 0;
 
     /**
     \brief Register Annotation.
@@ -90,27 +88,25 @@ public:
     at the top annotation area. Note: Unity shell can ignore some or all annotations, depending
     on available screen estate.
     */
-    bool register_annotation(Annotation const& annotation) const;
+    virtual bool register_annotation(Annotation const& annotation) const = 0;
 
     /**
     \brief Sends all filters and their state to the source of a query.
     \return true if the filters were accepted, false otherwise.
     */
-    bool push(Filters const& filters, FilterState const& filter_state) const;
+    virtual bool push(Filters const& filters, FilterState const& filter_state) const = 0;
 
     /**
     \brief Destroys a Reply.
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
-    virtual ~SearchReply();
+    virtual ~SearchReplyBase() = default;
 
 protected:
-    SearchReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
+    SearchReplyBase() = default;
 };
 
 } // namespace scopes
-
 } // namespace unity
 
 #endif
