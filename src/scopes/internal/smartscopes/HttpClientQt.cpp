@@ -32,9 +32,8 @@ using namespace unity::scopes::internal::smartscopes;
 
 //-- HttpClientQt
 
-HttpClientQt::HttpClientQt(uint max_sessions, uint no_reply_timeout)
+HttpClientQt::HttpClientQt(uint no_reply_timeout)
     : session_index_(0)
-    , max_sessions_(max_sessions > 0 ? max_sessions : 1)
     , no_reply_timeout_(no_reply_timeout)
     , app_(nullptr)
 {
@@ -53,26 +52,19 @@ HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, uint 
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
-    while (sessions_.size() >= max_sessions_)
-    {
-        auto it = sessions_.begin();
-        it->second->wait_for_session();
-        sessions_.erase(it);
-    }
-
     // start new session
     auto session = std::make_shared<HttpSession>(request_url, port, no_reply_timeout_);
     sessions_[session_index_] = session;
 
-    return std::make_shared<HttpResponseHandle>(session_index_++, session->get_future());
+    return std::make_shared<HttpResponseHandle>(shared_from_this(), session_index_++, session->get_future());
 }
 
-void HttpClientQt::cancel_get(const HttpResponseHandle::SPtr& session_handle)
+void HttpClientQt::cancel_get(uint session_id)
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
     // if session_id in map, cancel it
-    auto it = sessions_.find(session_handle->session_id());
+    auto it = sessions_.find(session_id);
     if (it != sessions_.end())
     {
         it->second->cancel_session();
