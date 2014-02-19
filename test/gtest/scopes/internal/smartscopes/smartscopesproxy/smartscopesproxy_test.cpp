@@ -68,7 +68,7 @@ public:
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60,
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2000, 60,
                                                            "http://127.0.0.1", server_.port_, false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 

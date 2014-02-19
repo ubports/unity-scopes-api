@@ -41,7 +41,7 @@ class SmartScopesClientTest : public Test
 {
 public:
     SmartScopesClientTest()
-        : http_client_(new HttpClientQt(2, 2000)),
+        : http_client_(new HttpClientQt(2000)),
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH)
     {
