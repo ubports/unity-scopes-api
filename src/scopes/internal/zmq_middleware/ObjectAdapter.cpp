@@ -388,7 +388,7 @@ void ObjectAdapter::wait_for_shutdown()
 
     if (state == Failed)
     {
-        throw_bad_state(state_);
+        throw_bad_state(state);
     }
 }
 
