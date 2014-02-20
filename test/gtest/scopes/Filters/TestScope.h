@@ -74,12 +74,12 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual QueryBase::UPtr create_query(Query const &q, SearchMetadata const &) override
+    virtual SearchQuery::UPtr create_query(Query const &q, SearchMetadata const &) override
     {
-        return QueryBase::UPtr(new TestQuery(q));
+        return SearchQuery::UPtr(new TestQuery(q));
     }
 
-    virtual QueryBase::UPtr preview(Result const&, ActionMetadata const &) override
+    virtual PreviewQuery::UPtr preview(Result const&, ActionMetadata const &) override
     {
         return nullptr;
     }

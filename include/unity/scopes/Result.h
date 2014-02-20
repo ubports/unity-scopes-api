@@ -142,9 +142,11 @@ public:
     */
     VariantMap serialize() const;
 
+protected:
+    Result(internal::ResultImpl* impl);
+
 private:
     explicit Result(const VariantMap &variant_map);
-    Result(internal::ResultImpl* impl);
     Result(std::shared_ptr<internal::ResultImpl> impl);
 
     std::shared_ptr<internal::ResultImpl> p;

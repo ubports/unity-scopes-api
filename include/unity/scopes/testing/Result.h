@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,15 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
+#ifndef UNITY_SCOPES_TESTING_RESULT_H
+#define UNITY_SCOPES_TESTING_RESULT_H
 
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/SymbolExport.h>
-#include <string>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {
@@ -29,25 +27,18 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+namespace testing
 {
 
-class UNITY_API CategoryRendererImpl
+class Result : public unity::scopes::Result
 {
 public:
-    CategoryRendererImpl(std::string const& json_text);
-    static CategoryRenderer from_file(std::string const& path);
-
-    const std::string& data() const;
-
-private:
-    std::string data_;
+    Result();
 };
 
-} // namespace internal
+} // namespace testing
 
 } // namespace scopes
 
 } // namespace unity
-
 #endif

@@ -1,8 +1,13 @@
-set(TESTLIBDIR ${CMAKE_BINARY_DIR}/test/gtest/libgtest/build)
-set(LIBGTEST gtest)
+if (NOT DEFINED GMOCK_ROOT)
+    set(GMOCK_ROOT /usr/src/gmock)
+endif()
+
+add_subdirectory(${GMOCK_ROOT} gmock)
+include_directories(${GMOCK_ROOT}/gtest/include)
+
+set(LIBGTEST gtest gmock gmock_main)
 set(TESTLIBS ${TESTLIBS} ${LIBGTEST} boost_regex)
 
-add_subdirectory(libgtest)
 add_subdirectory(scopes)
 
 set(TEST_SRC

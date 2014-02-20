@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
+#ifndef UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
+#define UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
 
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/SymbolExport.h>
-#include <string>
+#include <unity/scopes/PreviewReplyBase.h>
+
+#include <gmock/gmock.h>
 
 namespace unity
 {
@@ -29,22 +29,25 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+namespace testing
 {
 
-class UNITY_API CategoryRendererImpl
+class MockPreviewReply : public unity::scopes::PreviewReplyBase
 {
 public:
-    CategoryRendererImpl(std::string const& json_text);
-    static CategoryRenderer from_file(std::string const& path);
+    MockPreviewReply() = default;
 
-    const std::string& data() const;
+    // From ReplyBase
+    MOCK_CONST_METHOD0(finished, void());
+    MOCK_CONST_METHOD1(error, void(std::exception_ptr));
 
-private:
-    std::string data_;
+    // From SearchReplyBase
+    MOCK_CONST_METHOD1(register_layout, bool(ColumnLayoutList const&));
+    MOCK_CONST_METHOD1(push, bool(PreviewWidgetList const&));
+    MOCK_CONST_METHOD2(push, bool(std::string const&, Variant const&));
 };
 
-} // namespace internal
+} // namespace testing
 
 } // namespace scopes
 

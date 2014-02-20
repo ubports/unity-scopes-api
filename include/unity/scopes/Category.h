@@ -52,19 +52,22 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
+    virtual ~Category() = default;
+
     std::string id() const;
     std::string title() const;
     std::string icon() const;
     CategoryRenderer const& renderer_template() const;
     VariantMap serialize() const;
 
-private:
+protected:
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
 
-    std::shared_ptr<internal::CategoryImpl> p;
-
     friend class internal::CategoryRegistry;
+
+private:
+    std::shared_ptr<internal::CategoryImpl> p;
 };
 
 } // namespace scopes

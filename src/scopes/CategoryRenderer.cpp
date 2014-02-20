@@ -136,9 +136,14 @@ CategoryRenderer CategoryRenderer::from_file(std::string const& path)
     return internal::CategoryRendererImpl::from_file(path);
 }
 
-std::string CategoryRenderer::data() const
+const std::string& CategoryRenderer::data() const
 {
     return p->data();
+}
+
+bool operator==(const CategoryRenderer& lhs, const CategoryRenderer& rhs)
+{
+    return lhs.data() == rhs.data();
 }
 
 //! @endcond

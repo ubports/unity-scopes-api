@@ -60,7 +60,6 @@ public:
 
     CategoryRenderer(CategoryRenderer&&);
     CategoryRenderer& operator=(CategoryRenderer&&);
-
     /**
      \brief Creates CategoryRenderer from a text file.
      */
@@ -70,13 +69,15 @@ public:
      \brief Returns complete renderer template definition in JSON format.
      \return renderer template (JSON)
      */
-    std::string data() const;
+    const std::string& data() const;
 
 private:
     std::shared_ptr<internal::CategoryRendererImpl> p;
 
     friend class internal::CategoryRendererImpl;
 };
+
+bool operator==(const CategoryRenderer&, const CategoryRenderer&);
 
 } // namespace scopes
 

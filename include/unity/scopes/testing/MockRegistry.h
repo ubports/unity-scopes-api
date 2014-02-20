@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
+#ifndef UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
+#define UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
 
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/SymbolExport.h>
-#include <string>
+#include <unity/scopes/RegistryBase.h>
+
+#include <gmock/gmock.h>
 
 namespace unity
 {
@@ -29,22 +29,20 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+namespace testing
 {
 
-class UNITY_API CategoryRendererImpl
+class MockRegistry : public RegistryBase
 {
 public:
-    CategoryRendererImpl(std::string const& json_text);
-    static CategoryRenderer from_file(std::string const& path);
+    MockRegistry() = default;
 
-    const std::string& data() const;
-
-private:
-    std::string data_;
+    MOCK_CONST_METHOD1(get_metadata, ScopeMetadata(std::string const&));
+    MOCK_CONST_METHOD0(list, MetadataMap());
+    MOCK_CONST_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
 };
 
-} // namespace internal
+} // namespace testing
 
 } // namespace scopes
 
