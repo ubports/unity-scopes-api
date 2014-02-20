@@ -46,15 +46,15 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query)
+    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query, SearchMetadata const& hints)
         : scope_id_(scope_id)
         , query_(query)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, query_id, platform, locale, country, limit
-        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, "platform", "en", "US", 10);
+        ///! TODO: session_id, query_id, locale, country, limit
+        search_handle_ = ss_client->search(base_url, query_.query_string(), "session_id", 0, hints.form_factor(), "", "", 10);
     }
 
     ~SmartQuery() noexcept
@@ -89,10 +89,6 @@ public:
 
             CategorisedResult res(cat);
             res.set_uri(result.uri);
-            res.set_title(result.title);
-            res.set_art(result.art);
-            res.set_dnd_uri(result.dnd_uri);
-
             res["result_json"] = result.json;
 
             auto other_params = result.other_params;
@@ -116,15 +112,15 @@ private:
 class SmartPreview : public PreviewQuery
 {
 public:
-    SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result)
+    SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
         : scope_id_(scope_id)
         , result_(result)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, platform, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", "platform", 0, "en", "US");
+        ///! TODO: session_id, widgets_api_version, locale, country
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, "", "");
     }
 
     ~SmartPreview()
@@ -180,6 +176,23 @@ private:
     PreviewHandle::UPtr preview_handle_;
 };
 
+class NullActivation : public ActivationBase
+{
+    ActivationResponse activate() override
+    {
+        return ActivationResponse(ActivationResponse::Status::NotHandled);
+    }
+};
+
+class SmartActivation : public ActivationBase
+{
+    ActivationResponse activate() override
+    {
+        ///! TODO: need SSS endpoint for this
+        return ActivationResponse(ActivationResponse::Status::NotHandled);
+    }
+};
+
 class SmartScope
 {
 public:
@@ -188,38 +201,31 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& id, Query const& q, SearchMetadata const&)
+    QueryBase::UPtr create_query(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
     {
-        QueryBase::UPtr query(new SmartQuery(id, reg_, q));
-        std::cout << "SmartScope: created query for \"" << id << "\": \"" << q.query_string() << "\"" << std::endl;
+        QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
+        std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
     }
 
-    QueryBase::UPtr preview(std::string const& id, Result const& result, ActionMetadata const&)
+    QueryBase::UPtr preview(std::string const& scope_id, Result const& result, ActionMetadata const& hints)
     {
-        QueryBase::UPtr preview(new SmartPreview(id, reg_, result));
-        std::cout << "SmartScope: created preview for \"" << id << "\": \"" << result.uri() << "\"" << std::endl;
+        QueryBase::UPtr preview(new SmartPreview(scope_id, reg_, result, hints));
+        std::cout << "SmartScope: created preview for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return preview;
     }
 
-    ActivationBase::UPtr activate(std::string const& id, Result const& result, ActionMetadata const& hints)
+    ActivationBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
     {
-        ///! TODO
-        (void)id;
-        (void)result;
-        (void)hints;
-        return ActivationBase::UPtr();
+        ActivationBase::UPtr activation(new NullActivation());
+        return activation;
     }
 
-    ActivationBase::UPtr perform_action(std::string const& id, Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id)
+    ActivationBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
     {
-        ///! TODO
-        (void)id;
-        (void)result;
-        (void)hints;
-        (void)widget_id;
-        (void)action_id;
-        return ActivationBase::UPtr();
+        ActivationBase::UPtr activation(new SmartActivation());
+        std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
+        return activation;
     }
 
 private:

@@ -139,7 +139,7 @@ void ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         try
         {
-            auto impl = std::make_shared<internal::CategorisedResultImpl>(*cat_registry_, result_var);
+            auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
 
             impl->set_runtime(runtime_);
             // set result origin
@@ -148,7 +148,7 @@ void ResultReplyObject::process_data(VariantMap const& data)
                 impl->set_origin(origin_proxy());
             }
 
-            CategorisedResult result(impl);
+            CategorisedResult result(impl.release());
             receiver_->push(std::move(result));
         }
         catch (std::exception const& e)

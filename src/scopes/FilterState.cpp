@@ -41,6 +41,8 @@ FilterState::FilterState(internal::FilterStateImpl *pimpl)
 {
 }
 
+FilterState::~FilterState() = default;
+
 FilterState::FilterState(FilterState &&) = default;
 FilterState& FilterState::operator=(FilterState &&) = default;
 

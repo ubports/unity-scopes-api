@@ -48,6 +48,8 @@ Query::Query(internal::QueryImpl *impl)
 
 Query::Query(Query&&) = default;
 
+Query::~Query() = default;
+
 Query& Query::operator=(Query const& other)
 {
     if (this != &other)

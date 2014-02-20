@@ -22,6 +22,7 @@
 #include <string>
 #include <memory>
 #include <unity/SymbolExport.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -50,16 +51,22 @@ namespace internal
 class UNITY_API CategoryRenderer
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(CategoryRenderer);
+    /// @endcond
+
     /**
      \brief Creates CategoryRenderer from a JSON data.
      */
     explicit CategoryRenderer(std::string const& json_text = DEFAULT_RENDERER);
 
+    /// @cond
     CategoryRenderer(CategoryRenderer const&);
     CategoryRenderer& operator=(CategoryRenderer const&);
 
     CategoryRenderer(CategoryRenderer&&);
     CategoryRenderer& operator=(CategoryRenderer&&);
+    virtual ~CategoryRenderer();
 
     /**
      \brief Creates CategoryRenderer from a text file.
@@ -73,7 +80,7 @@ public:
     std::string data() const;
 
 private:
-    std::shared_ptr<internal::CategoryRendererImpl> p;
+    std::unique_ptr<internal::CategoryRendererImpl> p;
 
     friend class internal::CategoryRendererImpl;
 };

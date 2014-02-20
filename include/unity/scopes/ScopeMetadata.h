@@ -37,12 +37,14 @@ class UNITY_API ScopeMetadata final
 public:
     UNITY_DEFINES_PTRS(ScopeMetadata);
 
+    /// @cond
     ScopeMetadata(ScopeMetadata const& other);
     ScopeMetadata(ScopeMetadata&&);
     ~ScopeMetadata();
 
     ScopeMetadata& operator=(ScopeMetadata const& other);
     ScopeMetadata& operator=(ScopeMetadata&&);
+    /// @endcond
 
     std::string scope_name() const;
     ScopeProxy proxy() const;

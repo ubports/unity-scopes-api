@@ -126,8 +126,22 @@ CategoryRenderer::CategoryRenderer(std::string const& json_text)
 {
 }
 
-CategoryRenderer::CategoryRenderer(CategoryRenderer const&) = default;
-CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const&) = default;
+CategoryRenderer::~CategoryRenderer() = default;
+
+CategoryRenderer::CategoryRenderer(CategoryRenderer const& other)
+    : p(new internal::CategoryRendererImpl(*(other.p)))
+{
+}
+
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::CategoryRendererImpl(*(other.p)));
+    }
+    return *this;
+}
+
 CategoryRenderer::CategoryRenderer(CategoryRenderer&&) = default;
 CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer&&) = default;
 

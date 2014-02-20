@@ -83,6 +83,8 @@ ColumnLayout& ColumnLayout::operator=(ColumnLayout const& other)
     return *this;
 }
 
+ColumnLayout::~ColumnLayout() = default;
+
 ColumnLayout& ColumnLayout::operator=(ColumnLayout&&) = default;
 
 void ColumnLayout::add_column(std::vector<std::string> widget_ids)

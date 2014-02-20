@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <list>
 #include <string>
 #include <memory>
@@ -50,6 +51,10 @@ class DepartmentImpl;
 class UNITY_API Department final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(Department);
+    /// @endcond
+
     /**
     \brief Create deparment with given search Query and name.
 

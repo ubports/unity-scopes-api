@@ -36,6 +36,24 @@ Link::Link(VariantMap const& variant_map)
 {
 }
 
+Link::Link(Link&&) = default;
+
+Link::Link(Link const& other)
+    : p(new internal::LinkImpl(*(other.p)))
+{
+}
+
+Link& Link::operator=(Link const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::LinkImpl(*(other.p)));
+    }
+    return *this;
+}
+
+Link::~Link() = default;
+
 std::string Link::label() const
 {
     return p->label();

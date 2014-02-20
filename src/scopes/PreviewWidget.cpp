@@ -345,6 +345,7 @@ PreviewWidget::PreviewWidget(PreviewWidget const& other)
 
 PreviewWidget::PreviewWidget(PreviewWidget&&) = default;
 PreviewWidget& PreviewWidget::operator=(PreviewWidget&&) = default;
+PreviewWidget::~PreviewWidget() = default;
 
 PreviewWidget& PreviewWidget::operator=(PreviewWidget const& other)
 {

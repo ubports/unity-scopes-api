@@ -61,8 +61,6 @@ struct SSQuery
     MWReplyProxy q_reply;
     std::weak_ptr<ReplyBase> q_reply_proxy;
     bool q_pushable = true;
-    bool q_done_ = false;
-    std::condition_variable q_done_cond_;
 };
 
 class SSQueryObject : public QueryObjectBase, public std::enable_shared_from_this<SSQueryObject>
@@ -83,13 +81,11 @@ public:
 
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
-    void add_query(std::string const& scope_id,
-                   SSQuery::QueryType query_type,
+    void add_query(SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    int cardinality,
                    MWReplyProxy const& reply);
-    void add_query(std::string const& scope_id,
-                   SSQuery::QueryType query_type,
+    void add_query( SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    MWReplyProxy const& reply);
 
@@ -101,8 +97,7 @@ private:
 private:
     mutable std::mutex queries_mutex_;
 
-    std::map<std::string, SSQuery::SPtr> queries_;  // scope ID : query
-    std::map<std::string, std::string> replies_;    // reply ID : scope ID
+    std::map<std::string, SSQuery::SPtr> queries_;  // reply ID : query
 };
 
 }  // namespace smartscopes

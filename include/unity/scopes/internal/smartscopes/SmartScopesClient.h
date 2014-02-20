@@ -51,7 +51,8 @@ struct RemoteScope
     std::string name;
     std::string description;
     std::string base_url;
-    std::string icon;
+    std::shared_ptr<std::string> icon;  // optional
+    std::shared_ptr<std::string> art;  // optional
     bool invisible = false;
 };
 
@@ -67,9 +68,6 @@ struct SearchResult
 {
     std::string json;
     std::string uri;
-    std::string title;
-    std::string art;
-    std::string dnd_uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
     std::shared_ptr<SearchCategory> category;
 };
@@ -130,7 +128,7 @@ public:
 
     virtual ~SmartScopesClient();
 
-    std::vector<RemoteScope> get_remote_scopes(std::string const& locale = "", bool caching_enabled = true);
+    bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
     SearchHandle::UPtr search(std::string const& base_url,
                               std::string const& query,

@@ -24,6 +24,7 @@
 #include <memory>
 #include <list>
 #include <vector>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -39,6 +40,10 @@ class ColumnLayoutImpl;
 class UNITY_API ColumnLayout final
 {
 public:
+/// @cond
+    UNITY_DEFINES_PTRS(ColumnLayout);
+/// @endcond
+
     /**
     \brief Creates a layout definition which expects num_of_columns columns to be added with ColumnLayout::add_column.
     The number of columns needs to be greater than 0. Throws unity::InvalidArgumentException on invalid number.
@@ -50,6 +55,7 @@ public:
     ColumnLayout(ColumnLayout&&);
     ColumnLayout& operator=(ColumnLayout const& other);
     ColumnLayout& operator=(ColumnLayout&&);
+    ~ColumnLayout();
 /// @endcond
 
     /**
@@ -86,7 +92,7 @@ public:
 
 private:
     ColumnLayout(internal::ColumnLayoutImpl *impl);
-    std::shared_ptr<internal::ColumnLayoutImpl> p;
+    std::unique_ptr<internal::ColumnLayoutImpl> p;
     friend class internal::ColumnLayoutImpl;
 };
 

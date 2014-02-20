@@ -21,6 +21,7 @@
 
 #include <unity/SymbolExport.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/util/NonCopyable.h>
 
 namespace unity
 {

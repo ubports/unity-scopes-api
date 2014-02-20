@@ -45,7 +45,7 @@ public:
     void set_category(Category::SCPtr category);
     Category::SCPtr category() const;
 
-    static CategorisedResult create_result(std::shared_ptr<CategorisedResultImpl> impl);
+    static CategorisedResult create_result(CategorisedResultImpl* impl);
 
 protected:
     void serialize_internal(VariantMap& var) const override;
