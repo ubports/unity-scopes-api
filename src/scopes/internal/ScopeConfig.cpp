@@ -21,6 +21,9 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <algorithm>
+#include <string>
+
 using namespace std;
 
 namespace unity
@@ -41,6 +44,7 @@ namespace
     const string icon_str = "Icon";
     const string search_hint_str = "SearchHint";
     const string hot_key_str = "HotKey";
+    const string invisible_str = "Invisible";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -88,6 +92,15 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         string key = parser()->get_string(SCOPE_CONFIG_GROUP, hot_key_str);
         hot_key_.reset(new string(key));
+    }
+    catch (LogicException const&)
+    {
+    }
+    try
+    {
+        string key = parser()->get_string(SCOPE_CONFIG_GROUP, invisible_str);
+        std::transform(begin(key), end(key), begin(key), ::toupper);
+        invisible_.reset(new bool(key == "TRUE"));
     }
     catch (LogicException const&)
     {
@@ -147,6 +160,15 @@ string ScopeConfig::hot_key() const
         throw NotFoundException("Key not set", hot_key_str);
     }
     return *hot_key_;
+}
+
+bool ScopeConfig::invisible() const
+{
+    if (!invisible_)
+    {
+        return false;
+    }
+    return *invisible_;
 }
 
 } // namespace internal
