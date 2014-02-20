@@ -37,7 +37,7 @@ class QueryCtrlImpl;
 \brief QueryCtrl allows a query to be cancelled.
 */
 
-class UNITY_API QueryCtrl : public virtual ObjectProxy
+class QueryCtrl : public virtual ObjectProxy
 {
 public:
     /**

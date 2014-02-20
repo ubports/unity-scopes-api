@@ -23,6 +23,18 @@
 #include <QNetworkReply>
 #include <QTimer>
 
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace internal
+{
+
+namespace smartscopes
+{
+
 HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
     : QThread()
     , url_(url)
@@ -123,3 +135,11 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
 
     quit();
 }
+
+} // namespace smartscopes
+
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity

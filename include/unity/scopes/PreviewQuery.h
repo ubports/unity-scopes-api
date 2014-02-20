@@ -25,7 +25,6 @@
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/QueryBase.h>
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -47,7 +46,7 @@ class QueryObject;
 
 // TODO: documentation
 
-class UNITY_API PreviewQuery: public QueryBase
+class PreviewQuery: public QueryBase
 {
 public:
     NONCOPYABLE(PreviewQuery);

@@ -16,11 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
-#define UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
+#define UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
 
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/SymbolExport.h>
 #include <string>
 
 namespace unity

@@ -44,7 +44,7 @@ namespace internal
    To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
-class UNITY_API Category final
+class Category
 {
 public:
 /// @cond

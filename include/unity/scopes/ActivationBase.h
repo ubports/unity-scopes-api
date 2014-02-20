@@ -39,7 +39,7 @@ class ActivationBaseImpl;
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
 Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
-class UNITY_API ActivationBase : public QueryBase
+class ActivationBase : public QueryBase
 {
 public:
     /// @cond

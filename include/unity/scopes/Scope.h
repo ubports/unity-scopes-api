@@ -47,7 +47,7 @@ class ScopeImpl;
 \brief Allows queries to be sent to a scope and results for the query to be retrieved.
 */
 
-class UNITY_API Scope : public virtual ObjectProxy
+class Scope : public virtual ObjectProxy
 {
 public:
     /**

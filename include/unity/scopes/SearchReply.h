@@ -35,7 +35,7 @@ namespace scopes
 class CategorisedResult;
 class Annotation;
 
-class UNITY_API SearchReply : public virtual ReplyBase
+class SearchReply : public virtual ReplyBase
 {
 public:
     SearchReply(SearchReply const&) = delete;

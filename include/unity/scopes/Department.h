@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_DEPARTMENT_H
 #define UNITY_SCOPES_DEPARTMENT_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 #include <list>
@@ -48,7 +47,7 @@ class DepartmentImpl;
 /**
 \brief Definition of a department and its optional sub-departments
 */
-class UNITY_API Department final
+class Department final
 {
 public:
     /// @cond

@@ -38,7 +38,7 @@ namespace internal
 \brief CategorisedResult is a Result plus a category it belongs to.
 */
 
-class UNITY_API CategorisedResult: public Result
+class CategorisedResult: public Result
 {
 public:
     UNITY_DEFINES_PTRS(CategorisedResult);

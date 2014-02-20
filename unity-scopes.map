@@ -1,0 +1,37 @@
+{
+global:
+    extern "C++" {
+        unity::scopes::[!i]*;
+        unity::scopes::i[!n]*;
+        unity::scopes::in[!t]*;
+        unity::scopes::int[!e]*;
+        unity::scopes::inte[!r]*;
+        unity::scopes::inter[!n]*;
+        unity::scopes::intern[!a]*;
+        unity::scopes::interna[!l]*;
+        *unity::scopes::ActivationListener;
+        *unity::scopes::ConfigException;
+        *unity::scopes::FilterBase;
+        *unity::scopes::NotFoundException;
+        *unity::scopes::ObjectProxy;
+        *unity::scopes::PreviewListener;
+        *unity::scopes::Scope;
+        *unity::scopes::SearchListener;
+        unity::scopes::internal::MiddlewareBase::*;
+        unity::scopes::internal::MiddlewareFactory::*;
+        unity::scopes::internal::RegistryConfig::*;
+        unity::scopes::internal::RegistryObject::*;
+        unity::scopes::internal::RuntimeImpl::*;
+        unity::scopes::internal::ScopeConfig::*;
+        unity::scopes::internal::ScopeImpl::*;
+        unity::scopes::internal::ScopeLoader::*;
+        unity::scopes::internal::ScopeMetadataImpl::*;
+        unity::scopes::internal::ScopeObject::*;
+        unity::scopes::internal::smartscopes::SSRegistryObject::*;
+        unity::scopes::internal::smartscopes::SSScopeObject::*;
+    };
+local:
+    extern "C++" {
+        *;
+    };
+};

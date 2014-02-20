@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_QUERYMETADATA_H
 #define UNITY_SCOPES_QUERYMETADATA_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
@@ -40,7 +39,7 @@ class QueryMetadataImpl;
 /**
 \brief Base class for extra metadata passed to scopes as a part of a request.
 */
-class UNITY_API QueryMetadata
+class QueryMetadata
 {
 public:
     QueryMetadata(QueryMetadata const& other);

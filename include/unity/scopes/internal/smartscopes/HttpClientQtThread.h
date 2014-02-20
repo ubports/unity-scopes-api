@@ -28,6 +28,18 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace internal
+{
+
+namespace smartscopes
+{
+
 class Q_DECL_EXPORT HttpClientQtThread : public QThread
 {
     Q_OBJECT
@@ -59,5 +71,13 @@ private:
     bool success_;
     std::string reply_;
 };
+
+} // namespace smartscopes
+
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity
 
 #endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H

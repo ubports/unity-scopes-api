@@ -32,7 +32,7 @@ namespace internal
 class ScopeMetadataImpl;
 } // namespace internal
 
-class UNITY_API ScopeMetadata final
+class ScopeMetadata final
 {
 public:
     UNITY_DEFINES_PTRS(ScopeMetadata);

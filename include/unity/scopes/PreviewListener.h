@@ -34,7 +34,7 @@ namespace unity
 namespace scopes
 {
 
-class UNITY_API PreviewListener : public ListenerBase
+class PreviewListener : public ListenerBase
 {
 public:
     /// @cond
