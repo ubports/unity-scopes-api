@@ -48,6 +48,16 @@ TEST(ActivationResponse, basic)
         EXPECT_EQ("bar", resp.hints()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
     }
+
+    {
+        ActivationResponse resp(ActivationResponse::Status::HideDash);
+        resp.set_scope_data(Variant("foo"));
+        EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
+        // hints() with non-dict scope_data returns empty dict
+        EXPECT_EQ(0, resp.hints().size());
+        EXPECT_EQ("foo", resp.scope_data().get_string());
+    }
+
     {
         Query const query("scope-foo");
         ActivationResponse resp(query);
@@ -168,6 +178,24 @@ TEST(ActivationResponse, deserialize)
             FAIL();
         }
     }
+
+    // valid variant
+    {
+        VariantMap var;
+        var["scope_data"] = Variant("foobar");
+        var["status"] = static_cast<int>(ActivationResponse::Status::HideDash);
+        try
+        {
+            internal::ActivationResponseImpl res(var);
+            EXPECT_EQ("foobar", res.scope_data().get_string());
+            EXPECT_EQ(ActivationResponse::Status::HideDash, res.status());
+        }
+        catch (unity::LogicException const &e)
+        {
+            FAIL();
+        }
+    }
+
 }
 
 TEST(ActivationResponse, copy_ctor)
