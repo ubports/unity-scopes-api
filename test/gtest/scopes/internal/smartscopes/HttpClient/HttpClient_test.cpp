@@ -38,7 +38,7 @@ class HttpClientTest : public Test
 {
 public:
     HttpClientTest(uint no_reply_timeout = 20000)
-        : http_client_(new HttpClientQt(2, no_reply_timeout)),
+        : http_client_(new HttpClientQt(no_reply_timeout)),
           server_(FAKE_SERVER_PATH) {}
 
 protected:
@@ -139,7 +139,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 TEST_F(HttpClientTest, cancel_get)
 {
     HttpResponseHandle::SPtr response = http_client_->get(test_url + "?18", server_.port_);
-    http_client_->cancel_get(response);
+    response->cancel();
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
