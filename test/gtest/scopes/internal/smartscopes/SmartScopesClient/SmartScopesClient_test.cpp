@@ -41,7 +41,7 @@ class SmartScopesClientTest : public Test
 {
 public:
     SmartScopesClientTest()
-        : http_client_(new HttpClientQt(2, 2000)),
+        : http_client_(new HttpClientQt(20000)),
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH)
     {
@@ -57,22 +57,25 @@ protected:
 
 TEST_F(SmartScopesClientTest, remote_scopes)
 {
-    std::vector<RemoteScope> scopes = ssc_->get_remote_scopes("", false);
+    std::vector<RemoteScope> scopes;
 
+    EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
     ASSERT_EQ(2, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
     EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
-    EXPECT_EQ("icon", scopes[0].icon);
+    EXPECT_EQ("icon", *scopes[0].icon);
+    EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
     EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
-    EXPECT_EQ("", scopes[1].icon);
+    EXPECT_EQ(nullptr, scopes[1].icon);
+    EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
 }
 
@@ -84,18 +87,20 @@ TEST_F(SmartScopesClientTest, search)
     ASSERT_EQ(2, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
-    EXPECT_EQ("Stuff", results[0].title);
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", results[0].art);
-    EXPECT_EQ("", results[0].dnd_uri);
+    EXPECT_EQ(nullptr, results[0].other_params["dnd_uri"]);
+    EXPECT_EQ("Stuff", results[0].other_params["title"]->as_string());
+    EXPECT_EQ(nullptr, results[0].other_params["icon"]);
+    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", results[0].other_params["art"]->as_string());
     EXPECT_EQ("cat1", results[0].category->id);
     EXPECT_EQ("Category 1", results[0].category->title);
     EXPECT_EQ("", results[0].category->icon);
     EXPECT_EQ("", results[0].category->renderer_template);
 
     EXPECT_EQ("URI2", results[1].uri);
-    EXPECT_EQ("Things", results[1].title);
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", results[1].art);
-    EXPECT_EQ("", results[1].dnd_uri);
+    EXPECT_EQ(nullptr, results[1].other_params["dnd_uri"]);
+    EXPECT_EQ("Things", results[1].other_params["title"]->as_string());
+    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", results[1].other_params["icon"]->as_string());
+    EXPECT_EQ(nullptr, results[1].other_params["art"]);
     EXPECT_EQ("cat1", results[1].category->id);
     EXPECT_EQ("Category 1", results[1].category->title);
     EXPECT_EQ("", results[1].category->icon);

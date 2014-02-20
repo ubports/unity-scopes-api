@@ -149,16 +149,18 @@ void ZmqMiddleware::stop()
                 // No more outgoing invocations
                 invokers_.reset();
             }
-            for (auto& pair : am_)
+            auto adapter_map = move(am_);
+            for (auto& pair : adapter_map)
             {
                 pair.second->shutdown();
             }
-            for (auto& pair : am_)
+            state_ = Stopped;
+            state_changed_.notify_all();
+            lock.unlock();
+            for (auto& pair : adapter_map)
             {
                 pair.second->wait_for_shutdown();
             }
-            state_ = Stopped;
-            state_changed_.notify_all();
             break;
         }
         default:

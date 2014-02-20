@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        uint const max_sessions = 4;
         uint const no_reply_timeout = 20000;
         uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
 
@@ -95,7 +94,7 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(), max_sessions,
+        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
                                                         no_reply_timeout, ss_reg_refresh_rate));
 
         // Instantiate a SS scope object
