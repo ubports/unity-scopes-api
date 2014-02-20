@@ -38,13 +38,14 @@ public:
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig();
 
-    bool overrideable() const;      // Optional, returns false if not present
+    bool overrideable() const;           // Optional, returns false if not present
     std::string display_name() const;
     std::string description() const;
     std::string art() const;             // Optional, throws NotFoundException if not present
     std::string icon() const;            // Optional, throws NotFoundException if not present
     std::string search_hint() const;     // Optional, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
+    bool invisible() const;              // Optional, returns false if not present
 
 private:
     bool overrideable_;
@@ -54,6 +55,7 @@ private:
     std::unique_ptr<std::string> icon_;
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
+    std::unique_ptr<bool> invisible_;
 };
 
 } // namespace internal
