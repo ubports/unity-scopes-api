@@ -5,3 +5,4 @@ race:memcmp
 race:strlen
 race:memcpy
 race:free
+race:QThread::setPriority
