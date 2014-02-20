@@ -52,7 +52,7 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
     {
         throw LogicException("ActivationResponseImpl(): Invalid data, missing 'scope_data'");
     }
-    scope_data_ = it->second.get_dict();
+    scope_data_ = it->second;
 
     it = var.find("status");
     if (it == var.end())
