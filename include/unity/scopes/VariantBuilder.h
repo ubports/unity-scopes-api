@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_VARIANTBUILDER_H
 #define UNITY_SCOPES_VARIANTBUILDER_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <vector>
@@ -57,7 +56,7 @@ VariantBuilder builder;
 builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
 \endcode
 */
-class UNITY_API VariantBuilder
+class VariantBuilder
 {
 public:
     /// @cond

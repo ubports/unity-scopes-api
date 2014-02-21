@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_ANNOTATION_H
 #define UNITY_SCOPES_ANNOTATION_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
 #include <unity/util/DefinesPtrs.h>
@@ -42,7 +41,7 @@ class ResultReplyObject;
 /**
  * \brief Handles a scope query link(s) that result in a new search query when clicked by user.
  */
-class UNITY_API Annotation final
+class Annotation final
 {
 public:
     /// @cond

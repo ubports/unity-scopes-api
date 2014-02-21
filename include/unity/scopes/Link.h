@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_LINK_H
 #define UNITY_SCOPES_LINK_H
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Variant.h>
@@ -41,7 +40,7 @@ class AnnotationImpl;
 /**
  * \brief Represents a hyperlink (a label and canned Query)
  */
-class UNITY_API Link final
+class Link final
 {
 public:
     /// @cond

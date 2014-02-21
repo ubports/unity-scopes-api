@@ -21,7 +21,6 @@
 
 #include <string>
 #include <memory>
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 
 namespace unity
@@ -48,7 +47,7 @@ namespace internal
 /**
    \brief CategoryRenderer encapsulates category renderer template in JSON format.
 */
-class UNITY_API CategoryRenderer
+class CategoryRenderer
 {
 public:
     /// @cond

@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_COLUMNLAYOUT_H
 #define UNITY_SCOPES_COLUMNLAYOUT_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <memory>
 #include <list>
@@ -37,7 +36,7 @@ namespace internal
 class ColumnLayoutImpl;
 }
 
-class UNITY_API ColumnLayout final
+class ColumnLayout final
 {
 public:
 /// @cond

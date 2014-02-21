@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
 #define UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterOption.h>
 #include <string>
@@ -36,7 +35,7 @@ class FilterState;
 namespace internal
 {
 
-class UNITY_API OptionSelectorFilterImpl : public FilterBaseImpl
+class OptionSelectorFilterImpl : public FilterBaseImpl
 {
 public:
     OptionSelectorFilterImpl(std::string const& id, std::string const& label, bool multi_select);

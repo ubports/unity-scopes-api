@@ -24,7 +24,6 @@
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -56,7 +55,7 @@ class SSQueryObject;
 
 // TODO: documentation
 
-class UNITY_API QueryBase
+class QueryBase
 {
 public:
     NONCOPYABLE(QueryBase);

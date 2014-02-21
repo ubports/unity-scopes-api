@@ -26,7 +26,6 @@
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/SearchListener.h>
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -50,7 +49,7 @@ class QueryObject;
 
 // TODO: documentation
 
-class UNITY_API SearchQuery: public QueryBase
+class SearchQuery: public QueryBase
 {
 public:
     NONCOPYABLE(SearchQuery);

@@ -23,7 +23,6 @@
 #include <map>
 
 class QCoreApplication;
-class HttpClientQtThread;
 
 namespace unity
 {
@@ -36,6 +35,8 @@ namespace internal
 
 namespace smartscopes
 {
+
+class HttpClientQtThread;
 
 class HttpClientQt : public HttpClientInterface
 {

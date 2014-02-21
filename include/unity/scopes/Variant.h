@@ -19,8 +19,6 @@
 #ifndef UNITY_SCOPES_VARIANT_H
 #define UNITY_SCOPES_VARIANT_H
 
-#include <unity/SymbolExport.h>
-
 #include <memory>
 #include <string>
 #include <map>
@@ -49,7 +47,7 @@ struct NullVariant;
 \brief Simple variant class that can hold an integer, a boolean, a string, a double, a dictionary, an array or null value.
 */
 
-class UNITY_API Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
+class Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
 {
 public:
     /**

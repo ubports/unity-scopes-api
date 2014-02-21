@@ -46,7 +46,7 @@ class ScopeImpl;
    operator. The only required attribute is 'uri' and it must not be empty before
    calling Reply::push.
 */
-class UNITY_API Result
+class Result
 {
 public:
     UNITY_DEFINES_PTRS(Result);

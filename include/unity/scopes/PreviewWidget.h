@@ -38,7 +38,7 @@ namespace internal
     class PreviewWidgetImpl;
 }
 
-class UNITY_API PreviewWidget
+class PreviewWidget
 {
 public:
 /// @cond

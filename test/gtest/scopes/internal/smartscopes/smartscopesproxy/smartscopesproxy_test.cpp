@@ -89,8 +89,8 @@ public:
 protected:
     RaiiServer server_;
 
-    std::string reg_id_ = reg_id_;
-    std::string scope_id_ = scope_id_;
+    std::string reg_id_;
+    std::string scope_id_;
 
     RuntimeImpl::UPtr reg_rt_;
     RuntimeImpl::UPtr scope_rt_;
