@@ -138,7 +138,27 @@ bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
 
     VariantMap var;
     var["result"] = result.serialize();
-    return push(var);
+    if (!push(var))
+    {
+        return false;
+    }
+
+    // Enforce cardinality limit (0 means no limit). If the scope pushes more results
+    // than requested, future pushes are ignored. push() returns false
+    // on the last call that actually still pushed a result.
+    // To the client, a query that exceeds the limit looks like a query
+    // that returned the maximum number of results and finished normally.
+    if (cardinality_ == 0)
+    {
+        return true;  // No cardinality limit
+    }
+    if (++num_pushes_ == cardinality_)
+    {
+        // At most one thread will execute this.
+        finished();
+        return false;  // This was the last successful push
+    }
+    return true;
 }
 
 bool ReplyImpl::push(Category::SCPtr category)
@@ -236,30 +256,14 @@ bool ReplyImpl::push(VariantMap const& variant_map)
     try
     {
         fwd()->push(variant_map);
-
-        // Enforce cardinality limit (0 means no limit). If the scope pushes more results
-        // than requested, future pushes are ignored. push() returns false
-        // on the last call that actually still pushed a result.
-        // To the client, a query that exceeds the limit looks like a query
-        // that returned the maximum number of results and finished normally.
-        if (cardinality_ == 0)
-        {
-            return true;  // No cardinality limit
-        }
-        if (++num_pushes_ == cardinality_)
-        {
-            // At most one thread will execute this.
-            finished();
-            return false;  // This was the last successful push
-        }
-        return true;
     }
     catch (std::exception const&)
     {
         error(current_exception());
         return false;
     }
-    // NOTREACHED
+
+    return true;
 }
 
 void ReplyImpl::finished()

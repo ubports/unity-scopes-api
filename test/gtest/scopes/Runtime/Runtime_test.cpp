@@ -35,6 +35,7 @@
 #include <gtest/gtest.h>
 
 #include "TestScope.h"
+#include "PusherScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -93,7 +94,6 @@ public:
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
-cerr << error_message << endl;
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
@@ -177,22 +177,19 @@ public:
           pushes_expected_(pushes_expected),
           count_(0)
     {
-    cerr << "PushReceiver()" << endl;
     }
 
     virtual void push(CategorisedResult /* result */) override
     {
-    cerr << "got result" << endl;
         if (++count_ > pushes_expected_)
         {
             FAIL();
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
     {
         EXPECT_EQ(Finished, reason);
-cerr << "reason: " << error_message << endl;
         EXPECT_EQ(pushes_expected_, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
@@ -210,9 +207,8 @@ private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
-    int pushes_expected_;
-    int count_;
-    std::shared_ptr<Result> last_result_;
+    atomic_int pushes_expected_;
+    atomic_int count_;
 };
 
 TEST(Runtime, create_query)
@@ -266,11 +262,8 @@ TEST(Runtime, cardinality)
     // Run a query with unlimited cardinality. We check that the
     // scope returns 100 results.
     auto receiver = make_shared<PushReceiver>(100);
-cerr << "creating query" << endl;
-    scope->create_query("test", SearchMetadata("unused", "unused"), receiver);
-cerr << "done creating query" << endl;
+    scope->create_query("test", SearchMetadata(100, "unused", "unused"), receiver);
     receiver->wait_until_finished();
-cerr << "receiver finished" << endl;
 
     // Run a query with 20 cardinality. We check that we receive only 20 results and,
     // in the scope, check that push() returns true for the first 19, and false afterwards.
@@ -285,13 +278,29 @@ void scope_thread(Runtime::SPtr const& rt)
     rt->run_scope(&scope);
 }
 
+void pusher_thread(Runtime::SPtr const& rt)
+{
+    PusherScope scope;
+    rt->run_scope(&scope);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
+
+    Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, srt);
+
+    Runtime::SPtr prt = move(Runtime::create_scope_runtime("PusherScope", "Runtime.ini"));
+    std::thread pusher_t(pusher_thread, prt);
+
     auto rc = RUN_ALL_TESTS();
-    rt->destroy();
+
+    srt->destroy();
     scope_t.join();
+
+    prt->destroy();
+    pusher_t.join();
+
     return rc;
 }

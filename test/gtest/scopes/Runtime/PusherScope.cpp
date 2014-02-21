@@ -34,34 +34,28 @@ public:
     PusherQuery(int cardinality)
         : cardinality_(cardinality)
     {
-cerr << "PusherQuery(" << cardinality << ")" << endl;
     }
 
     virtual void cancelled() override
     {
-cerr << "Query cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-cerr << "pusher query run" << endl;
         auto cat = reply->register_category("cat1", "Category 1", "");
+
         CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title("title");
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
 
-        // We push 100 results. If cardinality_ is less than 100
-        // we check that last valid push and the ones following
-        // it return false.
+        // We push 100 results. we check that last valid push
+        // and the ones following it return false.
         for (int i = 1; i <= 100; ++i)
         {
             bool b = reply->push(res);
-            if (cardinality_ < 100)
-            {
-                EXPECT_EQ(i < cardinality_ ? true : false, b);
-            }
+            EXPECT_EQ(i < cardinality_ ? true : false, b);
         }
     }
 
@@ -71,7 +65,6 @@ private:
 
 int PusherScope::start(string const&, RegistryProxy const &)
 {
-cerr << "PusherScope start" << endl;
     return VERSION;
 }
 
@@ -81,11 +74,14 @@ void PusherScope::stop()
 
 void PusherScope::run()
 {
-cerr << "PusherScope run" << endl;
 }
 
 QueryBase::UPtr PusherScope::create_query(Query const& /* query */, SearchMetadata const& md)
 {
-cerr << "creating pusher query" << endl;
     return QueryBase::UPtr(new PusherQuery(md.cardinality()));
+}
+
+QueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
+{
+    abort();  // Not called
 }
