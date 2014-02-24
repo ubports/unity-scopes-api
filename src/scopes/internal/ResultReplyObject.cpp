@@ -125,8 +125,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
             return true;
         }
         auto result_var = it->second.get_dict();
-        auto impl = std::unique_ptr<internal::CategorisedResultImpl>(
-                        new internal::CategorisedResultImpl(*cat_registry_, result_var));
+        auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
 
         impl->set_runtime(runtime_);
         // set result origin
@@ -138,7 +137,6 @@ bool ResultReplyObject::process_data(VariantMap const& data)
         CategorisedResult result(impl.release());
         receiver_->push(std::move(result));
     }
-
     return false;
 }
 
