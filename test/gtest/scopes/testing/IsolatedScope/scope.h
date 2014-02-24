@@ -18,18 +18,35 @@
 
 #include <unity/scopes/ScopeBase.h>
 
-using namespace std;
-using namespace unity::scopes;
+namespace testing
+{
 
-class TestScope : public ScopeBase
+class Scope : public unity::scopes::ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const &) override;
+    int start(std::string const&, unity::scopes::RegistryProxy const &) override;
 
-    virtual void stop() override;
+    void stop() override;
 
-    virtual void run() override;
+    void run() override;
 
-    virtual SearchQuery::UPtr create_query(Query const &, SearchMetadata const &) override;
-    virtual PreviewQuery::UPtr preview(Result const&, ActionMetadata const &) override;
+    unity::scopes::SearchQuery::UPtr create_query(
+            unity::scopes::Query const &,
+            unity::scopes::SearchMetadata const &) override;
+
+    unity::scopes::ActivationBase::UPtr activate(
+            unity::scopes::Result const& result,
+            unity::scopes::ActionMetadata const& metadata) override;
+
+    unity::scopes::ActivationBase::UPtr perform_action(
+            unity::scopes::Result const& result,
+            unity::scopes::ActionMetadata const& metadata,
+            std::string const& widget_id,
+            std::string const& action_id) override;
+
+    unity::scopes::PreviewQuery::UPtr preview(
+            unity::scopes::Result const&,
+            unity::scopes::ActionMetadata const &) override;
 };
+
+} // namespace testing

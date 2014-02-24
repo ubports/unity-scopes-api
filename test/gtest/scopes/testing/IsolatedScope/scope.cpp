@@ -27,80 +27,146 @@
 
 #include "scope.h"
 
-using namespace std;
-using namespace unity::scopes;
+#include <thread>
 
-class TestQuery : public SearchQuery
+namespace testing
+{
+
+class ActivationShowingDash : public unity::scopes::ActivationBase
 {
 public:
-    TestQuery(Query const& query)
+    ActivationShowingDash()
+    {
+    }
+
+    unity::scopes::ActivationResponse activate() override
+    {
+        return unity::scopes::ActivationResponse
+        {
+            unity::scopes::ActivationResponse::ShowDash
+        };
+    }
+};
+
+class LongRunningActivation : public unity::scopes::ActivationBase
+{
+public:
+    LongRunningActivation()
+    {
+    }
+
+    unity::scopes::ActivationResponse activate() override
+    {
+        std::this_thread::sleep_for(std::chrono::seconds{2});
+
+        return unity::scopes::ActivationResponse
+        {
+            unity::scopes::ActivationResponse::ShowDash
+        };
+    }
+};
+
+class Query : public unity::scopes::SearchQuery
+{
+public:
+    Query(unity::scopes::Query const& query)
         : query_(query)
     {
     }
 
-    virtual void cancelled() override
+    void cancelled() override
     {
     }
-    virtual void run(SearchReplyProxy const& reply) override
+
+    void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        Department dep("news", query_, "News");
+        unity::scopes::Department dep("news", query_, "News");
         dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
         reply->register_departments({dep}, "news");
 
         auto cat = reply->register_category("cat1", "Category 1", "");
-        CategorisedResult res(cat);
+        unity::scopes::CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title("title");
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        Query query("scope-A", "foo", "dep1");
-        Annotation annotation(Annotation::Type::Link);
+        unity::scopes::Query query("scope-A", "foo", "dep1");
+        unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->register_annotation(annotation);
     }
 
 private:
-    Query query_;
+    unity::scopes::Query query_;
 };
 
-class TestPreview : public PreviewQuery
+class Preview : public unity::scopes::PreviewQuery
 {
 public:
-    virtual void cancelled() override
+    void cancelled() override
     {
     }
-    virtual void run(PreviewReplyProxy const& reply) override
+
+    void run(unity::scopes::PreviewReplyProxy const& reply) override
     {
-        PreviewWidgetList widgets;
-        widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
-        widgets.emplace_back(PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
+        unity::scopes::PreviewWidgetList widgets;
+        widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
         reply->push(widgets);
-        reply->push("author", Variant("Foo"));
-        reply->push("rating", Variant("Bar"));
+        reply->push("author", unity::scopes::Variant("Foo"));
+        reply->push("rating", unity::scopes::Variant("Bar"));
     }
 };
 
-int TestScope::start(string const&, RegistryProxy const &)
+} // namespace testing
+
+int testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &)
 {
     return VERSION;
 }
 
-void TestScope::stop()
+void testing::Scope::stop()
 {
 }
 
-void TestScope::run()
+void testing::Scope::run()
 {
 }
 
-SearchQuery::UPtr TestScope::create_query(Query const& query, SearchMetadata const &)
+unity::scopes::SearchQuery::UPtr testing::Scope::create_query(
+        unity::scopes::Query const& query,
+        unity::scopes::SearchMetadata const &)
 {
-    return SearchQuery::UPtr(new TestQuery(query));
+    return unity::scopes::SearchQuery::UPtr(new testing::Query(query));
 }
 
-PreviewQuery::UPtr TestScope::preview(Result const&, ActionMetadata const &)
+unity::scopes::ActivationBase::UPtr testing::Scope::activate(
+        unity::scopes::Result const&,
+        unity::scopes::ActionMetadata const&)
 {
-    return PreviewQuery::UPtr(new TestPreview());
+    return unity::scopes::ActivationBase::UPtr
+    {
+        new testing::ActivationShowingDash()
+    };
+}
+
+unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
+        unity::scopes::Result const&,
+        unity::scopes::ActionMetadata const&,
+        std::string const&,
+        std::string const&)
+{
+    return unity::scopes::ActivationBase::UPtr
+    {
+        new testing::LongRunningActivation()
+    };
+}
+
+unity::scopes::PreviewQuery::UPtr testing::Scope::preview(
+        unity::scopes::Result const&,
+        unity::scopes::ActionMetadata const &)
+{
+    return unity::scopes::PreviewQuery::UPtr(new testing::Preview());
 }

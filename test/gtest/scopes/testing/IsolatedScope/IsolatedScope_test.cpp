@@ -33,7 +33,7 @@
 
 namespace
 {
-typedef unity::scopes::testing::TypedScopeFixture<TestScope> TestScopeFixture;
+typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> TestScopeFixture;
 
 static const std::string scope_name{"does.not.exist.scope"};
 static const std::string scope_query_string{"does.not.exist.scope.query_string"};
@@ -118,25 +118,15 @@ TEST_F(TestScopeFixture,
     search_query->run(search_reply_proxy);
 }
 
-TEST_F(TestScopeFixture, creating_a_preview_query_and_checking_for_pushed_results_works)
+TEST_F(TestScopeFixture, activating_a_result_works)
 {
     using namespace ::testing;
 
-    NiceMock<unity::scopes::testing::MockPreviewReply> reply;
-    EXPECT_CALL(reply, push(_)).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(reply, push(_, _)).Times(2).WillRepeatedly(Return(true));
-
-    unity::scopes::PreviewReplyProxy preview_reply_proxy
-    {
-        &reply, [](unity::scopes::PreviewReplyBase*) {}
-    };
-
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
     unity::scopes::testing::Result result;
-    auto preview = scope->preview(result, meta_data);
+    auto activation = scope->activate(result, meta_data);
 
-    EXPECT_NE(nullptr, preview);
+    EXPECT_NE(nullptr, activation);
 
-    preview->run(preview_reply_proxy);
+    auto preview->run(preview_reply_proxy);
 }
-
