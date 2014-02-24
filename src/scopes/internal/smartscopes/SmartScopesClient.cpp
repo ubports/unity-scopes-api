@@ -109,13 +109,14 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
             // * ignore the colon after "http"/"https"
 
             const size_t hier_pos = strlen("https");
-
             std::string::size_type port_pos = base_url.find_last_of(':');
+
+            // if there is a port specified in the url
             if (port_pos != std::string::npos && port_pos > hier_pos)
             {
                 url_ = base_url.substr(0, port_pos);
 
-                // check if the url continues after port
+                // if the url continues after the port
                 std::string::size_type url_cont = base_url.find('/', port_pos);
                 if (url_cont != std::string::npos)
                 {
@@ -129,6 +130,7 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                     port_ = std::stoi(base_url.substr(port_pos + 1));
                 }
             }
+            // else if there is no port specified in the url
             else
             {
                 url_ = base_url;
