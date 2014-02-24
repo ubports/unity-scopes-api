@@ -152,12 +152,14 @@ bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
     {
         return true;  // No cardinality limit
     }
+#if 0
     if (++num_pushes_ == cardinality_)
     {
         // At most one thread will execute this.
         finished();
         return false;  // This was the last successful push
     }
+#endif
     return true;
 }
 

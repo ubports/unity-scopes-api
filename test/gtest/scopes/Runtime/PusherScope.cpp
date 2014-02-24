@@ -54,8 +54,7 @@ public:
         // and the ones following it return false.
         for (int i = 1; i <= 100; ++i)
         {
-            bool b = reply->push(res);
-            EXPECT_EQ(i < cardinality_ ? true : false, b);
+            EXPECT_EQ(i < cardinality_, reply->push(res));
         }
     }
 

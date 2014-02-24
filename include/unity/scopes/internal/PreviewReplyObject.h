@@ -40,7 +40,7 @@ public:
     PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~PreviewReplyObject();
 
-    virtual void process_data(VariantMap const& data) override;
+    virtual bool process_data(VariantMap const& data) override;
 
 private:
     PreviewListener::SPtr const receiver_;
