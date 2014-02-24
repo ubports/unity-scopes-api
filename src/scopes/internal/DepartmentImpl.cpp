@@ -161,6 +161,19 @@ void DepartmentImpl::validate_departments(DepartmentList const& departments, std
     }
 }
 
+VariantMap DepartmentImpl::serialize_departments(DepartmentList const& departments, std::string const& current_department_id)
+{
+    VariantMap vm;
+    VariantArray arr;
+    for (auto const& dep: departments)
+    {
+        arr.push_back(Variant(dep.serialize()));
+    }
+    vm["departments"] = arr;
+    vm["current_department"] = current_department_id;
+    return vm;
+}
+
 } // namespace internal
 
 } // namespace scopes

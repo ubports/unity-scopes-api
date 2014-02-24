@@ -92,15 +92,7 @@ void ReplyImpl::register_departments(DepartmentList const& departments, std::str
         throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
     }
 
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& dep: departments)
-    {
-        arr.push_back(Variant(dep.serialize()));
-    }
-    vm["departments"] = arr;
-    vm["current_department"] = current_department_id;
-    push(vm); // ignore return value?
+    push(internal::DepartmentImpl::serialize_departments(departments, current_department_id)); // ignore return value?
 }
 
 Category::SCPtr ReplyImpl::register_category(std::string const& id,
