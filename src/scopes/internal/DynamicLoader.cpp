@@ -73,10 +73,11 @@ DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
 
 DynamicLoader::~DynamicLoader()
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     if (unload_ == Unload::automatic)
     {
         assert(handle_);
-        lock_guard<decltype(mutex_)> lock(mutex_);
         dlclose(handle_);
     }
 }
@@ -96,6 +97,8 @@ DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 
 void* DynamicLoader::find_variable(string const& symbol)
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     dlerror();  // Clear any existing error
     void* p = dlsym(handle_, symbol.c_str());
     char const* error = dlerror();
