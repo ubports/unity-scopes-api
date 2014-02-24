@@ -108,14 +108,8 @@ Category::SCPtr ReplyImpl::register_category(std::string const& id,
                                              CategoryRenderer const& renderer_template)
 {
     auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
-
-    // return category instance only if pushed successfuly (i.e. search wasn't finished)
-    if (push(cat))
-    {
-        return cat;
-    }
-
-    return nullptr;
+    push(cat);
+    return cat;
 }
 
 Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
