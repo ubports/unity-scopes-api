@@ -73,6 +73,8 @@ TEST(ResultReplyObject, departments_push)
         reply.process_data(internal::DepartmentImpl::serialize_departments(input_deps, input_current_dep));
 
         EXPECT_EQ(2, received_deps.size());
+        EXPECT_EQ("dep1", received_deps.front().id());
+        EXPECT_EQ("dep2", received_deps.back().id());
         EXPECT_EQ("dep1", received_current_dep_id);
     }
 
