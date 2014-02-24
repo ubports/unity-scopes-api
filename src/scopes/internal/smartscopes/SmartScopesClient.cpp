@@ -115,15 +115,16 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
             if (port_pos != std::string::npos && port_pos > hier_pos)
             {
                 url_ = base_url.substr(0, port_pos);
+                std::string::size_type url_cont = base_url.find('/', port_pos);
 
                 // if the url continues after the port
-                std::string::size_type url_cont = base_url.find('/', port_pos);
                 if (url_cont != std::string::npos)
                 {
                     // extract port, then add the rest of the url to url_
                     port_ = std::stoi(base_url.substr(port_pos + 1, url_cont - port_pos));
                     url_ += base_url.substr(url_cont);
                 }
+                // else if the remainder of the string is just the port
                 else
                 {
                     // extract port
