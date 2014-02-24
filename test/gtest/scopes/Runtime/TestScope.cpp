@@ -25,7 +25,7 @@
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Department.h>
 
-#include "scope.h"
+#include "TestScope.h"
 
 using namespace std;
 using namespace unity::scopes;

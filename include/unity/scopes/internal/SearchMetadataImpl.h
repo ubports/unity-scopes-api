@@ -48,6 +48,8 @@ protected:
     std::string metadata_type() const override;
     void serialize(VariantMap &var) const override;
 
+    void check_cardinality(std::string const& func_name, int cardinality);
+
 private:
     int cardinality_;
 };
