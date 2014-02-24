@@ -128,5 +128,27 @@ TEST_F(TestScopeFixture, activating_a_result_works)
 
     EXPECT_NE(nullptr, activation);
 
-    auto preview->run(preview_reply_proxy);
+    EXPECT_EQ(unity::scopes::ActivationResponse::ShowDash,
+              activation->activate().status());
+}
+
+TEST_F(TestScopeFixture, performing_an_action_works)
+{
+    using namespace ::testing;
+
+    static const std::string action_id{"action"};
+    static const std::string widget_id{"widget"};
+
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+    unity::scopes::testing::Result result;
+
+    auto activation = scope->perform_action(
+                result,
+                meta_data,
+                widget_id,
+                action_id);
+
+    EXPECT_NE(nullptr, activation);
+    EXPECT_EQ(unity::scopes::ActivationResponse::ShowDash,
+              activation->activate().status());
 }
