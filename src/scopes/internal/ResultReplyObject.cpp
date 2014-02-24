@@ -108,11 +108,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
         }
         else
         {
-            // TODO: log this
-            const std::string msg("ReplyObject::process_data(): departments present but missing current_department");
-            cerr << msg << endl;
-            finished(ListenerBase::Error, msg);
-            return;
+            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
         }
     }
 
