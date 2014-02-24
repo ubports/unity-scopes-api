@@ -201,7 +201,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             RemoteScope scope;
 
             if (!child_node->has_node("id") || !child_node->has_node("name") ||
-                !child_node->has_node("base_url") || !child_node->has_node("description"))
+                !child_node->has_node("description") || !child_node->has_node("author") ||
+                !child_node->has_node("base_url"))
             {
                 break;
             }
@@ -209,6 +210,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.id = child_node->get_node("id")->as_string();
             scope.name = child_node->get_node("name")->as_string();
             scope.description = child_node->get_node("description")->as_string();
+            scope.author = child_node->get_node("author")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
             if (child_node->has_node("icon"))

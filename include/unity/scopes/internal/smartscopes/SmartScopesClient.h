@@ -50,6 +50,7 @@ struct RemoteScope
     std::string id;
     std::string name;
     std::string description;
+    std::string author;
     std::string base_url;
     std::shared_ptr<std::string> icon;  // optional
     std::shared_ptr<std::string> art;  // optional

@@ -50,7 +50,8 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     scope_name_(other.scope_name_),
     proxy_(other.proxy_),
     display_name_(other.display_name_),
-    description_(other.description_)
+    description_(other.description_),
+    author_(other.author_)
 {
     if (other.art_)
     {
@@ -82,6 +83,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         proxy_ = rhs.proxy_;
         display_name_ = rhs.display_name_;
         description_ = rhs.description_;
+        author_ = rhs.author_;
         art_.reset(rhs.art_ ? new string(*rhs.art_) : nullptr);
         icon_.reset(rhs.icon_ ? new string(*rhs.icon_) : nullptr);
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
@@ -109,6 +111,11 @@ std::string ScopeMetadataImpl::display_name() const
 std::string ScopeMetadataImpl::description() const
 {
     return description_;
+}
+
+std::string ScopeMetadataImpl::author() const
+{
+    return author_;
 }
 
 std::string ScopeMetadataImpl::art() const
@@ -176,6 +183,11 @@ void ScopeMetadataImpl::set_description(std::string const& description)
     description_ = description;
 }
 
+void ScopeMetadataImpl::set_author(std::string const& author)
+{
+    author_ = author;
+}
+
 void ScopeMetadataImpl::set_art(std::string const& art)
 {
     art_.reset(new string(art));
@@ -223,6 +235,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     }
     throw_on_empty("display_name", display_name_);
     throw_on_empty("description", description_);
+    throw_on_empty("author", author_);
 
     VariantMap var;
     var["scope_name"] = scope_name_;
@@ -232,6 +245,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     var["proxy"] = proxy;
     var["display_name"] = display_name_;
     var["description"] = description_;
+    var["author"] = author_;
 
     // Optional fields
     if (art_)
@@ -303,6 +317,9 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
 
     it = find_or_throw(var, "description");
     description_ = it->second.get_string();
+
+    it = find_or_throw(var, "author");
+    author_ = it->second.get_string();
 
     // Optional fields
 

@@ -50,6 +50,7 @@ public:
     ScopeProxy proxy() const;
     std::string display_name() const;   // localized
     std::string description() const;    // localized
+    std::string author() const;
     std::string art() const;            // optional
     std::string icon() const;           // optional
     std::string search_hint() const;    // localized, optional
