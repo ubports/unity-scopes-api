@@ -222,7 +222,7 @@ set(OTHER_LIBS
     ${KJLIB}
     ${DLLIB}
     pthread
-    #smartscopes
+    smartscopes
 )
 
 # All the libraries we need to link a normal executable that uses Unity scopes
@@ -253,7 +253,7 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(scoperegistry)
 add_subdirectory(scoperunner)
-#add_subdirectory(smartscopesproxy)
+add_subdirectory(smartscopesproxy)
 add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
