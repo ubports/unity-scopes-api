@@ -148,10 +148,6 @@ bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
     // on the last call that actually still pushed a result.
     // To the client, a query that exceeds the limit looks like a query
     // that returned the maximum number of results and finished normally.
-    if (cardinality_ == 0)
-    {
-        return true;  // No cardinality limit
-    }
     if (++num_pushes_ == cardinality_)
     {
         // At most one thread will execute this.

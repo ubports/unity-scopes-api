@@ -85,7 +85,7 @@ public:
                    std::shared_ptr<QueryBase> const& query_base,
                    int cardinality,
                    MWReplyProxy const& reply);
-    void add_query( SSQuery::QueryType query_type,
+    void add_query(SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    MWReplyProxy const& reply);
 
