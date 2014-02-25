@@ -60,21 +60,21 @@ constexpr const char* DEFAULT_RENDERER
  */
 constexpr const char* MUSIC_GRID_RENDERER
 {
-R"(
-    {
-        "schema-version":1,
-        "template":
+    R"(
         {
-            "category-layout":"grid"
-        },
-        "components":
-        {
-            "title":"title",
-            "subtitle":"subtitle",
-            "art":"art"
+            "schema-version":1,
+            "template":
+            {
+                "category-layout":"grid"
+            },
+            "components":
+            {
+                "title":"title",
+                "subtitle":"subtitle",
+                "art":"art"
+            }
         }
-    }
-)"
+    )"
 };
 
 /**
