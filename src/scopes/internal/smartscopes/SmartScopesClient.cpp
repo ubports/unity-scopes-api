@@ -133,7 +133,7 @@ void SmartScopesClient::reset_url(std::string const& url)
 {
     std::string base_url = url;
 
-    // if a url was not provided, get the environmnet variable
+    // if a url was not provided, get the environment variable
     if (base_url.empty())
     {
         char* sss_url_env = ::getenv("SMART_SCOPES_SERVER");
@@ -159,10 +159,10 @@ void SmartScopesClient::reset_url(std::string const& url)
         std::string port_str;
         std::string::size_type url_cont = base_url.find('/', port_pos);
 
-        // if the url continues after the port
+        // if the address continues after the port
         if (url_cont != std::string::npos)
         {
-            // extract port, and add the rest of the url to url_
+            // extract port, and add the rest of the address to url_
             url_ += base_url.substr(url_cont);
             port_str = base_url.substr(port_pos + 1, url_cont - port_pos - 1);
         }
@@ -182,7 +182,7 @@ void SmartScopesClient::reset_url(std::string const& url)
         }
         else
         {
-            // the port supplied is not a number, don't trust url either
+            // the port supplied is not a number, don't trust the url either
             url_ = "";
             port_ = 0;
             throw unity::InvalidArgumentException("Invalid url: " + url);
