@@ -81,7 +81,7 @@ TEST(Variant, basic)
         VariantArray varr {Variant(1), Variant("foo")};
         Variant v(varr);
         EXPECT_EQ(Variant::Type::Array, v.which());
-        EXPECT_EQ(2, v.get_array().size());
+        EXPECT_EQ(2u, v.get_array().size());
         EXPECT_EQ(1, v.get_array()[0].get_int());
         EXPECT_EQ("foo", v.get_array()[1].get_string());
     }

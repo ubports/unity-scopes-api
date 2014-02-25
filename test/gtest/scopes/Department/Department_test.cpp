@@ -36,7 +36,7 @@ TEST(Department, basic)
     EXPECT_EQ("News", dep.label());
 
     dep.set_subdepartments({{"subdep1", query, "Europe"}});
-    EXPECT_EQ(1, dep.subdepartments().size());
+    EXPECT_EQ(1u, dep.subdepartments().size());
     EXPECT_EQ("subdep1", dep.subdepartments().front().id());
     EXPECT_EQ("subdep1", dep.subdepartments().front().query().department_id());
     EXPECT_EQ("Europe", dep.subdepartments().front().label());
@@ -59,7 +59,7 @@ TEST(Department, serialize_and_deserialize)
     EXPECT_EQ("dep1", dep2.query().department_id());
     EXPECT_EQ("fooscope", dep2.query().scope_name());
     EXPECT_EQ("News", dep2.label());
-    EXPECT_EQ(2, dep2.subdepartments().size());
+    EXPECT_EQ(2u, dep2.subdepartments().size());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().id());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().query().department_id());
     EXPECT_EQ("Europe", dep2.subdepartments().front().label());

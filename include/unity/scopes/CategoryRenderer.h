@@ -37,12 +37,45 @@ namespace internal
 /**
   \brief A default template for generic use.
  */
-#define DEFAULT_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","art":"art"}})"
+constexpr const char* DEFAULT_RENDERER
+{
+    R"(
+    {
+        "schema-version":1,
+        "template":
+        {
+            "category-layout":"grid"
+        },
+        "components":
+        {
+            "title":"title",
+            "art":"art"
+        }
+    }
+    )"
+};
 
 /**
   \brief A template suitable for displaying music results.
  */
-#define MUSIC_GRID_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","subtitle":"subtitle","art":"art"}})"
+constexpr const char* MUSIC_GRID_RENDERER
+{
+    R"(
+        {
+            "schema-version":1,
+            "template":
+            {
+                "category-layout":"grid"
+            },
+            "components":
+            {
+                "title":"title",
+                "subtitle":"subtitle",
+                "art":"art"
+            }
+        }
+    )"
+};
 
 /**
    \brief CategoryRenderer encapsulates category renderer template in JSON format.
@@ -83,6 +116,8 @@ private:
 
     friend class internal::CategoryRendererImpl;
 };
+
+bool operator==(const CategoryRenderer&, const CategoryRenderer&);
 
 } // namespace scopes
 
