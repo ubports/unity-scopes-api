@@ -25,6 +25,12 @@ namespace unity
 namespace scopes
 {
 
+QueryMetadata::QueryMetadata(std::string const& locale, std::string const& form_factor)
+    : p(new internal::QueryMetadataImpl(locale, form_factor))
+{
+}
+
+/// @cond
 QueryMetadata::QueryMetadata(QueryMetadata const& other)
 {
     p.reset(new internal::QueryMetadataImpl(*(other.p)));
@@ -35,18 +41,12 @@ QueryMetadata::QueryMetadata(internal::QueryMetadataImpl *impl)
 {
 }
 
-QueryMetadata::QueryMetadata(std::string const& locale, std::string const& form_factor)
-    : p(new internal::QueryMetadataImpl(locale, form_factor))
-{
-}
-
 QueryMetadata::QueryMetadata(QueryMetadata&&) = default;
 
 QueryMetadata& QueryMetadata::operator=(QueryMetadata&&) = default;
 
-QueryMetadata::~QueryMetadata()
-{
-}
+QueryMetadata::~QueryMetadata() = default;
+/// @endcond
 
 std::string QueryMetadata::locale() const
 {

@@ -65,11 +65,11 @@ public:
     /// @cond
     VariantMap serialize() const;
     virtual ~FilterBase();
-    /// @endcond
 
 protected:
     FilterBase(internal::FilterBaseImpl *pimpl);
     std::unique_ptr<internal::FilterBaseImpl> p;
+    /// @endcond
 };
 
 /**
