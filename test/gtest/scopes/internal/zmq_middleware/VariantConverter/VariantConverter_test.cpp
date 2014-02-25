@@ -64,7 +64,7 @@ TEST(VariantConverter, basic)
 
     EXPECT_EQ(Variant::Array, outerDict["baz"].which());
     auto varArray = outerDict["baz"].get_array();
-    EXPECT_EQ(2, varArray.size());
+    EXPECT_EQ(2u, varArray.size());
     EXPECT_EQ(1, varArray[0].get_int());
     EXPECT_EQ(true, varArray[1].get_bool());
 

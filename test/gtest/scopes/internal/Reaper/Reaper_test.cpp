@@ -62,7 +62,7 @@ TEST(Reaper, basic)
             {
                 r->add(bind(&Counter::increment, &c));
             }
-            EXPECT_EQ(10, r->size());
+            EXPECT_EQ(10u, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
@@ -77,7 +77,7 @@ TEST(Reaper, basic)
             {
                 r->add(bind(&Counter::increment, &c));
             }
-            EXPECT_EQ(10, r->size());
+            EXPECT_EQ(10u, r->size());
         }
         EXPECT_EQ(10, c.get());
     }
@@ -92,7 +92,7 @@ TEST(Reaper, basic)
             {
                 v.push_back(r->add(bind(&Counter::increment, &c)));
             }
-            EXPECT_EQ(10, r->size());
+            EXPECT_EQ(10u, r->size());
         }
         EXPECT_EQ(0, c.get());
 
@@ -112,17 +112,17 @@ TEST(Reaper, basic)
             {
                 v.push_back(r->add(bind(&Counter::increment, &c)));
             }
-            EXPECT_EQ(10, r->size());
+            EXPECT_EQ(10u, r->size());
             v[0]->destroy();
             v[4]->destroy();
             v[9]->destroy();
-            EXPECT_EQ(7, r->size());
+            EXPECT_EQ(7u, r->size());
             // We call destroy again, to make sure that it's safe to call it twice even though the first time
             // around, the destroy actually removed the item.
             v[0]->destroy();
             v[4]->destroy();
             v[9]->destroy();
-            EXPECT_EQ(7, r->size());
+            EXPECT_EQ(7u, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
@@ -137,17 +137,17 @@ TEST(Reaper, basic)
             v.push_back(r->add(bind(&Counter::increment, &c)));
             v.push_back(r->add(bind(&Counter::increment, &c)));
             v.push_back(r->add(bind(&Counter::increment, &c)));
-            EXPECT_EQ(3, r->size());
+            EXPECT_EQ(3u, r->size());
 
             v[0]->refresh(); // Moves this element from the tail to the head
-            EXPECT_EQ(3, r->size());
+            EXPECT_EQ(3u, r->size());
             v[0]->destroy();
-            EXPECT_EQ(2, r->size());
+            EXPECT_EQ(2u, r->size());
             v[0]->destroy();            // no-op
-            EXPECT_EQ(2, r->size());
+            EXPECT_EQ(2u, r->size());
             v[1]->destroy();
             v[2]->destroy();
-            EXPECT_EQ(0, r->size());
+            EXPECT_EQ(0u, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
@@ -165,7 +165,7 @@ TEST(Reaper, expiry)
 
         // One second later, they still must both be there.
         this_thread::sleep_for(chrono::milliseconds(1000));
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         EXPECT_EQ(0, c.get());
 
         // Refresh one of the entries.
@@ -173,17 +173,17 @@ TEST(Reaper, expiry)
 
         // 1.2 seconds later, one of them must have disappeared.
         this_thread::sleep_for(chrono::milliseconds(1200));
-        EXPECT_EQ(1, r->size());
+        EXPECT_EQ(1u, r->size());
         EXPECT_EQ(1, c.get());
 
         // 0.6 seconds later, the second entry must still be around.
         this_thread::sleep_for(chrono::milliseconds(600));
-        EXPECT_EQ(1, r->size());
+        EXPECT_EQ(1u, r->size());
         EXPECT_EQ(1, c.get());
 
         // 0.4 seconds later, the second entry must have disappeared.
         this_thread::sleep_for(chrono::milliseconds(400));
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
         EXPECT_EQ(2, c.get());
     }
 }
@@ -229,7 +229,7 @@ TEST(Reaper, exceptions)
     {
         auto r = Reaper::create(5, 5, Reaper::CallbackOnDestroy);
         r->add(bind(&Counter::increment_throw, &c));
-        EXPECT_EQ(1, r->size());
+        EXPECT_EQ(1u, r->size());
         EXPECT_EQ(0, c.get());
     }
     EXPECT_EQ(1, c.get());
