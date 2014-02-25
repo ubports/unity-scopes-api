@@ -56,6 +56,10 @@ public:
     */
     std::string id() const;
 
+    /// @cond
+    VariantMap serialize() const;
+    /// @endcond
+
     /**
      \brief Get type name of this filter.
      \return filer type string
@@ -63,7 +67,6 @@ public:
     std::string filter_type() const;
 
     /// @cond
-    VariantMap serialize() const;
     virtual ~FilterBase();
 
 protected:

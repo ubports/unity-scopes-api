@@ -45,8 +45,6 @@ public:
     /// @cond
     UNITY_DEFINES_PTRS(FilterOption);
     NONCOPYABLE(FilterOption);
-
-    ~FilterOption();
     /// @endcond
 
     /**
@@ -60,6 +58,10 @@ public:
      \return option label
     */
     std::string label() const;
+
+    /// @cond
+    ~FilterOption();
+    /// @endcond
 
 private:
     FilterOption(std::string const& id, std::string const& label);
