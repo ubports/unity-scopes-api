@@ -47,11 +47,10 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    uint no_reply_timeout,
                                    uint refresh_rate_in_sec,
                                    std::string const& sss_url,
-                                   uint sss_port,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
                     std::make_shared<HttpClientQt>(no_reply_timeout),
-                    std::make_shared<JsonCppNode>(), sss_url, sss_port))
+                    std::make_shared<JsonCppNode>(), sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
