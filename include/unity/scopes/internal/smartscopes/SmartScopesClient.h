@@ -128,6 +128,11 @@ public:
 
     virtual ~SmartScopesClient();
 
+    void set_url(std::string const& url);
+    void set_port(uint port);
+    std::string url();
+    uint port();
+
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
     SearchHandle::UPtr search(std::string const& base_url,
