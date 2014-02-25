@@ -97,7 +97,23 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
     , have_latest_cache_(false)
     , query_counter_(0)
 {
-    reset_url(url);
+    try
+    {
+        // try to set url from url supplied
+        reset_url(url);
+    }
+    catch(...)
+    {
+        try
+        {
+            // url supplied failed, try to set url automatically
+            reset_url();
+        }
+        catch(...)
+        {
+            std::cerr << "SmartScopesClient::SmartScopesClient: Failed to initialise SSS url" << std::endl;
+        }
+    }
 
     // force set a port only if one was explicitly provided
     if (port != 0)
@@ -140,26 +156,43 @@ void SmartScopesClient::reset_url(std::string const& url)
     if (port_pos != std::string::npos && port_pos > hier_pos)
     {
         url_ = base_url.substr(0, port_pos);
+        std::string port_str;
         std::string::size_type url_cont = base_url.find('/', port_pos);
 
         // if the url continues after the port
         if (url_cont != std::string::npos)
         {
-            // extract port, then add the rest of the url to url_
-            port_ = std::stoi(base_url.substr(port_pos + 1, url_cont - port_pos));
+            // extract port, and add the rest of the url to url_
             url_ += base_url.substr(url_cont);
+            port_str = base_url.substr(port_pos + 1, url_cont - port_pos - 1);
         }
         // else if the remainder of the string is just the port
         else
         {
             // extract port
-            port_ = std::stoi(base_url.substr(port_pos + 1));
+            port_str = base_url.substr(port_pos + 1);
+        }
+
+        // check if port_str is actually a number before setting port_
+        if (!port_str.empty() &&
+                std::find_if(begin(port_str), end(port_str),
+                             [](char const& c){ return !std::isdigit(c); }) == port_str.end())
+        {
+            port_ = std::stoi(port_str);
+        }
+        else
+        {
+            // the port supplied is not a number, don't trust url either
+            url_ = "";
+            port_ = 0;
+            throw unity::InvalidArgumentException("Invalid url: " + url);
         }
     }
     // else if there is no port specified in the url
     else
     {
         url_ = base_url;
+        port_ = 0;
     }
 }
 
