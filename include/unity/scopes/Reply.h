@@ -49,7 +49,7 @@ public:
     The destructor implicitly calls finished() if a Reply goes out of scope without
     a prior call to finished().
     */
-    void finished() const;
+    void finished() const override;
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
@@ -58,7 +58,7 @@ public:
               the return value of `what()` is made available to the query source. Otherwise,
               the query source receives `"unknown exception"`.
     */
-    void error(std::exception_ptr ex) const;
+    void error(std::exception_ptr ex) const override;
 
     /**
     \brief Destroys a Reply.

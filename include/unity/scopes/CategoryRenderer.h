@@ -76,7 +76,7 @@ public:
      \brief Returns complete renderer template definition in JSON format.
      \return renderer template (JSON)
      */
-    const std::string& data() const;
+    std::string data() const;
 
 private:
     std::unique_ptr<internal::CategoryRendererImpl> p;

@@ -49,7 +49,7 @@ public:
      \param departments a list of departments
      \param current_department_id a department id that should be considered as current
      */
-    void register_departments(DepartmentList const& departments, std::string current_department_id = "");
+    void register_departments(DepartmentList const& departments, std::string current_department_id = "") override;
 
     /**
     \brief Create and register a new Category. The category is automatically sent to the source of the query.
@@ -58,20 +58,20 @@ public:
     Category::SCPtr register_category(std::string const& id,
                                       std::string const& title,
                                       std::string const &icon,
-                                      CategoryRenderer const& renderer_template = CategoryRenderer());
+                                      CategoryRenderer const& renderer_template = CategoryRenderer()) override;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.
     The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
     results and categories from other scope(s).
     */
-    void register_category(Category::SCPtr category);
+    void register_category(Category::SCPtr category) override;
 
     /**
     \brief Returns an instance of previously registered category.
     \return Category instance or nullptr if category hasn't been registered.
     */
-    Category::SCPtr lookup_category(std::string const& id) const;
+    Category::SCPtr lookup_category(std::string const& id) const override;
 
     // TODO: document return value from push()
     /**
@@ -81,7 +81,7 @@ public:
     A false return value is due to either finished() having been called earlier,
     or the client that sent the query having cancelled that query.
     */
-    bool push(CategorisedResult const& result) const;
+    bool push(CategorisedResult const& result) const override;
 
     /**
     \brief Register Annotation.
@@ -90,13 +90,13 @@ public:
     at the top annotation area. Note: Unity shell can ignore some or all annotations, depending
     on available screen estate.
     */
-    bool register_annotation(Annotation const& annotation) const;
+    bool register_annotation(Annotation const& annotation) const override;
 
     /**
     \brief Sends all filters and their state to the source of a query.
     \return true if the filters were accepted, false otherwise.
     */
-    bool push(Filters const& filters, FilterState const& filter_state) const;
+    bool push(Filters const& filters, FilterState const& filter_state) const override;
 
     /**
     \brief Destroys a Reply.

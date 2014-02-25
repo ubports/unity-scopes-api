@@ -43,7 +43,7 @@ class RegistryImpl;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class Registry : public RegistryBase, public virtual ObjectProxy
+class Registry : public RegistryBase
 {
 public:
     /// @cond
@@ -54,19 +54,19 @@ public:
     \brief Returns the metadata for the scope with the given name.
     @return The metadata for the scope. If no scope with the given name exists, get_metadata() throws NotFoundException.
     */
-    ScopeMetadata get_metadata(std::string const& scope_name) const;
+    ScopeMetadata get_metadata(std::string const& scope_name) const override;
 
     /**
     \brief Returns a map containing the metadata for all scopes.
     */
-    MetadataMap list() const;
+    MetadataMap list() const override;
 
     /**
     \brief Returns a map containing only those scopes for which predicate returns true.
     \param predicate a function object the must return true for each metadata item to be include in the map.
     \return The metadata items for which the predicate returned true.
     */
-    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const;
+    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const override;
 
 protected:
     Registry(internal::RegistryImpl* impl);          // Instantiated only by RegistryImpl

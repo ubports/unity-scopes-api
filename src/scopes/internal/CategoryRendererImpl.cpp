@@ -44,7 +44,7 @@ CategoryRenderer CategoryRendererImpl::from_file(std::string const& path)
     return CategoryRenderer(contents);
 }
 
-const std::string& CategoryRendererImpl::data() const
+std::string CategoryRendererImpl::data() const
 {
     return data_;
 }

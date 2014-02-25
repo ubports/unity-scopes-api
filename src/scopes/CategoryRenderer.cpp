@@ -150,7 +150,7 @@ CategoryRenderer CategoryRenderer::from_file(std::string const& path)
     return internal::CategoryRendererImpl::from_file(path);
 }
 
-const std::string& CategoryRenderer::data() const
+std::string CategoryRenderer::data() const
 {
     return p->data();
 }

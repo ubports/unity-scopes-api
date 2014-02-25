@@ -37,7 +37,7 @@ public:
     CategoryRendererImpl(std::string const& json_text);
     static CategoryRenderer from_file(std::string const& path);
 
-    const std::string& data() const;
+    std::string data() const;
 
 private:
     std::string data_;
