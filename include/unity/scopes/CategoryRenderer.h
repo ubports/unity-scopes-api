@@ -45,7 +45,7 @@ namespace internal
 #define MUSIC_GRID_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","subtitle":"subtitle","art":"art"}})"
 
 /**
-   \brief CategoryRenderer encapsulates category renderer template in JSON format.
+\brief CategoryRenderer encapsulates category renderer template in JSON format.
 */
 class CategoryRenderer
 {
@@ -66,6 +66,7 @@ public:
     CategoryRenderer(CategoryRenderer&&);
     CategoryRenderer& operator=(CategoryRenderer&&);
     virtual ~CategoryRenderer();
+    /// @endcond
 
     /**
      \brief Creates CategoryRenderer from a text file.

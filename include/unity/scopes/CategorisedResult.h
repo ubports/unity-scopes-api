@@ -37,21 +37,24 @@ namespace internal
 /**
 \brief CategorisedResult is a Result plus a category it belongs to.
 */
-
 class CategorisedResult: public Result
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(CategorisedResult);
+    /// @endcond
 
     /**
      \brief Creates a CategorisedResult instance assigned to given category, with all base attributes initially empty.
      */
     explicit CategorisedResult(Category::SCPtr category);
 
+    /// @cond
     CategorisedResult(CategorisedResult const& other);
     CategorisedResult& operator=(CategorisedResult const& other);
     CategorisedResult(CategorisedResult&&);
     CategorisedResult& operator=(CategorisedResult&&);
+    /// @endcond
 
     /**
      \brief Set category of this result.
