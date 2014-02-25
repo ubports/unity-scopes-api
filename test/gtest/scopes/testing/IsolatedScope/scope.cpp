@@ -41,10 +41,7 @@ public:
 
     unity::scopes::ActivationResponse activate() override
     {
-        return unity::scopes::ActivationResponse
-        {
-            unity::scopes::ActivationResponse::ShowDash
-        };
+        return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };
 
@@ -59,10 +56,7 @@ public:
     {
         std::this_thread::sleep_for(std::chrono::seconds{2});
 
-        return unity::scopes::ActivationResponse
-        {
-            unity::scopes::ActivationResponse::ShowDash
-        };
+        return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };
 
@@ -146,10 +140,7 @@ unity::scopes::ActivationBase::UPtr testing::Scope::activate(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&)
 {
-    return unity::scopes::ActivationBase::UPtr
-    {
-        new testing::ActivationShowingDash()
-    };
+    return unity::scopes::ActivationBase::UPtr{new testing::ActivationShowingDash()};
 }
 
 unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
@@ -158,10 +149,7 @@ unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
         std::string const&,
         std::string const&)
 {
-    return unity::scopes::ActivationBase::UPtr
-    {
-        new testing::LongRunningActivation()
-    };
+    return unity::scopes::ActivationBase::UPtr{new testing::LongRunningActivation()};
 }
 
 unity::scopes::PreviewQuery::UPtr testing::Scope::preview(
