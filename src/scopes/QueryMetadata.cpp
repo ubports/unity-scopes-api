@@ -46,6 +46,12 @@ QueryMetadata::QueryMetadata(QueryMetadata&&) = default;
 QueryMetadata& QueryMetadata::operator=(QueryMetadata&&) = default;
 
 QueryMetadata::~QueryMetadata() = default;
+
+VariantMap QueryMetadata::serialize() const
+{
+    return p->serialize();
+}
+
 /// @endcond
 
 std::string QueryMetadata::locale() const
@@ -56,11 +62,6 @@ std::string QueryMetadata::locale() const
 std::string QueryMetadata::form_factor() const
 {
     return p->form_factor();
-}
-
-VariantMap QueryMetadata::serialize() const
-{
-    return p->serialize();
 }
 
 } // namespace scopes

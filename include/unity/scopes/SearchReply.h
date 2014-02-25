@@ -35,6 +35,9 @@ namespace scopes
 class CategorisedResult;
 class Annotation;
 
+/**
+\brief SearchReply allows the results of a search query to be sent to the source of the query.
+*/
 class SearchReply : public virtual ReplyBase
 {
 public:

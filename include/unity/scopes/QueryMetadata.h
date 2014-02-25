@@ -64,10 +64,10 @@ public:
 
     /// @cond
     VariantMap serialize() const;
-    /// @endcond
 
 protected:
     QueryMetadata(std::string const& locale, std::string const& form_factor);
+    /// @endcond
 
 private:
     QueryMetadata(internal::QueryMetadataImpl *impl);
