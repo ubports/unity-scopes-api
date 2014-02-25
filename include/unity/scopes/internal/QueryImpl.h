@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_QUERYIMPL_H
 #define UNITY_SCOPES_INTERNAL_QUERYIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterState.h>
 #include <string>

@@ -30,7 +30,7 @@ namespace scopes
 namespace testing
 {
 
-class UNITY_API ScopeMetadataBuilder
+class ScopeMetadataBuilder
 {
 public:
     template<typename T>

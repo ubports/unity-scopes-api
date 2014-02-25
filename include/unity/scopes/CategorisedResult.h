@@ -38,7 +38,7 @@ namespace internal
 \brief CategorisedResult is a Result plus a category it belongs to.
 */
 
-class UNITY_API CategorisedResult: public Result
+class CategorisedResult: public Result
 {
 public:
     UNITY_DEFINES_PTRS(CategorisedResult);
@@ -66,7 +66,7 @@ public:
     Category::SCPtr category() const;
 
 private:
-    CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
+    CategorisedResult(internal::ResultImpl* impl);
     internal::CategorisedResultImpl* fwd() const;
 
     friend class internal::CategorisedResultImpl;

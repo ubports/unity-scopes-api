@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_VARIANTBUILDER_H
 #define UNITY_SCOPES_VARIANTBUILDER_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <vector>
@@ -57,9 +56,10 @@ VariantBuilder builder;
 builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
 \endcode
 */
-class UNITY_API VariantBuilder
+class VariantBuilder
 {
 public:
+    /// @cond
     VariantBuilder();
     VariantBuilder(VariantBuilder const& other);
     VariantBuilder(VariantBuilder&& other);
@@ -67,6 +67,7 @@ public:
 
     VariantBuilder& operator=(VariantBuilder const& other);
     VariantBuilder& operator=(VariantBuilder&& other);
+    /// @endcond
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
@@ -99,7 +100,7 @@ public:
     Variant end();
 
 private:
-    std::shared_ptr<internal::VariantBuilderImpl> p;
+    std::unique_ptr<internal::VariantBuilderImpl> p;
 };
 
 } // namespace scopes

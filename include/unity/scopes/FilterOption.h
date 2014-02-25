@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_FILTEROPTION_H
 
 #include <unity/util/NonCopyable.h>
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
@@ -40,7 +39,7 @@ class OptionSelectorFilterImpl;
 /**
 \brief Holds definition of filter option for OptionSelectorFilter.
 */
-class UNITY_API FilterOption final
+class FilterOption final
 {
 public:
 /// @cond
@@ -54,7 +53,7 @@ public:
 
 private:
     FilterOption(std::string const& id, std::string const& label);
-    std::shared_ptr<internal::FilterOptionImpl> p;
+    std::unique_ptr<internal::FilterOptionImpl> p;
 
     friend class internal::OptionSelectorFilterImpl;
 };

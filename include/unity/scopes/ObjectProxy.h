@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_OBJECTPROXY_H
 
 #include <unity/scopes/ObjectProxyFwd.h>
-#include <unity/SymbolExport.h>
 
 namespace unity
 {
@@ -34,7 +33,7 @@ class ObjectProxyImpl;
 class RuntimeImpl;
 }
 
-class UNITY_API ObjectProxy
+class ObjectProxy
 {
 public:
     ObjectProxy();

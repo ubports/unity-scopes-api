@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_ANNOTATION_H
 #define UNITY_SCOPES_ANNOTATION_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
+#include <unity/util/DefinesPtrs.h>
 #include <list>
 #include <memory>
 
@@ -41,9 +41,13 @@ class ResultReplyObject;
 /**
  * \brief Handles a scope query link(s) that result in a new search query when clicked by user.
  */
-class UNITY_API Annotation final
+class Annotation final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(Annotation);
+    /// @endcond
+
     /*!
      \brief Enumeration of supported Annotation types
      */
@@ -115,7 +119,7 @@ public:
 
 private:
     Annotation(internal::AnnotationImpl* impl);
-    std::shared_ptr<internal::AnnotationImpl> p;
+    std::unique_ptr<internal::AnnotationImpl> p;
 
     friend class internal::ResultReplyObject;
 };

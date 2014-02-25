@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_SEARCHMETADATA_H
 #define UNITY_SCOPES_SEARCHMETADATA_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/QueryMetadata.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -37,7 +36,7 @@ class SearchMetadataImpl;
 /**
 \brief Metadata passed with search requests.
 */
-class UNITY_API SearchMetadata : public QueryMetadata
+class SearchMetadata : public QueryMetadata
 {
 public:
     /// @cond

@@ -43,7 +43,7 @@ Calls to push() and finished() are made by an arbitrary thread.
 // TODO: add doc for thread pool and concurrent calls to push()
 */
 
-class UNITY_API ListenerBase
+class ListenerBase
 {
 public:
     /// @cond

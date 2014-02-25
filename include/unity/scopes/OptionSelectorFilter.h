@@ -43,7 +43,7 @@ class FilterBaseImpl;
 \brief Provides a list of choices, allows one or more to be selected.
 A selection filter that displays a list of choices and allows one or more of them to be selected.
 */
-class UNITY_API OptionSelectorFilter : public FilterBase
+class OptionSelectorFilter : public FilterBase
 {
 public:
 /// @cond

@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
 
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/SymbolExport.h>
 #include <string>
 
 namespace unity
@@ -32,7 +31,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API CategoryRendererImpl
+class CategoryRendererImpl
 {
 public:
     CategoryRendererImpl(std::string const& json_text);

@@ -120,19 +120,10 @@ add_definitions(-DUNITY_DLL_EXPORTS)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
-# TODO: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
-# base class from a static library without an unresolved dependency. But, without static linking, we can't
-# do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
-# with visbility=default.
-# Longer term, we can either build two libraries each time, one with hidden and one with default visibility,
-# and link the tests against the default visibility one, but the demos against the hidden one. Problem is that
-# this will compile everything twice for every build.
-# Or we can build a single library with visibility=default in debug and coverage mode, and build the library
-# with visibliity=hidden only in release mode. But this means that we can't run the tests against the
-# library build with release mode.
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")   # HACK
+# By default, all symbols are visible in the library. We strip out things we don't
+# want at link time, by running a version script (see unity-scopes.map and the
+# setting of LINK_FLAGS below).
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
@@ -185,13 +176,13 @@ set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 3)
-set(UNITY_SCOPES_MICRO 1)
+set(UNITY_SCOPES_MICRO 2)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
 
-# Static version for testing
-set(UNITY_SCOPES_STATIC_LIB unity-scopes-static)
+# Version for testing, with all symbols visible
+set(UNITY_SCOPES_TEST_LIB unity-scopes-test)
 
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
@@ -245,8 +236,7 @@ set(LIBS ${UNITY_SCOPES_LIB})
 # do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
 # with visbility=default.
 
-# set(TESTLIBS ${UNITY_SCOPES_STATIC_LIB})
-set(TESTLIBS ${UNITY_SCOPES_LIB}) # HACK
+set(TESTLIBS ${UNITY_SCOPES_TEST_LIB})
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
@@ -314,18 +304,16 @@ if(cmake_build_type_lower MATCHES coverage)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
 endif()
 
-# Pseudo-library of object files. We need a dynamic version of the library for normal clients,
-# and a static version for the whitebox tests, so we can write unit tests for classes in the internal namespaces
-# (because, for the .so, non-public APIs are compiled with -fvisibility=hidden).
-# Everything is compiled with -fPIC, so the same object files are suitable for either library.
-# Here, we create an object library that then is used to link the static and dynamic
-# libraries, without having to compile each source file twice with different compile flags.
+# Pseudo-library of object files. We need a version of the library for normal clients
+# that does not expose symbols in the unity::scopes::internal namespace, and another
+# version for whitebox tests, so we can write unit tests for classes in the internal namespaces.
+# Here, we create an object library that then is used to link the normal and the test libraries.
 
 set(UNITY_SCOPES_LIB_OBJ ${UNITY_SCOPES_LIB}-obj)
 add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${SLICE_SRC} ${CAPNPROTO_SRC})
 set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
-# Use the object files to make the shared library.
+# Use the object files to make the normal library.
 set(UNITY_SCOPES_SOVERSION 0)
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
@@ -333,25 +321,36 @@ set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
-# Clang sanitizers don't work if --no-undefined is given as a linker argument.
-if(NOT IS_CLANG)
-  set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-  LINK_FLAGS "-Wl,--no-undefined")
-endif()
-
-target_link_libraries(${UNITY_SCOPES_LIB} ${OTHER_LIBS})
-
-# Use the object files to make the static library.
-add_library(${UNITY_SCOPES_STATIC_LIB} STATIC $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
-set_target_properties(${UNITY_SCOPES_STATIC_LIB} PROPERTIES OUTPUT_NAME ${UNITY_SCOPES_LIB})
-
-# Only the dynamic library gets installed.
-install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
-
-set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
+# Use the object files to make the test library.
+add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
+set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
     VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
+
+set(ldflags "")
+
+# Clang sanitizers don't work if --no-undefined is given as a linker argument.
+if(NOT IS_CLANG)
+    set(ldflags "-Wl,--no-undefined")
+endif()
+
+set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "${ldflags}")
+
+# We compile with all symbols visible by default. For the shipping library, we strip
+# out all symbols that (recursively) are in the unity::scopes::internal namespace,
+# except for a few exceptions that are needed by the scoperegistry, scoperunner,
+# smartscopesproxy, and any other binaries that reach into the internal namespace.
+set(symbol_map "${CMAKE_SOURCE_DIR}/unity-scopes.map")
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
+                      LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
+
+target_link_libraries(${UNITY_SCOPES_LIB} ${OTHER_LIBS})
+target_link_libraries(${UNITY_SCOPES_TEST_LIB} ${OTHER_LIBS})
+
+# Only the normal library gets installed.
+install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 
 # Enable coverage testing
 

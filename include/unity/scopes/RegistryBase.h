@@ -46,7 +46,7 @@ typedef std::map<std::string, ScopeMetadata> MetadataMap;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class UNITY_API RegistryBase : public virtual ObjectProxy
+class RegistryBase : public virtual ObjectProxy
 {
 public:
     /// @cond

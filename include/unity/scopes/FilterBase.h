@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_FILTERBASE_H
 
 #include <unity/util/NonCopyable.h>
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 #include <memory>
@@ -43,7 +42,7 @@ All implementations of FilterBase define the "look" of
 filter in the UI and do not hold any state information.
 Actual state of a filters is kept by a FilterState object.
 */
-class UNITY_API FilterBase
+class FilterBase
 {
 public:
 /// @cond
@@ -63,7 +62,7 @@ public:
 protected:
     FilterBase(internal::FilterBaseImpl *pimpl);
 
-    std::shared_ptr<internal::FilterBaseImpl> p;
+    std::unique_ptr<internal::FilterBaseImpl> p;
 };
 
 typedef std::list<FilterBase::SCPtr> Filters;

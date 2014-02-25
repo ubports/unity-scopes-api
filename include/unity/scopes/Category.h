@@ -44,7 +44,7 @@ namespace internal
    To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
-class UNITY_API Category
+class Category
 {
 public:
 /// @cond
@@ -52,7 +52,7 @@ public:
     UNITY_DEFINES_PTRS(Category);
 /// @endcond
 
-    virtual ~Category() = default;
+    virtual ~Category();
 
     std::string id() const;
     std::string title() const;
@@ -67,7 +67,7 @@ protected:
     friend class internal::CategoryRegistry;
 
 private:
-    std::shared_ptr<internal::CategoryImpl> p;
+    std::unique_ptr<internal::CategoryImpl> p;
 };
 
 } // namespace scopes

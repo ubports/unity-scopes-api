@@ -43,7 +43,7 @@ class RegistryImpl;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class UNITY_API Registry : public RegistryBase, public virtual ObjectProxy
+class Registry : public RegistryBase, public virtual ObjectProxy
 {
 public:
     /// @cond

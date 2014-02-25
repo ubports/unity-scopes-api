@@ -33,7 +33,7 @@ namespace scopes
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
-class UNITY_API PreviewReplyBase : public virtual ReplyBase
+class PreviewReplyBase : public virtual ReplyBase
 {
 public:
     virtual ~PreviewReplyBase() = default;

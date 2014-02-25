@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_ACTIVATIONRESPONSE_H
 #define UNITY_SCOPES_ACTIVATIONRESPONSE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Query.h>
 #include <memory>
@@ -38,7 +37,7 @@ class ActivationResponseImpl;
 /**
 \brief Carries response to a Result activation request.
 */
-class UNITY_API ActivationResponse final
+class ActivationResponse final
 {
 public:
     /*!
@@ -83,15 +82,33 @@ public:
     ActivationResponse::Status status() const;
 
     /**
-     \brief Attach arbitrary hints to this response.
+     \deprecated Attach arbitrary data to this response.  This method will be removed in version 0.4.0, please use set_scope_data instead.
      */
     void setHints(VariantMap const& hints);
 
     /**
-     \brief Get hints attached to this response object.
-     \return hints
+     \brief Attach arbitrary data to this response.
+
+     The attached data will be sent back to the scope if status of this response is Status::ShowPreview.
+     \param data arbitrary value attached to response
+     */
+    void set_scope_data(Variant const& data);
+
+    /**
+     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use scope_data instead.
+
+     This method returns data attached with setHints() or set_scope_data() call; this method returns empty VariantMap if the attached data was added with
+     set_scope_data() and it is is not of VariantMap type.
+
+     \return data attached to response
      */
     VariantMap hints() const;
+
+    /**
+     \brief Get data attached to this response object.
+     \return data attached to response
+     */
+    Variant scope_data() const;
 
     /**
      \brief Query to be executed if status is Status::PerformQuery.
@@ -106,8 +123,8 @@ public:
     /// @endcond
 
 private:
-    std::shared_ptr<internal::ActivationResponseImpl> p;
-    ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl);
+    std::unique_ptr<internal::ActivationResponseImpl> p;
+    ActivationResponse(internal::ActivationResponseImpl* pimpl);
     friend class internal::ActivationResponseImpl;
 };
 

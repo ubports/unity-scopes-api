@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_ACTIVATIONLISTENER_H
 #define UNITY_SCOPES_ACTIVATIONLISTENER_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/util/NonCopyable.h>
 
 namespace unity
 {
@@ -32,7 +32,7 @@ class ActivationResponse;
 /**
 \brief Base class to receive response to the result activation request.
 */
-class UNITY_API ActivationListener: public ListenerBase
+class ActivationListener: public ListenerBase
 {
 public:
     /// @cond

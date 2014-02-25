@@ -70,7 +70,7 @@ namespace internal
 //  int_func(5);
 //
 
-class UNITY_API DynamicLoader
+class DynamicLoader
 {
 public:
     NONCOPYABLE(DynamicLoader);

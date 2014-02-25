@@ -32,12 +32,6 @@ Result::Result(internal::ResultImpl* impl)
 {
 }
 
-Result::Result(std::shared_ptr<internal::ResultImpl> impl)
-    : p(impl)
-{
-}
-
-
 Result::Result(const VariantMap &variant_map)
     : p(new internal::ResultImpl(variant_map))
 {
@@ -56,7 +50,7 @@ Result& Result::operator=(Result const& other)
 {
     if (this != &other)
     {
-        p = std::make_shared<internal::ResultImpl>(*(other.p));
+        p.reset(new internal::ResultImpl(*(other.p)));
     }
     return *this;
 }
@@ -122,8 +116,7 @@ Variant& Result::operator[](std::string const& key)
 
 Variant const& Result::operator[](std::string const& key) const
 {
-    // const_pointer_cast to force const [] operator of ResultImpl
-    return (*(std::const_pointer_cast<internal::ResultImpl const>(p)))[key];
+    return p->value(key);
 }
 
 std::string Result::uri() const noexcept

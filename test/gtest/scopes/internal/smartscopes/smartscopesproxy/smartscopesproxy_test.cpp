@@ -68,7 +68,7 @@ public:
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 2, 2000, 60,
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 20000, 60,
                                                            "http://127.0.0.1", server_.port_, false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
@@ -89,8 +89,8 @@ public:
 protected:
     RaiiServer server_;
 
-    std::string reg_id_ = reg_id_;
-    std::string scope_id_ = scope_id_;
+    std::string reg_id_;
+    std::string scope_id_;
 
     RuntimeImpl::UPtr reg_rt_;
     RuntimeImpl::UPtr scope_rt_;
@@ -162,7 +162,7 @@ public:
         {
             EXPECT_EQ("URI2", result.uri());
             EXPECT_EQ("Things", result.title());
-            EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", result.art());
+            EXPECT_EQ("", result.art());
             EXPECT_EQ("", result.dnd_uri());
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
@@ -213,6 +213,23 @@ TEST_F(smartscopesproxytest, create_query)
 
     meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
+}
+
+TEST_F(smartscopesproxytest, consecutive_queries)
+{
+    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+    std::vector<std::shared_ptr<Receiver>> replies;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    for (int i = 0; i < 10; ++i)
+    {
+        replies[i]->wait_until_finished();
+    }
 }
 
 class PreviewerWithCols : public PreviewListener

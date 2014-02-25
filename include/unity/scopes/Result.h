@@ -46,7 +46,7 @@ class ScopeImpl;
    operator. The only required attribute is 'uri' and it must not be empty before
    calling Reply::push.
 */
-class UNITY_API Result
+class Result
 {
 public:
     UNITY_DEFINES_PTRS(Result);
@@ -143,13 +143,11 @@ public:
     VariantMap serialize() const;
 
 protected:
-    Result(internal::ResultImpl* impl);
+    explicit Result(const VariantMap &variant_map);
+    explicit Result(internal::ResultImpl* impl);
 
 private:
-    explicit Result(const VariantMap &variant_map);
-    Result(std::shared_ptr<internal::ResultImpl> impl);
-
-    std::shared_ptr<internal::ResultImpl> p;
+    std::unique_ptr<internal::ResultImpl> p;
 
     friend class internal::ResultImpl;
     friend class internal::ScopeImpl;

@@ -504,9 +504,8 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
-void scope_thread()
+void scope_thread(Runtime::SPtr const& rt)
 {
-    auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
     TestScope scope;
     rt->run_scope(&scope);
 }
@@ -549,9 +548,9 @@ TEST(Activation, scope)
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
         EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
-        EXPECT_EQ("bar", response->hints()["foo"].get_string());
-        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
-        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+        EXPECT_EQ("bar", response->scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->scope_data().get_dict()["activated_uri"].get_string());
     }
 
     // activate action
@@ -566,16 +565,19 @@ TEST(Activation, scope)
         auto response = act_receiver->response;
         EXPECT_TRUE(response != nullptr);
         EXPECT_EQ(ActivationResponse::Status::ShowDash, response->status());
-        EXPECT_EQ("widget1action1", response->hints()["activated action"].get_string());
-        EXPECT_EQ("maiden", response->hints()["received_hints"].get_dict()["iron"].get_string());
-        EXPECT_EQ("uri", response->hints()["activated_uri"].get_string());
+        EXPECT_EQ("widget1action1", response->scope_data().get_dict()["activated action"].get_string());
+        EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
+        EXPECT_EQ("uri", response->scope_data().get_dict()["activated_uri"].get_string());
     }
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    std::thread scope_t(scope_thread);
-    scope_t.detach();
-    return RUN_ALL_TESTS();
+    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, rt);
+    auto rc = RUN_ALL_TESTS();
+    rt->destroy();
+    scope_t.join();
+    return rc;
 }

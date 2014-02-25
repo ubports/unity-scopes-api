@@ -37,7 +37,7 @@ namespace scopes
 class CategorisedResult;
 class Annotation;
 
-class SearchReply : public virtual SearchReplyBase, public Reply
+class SearchReply : public virtual SearchReplyBase, public virtual Reply
 {
 public:
     SearchReply(SearchReply const&) = delete;

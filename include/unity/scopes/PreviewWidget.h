@@ -38,7 +38,7 @@ namespace internal
     class PreviewWidgetImpl;
 }
 
-class UNITY_API PreviewWidget
+class PreviewWidget
 {
 public:
 /// @cond
@@ -49,6 +49,7 @@ public:
     PreviewWidget(std::string const& definition);
     PreviewWidget(PreviewWidget const& other);
     PreviewWidget(PreviewWidget&& other);
+    virtual ~PreviewWidget();
 
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
@@ -79,7 +80,7 @@ public:
     VariantMap serialize() const;
 
 private:
-    std::shared_ptr<internal::PreviewWidgetImpl> p;
+    std::unique_ptr<internal::PreviewWidgetImpl> p;
     PreviewWidget(internal::PreviewWidgetImpl *impl);
     friend class internal::PreviewWidgetImpl;
 };

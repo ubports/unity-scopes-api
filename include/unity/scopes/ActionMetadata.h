@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_ACTIONMETADATA_H
 #define UNITY_SCOPES_ACTIONMETADATA_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/QueryMetadata.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -37,9 +37,13 @@ class ActionMetadataImpl;
 \brief Metadata passed to scopes as a part of unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate or
 unity::scopes::ScopeBase::perform_action requests.
 */
-class UNITY_API ActionMetadata : public QueryMetadata
+class ActionMetadata : public QueryMetadata
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(ActionMetadata);
+    /// @endcond
+
     ActionMetadata(std::string const& locale, std::string const& form_factor);
     void set_scope_data(Variant const& data);
     Variant scope_data() const;
