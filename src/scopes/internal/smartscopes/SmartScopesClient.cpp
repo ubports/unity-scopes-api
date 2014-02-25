@@ -152,7 +152,7 @@ void SmartScopesClient::reset_url(std::string const& url)
     const size_t hier_pos = strlen("https");
     std::string::size_type port_pos = base_url.find_last_of(':');
 
-    // if there is a port specified in the url
+    // if there is a port specified in the url (i.e. a colon occurs after "http:" / "https:")
     if (port_pos != std::string::npos && port_pos > hier_pos)
     {
         url_ = base_url.substr(0, port_pos);
