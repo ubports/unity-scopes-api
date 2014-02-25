@@ -49,7 +49,9 @@ class ScopeImpl;
 class Result
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(Result);
+    /// @endcond
 
     /**
        \brief Creates a Result that is a copy of another Result.
@@ -61,27 +63,58 @@ public:
     */
     virtual ~Result();
 
+    /// @cond
     Result& operator=(Result const& other);
     Result(Result&&);
     Result& operator=(Result&&);
+    /// @endcond
 
+    /**
+    \brief Stores a Result inside this Result instance.
+    This method is meant to be used by aggregator scopes which want to modify results they receive, but want
+    to keep a copy of the original result so that they can be correctly handled by the original scopes
+    who created them when it comes to activation or previews.
+    Scopes middleware will automatically pass the correct inner stored result to the activation or preview request handler
+    of a scope which created it.
+    \param other original result to store within this result
+    \param intercept_activation whether this scope should receive activation and preview request
+    */
     void store(Result const& other, bool intercept_activation = false);
+
+    /**
+    \brief Check if this Result instance has a stored result.
+    \return true if there is a stored result
+     */
     bool has_stored_result() const;
+
+    /**
+     \brief Get stored result.
+     This method throws unity::InvalidArgumentException if no result has been stored in this Result instance.
+     \return stored result
+     */
     Result retrieve() const;
 
-    void set_uri(std::string const& uri);
     /**
-     \brief Set "title" property of this result.
+     \brief Set "uri" attribute of this result.
+     */
+    void set_uri(std::string const& uri);
+
+    /**
+     \brief Set "title" attribute of this result.
 
      Equivalent to calling result["title"] = title;
      */
     void set_title(std::string const& title);
     /**
-     \brief Set "art" property of this result.
+     \brief Set "art" attribute of this result.
 
      Equivalent to calling result["art"] = image;
      */
     void set_art(std::string const& image);
+
+    /**
+     \brief Set "dnd_uri" attribute of this result.
+     */
     void set_dnd_uri(std::string const& dnd_uri);
 
     /**
@@ -128,12 +161,47 @@ public:
      */
     Variant const& operator[](std::string const& key) const;
 
+    /**
+     \brief Get "uri" property of this Result.
+     This method returns empty string if this attribute is not of Variant::Type::String type (e.g. it was set with operator[]).
+     \return the value of "uri" or empty string
+     */
     std::string uri() const noexcept;
+
+    /**
+     \brief Get "title" property of this Result.
+     This method returns empty string if this attribute is not of Variant::Type::String type (e.g. it was set with operator[]).
+     \return the value of "title" or empty string
+     */
     std::string title() const noexcept;
+
+    /**
+     \brief Get "art" property of this Result.
+     This method returns empty string if this attribute is not of Variant::Type::String type (e.g. it was set with operator[]).
+     \return the value of "art" or empty string
+     */
     std::string art() const noexcept;
+
+    /**
+     \brief Get "dnd_uri" property of this Result.
+     This method returns empty string if this attribute is not of Variant::Type::String type (e.g. it was set with operator[]).
+     \return the value of "dnd_uri" or empty string
+     */
     std::string dnd_uri() const noexcept;
 
+    /**
+    \brief Check if this Result has an attribute.
+    \param key attribute name
+    \return true if attribute is set
+    */
     bool contains(std::string const& key) const;
+
+    /**
+    \brief Get value of an attribute.
+    This method thows unity::InvalidArgumentException if given attribute hasn't been set.
+    \param key attribute name
+    \return attribute value
+    */
     Variant const& value(std::string const& key) const;
 
     /**

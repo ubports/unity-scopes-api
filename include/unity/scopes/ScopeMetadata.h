@@ -32,12 +32,18 @@ namespace internal
 class ScopeMetadataImpl;
 } // namespace internal
 
+/**
+ \brief Holds scope attributes such as name, description, icon etc.
+ The information carried by ScopeMetadata comes from the .ini file of given scope (for local scopes)
+ or is fetched from the remote server (for scopes running on Smart Scopes Server).
+ Use unity::scopes::Registry to get ScopeMetadata for a specific scope or all scopes.
+ */
 class ScopeMetadata final
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(ScopeMetadata);
 
-    /// @cond
     ScopeMetadata(ScopeMetadata const& other);
     ScopeMetadata(ScopeMetadata&&);
     ~ScopeMetadata();
@@ -46,14 +52,58 @@ public:
     ScopeMetadata& operator=(ScopeMetadata&&);
     /// @endcond
 
+    /**
+     \brief Get scope name.
+     \return name of the scope
+     */
     std::string scope_name() const;
+
+    /**
+     \brief Get proxy object for this scope.
+     \return scope proxy
+     */
     ScopeProxy proxy() const;
+
+    /**
+     \brief Get display name for this scope.
+     \return scope display name
+     */
     std::string display_name() const;   // localized
+
+    /**
+     \brief Get description for this scope.
+     \return scope description
+     */
     std::string description() const;    // localized
+
+    /**
+     \brief Get art for this scope.
+     \return scope art
+     */
     std::string art() const;            // optional
+
+    /**
+     \brief Get icon for this scope.
+     \return scope icon
+    */
     std::string icon() const;           // optional
+
+    /**
+     \brief Get search hint for this scope.
+     \return search hint
+    */
     std::string search_hint() const;    // localized, optional
+
+    /**
+     \brief Get hot key for this scope
+     \return hot key
+     */
     std::string hot_key() const;        // localized, optional
+
+    /**
+     \brief Check if this scope should be hidden in the Dash.
+     \return true if this scope is invisible
+     */
     bool invisible() const;             // optional (default = false)
 
     /**

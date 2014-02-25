@@ -108,6 +108,12 @@ public:
      * \return a uri in scope:// schema
      */
     std::string to_string() const;
+
+    /**
+     \brief Get state of the filters for this Query.
+     Pass this state to methods of specific filter instances (such as unity::scopes::OptionSelectorFilter::active_options())to examine filter state.
+     \return state of the filters
+     */
     FilterState filter_state() const;
 
     /**

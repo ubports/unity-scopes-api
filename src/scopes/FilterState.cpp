@@ -26,6 +26,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 FilterState::FilterState()
     : p(new internal::FilterStateImpl())
 {
@@ -59,6 +60,7 @@ VariantMap FilterState::serialize() const
 {
     return p->serialize();
 }
+/// @endcond
 
 bool FilterState::has_filter(std::string const& id) const
 {

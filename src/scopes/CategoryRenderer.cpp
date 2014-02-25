@@ -26,7 +26,6 @@ namespace scopes
 {
 
 /*!
-
 \class CategoryRenderer
 
 This class specifies how is a particular category rendered by Unity. Note that the data is likely to change between major versions of Unity, and therefore the definition isn't strongly typed and provided by a scope author as a JSON string.

@@ -31,6 +31,7 @@ Link::Link(std::string const& label, Query const& query)
 {
 }
 
+/// @cond
 Link::Link(VariantMap const& variant_map)
     : p(new internal::LinkImpl(variant_map))
 {
@@ -54,6 +55,12 @@ Link& Link::operator=(Link const& other)
 
 Link::~Link() = default;
 
+VariantMap Link::serialize() const
+{
+    return p->serialize();
+}
+/// @endcond
+
 std::string Link::label() const
 {
     return p->label();
@@ -62,11 +69,6 @@ std::string Link::label() const
 Query Link::query() const
 {
     return p->query();
-}
-
-VariantMap Link::serialize() const
-{
-    return p->serialize();
 }
 
 } // namespace scopes

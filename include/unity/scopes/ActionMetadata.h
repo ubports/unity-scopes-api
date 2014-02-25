@@ -44,8 +44,23 @@ public:
     UNITY_DEFINES_PTRS(ActionMetadata);
     /// @endcond
 
+    /**
+    \brief Create ActionMetadata with given locale and form factor
+    \param locale locale string, eg. en_EN
+    \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
+    */
     ActionMetadata(std::string const& locale, std::string const& form_factor);
+
+    /**
+     \brief Attach arbitrary data to this ActionMetadata.
+     \param data value to attach
+     */
     void set_scope_data(Variant const& data);
+
+    /**
+     \brief Get data attached to this ActionMetadata.
+     \return attached data, or Variant::null
+     */
     Variant scope_data() const;
 
     /// @cond

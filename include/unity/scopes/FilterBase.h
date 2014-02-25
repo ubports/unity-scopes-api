@@ -45,26 +45,39 @@ Actual state of a filters is kept by a FilterState object.
 class FilterBase
 {
 public:
-/// @cond
+    /// @cond
     UNITY_DEFINES_PTRS(FilterBase);
     NONCOPYABLE(FilterBase);
-/// @endcond
+    /// @endcond
 
     /**
-      \brief Get an identifier of this filter.
-      \return filter id
-      */
+     \brief Get an identifier of this filter.
+     \return filter id
+    */
     std::string id() const;
+
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
+
+    /**
+     \brief Get type name of this filter.
+     \return filer type string
+     */
     std::string filter_type() const;
+
+    /// @cond
     virtual ~FilterBase();
 
 protected:
     FilterBase(internal::FilterBaseImpl *pimpl);
-
     std::unique_ptr<internal::FilterBaseImpl> p;
+    /// @endcond
 };
 
+/**
+ \brief List of filters
+*/
 typedef std::list<FilterBase::SCPtr> Filters;
 
 } // namespace scopes
