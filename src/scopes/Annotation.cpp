@@ -31,6 +31,7 @@ Annotation::Annotation(Type atype)
 {
 }
 
+/// @cond
 Annotation::Annotation(Annotation const &other)
     : p(new internal::AnnotationImpl(*(other.p)))
 {
@@ -62,6 +63,7 @@ VariantMap Annotation::serialize() const
 {
     return p->serialize();
 }
+/// @endcond
 
 void Annotation::set_label(std::string const& label)
 {

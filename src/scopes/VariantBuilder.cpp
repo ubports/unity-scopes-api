@@ -25,6 +25,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 VariantBuilder::VariantBuilder()
     : p(new internal::VariantBuilderImpl())
 {
@@ -48,6 +49,7 @@ VariantBuilder& VariantBuilder::operator=(VariantBuilder const& other)
 }
 
 VariantBuilder::~VariantBuilder() = default;
+/// @endcond
 
 void VariantBuilder::add_tuple(std::initializer_list<std::pair<std::string, Variant>> const& tuple)
 {

@@ -32,7 +32,14 @@ namespace scopes
 
 class Variant;
 
+/**
+ \brief A dictionary of (string, Variant) pairs
+*/
 typedef std::map<std::string, Variant> VariantMap;
+
+/**
+ \brief An array of variants
+*/
 typedef std::vector<Variant> VariantArray;
 
 namespace internal

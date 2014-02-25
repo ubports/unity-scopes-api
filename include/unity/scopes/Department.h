@@ -68,6 +68,7 @@ public:
 
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
+    \param department_id department identifier
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
     \param label name of this department to be displayed in the UI
      */
@@ -78,6 +79,7 @@ public:
 
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
+    \param department_id department identifier
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
     \param label name of this department to be displayed in the UI
     \param subdepartments sub-departments of this department

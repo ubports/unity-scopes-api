@@ -42,16 +42,29 @@ class QueryMetadataImpl;
 class QueryMetadata
 {
 public:
+    /// @cond
     QueryMetadata(QueryMetadata const& other);
     QueryMetadata(QueryMetadata&&);
     virtual ~QueryMetadata();
 
     QueryMetadata& operator=(QueryMetadata&&);
+    /// @endcond
 
+    /**
+     \brief Get locale string.
+     \return locale string
+     */
     std::string locale() const;
+
+    /**
+     \brief Get form factor string.
+     \return form factor string
+     */
     std::string form_factor() const;
 
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 protected:
     QueryMetadata(std::string const& locale, std::string const& form_factor);
