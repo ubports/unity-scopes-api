@@ -32,7 +32,7 @@ using namespace unity::test::scopes::internal::smartscopes;
 namespace
 {
 
-const std::string test_url = "http://127.0.0.1";
+const std::string c_test_url = "http://127.0.0.1";
 
 class HttpClientTest : public Test
 {
@@ -41,7 +41,7 @@ public:
         : http_client_(new HttpClientQt(no_reply_timeout)),
           server_(FAKE_SERVER_PATH)
     {
-        test_url_ = test_url + ":" + std::to_string(server_.port_);
+        test_url_ = c_test_url + ":" + std::to_string(server_.port_);
     }
 
 protected:
@@ -67,7 +67,7 @@ TEST_F(HttpClientTest, no_server)
         // RaiiServer goes out of scope, so it gets killed
     }
     // no server
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + ":" + std::to_string(dead_port));
+    HttpResponseHandle::SPtr response = http_client_->get(c_test_url + ":" + std::to_string(dead_port));
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
