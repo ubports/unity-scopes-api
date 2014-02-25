@@ -128,8 +128,8 @@ public:
 
     virtual ~SmartScopesClient();
 
-    void set_url(std::string const& url);
-    void set_port(uint port);
+    void reset_url(std::string const& url = "");
+    void reset_port(uint port = 0);
     std::string url();
     uint port();
 

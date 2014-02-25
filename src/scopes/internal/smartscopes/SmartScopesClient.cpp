@@ -97,33 +97,12 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
     , have_latest_cache_(false)
     , query_counter_(0)
 {
-    std::string base_url;
-
-    // if a url was not provided, get the environmnet variable
-    if (url.empty())
-    {
-        char* sss_url_env = ::getenv("SMART_SCOPES_SERVER");
-        base_url = sss_url_env ? sss_url_env : "";
-    }
-    else
-    {
-        base_url = url;
-    }
-
-    // if we still don't have a url, set url as c_base_url constant
-    if (base_url.empty())
-    {
-        set_url(c_base_url);
-    }
-    else
-    {
-        set_url(base_url);
-    }
+    reset_url(url);
 
     // force set a port only if one was explicitly provided
     if (port != 0)
     {
-        set_port(port);
+        reset_port(port);
     }
 
     // initialise cached_scopes_
@@ -134,42 +113,57 @@ SmartScopesClient::~SmartScopesClient()
 {
 }
 
-void SmartScopesClient::set_url(std::string const& url)
+void SmartScopesClient::reset_url(std::string const& url)
 {
+    std::string base_url = url;
+
+    // if a url was not provided, get the environmnet variable
+    if (base_url.empty())
+    {
+        char* sss_url_env = ::getenv("SMART_SCOPES_SERVER");
+        base_url = sss_url_env ? sss_url_env : "";
+
+        // if the env var was not provided, use the c_base_url constant
+        if (base_url.empty())
+        {
+            base_url = c_base_url;
+        }
+    }
+
     // find the last occurrence of ':' in the url in order to extract the port number
     // * ignore the colon after "http" / "https"
 
     const size_t hier_pos = strlen("https");
-    std::string::size_type port_pos = url.find_last_of(':');
+    std::string::size_type port_pos = base_url.find_last_of(':');
 
     // if there is a port specified in the url
     if (port_pos != std::string::npos && port_pos > hier_pos)
     {
-        url_ = url.substr(0, port_pos);
-        std::string::size_type url_cont = url.find('/', port_pos);
+        url_ = base_url.substr(0, port_pos);
+        std::string::size_type url_cont = base_url.find('/', port_pos);
 
         // if the url continues after the port
         if (url_cont != std::string::npos)
         {
             // extract port, then add the rest of the url to url_
-            port_ = std::stoi(url.substr(port_pos + 1, url_cont - port_pos));
-            url_ += url.substr(url_cont);
+            port_ = std::stoi(base_url.substr(port_pos + 1, url_cont - port_pos));
+            url_ += base_url.substr(url_cont);
         }
         // else if the remainder of the string is just the port
         else
         {
             // extract port
-            port_ = std::stoi(url.substr(port_pos + 1));
+            port_ = std::stoi(base_url.substr(port_pos + 1));
         }
     }
     // else if there is no port specified in the url
     else
     {
-        url_ = url;
+        url_ = base_url;
     }
 }
 
-void SmartScopesClient::set_port(uint port)
+void SmartScopesClient::reset_port(uint port)
 {
     port_ = port;
 }
