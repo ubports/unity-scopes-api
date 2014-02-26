@@ -220,7 +220,7 @@ TEST(ScopeMetadataImpl, serialize)
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(10, var.size());
+    EXPECT_EQ(10u, var.size());
     EXPECT_EQ("scope_name", var["scope_name"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
