@@ -28,11 +28,11 @@ namespace scopes
 {
 
 class ReplyBase;
-class SearchReply;
-class PreviewReply;
+class SearchReplyBase;
+class PreviewReplyBase;
 typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+typedef std::shared_ptr<SearchReplyBase> SearchReplyProxy;
+typedef std::shared_ptr<PreviewReplyBase> PreviewReplyProxy;
 
 } // namespace scopes
 

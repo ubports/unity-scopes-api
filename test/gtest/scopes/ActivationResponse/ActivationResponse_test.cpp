@@ -43,7 +43,7 @@ TEST(ActivationResponse, basic)
         var["foo"] = "bar";
         resp.set_scope_data(Variant(var));
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
-        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ(1u, resp.scope_data().get_dict().size());
         EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
         EXPECT_EQ("bar", resp.hints()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
@@ -54,7 +54,7 @@ TEST(ActivationResponse, basic)
         resp.set_scope_data(Variant("foo"));
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         // hints() with non-dict scope_data returns empty dict
-        EXPECT_EQ(0, resp.hints().size());
+        EXPECT_EQ(0u, resp.hints().size());
         EXPECT_EQ("foo", resp.scope_data().get_string());
     }
 
@@ -215,9 +215,9 @@ TEST(ActivationResponse, copy_ctor)
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ(1u, resp.scope_data().get_dict().size());
         EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
-        EXPECT_EQ(1, copy.scope_data().get_dict().size());
+        EXPECT_EQ(1u, copy.scope_data().get_dict().size());
         EXPECT_EQ("maiden", copy.scope_data().get_dict()["iron"].get_string());
     }
 }
@@ -239,9 +239,9 @@ TEST(ActivationResponse, assign_op_copy)
         }
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(ActivationResponse::Status::HideDash, copy.status());
-        EXPECT_EQ(1, resp.scope_data().get_dict().size());
+        EXPECT_EQ(1u, resp.scope_data().get_dict().size());
         EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
-        EXPECT_EQ(1, copy.scope_data().get_dict().size());
+        EXPECT_EQ(1u, copy.scope_data().get_dict().size());
         EXPECT_EQ("maiden", copy.scope_data().get_dict()["iron"].get_string());
     }
 }

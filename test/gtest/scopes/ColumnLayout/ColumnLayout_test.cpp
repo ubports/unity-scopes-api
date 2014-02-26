@@ -34,7 +34,7 @@ TEST(ColumnLayout, basic)
         cl.add_column({"widget1", "widget2"});
         EXPECT_EQ(1, cl.number_of_columns());
         EXPECT_EQ(1, cl.size());
-        EXPECT_EQ(2, cl.column(0).size());
+        EXPECT_EQ(2u, cl.column(0).size());
         EXPECT_EQ("widget1", cl.column(0)[0]);
     }
     {
@@ -74,9 +74,9 @@ TEST(ColumnLayout, serialize)
         cl.add_column({"widget1", "widget2"});
         auto var = cl.serialize();
         auto outer = var["column_data"];
-        EXPECT_EQ(1, outer.get_array().size());
+        EXPECT_EQ(1u, outer.get_array().size());
         auto inner = outer.get_array()[0];
-        EXPECT_EQ(2, inner.get_array().size());
+        EXPECT_EQ(2u, inner.get_array().size());
     }
 }
 
@@ -92,7 +92,7 @@ TEST(ColumnLayout, deserialize)
         auto layout = ColumnLayoutImpl::create(var);
         EXPECT_EQ(1, layout.size());
         EXPECT_EQ(1, layout.number_of_columns());
-        EXPECT_EQ(2, layout.column(0).size());
+        EXPECT_EQ(2u, layout.column(0).size());
         EXPECT_EQ("widget1", layout.column(0)[0]);
         EXPECT_EQ("widget2", layout.column(0)[1]);
     }

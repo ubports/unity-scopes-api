@@ -192,7 +192,7 @@ public:
     /param q The query string to be executed by the returned object instance.
     /param metadata additional data sent by the client.
     */
-    virtual QueryBase::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
+    virtual SearchQuery::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
@@ -233,7 +233,7 @@ public:
     \param result The result that should be previewed.
     \param method additional data sent by the client.
      */
-    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
+    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

@@ -28,7 +28,7 @@ using namespace unity::scopes::internal;
 TEST(CategoryRenderer, basic)
 {
     CategoryRenderer rdr;
-    EXPECT_TRUE(rdr.data().size() > 0);
+    EXPECT_FALSE(rdr.data().empty());
     EXPECT_EQ(DEFAULT_RENDERER, rdr.data());
 }
 
@@ -40,5 +40,5 @@ TEST(CategoryRenderer, from_file)
     EXPECT_NO_THROW(CategoryRenderer::from_file(input_file));
 
     auto rdr = CategoryRenderer::from_file(input_file);
-    EXPECT_TRUE(rdr.data().size() > 0);
+    EXPECT_FALSE(rdr.data().empty());
 }

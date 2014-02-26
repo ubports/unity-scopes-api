@@ -79,9 +79,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual QueryBase::UPtr create_query(Query const& q, SearchMetadata const& hints) override
+    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const& hints) override
     {
-        QueryBase::UPtr query(new MyQuery(q, renderer_));
+        SearchQuery::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;
 
         if (hints.cardinality() > 0)
@@ -94,7 +94,7 @@ public:
         return query;
     }
 
-    virtual QueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

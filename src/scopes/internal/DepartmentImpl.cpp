@@ -82,7 +82,7 @@ VariantMap DepartmentImpl::serialize() const
     vm["query"] = query_.serialize();
 
     // sub-departments are optional
-    if (departments_.size())
+    if (!departments_.empty())
     {
         VariantArray subdeparr;
         for (auto const& dep: departments_)
@@ -142,7 +142,7 @@ void DepartmentImpl::validate_departments(DepartmentList const& departments, std
 
 void DepartmentImpl::validate_departments(DepartmentList const& departments, std::string const &current_department_id)
 {
-    if (departments.size() == 0)
+    if (departments.empty())
     {
         throw unity::LogicException("DepartmentImpl::validate_departments(): empty departments list");
     }

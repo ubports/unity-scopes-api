@@ -31,7 +31,7 @@ namespace scopes
 //! @cond
 
 SearchReply::SearchReply(internal::ReplyImpl* impl) :
-    ObjectProxy(impl), ReplyBase(impl)
+    SearchReplyBase(), Reply(impl)
 {
 }
 
