@@ -42,7 +42,7 @@ public:
     ConfigBase(std::string const& configfile);
     virtual ~ConfigBase();
 
-    unity::util::IniParser::SPtr parser() const noexcept;
+    unity::util::IniParser::SPtr parser() const;
 
     virtual std::string get_string(std::string const& group, std::string const& key) const;
     virtual std::string get_optional_string(std::string const& group, std::string const& key) const;
@@ -51,7 +51,6 @@ public:
     virtual void throw_ex(::std::string const& reason) const;
 
 private:
-    unity::util::IniParser::SPtr p() const;
     unity::util::IniParser::SPtr parser_;
     std::string configfile_;
 };
