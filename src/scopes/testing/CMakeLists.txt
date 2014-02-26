@@ -1,4 +1,5 @@
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/Benchmark.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataBuilder.cpp
 )

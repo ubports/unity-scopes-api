@@ -74,6 +74,8 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
+
         unity::scopes::Department dep("news", query_, "News");
         dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
         reply->register_departments({dep}, "news");
@@ -105,6 +107,8 @@ public:
 
     void run(unity::scopes::PreviewReplyProxy const& reply) override
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
+
         unity::scopes::PreviewWidgetList widgets;
         widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
         widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));

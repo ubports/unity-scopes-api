@@ -16,6 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <unity/scopes/testing/Benchmark.h>
 #include <unity/scopes/testing/Category.h>
 #include <unity/scopes/testing/Result.h>
 #include <unity/scopes/testing/ScopeMetadataBuilder.h>
@@ -151,4 +152,44 @@ TEST_F(TestScopeFixture, performing_an_action_works)
     EXPECT_NE(nullptr, activation);
     EXPECT_EQ(unity::scopes::ActivationResponse::ShowDash,
               activation->activate().status());
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_query_performance_works)
+{
+    unity::scopes::testing::Benchmark benchmark;
+
+    unity::scopes::Query query{scope_name};
+    query.set_query_string(scope_query_string);
+
+    unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    auto result = benchmark.for_query(scope,
+                                      query,
+                                      meta_data,
+                                      sample_size,
+                                      per_trial_timeout);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_preview_performance_works)
+{
+    unity::scopes::testing::Benchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    auto result = benchmark.for_preview(scope,
+                                        search_result,
+                                        meta_data,
+                                        sample_size,
+                                        per_trial_timeout);
+
+    std::cout << result << std::endl;
 }
