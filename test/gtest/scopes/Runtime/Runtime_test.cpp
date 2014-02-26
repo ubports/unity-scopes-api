@@ -38,6 +38,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Runtime, basic)
 {
@@ -193,7 +194,7 @@ TEST(Runtime, preview)
     previewer->wait_until_finished();
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
     rt->run_scope(&scope);
@@ -202,7 +203,7 @@ void scope_thread(Runtime::SPtr const& rt)
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
     std::thread scope_t(scope_thread, rt);
     auto rc = RUN_ALL_TESTS();
     rt->destroy();
