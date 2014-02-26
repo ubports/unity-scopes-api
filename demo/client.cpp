@@ -61,7 +61,7 @@ std::string to_string(Department const& dep, std::string const& indent = "")
     std::ostringstream str;
     str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
     auto const subdeps = dep.subdepartments();
-    if (subdeps.size() > 0)
+    if (!subdeps.empty())
     {
         str << indent << "\tsubdepartments:" << endl;
         for (auto const& d: subdeps)
