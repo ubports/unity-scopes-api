@@ -238,7 +238,7 @@ public:
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.
     */
-    void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
+    static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
 protected:
     /// @cond
