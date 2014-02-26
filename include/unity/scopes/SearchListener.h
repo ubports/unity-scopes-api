@@ -62,6 +62,7 @@ public:
 
     /**
     \brief Called at most once by the scopes run time for a list of departments returned by a query.
+
     The default implementation does nothing.
     */
     virtual void push(DepartmentList const& departments, std::string const& current_department_id);
@@ -73,12 +74,14 @@ public:
 
     /**
     \brief Called once by the scopes run time for each annotation that is returned by a query().
+
     The default implementation does nothing.
     */
     virtual void push(Annotation annotation);
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().
+
     The default implementation does nothing. Receipt of categories may be interleaved with
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
@@ -87,6 +90,7 @@ public:
 
     /**
      \brief Called once by the scopes to send all the filters and their state.
+
      The default implementation does nothing.
      */
     virtual void push(Filters const& filters, FilterState const& filter_state);

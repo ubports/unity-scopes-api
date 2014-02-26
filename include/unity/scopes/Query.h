@@ -38,7 +38,8 @@ class QueryImpl;
 
 /**
  * \brief Holds all parameters of a search query.
- * Holds all parameters of search query: a target scope name, query string, department id and
+
+ * Holds all parameters of a search query: the target scope name, query string, department id, and
  * state of the filters. Can be converted to/from scope:// uri schema string.
  */
 class Query final
@@ -82,20 +83,20 @@ public:
     void set_filter_state(FilterState const& filter_state);
 
     /**
-     * \brief Returns scope name of this Query.
-     * \return scope name
+     * \brief Returns the scope name of this Query.
+     * \return The scope name.
      */
     std::string scope_name() const;
 
     /**
      * \brief Returns the department id of this Query.
-     * \return department id
+     * \return The department id.
      */
     std::string department_id() const;
 
     /**
      * \brief Returns the query string of this Query.
-     * \return query string
+     * \return The query string.
      */
     std::string query_string() const;
 
@@ -104,22 +105,26 @@ public:
     /// @endcond
 
     /**
-     * \brief Returns a string representation of this Query object using scope:// schema
-     * \return a uri in scope:// schema
+     * \brief Returns a string representation of this Query object as a URI using scope:// schema.
+     * \return The URI for the query.
      */
     std::string to_string() const;
 
     /**
      \brief Get state of the filters for this Query.
-     Pass this state to methods of specific filter instances (such as unity::scopes::OptionSelectorFilter::active_options())to examine filter state.
-     \return state of the filters
+
+     Pass this state to methods of specific filter instances (such as
+     unity::scopes::OptionSelectorFilter::active_options())to examine filter state.
+     \return The state of the filters.
      */
     FilterState filter_state() const;
 
     /**
-     * \brief Recreates a Query object from a scope:// uri.
+     * \brief Recreates a Query object from a scope:// URI.
+
      * May throw InvalidArgumentException on invalid schema.
      * \return a Query instance
+     * \throws InvalidArgumentException of the URI cannot be parsed.
      */
     static Query from_string();
 

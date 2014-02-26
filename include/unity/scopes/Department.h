@@ -103,25 +103,25 @@ public:
 
     /**
      \brief Get an identifier of this department.
-     \return department identifier
+     \return The department identifier.
      */
     std::string id() const;
 
     /**
-     \brief Get name of this department.
-     \return department name
+     \brief Get the label of this department.
+     \return The department label.
      */
     std::string label() const;
 
     /**
-     \brief Get query associated with this department.
-     \return query for this department
+     \brief Get the query associated with this department.
+     \return The query for this department.
      */
     Query query() const;
 
     /**
      \brief Get list of sub-departments of this department.
-     \return list of sub-departments.
+     \return The list of sub-departments.
     */
     DepartmentList subdepartments() const;
 

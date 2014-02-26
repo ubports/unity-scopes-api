@@ -52,12 +52,14 @@ public:
 
     /**
     \brief Returns the metadata for the scope with the given name.
-    @return The metadata for the scope. If no scope with the given name exists, get_metadata() throws NotFoundException.
+    \return The metadata for the scope.
+    \throws NotFoundException if no scope with the given name exists.
     */
     ScopeMetadata get_metadata(std::string const& scope_name) const override;
 
     /**
     \brief Returns a map containing the metadata for all scopes.
+    \return The metadata for all scopes.
     */
     MetadataMap list() const override;
 

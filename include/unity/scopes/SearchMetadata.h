@@ -68,14 +68,14 @@ public:
     /// @endcond
 
     /**
-     \brief Set cardinality
-     \param cardinality maximum number of search results
+     \brief Set cardinality.
+     \param cardinality The maximum number of search results.
     */
     void set_cardinality(int cardinality);
 
     /**
-     \brief Get cardinality
-     \return maxmium number of search results, or 0 for no limit
+     \brief Get cardinality.
+     \return The maxmium number of search results, or 0 for no limit.
     */
     int cardinality() const;
 

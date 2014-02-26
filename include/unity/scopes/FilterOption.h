@@ -48,14 +48,14 @@ public:
     /// @endcond
 
     /**
-     \brief Get identifier of this filter option
-     \return option identifier
+     \brief Get the identifier of this filter option.
+     \return The option identifier.
      */
     std::string id() const;
 
     /**
-     \brief Get label of this filter option
-     \return option label
+     \brief Get the label of this filter option.
+     \return The option label.
     */
     std::string label() const;
 

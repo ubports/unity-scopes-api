@@ -40,8 +40,7 @@ class FilterBaseImpl;
 }
 
 /**
-\brief Provides a list of choices, allows one or more to be selected.
-A selection filter that displays a list of choices and allows one or more of them to be selected.
+\brief A selection filter that displays a list of choices and allows one or more of them to be selected.
 */
 
 class OptionSelectorFilter : public FilterBase
@@ -61,45 +60,47 @@ public:
     static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
-     \brief Get label of this filter.
-     \return filter label
+     \brief Get the label of this filter.
+     \return The filter label.
     */
     std::string label() const;
 
     /**
      \brief Check if this filter supports multiple options to be selected.
-     \return true if multi-selection is enabled.
+     \return True if multi-selection is enabled.
      */
     bool multi_select() const;
 
     /**
      \brief Add a new option to this filter.
-     \return an option instance
+     \return The new option instance.
      */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
 
     /**
      \brief Get all options of this filter, in the order they were added.
-     \return list of options
+     \return The list of options.
      */
     std::list<FilterOption::SCPtr> options() const;
 
     /**
     \brief Get active options from an instance of FilterState for this filter.
-    \return a set of selected filter options
+    \return The set of selected filter options.
     */
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
 
     /**
      \brief Marks given FilterOption of this filter instance as active (or not active) in a FilterState object.
-     Records given FilterOption as "selected" in the FilterState. This is meant to be used to modify FilterState
-     received with search request before sending it back to the client (UI shell).
+
+     Records the given FilterOption as "selected" in the FilterState. This is meant to be used to modify a
+     FilterState received with a search request before sending it back to the client (UI shell).
      */
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
 
     /**
     \brief Marks an option of a filter active/inactive in a FilterState object, without having an instance of OptionSelectorFilter.
-    Updates an instance of FilterState, with no need of having an OptionSelectorFilter instance. This is meant
+
+    Updates an instance of FilterState, without the need for an OptionSelectorFilter instance. This is meant
     to be used when creating a canned Query that references another scope.
     */
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);

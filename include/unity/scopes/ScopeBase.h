@@ -189,8 +189,9 @@ public:
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to create_query() is made
     by an arbitrary thread.
-    /param q The query string to be executed by the returned object instance.
-    /param metadata additional data sent by the client.
+    \param query The query string to be executed by the returned object instance.
+    \param metadata additional data sent by the client.
+    \return The query instance.
     */
     virtual SearchQuery::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
 
@@ -205,6 +206,7 @@ public:
     ActivationResponse::Status::NotHandled.
     \param result The result that should be activated.
     \param metadata additional data sent by the client.
+    \return The activation instance.
      */
     virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
@@ -221,6 +223,7 @@ public:
     \param metadata Additional data sent by client.
     \param widget_id The identifier of the 'actions' widget of the activated action.
     \param action_id The identifier of the action that was activated.
+    \return The activation instance.
      */
     virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
@@ -233,6 +236,7 @@ public:
     by an arbitrary thread.
     \param result The result that should be previewed.
     \param metadata Additional data sent by the client.
+    \return The preview instance.
      */
     virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
@@ -259,6 +263,8 @@ destroy function is called by the scopes run time.
 
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
+
+\return The pointer to the ScopeBase instance.
 */
 extern "C" unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION();
 
@@ -267,8 +273,10 @@ extern "C" unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION();
 The passed pointer is the pointer that was returned by the create function.
 
 Exceptions thrown by the destroy function are ignored.
+
+\param p The pointer to the instance to be destroyed (previously returned by the create function).
 */
-extern "C" void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase*);
+extern "C" void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* p);
 
 namespace unity
 {

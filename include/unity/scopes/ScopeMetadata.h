@@ -59,56 +59,56 @@ public:
     /// @endcond
 
     /**
-     \brief Get scope name.
-     \return name of the scope
+     \brief Get the scope name.
+     \return The name of the scope.
      */
     std::string scope_name() const;
 
     /**
-     \brief Get proxy object for this scope.
-     \return scope proxy
+     \brief Get the proxy object for this scope.
+     \return The scope proxy.
      */
     ScopeProxy proxy() const;
 
     /**
-     \brief Get display name for this scope.
-     \return scope display name
+     \brief Get the display name for this scope.
+     \return The scope display name.
      */
     std::string display_name() const;   // localized
 
     /**
-     \brief Get description for this scope.
-     \return scope description
+     \brief Get the description for this scope.
+     \return The scope description.
      */
     std::string description() const;    // localized
 
     /**
-     \brief Get art for this scope.
-     \return scope art
+     \brief Get the art for this scope.
+     \return The scope art.
      */
     std::string art() const;            // optional
 
     /**
-     \brief Get icon for this scope.
-     \return scope icon
+     \brief Get the icon for this scope.
+     \return The scope icon.
     */
     std::string icon() const;           // optional
 
     /**
-     \brief Get search hint for this scope.
-     \return search hint
+     \brief Get the search hint for this scope.
+     \return The search hint.
     */
     std::string search_hint() const;    // localized, optional
 
     /**
-     \brief Get hot key for this scope
-     \return hot key
+     \brief Get the hot key for this scope.
+     \return The hot key.
      */
     std::string hot_key() const;        // localized, optional
 
     /**
      \brief Check if this scope should be hidden in the Dash.
-     \return true if this scope is invisible
+     \return True if this scope is invisible.
      */
     bool invisible() const;             // optional (default = false)
 

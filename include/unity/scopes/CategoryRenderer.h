@@ -103,12 +103,13 @@ public:
 
     /**
      \brief Creates CategoryRenderer from a text file.
+     \return The CategoryRenderer corresponding to the information in the file.
      */
     static CategoryRenderer from_file(std::string const& path);
 
     /**
      \brief Returns complete renderer template definition in JSON format.
-     \return renderer template (JSON)
+     \return The renderer template (JSON).
      */
     std::string data() const;
 
