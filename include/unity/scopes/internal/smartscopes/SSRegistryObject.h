@@ -47,8 +47,8 @@ public:
                      uint sss_port = 0, bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_name) override;
-    MetadataMap list() override;
+    ScopeMetadata get_metadata(std::string const& scope_name) const override;
+    MetadataMap list() const override;
 
     ScopeProxy locate(std::string const& scope_name) override;
 
