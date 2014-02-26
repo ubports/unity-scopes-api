@@ -380,7 +380,6 @@ else()
     endif()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
-                       COMMAND echo Doxygen warnings: `grep warning doxygen-warnings.txt | wc -l`
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${PROJECT_SOURCE_DIR}/doc/tutorial.dox
                                ${UNITY_SCOPES_LIB_SRC}
