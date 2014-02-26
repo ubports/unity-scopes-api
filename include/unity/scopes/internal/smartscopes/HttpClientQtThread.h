@@ -19,15 +19,19 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 
-#include <unity/util/NonCopyable.h>
+// This hack allows unity-scopes-api to be built with
+// clang-3.4+ and versions of Qt before v5.1.1.
+#if QT_VERSION < 0x050101
+    #define qHash(x,y) qHash(const QUrl &url, uint seed)
+    #include <QUrl>
+    #undef qHash
+#else
+    #include <QUrl>
+#endif
 
 #include <QThread>
 
-///! This hack allows unity-scopes-api to build with clang-3.4+
-///! TODO: Remove this when Qt is updated to 5.1.1+ on Ubuntu
-#define qHash(x,y) qHash(const QUrl &url, uint seed)
-#include <QUrl>
-#undef qHash
+#include <unity/util/NonCopyable.h>
 
 #include <mutex>
 
