@@ -23,7 +23,7 @@
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReplyBase.h>
 
-#include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
 
 #include <unity/scopes/testing/Category.h>
 
@@ -45,6 +45,10 @@ namespace acc = boost::accumulators;
 
 namespace
 {
+constexpr static const int result_idx = 0;
+constexpr static const int metadata_idx = 1;
+constexpr static const int widget_idx = 2;
+constexpr static const int action_idx = 3;
 
 struct WaitableReply : public virtual unity::scopes::ReplyBase
 {
@@ -120,7 +124,7 @@ struct DevNullPreviewReply : public virtual unity::scopes::PreviewReplyBase, pub
 
 struct DevNullSearchReply : public virtual unity::scopes::SearchReplyBase, public WaitableReply
 {
-    std::unordered_map<std::string, unity::scopes::Category::SCPtr> categories;
+    unity::scopes::internal::CategoryRegistry category_registry;
 
     void register_departments(unity::scopes::DepartmentList const&, std::string)
     {
@@ -132,29 +136,17 @@ struct DevNullSearchReply : public virtual unity::scopes::SearchReplyBase, publi
             std::string const& icon,
             unity::scopes::CategoryRenderer const& renderer)
     {
-        auto it = categories.find(id);
-
-        if (it != categories.end())
-            return it->second;
-
-        unity::scopes::Category::SCPtr category{new unity::scopes::testing::Category{id, title, icon, renderer}};
-        categories[id] = category;
-
-        return category;
+        return category_registry.register_category(id, title, icon, renderer);
     }
 
-    void register_category(unity::scopes::Category::SCPtr)
+    void register_category(unity::scopes::Category::SCPtr category)
     {
+        category_registry.register_category(category);
     }
 
     unity::scopes::Category::SCPtr lookup_category(std::string const& id) const
     {
-        auto it = categories.find(id);
-
-        if (it != categories.end())
-            return it->second;
-
-        return unity::scopes::Category::SCPtr{};
+        return category_registry.lookup_category(id);
     }
 
     bool push(unity::scopes::CategorisedResult const&) const
@@ -186,25 +178,183 @@ typedef acc::accumulator_set<
 > Statistics;
 }
 
-unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for_query(
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-        const unity::scopes::Query& query,
-        const unity::scopes::SearchMetadata& md,
-        std::size_t sample_size,
-        const std::chrono::microseconds& per_query_timeout)
+        unity::scopes::testing::Benchmark::QueryConfiguration config)
 {
     Statistics stats;
 
-    for (unsigned int i = 0; i < sample_size; i++)
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
-        auto child = core::posix::fork([per_query_timeout, scope, query, md]()
+        DevNullSearchReply search_reply;
+
+        auto before = Clock::now();
+        {
+            auto sample = config.sampler();
+            auto q = scope->create_query(sample.first, sample.second);
+
+            q->run(unity::scopes::SearchReplyProxy
+            {
+                &search_reply,
+                [](unity::scopes::SearchReplyBase* r)
+                {
+                    r->finished();
+                }
+            });
+            if (!search_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
+                throw std::runtime_error("Query did not complete within the specified timeout interval.");
+        }
+        auto after = Clock::now();
+
+        stats(std::chrono::duration_cast<Resolution>(after - before).count());
+    }
+
+    unity::scopes::testing::Benchmark::Result result;
+    result.sample_size = acc::count(stats);
+    result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_preview(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::PreviewConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+            DevNullPreviewReply preview_reply;
+
+            auto before = Clock::now();
+            {
+                auto sample = config.sampler();
+
+                auto q = scope->preview(sample.first, sample.second);
+                q->run(unity::scopes::PreviewReplyProxy
+                {
+                    &preview_reply,
+                    [](unity::scopes::PreviewReplyBase* r)
+                    {
+                        r->finished();
+                    }
+                });
+                if (!preview_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
+                    throw std::runtime_error("Preview did not complete within the specified timeout interval.");
+            }
+            auto after = Clock::now();
+
+            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+    }
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.sample_size = acc::count(stats);
+    benchmark_result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    benchmark_result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return benchmark_result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_activation(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::ActivationConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+            auto before = Clock::now();
+            {
+                auto sample = config.sampler();
+                auto a = scope->activate(sample.first, sample.second);
+                (void) a->activate();
+            }
+            auto after = Clock::now();
+
+            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+    }
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.sample_size = acc::count(stats);
+    benchmark_result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    benchmark_result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return benchmark_result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_action(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::ActionConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+            auto before = Clock::now();
+            {
+                auto sample = config.sampler();
+                auto a = scope->perform_action(std::get<result_idx>(sample),
+                                               std::get<metadata_idx>(sample),
+                                               std::get<widget_idx>(sample),
+                                               std::get<action_idx>(sample));
+                (void) a->activate();
+            }
+            auto after = Clock::now();
+
+            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+    }
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.sample_size = acc::count(stats);
+    benchmark_result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    benchmark_result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return benchmark_result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_query(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::QueryConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+        auto child = core::posix::fork([config, scope]()
         {
             core::posix::exit::Status exit_status{core::posix::exit::Status::success};
             DevNullSearchReply search_reply;
 
             auto before = Clock::now();
             {
-                auto q = scope->create_query(query, md);
+                auto sample = config.sampler();
+                auto q = scope->create_query(sample.first, sample.second);
+
                 q->run(unity::scopes::SearchReplyProxy
                 {
                     &search_reply,
@@ -213,12 +363,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for
                         r->finished();
                     }
                 });
-                if (!search_reply.wait_for_finished_for(per_query_timeout))
+                if (!search_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
                     exit_status = core::posix::exit::Status::failure;
             }
             auto after = Clock::now();
 
-            std::cout << std::chrono::duration_cast<Resolution>(after.time_since_epoch() - before.time_since_epoch()).count() << std::endl;
+            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
 
             return exit_status;
         },
@@ -261,25 +411,24 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for
     return result;
 }
 
-unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for_preview(
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_preview(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-        const unity::scopes::Result& result,
-        const unity::scopes::ActionMetadata& md,
-        std::size_t sample_size,
-        const std::chrono::microseconds& per_query_timeout)
+        unity::scopes::testing::Benchmark::PreviewConfiguration config)
 {
     Statistics stats;
 
-    for (unsigned int i = 0; i < sample_size; i++)
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
-        auto child = core::posix::fork([per_query_timeout, scope, result, md]()
+        auto child = core::posix::fork([config, scope]()
         {
             core::posix::exit::Status exit_status{core::posix::exit::Status::success};
             DevNullPreviewReply preview_reply;
 
             auto before = Clock::now();
             {
-                auto q = scope->preview(result, md);
+                auto sample = config.sampler();
+
+                auto q = scope->preview(sample.first, sample.second);
                 q->run(unity::scopes::PreviewReplyProxy
                 {
                     &preview_reply,
@@ -288,12 +437,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for
                         r->finished();
                     }
                 });
-                if (!preview_reply.wait_for_finished_for(per_query_timeout))
+                if (!preview_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
                     exit_status = core::posix::exit::Status::failure;
             }
             auto after = Clock::now();
 
-            std::cout << std::chrono::duration_cast<Resolution>(after.time_since_epoch() - before.time_since_epoch()).count() << std::endl;
+            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
 
             return exit_status;
         },
@@ -316,6 +465,135 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::Benchmark::for
 
         if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
             throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                     "Trial exited with failure, bailing out now. "
+                                     "Please see the detailed error output and backtrace.");
+
+        stats(result);
+    }
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.sample_size = acc::count(stats);
+    benchmark_result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    benchmark_result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return benchmark_result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_activation(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::ActivationConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+        auto child = core::posix::fork([config, scope]()
+        {
+            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
+
+            auto before = Clock::now();
+            {
+                auto sample = config.sampler();
+                auto a = scope->activate(sample.first, sample.second);
+                (void) a->activate();
+            }
+            auto after = Clock::now();
+
+            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
+
+            return exit_status;
+        },
+        core::posix::StandardStream::stdout);
+
+        Resolution::rep result; child.cout() >> result;
+
+        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
+
+        switch(wait_result.status)
+        {
+        case core::posix::wait::Result::Status::signaled:
+        case core::posix::wait::Result::Status::stopped:
+            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
+                                     "Trial terminated with error, bailing out now. "
+                                     "Please see the detailed error output and backtrace.");
+        default:
+            break;
+        }
+
+        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
+                                     "Trial exited with failure, bailing out now. "
+                                     "Please see the detailed error output and backtrace.");
+
+        stats(result);
+    }
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.sample_size = acc::count(stats);
+    benchmark_result.time.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    benchmark_result.time.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+
+    return benchmark_result;
+}
+
+unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_action(
+        const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+        unity::scopes::testing::Benchmark::ActionConfiguration config)
+{
+    Statistics stats;
+
+    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    {
+        auto child = core::posix::fork([config, scope]()
+        {
+            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
+
+            auto before = Clock::now();
+            {
+                auto sample = config.sampler();
+                auto a = scope->perform_action(std::get<result_idx>(sample),
+                                               std::get<metadata_idx>(sample),
+                                               std::get<widget_idx>(sample),
+                                               std::get<action_idx>(sample));
+                (void) a->activate();
+            }
+            auto after = Clock::now();
+
+            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
+
+            return exit_status;
+        },
+        core::posix::StandardStream::stdout);
+
+        Resolution::rep result; child.cout() >> result;
+
+        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
+
+        switch(wait_result.status)
+        {
+        case core::posix::wait::Result::Status::signaled:
+        case core::posix::wait::Result::Status::stopped:
+            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
+                                     "Trial terminated with error, bailing out now. "
+                                     "Please see the detailed error output and backtrace.");
+        default:
+            break;
+        }
+
+        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
                                      "Trial exited with failure, bailing out now. "
                                      "Please see the detailed error output and backtrace.");
 

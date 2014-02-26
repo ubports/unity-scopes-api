@@ -19,7 +19,13 @@
 #ifndef UNITY_SCOPES_TESTING_BENCHMARK_H
 #define UNITY_SCOPES_TESTING_BENCHMARK_H
 
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/Query.h>
+#include <unity/scopes/Result.h>
+#include <unity/scopes/SearchMetadata.h>
+
 #include <chrono>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 
@@ -28,11 +34,7 @@ namespace unity
 
 namespace scopes
 {
-class ActionMetadata;
-class Query;
-class Result;
 class ScopeBase;
-class SearchMetadata;
 
 namespace testing
 {
@@ -50,17 +52,100 @@ public:
         } time{};
     };
 
+    struct TrialConfiguration
+    {
+        std::size_t trial_count;
+        std::chrono::microseconds per_trial_timeout;
+    };
+
+    struct QueryConfiguration
+    {
+        std::function<std::pair<unity::scopes::Query, unity::scopes::SearchMetadata>()> sampler;
+        TrialConfiguration trial_configuration;
+    };
+
+    struct PreviewConfiguration
+    {
+        std::function<std::pair<unity::scopes::Result, unity::scopes::ActionMetadata>()> sampler;
+        TrialConfiguration trial_configuration;
+    };
+
+    struct ActivationConfiguration
+    {
+        std::function<std::pair<unity::scopes::Result, unity::scopes::ActionMetadata>()> sampler;
+        TrialConfiguration trial_configuration;
+    };
+
+    struct ActionConfiguration
+    {
+        std::function<
+            std::tuple<
+                unity::scopes::Result,
+                unity::scopes::ActionMetadata,
+                std::string,
+                std::string
+            >()
+        > sampler;
+        TrialConfiguration trial_configuration;
+    };
+
+    virtual ~Benchmark() = default;
+    Benchmark(const Benchmark&) = delete;
+    Benchmark(Benchmark&&) = delete;
+
+    Benchmark& operator=(const Benchmark&) = delete;
+    Benchmark& operator=(Benchmark&&) = delete;
+
+    virtual Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                             QueryConfiguration configuration) = 0;
+
+    virtual Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                               PreviewConfiguration preview_configuration) = 0;
+
+    virtual Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                                  ActivationConfiguration activation_configuration) = 0;
+
+    virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                              ActionConfiguration activation_configuration) = 0;
+
+protected:
+    Benchmark() = default;
+};
+
+class InProcessBenchmark : public Benchmark
+{
+public:
+    InProcessBenchmark() = default;
+
     Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                     const unity::scopes::Query& query,
-                     const unity::scopes::SearchMetadata& md,
-                     std::size_t sample_size,
-                     const std::chrono::microseconds& per_query_timeout);
+                     QueryConfiguration configuration) override;
 
     Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                       const unity::scopes::Result& result,
-                       const unity::scopes::ActionMetadata& md,
-                       std::size_t sample_size,
-                       const std::chrono::microseconds& per_query_timeout);
+                       PreviewConfiguration preview_configuration) override;
+
+    Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                          ActivationConfiguration activation_configuration) override;
+
+    Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                              ActionConfiguration activation_configuration) override;
+};
+
+class OutOfProcessBenchmark : public Benchmark
+{
+public:
+    OutOfProcessBenchmark() = default;
+
+    Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                     QueryConfiguration configuration) override;
+
+    Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                       PreviewConfiguration preview_configuration) override;
+
+    Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                          ActivationConfiguration activation_configuration) override;
+
+    Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                              ActionConfiguration activation_configuration) override;
 };
 
 std::ostream& operator<<(std::ostream&, const Benchmark::Result&);

@@ -154,9 +154,9 @@ TEST_F(TestScopeFixture, performing_an_action_works)
               activation->activate().status());
 }
 
-TEST_F(TestScopeFixture, benchmarking_a_scope_query_performance_works)
+TEST_F(TestScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 {
-    unity::scopes::testing::Benchmark benchmark;
+    unity::scopes::testing::OutOfProcessBenchmark benchmark;
 
     unity::scopes::Query query{scope_name};
     query.set_query_string(scope_query_string);
@@ -166,18 +166,23 @@ TEST_F(TestScopeFixture, benchmarking_a_scope_query_performance_works)
     static const std::size_t sample_size{10};
     static const std::chrono::seconds per_trial_timeout{1};
 
-    auto result = benchmark.for_query(scope,
-                                      query,
-                                      meta_data,
-                                      sample_size,
-                                      per_trial_timeout);
+    unity::scopes::testing::Benchmark::QueryConfiguration config
+    {
+        [query, meta_data]() { return std::make_pair(query, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_query(scope, config);
 
     std::cout << result << std::endl;
 }
 
-TEST_F(TestScopeFixture, benchmarking_a_scope_preview_performance_works)
+TEST_F(TestScopeFixture, benchmarking_a_scope_preview_performance_oop_works)
 {
-    unity::scopes::testing::Benchmark benchmark;
+    unity::scopes::testing::OutOfProcessBenchmark benchmark;
 
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
@@ -185,11 +190,166 @@ TEST_F(TestScopeFixture, benchmarking_a_scope_preview_performance_works)
     static const std::size_t sample_size{10};
     static const std::chrono::seconds per_trial_timeout{1};
 
-    auto result = benchmark.for_preview(scope,
-                                        search_result,
-                                        meta_data,
-                                        sample_size,
-                                        per_trial_timeout);
+    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_preview(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
+{
+    unity::scopes::testing::OutOfProcessBenchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_activation(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_action_performance_oop_works)
+{
+    unity::scopes::testing::InProcessBenchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+    static const std::string widget_id{"does.not.exist.widget"};
+    static const std::string action_id{"does.not.exist.action"};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::ActionConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_action(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_query_performance_works)
+{
+    unity::scopes::testing::InProcessBenchmark benchmark;
+
+    unity::scopes::Query query{scope_name};
+    query.set_query_string(scope_query_string);
+
+    unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::QueryConfiguration config
+    {
+        [query, meta_data]() { return std::make_pair(query, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_query(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_preview_performance_works)
+{
+    unity::scopes::testing::InProcessBenchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_preview(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_activation_performance_works)
+{
+    unity::scopes::testing::InProcessBenchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_activation(scope, config);
+
+    std::cout << result << std::endl;
+}
+
+TEST_F(TestScopeFixture, benchmarking_a_scope_action_performance_works)
+{
+    unity::scopes::testing::InProcessBenchmark benchmark;
+
+    unity::scopes::testing::Result search_result;
+    unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
+    static const std::string widget_id{"does.not.exist.widget"};
+    static const std::string action_id{"does.not.exist.action"};
+
+    static const std::size_t sample_size{10};
+    static const std::chrono::seconds per_trial_timeout{1};
+
+    unity::scopes::testing::Benchmark::ActionConfiguration config
+    {
+        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
+        {
+            sample_size,
+            per_trial_timeout
+        }
+    };
+
+    auto result = benchmark.for_action(scope, config);
 
     std::cout << result << std::endl;
 }
