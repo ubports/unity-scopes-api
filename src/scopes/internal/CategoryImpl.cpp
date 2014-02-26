@@ -28,8 +28,6 @@ namespace scopes
 namespace internal
 {
 
-//! @cond
-
 CategoryImpl::CategoryImpl(VariantMap const& variant_map)
 {
     deserialize(variant_map);
