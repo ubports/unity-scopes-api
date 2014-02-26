@@ -75,12 +75,12 @@ void PusherScope::run()
 {
 }
 
-QueryBase::UPtr PusherScope::create_query(Query const& /* query */, SearchMetadata const& md)
+SearchQuery::UPtr PusherScope::create_query(Query const& /* query */, SearchMetadata const& md)
 {
-    return QueryBase::UPtr(new PusherQuery(md.cardinality()));
+    return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
 }
 
-QueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
+PreviewQuery::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
     abort();  // Not called
 }
