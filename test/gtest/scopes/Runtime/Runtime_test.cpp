@@ -53,9 +53,9 @@ public:
     virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
     {
         EXPECT_EQ(current_department_id, "news");
-        EXPECT_EQ(1, departments.size());
+        EXPECT_EQ(1u, departments.size());
         auto subdeps = departments.front().subdepartments();
-        EXPECT_EQ(2, subdeps.size());
+        EXPECT_EQ(2u, subdeps.size());
         EXPECT_EQ("subdep1", subdeps.front().id());
         EXPECT_EQ("Europe", subdeps.front().label());
         EXPECT_EQ("test", subdeps.front().query().query_string());
@@ -76,7 +76,7 @@ public:
     }
     virtual void push(Annotation annotation) override
     {
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
         auto query = annotation.links().front()->query();
         EXPECT_EQ("scope-A", query.scope_name());
@@ -120,7 +120,7 @@ class PreviewReceiver : public PreviewListener
 public:
     virtual void push(PreviewWidgetList const& widgets) override
     {
-        EXPECT_EQ(widgets.size(), 2);
+        EXPECT_EQ(2u, widgets.size());
         widgets_pushes_++;
     }
     virtual void push(std::string const& key, Variant const&) override

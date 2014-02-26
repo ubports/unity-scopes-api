@@ -29,28 +29,28 @@ TEST(ThreadSafeQueue, basic)
 {
     ThreadSafeQueue<int> q;
     EXPECT_TRUE(q.empty());
-    EXPECT_EQ(0, q.size());
+    EXPECT_EQ(0u, q.size());
     int n;
     EXPECT_FALSE(q.try_pop(n));
 
     q.push(5);                // R-value
     EXPECT_FALSE(q.empty());
-    EXPECT_EQ(1, q.size());
+    EXPECT_EQ(1u, q.size());
     n = q.wait_and_pop();
     EXPECT_EQ(5, n);
     EXPECT_TRUE(q.empty());
-    EXPECT_EQ(0, q.size());
+    EXPECT_EQ(0u, q.size());
 
     n = 6;                    // L-value
     q.push(n);
-    EXPECT_EQ(1, q.size());
+    EXPECT_EQ(1u, q.size());
     auto r = q.wait_and_pop();
     EXPECT_EQ(6, r);
-    EXPECT_EQ(0, q.size());
+    EXPECT_EQ(0u, q.size());
 
     n = 7;
     q.push(n);
-    EXPECT_EQ(1, q.size());
+    EXPECT_EQ(1u, q.size());
     EXPECT_TRUE(q.try_pop(r));
     EXPECT_EQ(7, r);
 }

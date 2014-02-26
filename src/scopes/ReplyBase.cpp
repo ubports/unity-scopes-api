@@ -17,9 +17,6 @@
  */
 
 #include <unity/scopes/ReplyBase.h>
-#include <unity/scopes/internal/ReplyImpl.h>
-
-#include <cassert>
 
 namespace unity
 {
@@ -27,34 +24,13 @@ namespace unity
 namespace scopes
 {
 
-//! @cond
+/// @cond
 
-ReplyBase::ReplyBase(internal::ReplyImpl* impl) :
-    ObjectProxy(impl)
-{
-    assert(impl);
-}
+ReplyBase::ReplyBase() = default;
 
-ReplyBase::~ReplyBase()
-{
-}
+ReplyBase::~ReplyBase() = default;
 
-void ReplyBase::finished() const
-{
-    return fwd()->finished();
-}
-
-void ReplyBase::error(std::exception_ptr ex) const
-{
-    return fwd()->error(ex);
-}
-
-internal::ReplyImpl* ReplyBase::fwd() const
-{
-    return dynamic_cast<internal::ReplyImpl*>(pimpl());
-}
-
-//! @endcond
+/// @endcond
 
 } // namespace scopes
 

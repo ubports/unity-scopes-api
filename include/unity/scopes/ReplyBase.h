@@ -19,8 +19,9 @@
 #ifndef UNITY_SCOPES_REPLYBASE_H
 #define UNITY_SCOPES_REPLYBASE_H
 
-#include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/SymbolExport.h>
+
+#include <exception>
 
 namespace unity
 {
@@ -28,16 +29,11 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-{
-class QueryObject;
-class ReplyImpl;
-}
-
 /**
-\brief ReplyBase allows the results of a query to be sent to the source of the query.
+\brief Abstract base class to allow the results of a query to be sent to the source of the query.
 */
-class ReplyBase : public virtual ObjectProxy
+
+class ReplyBase
 {
 public:
     // @cond
@@ -56,7 +52,7 @@ public:
     either when the last reply proxy goes out of scope, or when QueryBase::run() returns
     (whichever happens last).
     */
-    void finished() const;
+    virtual void finished() const = 0;
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
@@ -65,7 +61,7 @@ public:
               the return value of `what()` is made available to the query source. Otherwise,
               the query source receives `"unknown exception"`.
     */
-    void error(std::exception_ptr ex) const;
+    virtual void error(std::exception_ptr ex) const = 0;
 
     /**
     \brief Destroys a Reply.
@@ -76,14 +72,7 @@ public:
 
 protected:
     /// @cond
-    ReplyBase(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
-
-    internal::ReplyImpl* fwd() const;
-
-    // TODO: this should be a data member of ReplyImpl instead of being a data member in the public API.
-    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
-                                               // forward cancellation.
+    ReplyBase();
     /// @endcond
 };
 

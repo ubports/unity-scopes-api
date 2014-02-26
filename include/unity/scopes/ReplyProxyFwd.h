@@ -28,8 +28,8 @@ namespace scopes
 {
 
 class ReplyBase;
-class SearchReply;
-class PreviewReply;
+class SearchReplyBase;
+class PreviewReplyBase;
 
 /** \typedef ReplyBaseProxy
 \brief Convenience type definition.
@@ -39,12 +39,12 @@ typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
 /** \typedef SearchReplyProxy
 \brief Convenience type definition.
 */
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
+typedef std::shared_ptr<SearchReplyBase> SearchReplyProxy;
 
 /** \typedef PreviewReplyProxy
 \brief Convenience type definition.
 */
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+typedef std::shared_ptr<PreviewReplyBase> PreviewReplyProxy;
 
 } // namespace scopes
 

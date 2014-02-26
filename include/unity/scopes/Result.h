@@ -210,10 +210,13 @@ public:
     */
     VariantMap serialize() const;
 
-private:
+protected:
+    /// @cond
     explicit Result(const VariantMap &variant_map);
     explicit Result(internal::ResultImpl* impl);
+    /// @endcond
 
+private:
     std::unique_ptr<internal::ResultImpl> p;
 
     friend class internal::ResultImpl;

@@ -32,12 +32,18 @@ namespace internal
 class ScopeMetadataImpl;
 } // namespace internal
 
+namespace testing
+{
+class ScopeMetadataBuilder;
+} // namespace testing
+
 /**
  \brief Holds scope attributes such as name, description, icon etc.
  The information carried by ScopeMetadata comes from the .ini file of given scope (for local scopes)
  or is fetched from the remote server (for scopes running on Smart Scopes Server).
  Use unity::scopes::Registry to get ScopeMetadata for a specific scope or all scopes.
  */
+
 class ScopeMetadata final
 {
 public:

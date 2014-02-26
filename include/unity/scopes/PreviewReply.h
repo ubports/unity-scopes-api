@@ -19,8 +19,11 @@
 #ifndef UNITY_SCOPES_PREVIEW_REPLY_H
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
+#include <unity/scopes/PreviewReplyBase.h>
+
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Reply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ReplyBase.h>
@@ -42,7 +45,7 @@ class ReplyImpl;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class PreviewReply : public virtual ReplyBase
+class PreviewReply : public virtual PreviewReplyBase, public Reply
 {
 public:
     /// @cond
@@ -54,16 +57,16 @@ public:
      Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
      This method throws unity::LogicException if this constrains are violated.
      */
-    bool register_layout(ColumnLayoutList const& layouts) const;
+    bool register_layout(ColumnLayoutList const& layouts) const override;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
      */
-    bool push(PreviewWidgetList const& widget_list) const;
+    bool push(PreviewWidgetList const& widget_list) const override;
     /**
      \brief Sends data for a preview widget attribute.
      */
-    bool push(std::string const& key, Variant const& value) const;
+    bool push(std::string const& key, Variant const& value) const override;
 
     /**
     \brief Destroys a Reply.

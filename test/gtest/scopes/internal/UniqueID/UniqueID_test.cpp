@@ -39,7 +39,7 @@ TEST(UniqueID, basic)
     UniqueID u;
 
     string id = u.gen();
-    EXPECT_EQ(16, id.size());
+    EXPECT_EQ(16u, id.size());
     EXPECT_TRUE(has_suffix(id, "00000000"));
 
     string id2 = u.gen();
