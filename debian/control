@@ -16,6 +16,7 @@ Build-Depends: debhelper (>= 9),
                libzmqpp-dev,
                liblttng-ust-dev,
                lttng-tools,
+               process-cpp,
                qtbase5-dev,
                libjsoncpp-dev,
 Standards-Version: 3.9.4

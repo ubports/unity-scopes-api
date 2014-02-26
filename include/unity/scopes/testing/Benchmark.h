@@ -117,20 +117,20 @@ class InProcessBenchmark : public Benchmark
 public:
     InProcessBenchmark() = default;
 
-    Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                     QueryConfiguration configuration) override;
+    virtual Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                             QueryConfiguration configuration) override;
 
-    Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                       PreviewConfiguration preview_configuration) override;
+    virtual Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                               PreviewConfiguration preview_configuration) override;
 
-    Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                          ActivationConfiguration activation_configuration) override;
+    virtual Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+                                  ActivationConfiguration activation_configuration) override;
 
-    Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
+    virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                               ActionConfiguration activation_configuration) override;
 };
 
-class OutOfProcessBenchmark : public Benchmark
+class OutOfProcessBenchmark : public InProcessBenchmark
 {
 public:
     OutOfProcessBenchmark() = default;

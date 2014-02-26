@@ -50,6 +50,13 @@ constexpr static const int metadata_idx = 1;
 constexpr static const int widget_idx = 2;
 constexpr static const int action_idx = 3;
 
+struct CompactResult
+{
+    std::size_t sample_size;
+    std::chrono::microseconds::rep mean;
+    std::chrono::microseconds::rep std_dev;
+};
+
 struct WaitableReply : public virtual unity::scopes::ReplyBase
 {
     enum class State
@@ -341,72 +348,38 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::QueryConfiguration config)
 {
-    Statistics stats;
-
-    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    auto child = core::posix::fork([this, config, scope]()
     {
-        auto child = core::posix::fork([config, scope]()
-        {
-            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
-            DevNullSearchReply search_reply;
-
-            auto before = Clock::now();
-            {
-                auto sample = config.sampler();
-                auto q = scope->create_query(sample.first, sample.second);
-
-                q->run(unity::scopes::SearchReplyProxy
-                {
-                    &search_reply,
-                    [](unity::scopes::SearchReplyBase* r)
-                    {
-                        r->finished();
-                    }
-                });
-                if (!search_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
-                    exit_status = core::posix::exit::Status::failure;
-            }
-            auto after = Clock::now();
-
-            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
-
-            return exit_status;
-        },
-        core::posix::StandardStream::stdout);
-
-        Resolution::rep result; child.cout() >> result;
-
-        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
-
-        switch(wait_result.status)
-        {
-        case core::posix::wait::Result::Status::signaled:
-        case core::posix::wait::Result::Status::stopped:
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
-                                     "Trial terminated with error, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-        default:
-            break;
-        }
-
-        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
-                                     "Trial exited with failure, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-
-        stats(result);
-    }
+        auto result = InProcessBenchmark::for_query(scope, config);
+        std::cout << result.sample_size << " " << result.time.mean.count() << " " << result.time.std_dev.count();
+        return core::posix::exit::Status::success;
+    },
+    core::posix::StandardStream::stdout);
 
     unity::scopes::testing::Benchmark::Result result;
-    result.sample_size = acc::count(stats);
-    result.time.mean = std::chrono::microseconds
+    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
+    child.cout() >> sample_size >> mean >> std_dev;
+    result.sample_size = sample_size;
+    result.time.mean = std::chrono::microseconds{mean};
+    result.time.std_dev = std::chrono::microseconds{std_dev};
+
+    auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
+
+    switch(wait_result.status)
     {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
+    case core::posix::wait::Result::Status::signaled:
+    case core::posix::wait::Result::Status::stopped:
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial terminated with error, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
+    default:
+        break;
+    }
+
+    if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial exited with failure, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
 
     return result;
 }
@@ -415,203 +388,120 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::PreviewConfiguration config)
 {
-    Statistics stats;
-
-    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    auto child = core::posix::fork([this, config, scope]()
     {
-        auto child = core::posix::fork([config, scope]()
-        {
-            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
-            DevNullPreviewReply preview_reply;
+        auto result = InProcessBenchmark::for_preview(scope, config);
+        std::cout << result.sample_size << " " << result.time.mean.count() << " " << result.time.std_dev.count();
+        return core::posix::exit::Status::success;
+    },
+    core::posix::StandardStream::stdout);
 
-            auto before = Clock::now();
-            {
-                auto sample = config.sampler();
+    unity::scopes::testing::Benchmark::Result result;
+    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
+    child.cout() >> sample_size >> mean >> std_dev;
+    result.sample_size = sample_size;
+    result.time.mean = std::chrono::microseconds{mean};
+    result.time.std_dev = std::chrono::microseconds{std_dev};
 
-                auto q = scope->preview(sample.first, sample.second);
-                q->run(unity::scopes::PreviewReplyProxy
-                {
-                    &preview_reply,
-                    [](unity::scopes::PreviewReplyBase* r)
-                    {
-                        r->finished();
-                    }
-                });
-                if (!preview_reply.wait_for_finished_for(config.trial_configuration.per_trial_timeout))
-                    exit_status = core::posix::exit::Status::failure;
-            }
-            auto after = Clock::now();
+    auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
-            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
-
-            return exit_status;
-        },
-        core::posix::StandardStream::stdout);
-
-        Resolution::rep result; child.cout() >> result;
-
-        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
-
-        switch(wait_result.status)
-        {
-        case core::posix::wait::Result::Status::signaled:
-        case core::posix::wait::Result::Status::stopped:
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
-                                     "Trial terminated with error, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-        default:
-            break;
-        }
-
-        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
-                                     "Trial exited with failure, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-
-        stats(result);
+    switch(wait_result.status)
+    {
+    case core::posix::wait::Result::Status::signaled:
+    case core::posix::wait::Result::Status::stopped:
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial terminated with error, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
+    default:
+        break;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
+    if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial exited with failure, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
 
-    return benchmark_result;
+    return result;
 }
 
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_activation(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::ActivationConfiguration config)
 {
-    Statistics stats;
-
-    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    auto child = core::posix::fork([this, config, scope]()
     {
-        auto child = core::posix::fork([config, scope]()
-        {
-            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
+        auto result = InProcessBenchmark::for_activation(scope, config);
+        std::cout << result.sample_size << " " << result.time.mean.count() << " " << result.time.std_dev.count();
+        return core::posix::exit::Status::success;
+    },
+    core::posix::StandardStream::stdout);
 
-            auto before = Clock::now();
-            {
-                auto sample = config.sampler();
-                auto a = scope->activate(sample.first, sample.second);
-                (void) a->activate();
-            }
-            auto after = Clock::now();
+    unity::scopes::testing::Benchmark::Result result;
+    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
+    child.cout() >> sample_size >> mean >> std_dev;
+    result.sample_size = sample_size;
+    result.time.mean = std::chrono::microseconds{mean};
+    result.time.std_dev = std::chrono::microseconds{std_dev};
 
-            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
+    auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
-            return exit_status;
-        },
-        core::posix::StandardStream::stdout);
-
-        Resolution::rep result; child.cout() >> result;
-
-        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
-
-        switch(wait_result.status)
-        {
-        case core::posix::wait::Result::Status::signaled:
-        case core::posix::wait::Result::Status::stopped:
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
-                                     "Trial terminated with error, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-        default:
-            break;
-        }
-
-        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
-                                     "Trial exited with failure, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-
-        stats(result);
+    switch(wait_result.status)
+    {
+    case core::posix::wait::Result::Status::signaled:
+    case core::posix::wait::Result::Status::stopped:
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial terminated with error, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
+    default:
+        break;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
+    if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial exited with failure, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
 
-    return benchmark_result;
+    return result;
 }
 
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_action(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::ActionConfiguration config)
 {
-    Statistics stats;
-
-    for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
+    auto child = core::posix::fork([this, config, scope]()
     {
-        auto child = core::posix::fork([config, scope]()
-        {
-            core::posix::exit::Status exit_status{core::posix::exit::Status::success};
+        auto result = InProcessBenchmark::for_action(scope, config);
+        std::cout << result.sample_size << " " << result.time.mean.count() << " " << result.time.std_dev.count();
+        return core::posix::exit::Status::success;
+    },
+    core::posix::StandardStream::stdout);
 
-            auto before = Clock::now();
-            {
-                auto sample = config.sampler();
-                auto a = scope->perform_action(std::get<result_idx>(sample),
-                                               std::get<metadata_idx>(sample),
-                                               std::get<widget_idx>(sample),
-                                               std::get<action_idx>(sample));
-                (void) a->activate();
-            }
-            auto after = Clock::now();
+    unity::scopes::testing::Benchmark::Result result;
+    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
+    child.cout() >> sample_size >> mean >> std_dev;
+    result.sample_size = sample_size;
+    result.time.mean = std::chrono::microseconds{mean};
+    result.time.std_dev = std::chrono::microseconds{std_dev};
 
-            std::cout << std::chrono::duration_cast<Resolution>(after - before).count() << std::endl;
+    auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
-            return exit_status;
-        },
-        core::posix::StandardStream::stdout);
-
-        Resolution::rep result; child.cout() >> result;
-
-        auto wait_result = child.wait_for(core::posix::wait::Flags::continued);
-
-        switch(wait_result.status)
-        {
-        case core::posix::wait::Result::Status::signaled:
-        case core::posix::wait::Result::Status::stopped:
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
-                                     "Trial terminated with error, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-        default:
-            break;
-        }
-
-        if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
-            throw std::runtime_error("unity::scopes::testing::Benchmark::for_activation: "
-                                     "Trial exited with failure, bailing out now. "
-                                     "Please see the detailed error output and backtrace.");
-
-        stats(result);
+    switch(wait_result.status)
+    {
+    case core::posix::wait::Result::Status::signaled:
+    case core::posix::wait::Result::Status::stopped:
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial terminated with error, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
+    default:
+        break;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
+    if (wait_result.detail.if_exited.status != core::posix::exit::Status::success)
+        throw std::runtime_error("unity::scopes::testing::Benchmark::for_query: "
+                                 "Trial exited with failure, bailing out now. "
+                                 "Please see the detailed error output and backtrace.");
 
-    return benchmark_result;
+    return result;
 }
 
 std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity::scopes::testing::Benchmark::Result& result)
