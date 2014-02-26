@@ -34,7 +34,7 @@ TEST(Annotation, link)
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
 
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query.scope_name(), link->query().scope_name());
@@ -54,7 +54,7 @@ TEST(Annotation, emblemLink)
         annotation.add_link("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
         EXPECT_EQ(query.scope_name(), link->query().scope_name());
@@ -71,7 +71,7 @@ TEST(Annotation, link_exceptions)
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
         EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         EXPECT_NO_THROW(annotation.set_label("label"));
         // no design case for link with a label (makes sense for a group only), but we shouldn't throw
         EXPECT_NO_THROW(annotation.label());
@@ -90,7 +90,7 @@ TEST(Annotation, groupedLink)
         annotation.add_link("Link2", query2);
 
         EXPECT_EQ("Group", annotation.label());
-        EXPECT_EQ(2, annotation.links().size());
+        EXPECT_EQ(2u, annotation.links().size());
         auto link1 = annotation.links().front();
         auto link2 = annotation.links().back();
         EXPECT_EQ("Link1", link1->label());
@@ -132,7 +132,7 @@ TEST(Annotation, serialize)
         EXPECT_TRUE(vm.find("label") == vm.end());
         EXPECT_TRUE(vm.find("icon") == vm.end());
         auto links = vm["links"].get_array();
-        EXPECT_EQ(1, links.size());
+        EXPECT_EQ(1u, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
         Query qout = internal::QueryImpl::create(linkvm["query"].get_dict());
@@ -253,6 +253,6 @@ TEST(Annotation, copy)
         EXPECT_EQ("Group", copy.label());
         EXPECT_EQ(Annotation::Type::GroupedLink, copy.annotation_type());
         annotation.add_link("Link2", query);
-        EXPECT_EQ(1, copy.links().size());
+        EXPECT_EQ(1u, copy.links().size());
     }
 }

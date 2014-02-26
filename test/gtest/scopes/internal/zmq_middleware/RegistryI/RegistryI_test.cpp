@@ -105,12 +105,12 @@ TEST(RegistryI, list)
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
-    EXPECT_EQ(1, scopes.size());
+    EXPECT_EQ(1u, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
 
     ro->remove_local_scope("scope1");
     scopes = r->list();
-    EXPECT_EQ(0, scopes.size());
+    EXPECT_EQ(0u, scopes.size());
 
     set<string> ids;
     for (int i = 0; i < 10; ++i)
@@ -121,7 +121,7 @@ TEST(RegistryI, list)
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(10, scopes.size());
+    EXPECT_EQ(10u, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);
@@ -154,14 +154,14 @@ TEST(RegistryI, add_remove)
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
-    EXPECT_EQ(1, scopes.size());
+    EXPECT_EQ(1u, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
     EXPECT_FALSE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
 
     EXPECT_TRUE(ro->remove_local_scope("scope1"));
     scopes = r->list();
-    EXPECT_EQ(0, scopes.size());
+    EXPECT_EQ(0u, scopes.size());
     EXPECT_FALSE(ro->remove_local_scope("scope1"));
 
     set<string> ids;
@@ -173,7 +173,7 @@ TEST(RegistryI, add_remove)
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(10, scopes.size());
+    EXPECT_EQ(10u, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);

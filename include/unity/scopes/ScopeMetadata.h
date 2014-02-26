@@ -32,6 +32,11 @@ namespace internal
 class ScopeMetadataImpl;
 } // namespace internal
 
+namespace testing
+{
+class ScopeMetadataBuilder;
+} // namespace testing
+
 class ScopeMetadata final
 {
 public:

@@ -50,9 +50,9 @@ public:
 /// @cond
     NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
-
-    ~Category();
 /// @endcond
+
+    virtual ~Category();
 
     std::string id() const;
     std::string title() const;
@@ -60,13 +60,14 @@ public:
     CategoryRenderer const& renderer_template() const;
     VariantMap serialize() const;
 
-private:
+protected:
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
 
-    std::unique_ptr<internal::CategoryImpl> p;
-
     friend class internal::CategoryRegistry;
+
+private:
+    std::unique_ptr<internal::CategoryImpl> p;
 };
 
 } // namespace scopes

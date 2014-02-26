@@ -93,38 +93,32 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      uint port)
     : http_client_(http_client)
     , json_node_(json_node)
-    , url_(url)
-    , port_(port)
+    , port_(0)
     , have_latest_cache_(false)
     , query_counter_(0)
 {
-    // initialise url_
-    if (url_.empty())
+    try
     {
-        char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
-        std::string base_url = base_url_env ? base_url_env : "";
-        if (!base_url.empty())
+        // try to set url from url supplied
+        reset_url(url);
+    }
+    catch(...)
+    {
+        try
         {
-            // find the last occurrence of ':' in the url in order to extract the port number
-            // * ignore the colon after "http"/"https"
-
-            const size_t hier_pos = strlen("https");
-
-            uint64_t found = base_url.find_last_of(':');
-            if (found != std::string::npos && found > hier_pos)
-            {
-                url_ = base_url.substr(0, found);
-                port_ = std::stoi(base_url.substr(found + 1));
-            }
-            else
-            {
-                url_ = base_url;
-            }
+            // url supplied failed, try to set url automatically
+            reset_url();
         }
-        else
+        catch(...)
         {
-            url_ = c_base_url;
+            std::cerr << "SmartScopesClient::SmartScopesClient: Failed to initialise SSS url" << std::endl;
         }
+    }
+
+    // force set a port only if one was explicitly provided
+    if (port != 0)
+    {
+        reset_port(port);
     }
 
     // initialise cached_scopes_
@@ -133,6 +127,88 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
 
 SmartScopesClient::~SmartScopesClient()
 {
+}
+
+void SmartScopesClient::reset_url(std::string const& url)
+{
+    std::string base_url = url;
+
+    // if a url was not provided, get the environment variable
+    if (base_url.empty())
+    {
+        char* sss_url_env = ::getenv("SMART_SCOPES_SERVER");
+        base_url = sss_url_env ? sss_url_env : "";
+
+        // if the env var was not provided, use the c_base_url constant
+        if (base_url.empty())
+        {
+            base_url = c_base_url;
+        }
+    }
+
+    // find the last occurrence of ':' in the url in order to extract the port number
+    // * ignore the colon after "http" / "https"
+
+    const size_t hier_pos = strlen("https");
+    std::string::size_type port_pos = base_url.find_last_of(':');
+
+    // if there is a port specified in the url (i.e. a colon occurs after "http:" / "https:")
+    if (port_pos != std::string::npos && port_pos > hier_pos)
+    {
+        url_ = base_url.substr(0, port_pos);
+        std::string port_str;
+        std::string::size_type url_cont = base_url.find('/', port_pos);
+
+        // if the address continues after the port
+        if (url_cont != std::string::npos)
+        {
+            // extract port, and add the rest of the address to url_
+            url_ += base_url.substr(url_cont);
+            port_str = base_url.substr(port_pos + 1, url_cont - port_pos - 1);
+        }
+        // else if the remainder of the string is just the port
+        else
+        {
+            // extract port
+            port_str = base_url.substr(port_pos + 1);
+        }
+
+        // check if port_str is actually a number before setting port_
+        if (!port_str.empty() &&
+                std::find_if(begin(port_str), end(port_str),
+                             [](char const& c){ return !std::isdigit(c); }) == port_str.end())
+        {
+            port_ = std::stoi(port_str);
+        }
+        else
+        {
+            // the port supplied is not a number, don't trust the url either
+            url_ = "";
+            port_ = 0;
+            throw unity::InvalidArgumentException("Invalid url: " + url);
+        }
+    }
+    // else if there is no port specified in the url
+    else
+    {
+        url_ = base_url;
+        port_ = 0;
+    }
+}
+
+void SmartScopesClient::reset_port(uint port)
+{
+    port_ = port;
+}
+
+std::string SmartScopesClient::url()
+{
+    return url_;
+}
+
+uint SmartScopesClient::port()
+{
+    return port_;
 }
 
 // returns false if cache used

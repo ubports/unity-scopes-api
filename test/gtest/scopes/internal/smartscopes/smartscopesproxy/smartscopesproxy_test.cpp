@@ -41,8 +41,6 @@ using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 
-///! TODO: more tests
-
 namespace
 {
 
@@ -109,7 +107,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
-    EXPECT_EQ(scopes.size(), 2);
+    EXPECT_EQ(2u, scopes.size());
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
@@ -129,7 +127,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (via mw)
     scopes = mw_reg->list();
-    EXPECT_EQ(scopes.size(), 2);
+    EXPECT_EQ(2u, scopes.size());
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("dummy.scope");
@@ -239,7 +237,7 @@ class PreviewerWithCols : public PreviewListener
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(3, widget_list.size());
+        EXPECT_EQ(3u, widget_list.size());
 
         // widget 1
         auto it = widget_list.begin();
@@ -272,12 +270,12 @@ public:
 
     virtual void push(ColumnLayoutList const& column_list) override
     {
-        ASSERT_EQ(3, column_list.size());
+        ASSERT_EQ(3u, column_list.size());
 
         // column 1
         auto it = column_list.begin();
         ASSERT_EQ(1, it->number_of_columns());
-        ASSERT_EQ(3, it->column(0).size());
+        ASSERT_EQ(3u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
         EXPECT_EQ("widget_id_B", it->column(0)[1]);
         EXPECT_EQ("widget_id_C", it->column(0)[2]);
@@ -285,23 +283,23 @@ public:
         // column 2
         std::advance(it, 1);
         ASSERT_EQ(2, it->number_of_columns());
-        ASSERT_EQ(1, it->column(0).size());
+        ASSERT_EQ(1u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
 
-        ASSERT_EQ(2, it->column(1).size());
+        ASSERT_EQ(2u, it->column(1).size());
         EXPECT_EQ("widget_id_B", it->column(1)[0]);
         EXPECT_EQ("widget_id_C", it->column(1)[1]);
 
         // column 3
         std::advance(it, 1);
         ASSERT_EQ(3, it->number_of_columns());
-        ASSERT_EQ(1, it->column(0).size());
+        ASSERT_EQ(1u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
 
-        ASSERT_EQ(1, it->column(1).size());
+        ASSERT_EQ(1u, it->column(1).size());
         EXPECT_EQ("widget_id_B", it->column(1)[0]);
 
-        ASSERT_EQ(1, it->column(2).size());
+        ASSERT_EQ(1u, it->column(2).size());
         EXPECT_EQ("widget_id_C", it->column(2)[0]);
 
         col_pushes_++;
@@ -339,7 +337,7 @@ class PreviewerNoCols : public PreviewListener
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(2, widget_list.size());
+        EXPECT_EQ(2u, widget_list.size());
 
         // widget 1
         auto it = widget_list.begin();

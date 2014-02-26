@@ -61,7 +61,7 @@ TEST_F(JsonNodeTest, flat_values)
     EXPECT_EQ(3, root_node_->size());
 
     auto members = root_node_->member_names();
-    EXPECT_EQ(3, members.size());
+    EXPECT_EQ(3u, members.size());
     EXPECT_TRUE(std::find(members.begin(), members.end(), "firstName") != members.end());
     EXPECT_TRUE(std::find(members.begin(), members.end(), "age") != members.end());
     EXPECT_TRUE(std::find(members.begin(), members.end(), "human") != members.end());
@@ -191,12 +191,12 @@ TEST_F(JsonNodeTest, to_variant)
     JsonCppNode node(json_string);
     auto var = node.to_variant();
     auto outer = var.get_dict();
-    EXPECT_EQ(4, outer.size());
+    EXPECT_EQ(4u, outer.size());
     EXPECT_EQ(1, outer["a"].get_int());
     EXPECT_TRUE(outer["b"].get_double() - 2.0f < 0.00001f);
     EXPECT_TRUE(outer["c"].is_null());
     auto arr = outer["d"].get_array();
-    EXPECT_EQ(3, arr.size());
+    EXPECT_EQ(3u, arr.size());
     EXPECT_EQ(1, arr[0].get_int());
     EXPECT_TRUE(arr[1].get_bool());
     EXPECT_EQ("foo", arr[2].get_string());

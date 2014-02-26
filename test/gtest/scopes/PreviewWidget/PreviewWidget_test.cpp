@@ -35,9 +35,9 @@ TEST(PreviewWidget, basic)
 
         EXPECT_EQ("i1", w.id());
         EXPECT_EQ("image", w.widget_type());
-        EXPECT_EQ(1, w.attributes().size());
+        EXPECT_EQ(1u, w.attributes().size());
         EXPECT_EQ(10, w.attributes()["foo"].get_int());
-        EXPECT_EQ(1, w.components().size());
+        EXPECT_EQ(1u, w.components().size());
         EXPECT_EQ("bar", w.components()["boo"]);
     }
 }
@@ -122,9 +122,9 @@ TEST(PreviewWidget, deserialize)
         auto w = internal::PreviewWidgetImpl::create(outer);
         EXPECT_EQ("i1", w.id());
         EXPECT_EQ("image", w.widget_type());
-        EXPECT_EQ(1, w.attributes().size());
+        EXPECT_EQ(1u, w.attributes().size());
         EXPECT_EQ("bar", w.attributes()["foo"].get_string());
-        EXPECT_EQ(1, w.components().size());
+        EXPECT_EQ(1u, w.components().size());
         EXPECT_EQ("cee", w.components()["bee"]);
     }
 }
