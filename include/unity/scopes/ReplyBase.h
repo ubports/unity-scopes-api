@@ -40,17 +40,21 @@ class ReplyImpl;
 class ReplyBase : public virtual ObjectProxy
 {
 public:
+    // @cond
     ReplyBase(ReplyBase const&) = delete;
+    // @endcond
 
     /**
     \brief Informs the source of a query that the query results are complete.
     Calling finished() informs the source of a query that the final result for the query
     was sent, that is, that the query is complete.
-    The scope application code is responsible for calling finished() once it has sent the
-    final result for a query.
     Multiple calls to finished() and calls to error() after finished() was called are ignored.
     The destructor implicitly calls finished() if a Reply goes out of scope without
-    a prior call to finished().
+    a prior call to finished(). Similarly, QueryBase::run() implicitly calls finished() when
+    it returns, provided there are no more reply proxies in scope. In other words, calling
+    finished() is optional. The scopes run time ensures that the call happens automatically,
+    either when the last reply proxy goes out of scope, or when QueryBase::run() returns
+    (whichever happens last).
     */
     void finished() const;
 
@@ -65,18 +69,22 @@ public:
 
     /**
     \brief Destroys a Reply.
-    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
+    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished(),
+    provided QueryBase::run() has returned.
     */
     virtual ~ReplyBase();
 
 protected:
+    /// @cond
     ReplyBase(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
 
     internal::ReplyImpl* fwd() const;
 
+    // TODO: this should be a data member of ReplyImpl instead of being a data member in the public API.
     std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
                                                // forward cancellation.
+    /// @endcond
 };
 
 } // namespace scopes

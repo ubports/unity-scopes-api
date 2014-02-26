@@ -38,6 +38,18 @@ namespace scopes
 class CategorisedResult;
 class FilterState;
 
+/**
+\brief SearchListener is an abstract base interface that a scope specializes to
+receive the results of a query.
+
+An instance of this interface must be passed to Scope::create_query().
+Results for the query are delivered to the instance by the scopes run
+time by invoking the appropriate push method.
+
+If a scope throw an exception from one of the push() methods, the scopes
+run time calls ListenerBase::finished() with an 'Error' reason.
+*/
+
 class SearchListener : public ListenerBase
 {
 public:
@@ -70,8 +82,6 @@ public:
     The default implementation does nothing. Receipt of categories may be interleaved with
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
-
-    If push() throws an exception, the scopes run time calls finished() with an 'Error' reason.
     */
     virtual void push(Category::SCPtr category);
 

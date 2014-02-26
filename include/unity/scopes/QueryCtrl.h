@@ -56,8 +56,10 @@ public:
     virtual ~QueryCtrl();
 
 protected:
+    /// @cond
     QueryCtrl(internal::QueryCtrlImpl* impl);         // Instantiated only by QueryCtrlImpl
     friend class internal::QueryCtrlImpl;
+    /// @endcond
 
 private:
     internal::QueryCtrlImpl* fwd() const;

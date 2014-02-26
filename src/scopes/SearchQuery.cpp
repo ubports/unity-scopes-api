@@ -29,6 +29,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 SearchQuery::SearchQuery() : QueryBase()
 {
 }
@@ -36,10 +37,11 @@ SearchQuery::SearchQuery() : QueryBase()
 SearchQuery::~SearchQuery()
 {
 }
+/// @endcond
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             string const& query_string,
-                                            shared_ptr<SearchListener> const& reply)
+                                            SearchListener::SPtr const& reply)
 {
     return p->create_subquery(scope, query_string, reply);
 }

@@ -127,7 +127,7 @@ public:
     is needed in order to obtain a string for a null proxy (because it is not possible to invoke
     a member function on a null proxy).
 
-    \param p The proxy to convert to a string.
+    \param proxy The proxy to convert to a string.
     \return The string representation of the proxy.
     */
     std::string proxy_to_string(Proxy const& proxy) const;

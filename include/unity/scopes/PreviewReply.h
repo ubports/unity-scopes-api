@@ -45,7 +45,9 @@ class ReplyImpl;
 class PreviewReply : public virtual ReplyBase
 {
 public:
+    /// @cond
     PreviewReply(PreviewReply const&) = delete;
+    /// @endcond
 
     /**
      \brief Registers a list of column layouts for current preview.
@@ -70,8 +72,10 @@ public:
     virtual ~PreviewReply();
 
 protected:
+    // @cond
     PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
+    // @endcond
 };
 
 } // namespace scopes

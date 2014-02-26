@@ -43,6 +43,7 @@ class FilterBaseImpl;
 \brief Provides a list of choices, allows one or more to be selected.
 A selection filter that displays a list of choices and allows one or more of them to be selected.
 */
+
 class OptionSelectorFilter : public FilterBase
 {
 public:
@@ -50,6 +51,13 @@ public:
     UNITY_DEFINES_PTRS(OptionSelectorFilter);
 /// @endcond
 
+    /**
+    \brief Creates an OpionSelectorFilter.
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param label A display label for the filter.
+    \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
+    option can be selected.
+    */
     static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**

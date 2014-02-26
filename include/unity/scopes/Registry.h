@@ -72,8 +72,10 @@ public:
     MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const;
 
 protected:
+    /// @cond
     Registry(internal::RegistryImpl* impl);          // Instantiated only by RegistryImpl
     friend class internal::RegistryImpl;
+    /// @endcond
 
 private:
     internal::RegistryImpl* fwd() const;

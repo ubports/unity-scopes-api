@@ -382,6 +382,7 @@ else()
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        COMMAND echo Doxygen warnings: `grep warning doxygen-warnings.txt | wc -l`
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
+                               ${PROJECT_SOURCE_DIR}/doc/tutorial.dox
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL

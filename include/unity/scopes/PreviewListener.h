@@ -34,6 +34,12 @@ namespace unity
 namespace scopes
 {
 
+/**
+\brief Abstract base class for a scope to respond to previews.
+
+An instance of this class must be return from Scope::preview().
+*/
+
 class PreviewListener : public ListenerBase
 {
 public:

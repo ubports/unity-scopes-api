@@ -30,6 +30,9 @@ namespace scopes
 {
 
 class Registry;
+/** \typedef RegistryProxy
+\brief Convenience type definition.
+*/
 typedef std::shared_ptr<Registry> RegistryProxy;
 
 } // namespace scopes

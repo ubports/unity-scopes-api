@@ -28,6 +28,9 @@ namespace scopes
 {
 
 class ObjectProxy;
+/** \typedef Proxy
+\brief Convenience type definition for the proxy inheritance root.
+*/
 typedef std::shared_ptr<ObjectProxy> Proxy;
 
 } // namespace scopes

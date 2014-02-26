@@ -41,7 +41,9 @@ class Annotation;
 class SearchReply : public virtual ReplyBase
 {
 public:
+    // @cond
     SearchReply(SearchReply const&) = delete;
+    // @endcond
 
     /**
      \brief Register departments for current search reply and hint the client about current department.
@@ -107,7 +109,9 @@ public:
     virtual ~SearchReply();
 
 protected:
+    /// @cond
     SearchReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    /// @endcond
     friend class internal::ReplyImpl;
 };
 
