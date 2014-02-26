@@ -22,7 +22,13 @@
 #include <unity/util/NonCopyable.h>
 
 #include <QThread>
+
+///! This hack allows unity-scopes-api to build with clang-3.4+
+///! TODO: Remove this when Qt is updated to 5.1.1+ on Ubuntu
+#define qHash(x,y) qHash(const QUrl &url, uint seed)
 #include <QUrl>
+#undef qHash
+
 #include <mutex>
 
 class QNetworkReply;
