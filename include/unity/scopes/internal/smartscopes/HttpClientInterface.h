@@ -47,7 +47,7 @@ public:
     HttpClientInterface() = default;
     virtual ~HttpClientInterface() = default;
 
-    virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url, uint port) = 0;
+    virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;
 
