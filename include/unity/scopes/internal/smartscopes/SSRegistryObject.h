@@ -44,7 +44,7 @@ public:
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
                      uint no_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
-                     uint sss_port = 0, bool caching_enabled = true);
+                     bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
     ScopeMetadata get_metadata(std::string const& scope_name) override;
