@@ -5,9 +5,9 @@ endif()
 add_subdirectory(${GMOCK_ROOT} gmock)
 
 # Selectively switch off warnings about missing field initializers when building gmock and gtest
-set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-missing-field-initializers)
-set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-missing-field-initializers)
-set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-missing-field-initializers)
+set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers")
+set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers")
+set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers")
 
 include_directories(${GMOCK_ROOT}/gtest/include)
 
