@@ -61,7 +61,7 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Int, Bool, String, Double, Dict, Array, Null };
+    enum Type { Null, Int, Bool, String, Double, Dict, Array };
 
     /**@name Constructors and destructor
     */
