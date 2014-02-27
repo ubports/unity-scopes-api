@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIVATIONBASE_H
-#define UNITY_SCOPES_ACTIVATIONBASE_H
+#ifndef UNITY_SCOPES_ACTIVATIONQUERYBASE_H
+#define UNITY_SCOPES_ACTIVATIONQUERYBASE_H
 
 #include <unity/scopes/QueryBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -39,13 +39,13 @@ class ActivationBaseImpl;
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
 Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
-class ActivationBase : public QueryBase
+class ActivationQueryBase : public QueryBase
 {
 public:
     /// @cond
-    UNITY_DEFINES_PTRS(ActivationBase);
-    ActivationBase();
-    virtual ~ActivationBase();
+    UNITY_DEFINES_PTRS(ActivationQueryBase);
+    ActivationQueryBase();
+    virtual ~ActivationQueryBase();
     /// @endcond
 
     /**

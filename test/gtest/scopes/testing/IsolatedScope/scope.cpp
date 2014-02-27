@@ -33,7 +33,7 @@
 namespace testing
 {
 
-class ActivationShowingDash : public unity::scopes::ActivationBase
+class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
 public:
     ActivationShowingDash()
@@ -47,7 +47,7 @@ public:
     }
 };
 
-class LongRunningActivation : public unity::scopes::ActivationBase
+class LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
 public:
     LongRunningActivation()
@@ -136,20 +136,20 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
     return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::activate(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::ActivationShowingDash()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash()};
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&,
         std::string const&,
         std::string const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::LongRunningActivation()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation()};
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(

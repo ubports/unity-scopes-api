@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/Category.h>
@@ -162,7 +162,7 @@ private:
     Queue& queue_;
 };
 
-class MyActivation : public ActivationBase
+class MyActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -224,10 +224,10 @@ public:
         return SearchQueryBase::UPtr(new MyQuery(q, queue));
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
     {
         cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
-        return ActivationBase::UPtr(new MyActivation());
+        return ActivationQueryBase::UPtr(new MyActivation());
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override

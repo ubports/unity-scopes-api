@@ -169,7 +169,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                 return this->scope_base_->activate(result, hints);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
                 return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }
@@ -188,7 +188,7 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
                 return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
                 return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }

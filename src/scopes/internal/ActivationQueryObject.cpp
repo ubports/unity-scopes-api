@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/ActivationQueryObject.h>
 #include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <iostream>
@@ -36,7 +36,7 @@ namespace scopes
 namespace internal
 {
 
-ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
+ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
     : QueryObject(act_base, reply, ctrl),
     act_base_(act_base)
 {

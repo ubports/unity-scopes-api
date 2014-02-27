@@ -35,11 +35,11 @@ public:
             unity::scopes::CannedQuery const &,
             unity::scopes::SearchMetadata const &) override;
 
-    unity::scopes::ActivationBase::UPtr activate(
+    unity::scopes::ActivationQueryBase::UPtr activate(
             unity::scopes::Result const& result,
             unity::scopes::ActionMetadata const& metadata) override;
 
-    unity::scopes::ActivationBase::UPtr perform_action(
+    unity::scopes::ActivationQueryBase::UPtr perform_action(
             unity::scopes::Result const& result,
             unity::scopes::ActionMetadata const& metadata,
             std::string const& widget_id,

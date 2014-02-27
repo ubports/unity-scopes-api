@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/ActivationBaseImpl.h>
 
 namespace unity
@@ -26,23 +26,23 @@ namespace scopes
 {
 
 /// @cond
-ActivationBase::ActivationBase() :
+ActivationQueryBase::ActivationQueryBase() :
     QueryBase(),
     p(new internal::ActivationBaseImpl())
 {
 }
 
-ActivationBase::~ActivationBase()
+ActivationQueryBase::~ActivationQueryBase()
 {
 }
 /// @endcond
 
-void ActivationBase::cancelled()
+void ActivationQueryBase::cancelled()
 {
     //default implementation does nothing
 }
 
-ActivationResponse ActivationBase::activate()
+ActivationResponse ActivationQueryBase::activate()
 {
     return p->activate();
 }

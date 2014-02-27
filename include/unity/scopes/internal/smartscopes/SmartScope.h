@@ -175,7 +175,7 @@ private:
     PreviewHandle::UPtr preview_handle_;
 };
 
-class NullActivation : public ActivationBase
+class NullActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -183,7 +183,7 @@ class NullActivation : public ActivationBase
     }
 };
 
-class SmartActivation : public ActivationBase
+class SmartActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -214,15 +214,15 @@ public:
         return preview;
     }
 
-    ActivationBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
+    ActivationQueryBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
     {
-        ActivationBase::UPtr activation(new NullActivation());
+        ActivationQueryBase::UPtr activation(new NullActivation());
         return activation;
     }
 
-    ActivationBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
+    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
     {
-        ActivationBase::UPtr activation(new SmartActivation());
+        ActivationQueryBase::UPtr activation(new SmartActivation());
         std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return activation;
     }

@@ -19,6 +19,8 @@ unity-scopes-api (0.3.2+14.04.20140220.1-0ubuntu2) UNRELEASED; urgency=medium
 
     SearchQuery -> SearchQueryBase
 
+    ActivationBase -> ActivationQueryBase
+
     Query -> CannedQuery
     CannedQuery::scope_name() -> CannedQuery::scope_id()
 

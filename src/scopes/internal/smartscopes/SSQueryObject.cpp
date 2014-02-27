@@ -21,7 +21,7 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/SearchReply.h>
@@ -242,11 +242,11 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
-    ActivationBase::SPtr activation_query;
+    ActivationQueryBase::SPtr activation_query;
 
     q_base = query->q_base;
 
-    activation_query = dynamic_pointer_cast<ActivationBase>(q_base);
+    activation_query = dynamic_pointer_cast<ActivationQueryBase>(q_base);
     assert(activation_query);
 
     // no need for intermediate proxy (like with ReplyImpl::create),

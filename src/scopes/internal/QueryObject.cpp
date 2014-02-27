@@ -25,7 +25,7 @@
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/PreviewQueryBase.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/Exception.h>
 
