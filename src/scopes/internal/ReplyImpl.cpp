@@ -25,7 +25,6 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ReplyBase.h>
-#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/PreviewReply.h>
@@ -55,10 +54,12 @@ ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBa
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
     finished_(false),
-    layouts_push_disallowed_(false)
+    layouts_push_disallowed_(false),
+    cardinality_(qo->cardinality({ fwd()->identity(), fwd()->mw_base() })),
+    num_pushes_(0)
 {
     assert(mw_proxy);
-    assert(qo);
+    assert(cardinality_ >= 0);
 }
 
 ReplyImpl::~ReplyImpl()
@@ -91,15 +92,7 @@ void ReplyImpl::register_departments(DepartmentList const& departments, std::str
         throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
     }
 
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& dep: departments)
-    {
-        arr.push_back(Variant(dep.serialize()));
-    }
-    vm["departments"] = arr;
-    vm["current_department"] = current_department_id;
-    push(vm); // ignore return value?
+    push(internal::DepartmentImpl::serialize_departments(departments, current_department_id)); // ignore return value?
 }
 
 Category::SCPtr ReplyImpl::register_category(std::string const& id,
@@ -131,7 +124,23 @@ bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
 
     VariantMap var;
     var["result"] = result.serialize();
-    return push(var);
+    if (!push(var))
+    {
+        return false;
+    }
+
+    // Enforce cardinality limit (0 means no limit). If the scope pushes more results
+    // than requested, future pushes are ignored. push() returns false
+    // on the last call that actually still pushed a result.
+    // To the client, a query that exceeds the limit looks like a query
+    // that returned the maximum number of results and finished normally.
+    if (++num_pushes_ == cardinality_)
+    {
+        // At most one thread will execute this.
+        finished();
+        return false;  // This was the last successful push
+    }
+    return true;
 }
 
 bool ReplyImpl::push(Category::SCPtr category)
@@ -221,21 +230,22 @@ bool ReplyImpl::push(VariantMap const& variant_map)
         return false; // Query was cancelled or had an error.
     }
 
-    if (!finished_.load())
+    if (finished_)
     {
-        try
-        {
-            fwd()->push(variant_map);
-            return true;
-        }
-        catch (MiddlewareException const& e)
-        {
-            // TODO: log error
-            error(current_exception());
-            return false;
-        }
+        return false;
     }
-    return false;
+
+    try
+    {
+        fwd()->push(variant_map);
+    }
+    catch (std::exception const&)
+    {
+        error(current_exception());
+        return false;
+    }
+
+    return true;
 }
 
 void ReplyImpl::finished()
@@ -251,7 +261,7 @@ void ReplyImpl::finished(ListenerBase::Reason reason)
         {
             fwd()->finished(reason, "");
         }
-        catch (MiddlewareException const& e)
+        catch (std::exception const& e)
         {
             // TODO: log error
             cerr << e.what() << endl;
@@ -261,6 +271,13 @@ void ReplyImpl::finished(ListenerBase::Reason reason)
 
 void ReplyImpl::error(exception_ptr ex)
 {
+    if (finished_.exchange(true))
+    {
+        // Only the first thread to encounter an error
+        // reports the error to the client.
+        return;
+    }
+
     string error_message;
     try
     {
@@ -274,12 +291,14 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
+    // TODO: log error
+    cerr << error_message << endl;
 
     try
     {
         fwd()->finished(ListenerBase::Error, error_message);
     }
-    catch (MiddlewareException const& e)
+    catch (std::exception const& e)
     {
         // TODO: log error
         cerr << e.what() << endl;

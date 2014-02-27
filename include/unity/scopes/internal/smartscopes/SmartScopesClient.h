@@ -123,15 +123,12 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
-                      std::string const& url = "", // detect url
-                      uint port = 0);
+                      std::string const& url = ""); // detect url
 
     virtual ~SmartScopesClient();
 
     void reset_url(std::string const& url = "");
-    void reset_port(uint port = 0);
     std::string url();
-    uint port();
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
@@ -171,7 +168,6 @@ private:
     JsonNodeInterface::SPtr json_node_;
 
     std::string url_;
-    uint port_;
 
     std::map<uint, HttpResponseHandle::SPtr> query_results_;
 

@@ -148,7 +148,7 @@ TEST(Activation, direct_activation)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -181,7 +181,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -203,7 +203,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -233,7 +233,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -255,7 +255,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -291,7 +291,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -314,7 +314,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -345,7 +345,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -368,7 +368,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -400,7 +400,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -423,7 +423,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -459,7 +459,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -482,7 +482,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
