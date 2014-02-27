@@ -23,7 +23,7 @@
 #include "Counters.h"
 
 #include <unity/scopes/internal/ScopeLoader.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <iostream>
 
@@ -44,7 +44,7 @@ public:
         inc_stop();
     }
 
-    virtual unity::scopes::SearchQuery::UPtr search(unity::scopes::Query const&,
+    virtual unity::scopes::SearchQuery::UPtr search(unity::scopes::CannedQuery const&,
                                                              unity::scopes::SearchMetadata const&) override
     {
         return nullptr;

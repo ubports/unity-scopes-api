@@ -9,6 +9,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationResponse.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Annotation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CannedQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
@@ -25,7 +26,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Query.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListener.cpp

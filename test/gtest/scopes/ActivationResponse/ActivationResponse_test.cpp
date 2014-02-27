@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/ActivationResponse.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -49,12 +49,12 @@ TEST(ActivationResponse, basic)
     }
 
     {
-        Query const query("scope-foo");
+        CannedQuery const query("scope-foo");
         ActivationResponse resp(query);
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, resp.status());
     }
 
-    // Search only allowed with Query
+    // Search only allowed with CannedQuery
     {
         try
         {
@@ -79,7 +79,7 @@ TEST(ActivationResponse, serialize)
         EXPECT_EQ("bar", var["scope_data"].get_dict()["foo"].get_string());
     }
     {
-        Query const query("scope-foo");
+        CannedQuery const query("scope-foo");
         ActivationResponse resp(query);
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, static_cast<ActivationResponse::Status>(var["status"].get_int()));
@@ -152,7 +152,7 @@ TEST(ActivationResponse, deserialize)
 
     // valid variant
     {
-        Query query("scope-foo");
+        CannedQuery query("scope-foo");
         VariantMap var;
         var["scope_data"] = VariantMap();
         var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);

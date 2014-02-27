@@ -89,7 +89,7 @@ class MyQuery : public SearchQuery
 {
 public:
     MyQuery(string const& scope_name,
-            Query const& query,
+            CannedQuery const& query,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
         scope_name_(scope_name),
@@ -125,7 +125,7 @@ public:
 
 private:
     string scope_name_;
-    Query query_;
+    CannedQuery query_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };
@@ -154,7 +154,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const&) override
+    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         SearchQuery::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;

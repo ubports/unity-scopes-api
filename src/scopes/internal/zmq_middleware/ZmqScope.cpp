@@ -25,7 +25,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -73,7 +73,7 @@ ZmqScope::~ZmqScope()
 {
 }
 
-QueryCtrlProxy ZmqScope::search(Query const& query, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);

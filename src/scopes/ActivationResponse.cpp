@@ -17,7 +17,7 @@
 */
 
 #include <unity/scopes/ActivationResponse.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 
 namespace unity
@@ -31,7 +31,7 @@ ActivationResponse::ActivationResponse(Status status)
 {
 }
 
-ActivationResponse::ActivationResponse(Query const& query)
+ActivationResponse::ActivationResponse(CannedQuery const& query)
     : p(new internal::ActivationResponseImpl(query))
 {
 }
@@ -83,7 +83,7 @@ Variant ActivationResponse::scope_data() const
     return p->scope_data();
 }
 
-Query ActivationResponse::query() const
+CannedQuery ActivationResponse::query() const
 {
     return p->query();
 }

@@ -18,7 +18,7 @@
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -27,7 +27,7 @@ using namespace unity::scopes::internal;
 
 TEST(Department, basic)
 {
-    Query query("fooscope", "foo", "dep1");
+    CannedQuery query("fooscope", "foo", "dep1");
     Department dep(query, "News");
 
     EXPECT_EQ("dep1", dep.id());
@@ -46,7 +46,7 @@ TEST(Department, serialize_and_deserialize)
 {
     VariantMap var;
     {
-        Query query("fooscope", "foo", "dep1");
+        CannedQuery query("fooscope", "foo", "dep1");
         Department dep(query, "News");
         dep.set_subdepartments({{"subdep1", query, "Europe"},{"subdep2", query, "US"}});
 

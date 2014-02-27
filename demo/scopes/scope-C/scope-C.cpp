@@ -22,7 +22,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <algorithm>
 #include <condition_variable>
@@ -129,7 +129,7 @@ private:
 class MyQuery : public SearchQuery
 {
 public:
-    MyQuery(Query const& query, Queue& queue) :
+    MyQuery(CannedQuery const& query, Queue& queue) :
         query_(query),
         queue_(queue)
     {
@@ -158,7 +158,7 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
     Queue& queue_;
 };
 
@@ -218,7 +218,7 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const&) override
+    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return SearchQuery::UPtr(new MyQuery(q, queue));

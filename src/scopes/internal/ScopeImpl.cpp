@@ -60,14 +60,14 @@ ScopeImpl::~ScopeImpl()
 
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    Query query(scope_name_, query_string, department_id);
+    CannedQuery query(scope_name_, query_string, department_id);
     query.set_filter_state(filter_state);
     return search(query, metadata, reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    Query query(scope_name_);
+    CannedQuery query(scope_name_);
     query.set_query_string(query_string);
     query.set_filter_state(filter_state);
     return search(query, metadata, reply);
@@ -75,12 +75,12 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string, FilterState co
 
 QueryCtrlProxy ScopeImpl::search(string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
-    Query query(scope_name_);
+    CannedQuery query(scope_name_);
     query.set_query_string(query_string);
     return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::search(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(CannedQuery const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {

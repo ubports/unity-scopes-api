@@ -61,7 +61,7 @@ SSScopeObject::~SSScopeObject() noexcept
 {
 }
 
-MWQueryCtrlProxy SSScopeObject::search(Query const& q,
+MWQueryCtrlProxy SSScopeObject::search(CannedQuery const& q,
                                              SearchMetadata const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)

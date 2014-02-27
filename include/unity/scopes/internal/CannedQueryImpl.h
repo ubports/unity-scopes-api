@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYIMPL_H
-#define UNITY_SCOPES_INTERNAL_QUERYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_CANNEDQUERYIMPL_H
+#define UNITY_SCOPES_INTERNAL_CANNEDQUERYIMPL_H
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterState.h>
@@ -29,22 +29,22 @@ namespace unity
 namespace scopes
 {
 
-class Query;
+class CannedQuery;
 class FilterState;
 
 namespace internal
 {
 
-class QueryImpl
+class CannedQueryImpl
 {
 public:
-    explicit QueryImpl(std::string const& scope_id);
-    QueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
-    QueryImpl(VariantMap const& variant);
-    QueryImpl(QueryImpl const &other) = default;
-    QueryImpl(QueryImpl&&) = default;
-    QueryImpl& operator=(QueryImpl const& other) = default;
-    QueryImpl& operator=(QueryImpl&&) = default;
+    explicit CannedQueryImpl(std::string const& scope_id);
+    CannedQueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
+    CannedQueryImpl(VariantMap const& variant);
+    CannedQueryImpl(CannedQueryImpl const &other) = default;
+    CannedQueryImpl(CannedQueryImpl&&) = default;
+    CannedQueryImpl& operator=(CannedQueryImpl const& other) = default;
+    CannedQueryImpl& operator=(CannedQueryImpl&&) = default;
 
     void set_department_id(std::string const& dep_id);
     void set_query_string(std::string const& query_str);
@@ -55,8 +55,8 @@ public:
     FilterState filter_state() const;
     VariantMap serialize() const;
     std::string to_string() const;
-    static Query from_string();
-    static Query create(VariantMap const& var);
+    static CannedQuery from_string();
+    static CannedQuery create(VariantMap const& var);
 
 private:
     std::string scope_id_;

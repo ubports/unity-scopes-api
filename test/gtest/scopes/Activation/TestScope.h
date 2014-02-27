@@ -90,7 +90,7 @@ public:
 
     virtual void run() override {}
 
-    virtual SearchQuery::UPtr search(Query const &, SearchMetadata const &) override
+    virtual SearchQuery::UPtr search(CannedQuery const &, SearchMetadata const &) override
     {
         return SearchQuery::UPtr(new TestQuery());
     }

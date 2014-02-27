@@ -32,7 +32,7 @@ public:
     void run() override;
 
     unity::scopes::SearchQuery::UPtr search(
-            unity::scopes::Query const &,
+            unity::scopes::CannedQuery const &,
             unity::scopes::SearchMetadata const &) override;
 
     unity::scopes::ActivationBase::UPtr activate(

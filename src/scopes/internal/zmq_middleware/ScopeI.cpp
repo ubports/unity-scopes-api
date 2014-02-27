@@ -20,7 +20,7 @@
 
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
 #include <unity/scopes/internal/ResultImpl.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/ActionMetadataImpl.h>
 #include <unity/scopes/internal/SearchMetadataImpl.h>
@@ -29,7 +29,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <cassert>
 
@@ -85,7 +85,7 @@ void ScopeI::search_(Current const& current,
                            capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
-    auto query = internal::QueryImpl::create(to_variant_map(req.getQuery()));
+    auto query = internal::CannedQueryImpl::create(to_variant_map(req.getQuery()));
     auto metadata = SearchMetadataImpl::create(to_variant_map(req.getHints()));
     auto proxy = req.getReplyProxy();
     ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),

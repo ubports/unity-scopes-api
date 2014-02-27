@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_TESTING_BENCHMARK_H
 
 #include <unity/scopes/ActionMetadata.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/SearchMetadata.h>
 
@@ -60,7 +60,7 @@ public:
 
     struct QueryConfiguration
     {
-        std::function<std::pair<unity::scopes::Query, unity::scopes::SearchMetadata>()> sampler;
+        std::function<std::pair<unity::scopes::CannedQuery, unity::scopes::SearchMetadata>()> sampler;
         TrialConfiguration trial_configuration;
     };
 

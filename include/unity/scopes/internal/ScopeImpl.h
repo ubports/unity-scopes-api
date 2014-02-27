@@ -55,7 +55,7 @@ public:
     QueryCtrlProxy search(std::string const& q, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
-    QueryCtrlProxy search(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(CannedQuery const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
     QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const;
     QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const;
     QueryCtrlProxy preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const;

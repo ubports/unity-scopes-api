@@ -30,7 +30,7 @@ namespace unity
 
 namespace scopes
 {
-class Query;
+class CannedQuery;
 
 namespace internal
 {
@@ -88,7 +88,7 @@ public:
      * and at least one for Type::GroupedLink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
-    void add_link(std::string const& label, Query const& query);
+    void add_link(std::string const& label, CannedQuery const& query);
 
     /**
      * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedLink only.

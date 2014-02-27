@@ -34,7 +34,7 @@ namespace scopes
 class TestQuery : public SearchQuery
 {
 public:
-    TestQuery(Query const& q) :
+    TestQuery(CannedQuery const& q) :
         SearchQuery(),
         query_(q)
     {
@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
 };
 
 class TestScope : public ScopeBase
@@ -74,7 +74,7 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual SearchQuery::UPtr search(Query const &q, SearchMetadata const &) override
+    virtual SearchQuery::UPtr search(CannedQuery const &q, SearchMetadata const &) override
     {
         return SearchQuery::UPtr(new TestQuery(q));
     }

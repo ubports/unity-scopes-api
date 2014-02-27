@@ -20,11 +20,10 @@
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Category.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Query.h>
 #include <unity/scopes/Annotation.h>
 
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
@@ -46,7 +45,7 @@ namespace smartscopes
 class SmartQuery : public SearchQuery
 {
 public:
-    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query, SearchMetadata const& hints)
+    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)
         : scope_id_(scope_id)
         , query_(query)
     {
@@ -105,7 +104,7 @@ public:
 
 private:
     std::string scope_id_;
-    Query query_;
+    CannedQuery query_;
     SearchHandle::UPtr search_handle_;
 };
 
@@ -201,7 +200,7 @@ public:
     {
     }
 
-    QueryBase::UPtr search(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
+    QueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
     {
         QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;

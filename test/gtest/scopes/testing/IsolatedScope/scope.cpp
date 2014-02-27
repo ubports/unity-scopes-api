@@ -23,7 +23,7 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Department.h>
 
 #include "scope.h"
@@ -63,7 +63,7 @@ public:
 class Query : public unity::scopes::SearchQuery
 {
 public:
-    Query(unity::scopes::Query const& query)
+    Query(unity::scopes::CannedQuery const& query)
         : query_(query)
     {
     }
@@ -86,14 +86,14 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        unity::scopes::Query query("scope-A", "foo", "dep1");
+        unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
         unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->register_annotation(annotation);
     }
 
 private:
-    unity::scopes::Query query_;
+    unity::scopes::CannedQuery query_;
 };
 
 class Preview : public unity::scopes::PreviewQuery
@@ -130,7 +130,7 @@ void testing::Scope::run()
 }
 
 unity::scopes::SearchQuery::UPtr testing::Scope::search(
-        unity::scopes::Query const& query,
+        unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &)
 {
     return unity::scopes::SearchQuery::UPtr(new testing::Query(query));

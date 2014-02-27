@@ -51,7 +51,7 @@ public:
     /**
     \brief Register departments for the current search reply and provide the current department.
 
-    current_department_id should in most cases be the department returned by Query::department_id().
+    current_department_id should in most cases be the department returned by CannedQuery::department_id().
     Pass an empty string for current_department_id to indicate no active department.
     \param departments A list of departments.
     \param current_department_id A department id that should be considered current.

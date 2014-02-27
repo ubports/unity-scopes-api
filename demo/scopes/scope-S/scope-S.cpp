@@ -21,7 +21,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <iostream>
 #include <thread>
@@ -36,7 +36,7 @@ using namespace unity::scopes;
 class MyQuery : public SearchQuery
 {
 public:
-    MyQuery(Query const& query, CategoryRenderer const& renderer) :
+    MyQuery(CannedQuery const& query, CategoryRenderer const& renderer) :
         query_(query),
         renderer_(renderer)
     {
@@ -65,7 +65,7 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
     CategoryRenderer renderer_;
 };
 
@@ -79,7 +79,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const& hints) override
+    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const& hints) override
     {
         SearchQuery::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;

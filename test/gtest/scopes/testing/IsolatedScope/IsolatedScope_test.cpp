@@ -111,7 +111,7 @@ TEST_F(TestScopeFixutre,
         &reply, [](unity::scopes::SearchReplyBase*) {}
     };
 
-    unity::scopes::Query query{scope_id};
+    unity::scopes::CannedQuery query{scope_id};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};

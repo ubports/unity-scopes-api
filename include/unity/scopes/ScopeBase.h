@@ -64,7 +64,7 @@ namespace unity
 namespace scopes
 {
 
-class Query;
+class CannedQuery;
 
 /**
 \file ScopeBase.h
@@ -193,7 +193,7 @@ public:
     \param metadata additional data sent by the client.
     \return The query instance.
     */
-    virtual SearchQuery::UPtr search(Query const& query, SearchMetadata const& metadata) = 0;
+    virtual SearchQuery::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.

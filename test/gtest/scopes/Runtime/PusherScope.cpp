@@ -21,7 +21,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <gtest/gtest.h>
 
@@ -75,7 +75,7 @@ void PusherScope::run()
 {
 }
 
-SearchQuery::UPtr PusherScope::search(Query const& /* query */, SearchMetadata const& md)
+SearchQuery::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMetadata const& md)
 {
     return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
 }

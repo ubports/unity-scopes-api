@@ -142,7 +142,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     return ctrl_proxy;
 }
 
-MWQueryCtrlProxy ScopeObject::search(Query const& q,
+MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                            SearchMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)

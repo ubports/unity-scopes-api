@@ -31,7 +31,7 @@ using namespace unity::scopes;
 class MyQuery : public SearchQuery
 {
 public:
-    MyQuery(Query const& query) :
+    MyQuery(CannedQuery const& query) :
         query_(query)
     {
     }
@@ -67,7 +67,7 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        Query q("scope-A", query_.query_string(), "");
+        CannedQuery q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
         reply->register_annotation(annotation);
@@ -76,7 +76,7 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
 };
 
 class MyPreview : public PreviewQuery
@@ -139,7 +139,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const&) override
+    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         SearchQuery::UPtr query(new MyQuery(q));
         cout << "scope-A: created query: \"" << q.query_string() << "\"" << endl;

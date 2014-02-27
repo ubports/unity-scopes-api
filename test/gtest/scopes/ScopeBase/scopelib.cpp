@@ -33,7 +33,7 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual unity::scopes::SearchQuery::UPtr search(unity::scopes::Query const&,
+    virtual unity::scopes::SearchQuery::UPtr search(unity::scopes::CannedQuery const&,
             unity::scopes::SearchMetadata const&) override
     {
         return nullptr;

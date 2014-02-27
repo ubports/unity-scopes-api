@@ -22,7 +22,7 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Department.h>
 
 #include "TestScope.h"
@@ -33,7 +33,7 @@ using namespace unity::scopes;
 class TestQuery : public SearchQuery
 {
 public:
-    TestQuery(Query const& query)
+    TestQuery(CannedQuery const& query)
         : query_(query)
     {
     }
@@ -55,14 +55,14 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->register_annotation(annotation);
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
 };
 
 class TestPreview : public PreviewQuery
@@ -95,7 +95,7 @@ void TestScope::run()
 {
 }
 
-SearchQuery::UPtr TestScope::search(Query const& query, SearchMetadata const &)
+SearchQuery::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
 {
     return SearchQuery::UPtr(new TestQuery(query));
 }
