@@ -37,10 +37,11 @@ ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& rec
     assert(receiver_);
 }
 
-void ActivationReplyObject::process_data(VariantMap const& data)
+bool ActivationReplyObject::process_data(VariantMap const& data)
 {
     ActivationResponse resp = ActivationResponseImpl::create(data);
     receiver_->activation_response(resp);
+    return false;
 }
 
 } // namespace internal

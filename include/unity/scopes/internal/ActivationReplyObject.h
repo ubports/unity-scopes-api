@@ -35,7 +35,7 @@ class ActivationReplyObject : public ReplyObject
 {
 public:
     ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual void process_data(VariantMap const& data) override;
+    virtual bool process_data(VariantMap const& data) override;
 
 private:
     ActivationListener::SPtr const receiver_;
