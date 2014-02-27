@@ -102,10 +102,14 @@ bool ResultReplyObject::process_data(VariantMap const& data)
             departments.push_back(DepartmentImpl::create(dep.get_dict()));
         }
         it = data.find("current_department");
-        if (it == data.end())
+        if (it != data.end())
         {
+            receiver_->push(departments, it->second.get_string());
         }
-        receiver_->push(departments, it->second.get_string());
+        else
+        {
+            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
+        }
     }
 
     it = data.find("annotation");
