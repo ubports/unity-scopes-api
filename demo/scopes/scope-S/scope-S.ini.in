@@ -1,3 +1,4 @@
 [ScopeConfig]
 DisplayName = scope-S.DisplayName
 Description = scope-S.Description
+Author = Canonical
