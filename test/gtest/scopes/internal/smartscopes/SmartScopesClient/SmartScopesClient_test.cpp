@@ -67,6 +67,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
+    EXPECT_EQ("Mr.Fake", scopes[0].author);
     EXPECT_EQ(sss_url_ + "/demo", scopes[0].base_url);
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
@@ -75,6 +76,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
+    EXPECT_EQ("Mr.Fake", scopes[1].author);
     EXPECT_EQ(sss_url_ + "/demo2", scopes[1].base_url);
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);

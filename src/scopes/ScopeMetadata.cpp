@@ -86,6 +86,11 @@ string ScopeMetadata::description() const
     return p->description();
 }
 
+string ScopeMetadata::author() const
+{
+    return p->author();
+}
+
 string ScopeMetadata::art() const
 {
     return p->art();
