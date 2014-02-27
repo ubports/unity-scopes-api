@@ -33,8 +33,6 @@ namespace scopes
 namespace internal
 {
 
-class RegistryObjectPrivate;
-
 // Maintains a map of <scope name, scope proxy> pairs.
 
 class RegistryObject : public RegistryObjectBase
