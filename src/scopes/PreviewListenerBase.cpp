@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/PreviewListenerBase.h>
 
 namespace unity
 {
@@ -26,11 +26,11 @@ namespace scopes
 
 //! @cond
 
-PreviewListener::PreviewListener()
+PreviewListenerBase::PreviewListenerBase()
 {
 }
 
-PreviewListener::~PreviewListener()
+PreviewListenerBase::~PreviewListenerBase()
 {
 }
 

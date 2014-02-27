@@ -124,7 +124,7 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-class PreviewReceiver : public PreviewListener
+class PreviewReceiver : public PreviewListenerBase
 {
 public:
     PreviewReceiver() :

@@ -24,7 +24,7 @@
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/SearchListener.h>
 #include <unity/scopes/ActivationListenerBase.h>
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
@@ -59,7 +59,7 @@ public:
     QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const;
     QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id,
             ActivationListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& hints, PreviewListenerBase::SPtr const& reply) const;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
 

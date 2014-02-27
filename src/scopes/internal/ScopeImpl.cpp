@@ -189,11 +189,11 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata co
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListenerBase::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
-        throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListener (nullptr)");
+        throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListenerBase (nullptr)");
     }
 
     QueryCtrlProxy ctrl;

@@ -22,7 +22,7 @@
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/SearchListener.h>
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
@@ -120,7 +120,7 @@ public:
      \param metadata additional data to pass to scope
      \param reply preview response handler
      */
-    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListenerBase::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

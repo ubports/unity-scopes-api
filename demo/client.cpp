@@ -250,7 +250,7 @@ private:
     condition_variable condvar_;
 };
 
-class PreviewReceiver : public PreviewListener
+class PreviewReceiver : public PreviewListenerBase
 {
 public:
     void push(ColumnLayoutList const& columns) override

@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWLISTENER_H
-#define UNITY_SCOPES_PREVIEWLISTENER_H
+#ifndef UNITY_SCOPES_PREVIEWLISTENERBASE_H
+#define UNITY_SCOPES_PREVIEWLISTENERBASE_H
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -40,14 +40,14 @@ namespace scopes
 An instance of this class must be return from Scope::preview().
 */
 
-class PreviewListener : public ListenerBase
+class PreviewListenerBase : public ListenerBase
 {
 public:
     /// @cond
-    NONCOPYABLE(PreviewListener);
-    UNITY_DEFINES_PTRS(PreviewListener);
+    NONCOPYABLE(PreviewListenerBase);
+    UNITY_DEFINES_PTRS(PreviewListenerBase);
 
-    virtual ~PreviewListener();
+    virtual ~PreviewListenerBase();
     /// @endcond
 
     /**
@@ -67,7 +67,7 @@ public:
 
 protected:
     /// @cond
-    PreviewListener();
+    PreviewListenerBase();
     /// @endcond
 };
 

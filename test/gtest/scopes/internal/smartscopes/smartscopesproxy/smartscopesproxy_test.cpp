@@ -232,7 +232,7 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     }
 }
 
-class PreviewerWithCols : public PreviewListener
+class PreviewerWithCols : public PreviewListenerBase
 {
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
@@ -332,7 +332,7 @@ private:
     std::condition_variable cond_;
 };
 
-class PreviewerNoCols : public PreviewListener
+class PreviewerNoCols : public PreviewListenerBase
 {
 public:
     virtual void push(PreviewWidgetList const& widget_list) override

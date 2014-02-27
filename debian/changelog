@@ -1,6 +1,6 @@
 unity-scopes-api (0.3.2+14.04.20140220.1-0ubuntu2) UNRELEASED; urgency=medium
 
-  [ Pawel Stolowski ]
+  [ Pawel Stolowski, Michi Henning ]
   * Renaming of various API elements for consistency and clarity:
 
     PreviewWidget::add_attribute() -> PreviewWidget::add_attribute_value()
@@ -10,6 +10,8 @@ unity-scopes-api (0.3.2+14.04.20140220.1-0ubuntu2) UNRELEASED; urgency=medium
 
     ActivationListener -> ActivationListenerBase
     ActivationListenerBase::activation_response() -> ActivationListenerBase::activated()
+
+    PreviewListener -> PreviewListenerBase
 
     Query -> CannedQuery
     CannedQuery::scope_name() -> CannedQuery::scope_id()

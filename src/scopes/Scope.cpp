@@ -63,7 +63,7 @@ QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const&
     return fwd()->perform_action(result, metadata, widget_id, action_id, reply);
 }
 
-QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListenerBase::SPtr const& reply) const
 {
     return fwd()->preview(result, metadata, reply);
 }
