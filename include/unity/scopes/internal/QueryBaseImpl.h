@@ -44,19 +44,19 @@ public:
     QueryBaseImpl();
     ~QueryBaseImpl();
 
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,

@@ -44,38 +44,38 @@ SearchQuery::~SearchQuery()
 // a bogus warning from doxygen about undocumented methods. (Doxygen gets
 // confused by the typedef for ScopeProxy.)
 
-QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
                                             string const& query_string,
                                             SearchListener::SPtr const& reply)
 {
-    return p->create_subquery(scope, query_string, reply);
+    return p->subsearch(scope, query_string, reply);
 }
 
-QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             FilterState const& filter_state,
                                             SearchListener::SPtr const& reply)
 {
-    return p->create_subquery(scope, query_string, filter_state, reply);
+    return p->subsearch(scope, query_string, filter_state, reply);
 }
 
-QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             std::string const& department_id,
                                             FilterState const& filter_state,
                                             SearchListener::SPtr const& reply)
 {
-    return p->create_subquery(scope, query_string, department_id, filter_state, reply);
+    return p->subsearch(scope, query_string, department_id, filter_state, reply);
 }
 
-QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
                                             std::string const& query_string,
                                             std::string const& department_id,
                                             FilterState const& filter_state,
                                             SearchMetadata const& hints,
                                             SearchListener::SPtr const& reply)
 {
-    return p->create_subquery(scope, query_string, department_id, filter_state, hints, reply);
+    return p->subsearch(scope, query_string, department_id, filter_state, hints, reply);
 }
 /// @endcond
 

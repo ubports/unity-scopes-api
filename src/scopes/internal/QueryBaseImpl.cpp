@@ -44,7 +44,7 @@ QueryBaseImpl::~QueryBaseImpl()
 {
 }
 
-QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               string const& query_string,
                                               SearchListener::SPtr const& reply)
 {
@@ -58,7 +58,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
     return qcp;
 }
 
-QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               FilterState const& filter_state,
                                               SearchListener::SPtr const& reply)
@@ -70,7 +70,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
     return qcp;
 }
 
-QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
@@ -83,7 +83,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
     return qcp;
 }
 
-QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
+QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,

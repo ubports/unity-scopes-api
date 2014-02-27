@@ -119,8 +119,8 @@ public:
         }
 
         SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
-        create_subquery(scope_c_, query_.query_string(), reply);
-        create_subquery(scope_d_, query_.query_string(), reply);
+        subsearch(scope_c_, query_.query_string(), reply);
+        subsearch(scope_d_, query_.query_string(), reply);
     }
 
 private:

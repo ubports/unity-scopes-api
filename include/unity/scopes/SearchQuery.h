@@ -82,10 +82,10 @@ public:
     virtual void run(SearchReplyProxy const& reply) = 0;
 
     /** @name Subquery methods
-    The create_subquery() methods are for use by aggregating scopes.
+    The subsearch() methods are for use by aggregating scopes.
     When an aggregator passes a query to its child scopes, it should
-    use create_subquery() instead of the normal Scope::create_query()
-    that would be called by a client. create_subquery() takes care
+    use subsearch() instead of the normal Scope::search()
+    that would be called by a client. subsearch() takes care
     of automatically forwarding query cancellation to child scopes.
     This means that there is no need for an aggregating scope to
     explicitly forward cancellation to child scopes
@@ -93,19 +93,19 @@ public:
     run time.
     */
     //{@
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
