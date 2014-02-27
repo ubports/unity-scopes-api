@@ -88,8 +88,6 @@ public:
     \brief Sends a single result to the source of a query.
 
     Any calls to push() after finished() was called are ignored.
-    This method throws unity::InvalidArgumentException if pushing a result
-    in a category that wasn't registered earlier with unity::scopes::SearchReply::register_category().
     \return The return value is true if the result was accepted, false otherwise.
     A false return value is due to either finished() having been called earlier,
     or the client that sent the query having cancelled that query.

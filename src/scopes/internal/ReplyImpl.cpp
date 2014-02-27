@@ -114,12 +114,9 @@ bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
     // If this is an aggregator scope, it may be pushing result items obtained
     // from ReplyObject without registering a category first.
-    auto cat = cat_registry_->lookup_category(result.category()->id());
-    if (cat == nullptr)
+    if (cat_registry_->lookup_category(result.category()->id()) == nullptr)
     {
-        std::ostringstream s;
-        s << "Unknown category " << result.category()->id();
-        throw InvalidArgumentException(s.str());
+        register_category(result.category());
     }
 
     VariantMap var;
