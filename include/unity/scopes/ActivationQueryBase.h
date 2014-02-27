@@ -31,7 +31,7 @@ namespace scopes
 
 namespace internal
 {
-class ActivationBaseImpl;
+class ActivationQueryBaseImpl;
 }
 
 /**
@@ -62,7 +62,7 @@ public:
     virtual ActivationResponse activate();
 
 private:
-    std::unique_ptr<internal::ActivationBaseImpl> p;
+    std::unique_ptr<internal::ActivationQueryBaseImpl> p;
 };
 
 } // namespace scopes

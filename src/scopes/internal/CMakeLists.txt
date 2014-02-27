@@ -7,7 +7,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ActionMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationReplyObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ActivationBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ActivationQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationResponseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AbstractObject.cpp

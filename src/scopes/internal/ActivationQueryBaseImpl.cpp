@@ -14,13 +14,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- */
+*/
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONBASEIMPL_H
-
-#include <unity/scopes/ActivationResponse.h>
-#include <unity/util/NonCopyable.h>
+#include <unity/scopes/internal/ActivationQueryBaseImpl.h>
 
 namespace unity
 {
@@ -31,20 +27,13 @@ namespace scopes
 namespace internal
 {
 
-class ActivationBaseImpl final
+ActivationResponse ActivationQueryBaseImpl::activate()
 {
-public:
-    NONCOPYABLE(ActivationBaseImpl);
-
-    ActivationBaseImpl() = default;
-    ~ActivationBaseImpl() = default;
-    ActivationResponse activate();
-};
+    return ActivationResponse(ActivationResponse::Status::NotHandled);
+}
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

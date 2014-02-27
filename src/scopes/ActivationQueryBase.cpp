@@ -17,7 +17,7 @@
 */
 
 #include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/internal/ActivationBaseImpl.h>
+#include <unity/scopes/internal/ActivationQueryBaseImpl.h>
 
 namespace unity
 {
@@ -28,7 +28,7 @@ namespace scopes
 /// @cond
 ActivationQueryBase::ActivationQueryBase() :
     QueryBase(),
-    p(new internal::ActivationBaseImpl())
+    p(new internal::ActivationQueryBaseImpl())
 {
 }
 
