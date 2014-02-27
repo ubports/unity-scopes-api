@@ -126,7 +126,7 @@ private:
 // alive as long as it can still be cancelled, which is while there is at least one
 // SearchReplyProxy still in existence for this query.
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery(CannedQuery const& query, Queue& queue) :
@@ -218,10 +218,10 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
-        return SearchQuery::UPtr(new MyQuery(q, queue));
+        return SearchQueryBase::UPtr(new MyQuery(q, queue));
     }
 
     virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override

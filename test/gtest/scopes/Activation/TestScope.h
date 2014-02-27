@@ -33,7 +33,7 @@ namespace unity
 namespace scopes
 {
 
-class TestQuery : public SearchQuery
+class TestQuery : public SearchQueryBase
 {
 public:
     virtual void cancelled() override {}
@@ -90,9 +90,9 @@ public:
 
     virtual void run() override {}
 
-    virtual SearchQuery::UPtr search(CannedQuery const &, SearchMetadata const &) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override
     {
-        return SearchQuery::UPtr(new TestQuery());
+        return SearchQueryBase::UPtr(new TestQuery());
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override

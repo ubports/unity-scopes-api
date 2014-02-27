@@ -26,7 +26,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
@@ -85,7 +85,7 @@ private:
     SearchReplyProxy upstream_;
 };
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery(string const& scope_name,
@@ -154,9 +154,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQuery::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }

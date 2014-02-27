@@ -28,7 +28,7 @@ using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery(CannedQuery const& query) :
@@ -139,9 +139,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQuery::UPtr query(new MyQuery(q));
+        SearchQueryBase::UPtr query(new MyQuery(q));
         cout << "scope-A: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }

@@ -28,7 +28,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class PusherQuery : public SearchQuery
+class PusherQuery : public SearchQueryBase
 {
 public:
     PusherQuery(int cardinality)
@@ -75,9 +75,9 @@ void PusherScope::run()
 {
 }
 
-SearchQuery::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMetadata const& md)
+SearchQueryBase::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMetadata const& md)
 {
-    return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
+    return SearchQueryBase::UPtr(new PusherQuery(md.cardinality()));
 }
 
 PreviewQueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)

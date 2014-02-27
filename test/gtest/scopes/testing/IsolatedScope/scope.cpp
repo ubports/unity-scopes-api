@@ -60,7 +60,7 @@ public:
     }
 };
 
-class Query : public unity::scopes::SearchQuery
+class Query : public unity::scopes::SearchQueryBase
 {
 public:
     Query(unity::scopes::CannedQuery const& query)
@@ -129,11 +129,11 @@ void testing::Scope::run()
 {
 }
 
-unity::scopes::SearchQuery::UPtr testing::Scope::search(
+unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &)
 {
-    return unity::scopes::SearchQuery::UPtr(new testing::Query(query));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
 }
 
 unity::scopes::ActivationBase::UPtr testing::Scope::activate(

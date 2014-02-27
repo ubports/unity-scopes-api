@@ -40,7 +40,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchListenerBase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SearchQuery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Scope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBase.cpp

@@ -30,7 +30,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class TestQuery : public SearchQuery
+class TestQuery : public SearchQueryBase
 {
 public:
     TestQuery(CannedQuery const& query)
@@ -95,9 +95,9 @@ void TestScope::run()
 {
 }
 
-SearchQuery::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
+SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
 {
-    return SearchQuery::UPtr(new TestQuery(query));
+    return SearchQueryBase::UPtr(new TestQuery(query));
 }
 
 PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)

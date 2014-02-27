@@ -23,11 +23,10 @@
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
 #include <unity/Exception.h>
 
 #include <iostream>
@@ -108,7 +107,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // On return, replies for the query may still be outstanding.
     try
     {
-        auto search_query = dynamic_pointer_cast<SearchQuery>(query_base_);
+        auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
         assert(search_query);
         search_query->run(reply_proxy);
     }

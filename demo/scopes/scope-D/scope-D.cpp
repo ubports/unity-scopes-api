@@ -122,7 +122,7 @@ private:
     std::condition_variable condvar_;
 };
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery(string const& scope_name,
@@ -223,9 +223,9 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQuery::UPtr query(new MyQuery(scope_name_, q, queue_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
         cerr << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }

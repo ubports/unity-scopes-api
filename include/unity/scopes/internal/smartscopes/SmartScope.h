@@ -42,7 +42,7 @@ namespace internal
 namespace smartscopes
 {
 
-class SmartQuery : public SearchQuery
+class SmartQuery : public SearchQueryBase
 {
 public:
     SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)

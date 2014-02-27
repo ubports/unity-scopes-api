@@ -148,7 +148,7 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> SearchQuery::UPtr {
+            [&q, &hints, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_metadata(hints);
                  return search_query;

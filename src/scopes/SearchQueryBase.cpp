@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
@@ -30,11 +30,11 @@ namespace scopes
 {
 
 /// @cond
-SearchQuery::SearchQuery() : QueryBase()
+SearchQueryBase::SearchQueryBase() : QueryBase()
 {
 }
 
-SearchQuery::~SearchQuery()
+SearchQueryBase::~SearchQueryBase()
 {
 }
 /// @endcond
@@ -44,36 +44,36 @@ SearchQuery::~SearchQuery()
 // a bogus warning from doxygen about undocumented methods. (Doxygen gets
 // confused by the typedef for ScopeProxy.)
 
-QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
-                                            string const& query_string,
-                                            SearchListenerBase::SPtr const& reply)
+QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
+                                          string const& query_string,
+                                          SearchListenerBase::SPtr const& reply)
 {
     return p->subsearch(scope, query_string, reply);
 }
 
-QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
-                                            std::string const& query_string,
-                                            FilterState const& filter_state,
-                                            SearchListenerBase::SPtr const& reply)
+QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
+                                          std::string const& query_string,
+                                          FilterState const& filter_state,
+                                          SearchListenerBase::SPtr const& reply)
 {
     return p->subsearch(scope, query_string, filter_state, reply);
 }
 
-QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
-                                            std::string const& query_string,
-                                            std::string const& department_id,
-                                            FilterState const& filter_state,
-                                            SearchListenerBase::SPtr const& reply)
+QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
+                                          std::string const& query_string,
+                                          std::string const& department_id,
+                                          FilterState const& filter_state,
+                                          SearchListenerBase::SPtr const& reply)
 {
     return p->subsearch(scope, query_string, department_id, filter_state, reply);
 }
 
-QueryCtrlProxy SearchQuery::subsearch(ScopeProxy const& scope,
-                                            std::string const& query_string,
-                                            std::string const& department_id,
-                                            FilterState const& filter_state,
-                                            SearchMetadata const& hints,
-                                            SearchListenerBase::SPtr const& reply)
+QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
+                                          std::string const& query_string,
+                                          std::string const& department_id,
+                                          FilterState const& filter_state,
+                                          SearchMetadata const& hints,
+                                          SearchListenerBase::SPtr const& reply)
 {
     return p->subsearch(scope, query_string, department_id, filter_state, hints, reply);
 }

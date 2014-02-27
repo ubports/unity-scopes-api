@@ -54,12 +54,12 @@ A scope must return an instance of this class from its implementation of ScopeBa
 constructor that might block.
 */
 
-class SearchQuery: public QueryBase
+class SearchQueryBase : public QueryBase
 {
 public:
     /// @cond
-    NONCOPYABLE(SearchQuery);
-    UNITY_DEFINES_PTRS(SearchQuery);
+    NONCOPYABLE(SearchQueryBase);
+    UNITY_DEFINES_PTRS(SearchQueryBase);
     /// @endcond
 
     /**
@@ -114,12 +114,12 @@ public:
     //@}
 
     /// @cond
-    virtual ~SearchQuery();
+    virtual ~SearchQueryBase();
     /// @endcond
 
 protected:
     /// @cond
-    SearchQuery();
+    SearchQueryBase();
     /// @endcond
 };
 

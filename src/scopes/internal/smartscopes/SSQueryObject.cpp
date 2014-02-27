@@ -25,7 +25,7 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
 
 #include <iostream>
 #include <cassert>
@@ -199,7 +199,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     SearchReplyProxy q_reply_proxy;
-    SearchQuery::SPtr search_query;
+    SearchQueryBase::SPtr search_query;
 
     q_base = query->q_base;
 
@@ -209,7 +209,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
-    search_query = dynamic_pointer_cast<SearchQuery>(q_base);
+    search_query = dynamic_pointer_cast<SearchQueryBase>(q_base);
     assert(search_query);
 
     // Synchronous call into scope implementation.

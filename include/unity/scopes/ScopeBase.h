@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <unity/scopes/SearchQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ActivationBase.h>
@@ -193,7 +193,7 @@ public:
     \param metadata additional data sent by the client.
     \return The query instance.
     */
-    virtual SearchQuery::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) = 0;
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
