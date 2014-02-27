@@ -230,7 +230,7 @@ public:
         return ActivationBase::UPtr(new MyActivation());
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

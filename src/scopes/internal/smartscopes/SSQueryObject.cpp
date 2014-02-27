@@ -23,7 +23,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/SearchQuery.h>
 
@@ -221,7 +221,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     PreviewReplyProxy q_reply_proxy;
-    PreviewQuery::SPtr preview_query;
+    PreviewQueryBase::SPtr preview_query;
 
     q_base = query->q_base;
 
@@ -231,7 +231,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
-    preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
+    preview_query = dynamic_pointer_cast<PreviewQueryBase>(q_base);
     assert(preview_query);
 
     // Synchronous call into scope implementation.

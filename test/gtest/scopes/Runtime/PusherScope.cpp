@@ -80,7 +80,7 @@ SearchQuery::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMeta
     return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
 }
 
-PreviewQuery::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
+PreviewQueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
     abort();  // Not called
 }

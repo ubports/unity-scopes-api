@@ -95,7 +95,7 @@ public:
         return query;
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

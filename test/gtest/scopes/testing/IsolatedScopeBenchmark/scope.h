@@ -45,7 +45,7 @@ public:
             std::string const& widget_id,
             std::string const& action_id) override;
 
-    unity::scopes::PreviewQuery::UPtr preview(
+    unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
 };

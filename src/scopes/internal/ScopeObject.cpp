@@ -205,7 +205,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                 return this->scope_base_->preview(result, hints);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
+                auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base);
                 assert(preview_query);
                 return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }

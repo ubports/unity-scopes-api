@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewQueryBase.h>
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
@@ -29,11 +29,11 @@ namespace scopes
 {
 
 /// @cond
-PreviewQuery::PreviewQuery() : QueryBase()
+PreviewQueryBase::PreviewQueryBase() : QueryBase()
 {
 }
 
-PreviewQuery::~PreviewQuery()
+PreviewQueryBase::~PreviewQueryBase()
 {
 }
 /// @endcond

@@ -40,7 +40,7 @@ namespace scopes
 namespace internal
 {
 
-PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQuery> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
+PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
     : QueryObject(preview_base, reply, ctrl),
     preview_base_(preview_base)
 {
@@ -69,7 +69,7 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     // On return, replies for the query may still be outstanding.
     try
     {
-        auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base_);
+        auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base_);
         assert(preview_query);
         preview_query->run(reply_proxy);
     }

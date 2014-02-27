@@ -24,7 +24,7 @@
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQuery.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/SearchQuery.h>

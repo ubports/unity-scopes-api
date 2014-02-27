@@ -22,7 +22,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQuery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilder.cpp

@@ -96,7 +96,7 @@ private:
     unity::scopes::CannedQuery query_;
 };
 
-class Preview : public unity::scopes::PreviewQuery
+class Preview : public unity::scopes::PreviewQueryBase
 {
 public:
     void cancelled() override
@@ -152,9 +152,9 @@ unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
     return unity::scopes::ActivationBase::UPtr{new testing::LongRunningActivation()};
 }
 
-unity::scopes::PreviewQuery::UPtr testing::Scope::preview(
+unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const &)
 {
-    return unity::scopes::PreviewQuery::UPtr(new testing::Preview());
+    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview());
 }

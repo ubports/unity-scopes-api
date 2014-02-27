@@ -79,7 +79,7 @@ private:
     CannedQuery query_;
 };
 
-class MyPreview : public PreviewQuery
+class MyPreview : public PreviewQueryBase
 {
 public:
     MyPreview(string const& uri) :
@@ -146,9 +146,9 @@ public:
         return query;
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        PreviewQuery::UPtr preview(new MyPreview(result.uri()));
+        PreviewQueryBase::UPtr preview(new MyPreview(result.uri()));
         cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
         return preview;
     }

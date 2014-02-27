@@ -95,7 +95,7 @@ public:
         return SearchQuery::UPtr(new TestQuery());
     }
 
-    virtual PreviewQuery::UPtr preview(Result const&, ActionMetadata const &) override
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override
     {
         return nullptr;
     }

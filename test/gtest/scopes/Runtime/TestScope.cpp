@@ -65,7 +65,7 @@ private:
     CannedQuery query_;
 };
 
-class TestPreview : public PreviewQuery
+class TestPreview : public PreviewQueryBase
 {
 public:
     virtual void cancelled() override
@@ -100,7 +100,7 @@ SearchQuery::UPtr TestScope::search(CannedQuery const& query, SearchMetadata con
     return SearchQuery::UPtr(new TestQuery(query));
 }
 
-PreviewQuery::UPtr TestScope::preview(Result const&, ActionMetadata const &)
+PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
 {
-    return PreviewQuery::UPtr(new TestPreview());
+    return PreviewQueryBase::UPtr(new TestPreview());
 }

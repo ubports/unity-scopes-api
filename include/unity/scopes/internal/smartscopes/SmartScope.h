@@ -108,7 +108,7 @@ private:
     SearchHandle::UPtr search_handle_;
 };
 
-class SmartPreview : public PreviewQuery
+class SmartPreview : public PreviewQueryBase
 {
 public:
     SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)

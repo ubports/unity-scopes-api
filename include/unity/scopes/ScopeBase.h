@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_SCOPEBASE_H
 
 #include <unity/scopes/SearchQuery.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ActivationBase.h>
 #include <unity/scopes/Version.h>
@@ -230,7 +230,7 @@ public:
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
 
-    This method must return an instance that is derived from PreviewQuery. The implementation
+    This method must return an instance that is derived from PreviewQueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -238,7 +238,7 @@ public:
     \param metadata Additional data sent by the client.
     \return The preview instance.
      */
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.
