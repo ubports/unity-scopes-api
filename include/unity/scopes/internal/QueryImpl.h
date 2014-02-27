@@ -38,8 +38,8 @@ namespace internal
 class QueryImpl
 {
 public:
-    explicit QueryImpl(std::string const& scope_name);
-    QueryImpl(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
+    explicit QueryImpl(std::string const& scope_id);
+    QueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
     QueryImpl(VariantMap const& variant);
     QueryImpl(QueryImpl const &other) = default;
     QueryImpl(QueryImpl&&) = default;
@@ -49,7 +49,7 @@ public:
     void set_department_id(std::string const& dep_id);
     void set_query_string(std::string const& query_str);
     void set_filter_state(FilterState const& filter_state);
-    std::string scope_name() const;
+    std::string scope_id() const;
     std::string department_id() const;
     std::string query_string() const;
     FilterState filter_state() const;
@@ -59,7 +59,7 @@ public:
     static Query create(VariantMap const& var);
 
 private:
-    std::string scope_name_;
+    std::string scope_id_;
     std::string query_string_;
     std::string department_id_;
     FilterState filter_state_;

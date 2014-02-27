@@ -161,7 +161,7 @@ TEST(ActivationResponse, deserialize)
         {
             internal::ActivationResponseImpl res(var);
             EXPECT_EQ(ActivationResponse::Status::PerformQuery, res.status());
-            EXPECT_EQ("scope-foo", res.query().scope_name());
+            EXPECT_EQ("scope-foo", res.query().scope_id());
         }
         catch (unity::LogicException const &e)
         {

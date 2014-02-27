@@ -39,7 +39,7 @@ class QueryImpl;
 /**
  * \brief Holds all parameters of a search query.
 
- * Holds all parameters of a search query: the target scope name, query string, department id, and
+ * Holds all parameters of a search query: the target scope id, query string, department id, and
  * state of the filters. Can be converted to/from scope:// uri schema string.
  */
 class Query final
@@ -52,12 +52,12 @@ public:
     /**
      * \brief Creates a query for given scope with empty query string.
      */
-    explicit Query(std::string const& scope_name);
+    explicit Query(std::string const& scope_id);
 
     /**
      * \brief Creates a query for given scope with specific query string and in given department.
      */
-    Query(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
+    Query(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
 
     /// @cond
     Query(Query const &other);
@@ -83,10 +83,10 @@ public:
     void set_filter_state(FilterState const& filter_state);
 
     /**
-     * \brief Returns the scope name of this Query.
-     * \return The scope name.
+     * \brief Returns the scope identifier of this Query.
+     * \return The scope identifier.
      */
-    std::string scope_name() const;
+    std::string scope_id() const;
 
     /**
      * \brief Returns the department id of this Query.

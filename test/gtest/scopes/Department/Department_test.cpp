@@ -32,7 +32,7 @@ TEST(Department, basic)
 
     EXPECT_EQ("dep1", dep.id());
     EXPECT_EQ("dep1", dep.query().department_id());
-    EXPECT_EQ("fooscope", dep.query().scope_name());
+    EXPECT_EQ("fooscope", dep.query().scope_id());
     EXPECT_EQ("News", dep.label());
 
     dep.set_subdepartments({{"subdep1", query, "Europe"}});
@@ -57,7 +57,7 @@ TEST(Department, serialize_and_deserialize)
     auto dep2 = internal::DepartmentImpl::create(var);
     EXPECT_EQ("dep1", dep2.id());
     EXPECT_EQ("dep1", dep2.query().department_id());
-    EXPECT_EQ("fooscope", dep2.query().scope_name());
+    EXPECT_EQ("fooscope", dep2.query().scope_id());
     EXPECT_EQ("News", dep2.label());
     EXPECT_EQ(2u, dep2.subdepartments().size());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().id());

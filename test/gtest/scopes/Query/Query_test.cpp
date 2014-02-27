@@ -29,7 +29,7 @@ TEST(Query, basic)
 {
     {
         Query q("scope-A");
-        EXPECT_EQ("scope-A", q.scope_name());
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("", q.query_string());
         EXPECT_EQ("", q.department_id());
     }
@@ -37,7 +37,7 @@ TEST(Query, basic)
         Query q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
-        EXPECT_EQ("scope-A", q.scope_name());
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
     }
@@ -49,7 +49,7 @@ TEST(Query, copy)
         Query a("scope-A", "foo", "dep1");
         Query b(a);
 
-        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.scope_id(), b.scope_id());
         EXPECT_EQ(a.department_id(), b.department_id());
         EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
@@ -62,7 +62,7 @@ TEST(Query, copy)
         Query a("scope-A", "foo", "dep1");
         Query b = a;
 
-        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.scope_id(), b.scope_id());
         EXPECT_EQ(a.department_id(), b.department_id());
         EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
@@ -111,7 +111,7 @@ TEST(Query, deserialize)
         vm["filter_state"] = Variant(VariantMap());
 
         auto q = internal::QueryImpl::create(vm);
-        EXPECT_EQ("scope-A", q.scope_name());
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
     }

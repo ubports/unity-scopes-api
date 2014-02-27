@@ -88,7 +88,7 @@ public:
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
         auto query = annotation.links().front()->query();
-        EXPECT_EQ("scope-A", query.scope_name());
+        EXPECT_EQ("scope-A", query.scope_id());
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;

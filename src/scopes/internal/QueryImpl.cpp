@@ -31,17 +31,17 @@ namespace scopes
 namespace internal
 {
 
-QueryImpl::QueryImpl(std::string const& scope_name)
-    : scope_name_(scope_name)
+QueryImpl::QueryImpl(std::string const& scope_id)
+    : scope_id_(scope_id)
 {
-    if (scope_name_.empty())
+    if (scope_id_.empty())
     {
         throw InvalidArgumentException("Query(): scope name cannot be empty");
     }
 }
 
-QueryImpl::QueryImpl(std::string const& scope_name, std::string const& query_str, std::string const& department_id)
-    : scope_name_(scope_name),
+QueryImpl::QueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id)
+    : scope_id_(scope_id),
       query_string_(query_str),
       department_id_(department_id)
 {
@@ -54,8 +54,8 @@ QueryImpl::QueryImpl(VariantMap const& variant)
     {
         throw InvalidArgumentException("Query(): scope name not set");
     }
-    scope_name_ = it->second.get_string();
-    if (scope_name_.empty())
+    scope_id_ = it->second.get_string();
+    if (scope_id_.empty())
     {
         throw InvalidArgumentException("Query(): scope name cannot be empty");
     }
@@ -95,9 +95,9 @@ void QueryImpl::set_filter_state(FilterState const& filter_state)
     filter_state_ = filter_state;
 }
 
-std::string QueryImpl::scope_name() const
+std::string QueryImpl::scope_id() const
 {
-    return scope_name_;
+    return scope_id_;
 }
 
 std::string QueryImpl::department_id() const
@@ -118,7 +118,7 @@ FilterState QueryImpl::filter_state() const
 VariantMap QueryImpl::serialize() const
 {
     VariantMap vm;
-    vm["scope"] = scope_name_;
+    vm["scope"] = scope_id_;
     vm["query_string"] = query_string_;
     vm["department_id"] = department_id_;
     vm["filter_state"] = filter_state_.serialize();
@@ -128,7 +128,7 @@ VariantMap QueryImpl::serialize() const
 std::string QueryImpl::to_string() const
 {
     std::ostringstream s;
-    s << "scope://" << scope_name_;
+    s << "scope://" << scope_id_;
     s << "?q=" << query_string_; // FIXME: escape
     if (!department_id_.empty())
     {

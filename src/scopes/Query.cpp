@@ -26,13 +26,13 @@ namespace unity
 namespace scopes
 {
 
-Query::Query(std::string const& scope_name)
-    : p(new internal::QueryImpl(scope_name))
+Query::Query(std::string const& scope_id)
+    : p(new internal::QueryImpl(scope_id))
 {
 }
 
-Query::Query(std::string const& scope_name, std::string const& query_str, std::string const& department_id)
-    : p(new internal::QueryImpl(scope_name, query_str, department_id))
+Query::Query(std::string const& scope_id, std::string const& query_str, std::string const& department_id)
+    : p(new internal::QueryImpl(scope_id, query_str, department_id))
 {
 }
 
@@ -83,9 +83,9 @@ void Query::set_filter_state(FilterState const& filter_state)
     p->set_filter_state(filter_state);
 }
 
-std::string Query::scope_name() const
+std::string Query::scope_id() const
 {
-    return p->scope_name();
+    return p->scope_id();
 }
 
 std::string Query::department_id() const
