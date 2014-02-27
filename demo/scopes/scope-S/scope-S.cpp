@@ -59,6 +59,7 @@ public:
         this_thread::sleep_for(chrono::seconds(20));
         auto cat = reply->register_category("cat1", "Category 1", "", renderer_);
         CategorisedResult result(cat);
+        result.set_uri("uri");
         result.set_title("scope-slow: result 1 for query \"" + query_.query_string() + "\"");
         reply->push(result);
         cout << "scope-slow: query \"" << query_.query_string() << "\" complete" << endl;
