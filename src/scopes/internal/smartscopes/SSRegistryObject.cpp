@@ -210,6 +210,7 @@ void SSRegistryObject::get_remote_scopes()
             metadata->set_scope_id(scope.id);
             metadata->set_display_name(scope.name);
             metadata->set_description(scope.description);
+            metadata->set_author(scope.author);
 
             if (scope.icon)
             {

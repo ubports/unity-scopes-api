@@ -158,6 +158,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
             mi->set_description(sc.description());
+            mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
             try
             {

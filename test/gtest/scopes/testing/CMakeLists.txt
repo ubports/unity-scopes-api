@@ -1,1 +1,2 @@
 add_subdirectory(IsolatedScope)
+add_subdirectory(IsolatedScopeBenchmark)

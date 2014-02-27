@@ -83,6 +83,12 @@ public:
     std::string description() const;    // localized
 
     /**
+     \brief Get the author for this scope.
+     \return The scope author.
+     */
+    std::string author() const;
+
+    /**
      \brief Get the art for this scope.
      \return The scope art.
      */

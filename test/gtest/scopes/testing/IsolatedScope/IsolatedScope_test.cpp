@@ -13,12 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
+#include <unity/scopes/testing/InProcessBenchmark.h>
+#include <unity/scopes/testing/OutOfProcessBenchmark.h>
 #include <unity/scopes/testing/Category.h>
 #include <unity/scopes/testing/Result.h>
 #include <unity/scopes/testing/ScopeMetadataBuilder.h>
+#include <unity/scopes/testing/Statistics.h>
 #include <unity/scopes/testing/TypedScopeFixture.h>
 
 #include <unity/scopes/testing/MockRegistry.h>
@@ -33,7 +36,7 @@
 
 namespace
 {
-typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> TestScopeFixture;
+typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> TestScopeFixutre;
 
 static const std::string scope_id{"does.not.exist.scope"};
 static const std::string scope_query_string{"does.not.exist.scope.query_string"};
@@ -73,7 +76,7 @@ TEST(ScopeMetadataBuilder, construction_in_case_of_missing_mandatory_arguments_a
     EXPECT_EXIT(builder(), ::testing::KilledBySignal(SIGABRT), ".*");
 }
 
-TEST_F(TestScopeFixture,
+TEST_F(TestScopeFixutre,
        creating_a_search_query_and_checking_for_pushed_results_works)
 {
     using namespace ::testing;
@@ -118,7 +121,7 @@ TEST_F(TestScopeFixture,
     search_query->run(search_reply_proxy);
 }
 
-TEST_F(TestScopeFixture, activating_a_result_works)
+TEST_F(TestScopeFixutre, activating_a_result_works)
 {
     using namespace ::testing;
 
@@ -132,7 +135,7 @@ TEST_F(TestScopeFixture, activating_a_result_works)
               activation->activate().status());
 }
 
-TEST_F(TestScopeFixture, performing_an_action_works)
+TEST_F(TestScopeFixutre, performing_an_action_works)
 {
     using namespace ::testing;
 
