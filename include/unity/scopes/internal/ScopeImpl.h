@@ -22,7 +22,7 @@
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/scopes/internal/ObjectProxyImpl.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/Result.h>
@@ -52,10 +52,10 @@ public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
     virtual ~ScopeImpl();
 
-    QueryCtrlProxy search(std::string const& q, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
-    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
-    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
-    QueryCtrlProxy search(CannedQuery const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& q, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
+    QueryCtrlProxy search(CannedQuery const& query, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
     QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const;
     QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id,
             ActivationListenerBase::SPtr const& reply) const;

@@ -51,7 +51,7 @@ private:
     std::condition_variable cond_;
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult /* result */) override {}

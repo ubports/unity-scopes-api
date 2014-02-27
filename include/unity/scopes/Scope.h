@@ -21,7 +21,7 @@
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -53,7 +53,7 @@ public:
     /**
     \brief Initiates a search query.
 
-    The search() method expects a SearchListener, which it uses to return
+    The search() method expects a SearchListenerBase, which it uses to return
     the results for the query. search() may block for some time, for example,
     if the target scope is not running and needs to be started first.
     Results for the query may begin to arrive only after search() completes (but may
@@ -64,7 +64,7 @@ public:
     \param reply search response handler
     \return query handler
     */
-    QueryCtrlProxy search(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
     \brief Initiates a search query (overloaded method).
@@ -77,7 +77,7 @@ public:
     \param reply search response handler
     \return query handler
      */
-    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
     \brief Initiates a search query (overloaded method).
@@ -91,7 +91,7 @@ public:
     \param reply search response handler
     \return query handler
      */
-    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates activation of a search result.

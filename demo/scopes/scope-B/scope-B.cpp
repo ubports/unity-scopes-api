@@ -42,7 +42,7 @@ using namespace unity::scopes;
 // A Receiver instance remembers the query string and the reply object that was passed
 // from upstream. Results from the child scopes are sent to that upstream reply object.
 
-class Receiver: public SearchListener
+class Receiver: public SearchListenerBase
 {
 public:
     virtual void push(Category::SCPtr category) override
@@ -118,7 +118,7 @@ public:
             assert(0);
         }
 
-        SearchListener::SPtr reply(new Receiver(scope_name_, upstream_reply));
+        SearchListenerBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
         subsearch(scope_c_, query_.query_string(), reply);
         subsearch(scope_d_, query_.query_string(), reply);
     }

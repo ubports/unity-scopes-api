@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver()

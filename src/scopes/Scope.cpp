@@ -37,17 +37,17 @@ Scope::~Scope()
 {
 }
 
-QueryCtrlProxy Scope::search(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
     return fwd()->search(query_string, metadata, reply);
 }
 
-QueryCtrlProxy Scope::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
     return fwd()->search(query_string, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
     return fwd()->search(query_string, department_id, filter_state, metadata, reply);
 }

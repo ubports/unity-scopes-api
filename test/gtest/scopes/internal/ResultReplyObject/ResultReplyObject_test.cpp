@@ -20,7 +20,7 @@
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
@@ -28,7 +28,7 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-class DummyReceiver : public SearchListener
+class DummyReceiver : public SearchListenerBase
 {
 public:
     DummyReceiver(std::function<void(DepartmentList const&, std::string const&)> departments_push_func)

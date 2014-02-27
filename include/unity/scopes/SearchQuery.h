@@ -24,7 +24,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -95,22 +95,22 @@ public:
     //{@
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchMetadata const& hints,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     //@}
 
     /// @cond

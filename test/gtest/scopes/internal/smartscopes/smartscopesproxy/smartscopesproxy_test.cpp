@@ -26,7 +26,7 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
 #include "../RaiiServer.h"
@@ -142,7 +142,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     virtual void push(CategorisedResult result) override

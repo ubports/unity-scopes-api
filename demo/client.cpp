@@ -117,7 +117,7 @@ std::string to_string(Variant const& var)
     return str.str();
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver(int index_to_save)

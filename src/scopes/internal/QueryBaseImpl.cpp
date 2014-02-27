@@ -46,7 +46,7 @@ QueryBaseImpl::~QueryBaseImpl()
 
 QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               string const& query_string,
-                                              SearchListener::SPtr const& reply)
+                                              SearchListenerBase::SPtr const& reply)
 {
     assert(search_metadata_);
 
@@ -61,7 +61,7 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
 QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               FilterState const& filter_state,
-                                              SearchListener::SPtr const& reply)
+                                              SearchListenerBase::SPtr const& reply)
 {
     assert(search_metadata_);
 
@@ -74,7 +74,7 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply)
+                                   SearchListenerBase::SPtr const& reply)
 {
     assert(search_metadata_);
 
@@ -88,7 +88,7 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
                                               SearchMetadata const& metadata,
-                                              SearchListener::SPtr const& reply)
+                                              SearchListenerBase::SPtr const& reply)
 {
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);
     subqueries_.push_back(qcp);

@@ -33,7 +33,7 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-class DummyReceiver : public SearchListener
+class DummyReceiver : public SearchListenerBase
 {
 public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
@@ -74,7 +74,7 @@ private:
 
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult result) override

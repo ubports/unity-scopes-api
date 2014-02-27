@@ -22,7 +22,7 @@
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
 #include <vector>
@@ -46,22 +46,22 @@ public:
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchMetadata const& metadata,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
 
     void cancel();
     void set_metadata(QueryMetadata const& metadata);

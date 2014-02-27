@@ -48,7 +48,7 @@ TEST(Runtime, basic)
     rt->destroy();
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver() :
@@ -170,7 +170,7 @@ private:
     int data_pushes_;
 };
 
-class PushReceiver : public SearchListener
+class PushReceiver : public SearchListenerBase
 {
 public:
     PushReceiver(int pushes_expected)
