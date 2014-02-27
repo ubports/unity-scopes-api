@@ -49,7 +49,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
         // convert VariantMap to map<string,string>
         for (auto const& kv: it->second.get_dict())
         {
-            add_component(kv.first, kv.second.get_string());
+            add_attribute_mapping(kv.first, kv.second.get_string());
         }
     }
 
@@ -68,7 +68,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
             }
             else
             {
-                add_attribute(kv.first, kv.second);
+                add_attribute_value(kv.first, kv.second);
             }
         }
     }
@@ -105,7 +105,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     }
     for (auto const& kv: it->second.get_dict())
     {
-        add_attribute(kv.first, kv.second);
+        add_attribute_value(kv.first, kv.second);
     }
 
     it = var.find("components");
@@ -115,7 +115,7 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     }
     for (auto const& kv: it->second.get_dict())
     {
-        add_component(kv.first, kv.second.get_string());
+        add_attribute_mapping(kv.first, kv.second.get_string());
     }
 }
 
@@ -136,20 +136,20 @@ void PreviewWidgetImpl::set_widget_type(std::string const& widget_type)
     type_ = widget_type;
 }
 
-void PreviewWidgetImpl::add_attribute(std::string const& key, Variant const& value)
+void PreviewWidgetImpl::add_attribute_value(std::string const& key, Variant const& value)
 {
     if (key == "id" || key == "type" || key == "components")
     {
-        throw InvalidArgumentException("PreviewWidget::add_attribute(): Can't override '" + key + "'");
+        throw InvalidArgumentException("PreviewWidget::add_attribute_value(): Can't override '" + key + "'");
     }
     attributes_[key] = value;
 }
 
-void PreviewWidgetImpl::add_component(std::string const& key, std::string const& field_name)
+void PreviewWidgetImpl::add_attribute_mapping(std::string const& key, std::string const& field_name)
 {
     if (key == "id" || key == "type")
     {
-        throw InvalidArgumentException("PreviewWidget::add_component(): Can't override component '" + key + "'");
+        throw InvalidArgumentException("PreviewWidget::add_attribute_mapping(): Can't override component '" + key + "'");
     }
     components_[key] = field_name;
 }
@@ -164,12 +164,12 @@ std::string PreviewWidgetImpl::widget_type() const
     return type_;
 }
 
-std::map<std::string, std::string> PreviewWidgetImpl::components() const
+std::map<std::string, std::string> PreviewWidgetImpl::attribute_mappings() const
 {
     return components_;
 }
 
-VariantMap PreviewWidgetImpl::attributes() const
+VariantMap PreviewWidgetImpl::attribute_values() const
 {
     return attributes_;
 }

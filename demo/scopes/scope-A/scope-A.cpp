@@ -102,8 +102,8 @@ public:
         widgets.emplace_back(PreviewWidget(R"({"id": "img", "type": "image", "art": "screenshot-url"})"));
 
         PreviewWidget w("img2", "image");
-        w.add_attribute("zoomable", Variant(false));
-        w.add_component("art", "screenshot-url");
+        w.add_attribute_value("zoomable", Variant(false));
+        w.add_attribute_mapping("art", "screenshot-url");
         widgets.emplace_back(w);
 
         ColumnLayout layout1col(1);

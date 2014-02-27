@@ -278,9 +278,9 @@ public:
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
             cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
-                 << "\t\t attributes: " << to_string(Variant(it->attributes())) << endl
+                 << "\t\t attributes: " << to_string(Variant(it->attribute_values())) << endl
                  << "\t\t components: {";
-            for (const auto kv: it->components())
+            for (const auto kv: it->attribute_mappings())
             {
                 cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
             }

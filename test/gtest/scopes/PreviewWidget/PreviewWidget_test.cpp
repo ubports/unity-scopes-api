@@ -30,23 +30,23 @@ TEST(PreviewWidget, basic)
 {
     {
         PreviewWidget w("i1", "image");
-        w.add_attribute("foo", Variant(10));
-        w.add_component("boo", "bar");
+        w.add_attribute_value("foo", Variant(10));
+        w.add_attribute_mapping("boo", "bar");
 
         EXPECT_EQ("i1", w.id());
         EXPECT_EQ("image", w.widget_type());
-        EXPECT_EQ(1u, w.attributes().size());
-        EXPECT_EQ(10, w.attributes()["foo"].get_int());
-        EXPECT_EQ(1u, w.components().size());
-        EXPECT_EQ("bar", w.components()["boo"]);
+        EXPECT_EQ(1u, w.attribute_values().size());
+        EXPECT_EQ(10, w.attribute_values()["foo"].get_int());
+        EXPECT_EQ(1u, w.attribute_mappings().size());
+        EXPECT_EQ("bar", w.attribute_mappings()["boo"]);
     }
 }
 
 TEST(PreviewWidget, to_json)
 {
     PreviewWidget w("i1", "image");
-    w.add_attribute("foo", Variant(10));
-    w.add_component("boo", "bar");
+    w.add_attribute_value("foo", Variant(10));
+    w.add_attribute_mapping("boo", "bar");
 
     internal::JsonCppNode node(w.data());
     EXPECT_EQ("i1", node.get_node("id")->as_string());
@@ -60,8 +60,8 @@ TEST(PreviewWidget, from_json)
     PreviewWidget w(R"({"id": "i1", "type": "header", "title": "foo", "components": {"rating": "boo"}})"); // from json
     EXPECT_EQ("i1", w.id());
     EXPECT_EQ("header", w.widget_type());
-    EXPECT_EQ("foo", w.attributes()["title"].get_string());
-    EXPECT_EQ("boo", w.components()["rating"]);
+    EXPECT_EQ("foo", w.attribute_values()["title"].get_string());
+    EXPECT_EQ("boo", w.attribute_mappings()["rating"]);
 }
 
 TEST(PreviewWidget, exceptions)
@@ -84,10 +84,10 @@ TEST(PreviewWidget, exceptions)
     }
     {
         PreviewWidget w("a", "image");
-        EXPECT_THROW(w.add_attribute("id", Variant("x")), unity::InvalidArgumentException);
-        EXPECT_THROW(w.add_attribute("type", Variant("x")), unity::InvalidArgumentException);
-        EXPECT_THROW(w.add_component("id", "x"), unity::InvalidArgumentException);
-        EXPECT_THROW(w.add_component("type", "x"), unity::InvalidArgumentException);
+        EXPECT_THROW(w.add_attribute_value("id", Variant("x")), unity::InvalidArgumentException);
+        EXPECT_THROW(w.add_attribute_value("type", Variant("x")), unity::InvalidArgumentException);
+        EXPECT_THROW(w.add_attribute_mapping("id", "x"), unity::InvalidArgumentException);
+        EXPECT_THROW(w.add_attribute_mapping("type", "x"), unity::InvalidArgumentException);
     }
 }
 
@@ -95,8 +95,8 @@ TEST(PreviewWidget, serialize)
 {
     {
         PreviewWidget w("i1", "image");
-        w.add_attribute("foo", Variant(10));
-        w.add_component("boo", "bar");
+        w.add_attribute_value("foo", Variant(10));
+        w.add_attribute_mapping("boo", "bar");
 
         auto var = w.serialize();
         EXPECT_EQ("i1", var["id"].get_string());
@@ -122,9 +122,9 @@ TEST(PreviewWidget, deserialize)
         auto w = internal::PreviewWidgetImpl::create(outer);
         EXPECT_EQ("i1", w.id());
         EXPECT_EQ("image", w.widget_type());
-        EXPECT_EQ(1u, w.attributes().size());
-        EXPECT_EQ("bar", w.attributes()["foo"].get_string());
-        EXPECT_EQ(1u, w.components().size());
-        EXPECT_EQ("cee", w.components()["bee"]);
+        EXPECT_EQ(1u, w.attribute_values().size());
+        EXPECT_EQ("bar", w.attribute_values()["foo"].get_string());
+        EXPECT_EQ(1u, w.attribute_mappings().size());
+        EXPECT_EQ("cee", w.attribute_mappings()["bee"]);
     }
 }

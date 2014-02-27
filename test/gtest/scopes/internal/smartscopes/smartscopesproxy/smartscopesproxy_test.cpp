@@ -241,22 +241,22 @@ public:
         auto it = widget_list.begin();
         EXPECT_EQ("widget_id_A", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
 
         // widget 2
         std::advance(it, 1);
         EXPECT_EQ("widget_id_B", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         // widget 3
         std::advance(it, 1);
         EXPECT_EQ("widget_id_C", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget C", it->attributes()["title"].get_string());
-        EXPECT_EQ("Third widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
 
         widget_pushes_++;
     }
@@ -341,15 +341,15 @@ public:
         auto it = widget_list.begin();
         EXPECT_EQ("widget_id_A", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
 
         // widget 2
         std::advance(it, 1);
         EXPECT_EQ("widget_id_B", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         widget_pushes_++;
     }
