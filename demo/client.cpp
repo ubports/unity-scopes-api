@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
         print_usage();
     }
 
-    string scope_name = argv[1];
+    string scope_id = argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
@@ -370,9 +370,9 @@ int main(int argc, char* argv[])
         Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
-        auto meta = r->get_metadata(scope_name);
+        auto meta = r->get_metadata(scope_id);
         cout << "Scope metadata:   " << endl;
-        cout << "\tscope_name:     " << meta.scope_name() << endl;
+        cout << "\tscope_id:       " << meta.scope_id() << endl;
         cout << "\tdisplay_name:   " << meta.display_name() << endl;
         cout << "\tdescription:    " << meta.description() << endl;
         string tmp;

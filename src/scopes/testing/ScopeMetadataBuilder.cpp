@@ -30,7 +30,7 @@ struct testing::ScopeMetadataBuilder::Private
 {
     constexpr static unity::scopes::internal::MiddlewareBase* invalid_middleware = nullptr;
 
-    std::string scope_name;
+    std::string scope_id;
     ScopeProxy proxy;
     std::string display_name;
     std::string description;
@@ -50,9 +50,9 @@ testing::ScopeMetadataBuilder::~ScopeMetadataBuilder()
 {
 }
 
-testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::scope_name(std::string const& value)
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::scope_id(std::string const& value)
 {
-    p->scope_name = value;
+    p->scope_id = value;
     return *this;
 }
 
@@ -107,7 +107,7 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::invisible(Optional
 unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
 {
     auto impl = new unity::scopes::internal::ScopeMetadataImpl(Private::invalid_middleware);
-    impl->set_scope_name(p->scope_name);
+    impl->set_scope_id(p->scope_id);
     impl->set_proxy(p->proxy);
     impl->set_display_name(p->display_name);
     impl->set_description(p->description);

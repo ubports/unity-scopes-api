@@ -59,10 +59,10 @@ public:
     /// @endcond
 
     /**
-     \brief Get the scope name.
+     \brief Get the scope identifier.
      \return The name of the scope.
      */
-    std::string scope_name() const;
+    std::string scope_id() const;
 
     /**
      \brief Get the proxy object for this scope.

@@ -40,7 +40,7 @@ public:
     RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
     ~RegistryImpl();
 
-    ScopeMetadata get_metadata(std::string const& scope_name);
+    ScopeMetadata get_metadata(std::string const& scope_id);
     MetadataMap list();
     MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
     ScopeProxy locate(std::string const& scope_name);

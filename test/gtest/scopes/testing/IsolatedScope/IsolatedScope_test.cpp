@@ -35,7 +35,7 @@ namespace
 {
 typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> TestScopeFixture;
 
-static const std::string scope_name{"does.not.exist.scope"};
+static const std::string scope_id{"does.not.exist.scope"};
 static const std::string scope_query_string{"does.not.exist.scope.query_string"};
 
 static const std::string default_locale{"C"};
@@ -66,7 +66,7 @@ TEST(Category, construction_passes_on_arguments)
 TEST(ScopeMetadataBuilder, construction_in_case_of_missing_mandatory_arguments_aborts)
 {
     unity::scopes::testing::ScopeMetadataBuilder builder;
-    builder.scope_name(scope_name)
+    builder.scope_id(scope_id)
            .display_name("does.not.exist.display_name")
            .description("does.not.exist.description");
 
@@ -108,7 +108,7 @@ TEST_F(TestScopeFixture,
         &reply, [](unity::scopes::SearchReplyBase*) {}
     };
 
-    unity::scopes::Query query{scope_name};
+    unity::scopes::Query query{scope_id};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};

@@ -51,11 +51,11 @@ public:
     /// @endcond
 
     /**
-    \brief Returns the metadata for the scope with the given name.
+    \brief Returns the metadata for the scope with the given id.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
-    ScopeMetadata get_metadata(std::string const& scope_name) const override;
+    ScopeMetadata get_metadata(std::string const& scope_id) const override;
 
     /**
     \brief Returns a map containing the metadata for all scopes.

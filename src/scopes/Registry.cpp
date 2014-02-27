@@ -39,9 +39,9 @@ Registry::~Registry()
 
 //! @endcond
 
-ScopeMetadata Registry::get_metadata(std::string const& scope_name) const
+ScopeMetadata Registry::get_metadata(std::string const& scope_id) const
 {
-    return fwd()->get_metadata(scope_name);
+    return fwd()->get_metadata(scope_id);
 }
 
 MetadataMap Registry::list() const

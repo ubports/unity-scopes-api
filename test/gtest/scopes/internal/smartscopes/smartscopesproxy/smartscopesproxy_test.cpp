@@ -111,7 +111,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_id());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
     EXPECT_EQ("icon", meta.icon());
@@ -130,7 +130,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_id());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
     EXPECT_EQ("icon", meta.icon());

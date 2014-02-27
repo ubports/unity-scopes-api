@@ -38,7 +38,7 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     // a ScopeMetadataImpl, fill it in, and then call this constructor.
     // We check here that all mandatory fields are present. If not
     // we have an internal logic error.
-    assert(!p->scope_name().empty());
+    assert(!p->scope_id().empty());
     assert(p->proxy());
     assert(!p->display_name().empty());
     assert(!p->description().empty());
@@ -66,9 +66,9 @@ ScopeMetadata& ScopeMetadata::operator=(ScopeMetadata const& other)
 
 ScopeMetadata& ScopeMetadata::operator=(ScopeMetadata&&) = default;
 
-string ScopeMetadata::scope_name() const
+string ScopeMetadata::scope_id() const
 {
-    return p->scope_name();
+    return p->scope_id();
 }
 
 ScopeProxy ScopeMetadata::proxy() const
