@@ -48,15 +48,20 @@ namespace internal
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
-    QueryObjectBase(),
+    QueryObject(query_base, 0, reply, ctrl)
+{
+}
+
+QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+                         int cardinality,
+                         MWReplyProxy const& reply,
+                         MWQueryCtrlProxy const& ctrl) :
     query_base_(query_base),
     reply_(reply),
     ctrl_(ctrl),
-    pushable_(true)
+    pushable_(true),
+    cardinality_(cardinality)
 {
-    assert(query_base);
-    assert(reply);
-    assert(ctrl);
 }
 
 QueryObject::~QueryObject()
@@ -143,6 +148,11 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept
 {
     return pushable_;
+}
+
+int QueryObject::cardinality(InvokeInfo const& /* info */) const noexcept
+{
+    return cardinality_;
 }
 
 // The point of keeping a shared_ptr to ourselves is to make sure this QueryObject cannot

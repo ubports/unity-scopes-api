@@ -51,7 +51,7 @@ PreviewReplyObject::~PreviewReplyObject()
 {
 }
 
-void PreviewReplyObject::process_data(VariantMap const& data)
+bool PreviewReplyObject::process_data(VariantMap const& data)
 {
     auto it = data.find("columns");
     if (it != data.end())
@@ -96,6 +96,8 @@ void PreviewReplyObject::process_data(VariantMap const& data)
             receiver_->push(it->first, it->second);
         }
     }
+
+    return false;
 }
 
 } // namespace internal

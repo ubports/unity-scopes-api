@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -38,6 +39,7 @@ SearchMetadataImpl::SearchMetadataImpl(int cardinality, std::string const& local
     : QueryMetadataImpl(locale, form_factor),
       cardinality_(cardinality)
 {
+    check_cardinality("SearchMetadataImpl()", cardinality);
 }
 
 SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
@@ -45,10 +47,12 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
 {
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
+    check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
 }
 
 void SearchMetadataImpl::set_cardinality(int cardinality)
 {
+    check_cardinality("SearchMetadataImpl::set_cardinality()", cardinality);
     cardinality_ = cardinality;
 }
 
@@ -67,6 +71,14 @@ void SearchMetadataImpl::serialize(VariantMap &var) const
 {
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);
+}
+
+void SearchMetadataImpl::check_cardinality(std::string const& func_name, int cardinality)
+{
+    if (cardinality < 0)
+    {
+        throw InvalidArgumentException(func_name + ": " + std::to_string(cardinality));
+    }
 }
 
 SearchMetadata SearchMetadataImpl::create(VariantMap const& var)

@@ -16,40 +16,20 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWREPLYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWREPLYOBJECT_H
+#include <unity/scopes/ScopeBase.h>
 
-#include <unity/scopes/internal/ReplyObject.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/PreviewListener.h>
+using namespace std;
+using namespace unity::scopes;
 
-namespace unity
-{
-
-namespace scopes
-{
-
-namespace internal
-{
-
-class RuntimeImpl;
-
-class PreviewReplyObject : public ReplyObject
+class PusherScope : public ScopeBase
 {
 public:
-    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
-    virtual ~PreviewReplyObject();
+    virtual int start(string const&, RegistryProxy const &) override;
 
-    virtual bool process_data(VariantMap const& data) override;
+    virtual void stop() override;
 
-private:
-    PreviewListener::SPtr const receiver_;
+    virtual void run() override;
+
+    virtual SearchQuery::UPtr create_query(Query const &, SearchMetadata const &) override;
+    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
 };
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
-
-#endif

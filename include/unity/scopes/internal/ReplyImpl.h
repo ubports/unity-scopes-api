@@ -90,6 +90,9 @@ private:
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
     bool layouts_push_disallowed_;
+
+    std::atomic_int cardinality_;
+    std::atomic_int num_pushes_;
 };
 
 } // namespace internal

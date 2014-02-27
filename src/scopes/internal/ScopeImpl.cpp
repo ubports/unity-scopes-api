@@ -88,7 +88,7 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const&
     }
 
     QueryCtrlProxy ctrl;
-    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string()));
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality()));
     try
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
