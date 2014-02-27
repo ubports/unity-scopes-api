@@ -47,6 +47,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBa
 }
 
 ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
+    mw_(other.mw_),
     scope_name_(other.scope_name_),
     proxy_(other.proxy_),
     display_name_(other.display_name_),
@@ -79,6 +80,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
 {
     if (this != &rhs)
     {
+        mw_ = rhs.mw_;
         scope_name_ = rhs.scope_name_;
         proxy_ = rhs.proxy_;
         display_name_ = rhs.display_name_;

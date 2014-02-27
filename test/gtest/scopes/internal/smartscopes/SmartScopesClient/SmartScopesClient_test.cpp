@@ -45,10 +45,12 @@ public:
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH)
     {
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", server_.port_);
+        sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, sss_url_);
     }
 
 protected:
+    std::string sss_url_;
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient::SPtr ssc_;
@@ -66,7 +68,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
     EXPECT_EQ("Mr.Fake", scopes[0].author);
-    EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
+    EXPECT_EQ(sss_url_ + "/demo", scopes[0].base_url);
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
@@ -75,7 +77,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
     EXPECT_EQ("Mr.Fake", scopes[1].author);
-    EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
+    EXPECT_EQ(sss_url_ + "/demo2", scopes[1].base_url);
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
@@ -83,7 +85,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2u, results.size());
@@ -111,7 +113,7 @@ TEST_F(SmartScopesClientTest, search)
 
 TEST_F(SmartScopesClientTest, preview)
 {
-    auto preview_handle = ssc_->preview("http://127.0.0.1/demo", "result", "session_id", "platform", 0);
+    auto preview_handle = ssc_->preview(sss_url_ + "/demo", "result", "session_id", "platform", 0);
 
     auto results = preview_handle->get_preview_results();
     PreviewHandle::Columns columns = results.first;
@@ -155,11 +157,11 @@ TEST_F(SmartScopesClientTest, preview)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle3 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle4 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle5 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle1 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle2 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle3 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2u, results.size());
@@ -181,163 +183,41 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
 {
     for (int i = 0; i < 50; ++i)
     {
-        auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+        auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
         search_handle->cancel_search();
         EXPECT_THROW(search_handle->get_search_results(), std::exception);
     }
 
-    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     EXPECT_EQ(2u, results.size());
 }
 
-TEST_F(SmartScopesClientTest, url_parsing)
+TEST_F(SmartScopesClientTest, reset_url)
 {
     // check initial values to be expected test values
-    EXPECT_EQ(server_.port_, ssc_->port());
-    EXPECT_EQ("http://127.0.0.1", ssc_->url());
+    EXPECT_EQ(sss_url_, ssc_->url());
 
     // empty the environment var (in case there already is one set)
     std::string server_url_env = "SMART_SCOPES_SERVER=";
     ::putenv(const_cast<char*>(server_url_env.c_str()));
 
-    // reset url and check that we now have contant values
+    // reset url and check that we now have falback contant url
     EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(0, ssc_->port());
     EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2", ssc_->url());
 
-    // http addr, no port
-    EXPECT_NO_THROW(ssc_->reset_url("http://hello.com/there"));
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_EQ("http://hello.com/there", ssc_->url());
-
-    // https addr, no port
-    EXPECT_NO_THROW(ssc_->reset_url("https://hello.com/there"));
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(1500));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("https://hello.com/there", ssc_->url());
-
-    // http addr, with port (end)
-    EXPECT_NO_THROW(ssc_->reset_url("http://hello.com:1500"));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("http://hello.com", ssc_->url());
-
-    // https addr, with port (end)
-    EXPECT_NO_THROW(ssc_->reset_url("https://hello.com:1500"));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(2000));
-    EXPECT_EQ(2000, ssc_->port());
-    EXPECT_EQ("https://hello.com", ssc_->url());
-
-    // http addr, with port (mid)
-    EXPECT_NO_THROW(ssc_->reset_url("http://hello.com:1500/there"));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("http://hello.com/there", ssc_->url());
-
-    // https addr, with port (mid)
-    EXPECT_NO_THROW(ssc_->reset_url("https://hello.com:1500/there"));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("https://hello.com/there", ssc_->url());
-
-    // https addr, with broken port
-    EXPECT_THROW(ssc_->reset_url("https://hello.com:15d00/there"), std::exception);
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_EQ("", ssc_->url());
-
-    // https addr, with floating colon
-    EXPECT_THROW(ssc_->reset_url("https://hello.com:1500/the:re"), std::exception);
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(1500));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("", ssc_->url());
-}
-
-TEST_F(SmartScopesClientTest, url_parsing_env_var)
-{
-    // check initial values to be expected test values
-    EXPECT_EQ(server_.port_, ssc_->port());
-    EXPECT_EQ("http://127.0.0.1", ssc_->url());
-
-    // empty the environment var (in case there already is one set)
-    std::string server_url_env = "SMART_SCOPES_SERVER=";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    // reset url and check that we now have contant values
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2", ssc_->url());
-
-    // env var, http addr, no port
+    // set the environment var
     server_url_env = "SMART_SCOPES_SERVER=http://hello.com/there";
     ::putenv(const_cast<char*>(server_url_env.c_str()));
 
+    // reset url and check that we now have the environment var url
     EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(0, ssc_->port());
     EXPECT_EQ("http://hello.com/there", ssc_->url());
 
-    // env var, https addr, no port
-    server_url_env = "SMART_SCOPES_SERVER=https://hello.com/there";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(1500));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("https://hello.com/there", ssc_->url());
-
-    // env var, http addr, with port (end)
-    server_url_env = "SMART_SCOPES_SERVER=http://hello.com:1500";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("http://hello.com", ssc_->url());
-
-    // env var, https addr, with port (end)
-    server_url_env = "SMART_SCOPES_SERVER=https://hello.com:1500";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(2000));
-    EXPECT_EQ(2000, ssc_->port());
-    EXPECT_EQ("https://hello.com", ssc_->url());
-
-    // env var, http addr, with port (mid)
-    server_url_env = "SMART_SCOPES_SERVER=http://hello.com:1500/there";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("http://hello.com/there", ssc_->url());
-
-    // env var, https addr, with port (mid)
-    server_url_env = "SMART_SCOPES_SERVER=https://hello.com:1500/there";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("https://hello.com/there", ssc_->url());
-
-    // env var, https addr, with broken port
-    server_url_env = "SMART_SCOPES_SERVER=https://hello.com:15d00/there";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_THROW(ssc_->reset_url(), std::exception);
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_EQ("", ssc_->url());
-
-    // env var, https addr, with floating colon
-    server_url_env = "SMART_SCOPES_SERVER=https://hello.com:1500/the:re";
-    ::putenv(const_cast<char*>(server_url_env.c_str()));
-
-    EXPECT_THROW(ssc_->reset_url(), std::exception);
-    EXPECT_EQ(0, ssc_->port());
-    EXPECT_NO_THROW(ssc_->reset_port(1500));
-    EXPECT_EQ(1500, ssc_->port());
-    EXPECT_EQ("", ssc_->url());
+    // force url
+    EXPECT_NO_THROW(ssc_->reset_url("http://hello.com:2000/there"));
+    EXPECT_EQ("http://hello.com:2000/there", ssc_->url());
 }
 
 } // namespace

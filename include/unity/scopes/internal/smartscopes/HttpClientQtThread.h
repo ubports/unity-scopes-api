@@ -19,10 +19,25 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 
+// This hack allows unity-scopes-api to be built with
+// clang-3.4+ and versions of Qt before v5.1.1.
+#if QT_VERSION < 0x050101
+    #define register
+
+    #include <QThread>
+
+    #define qHash(x,y) qHash(const QUrl &url, uint seed)
+    #include <QUrl>
+    #undef qHash
+
+    #undef register
+#else
+    #include <QThread>
+    #include <QUrl>
+#endif
+
 #include <unity/util/NonCopyable.h>
 
-#include <QThread>
-#include <QUrl>
 #include <mutex>
 
 class QNetworkReply;

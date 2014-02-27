@@ -58,7 +58,7 @@ RegistryObject::~RegistryObject()
     }
 }
 
-ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
@@ -85,7 +85,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
     throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
 }
 
-MetadataMap RegistryObject::list()
+MetadataMap RegistryObject::list() const
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     MetadataMap all_scopes(scopes_);  // Local scopes
@@ -216,16 +216,6 @@ void RegistryObject::spawn_scope(std::string const& scope_name)
     scope_processes_[scope_name] = pid;
 }
 
-int RegistryObject::kill_process(pid_t pid) {
-    int exitcode;
-    // Currently just shoot children dead.
-    // If we want to get fancy and give them a graceful
-    // warning, this is the place to do it.
-    kill(pid, SIGKILL);
-    waitpid(pid, &exitcode, 0);
-    return exitcode;
-}
-
 void RegistryObject::shutdown()
 {
     for (const auto &i : scope_processes_)
@@ -236,6 +226,16 @@ void RegistryObject::shutdown()
     }
     scope_processes_.clear();
     commands_.clear();
+}
+
+int RegistryObject::kill_process(pid_t pid) {
+    int exitcode;
+    // Currently just shoot children dead.
+    // If we want to get fancy and give them a graceful
+    // warning, this is the place to do it.
+    kill(pid, SIGKILL);
+    waitpid(pid, &exitcode, 0);
+    return exitcode;
 }
 
 bool RegistryObject::is_dead(pid_t pid)
