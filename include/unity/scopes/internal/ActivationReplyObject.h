@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
 
 #include <unity/scopes/internal/ReplyObject.h>
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/ActivationListenerBase.h>
 
 namespace unity
 {
@@ -34,11 +34,11 @@ namespace internal
 class ActivationReplyObject : public ReplyObject
 {
 public:
-    ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
+    ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual bool process_data(VariantMap const& data) override;
 
 private:
-    ActivationListener::SPtr const receiver_;
+    ActivationListenerBase::SPtr const receiver_;
 };
 
 } // namespace internal

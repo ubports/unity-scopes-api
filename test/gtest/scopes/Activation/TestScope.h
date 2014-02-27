@@ -22,7 +22,7 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ActivationBase.h>
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/ActivationListenerBase.h>
 
 #ifndef UNITY_SCOPES_TEST_SCOPE_H
 #define UNITY_SCOPES_TEST_SCOPE_H

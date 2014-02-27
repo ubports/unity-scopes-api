@@ -52,12 +52,13 @@ QueryCtrlProxy Scope::search(std::string const& query_string, std::string const&
     return fwd()->search(query_string, department_id, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const
 {
     return fwd()->activate(result, metadata, reply);
 }
 
-QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+        ActivationListenerBase::SPtr const& reply) const
 {
     return fwd()->perform_action(result, metadata, widget_id, action_id, reply);
 }

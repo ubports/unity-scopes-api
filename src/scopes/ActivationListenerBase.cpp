@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/ActivationListenerBase.h>
 
 namespace unity
 {
@@ -25,21 +25,21 @@ namespace scopes
 {
 
 /// @cond
-ActivationListener::ActivationListener()
+ActivationListenerBase::ActivationListenerBase()
 {
 }
 
-ActivationListener::~ActivationListener()
+ActivationListenerBase::~ActivationListenerBase()
 {
 }
 /// @endcond
 
-void ActivationListener::activated(ActivationResponse const& /* response */)
+void ActivationListenerBase::activated(ActivationResponse const& /* response */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
+void ActivationListenerBase::finished(Reason /* r */, std::string const& /* error_message */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

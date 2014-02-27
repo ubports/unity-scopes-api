@@ -90,7 +90,7 @@ public:
     std::shared_ptr<Result> result;
 };
 
-class ActivationReceiver : public ActivationListener, public WaitUntilFinished
+class ActivationReceiver : public ActivationListenerBase, public WaitUntilFinished
 {
 public:
     virtual void activated(ActivationResponse const& response) override

@@ -114,11 +114,11 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query, SearchMetadata const&
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
-        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListener (nullptr)");
+        throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListenerBase (nullptr)");
     }
 
     QueryCtrlProxy ctrl;
@@ -149,11 +149,12 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& m
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+        ActivationListenerBase::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
-        throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListener (nullptr)");
+        throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListenerBase (nullptr)");
     }
 
     QueryCtrlProxy ctrl;

@@ -30,7 +30,7 @@ namespace scopes
 namespace internal
 {
 
-ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver)
 {

@@ -225,7 +225,7 @@ private:
     std::shared_ptr<Result> saved_result_;
 };
 
-class ActivationReceiver : public ActivationListener
+class ActivationReceiver : public ActivationListenerBase
 {
 public:
     void activated(ActivationResponse const& response) override

@@ -23,7 +23,7 @@
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/SearchListener.h>
 #include <unity/scopes/PreviewListener.h>
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
@@ -100,7 +100,7 @@ public:
      \param reply activation response handler
      \return query handler
      */
-    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates activation of a preview action.
@@ -111,7 +111,8 @@ public:
      \param reply activation response handler
      \return query handler
      */
-    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+            ActivationListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates preview request.
