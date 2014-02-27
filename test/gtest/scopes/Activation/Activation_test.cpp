@@ -93,7 +93,7 @@ public:
 class ActivationReceiver : public ActivationListener, public WaitUntilFinished
 {
 public:
-    virtual void activation_response(ActivationResponse const& response)
+    virtual void activated(ActivationResponse const& response) override
     {
         this->response = std::make_shared<ActivationResponse>(response);
     }

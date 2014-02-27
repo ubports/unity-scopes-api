@@ -34,7 +34,7 @@ ActivationListener::~ActivationListener()
 }
 /// @endcond
 
-void ActivationListener::activation_response(ActivationResponse const& /* response */)
+void ActivationListener::activated(ActivationResponse const& /* response */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

@@ -47,7 +47,7 @@ public:
     Default implementation does nothing.
     \param response response to the activation request, returned by scope from ActivationBase::activate().
     */
-    virtual void activation_response(ActivationResponse const& response);
+    virtual void activated(ActivationResponse const& response);
 
     /**
     \brief Called once by the scopes run time after receiving activation response.

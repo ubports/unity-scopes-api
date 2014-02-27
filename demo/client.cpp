@@ -228,7 +228,7 @@ private:
 class ActivationReceiver : public ActivationListener
 {
 public:
-    void activation_response(ActivationResponse const& response) override
+    void activated(ActivationResponse const& response) override
     {
         cout << "\tGot activation response: " << response.status() << endl;
     }
