@@ -48,7 +48,7 @@ struct NullVariant
 
 struct VariantImpl
 {
-    boost::variant<int, bool, string, double, VariantMap, VariantArray, NullVariant> v;
+    boost::variant<NullVariant, int, bool, string, double, VariantMap, VariantArray> v;
 };
 
 } // namespace internal
