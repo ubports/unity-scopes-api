@@ -135,7 +135,7 @@ void testing::Scope::run()
 {
 }
 
-unity::scopes::SearchQuery::UPtr testing::Scope::create_query(
+unity::scopes::SearchQuery::UPtr testing::Scope::search(
         unity::scopes::Query const& query,
         unity::scopes::SearchMetadata const &)
 {

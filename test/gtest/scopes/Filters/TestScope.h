@@ -74,7 +74,7 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual SearchQuery::UPtr create_query(Query const &q, SearchMetadata const &) override
+    virtual SearchQuery::UPtr search(Query const &q, SearchMetadata const &) override
     {
         return SearchQuery::UPtr(new TestQuery(q));
     }

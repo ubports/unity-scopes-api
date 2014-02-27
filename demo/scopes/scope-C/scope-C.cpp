@@ -218,7 +218,7 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const&) override
+    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const&) override
     {
         cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return SearchQuery::UPtr(new MyQuery(q, queue));

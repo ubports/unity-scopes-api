@@ -191,7 +191,7 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
         auto before = Clock::now();
         {
             auto sample = config.sampler();
-            auto q = scope->create_query(sample.first, sample.second);
+            auto q = scope->search(sample.first, sample.second);
 
             q->run(unity::scopes::SearchReplyProxy
             {

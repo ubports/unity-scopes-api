@@ -53,7 +53,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries
     // without intervention from the scope application code.
-    QueryCtrlProxy qcp = scope->create_query(query_string, *search_metadata_, reply);
+    QueryCtrlProxy qcp = scope->search(query_string, *search_metadata_, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -65,7 +65,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
 {
     assert(search_metadata_);
 
-    QueryCtrlProxy qcp = scope->create_query(query_string, filter_state, *search_metadata_, reply);
+    QueryCtrlProxy qcp = scope->search(query_string, filter_state, *search_metadata_, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -78,7 +78,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
 {
     assert(search_metadata_);
 
-    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, *search_metadata_, reply);
+    QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, *search_metadata_, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -90,7 +90,7 @@ QueryCtrlProxy QueryBaseImpl::create_subquery(ScopeProxy const& scope,
                                               SearchMetadata const& metadata,
                                               SearchListener::SPtr const& reply)
 {
-    QueryCtrlProxy qcp = scope->create_query(query_string, department_id, filter_state, metadata, reply);
+    QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);
     subqueries_.push_back(qcp);
     return qcp;
 }

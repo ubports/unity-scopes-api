@@ -79,7 +79,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const& hints) override
+    virtual SearchQuery::UPtr search(Query const& q, SearchMetadata const& hints) override
     {
         SearchQuery::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;

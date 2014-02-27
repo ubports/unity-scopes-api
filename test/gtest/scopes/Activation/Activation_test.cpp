@@ -522,7 +522,7 @@ TEST(Activation, scope)
 
     VariantMap hints;
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->result;

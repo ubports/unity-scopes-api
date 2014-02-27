@@ -58,33 +58,33 @@ ScopeImpl::~ScopeImpl()
 {
 }
 
-QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_, query_string, department_id);
     query.set_filter_state(filter_state);
-    return create_query(query, metadata, reply);
+    return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_);
     query.set_query_string(query_string);
     query.set_filter_state(filter_state);
-    return create_query(query, metadata, reply);
+    return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     Query query(scope_name_);
     query.set_query_string(query_string);
-    return create_query(query, metadata, reply);
+    return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(Query const& query, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
 {
     if (reply == nullptr)
     {
-        throw unity::InvalidArgumentException("Scope::create_query(): invalid SearchListener (nullptr)");
+        throw unity::InvalidArgumentException("Scope::search(): invalid SearchListener (nullptr)");
     }
 
     QueryCtrlProxy ctrl;
@@ -93,11 +93,11 @@ QueryCtrlProxy ScopeImpl::create_query(Query const& query, SearchMetadata const&
     {
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the the create_query() method across the bus. This is a
+        // Forward the search() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return
         // the QueryCtrlProxy. This may block for some time, for example, if
         // the scope is not running and needs to be activated by the registry first.
-        ctrl = fwd()->create_query(query, metadata.serialize(), rp);
+        ctrl = fwd()->search(query, metadata.serialize(), rp);
         assert(ctrl);
     }
     catch (std::exception const& e)
@@ -203,12 +203,12 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hi
         // push() and finished() messages over the network.
         MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the the create_query() method across the bus. This is a
+        // Forward the search() method across the bus. This is a
         // synchronous twoway interaction with the scope, so it can return
         // the QueryCtrlProxy. Because the Scope implementation has a separate
-        // thread for create_query() calls, this is guaranteed not to block for
+        // thread for search() calls, this is guaranteed not to block for
         // any length of time. (No application code other than the QueryBase constructor
-        // is called by create_query() on the server side.)
+        // is called by search() on the server side.)
         ctrl = fwd()->preview(result.p->activation_target(), hints.serialize(), rp);
         assert(ctrl);
     }

@@ -142,14 +142,14 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     return ctrl_proxy;
 }
 
-MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
+MWQueryCtrlProxy ScopeObject::search(Query const& q,
                                            SearchMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
             [&q, &hints, this]() -> SearchQuery::UPtr {
-                 auto search_query = this->scope_base_->create_query(q, hints);
+                 auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_metadata(hints);
                  return search_query;
             },

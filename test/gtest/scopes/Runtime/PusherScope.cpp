@@ -75,7 +75,7 @@ void PusherScope::run()
 {
 }
 
-SearchQuery::UPtr PusherScope::create_query(Query const& /* query */, SearchMetadata const& md)
+SearchQuery::UPtr PusherScope::search(Query const& /* query */, SearchMetadata const& md)
 {
     return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
 }

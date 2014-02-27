@@ -187,13 +187,13 @@ public:
 
     This method must return an instance that is derived from QueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
-    initialization that is guaranteed to complete quickly. The call to create_query() is made
+    initialization that is guaranteed to complete quickly. The call to search() is made
     by an arbitrary thread.
     \param query The query string to be executed by the returned object instance.
     \param metadata additional data sent by the client.
     \return The query instance.
     */
-    virtual SearchQuery::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
+    virtual SearchQuery::UPtr search(Query const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.

@@ -205,13 +205,13 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-TEST_F(smartscopesproxytest, create_query)
+TEST_F(smartscopesproxytest, search)
 {
     auto reply = std::make_shared<Receiver>();
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 }
 
@@ -223,7 +223,7 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     for (int i = 0; i < 10; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
-        meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), replies.back());
+        meta.proxy()->search("search_string", SearchMetadata("en", "phone"), replies.back());
     }
 
     for (int i = 0; i < 10; ++i)
@@ -399,7 +399,7 @@ TEST_F(smartscopesproxytest, preview)
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 
     auto result = reply->last_result();

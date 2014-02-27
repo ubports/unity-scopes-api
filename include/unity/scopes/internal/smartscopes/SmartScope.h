@@ -201,7 +201,7 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
+    QueryBase::UPtr search(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
     {
         QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;

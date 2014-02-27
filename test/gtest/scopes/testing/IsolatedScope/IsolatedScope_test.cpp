@@ -116,7 +116,7 @@ TEST_F(TestScopeFixutre,
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
 
-    auto search_query = scope->create_query(query, meta_data);
+    auto search_query = scope->search(query, meta_data);
     ASSERT_NE(nullptr, search_query);
     search_query->run(search_reply_proxy);
 }

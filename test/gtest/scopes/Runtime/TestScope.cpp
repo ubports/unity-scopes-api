@@ -95,7 +95,7 @@ void TestScope::run()
 {
 }
 
-SearchQuery::UPtr TestScope::create_query(Query const& query, SearchMetadata const &)
+SearchQuery::UPtr TestScope::search(Query const& query, SearchMetadata const &)
 {
     return SearchQuery::UPtr(new TestQuery(query));
 }
