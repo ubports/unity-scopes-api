@@ -23,13 +23,22 @@
 // clang-3.4+ and versions of Qt before v5.1.1.
 #if QT_VERSION < 0x050101
     #define qHash(x,y) qHash(const QUrl &url, uint seed)
+    #define register
     #include <QUrl>
+    #undef register
     #undef qHash
 #else
     #include <QUrl>
 #endif
 
-#include <QThread>
+// Clang 3.4 produces deprecation warnings for register keyword
+#if QT_VERSION < 0x050101
+    #define register
+    #include <QThread>
+    #undef register
+#else
+    #include <QThread>
+#endif
 
 #include <unity/util/NonCopyable.h>
 
