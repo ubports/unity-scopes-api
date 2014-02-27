@@ -20,7 +20,6 @@
 
 #include <boost/math/distributions/students_t.hpp>
 
-#include <cassert>
 #include <cmath>
 
 #include <iostream>

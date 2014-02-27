@@ -20,10 +20,8 @@
 
 #include <core/posix/fork.h>
 
-#include <atomic>
 #include <chrono>
 #include <iostream>
-
 
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,

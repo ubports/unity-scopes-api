@@ -18,11 +18,6 @@
 
 #include <unity/scopes/testing/Benchmark.h>
 
-#include <boost/math/distributions/students_t.hpp>
-
-#include <cassert>
-#include <cmath>
-
 #include <iostream>
 
 std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity::scopes::testing::Benchmark::Result& result)
