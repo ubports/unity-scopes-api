@@ -20,7 +20,11 @@
 
 #include <unity/scopes/internal/ResultImpl.h>
 
+/// @cond
+
 unity::scopes::testing::Result::Result() :
     unity::scopes::Result(new unity::scopes::internal::ResultImpl())
 {
 }
+
+/// @endcond

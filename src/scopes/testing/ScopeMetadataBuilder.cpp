@@ -24,6 +24,8 @@
 namespace internal = unity::scopes::internal;
 namespace testing = unity::scopes::testing;
 
+/// @cond
+
 struct testing::ScopeMetadataBuilder::Private
 {
     constexpr static unity::scopes::internal::MiddlewareBase* invalid_middleware = nullptr;
@@ -125,3 +127,5 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
                 std::move(
                     std::unique_ptr<internal::ScopeMetadataImpl>{impl}));
 }
+
+/// @endcond

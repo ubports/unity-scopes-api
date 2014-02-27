@@ -51,16 +51,29 @@ class SSQueryObject;
 
 } // namespace internal
 
-// Abstract server-side base interface for a query that is executed inside a scope.
 
-// TODO: documentation
+/**
+\brief Abstract server-side base interface for a query that is executed inside a scope.
+\see SearchQuery, PreviewQuery, ActivationQuery
+*/
 
 class QueryBase
 {
 public:
+    /// @cond
     NONCOPYABLE(QueryBase);
     UNITY_DEFINES_PTRS(QueryBase);
+    /// @endcond
 
+    /**
+    \brief Called by the scopes run time when the query originator
+    cancels a query.
+
+    Your implementation of this method should ensure that the scope stops
+    processing the current query as soon as possible. Any calls to ReplyBase::push()
+    once a query is cancelled are ignored, so continuing to push after cancellation
+    only wastes CPU cycles.
+    */
     virtual void cancelled() = 0;                          // Originator cancelled the query
 
     /// @cond
@@ -70,11 +83,9 @@ public:
 protected:
     /// @cond
     QueryBase();
-    /// @endcond
-
     void cancel();
-
     std::unique_ptr<internal::QueryBaseImpl> p;
+    /// @endcond
 
 private:
     void set_metadata(QueryMetadata const& metadata);

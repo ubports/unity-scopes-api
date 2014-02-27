@@ -29,6 +29,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 SearchQuery::SearchQuery() : QueryBase()
 {
 }
@@ -36,10 +37,16 @@ SearchQuery::SearchQuery() : QueryBase()
 SearchQuery::~SearchQuery()
 {
 }
+/// @endcond
+
+/// @cond
+// These methods are documented in the header. The @cond is here to suppress
+// a bogus warning from doxygen about undocumented methods. (Doxygen gets
+// confused by the typedef for ScopeProxy.)
 
 QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
                                             string const& query_string,
-                                            shared_ptr<SearchListener> const& reply)
+                                            SearchListener::SPtr const& reply)
 {
     return p->create_subquery(scope, query_string, reply);
 }
@@ -70,6 +77,7 @@ QueryCtrlProxy SearchQuery::create_subquery(ScopeProxy const& scope,
 {
     return p->create_subquery(scope, query_string, department_id, filter_state, hints, reply);
 }
+/// @endcond
 
 } // namespace scopes
 

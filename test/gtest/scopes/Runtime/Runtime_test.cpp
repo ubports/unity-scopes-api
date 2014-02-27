@@ -34,10 +34,12 @@
 
 #include <gtest/gtest.h>
 
-#include "scope.h"
+#include "TestScope.h"
+#include "PusherScope.h"
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Runtime, basic)
 {
@@ -49,6 +51,14 @@ TEST(Runtime, basic)
 class Receiver : public SearchListener
 {
 public:
+    Receiver() :
+        query_complete_(false),
+        count_(0),
+        dep_count_(0),
+        annotation_count_(0)
+    {
+    }
+
     virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
     {
         EXPECT_EQ(current_department_id, "news");
@@ -117,6 +127,12 @@ private:
 class PreviewReceiver : public PreviewListener
 {
 public:
+    PreviewReceiver() :
+        query_complete_(false),
+        widgets_pushes_(0),
+        data_pushes_(0)
+    {
+    }
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
@@ -152,6 +168,48 @@ private:
     condition_variable cond_;
     int widgets_pushes_;
     int data_pushes_;
+};
+
+class PushReceiver : public SearchListener
+{
+public:
+    PushReceiver(int pushes_expected)
+        : query_complete_(false),
+          pushes_expected_(pushes_expected),
+          count_(0)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+        if (++count_ > pushes_expected_)
+        {
+            FAIL();
+        }
+    }
+
+    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(pushes_expected_, count_);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+    atomic_int pushes_expected_;
+    atomic_int count_;
 };
 
 TEST(Runtime, create_query)
@@ -193,19 +251,57 @@ TEST(Runtime, preview)
     previewer->wait_until_finished();
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+TEST(Runtime, cardinality)
+{
+    // connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("PusherScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "PusherScope");
+
+    // Run a query with unlimited cardinality. We check that the
+    // scope returns 100 results.
+    auto receiver = make_shared<PushReceiver>(100);
+    scope->create_query("test", SearchMetadata(100, "unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Run a query with 20 cardinality. We check that we receive only 20 results and,
+    // in the scope, check that push() returns true for the first 19, and false afterwards.
+    receiver = make_shared<PushReceiver>(20);
+    scope->create_query("test", SearchMetadata(20, "unused", "unused"), receiver);
+    receiver->wait_until_finished();
+}
+
+void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
+    rt->run_scope(&scope);
+}
+
+void pusher_thread(RuntimeImpl::SPtr const& rt)
+{
+    PusherScope scope;
     rt->run_scope(&scope);
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
+
+    RuntimeImpl::SPtr srt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, srt);
+
+    RuntimeImpl::SPtr prt = move(RuntimeImpl::create("PusherScope", "Runtime.ini"));
+    std::thread pusher_t(pusher_thread, prt);
+
     auto rc = RUN_ALL_TESTS();
-    rt->destroy();
+
+    srt->destroy();
     scope_t.join();
+
+    prt->destroy();
+    pusher_t.join();
+
     return rc;
 }

@@ -36,6 +36,7 @@ Query::Query(std::string const& scope_name, std::string const& query_str, std::s
 {
 }
 
+/// @cond
 Query::Query(Query const &other)
     : p(new internal::QueryImpl(*(other.p)))
 {
@@ -60,6 +61,12 @@ Query& Query::operator=(Query const& other)
 }
 
 Query& Query::operator=(Query&&) = default;
+
+VariantMap Query::serialize() const
+{
+    return p->serialize();
+}
+/// @endcond
 
 void Query::set_department_id(std::string const& dep_id)
 {
@@ -94,11 +101,6 @@ std::string Query::query_string() const
 FilterState Query::filter_state() const
 {
     return p->filter_state();
-}
-
-VariantMap Query::serialize() const
-{
-    return p->serialize();
 }
 
 std::string Query::to_string() const

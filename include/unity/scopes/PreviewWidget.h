@@ -41,23 +41,37 @@ namespace internal
 class PreviewWidget
 {
 public:
-/// @cond
+    /// @cond
     UNITY_DEFINES_PTRS(PreviewWidget);
-/// @endcond
+    /// @endcond
 
+    /**
+     \brief Create empty PreviewWidget definition with specific id and type.
+     \param id unique widget identifier
+     \param widget_type type of the widget
+     */
     PreviewWidget(std::string const& id, std::string const &widget_type);
+
+    /**
+     \brief Create PreviewWidget from a JSON definition.
+     \param definition JSON definition
+     */
     PreviewWidget(std::string const& definition);
+
+    /// @cond
     PreviewWidget(PreviewWidget const& other);
     PreviewWidget(PreviewWidget&& other);
     virtual ~PreviewWidget();
 
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
+    /// @endcond
 
     /**
      \brief Adds an attribute definition and its value.
      */
     void add_attribute(std::string const& key, Variant const& value);
+
     /**
      \brief Adds an attribute definition by using component mapping.
 
@@ -71,13 +85,43 @@ public:
      */
     void add_component(std::string const& key, std::string const& field_name);
 
+    /**
+     \brief Get the identifier of this widget.
+     \return The widget identifier.
+     */
     std::string id() const;
+
+    /**
+     \brief Get type name of this widget.
+     \return The widget type.
+     */
     std::string widget_type() const;
+
+    /**
+     \brief Get the components of this widget.
+
+     The returned map is a dictionary of (key, field name) pairs, as defined via calls to add_component() method.
+     \return The components map.
+     */
     std::map<std::string, std::string> components() const;
+
+    /**
+     \brief Get the attributes of this widget.
+
+     The returned map is a dictionary of (key, value) pairs, as defined via calls to add_attribute() method.
+     \return The attribute map.
+     */
     VariantMap attributes() const;
+
+    /**
+     \brief Get a JSON representation of this widget.
+     \return The JSON string.
+     */
     std::string data() const;
 
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 private:
     std::unique_ptr<internal::PreviewWidgetImpl> p;

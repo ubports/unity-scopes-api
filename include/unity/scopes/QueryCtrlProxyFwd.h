@@ -28,6 +28,9 @@ namespace scopes
 {
 
 class QueryCtrl;
+/** \typedef QueryCtrlProxy
+\brief Convenience type definition.
+*/
 typedef std::shared_ptr<QueryCtrl> QueryCtrlProxy;
 
 } // namespace scopes

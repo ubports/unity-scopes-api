@@ -30,6 +30,8 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 class ScopeMetadataBuilder
 {
 public:
@@ -95,6 +97,8 @@ private:
     struct Private;
     std::unique_ptr<Private> p;
 };
+
+/// @endcond
 
 } // namespace testing
 

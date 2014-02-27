@@ -43,7 +43,19 @@ public:
     UNITY_DEFINES_PTRS(SearchMetadata);
     /// @endcond
 
+    /**
+     \brief Create SearchMetadata with given locale and form factor.
+     \param locale locale string, eg. en_EN
+     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
+     */
     SearchMetadata(std::string const& locale, std::string const& form_factor);
+
+    /**
+     \brief Create SearchMetadata with given cardinality, locale and form factor.
+     \param cardinality maximum number of search results
+     \param locale locale string, eg. en_EN
+     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
+     */
     SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor);
 
     /// @cond
@@ -55,7 +67,16 @@ public:
     SearchMetadata& operator=(SearchMetadata&&);
     /// @endcond
 
+    /**
+     \brief Set cardinality.
+     \param cardinality The maximum number of search results.
+    */
     void set_cardinality(int cardinality);
+
+    /**
+     \brief Get cardinality.
+     \return The maxmium number of search results, or 0 for no limit.
+    */
     int cardinality() const;
 
 private:

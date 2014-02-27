@@ -56,7 +56,7 @@ public:
     The create_query() method expects a SearchListener, which it uses to return
     the results for the query. create_query() may block for some time, for example,
     if the target scope is not running and needs to be started first.
-    Results for the query may arrive only after create_query() completes (but may
+    Results for the query may begin to arrive only after create_query() completes (but may
     also arrive while create_query() is still running).
 
     \param query_string search string
@@ -129,8 +129,10 @@ public:
     virtual ~Scope();
 
 protected:
+    /// @cond
     Scope(internal::ScopeImpl* impl);          // Instantiated only by ScopeImpl
     friend class internal::ScopeImpl;
+    /// @endcond
 
 private:
     internal::ScopeImpl* fwd() const;

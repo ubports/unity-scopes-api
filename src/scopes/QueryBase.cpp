@@ -28,6 +28,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 QueryBase::QueryBase() :
     p(new internal::QueryBaseImpl)
 {
@@ -42,6 +43,7 @@ void QueryBase::cancel()
     p->cancel();    // Forward cancel to subqueries
     cancelled();    // Inform this query that it was cancelled
 }
+/// @endcond
 
 void QueryBase::set_metadata(QueryMetadata const& metadata)
 {

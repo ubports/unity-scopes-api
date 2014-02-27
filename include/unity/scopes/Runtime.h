@@ -75,8 +75,6 @@ public:
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
 
-    static UPtr create_scope_runtime(std::string const& scope_name, std::string const& configfile = "");
-
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
 
@@ -127,7 +125,7 @@ public:
     is needed in order to obtain a string for a null proxy (because it is not possible to invoke
     a member function on a null proxy).
 
-    \param p The proxy to convert to a string.
+    \param proxy The proxy to convert to a string.
     \return The string representation of the proxy.
     */
     std::string proxy_to_string(Proxy const& proxy) const;

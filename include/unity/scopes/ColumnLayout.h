@@ -61,27 +61,27 @@ public:
     \brief Adds new column and assigns widgets to it.
     ColumnLayout expects exactly the number of columns passed to the constructor to be created with add_column method.
     This method throws unity::LogicException if trying to add more columns than declared at the construction side.
-    Failing to add sufficient number of columns will result in unity::LogicException from \linkg unity::scopes::PreviewReply::register_layout\endlink.
+    Failing to add sufficient number of columns will result in unity::LogicException from \link unity::scopes::PreviewReply::register_layout\endlink.
      */
     void add_column(std::vector<std::string> widget_ids);
 
     /**
     \brief Get real number of columns in this layout.
     Note, this is can be smaller than number of columns passed to the constructor and available via number_of_columns().
-    \return number of columns added with add_column().
+    \return The number of columns added with add_column().
      */
     int size() const noexcept;
 
     /**
     \brief Get number of columns expected by this layout and passed to the constructor.
-    \return number of columns expected by this layout
+    \return The number of columns expected by this layout.
     */
     int number_of_columns() const noexcept;
 
     /**
     \brief Retrieve list of widgets for given column. This can throw unity::InvalidArgumentException if the index is invalid.
-    \param column index
-    \return widget identifiers for given column index
+    \param index index of a column
+    \return The widget identifiers for the given column index.
     */
     std::vector<std::string> column(int index) const;
 

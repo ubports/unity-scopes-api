@@ -32,6 +32,8 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 class MockPreviewReply : public unity::scopes::PreviewReplyBase
 {
 public:
@@ -46,6 +48,8 @@ public:
     MOCK_CONST_METHOD1(push, bool(PreviewWidgetList const&));
     MOCK_CONST_METHOD2(push, bool(std::string const&, Variant const&));
 };
+
+/// @endcond
 
 } // namespace testing
 

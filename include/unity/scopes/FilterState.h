@@ -58,13 +58,14 @@ public:
 /// @endcond
 
     /**
-     \brief Check if state for given filter has been stored.
-     \return true if state for filter with id is present.
+     \brief Check if state for the given filter has been stored.
+     \return True if state for a filter with the given ID is present; false otherwise.
      */
     bool has_filter(std::string const& id) const;
 
     /**
-      \brief Removes state for specific filter.
+      \brief Removes the state for a specific filter.
+      \param id The identity of the filter to remove.
      */
     void remove(std::string const& id);
 
