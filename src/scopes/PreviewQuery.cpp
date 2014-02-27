@@ -28,6 +28,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 PreviewQuery::PreviewQuery() : QueryBase()
 {
 }
@@ -35,6 +36,7 @@ PreviewQuery::PreviewQuery() : QueryBase()
 PreviewQuery::~PreviewQuery()
 {
 }
+/// @endcond
 
 } // namespace scopes
 

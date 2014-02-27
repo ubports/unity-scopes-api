@@ -44,7 +44,7 @@ public:
     explicit HttpClientQt(uint no_reply_timeout);
     ~HttpClientQt();
 
-    HttpResponseHandle::SPtr get(std::string const& request_url, uint port) override;
+    HttpResponseHandle::SPtr get(std::string const& request_url) override;
 
     std::string to_percent_encoding(std::string const& string) override;
 
@@ -55,7 +55,7 @@ private:
     class HttpSession
     {
     public:
-        HttpSession(std::string const& request_url, int port, uint timeout);
+        HttpSession(std::string const& request_url, uint timeout);
         ~HttpSession();
 
         std::future<std::string> get_future();

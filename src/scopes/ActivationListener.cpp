@@ -24,6 +24,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 ActivationListener::ActivationListener()
 {
 }
@@ -31,6 +32,7 @@ ActivationListener::ActivationListener()
 ActivationListener::~ActivationListener()
 {
 }
+/// @endcond
 
 void ActivationListener::activation_response(ActivationResponse const& /* response */)
 {

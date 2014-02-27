@@ -63,8 +63,8 @@ public:
 
     /**
      \brief Return category of this result.
-     Get category instance this result belongs to.
-     \return category instance
+     Get the category instance this result belongs to.
+     \return The category instance.
      */
     Category::SCPtr category() const;
 

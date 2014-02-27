@@ -37,12 +37,45 @@ namespace internal
 /**
   \brief A default template for generic use.
  */
-#define DEFAULT_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","art":"art"}})"
+constexpr const char* DEFAULT_RENDERER
+{
+    R"(
+    {
+        "schema-version":1,
+        "template":
+        {
+            "category-layout":"grid"
+        },
+        "components":
+        {
+            "title":"title",
+            "art":"art"
+        }
+    }
+    )"
+};
 
 /**
   \brief A template suitable for displaying music results.
  */
-#define MUSIC_GRID_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","subtitle":"subtitle","art":"art"}})"
+constexpr const char* MUSIC_GRID_RENDERER
+{
+    R"(
+        {
+            "schema-version":1,
+            "template":
+            {
+                "category-layout":"grid"
+            },
+            "components":
+            {
+                "title":"title",
+                "subtitle":"subtitle",
+                "art":"art"
+            }
+        }
+    )"
+};
 
 /**
 \brief CategoryRenderer encapsulates category renderer template in JSON format.
@@ -70,12 +103,13 @@ public:
 
     /**
      \brief Creates CategoryRenderer from a text file.
+     \return The CategoryRenderer corresponding to the information in the file.
      */
     static CategoryRenderer from_file(std::string const& path);
 
     /**
      \brief Returns complete renderer template definition in JSON format.
-     \return renderer template (JSON)
+     \return The renderer template (JSON).
      */
     std::string data() const;
 
@@ -84,6 +118,10 @@ private:
 
     friend class internal::CategoryRendererImpl;
 };
+
+/// @cond
+bool operator==(const CategoryRenderer&, const CategoryRenderer&);
+/// @endcond
 
 } // namespace scopes
 

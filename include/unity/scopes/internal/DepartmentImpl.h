@@ -53,6 +53,7 @@ public:
 
     static Department create(VariantMap const& var);
     static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
+    static VariantMap serialize_departments(DepartmentList const& departments, std::string const& current_department_id);
 
 private:
     static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);

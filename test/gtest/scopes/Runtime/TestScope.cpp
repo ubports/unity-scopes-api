@@ -25,7 +25,7 @@
 #include <unity/scopes/Query.h>
 #include <unity/scopes/Department.h>
 
-#include "scope.h"
+#include "TestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -95,12 +95,12 @@ void TestScope::run()
 {
 }
 
-QueryBase::UPtr TestScope::create_query(Query const& query, SearchMetadata const &)
+SearchQuery::UPtr TestScope::create_query(Query const& query, SearchMetadata const &)
 {
-    return QueryBase::UPtr(new TestQuery(query));
+    return SearchQuery::UPtr(new TestQuery(query));
 }
 
-QueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
+PreviewQuery::UPtr TestScope::preview(Result const&, ActionMetadata const &)
 {
-    return QueryBase::UPtr(new TestPreview());
+    return PreviewQuery::UPtr(new TestPreview());
 }

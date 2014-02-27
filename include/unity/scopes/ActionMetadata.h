@@ -53,13 +53,13 @@ public:
 
     /**
      \brief Attach arbitrary data to this ActionMetadata.
-     \param data value to attach
+     \param data The data value to attach.
      */
     void set_scope_data(Variant const& data);
 
     /**
      \brief Get data attached to this ActionMetadata.
-     \return attached data, or Variant::null
+     \return The attached data, or Variant::null.
      */
     Variant scope_data() const;
 

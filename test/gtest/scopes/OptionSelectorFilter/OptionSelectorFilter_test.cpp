@@ -36,7 +36,7 @@ TEST(OptionSelectorFilter, basic)
     filter1->add_option("2", "Option 2");
 
     auto opts = filter1->options();
-    EXPECT_EQ(2, opts.size());
+    EXPECT_EQ(2u, opts.size());
     EXPECT_EQ("1", opts.front()->id());
     EXPECT_EQ("Option 1", opts.front()->label());
     EXPECT_EQ("2", opts.back()->id());
@@ -56,19 +56,19 @@ TEST(OptionSelectorFilter, single_selection)
     filter1->update_state(fstate, option1, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
     auto active = filter1->active_options(fstate);
-    EXPECT_EQ(1, active.size());
+    EXPECT_EQ(1u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
 
     // enable option2, option1 get disabled
     filter1->update_state(fstate, option2, true);
     active = filter1->active_options(fstate);
-    EXPECT_EQ(1, active.size());
+    EXPECT_EQ(1u, active.size());
     EXPECT_TRUE(active.find(option2) != active.end());
 
     // disable option1; filter state remains in the FilterState, just no options are selected
     filter1->update_state(fstate, option2, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
-    EXPECT_EQ(0, filter1->active_options(fstate).size());
+    EXPECT_EQ(0u, filter1->active_options(fstate).size());
 }
 
 TEST(OptionSelectorFilter, multi_selection)
@@ -85,19 +85,19 @@ TEST(OptionSelectorFilter, multi_selection)
     filter1->update_state(fstate, option2, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
     auto active = filter1->active_options(fstate);
-    EXPECT_EQ(2, active.size());
+    EXPECT_EQ(2u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
     EXPECT_TRUE(active.find(option2) != active.end());
 
     // disable option1
     filter1->update_state(fstate, option1, false);
-    EXPECT_EQ(1, filter1->active_options(fstate).size());
+    EXPECT_EQ(1u, filter1->active_options(fstate).size());
     EXPECT_TRUE(active.find(option1) != active.end());
 
     // disable option2
     filter1->update_state(fstate, option2, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
-    EXPECT_EQ(0, filter1->active_options(fstate).size());
+    EXPECT_EQ(0u, filter1->active_options(fstate).size());
 }
 
 TEST(OptionSelectorFilter, serialize)
@@ -112,7 +112,7 @@ TEST(OptionSelectorFilter, serialize)
     EXPECT_EQ("Options", var["label"].get_string());
 
     auto optarr = var["options"].get_array();
-    EXPECT_EQ(2, optarr.size());
+    EXPECT_EQ(2u, optarr.size());
     EXPECT_EQ("1", optarr[0].get_dict()["id"].get_string());
     EXPECT_EQ("Option 1", optarr[0].get_dict()["label"].get_string());
     EXPECT_EQ("2", optarr[1].get_dict()["id"].get_string());
@@ -158,7 +158,7 @@ TEST(OptionSelectorFilter, deserialize)
         EXPECT_EQ("f1", filter.id());
         EXPECT_EQ("Filter 1", filter.label());
         EXPECT_EQ(true, filter.multi_select());
-        EXPECT_EQ(1, filter.options().size());
+        EXPECT_EQ(1u, filter.options().size());
         EXPECT_EQ("1", filter.options().front()->id());
     }
 }

@@ -32,18 +32,22 @@ using namespace unity::test::scopes::internal::smartscopes;
 namespace
 {
 
-const std::string test_url = "http://127.0.0.1";
+const std::string c_test_url = "http://127.0.0.1";
 
 class HttpClientTest : public Test
 {
 public:
     HttpClientTest(uint no_reply_timeout = 20000)
         : http_client_(new HttpClientQt(no_reply_timeout)),
-          server_(FAKE_SERVER_PATH) {}
+          server_(FAKE_SERVER_PATH)
+    {
+        test_url_ = c_test_url + ":" + std::to_string(server_.port_);
+    }
 
 protected:
     HttpClientInterface::SPtr http_client_;
     RaiiServer server_;
+    std::string test_url_;
 };
 
 class HttpClientTestQuick : public HttpClientTest
@@ -63,7 +67,7 @@ TEST_F(HttpClientTest, no_server)
         // RaiiServer goes out of scope, so it gets killed
     }
     // no server
-    HttpResponseHandle::SPtr response = http_client_->get(test_url, dead_port);
+    HttpResponseHandle::SPtr response = http_client_->get(c_test_url + ":" + std::to_string(dead_port));
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -72,7 +76,7 @@ TEST_F(HttpClientTest, no_server)
 TEST_F(HttpClientTest, bad_server)
 {
     // bad server
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?x", server_.port_);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url_ + "?x");
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -81,7 +85,7 @@ TEST_F(HttpClientTest, bad_server)
 TEST_F(HttpClientTest, good_server)
 {
     // responds immediately
-    HttpResponseHandle::SPtr response = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url_);
     response->wait();
 
     std::string response_str;
@@ -92,7 +96,7 @@ TEST_F(HttpClientTest, good_server)
 TEST_F(HttpClientTestQuick, ok_server)
 {
     // responds in 1 second
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?1", server_.port_);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url_ + "?1");
     response->wait();
 
     std::string response_str;
@@ -103,7 +107,7 @@ TEST_F(HttpClientTestQuick, ok_server)
 TEST_F(HttpClientTestQuick, slow_server)
 {
     // responds in 3 seconds
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?3", server_.port_);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url_ + "?3");
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);
@@ -111,11 +115,11 @@ TEST_F(HttpClientTestQuick, slow_server)
 
 TEST_F(HttpClientTest, multiple_sessions)
 {
-    HttpResponseHandle::SPtr response1 = http_client_->get(test_url, server_.port_);
-    HttpResponseHandle::SPtr response2 = http_client_->get(test_url, server_.port_);
-    HttpResponseHandle::SPtr response3 = http_client_->get(test_url, server_.port_);
-    HttpResponseHandle::SPtr response4 = http_client_->get(test_url, server_.port_);
-    HttpResponseHandle::SPtr response5 = http_client_->get(test_url, server_.port_);
+    HttpResponseHandle::SPtr response1 = http_client_->get(test_url_);
+    HttpResponseHandle::SPtr response2 = http_client_->get(test_url_);
+    HttpResponseHandle::SPtr response3 = http_client_->get(test_url_);
+    HttpResponseHandle::SPtr response4 = http_client_->get(test_url_);
+    HttpResponseHandle::SPtr response5 = http_client_->get(test_url_);
 
     response1->wait();
     response2->wait();
@@ -138,7 +142,7 @@ TEST_F(HttpClientTest, multiple_sessions)
 
 TEST_F(HttpClientTest, cancel_get)
 {
-    HttpResponseHandle::SPtr response = http_client_->get(test_url + "?18", server_.port_);
+    HttpResponseHandle::SPtr response = http_client_->get(test_url_ + "?18");
     response->cancel();
     response->wait();
 

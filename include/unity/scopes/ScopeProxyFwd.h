@@ -29,8 +29,8 @@ namespace scopes
 
 class Scope;
 
-/*! \typedef ScopeProxy
-\brief Pointer to unity::scopes::Scope object
+/** \typedef ScopeProxy
+\brief Convenience type definition.
 */
 typedef std::shared_ptr<Scope> ScopeProxy;
 

@@ -19,8 +19,11 @@
 #ifndef UNITY_SCOPES_PREVIEW_REPLY_H
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
+#include <unity/scopes/PreviewReplyBase.h>
+
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Reply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ReplyBase.h>
@@ -42,36 +45,46 @@ class ReplyImpl;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class PreviewReply : public virtual ReplyBase
+class PreviewReply : public virtual PreviewReplyBase, public Reply
 {
 public:
+    /// @cond
     PreviewReply(PreviewReply const&) = delete;
+    /// @endcond
 
     /**
      \brief Registers a list of column layouts for current preview.
-     Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
-     This method throws unity::LogicException if this constrains are violated.
+
+     Layouts need to be registered before pushing PreviewWidgetList, and must be
+     registered only once.
+     \return True if the query is still alive, false if the query failed or was cancelled.
+     \throws unity::LogicException register_layout() is called more than once.
      */
-    bool register_layout(ColumnLayoutList const& layouts) const;
+    bool register_layout(ColumnLayoutList const& layouts) const override;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
+     \throws unity::LogicException register_layout() is called more than once.
      */
-    bool push(PreviewWidgetList const& widget_list) const;
+    bool push(PreviewWidgetList const& widget_list) const override;
     /**
      \brief Sends data for a preview widget attribute.
+     \throws unity::LogicException register_layout() is called more than once.
      */
-    bool push(std::string const& key, Variant const& value) const;
+    bool push(std::string const& key, Variant const& value) const override;
 
     /**
     \brief Destroys a Reply.
+
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
     virtual ~PreviewReply();
 
 protected:
+    // @cond
     PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
+    // @endcond
 };
 
 } // namespace scopes

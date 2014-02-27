@@ -154,6 +154,11 @@ std::string CategoryRenderer::data() const
     return p->data();
 }
 
+bool operator==(const CategoryRenderer& lhs, const CategoryRenderer& rhs)
+{
+    return lhs.data() == rhs.data();
+}
+
 //! @endcond
 
 } // namespace scopes

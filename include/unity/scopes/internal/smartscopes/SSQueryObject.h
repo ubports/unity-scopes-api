@@ -49,13 +49,15 @@ struct SSQuery
         Query, Activation, Preview
     };
 
-    SSQuery(QueryType type, std::shared_ptr<QueryBase> base, MWReplyProxy reply)
+    SSQuery(QueryType type, std::shared_ptr<QueryBase> base, int cardinality, MWReplyProxy reply)
         : q_type(type),
           q_base(base),
+          q_cardinality(cardinality),
           q_reply(reply) {}
 
     QueryType q_type;
     std::shared_ptr<QueryBase> q_base;
+    int q_cardinality;
     MWReplyProxy q_reply;
     std::weak_ptr<ReplyBase> q_reply_proxy;
     bool q_pushable = true;
@@ -73,11 +75,16 @@ public:
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
     // Local methods
-    virtual void cancel(InvokeInfo const& info) override;                   // Called locally, by QueryCtrlObject.
-    virtual bool pushable(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
+    virtual void cancel(InvokeInfo const& info) override;                     // Called locally, by QueryCtrlObject.
+    virtual bool pushable(InvokeInfo const& info) const noexcept override;    // Called locally, by ReplyImpl
+    virtual int cardinality(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 
+    void add_query(SSQuery::QueryType query_type,
+                   std::shared_ptr<QueryBase> const& query_base,
+                   int cardinality,
+                   MWReplyProxy const& reply);
     void add_query(SSQuery::QueryType query_type,
                    std::shared_ptr<QueryBase> const& query_base,
                    MWReplyProxy const& reply);

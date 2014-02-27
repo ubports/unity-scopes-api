@@ -33,7 +33,7 @@ TEST(VariantBuilder, basic)
         builder.add_tuple({{"c", Variant::null()}, {"d", Variant("xyz")}});
 
         auto arr = builder.end().get_array();
-        EXPECT_EQ(2, arr.size());
+        EXPECT_EQ(2u, arr.size());
         EXPECT_EQ(1, arr[0].get_dict()["a"].get_int());
         EXPECT_EQ(2, arr[0].get_dict()["b"].get_int());
 
@@ -44,7 +44,7 @@ TEST(VariantBuilder, basic)
     {
         EXPECT_THROW(builder.end(), unity::LogicException);
         builder.add_tuple({{"a", Variant(0)}});
-        EXPECT_EQ(1, builder.end().get_array().size());
+        EXPECT_EQ(1u, builder.end().get_array().size());
     }
 }
 
@@ -54,8 +54,8 @@ TEST(VariantBuilder, copy)
         VariantBuilder builder;
         builder.add_tuple({{"a", Variant(0)}});
         VariantBuilder builder2 = builder;
-        EXPECT_EQ(1, builder.end().get_array().size());
-        EXPECT_EQ(1, builder2.end().get_array().size());
+        EXPECT_EQ(1u, builder.end().get_array().size());
+        EXPECT_EQ(1u, builder2.end().get_array().size());
     }
 }
 

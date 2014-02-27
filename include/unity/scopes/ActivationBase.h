@@ -57,6 +57,7 @@ public:
      \brief Return response to the activation request.
      The response is received by the originator of the request. Default implementation
      returns ActivationResponse(ActivationResponse::Status::NotHandled.
+     \return The response to the activation request.
      */
     virtual ActivationResponse activate();
 

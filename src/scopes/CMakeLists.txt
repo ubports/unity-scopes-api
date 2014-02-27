@@ -1,4 +1,5 @@
 add_subdirectory(internal)
+add_subdirectory(testing)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
@@ -28,9 +29,13 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListener.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RegistryBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Runtime.cpp

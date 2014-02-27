@@ -18,18 +18,14 @@
 
 #include <unity/scopes/internal/ScopeObject.h>
 
-#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/ActivationQueryObject.h>
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
-#include <unity/scopes/internal/ActivationQueryObject.h>
-#include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/ActionMetadata.h>
-#include <unity/scopes/SearchMetadata.h>
-#include <unity/scopes/Query.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -102,7 +98,6 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         // Instantiate the query. We tell it what the ctrl is so,
         // when the query completes, it can tell the ctrl object
         // to destroy itself.
-        //QueryObject::SPtr qo(make_shared<QueryObject>(query_base, reply, ctrl_proxy));
         QueryObjectBase::SPtr qo(query_object_factory_fun(query_base, ctrl_proxy));
         MWQueryProxy query_proxy = mw_base->add_query_object(qo);
 
@@ -153,13 +148,13 @@ MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> QueryBase::UPtr {
+            [&q, &hints, this]() -> SearchQuery::UPtr {
                  auto search_query = this->scope_base_->create_query(q, hints);
                  search_query->set_metadata(hints);
                  return search_query;
             },
-            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                return make_shared<QueryObject>(query_base, reply, ctrl_proxy);
+            [&reply, &hints](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                return make_shared<QueryObject>(query_base, hints.cardinality(), reply, ctrl_proxy);
             }
     );
 }

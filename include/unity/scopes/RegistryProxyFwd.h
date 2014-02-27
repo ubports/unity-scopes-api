@@ -19,8 +19,6 @@
 #ifndef UNITY_SCOPES_REGISTRYPROXYFWD_H
 #define UNITY_SCOPES_REGISTRYPROXYFWD_H
 
-#include <unity/scopes/RegistryProxyFwd.h>
-
 #include <memory>
 
 namespace unity
@@ -29,8 +27,11 @@ namespace unity
 namespace scopes
 {
 
-class Registry;
-typedef std::shared_ptr<Registry> RegistryProxy;
+class RegistryBase;
+/** \typedef RegistryProxy
+\brief Convenience type definition.
+*/
+typedef std::shared_ptr<RegistryBase> RegistryProxy;
 
 } // namespace scopes
 

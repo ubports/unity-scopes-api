@@ -38,6 +38,7 @@ namespace internal
 // and throws for the other methods.
 
 ConfigBase::ConfigBase(string const& configfile) :
+    parser_(nullptr),
     configfile_(configfile)
 {
     if (!configfile.empty())
@@ -50,14 +51,18 @@ ConfigBase::~ConfigBase()
 {
 }
 
-util::IniParser::SPtr ConfigBase::parser() const noexcept
+util::IniParser::SPtr ConfigBase::parser() const
 {
-    return p();
+    if (!parser_)
+    {
+        throw LogicException("ConfigBase: no parser available with default config");
+    }
+    return parser_;
 }
 
 string ConfigBase::get_string(string const& group, string const& key) const
 {
-    string val = p()->get_string(group, key);
+    string val = parser()->get_string(group, key);
     if (val.empty())
     {
         throw_ex("Illegal empty value for " + key);
@@ -69,7 +74,7 @@ string ConfigBase::get_optional_string(string const& group, string const& key) c
 {
     try
     {
-        return p()->get_string(group, key);
+        return parser()->get_string(group, key);
     }
     catch (unity::LogicException const&)
     {
@@ -96,15 +101,6 @@ void ConfigBase::throw_ex(string const& reason) const
 {
     string s = "\"" + configfile_ + "\": " + reason;
     throw ConfigException(s);
-}
-
-util::IniParser::SPtr ConfigBase::p() const
-{
-    if (!parser_)
-    {
-        throw LogicException("ConfigBase: no parser available with default config");
-    }
-    return parser_;
 }
 
 } // namespace internal
