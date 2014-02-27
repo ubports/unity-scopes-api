@@ -39,6 +39,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Runtime, basic)
 {
@@ -272,13 +273,13 @@ TEST(Runtime, cardinality)
     receiver->wait_until_finished();
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
     rt->run_scope(&scope);
 }
 
-void pusher_thread(Runtime::SPtr const& rt)
+void pusher_thread(RuntimeImpl::SPtr const& rt)
 {
     PusherScope scope;
     rt->run_scope(&scope);
@@ -288,10 +289,10 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    RuntimeImpl::SPtr srt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
     std::thread scope_t(scope_thread, srt);
 
-    Runtime::SPtr prt = move(Runtime::create_scope_runtime("PusherScope", "Runtime.ini"));
+    RuntimeImpl::SPtr prt = move(RuntimeImpl::create("PusherScope", "Runtime.ini"));
     std::thread pusher_t(pusher_thread, prt);
 
     auto rc = RUN_ALL_TESTS();

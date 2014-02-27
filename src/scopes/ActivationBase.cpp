@@ -25,6 +25,7 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 ActivationBase::ActivationBase() :
     QueryBase(),
     p(new internal::ActivationBaseImpl())
@@ -34,6 +35,7 @@ ActivationBase::ActivationBase() :
 ActivationBase::~ActivationBase()
 {
 }
+/// @endcond
 
 void ActivationBase::cancelled()
 {

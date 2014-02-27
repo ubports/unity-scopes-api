@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Canonical Ltd
+ * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,18 +13,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Thomas Voß <thomas.voss@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/testing/Result.h>
+#include <unity/scopes/ReplyBase.h>
 
-#include <unity/scopes/internal/ResultImpl.h>
+namespace unity
+{
+
+namespace scopes
+{
 
 /// @cond
 
-unity::scopes::testing::Result::Result() :
-    unity::scopes::Result(new unity::scopes::internal::ResultImpl())
-{
-}
+ReplyBase::ReplyBase() = default;
+
+ReplyBase::~ReplyBase() = default;
 
 /// @endcond
+
+} // namespace scopes
+
+} // namespace unity

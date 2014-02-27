@@ -45,20 +45,54 @@ class QueryObject;
 
 } // namespace internal
 
-// Abstract server-side base interface for a query that is executed inside a scope.
+/**
+\brief Abstract base class to represent a particular query.
 
-// TODO: documentation
+A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+
+\note The constructor of the instance must complete in a timely manner. Do not perform anything in the
+constructor that might block.
+*/
 
 class SearchQuery: public QueryBase
 {
 public:
+    /// @cond
     NONCOPYABLE(SearchQuery);
     UNITY_DEFINES_PTRS(SearchQuery);
+    /// @endcond
 
-    /// Invoked when a SearchQuery is run, use the provided proxy to push results
-    virtual void run(SearchReplyProxy const& reply) = 0;         // Called by the run time to start this query
+    /**
+    \brief Called by scopes run time to start the query.
 
-    // Create a sub-query.
+    Your implementation of run() can use the reply proxy to push results
+    for the query. You can push results from within run(), in which case
+    the query implicitly completes when run() returns. Alternatively,
+    run() can store the reply proxy and return immediately. In this
+    case, you can use the stored proxy to push results from another
+    thread. It is safe to call `push()` from multiple threads without
+    synchronization.
+
+    The query completes either when run() returns, or when the
+    last stored reply proxy goes out of scope (whichever happens
+    last).
+
+    \param reply The proxy on which to push results for the query.
+    */
+    virtual void run(SearchReplyProxy const& reply) = 0;
+
+    /** @name Subquery methods
+    The create_subquery() methods are for use by aggregating scopes.
+    When an aggregator passes a query to its child scopes, it should
+    use create_subquery() instead of the normal Scope::create_query()
+    that would be called by a client. create_subquery() takes care
+    of automatically forwarding query cancellation to child scopes.
+    This means that there is no need for an aggregating scope to
+    explicitly forward cancellation to child scopes
+    when its QueryBase::cancelled() method is called by the scopes
+    run time.
+    */
+    //{@
     QueryCtrlProxy create_subquery(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    SearchListener::SPtr const& reply);
@@ -77,6 +111,7 @@ public:
                                    FilterState const& filter_state,
                                    SearchMetadata const& hints,
                                    SearchListener::SPtr const& reply);
+    //@}
 
     /// @cond
     virtual ~SearchQuery();

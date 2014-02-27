@@ -57,13 +57,13 @@ public:
     Throws unity::InvalidArgumentException if status is Status::PerformQuery - to
     create ActivationResponse of that type, use ActivationResponse(Query const&)
     constructor.
-    \param status activation status
+    \param status The activation status.
     */
     ActivationResponse(Status status);
 
     /**
     \brief Creates ActivationResponse with activation status of Status::PerformQuery and a search query to be executed.
-    \param query search query to be executed by client
+    \param query The search query to be executed by client.
      */
     ActivationResponse(Query const& query);
 
@@ -77,7 +77,7 @@ public:
 
     /**
     \brief Get activation status.
-    \return activation status
+    \return The activation status.
     */
     ActivationResponse::Status status() const;
 
@@ -106,7 +106,7 @@ public:
 
     /**
      \brief Get data attached to this response object.
-     \return data attached to response
+     \return The data attached to response.
      */
     Variant scope_data() const;
 
@@ -114,7 +114,7 @@ public:
      \brief Query to be executed if status is Status::PerformQuery.
 
      This method throws unity::LogicException is status of this ActivationResponse is different than Status::PerformQuery.
-     \return query to be executed by client.
+     \return The query to be executed by the client.
     */
     Query query() const;
 

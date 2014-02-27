@@ -47,22 +47,46 @@ namespace internal
 class Category
 {
 public:
-/// @cond
+    /// @cond
     NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
-/// @endcond
 
     virtual ~Category();
+    /// @endcond
 
+    /**
+     \brief Get identifier of this Category
+     \return The category identifier.
+    */
     std::string id() const;
+
+    /**
+     \brief Get title of this Category
+     \return The category title.
+    */
     std::string title() const;
+
+    /**
+     \brief Get icon of this Category
+     \return Teh category icon.
+    */
     std::string icon() const;
+
+    /**
+     \brief Get renderer template of this Category
+     \return The category renderer template.
+     */
     CategoryRenderer const& renderer_template() const;
+
+    // @cond
     VariantMap serialize() const;
+    // @endcond
 
 protected:
+    /// @cond
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
+    /// @endcond
 
     friend class internal::CategoryRegistry;
 

@@ -62,6 +62,7 @@ ColumnLayout::ColumnLayout(int num_of_columns)
 {
 }
 
+/// @cond
 ColumnLayout::ColumnLayout(internal::ColumnLayoutImpl *impl)
     : p(impl)
 {
@@ -87,6 +88,13 @@ ColumnLayout::~ColumnLayout() = default;
 
 ColumnLayout& ColumnLayout::operator=(ColumnLayout&&) = default;
 
+VariantMap ColumnLayout::serialize() const
+{
+    return p->serialize();
+}
+
+/// @endcond
+
 void ColumnLayout::add_column(std::vector<std::string> widget_ids)
 {
     return p->add_column(widget_ids);
@@ -106,12 +114,6 @@ std::vector<std::string> ColumnLayout::column(int index) const
 {
     return p->column(index);
 }
-
-VariantMap ColumnLayout::serialize() const
-{
-    return p->serialize();
-}
-
 } // namespace scopes
 
 } // namespace unity

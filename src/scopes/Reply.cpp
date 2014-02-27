@@ -35,9 +35,7 @@ Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
     assert(impl);
 }
 
-Reply::~Reply()
-{
-}
+Reply::~Reply() = default;
 
 void Reply::finished() const
 {

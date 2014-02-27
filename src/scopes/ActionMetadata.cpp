@@ -25,13 +25,14 @@ namespace unity
 namespace scopes
 {
 
-ActionMetadata::ActionMetadata(internal::ActionMetadataImpl *impl)
-    : QueryMetadata(impl)
+ActionMetadata::ActionMetadata(std::string const& locale, std::string const& form_factor)
+    : QueryMetadata(new internal::ActionMetadataImpl(locale, form_factor))
 {
 }
 
-ActionMetadata::ActionMetadata(std::string const& locale, std::string const& form_factor)
-    : QueryMetadata(new internal::ActionMetadataImpl(locale, form_factor))
+/// @cond
+ActionMetadata::ActionMetadata(internal::ActionMetadataImpl *impl)
+    : QueryMetadata(impl)
 {
 }
 
@@ -56,6 +57,8 @@ ActionMetadata& ActionMetadata::operator=(ActionMetadata const &other)
 }
 
 ActionMetadata& ActionMetadata::operator=(ActionMetadata&&) = default;
+
+/// @endcond
 
 void ActionMetadata::set_scope_data(Variant const& data)
 {

@@ -42,14 +42,26 @@ class OptionSelectorFilterImpl;
 class FilterOption final
 {
 public:
-/// @cond
+    /// @cond
     UNITY_DEFINES_PTRS(FilterOption);
     NONCOPYABLE(FilterOption);
-/// @endcond
+    /// @endcond
 
+    /**
+     \brief Get the identifier of this filter option.
+     \return The option identifier.
+     */
     std::string id() const;
+
+    /**
+     \brief Get the label of this filter option.
+     \return The option label.
+    */
     std::string label() const;
+
+    /// @cond
     ~FilterOption();
+    /// @endcond
 
 private:
     FilterOption(std::string const& id, std::string const& label);

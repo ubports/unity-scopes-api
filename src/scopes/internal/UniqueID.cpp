@@ -34,7 +34,7 @@ UniqueID::UniqueID() :
 {
 }
 
-UniqueID::UniqueID(mt19937::result_type seed) :
+UniqueID::UniqueID(std::mt19937::result_type seed) :
     engine(seed),
     counter(0)
 {

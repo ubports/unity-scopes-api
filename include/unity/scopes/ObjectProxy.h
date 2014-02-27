@@ -33,24 +33,54 @@ class ObjectProxyImpl;
 class RuntimeImpl;
 }
 
+/**
+\brief The root base class for all proxies.
+*/
+
 class ObjectProxy
 {
 public:
+    /// @cond
     ObjectProxy();
     virtual ~ObjectProxy();
+    /// @endcond
 
+    /**
+    \brief Returns the endpoint this proxy connects to.
+    \return The endpoint of the proxy.
+    */
     std::string endpoint() const;
+
+    /**
+    \brief Returns the identity of the target object of this proxy.
+    \return The identity of the target of the proxy.
+    */
     std::string identity() const;
+
+    /**
+    \brief Returns the timeout in milliseconds if this proxy is a twoway proxy.
+
+    For oneway proxies and twoway proxies without a timeout, the return value is -1.
+    \return The timeout value in milliseconds (-1 if none or timeout does not apply).
+    */
     int64_t timeout() const;      // Timeout in milliseconds, -1 == no timeout
 
+    /**
+    \brief converts a proxy into its string representation.
+
+    A proxy string can be converted back into a proxy by calling Runtime::string_to_proxy().
+    \return The string representation of the proxy.
+    */
     std::string to_string() const;
 
 protected:
+    /// @cond
     internal::ObjectProxyImpl* pimpl() const noexcept; // Non-virtual because we can't use covariance with incomplete types
                                                        // Each derived proxy type implements a non-virtual fwd() method
                                                        // that is called from within each operation to down-cast the pimpl().
     ObjectProxy(internal::ObjectProxyImpl*);
     friend class internal::ObjectProxyImpl; // Instantiated only by ObjectProxyImpl
+    /// @endcond
 
 private:
     std::unique_ptr<internal::ObjectProxyImpl> p;

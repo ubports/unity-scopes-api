@@ -31,12 +31,8 @@ class CategoryRenderer;
 namespace testing
 {
 
-/**
-   \brief Category represents a set of related results returned by scope
-   and displayed within a single pane in the Unity dash.
-   To create a Category, use ReplyProxy::register_category.
-   \see ResultItem
-*/
+/// @cond
+
 class Category : public unity::scopes::Category
 {
 public:
@@ -50,6 +46,8 @@ public:
     {
     }
 };
+
+/// @endcond
 
 } // namespace testing
 

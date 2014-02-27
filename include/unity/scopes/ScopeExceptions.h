@@ -47,6 +47,7 @@ public:
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -73,11 +74,13 @@ public:
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 
     /**
     \brief Returns the identity of the non-existent object.
+    \return The identity of the non-existent object.
     */
     virtual std::string id() const;
 
@@ -105,6 +108,7 @@ public:
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -129,6 +133,7 @@ public:
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -154,11 +159,13 @@ public:
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 
     /**
     \brief Returns the name that was passed to the constructor.
+    \return The name that was passed to the constructor.
     */
     virtual std::string name() const;
 
