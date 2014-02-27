@@ -99,9 +99,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works)
@@ -132,9 +132,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
@@ -165,9 +165,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
@@ -200,9 +200,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
@@ -235,9 +235,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
@@ -268,9 +268,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
@@ -301,9 +301,9 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
@@ -336,7 +336,7 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               test_result.sample_mean_is_eq_to_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_ge_than_reference(alpha));
+              test_result.sample_mean_is_gt_reference(alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_le_than_reference(alpha));
+              test_result.sample_mean_is_lt_reference(alpha));
 }
