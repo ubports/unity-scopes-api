@@ -46,7 +46,6 @@ public:
 
     ActivationResponse::Status status() const;
     void set_scope_data(Variant const& hints);
-    VariantMap hints() const;
     Variant scope_data() const;
     Query query() const;
 

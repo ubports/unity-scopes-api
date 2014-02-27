@@ -82,27 +82,12 @@ public:
     ActivationResponse::Status status() const;
 
     /**
-     \deprecated Attach arbitrary data to this response.  This method will be removed in version 0.4.0, please use set_scope_data instead.
-     */
-    void setHints(VariantMap const& hints);
-
-    /**
      \brief Attach arbitrary data to this response.
 
      The attached data will be sent back to the scope if status of this response is Status::ShowPreview.
      \param data arbitrary value attached to response
      */
     void set_scope_data(Variant const& data);
-
-    /**
-     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use scope_data instead.
-
-     This method returns data attached with setHints() or set_scope_data() call; this method returns empty VariantMap if the attached data was added with
-     set_scope_data() and it is is not of VariantMap type.
-
-     \return data attached to response
-     */
-    VariantMap hints() const;
 
     /**
      \brief Get data attached to this response object.

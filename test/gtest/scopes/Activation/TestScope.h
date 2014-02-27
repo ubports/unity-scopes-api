@@ -67,7 +67,7 @@ public:
         var[hint_key_] = hint_val_;
         var["received_hints"] = recv_hints_; // send received hints back for testing
         var["activated_uri"] = uri_; //send activated uri back for testing
-        resp.setHints(var);
+        resp.set_scope_data(Variant(var));
         return resp;
     }
 
