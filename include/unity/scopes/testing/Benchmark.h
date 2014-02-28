@@ -65,6 +65,12 @@ public:
             /** Raw sample vector, with sample.size() == sample_size */
             std::vector<std::chrono::microseconds> sample{};
         } timing{};
+
+        void load_from(std::istream& in);
+        void save_to(std::ostream& out);
+
+        void load_from_xml(std::istream& in);
+        void save_to_xml(std::ostream& out);
     };
 
     /**
@@ -239,6 +245,8 @@ public:
 protected:
     Benchmark() = default;
 };
+
+bool operator==(const Benchmark::Result& lhs, const Benchmark::Result& rhs);
 
 std::ostream& operator<<(std::ostream&, const Benchmark::Result&);
 

@@ -30,6 +30,7 @@
 
 #include "scope.h"
 
+#include <cstdio>
 #include <fstream>
 
 namespace
@@ -42,7 +43,7 @@ static const std::string scope_query_string{"does.not.exist.scope.query_string"}
 static const std::string default_locale{"C"};
 static const std::string default_form_factor{"SuperDuperPhablet"};
 
-static const double alpha = 0.05;
+static const double alpha = 0.1;
 
 static const std::size_t dont_care{0};
 
@@ -84,6 +85,27 @@ unity::scopes::testing::Benchmark::Result reference_action_performance()
 
 }
 
+TEST(BenchmarkResult, saving_and_loading_works)
+{
+    const std::string fn{"test.result"};
+    std::remove(fn.c_str());
+
+    unity::scopes::testing::Benchmark::Result reference;
+    reference.sample_size = std::rand();
+
+    {
+        std::ofstream out{fn.c_str()};
+        ASSERT_NO_THROW(reference.save_to(out));
+    }
+
+    {
+        unity::scopes::testing::Benchmark::Result result;
+        std::ifstream in{fn.c_str()};
+        ASSERT_NO_THROW(result.load_from(in));
+        EXPECT_EQ(reference, result);
+    }
+}
+
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 {
     unity::scopes::testing::OutOfProcessBenchmark benchmark;
@@ -100,6 +122,8 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
     };
 
     auto result = benchmark.for_query(scope, config);
+    result.save_to(std::cout);
+    result.save_to_xml(std::cout);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
                 reference_query_performance(),

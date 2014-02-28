@@ -29,18 +29,13 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
 {
     auto child = core::posix::fork([this, config, scope]()
     {
-        auto result = InProcessBenchmark::for_query(scope, config);
-        std::cout << result.sample_size << " " << result.timing.mean.count() << " " << result.timing.std_dev.count();
+        InProcessBenchmark::for_query(scope, config).save_to(std::cout);
         return core::posix::exit::Status::success;
     },
     core::posix::StandardStream::stdout);
 
     unity::scopes::testing::Benchmark::Result result;
-    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
-    child.cout() >> sample_size >> mean >> std_dev;
-    result.sample_size = sample_size;
-    result.timing.mean = std::chrono::microseconds{mean};
-    result.timing.std_dev = std::chrono::microseconds{std_dev};
+    result.load_from(child.cout());
 
     auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
@@ -69,18 +64,13 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
 {
     auto child = core::posix::fork([this, config, scope]()
     {
-        auto result = InProcessBenchmark::for_preview(scope, config);
-        std::cout << result.sample_size << " " << result.timing.mean.count() << " " << result.timing.std_dev.count();
+        InProcessBenchmark::for_preview(scope, config).save_to(std::cout);
         return core::posix::exit::Status::success;
     },
     core::posix::StandardStream::stdout);
 
     unity::scopes::testing::Benchmark::Result result;
-    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
-    child.cout() >> sample_size >> mean >> std_dev;
-    result.sample_size = sample_size;
-    result.timing.mean = std::chrono::microseconds{mean};
-    result.timing.std_dev = std::chrono::microseconds{std_dev};
+    result.load_from(child.cout());
 
     auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
@@ -109,18 +99,13 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
 {
     auto child = core::posix::fork([this, config, scope]()
     {
-        auto result = InProcessBenchmark::for_activation(scope, config);
-        std::cout << result.sample_size << " " << result.timing.mean.count() << " " << result.timing.std_dev.count();
+        InProcessBenchmark::for_activation(scope, config).save_to(std::cout);
         return core::posix::exit::Status::success;
     },
     core::posix::StandardStream::stdout);
 
     unity::scopes::testing::Benchmark::Result result;
-    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
-    child.cout() >> sample_size >> mean >> std_dev;
-    result.sample_size = sample_size;
-    result.timing.mean = std::chrono::microseconds{mean};
-    result.timing.std_dev = std::chrono::microseconds{std_dev};
+    result.load_from(child.cout());
 
     auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 
@@ -149,18 +134,13 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
 {
     auto child = core::posix::fork([this, config, scope]()
     {
-        auto result = InProcessBenchmark::for_action(scope, config);
-        std::cout << result.sample_size << " " << result.timing.mean.count() << " " << result.timing.std_dev.count();
+        InProcessBenchmark::for_action(scope, config).save_to(std::cout);
         return core::posix::exit::Status::success;
     },
     core::posix::StandardStream::stdout);
 
     unity::scopes::testing::Benchmark::Result result;
-    std::size_t sample_size; std::chrono::microseconds::rep mean, std_dev;
-    child.cout() >> sample_size >> mean >> std_dev;
-    result.sample_size = sample_size;
-    result.timing.mean = std::chrono::microseconds{mean};
-    result.timing.std_dev = std::chrono::microseconds{std_dev};
+    result.load_from(child.cout());
 
     auto wait_result = child.wait_for(core::posix::wait::Flags::untraced);
 

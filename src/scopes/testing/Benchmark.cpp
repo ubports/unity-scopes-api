@@ -18,13 +18,123 @@
 
 #include <unity/scopes/testing/Benchmark.h>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_free.hpp>
+#include <boost/serialization/vector.hpp>
+
+#include <boost/archive/archive_exception.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+
 #include <iostream>
+
+namespace boost
+{
+namespace serialization
+{
+template<class Archive>
+void load(Archive & ar, std::chrono::microseconds& duration, const unsigned int)
+{
+    std::chrono::microseconds::rep value;
+    ar & boost::serialization::make_nvp("microseconds", value);
+    duration = std::chrono::microseconds{value};
+}
+
+template<class Archive>
+void save(Archive & ar, const std::chrono::microseconds& duration, const unsigned int)
+{
+    std::chrono::microseconds::rep value = duration.count();
+    ar & boost::serialization::make_nvp("microseconds", value);
+}
+
+template<class Archive>
+void serialize(Archive & ar, std::chrono::microseconds& duration, const unsigned int version)
+{
+    boost::serialization::split_free(ar, duration, version);
+}
+
+template<class Archive>
+void serialize(Archive & ar, std::pair<std::chrono::microseconds, double>& pair, const unsigned int)
+{
+    ar & boost::serialization::make_nvp("first", pair.first);
+    ar & boost::serialization::make_nvp("second", pair.second);
+}
+
+template<class Archive>
+void serialize(Archive & ar, unity::scopes::testing::Benchmark::Result& result, const unsigned int)
+{
+    ar & boost::serialization::make_nvp("sample_size", result.sample_size);
+    ar & boost::serialization::make_nvp("timing.mean", result.timing.mean);
+    ar & boost::serialization::make_nvp("timing.std_dev", result.timing.std_dev);
+    ar & boost::serialization::make_nvp("timing.sample", result.timing.sample);
+    ar & boost::serialization::make_nvp("timing.histogram", result.timing.histogram);
+}
+} // namespace boost
+} // namespace serialization
+
+void unity::scopes::testing::Benchmark::Result::load_from_xml(std::istream& in)
+{
+    try
+    {
+        boost::archive::xml_iarchive ia(in);
+        ia >> boost::serialization::make_nvp("result", *this);
+    } catch(const boost::archive::archive_exception& e)
+    {
+        throw std::runtime_error(std::string{"Benchmark::Result::write_to: "}+ e.what());
+    }
+}
+
+void unity::scopes::testing::Benchmark::Result::save_to_xml(std::ostream& out)
+{
+    try
+    {
+        boost::archive::xml_oarchive oa(out);
+        oa << boost::serialization::make_nvp("result", *this);
+    } catch(const boost::archive::archive_exception& e)
+    {
+        throw std::runtime_error(std::string{"Benchmark::Result::write_to: "} + e.what());
+    }
+}
+
+void unity::scopes::testing::Benchmark::Result::load_from(std::istream& in)
+{
+    try
+    {
+        boost::archive::text_iarchive ia(in);
+        ia >> boost::serialization::make_nvp("result", *this);
+    } catch(const boost::archive::archive_exception& e)
+    {
+        throw std::runtime_error(std::string{"Benchmark::Result::write_to: "}+ e.what());
+    }
+}
+
+void unity::scopes::testing::Benchmark::Result::save_to(std::ostream& out)
+{
+    try
+    {
+        boost::archive::text_oarchive oa(out);
+        oa << boost::serialization::make_nvp("result", *this);
+    } catch(const boost::archive::archive_exception& e)
+    {
+        throw std::runtime_error(std::string{"Benchmark::Result::write_to: "} + e.what());
+    }
+}
+
+bool unity::scopes::testing::operator==(const unity::scopes::testing::Benchmark::Result& lhs, const unity::scopes::testing::Benchmark::Result& rhs)
+{
+    return lhs.sample_size == rhs.sample_size &&
+            lhs.timing.mean == rhs.timing.mean &&
+            lhs.timing.std_dev == rhs.timing.std_dev &&
+            lhs.timing.sample == rhs.timing.sample;
+}
 
 std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity::scopes::testing::Benchmark::Result& result)
 {
     out << "{"
         << "sample_size: " << result.sample_size << ", "
-        << "time: {"
+        << "timing: {"
         << "µ: " << result.timing.mean.count() << " [µs], "
         << "σ: " << result.timing.std_dev.count() << " [µs]"
         << "}}";
