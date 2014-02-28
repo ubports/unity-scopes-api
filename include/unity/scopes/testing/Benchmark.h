@@ -68,7 +68,7 @@ public:
     };
 
     /**
-     * @brief The StatisticsConfiguration struct contains options controlling
+     * \brief The StatisticsConfiguration struct contains options controlling
      * the calculation of benchmark result statistics.
      */
     struct StatisticsConfiguration

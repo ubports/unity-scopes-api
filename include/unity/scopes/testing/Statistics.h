@@ -102,10 +102,10 @@ struct StudentsTTest
     };
 
     /**
-     * @brief one_sample calculates the Student's T test for the given reference and sample result.
-     * @param reference The reference result as obtained by a previous run.
-     * @param sample The current sample of the system performance.
-     * @return An instance of Result.
+     * \brief one_sample calculates the Student's T test for the given reference and sample result.
+     * \param reference The reference result as obtained by a previous run.
+     * \param sample The current sample of the system performance.
+     * \return An instance of Result.
      */
     Result one_sample(const Benchmark::Result& reference,
                       const Benchmark::Result& sample);
