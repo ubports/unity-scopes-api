@@ -44,44 +44,54 @@ public:
 /// @endcond
 
     /**
-    \brief Creates a layout definition which expects num_of_columns columns to be added with ColumnLayout::add_column.
-    The number of columns needs to be greater than 0. Throws unity::InvalidArgumentException on invalid number.
+    \brief Creates a layout definition that expects num_of_columns columns to be added with ColumnLayout::add_column.
+    \param The number of columns for the layout.
+    \throws unity::InvalidArgumentException for an invalid number of columns.
     */
     explicit ColumnLayout(int num_of_columns);
 
-/// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     ColumnLayout(ColumnLayout const& other);
     ColumnLayout(ColumnLayout&&);
     ColumnLayout& operator=(ColumnLayout const& other);
     ColumnLayout& operator=(ColumnLayout&&);
+    //@}
+
+    /// @cond
     ~ColumnLayout();
-/// @endcond
+    /// @endcond
 
     /**
-    \brief Adds new column and assigns widgets to it.
-    ColumnLayout expects exactly the number of columns passed to the constructor to be created with add_column method.
-    This method throws unity::LogicException if trying to add more columns than declared at the construction side.
-    Failing to add sufficient number of columns will result in unity::LogicException from \link unity::scopes::PreviewReply::register_layout\endlink.
-     */
+    \brief Adds a new column and assigns widgets to it.
+
+    ColumnLayout expects exactly the number of columns passed to the constructor to be created with the
+    add_column method.
+    \throws unity::LogicException if an attempt is made to add more columns than specified in the constructor.
+    \throws unity::LogicException from \link unity::scopes::PreviewReply::register_layout\endlink if a layout
+    has fewer columns than specified in the constructor.
+    */
     void add_column(std::vector<std::string> widget_ids);
 
     /**
-    \brief Get real number of columns in this layout.
-    Note, this is can be smaller than number of columns passed to the constructor and available via number_of_columns().
+    \brief Get the current number of columns in this layout.
     \return The number of columns added with add_column().
-     */
+    */
     int size() const noexcept;
 
     /**
-    \brief Get number of columns expected by this layout and passed to the constructor.
+    \brief Get the number of columns expected by this layout as specified in the constructor.
     \return The number of columns expected by this layout.
     */
     int number_of_columns() const noexcept;
 
     /**
-    \brief Retrieve list of widgets for given column. This can throw unity::InvalidArgumentException if the index is invalid.
-    \param index index of a column
+    \brief Retrieve the list of widgets for given column.
+    \param index The index of a column.
     \return The widget identifiers for the given column index.
+    \throws unity::InvalidArgumentException if the index is invalid.
     */
     std::vector<std::string> column(int index) const;
 
@@ -98,6 +108,7 @@ private:
 /*! \typedef ColumnLayoutList
 \brief List of column layouts (see unity::scopes::ColumnLayout)
 */
+
 typedef std::list<ColumnLayout> ColumnLayoutList;
 
 } // namespace scopes

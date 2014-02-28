@@ -35,13 +35,14 @@ class ActivationResponseImpl;
 }
 
 /**
-\brief Carries response to a Result activation request.
+\brief Response to a result activation.
 */
+
 class ActivationResponse final
 {
 public:
-    /*!
-     \brief Status of an unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
+    /**
+     \brief Status of a unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
      */
     enum Status
     {
@@ -54,16 +55,16 @@ public:
 
     /**
     \brief Creates ActivationResponse with given status.
-    Throws unity::InvalidArgumentException if status is Status::PerformQuery - to
-    create ActivationResponse of that type, use ActivationResponse(CannedQuery const&)
-    constructor.
     \param status The activation status.
+    \throws unity::InvalidArgumentException if status is Status::PerformQuery. To
+    create an ActivationResponse of that type, use the ActivationResponse(CannedQuery const&)
+    constructor.
     */
     ActivationResponse(Status status);
 
     /**
-    \brief Creates ActivationResponse with activation status of Status::PerformQuery and a search query to be executed.
-    \param query The search query to be executed by client.
+    \brief Creates an ActivationResponse with status Status::PerformQuery and a search query to be executed.
+    \param query The search query to be executed by the client.
      */
     ActivationResponse(CannedQuery const& query);
 
@@ -84,7 +85,7 @@ public:
     /**
      \brief Attach arbitrary data to this response.
 
-     The attached data will be sent back to the scope if status of this response is Status::ShowPreview.
+     The attached data is sent back to the scope if the status of this response is Status::ShowPreview.
      \param data arbitrary value attached to response
      */
     void set_scope_data(Variant const& data);
@@ -96,9 +97,9 @@ public:
     Variant scope_data() const;
 
     /**
-     \brief CannedQuery to be executed if status is Status::PerformQuery.
+     \brief A query to be executed if status is Status::PerformQuery.
 
-     This method throws unity::LogicException is status of this ActivationResponse is different than Status::PerformQuery.
+     \throws unity::LogicException if the status of this ActivationResponse is anything other than Status::PerformQuery.
      \return The query to be executed by the client.
     */
     CannedQuery query() const;
