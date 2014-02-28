@@ -178,6 +178,8 @@ typedef acc::accumulator_set<
 > Statistics;
 }
 
+/// @cond
+
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::QueryConfiguration config)
@@ -336,3 +338,5 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
 
     return benchmark_result;
 }
+
+/// @endcond
