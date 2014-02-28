@@ -1,4 +1,5 @@
 add_subdirectory(internal)
+add_subdirectory(testing)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 

@@ -39,6 +39,8 @@ class ScopeBase;
 namespace testing
 {
 
+/// @cond
+
 class Benchmark
 {
 public:
@@ -113,6 +115,8 @@ protected:
 };
 
 std::ostream& operator<<(std::ostream&, const Benchmark::Result&);
+
+/// @endcond
 
 } // namespace testing
 
