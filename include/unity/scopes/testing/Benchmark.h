@@ -38,73 +38,201 @@ class ScopeBase;
 
 namespace testing
 {
-
+/**
+ * \brief The Benchmark class defines an interface to provide scope authors with runtime benchmarking capabilities
+ * to be used in their own testing.
+ */
 class Benchmark
 {
 public:
+    /**
+     * \brief The Result struct encapsulates all of the result gathered from one
+     * individual benchmark run consisting of multiple independent trials.
+     */
     struct Result
     {
-        std::size_t sample_size;
-        struct Time
+        /** Size of the sample, corresponds to number of trials. */
+        std::size_t sample_size{0};
+        /** Timing characteristics captured during the benchmark run. */
+        struct Timing
         {
-            std::chrono::microseconds mean;
-            std::chrono::microseconds std_dev;
-        } time;
+            /** Mean execution time for the benchmarked operation. */
+            std::chrono::microseconds mean{std::chrono::microseconds::min()};
+            /** Std. deviation in execution time for the benchmarked operation. */
+            std::chrono::microseconds std_dev{std::chrono::microseconds::min()};
+            /** Histogram of measured execution times for the benchmarked operation. */
+            std::vector<std::pair<std::chrono::microseconds, double>> histogram{};
+            /** Raw sample vector, with sample.size() == sample_size */
+            std::vector<std::chrono::microseconds> sample{};
+        } timing{};
     };
 
+    /**
+     * @brief The StatisticsConfiguration struct contains options controlling
+     * the calculation of benchmark result statistics.
+     */
+    struct StatisticsConfiguration
+    {
+        /** Number of bins in the final histogram. */
+        std::size_t histogram_bin_count{10};
+    };
+
+    /**
+     * \brief The TrialConfiguration struct contains options controlling
+     * the execution of individual trials.
+     */
     struct TrialConfiguration
     {
-        std::size_t trial_count;
-        std::chrono::microseconds per_trial_timeout;
+        /** The number of independent trials. Please note that the number should not be << 10 */
+        std::size_t trial_count{10};
+        /** Wait at most this time for one trial to finish or throw if a timeout is encountered. */
+        std::chrono::microseconds per_trial_timeout{std::chrono::seconds{10}};
+        /** Fold in statistics configuration into the overall trial setup. */
+        StatisticsConfiguration statistics_configuration{};
     };
 
+    /**
+     * \brief The QueryConfiguration struct constains all options controlling the
+     * benchmark of scope query operations.
+     */
     struct QueryConfiguration
     {
-        std::function<std::pair<unity::scopes::Query, unity::scopes::SearchMetadata>()> sampler;
-        TrialConfiguration trial_configuration;
+        /** Function signature for choosing a query configuration. */
+        typedef std::function<
+            std::pair<
+                unity::scopes::Query,
+                unity::scopes::SearchMetadata>()
+        > Sampler;
+
+        /**
+         * The sampling function instance for choosing a query configuration.
+         * Has to be set to an actual instance.
+         */
+        Sampler sampler{};
+        /** fold in trial configuration options into the overall setup. */
+        TrialConfiguration trial_configuration{};
     };
 
+    /**
+     * \brief The PreviewConfiguration struct constains all options controlling the
+     * benchmark of scope preview operations.
+     */
     struct PreviewConfiguration
     {
-        std::function<std::pair<unity::scopes::Result, unity::scopes::ActionMetadata>()> sampler;
-        TrialConfiguration trial_configuration;
+        /** Function signature for choosing a preview configuration. */
+        typedef std::function<
+            std::pair<
+                unity::scopes::Result,
+                unity::scopes::ActionMetadata
+            >()
+        > Sampler;
+
+        /**
+         * The sampling function instance for choosing a preview configuration.
+         * Has to be set to an actual instance.
+         */
+        Sampler sampler{};
+        /** fold in trial configuration options into the overall setup. */
+        TrialConfiguration trial_configuration{};
     };
 
+    /**
+     * \brief The ActivationConfiguration struct constains all options controlling the
+     * benchmark of scope activation operations.
+     */
     struct ActivationConfiguration
     {
-        std::function<std::pair<unity::scopes::Result, unity::scopes::ActionMetadata>()> sampler;
-        TrialConfiguration trial_configuration;
+        /** Function signature for choosing an activation configuration. */
+        typedef std::function<
+            std::pair<
+                unity::scopes::Result,
+                unity::scopes::ActionMetadata>()
+        > Sampler;
+
+        /**
+         * The sampling function instance for choosing a preview configuration.
+         * Has to be set to an actual instance.
+         */
+        Sampler sampler{};
+        /** fold in trial configuration options into the overall setup. */
+        TrialConfiguration trial_configuration{};
     };
 
+    /**
+     * \brief The ActionConfiguration struct constains all options controlling the
+     * benchmark of scope action activation operations.
+     */
     struct ActionConfiguration
     {
-        std::function<
+        /** Function signature for choosing an action invocation configuration. */
+        typedef std::function<
             std::tuple<
                 unity::scopes::Result,
                 unity::scopes::ActionMetadata,
                 std::string,
                 std::string
             >()
-        > sampler;
+        > Sampler;
+
+        /**
+         * The sampling function instance for choosing an action activation configuration.
+         * Has to be set to an actual instance.
+         */
+        Sampler sampler{};
+        /** fold in trial configuration options into the overall setup. */
         TrialConfiguration trial_configuration;
     };
 
+    /** \cond */
     virtual ~Benchmark() = default;
     Benchmark(const Benchmark&) = delete;
     Benchmark(Benchmark&&) = delete;
 
     Benchmark& operator=(const Benchmark&) = delete;
     Benchmark& operator=(Benchmark&&) = delete;
+    /** \endcond */
 
+    /**
+     * \brief for_query executes a benchmark to measure the scope's query performance.
+     * \throw std::runtime_error in case of timeouts.
+     * \throw std::logic_error in case of misconfiguration.
+     * \param scope The scope instance to benchmark.
+     * \param configuration Options controlling the experiment.
+     * \return An instance of Result.
+     */
     virtual Result for_query(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                              QueryConfiguration configuration) = 0;
 
+    /**
+     * \brief for_preview executes a benchmark to measure the scope's preview performance.
+     * \throw std::runtime_error in case of timeouts.
+     * \throw std::logic_error in case of misconfiguration.
+     * \param scope The scope instance to benchmark.
+     * \param configuration Options controlling the experiment.
+     * \return An instance of Result.
+     */
     virtual Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                                PreviewConfiguration preview_configuration) = 0;
 
+    /**
+     * \brief for_preview executes a benchmark to measure the scope's activation performance.
+     * \throw std::runtime_error in case of timeouts.
+     * \throw std::logic_error in case of misconfiguration.
+     * \param scope The scope instance to benchmark.
+     * \param configuration Options controlling the experiment.
+     * \return An instance of Result.
+     */
     virtual Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                                   ActivationConfiguration activation_configuration) = 0;
 
+    /**
+     * \brief for_preview executes a benchmark to measure the scope's action activation performance.
+     * \throw std::runtime_error in case of timeouts.
+     * \throw std::logic_error in case of misconfiguration.
+     * \param scope The scope instance to benchmark.
+     * \param configuration Options controlling the experiment.
+     * \return An instance of Result.
+     */
     virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                               ActionConfiguration activation_configuration) = 0;
 

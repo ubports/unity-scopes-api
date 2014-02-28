@@ -25,8 +25,8 @@ std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity:
     out << "{"
         << "sample_size: " << result.sample_size << ", "
         << "time: {"
-        << "µ: " << result.time.mean.count() << " [µs], "
-        << "σ: " << result.time.std_dev.count() << " [µs]"
+        << "µ: " << result.timing.mean.count() << " [µs], "
+        << "σ: " << result.timing.std_dev.count() << " [µs]"
         << "}}";
 
     return out;

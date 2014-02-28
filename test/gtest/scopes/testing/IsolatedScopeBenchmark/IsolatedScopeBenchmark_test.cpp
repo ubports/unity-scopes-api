@@ -30,6 +30,8 @@
 
 #include "scope.h"
 
+#include <fstream>
+
 namespace
 {
 typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> BenchmarkScopeFixture;
@@ -43,29 +45,42 @@ static const std::string default_form_factor{"SuperDuperPhablet"};
 static const double alpha = 0.05;
 
 static const std::size_t dont_care{0};
-unity::scopes::testing::Benchmark::Result reference_query_performance
-{
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
 
-unity::scopes::testing::Benchmark::Result reference_preview_performance
+unity::scopes::testing::Benchmark::Result reference_query_performance()
 {
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = std::chrono::milliseconds{500};
+    result.timing.std_dev = std::chrono::microseconds{dont_care};
 
-unity::scopes::testing::Benchmark::Result reference_activation_performance
-{
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    return result;
+}
 
-unity::scopes::testing::Benchmark::Result reference_action_performance
+unity::scopes::testing::Benchmark::Result reference_preview_performance()
 {
-    dont_care,
-    {std::chrono::microseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = std::chrono::milliseconds{500};
+    result.timing.std_dev = std::chrono::microseconds{dont_care};
+
+    return result;
+}
+
+unity::scopes::testing::Benchmark::Result reference_activation_performance()
+{
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = std::chrono::milliseconds{500};
+    result.timing.std_dev = std::chrono::microseconds{dont_care};
+
+    return result;
+}
+
+unity::scopes::testing::Benchmark::Result reference_action_performance()
+{
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = std::chrono::milliseconds{500};
+    result.timing.std_dev = std::chrono::microseconds{dont_care};
+
+    return result;
+}
 
 }
 
@@ -78,22 +93,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::QueryConfiguration config
+    unity::scopes::testing::Benchmark::QueryConfiguration config;
+    config.sampler = [query, meta_data]()
     {
-        [query, meta_data]() { return std::make_pair(query, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(query, meta_data);
     };
 
     auto result = benchmark.for_query(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_query_performance,
+                reference_query_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -111,22 +120,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    unity::scopes::testing::Benchmark::PreviewConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_preview(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance,
+                reference_preview_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -144,22 +147,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    unity::scopes::testing::Benchmark::ActivationConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_activation(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance,
+                reference_activation_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -179,22 +176,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
     static const std::string widget_id{"does.not.exist.widget"};
     static const std::string action_id{"does.not.exist.action"};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActionConfiguration config
+    unity::scopes::testing::Benchmark::ActionConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_tuple(search_result, meta_data, widget_id, action_id);
     };
 
     auto result = benchmark.for_action(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance,
+                reference_action_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -214,22 +205,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::QueryConfiguration config
+    unity::scopes::testing::Benchmark::QueryConfiguration config;
+    config.sampler = [query, meta_data]()
     {
-        [query, meta_data]() { return std::make_pair(query, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(query, meta_data);
     };
 
     auto result = benchmark.for_query(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_query_performance,
+                reference_query_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -247,22 +232,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    unity::scopes::testing::Benchmark::PreviewConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_preview(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance,
+                reference_preview_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -280,22 +259,22 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    unity::scopes::testing::Benchmark::ActivationConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
+
+    config.trial_configuration.statistics_configuration.histogram_bin_count = 20;
 
     auto result = benchmark.for_activation(scope, config);
 
+    std::ofstream out("histogram.txt");
+    for (const auto& bin : result.timing.histogram)
+        out << bin.first.count() << " " << bin.second << std::endl;
+
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance,
+                reference_activation_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
@@ -315,22 +294,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
     static const std::string widget_id{"does.not.exist.widget"};
     static const std::string action_id{"does.not.exist.action"};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActionConfiguration config
+    unity::scopes::testing::Benchmark::ActionConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_tuple(search_result, meta_data, widget_id, action_id);
     };
 
     auto result = benchmark.for_action(scope, config);
 
     auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance,
+                reference_action_performance(),
                 result);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,

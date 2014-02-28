@@ -30,8 +30,9 @@
 #include <core/posix/fork.h>
 
 #include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/density.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
 #include <atomic>
@@ -172,17 +173,48 @@ typedef acc::accumulator_set<
     Resolution::rep,
     acc::stats<
         acc::tag::count,
+        acc::tag::density,
         acc::tag::mean,
         acc::tag::variance
     >
 > Statistics;
+
+void fill_results_from_statistics(unity::scopes::testing::Benchmark::Result& result,
+                                  const Statistics& stats)
+{
+    result.sample_size = acc::count(stats);
+
+    auto histogram = acc::density(stats);
+
+    for (const auto& bin : histogram)
+    {
+        result.timing.histogram.push_back(
+                    std::make_pair(
+                        std::chrono::microseconds(static_cast<Resolution::rep>(bin.first)),
+                        bin.second));
+    }
+
+    result.timing.mean = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::mean(stats))
+    };
+    result.timing.std_dev = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
+    };
+}
 }
 
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::QueryConfiguration config)
 {
-    Statistics stats;
+    Statistics stats(
+                acc::tag::density::num_bins = config.trial_configuration.statistics_configuration.histogram_bin_count,
+                acc::tag::density::cache_size = 10);
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.timing.sample.resize(config.trial_configuration.trial_count);
 
     for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
@@ -206,28 +238,25 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
         }
         auto after = Clock::now();
 
-        stats(std::chrono::duration_cast<Resolution>(after - before).count());
+        auto duration = std::chrono::duration_cast<Resolution>(after - before);
+        stats(duration.count());
+        benchmark_result.timing.sample[i] = duration;
     }
 
-    unity::scopes::testing::Benchmark::Result result;
-    result.sample_size = acc::count(stats);
-    result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
-
-    return result;
+    fill_results_from_statistics(benchmark_result, stats);
+    return benchmark_result;
 }
 
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_preview(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::PreviewConfiguration config)
 {
-    Statistics stats;
+    Statistics stats(
+                acc::tag::density::num_bins = config.trial_configuration.statistics_configuration.histogram_bin_count,
+                acc::tag::density::cache_size = 10);
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.timing.sample.resize(config.trial_configuration.trial_count);
 
     for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
@@ -251,20 +280,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
             }
             auto after = Clock::now();
 
-            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+            auto duration = std::chrono::duration_cast<Resolution>(after - before);
+            stats(duration.count());
+            benchmark_result.timing.sample[i] = duration;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
-
+    fill_results_from_statistics(benchmark_result, stats);
     return benchmark_result;
 }
 
@@ -272,7 +293,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::ActivationConfiguration config)
 {
-    Statistics stats;
+    Statistics stats(
+                acc::tag::density::num_bins = config.trial_configuration.statistics_configuration.histogram_bin_count,
+                acc::tag::density::cache_size = 10);
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.timing.sample.resize(config.trial_configuration.trial_count);
 
     for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
@@ -284,20 +310,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
             }
             auto after = Clock::now();
 
-            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+            auto duration = std::chrono::duration_cast<Resolution>(after - before);
+            stats(duration.count());
+            benchmark_result.timing.sample[i] = duration;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
-
+    fill_results_from_statistics(benchmark_result, stats);
     return benchmark_result;
 }
 
@@ -305,7 +323,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::ActionConfiguration config)
 {
-    Statistics stats;
+    Statistics stats(
+                acc::tag::density::num_bins = config.trial_configuration.statistics_configuration.histogram_bin_count,
+                acc::tag::density::cache_size = 10);
+
+    unity::scopes::testing::Benchmark::Result benchmark_result;
+    benchmark_result.timing.sample.resize(config.trial_configuration.trial_count);
 
     for (unsigned int i = 0; i < config.trial_configuration.trial_count; i++)
     {
@@ -320,19 +343,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
             }
             auto after = Clock::now();
 
-            stats(std::chrono::duration_cast<Resolution>(after - before).count());
+            auto duration = std::chrono::duration_cast<Resolution>(after - before);
+            stats(duration.count());
+            benchmark_result.timing.sample[i] = duration;
     }
 
-    unity::scopes::testing::Benchmark::Result benchmark_result;
-    benchmark_result.sample_size = acc::count(stats);
-    benchmark_result.time.mean = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(acc::mean(stats))
-    };
-    benchmark_result.time.std_dev = std::chrono::microseconds
-    {
-        static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
-    };
+    fill_results_from_statistics(benchmark_result, stats);
 
     return benchmark_result;
 }
