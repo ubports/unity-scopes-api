@@ -66,8 +66,12 @@ template<class Archive>
 void serialize(Archive & ar, unity::scopes::testing::Benchmark::Result& result, const unsigned int)
 {
     ar & boost::serialization::make_nvp("sample_size", result.sample_size);
+    ar & boost::serialization::make_nvp("timing.min", result.timing.min);
+    ar & boost::serialization::make_nvp("timing.max", result.timing.max);
     ar & boost::serialization::make_nvp("timing.mean", result.timing.mean);
     ar & boost::serialization::make_nvp("timing.std_dev", result.timing.std_dev);
+    ar & boost::serialization::make_nvp("timing.kurtosis", result.timing.kurtosis);
+    ar & boost::serialization::make_nvp("timing.skewness", result.timing.skewness);
     ar & boost::serialization::make_nvp("timing.sample", result.timing.sample);
     ar & boost::serialization::make_nvp("timing.histogram", result.timing.histogram);
 }
@@ -127,7 +131,8 @@ bool unity::scopes::testing::operator==(const unity::scopes::testing::Benchmark:
     return lhs.sample_size == rhs.sample_size &&
             lhs.timing.mean == rhs.timing.mean &&
             lhs.timing.std_dev == rhs.timing.std_dev &&
-            lhs.timing.sample == rhs.timing.sample;
+            lhs.timing.sample == rhs.timing.sample &&
+            lhs.timing.histogram == rhs.timing.histogram;
 }
 
 std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity::scopes::testing::Benchmark::Result& result)

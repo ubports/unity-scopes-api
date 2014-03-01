@@ -19,6 +19,7 @@
 #include <unity/scopes/testing/Statistics.h>
 
 #include <boost/math/distributions/students_t.hpp>
+#include <boost/math/special_functions/pow.hpp>
 
 #include <cmath>
 
@@ -32,7 +33,9 @@ unity::scopes::testing::StudentsTTest::Result unity::scopes::testing::StudentsTT
 {
     double difference_of_means = reference.timing.mean.count() - sample.timing.mean.count();
     std::size_t degrees_of_freedom = sample.sample_size - 1;
-    double t_statistics = difference_of_means * std::sqrt(static_cast<double>(sample.sample_size)) / sample.timing.std_dev.count();
+    double t_statistics =
+            difference_of_means *
+            std::sqrt(static_cast<double>(sample.sample_size)) / math::pow<2>(sample.timing.std_dev.count());
 
     math::students_t_distribution<> dist(degrees_of_freedom);
 

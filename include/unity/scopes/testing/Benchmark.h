@@ -56,20 +56,50 @@ public:
         /** Timing characteristics captured during the benchmark run. */
         struct Timing
         {
+            /** Minimum execution time for the benchmarked operation. */
+            std::chrono::microseconds min{std::chrono::microseconds::min()};
+            /** Maximum execution time for the benchmarked operation. */
+            std::chrono::microseconds max{std::chrono::microseconds::min()};
             /** Mean execution time for the benchmarked operation. */
             std::chrono::microseconds mean{std::chrono::microseconds::min()};
             /** Std. deviation in execution time for the benchmarked operation. */
             std::chrono::microseconds std_dev{std::chrono::microseconds::min()};
+            /** Kurtosis in execution time for the benchmarked operation. */
+            std::chrono::microseconds kurtosis{std::chrono::microseconds::min()};
+            /** Skewness in execution time for the benchmarked operation. */
+            std::chrono::microseconds skewness{std::chrono::microseconds::min()};
             /** Histogram of measured execution times for the benchmarked operation. */
             std::vector<std::pair<std::chrono::microseconds, double>> histogram{};
             /** Raw sample vector, with sample.size() == sample_size */
             std::vector<std::chrono::microseconds> sample{};
         } timing{};
 
+        /**
+         * \brief load_from restores a result from the given input stream.
+         * \throw std::runtime_error in case of issues.
+         * \param in The stream to read from.
+         */
         void load_from(std::istream& in);
+
+        /**
+         * \brief save_to stores a result to the given output stream.
+         * \throw std::runtime_error in case of issues.
+         * \param out The stream to write to.
+         */
         void save_to(std::ostream& out);
 
+        /**
+         * \brief load_from_xml restores a result stored as xml from the given input stream.
+         * \throw std::runtime_error in case of issues.
+         * \param in The stream to read from.
+         */
         void load_from_xml(std::istream& in);
+
+        /**
+         * \brief save_to_xml stores a result as xml to the given output stream.
+         * \throw std::runtime_error in case of issues.
+         * \param out The stream to write to.
+         */
         void save_to_xml(std::ostream& out);
     };
 

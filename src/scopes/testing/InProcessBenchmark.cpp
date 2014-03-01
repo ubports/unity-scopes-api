@@ -31,7 +31,11 @@
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/density.hpp>
+#include <boost/accumulators/statistics/kurtosis.hpp>
+#include <boost/accumulators/statistics/max.hpp>
+#include <boost/accumulators/statistics/min.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/skewness.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
@@ -174,7 +178,11 @@ typedef acc::accumulator_set<
     acc::stats<
         acc::tag::count,
         acc::tag::density,
+        acc::tag::min,
+        acc::tag::max,
         acc::tag::mean,
+        acc::tag::kurtosis,
+        acc::tag::skewness,
         acc::tag::variance
     >
 > Statistics;
@@ -194,6 +202,22 @@ void fill_results_from_statistics(unity::scopes::testing::Benchmark::Result& res
                         bin.second));
     }
 
+    result.timing.min = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::min(stats))
+    };
+    result.timing.max = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::max(stats))
+    };
+    result.timing.kurtosis = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::kurtosis(stats))
+    };
+    result.timing.skewness = std::chrono::microseconds
+    {
+        static_cast<Resolution::rep>(acc::skewness(stats))
+    };
     result.timing.mean = std::chrono::microseconds
     {
         static_cast<Resolution::rep>(acc::mean(stats))
