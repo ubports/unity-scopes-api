@@ -42,7 +42,7 @@ class ReplyImpl;
 }
 
 /**
-\brief Reply allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a query to be sent to the source of the query.
 */
 
 class PreviewReply : public virtual PreviewReplyBase, public Reply

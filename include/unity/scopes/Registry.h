@@ -39,7 +39,7 @@ class RegistryImpl;
 }
 
 /**
-\brief RegistryProxy provides access to the available scopes.
+\brief White pages service for available scopes.
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
