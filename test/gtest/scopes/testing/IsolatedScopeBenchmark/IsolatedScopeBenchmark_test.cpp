@@ -37,8 +37,8 @@
 
 namespace
 {
-std::chrono::milliseconds mean{100};
-std::chrono::milliseconds variance{10};
+std::chrono::milliseconds mean{10};
+std::chrono::milliseconds variance{1};
 }
 
 namespace unity
@@ -185,6 +185,8 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 
     auto result = benchmark.for_query(scope, config);
 
+    // We store the potential new reference such that we can copy over if
+    // the last test fails.
     std::ofstream out{"ref.xml"};
     result.save_to_xml(out);
 
