@@ -131,47 +131,76 @@ Sample a_uniformly_distributed_sample(std::size_t size)
 
 }
 
-TEST(StudentsTTest, eq_is_detected_correctly)
+TEST(StudentsTTestOneSample, eq_is_detected_correctly)
+{
+    auto r1 = a_normally_distributed_sample(10000, 0, 1);
+
+    auto result = unity::scopes::testing::StudentsTTest().one_sample(r1, 0., 1.);
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
+              result.both_means_are_equal(::testing::alpha));
+}
+
+TEST(StudentsTTestOneSample, lt_is_detected_correctly)
+{
+    auto r1 = a_normally_distributed_sample(10000, 0, 1);
+
+    auto result = unity::scopes::testing::StudentsTTest().one_sample(r1, 2., 1.);
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              result.both_means_are_equal(::testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
+              result.sample1_mean_lt_sample2_mean(::testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              result.sample1_mean_gt_sample2_mean(::testing::alpha));
+}
+
+TEST(StudentsTTestOneSample, gt_is_detected_correctly)
+{
+    auto r1 = a_normally_distributed_sample(10000, 2, 1);
+
+    auto result = unity::scopes::testing::StudentsTTest().one_sample(r1, 0., 1.);
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              result.both_means_are_equal(::testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              result.sample1_mean_lt_sample2_mean(::testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
+              result.sample1_mean_gt_sample2_mean(::testing::alpha));
+}
+TEST(StudentsTTestTwoSample, eq_is_detected_correctly)
 {
     auto r1 = a_normally_distributed_sample(10000, 0, 1);
     auto r2 = a_normally_distributed_sample(10000, 0, 1);
 
     auto result = unity::scopes::testing::StudentsTTest().two_independent_samples(r1, r2);
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              result.both_means_are_equal(0.05));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.sample1_mean_lt_sample2_mean(0.05));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.sample1_mean_gt_sample2_mean(0.05));
-
+              result.both_means_are_equal(::testing::alpha));
 }
 
-TEST(StudentsTTest, lt_is_detected_correctly)
+TEST(StudentsTTestTwoSample, lt_is_detected_correctly)
 {
     auto r1 = a_normally_distributed_sample(10000, 0, 1);
     auto r2 = a_normally_distributed_sample(10000, 2, 1);
 
     auto result = unity::scopes::testing::StudentsTTest().two_independent_samples(r1, r2);
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.both_means_are_equal(0.05));
+              result.both_means_are_equal(::testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              result.sample1_mean_lt_sample2_mean(0.05));
+              result.sample1_mean_lt_sample2_mean(::testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.sample1_mean_gt_sample2_mean(0.05));
+              result.sample1_mean_gt_sample2_mean(::testing::alpha));
 }
 
-TEST(StudentsTTest, gt_is_detected_correctly)
+TEST(StudentsTTestTwoSample, gt_is_detected_correctly)
 {
     auto r1 = a_normally_distributed_sample(10000, 2, 1);
     auto r2 = a_normally_distributed_sample(10000, 0, 1);
 
     auto result = unity::scopes::testing::StudentsTTest().two_independent_samples(r1, r2);
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.both_means_are_equal(0.05));
+              result.both_means_are_equal(::testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              result.sample1_mean_lt_sample2_mean(0.05));
+              result.sample1_mean_lt_sample2_mean(::testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              result.sample1_mean_gt_sample2_mean(0.05));
+              result.sample1_mean_gt_sample2_mean(::testing::alpha));
 }
 
 TEST(AndersonDarlingTest, responds_with_not_rejected_for_data_from_normal_distribution)

@@ -26,7 +26,7 @@ namespace testing
 
 double parse_double_from_cmake_variable()
 {
-    std::stringstream ss{"@UNITY_SCOPES_API_BENCHMARKING_TEST_CONFIDENCE_LEVEL@"};
+    std::stringstream ss{"@STATISTICS_TEST_CONFIDENCE_LEVEL@"};
     double result; ss >> result;
     return result;
 }
@@ -36,10 +36,6 @@ const double alpha
     parse_double_from_cmake_variable()
 };
 
-constexpr const char* reference_result_file
-{
-    "@CMAKE_CURRENT_SOURCE_DIR@/reference_result.xml"
-};
 } // namespace testing
 
 #endif

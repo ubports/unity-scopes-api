@@ -87,6 +87,43 @@ unity::scopes::testing::AndersonDarlingTest::for_normality(
     };
 }
 
+unity::scopes::testing::StudentsTTest::Result unity::scopes::testing::StudentsTTest::one_sample(
+        const unity::scopes::testing::Sample& sample,
+        unity::scopes::testing::Sample::ValueType mean,
+        unity::scopes::testing::Sample::ValueType std_dev)
+{
+    double t = (sample.get_mean() - mean) * std::sqrt(sample.get_size()) / std_dev;
+    std::size_t df = sample.get_size() - 1;
+
+    std::cout << t << std::endl;
+    std::cout << df << std::endl;
+
+    math::students_t_distribution<> dist(df);
+
+    return unity::scopes::testing::StudentsTTest::Result
+    {
+        t,
+        [=](double alpha)
+        {
+            return math::cdf(math::complement(dist, std::fabs(t))) < alpha / 2. ?
+                        unity::scopes::testing::HypothesisStatus::rejected :
+                        unity::scopes::testing::HypothesisStatus::not_rejected;
+        },
+        [=](double alpha)
+        {
+            return math::cdf(dist, t) < alpha ?
+                        unity::scopes::testing::HypothesisStatus::not_rejected :
+                        unity::scopes::testing::HypothesisStatus::rejected;
+        },
+        [=](double alpha)
+        {
+            return math::cdf(math::complement(dist, t)) < alpha ?
+                        unity::scopes::testing::HypothesisStatus::not_rejected :
+                        unity::scopes::testing::HypothesisStatus::rejected;
+        },
+    };
+}
+
 unity::scopes::testing::StudentsTTest::Result unity::scopes::testing::StudentsTTest::two_independent_samples(
         const unity::scopes::testing::Sample& reference,
         const unity::scopes::testing::Sample& sample)

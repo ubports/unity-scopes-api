@@ -178,7 +178,19 @@ struct StudentsTTest
     };
 
     /**
-     * \brief one_sample calculates the Student's T test for two samples
+     * \brief one_sample calculates the Student's T test for one sample and a known mean and std. dev..
+     * \param sample Sample of values.
+     * \param mean The known mean of the underlying distribution
+     * \param std_dev The known std. dev. of the underlying distribution
+     * \return
+     */
+    Result one_sample(
+            const Sample& sample,
+            Sample::ValueType mean,
+            Sample::ValueType std_dev);
+
+    /**
+     * \brief two_independent_samples calculates the Student's T test for two samples
      * \param sample1 The first sample
      * \param sample2 The second sample
      * \return An instance of Result.
