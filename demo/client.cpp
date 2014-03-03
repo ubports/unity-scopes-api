@@ -314,6 +314,7 @@ private:
 void print_usage()
 {
     cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./client list" << endl;
     cerr << "For example: ./client scope-B iron" << endl;
     cerr << "         or: ./client scope-B iron activate 1" << endl;
     cerr << "         or: ./client scope-B iron preview 1" << endl;
@@ -329,15 +330,9 @@ enum class ResultOperation
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3)
-    {
-        print_usage();
-    }
-
-    string scope_id = argv[1];
-    string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
+    bool do_list = false;
 
     // poor man's getopt
     if (argc > 3)
@@ -364,12 +359,34 @@ int main(int argc, char* argv[])
             print_usage();
         }
     }
+    else if (argc == 2 && strcmp(argv[1], "list") == 0)
+    {
+        do_list = true;
+    }
+    else if (argc != 3)
+    {
+        print_usage();
+    }
 
     try
     {
         Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
-
         RegistryProxy r = rt->registry();
+
+        if (do_list)
+        {
+            cout << "Scopes:" << endl;
+            auto mmap = r->list();
+            for (auto meta: mmap)
+            {
+                cout << "\t" << meta.second.scope_id() << endl;
+            }
+            return 0;
+        }
+
+        string scope_id = argv[1];
+        string search_string = argv[2];
+
         auto meta = r->get_metadata(scope_id);
         cout << "Scope metadata:   " << endl;
         cout << "\tscope_id:       " << meta.scope_id() << endl;
@@ -453,7 +470,6 @@ int main(int argc, char* argv[])
             }
         }
     }
-
     catch (unity::Exception const& e)
     {
         cerr << e.to_string() << endl;
