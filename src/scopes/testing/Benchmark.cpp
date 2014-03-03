@@ -30,33 +30,53 @@
 
 #include <iostream>
 
+namespace
+{
+constexpr const char* name_for_seconds{"seconds"};
+}
+
 namespace boost
 {
 namespace serialization
 {
 template<class Archive>
-void load(Archive & ar, std::chrono::microseconds& duration, const unsigned int)
+void load(
+        Archive & ar,
+        unity::scopes::testing::Benchmark::Result::Timing::Seconds& duration,
+        const unsigned int)
 {
-    std::chrono::microseconds::rep value;
-    ar & boost::serialization::make_nvp("microseconds", value);
-    duration = std::chrono::microseconds{value};
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds::rep value;
+    ar & boost::serialization::make_nvp(name_for_seconds, value);
+    duration = unity::scopes::testing::Benchmark::Result::Timing::Seconds{value};
 }
 
 template<class Archive>
-void save(Archive & ar, const std::chrono::microseconds& duration, const unsigned int)
+void save(
+        Archive & ar,
+        const unity::scopes::testing::Benchmark::Result::Timing::Seconds& duration,
+        const unsigned int)
 {
-    std::chrono::microseconds::rep value = duration.count();
-    ar & boost::serialization::make_nvp("microseconds", value);
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds::rep value = duration.count();
+    ar & boost::serialization::make_nvp(name_for_seconds, value);
 }
 
 template<class Archive>
-void serialize(Archive & ar, std::chrono::microseconds& duration, const unsigned int version)
+void serialize(
+        Archive & ar,
+        unity::scopes::testing::Benchmark::Result::Timing::Seconds& duration,
+        const unsigned int version)
 {
     boost::serialization::split_free(ar, duration, version);
 }
 
 template<class Archive>
-void serialize(Archive & ar, std::pair<std::chrono::microseconds, double>& pair, const unsigned int)
+void serialize(
+        Archive & ar,
+        std::pair<
+            unity::scopes::testing::Benchmark::Result::Timing::Seconds,
+            double
+        >& pair,
+        const unsigned int)
 {
     ar & boost::serialization::make_nvp("first", pair.first);
     ar & boost::serialization::make_nvp("second", pair.second);
@@ -124,6 +144,27 @@ void unity::scopes::testing::Benchmark::Result::save_to(std::ostream& out)
     {
         throw std::runtime_error(std::string{"Benchmark::Result::write_to: "} + e.what());
     }
+}
+
+unity::scopes::testing::Sample::SizeType unity::scopes::testing::Benchmark::Result::Timing::get_size() const
+{
+   return sample.size();
+}
+
+unity::scopes::testing::Sample::ValueType unity::scopes::testing::Benchmark::Result::Timing::get_mean() const
+{
+   return mean.count();
+}
+
+unity::scopes::testing::Sample::ValueType unity::scopes::testing::Benchmark::Result::Timing::get_variance() const
+{
+   return std_dev.count() * std_dev.count();
+}
+
+void unity::scopes::testing::Benchmark::Result::Timing::enumerate(const unity::scopes::testing::Sample::Enumerator& enumerator) const
+{
+   for (const auto& observation : sample)
+       enumerator(observation.count());
 }
 
 bool unity::scopes::testing::operator==(const unity::scopes::testing::Benchmark::Result& lhs, const unity::scopes::testing::Benchmark::Result& rhs)

@@ -171,7 +171,7 @@ struct DevNullSearchReply : public virtual unity::scopes::SearchReplyBase, publi
 };
 
 typedef std::chrono::high_resolution_clock Clock;
-typedef std::chrono::microseconds Resolution;
+typedef unity::scopes::testing::Benchmark::Result::Timing::Seconds Resolution;
 
 typedef acc::accumulator_set<
     Resolution::rep,
@@ -198,31 +198,31 @@ void fill_results_from_statistics(unity::scopes::testing::Benchmark::Result& res
     {
         result.timing.histogram.push_back(
                     std::make_pair(
-                        std::chrono::microseconds(static_cast<Resolution::rep>(bin.first)),
+                        Resolution(bin.first),
                         bin.second));
     }
 
-    result.timing.min = std::chrono::microseconds
+    result.timing.min = Resolution
     {
         static_cast<Resolution::rep>(acc::min(stats))
     };
-    result.timing.max = std::chrono::microseconds
+    result.timing.max = Resolution
     {
         static_cast<Resolution::rep>(acc::max(stats))
     };
-    result.timing.kurtosis = std::chrono::microseconds
+    result.timing.kurtosis = Resolution
     {
         static_cast<Resolution::rep>(acc::kurtosis(stats))
     };
-    result.timing.skewness = std::chrono::microseconds
+    result.timing.skewness = Resolution
     {
         static_cast<Resolution::rep>(acc::skewness(stats))
     };
-    result.timing.mean = std::chrono::microseconds
+    result.timing.mean = Resolution
     {
         static_cast<Resolution::rep>(acc::mean(stats))
     };
-    result.timing.std_dev = std::chrono::microseconds
+    result.timing.std_dev = Resolution
     {
         static_cast<Resolution::rep>(std::sqrt(acc::variance(stats)))
     };

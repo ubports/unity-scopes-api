@@ -33,6 +33,36 @@
 
 #include <cstdio>
 #include <fstream>
+#include <random>
+
+namespace
+{
+std::chrono::milliseconds mean{100};
+std::chrono::milliseconds variance{10};
+}
+
+namespace unity
+{
+namespace scopes
+{
+namespace testing
+{
+template<>
+struct ScopeTraits<::testing::Scope>
+{
+    inline static const char* name()
+    {
+        return "BenchmarkingScope";
+    }
+
+    inline static std::shared_ptr<::testing::Scope> construct()
+    {
+        return std::make_shared<::testing::Scope>(mean, variance);
+    }
+};
+}
+}
+}
 
 namespace
 {
@@ -49,8 +79,8 @@ static const std::size_t dont_care{0};
 unity::scopes::testing::Benchmark::Result reference_query_performance()
 {
     unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = std::chrono::milliseconds{500};
-    result.timing.std_dev = std::chrono::microseconds{dont_care};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
 
     return result;
 }
@@ -58,8 +88,8 @@ unity::scopes::testing::Benchmark::Result reference_query_performance()
 unity::scopes::testing::Benchmark::Result reference_preview_performance()
 {
     unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = std::chrono::milliseconds{500};
-    result.timing.std_dev = std::chrono::microseconds{dont_care};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
 
     return result;
 }
@@ -67,8 +97,8 @@ unity::scopes::testing::Benchmark::Result reference_preview_performance()
 unity::scopes::testing::Benchmark::Result reference_activation_performance()
 {
     unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = std::chrono::milliseconds{500};
-    result.timing.std_dev = std::chrono::microseconds{dont_care};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
 
     return result;
 }
@@ -76,8 +106,8 @@ unity::scopes::testing::Benchmark::Result reference_activation_performance()
 unity::scopes::testing::Benchmark::Result reference_action_performance()
 {
     unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = std::chrono::milliseconds{500};
-    result.timing.std_dev = std::chrono::microseconds{dont_care};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
 
     return result;
 }
@@ -155,16 +185,31 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 
     auto result = benchmark.for_query(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_result,
-                result);
+    std::ofstream out{"ref.xml"};
+    result.save_to_xml(out);
 
+    // We first check that our normality assumption of the data is valid
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
+              unity::scopes::testing::AndersonDarlingTest()
+              .for_normality(result.timing)
+              .data_fits_normal_distribution(
+                  unity::scopes::testing::Confidence::zero_point_five_percent));
+
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_result.timing,
+                result.timing);
+
+    // We work under the hypothesis that changes to the code did not result
+    // in a change in performance characteristics.
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
+              test_result.both_means_are_equal(testing::alpha));
+    // And we certainly don't want to get worse
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    // If changes significantly improved the performance, we fail the test to
+    // make sure that we adjust the performance baselines.
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works)
@@ -182,16 +227,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
 
     auto result = benchmark.for_preview(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_preview_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
@@ -209,16 +254,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
 
     auto result = benchmark.for_activation(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_activation_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
@@ -238,16 +283,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
 
     auto result = benchmark.for_action(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_action_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
@@ -267,16 +312,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
 
     auto result = benchmark.for_query(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_query_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_query_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
@@ -294,16 +339,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
 
     auto result = benchmark.for_preview(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_preview_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
@@ -327,16 +372,16 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     for (const auto& bin : result.timing.histogram)
         out << bin.first.count() << " " << bin.second << std::endl;
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_activation_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
@@ -356,14 +401,14 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
 
     auto result = benchmark.for_action(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance(),
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_action_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(testing::alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(testing::alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }

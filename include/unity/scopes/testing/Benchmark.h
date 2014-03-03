@@ -24,6 +24,8 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/SearchMetadata.h>
 
+#include <unity/scopes/testing/Statistics.h>
+
 #include <chrono>
 #include <functional>
 #include <iosfwd>
@@ -54,25 +56,41 @@ public:
         /** Size of the sample, corresponds to number of trials. */
         std::size_t sample_size{0};
         /** Timing characteristics captured during the benchmark run. */
-        struct Timing
+        struct Timing : public Sample
         {
+            /** All timing-based results are measures in fractional seconds. */
+            typedef std::chrono::duration<double> Seconds;
+
+            Timing() = default;
+            Timing(const Timing&) = default;
+            Timing(Timing&&) = default;
+
+             /** Query the size of the sample. */
+            Sample::SizeType get_size() const;
+            /** Query the empirical mean of the sample. */
+            inline Sample::ValueType get_mean() const;
+            /** Query the empirical variance of the sample. */
+            inline Sample::ValueType get_variance() const;
+            /** Enumerate all raw observations from the sample. */
+            inline void enumerate(const Sample::Enumerator& enumerator) const;
+
             /** Minimum execution time for the benchmarked operation. */
-            std::chrono::microseconds min{std::chrono::microseconds::min()};
+            Seconds min{Seconds::min()};
             /** Maximum execution time for the benchmarked operation. */
-            std::chrono::microseconds max{std::chrono::microseconds::min()};
+            Seconds max{Seconds::min()};
             /** Mean execution time for the benchmarked operation. */
-            std::chrono::microseconds mean{std::chrono::microseconds::min()};
+            Seconds mean{Seconds::min()};
             /** Std. deviation in execution time for the benchmarked operation. */
-            std::chrono::microseconds std_dev{std::chrono::microseconds::min()};
+            Seconds std_dev{Seconds::min()};
             /** Kurtosis in execution time for the benchmarked operation. */
-            std::chrono::microseconds kurtosis{std::chrono::microseconds::min()};
+            Seconds kurtosis{Seconds::min()};
             /** Skewness in execution time for the benchmarked operation. */
-            std::chrono::microseconds skewness{std::chrono::microseconds::min()};
+            Seconds skewness{Seconds::min()};
             /** Histogram of measured execution times for the benchmarked operation. */
-            std::vector<std::pair<std::chrono::microseconds, double>> histogram{};
+            std::vector<std::pair<Seconds, double>> histogram{};
             /** Raw sample vector, with sample.size() == sample_size */
-            std::vector<std::chrono::microseconds> sample{};
-        } timing{};
+            std::vector<Seconds> sample{};
+        } timing{}; ///< Runtime-specific sample data.
 
         /**
          * \brief load_from restores a result from the given input stream.
@@ -120,7 +138,7 @@ public:
     struct TrialConfiguration
     {
         /** The number of independent trials. Please note that the number should not be << 10 */
-        std::size_t trial_count{10};
+        std::size_t trial_count{25};
         /** Wait at most this time for one trial to finish or throw if a timeout is encountered. */
         std::chrono::microseconds per_trial_timeout{std::chrono::seconds{10}};
         /** Fold in statistics configuration into the overall trial setup. */
@@ -248,7 +266,7 @@ public:
      * \return An instance of Result.
      */
     virtual Result for_preview(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                               PreviewConfiguration preview_configuration) = 0;
+                               PreviewConfiguration configuration) = 0;
 
     /**
      * \brief for_preview executes a benchmark to measure the scope's activation performance.
@@ -259,7 +277,7 @@ public:
      * \return An instance of Result.
      */
     virtual Result for_activation(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                                  ActivationConfiguration activation_configuration) = 0;
+                                  ActivationConfiguration configuration) = 0;
 
     /**
      * \brief for_preview executes a benchmark to measure the scope's action activation performance.
@@ -270,7 +288,7 @@ public:
      * \return An instance of Result.
      */
     virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
-                              ActionConfiguration activation_configuration) = 0;
+                              ActionConfiguration configuration) = 0;
 
 protected:
     Benchmark() = default;

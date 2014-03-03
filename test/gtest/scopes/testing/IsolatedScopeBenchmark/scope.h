@@ -19,12 +19,17 @@
 
 #include <unity/scopes/ScopeBase.h>
 
+#include <chrono>
+#include <random>
+
 namespace testing
 {
 
 class Scope : public unity::scopes::ScopeBase
 {
 public:
+    Scope(const std::chrono::milliseconds& mean, const std::chrono::milliseconds& variance);
+
     int start(std::string const&, unity::scopes::RegistryProxy const &) override;
 
     void stop() override;
@@ -48,6 +53,10 @@ public:
     unity::scopes::PreviewQuery::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
+
+protected:
+    std::mt19937 gen;
+    std::normal_distribution<> normal;
 };
 
 } // namespace testing
