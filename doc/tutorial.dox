@@ -282,9 +282,9 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(std::string const& query, unity::scopes::VariantMap const&)
+unity::scopes::QueryBase::UPtr MyScope::search(std::string const& query, unity::scopes::SearchMetadata const&)
 {
-    QueryBase::UPtr q(new MyQuery(query, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
     return q;
 }
 
@@ -294,7 +294,7 @@ void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply)
 {
     auto category = reply->register_category("recommended", "Recommended", icon, "");
     SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
-    create_subquery(scope_to_query_, query_, VariantMap(), reply);
+    subsearch(scope_to_query_, query_, reply);
     ...
 }
 \endcode
