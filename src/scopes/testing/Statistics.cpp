@@ -95,9 +95,6 @@ unity::scopes::testing::StudentsTTest::Result unity::scopes::testing::StudentsTT
     double t = (sample.get_mean() - mean) * std::sqrt(sample.get_size()) / std_dev;
     std::size_t df = sample.get_size() - 1;
 
-    std::cout << t << std::endl;
-    std::cout << df << std::endl;
-
     math::students_t_distribution<> dist(df);
 
     return unity::scopes::testing::StudentsTTest::Result

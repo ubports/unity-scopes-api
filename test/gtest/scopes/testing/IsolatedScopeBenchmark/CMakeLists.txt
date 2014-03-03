@@ -1,5 +1,7 @@
+# Please adjust this value with extreme care.
+# It is common sense to keep the confidence level at 95%.
 set(
-  BENCHMARKING_TEST_CONFIDENCE_LEVEL 0.05
+  BENCHMARKING_TEST_CONFIDENCE_LEVEL 0.95
   CACHE STRING "Confidence level for statistical evaluation. The higher, the more likely the test will pass")
 
 configure_file(

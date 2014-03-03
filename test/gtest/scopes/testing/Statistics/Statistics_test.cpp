@@ -113,7 +113,7 @@ Sample a_normally_distributed_sample(std::size_t size, double mean = 0, double v
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    gen.seed();
+    gen.seed(42);
     std::normal_distribution<> normal(mean, variance);
 
     return a_sample_of_size(size, [&]() { return normal(gen); });
@@ -165,6 +165,7 @@ TEST(StudentsTTestOneSample, gt_is_detected_correctly)
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
               result.sample1_mean_gt_sample2_mean(::testing::alpha));
 }
+
 TEST(StudentsTTestTwoSample, eq_is_detected_correctly)
 {
     auto r1 = a_normally_distributed_sample(10000, 0, 1);

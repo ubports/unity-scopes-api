@@ -33,7 +33,7 @@ double parse_double_from_cmake_variable()
 
 const double alpha
 {
-    parse_double_from_cmake_variable()
+    1. - parse_double_from_cmake_variable()
 };
 
 } // namespace testing

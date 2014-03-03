@@ -61,9 +61,11 @@ public:
             /** All timing-based results are measures in fractional seconds. */
             typedef std::chrono::duration<double> Seconds;
 
+            /** \cond */
             Timing() = default;
             Timing(const Timing&) = default;
             Timing(Timing&&) = default;
+            /** \endcond */
 
              /** Query the size of the sample. */
             Sample::SizeType get_size() const;

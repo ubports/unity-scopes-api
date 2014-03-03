@@ -1,5 +1,5 @@
 set(
-  STATISTICS_TEST_CONFIDENCE_LEVEL 0.5
+  STATISTICS_TEST_CONFIDENCE_LEVEL 0.95
   CACHE STRING "Confidence level for statistical evaluation. The higher, the more likely the test will pass")
 
 configure_file(
