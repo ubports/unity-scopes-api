@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: James Henstridge <james.henstridge@canonical.com>
+ *              Thomas Voß <thomas.voss@canonical.com>
  */
 
 #include <unity/scopes/Category.h>
@@ -41,6 +42,7 @@ public:
 
     unity::scopes::ActivationResponse activate() override
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
         return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };
@@ -54,8 +56,6 @@ public:
 
     unity::scopes::ActivationResponse activate() override
     {
-        std::this_thread::sleep_for(std::chrono::seconds{2});
-
         return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };

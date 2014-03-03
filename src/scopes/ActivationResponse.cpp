@@ -36,6 +36,7 @@ ActivationResponse::ActivationResponse(Query const& query)
 {
 }
 
+/// @cond
 ActivationResponse::ActivationResponse(internal::ActivationResponseImpl* pimpl)
     : p(pimpl)
 {
@@ -60,6 +61,12 @@ ActivationResponse& ActivationResponse::operator=(ActivationResponse const& othe
 }
 
 ActivationResponse& ActivationResponse::operator=(ActivationResponse&&) = default;
+
+VariantMap ActivationResponse::serialize() const
+{
+    return p->serialize();
+}
+/// @endcond
 
 void ActivationResponse::setHints(VariantMap const& hints)
 {
@@ -89,11 +96,6 @@ Variant ActivationResponse::scope_data() const
 Query ActivationResponse::query() const
 {
     return p->query();
-}
-
-VariantMap ActivationResponse::serialize() const
-{
-    return p->serialize();
 }
 
 } // namespace scopes

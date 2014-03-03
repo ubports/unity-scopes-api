@@ -42,17 +42,40 @@ class QueryObject;
 
 } // namespace internal
 
-// Abstract server-side base interface for a query that is executed inside a scope.
+/**
+\brief Abstract base class to represent a particular preview.
 
-// TODO: documentation
+A scope must return an instance of this class from its implementation of ScopeBase::preview().
+
+\note The constructor of the instance must complete in a timely manner. Do not perform anything in the
+constructor that might block.
+*/
 
 class PreviewQuery: public QueryBase
 {
 public:
+    /// @cond
     NONCOPYABLE(PreviewQuery);
     UNITY_DEFINES_PTRS(PreviewQuery);
+    /// @endcond
 
-    /// Invoked when a PreviewQuery is run, use the provided proxy to push data
+    /**
+    \brief Called by scopes run time to start the preview.
+
+    Your implementation of run() can use the reply proxy to push results
+    for the preview. You can push results from within run(), in which case
+    the preview implicitly completes when run() returns. Alternatively,
+    run() can store the reply proxy and return immediately. In this
+    case, you can use the stored proxy to push results from another
+    thread. It is safe to call `push()` from multiple threads without
+    synchronization.
+
+    The preview completes either when run() returns, or when the
+    last stored reply proxy goes out of scope (whichever happens
+    last).
+
+    \param reply The proxy on which to push results for the preview.
+    */
     virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
 
     // TODO: Add a method for subpreview request?

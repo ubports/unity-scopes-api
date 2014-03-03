@@ -44,6 +44,7 @@ TEST(ScopeMetadataImpl, basic)
     mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
     mi->set_display_name("display_name");
     mi->set_description("description");
+    mi->set_author("author");
 
     // Keep a copy for tests below
     unique_ptr<ScopeMetadataImpl> mi2(new ScopeMetadataImpl(*mi));
@@ -55,6 +56,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("endpoint", m.proxy()->endpoint());
     EXPECT_EQ("display_name", m.display_name());
     EXPECT_EQ("description", m.description());
+    EXPECT_EQ("author", m.author());
 
     // Check that optional fields that are not set throw
     try
@@ -106,6 +108,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("endpoint", mi2->proxy()->endpoint());
     EXPECT_EQ("display_name", mi2->display_name());
     EXPECT_EQ("description", mi2->description());
+    EXPECT_EQ("author", mi2->author());
 
     // Set optional fields on copy.
     mi2->set_art("art");
@@ -130,6 +133,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "tmp scope_name"));
     ti->set_display_name("tmp display_name");
     ti->set_description("tmp description");
+    ti->set_author("tmp author");
     ti->set_art("tmp art");
     ti->set_icon("tmp icon");
     ti->set_search_hint("tmp search_hint");
@@ -144,6 +148,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp endpoint", ci.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", ci.display_name());
     EXPECT_EQ("tmp description", ci.description());
+    EXPECT_EQ("tmp author", ci.author());
     EXPECT_EQ("tmp art", ci.art());
     EXPECT_EQ("tmp icon", ci.icon());
     EXPECT_EQ("tmp search_hint", ci.search_hint());
@@ -158,6 +163,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp endpoint", m.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", m.display_name());
     EXPECT_EQ("tmp description", m.description());
+    EXPECT_EQ("tmp author", m.author());
     EXPECT_EQ("tmp art", m.art());
     EXPECT_EQ("tmp icon", m.icon());
     EXPECT_EQ("tmp search_hint", m.search_hint());
@@ -171,6 +177,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp endpoint", tmp.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", tmp.display_name());
     EXPECT_EQ("tmp description", tmp.description());
+    EXPECT_EQ("tmp author", tmp.author());
     EXPECT_EQ("tmp art", tmp.art());
     EXPECT_EQ("tmp icon", tmp.icon());
     EXPECT_EQ("tmp search_hint", tmp.search_hint());
@@ -184,6 +191,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp endpoint", tmp2.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", tmp2.display_name());
     EXPECT_EQ("tmp description", tmp2.description());
+    EXPECT_EQ("tmp author", tmp2.author());
     EXPECT_EQ("tmp art", tmp2.art());
     EXPECT_EQ("tmp icon", tmp2.icon());
     EXPECT_EQ("tmp search_hint", tmp2.search_hint());
@@ -202,6 +210,7 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
     mi->set_display_name("display_name");
     mi->set_description("description");
+    mi->set_author("author");
     mi->set_art("art");
     mi->set_icon("icon");
     mi->set_search_hint("search_hint");
@@ -211,10 +220,11 @@ TEST(ScopeMetadataImpl, serialize)
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(9u, var.size());
+    EXPECT_EQ(10u, var.size());
     EXPECT_EQ("scope_name", var["scope_name"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
+    EXPECT_EQ("author", var["author"].get_string());
     EXPECT_EQ("art", var["art"].get_string());
     EXPECT_EQ("icon", var["icon"].get_string());
     EXPECT_EQ("search_hint", var["search_hint"].get_string());
@@ -228,6 +238,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("endpoint", c.proxy()->endpoint());
     EXPECT_EQ("display_name", c.display_name());
     EXPECT_EQ("description", c.description());
+    EXPECT_EQ("author", c.author());
     EXPECT_EQ("art", c.art());
     EXPECT_EQ("icon", c.icon());
     EXPECT_EQ("search_hint", c.search_hint());
@@ -286,6 +297,18 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     catch (InvalidArgumentException const&e)
     {
         EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'description' is empty",
+                     e.what());
+    }
+
+    try
+    {
+        mi.set_description("description");
+        mi.serialize();
+        FAIL();
+    }
+    catch (InvalidArgumentException const&e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata: required attribute 'author' is empty",
                      e.what());
     }
 }
@@ -380,6 +403,19 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
                      e.what());
     }
     m["description"] = "description";
+    try
+    {
+        ScopeMetadataImpl mi(m, &mw);
+        mi.deserialize(m);
+        FAIL();
+    }
+    catch (InvalidArgumentException const&e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): required attribute "
+                     "'author' is missing",
+                     e.what());
+    }
+    m["author"] = "author";
 
     // Optional attributes
     m["art"] = "art";
@@ -394,6 +430,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_EQ("endpoint", mi.proxy()->endpoint());
     EXPECT_EQ("display_name", mi.display_name());
     EXPECT_EQ("description", mi.description());
+    EXPECT_EQ("author", mi.author());
     EXPECT_EQ("art", mi.art());
     EXPECT_EQ("icon", mi.icon());
     EXPECT_EQ("search_hint", mi.search_hint());

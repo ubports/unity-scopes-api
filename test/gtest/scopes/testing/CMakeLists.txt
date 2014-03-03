@@ -1,1 +1,4 @@
 add_subdirectory(IsolatedScope)
+if (${slowtests})
+    add_subdirectory(IsolatedScopeBenchmark)
+endif()

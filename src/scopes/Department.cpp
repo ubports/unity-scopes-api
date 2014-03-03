@@ -36,13 +36,14 @@ Department::Department(std::string const& department_id, Query const& query, std
 {
 }
 
-Department::Department(Department const& other)
-    : p(new internal::DepartmentImpl(*(other.p)))
+Department::Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
+    : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
 {
 }
 
-Department::Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
-    : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
+/// @cond
+Department::Department(Department const& other)
+    : p(new internal::DepartmentImpl(*(other.p)))
 {
 }
 
@@ -60,6 +61,13 @@ Department& Department::operator=(Department const& other)
 }
 
 Department& Department::operator=(Department&&) = default;
+
+VariantMap Department::serialize() const
+{
+    return p->serialize();
+}
+
+/// @endcond
 
 void Department::set_subdepartments(DepartmentList const& departments)
 {
@@ -84,11 +92,6 @@ Query Department::query() const
 DepartmentList Department::subdepartments() const
 {
     return p->subdepartments();
-}
-
-VariantMap Department::serialize() const
-{
-    return p->serialize();
 }
 
 } // namespace scopes

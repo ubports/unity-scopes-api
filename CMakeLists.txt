@@ -56,6 +56,7 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
+pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 find_program(LTTNG_EXECUTABLE lttng)
@@ -99,7 +100,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -139,9 +140,9 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-# These tests are slow, so make it possible not to run them
+# Some tests are slow, so make it possible not to run them
 # during day-to-day development.
-option(headertests "Check that headers compile cleanly" ON)
+option(slowtests "Run slow tests" ON)
 
 if (${Werror})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
@@ -216,6 +217,7 @@ endif()
 set(OTHER_LIBS
     ${OTHER_LIBS}
     ${JSONCPP_LDFLAGS}
+    ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}
@@ -380,8 +382,8 @@ else()
     endif()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
-                       COMMAND echo Doxygen warnings: `grep warning doxygen-warnings.txt | wc -l`
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
+                               ${PROJECT_SOURCE_DIR}/doc/tutorial.dox
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL

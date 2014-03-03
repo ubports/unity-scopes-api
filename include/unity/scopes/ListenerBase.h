@@ -55,6 +55,7 @@ public:
 
     /**
     \brief Indicates the cause of a call to finished().
+
     The Error enumerator indicates that a query terminated abnormally, for example,
     because a scope could not be reached over the network, a query terminated
     abnormally, or explicitly reported an error.
@@ -63,6 +64,7 @@ public:
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.
+
     Exceptions thrown from finished() are ignored.
     \param r Indicates the cause for the call to finished().
     \param error_message If r is set to Reason::Error, error_message contains further details.

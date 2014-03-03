@@ -40,7 +40,7 @@ The \link unity::scopes::ScopeBase::stop() stop\endlink method should release an
 documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
-The \link unity::scopes::SearchQuery::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
+The \link unity::scopes::ScopeBase::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
 \link unity::scopes::SearchQuery SearchQuery\endlink interface, e.g:
 
@@ -132,7 +132,7 @@ implementation of run method of \link unity::scopes::SearchQuery SearchQuery\end
 
 \subsection subquery Query another scopes via SearchQuery::create_subquery()
 
-To send search query to another scope, use \link unity::scope::SearchQuery create_subquery\endlink inside your implementation of SearchQuery.
+To send search query to another scope, use one of the `create_subquery()` overloads of \link unity::scopes::SearchQuery SearchQuery\endlink inside your implementation of SearchQuery.
 This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
 \link unity::scopes::SearchListener SearchListener\endlink interface. ScopeProxy can be obtained from unity::scopes::RegistryProxy and the right place to
 do this is in the implementation of \link unity::scopes::ScopeBase::start() start()\endlink method of \link unity::scopes::ScopeBase ScopeBase\endlink interface.

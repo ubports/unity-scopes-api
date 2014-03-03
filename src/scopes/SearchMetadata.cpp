@@ -25,11 +25,6 @@ namespace unity
 namespace scopes
 {
 
-SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
-    : QueryMetadata(impl)
-{
-}
-
 SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor)
     : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor))
 {
@@ -37,6 +32,12 @@ SearchMetadata::SearchMetadata(std::string const& locale, std::string const& for
 
 SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor)
     : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
+{
+}
+
+/// @cond
+SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
+    : QueryMetadata(impl)
 {
 }
 
@@ -58,9 +59,8 @@ SearchMetadata& SearchMetadata::operator=(SearchMetadata const &other)
 
 SearchMetadata& SearchMetadata::operator=(SearchMetadata&&) = default;
 
-SearchMetadata::~SearchMetadata()
-{
-}
+SearchMetadata::~SearchMetadata() = default;
+/// @endcond
 
 void SearchMetadata::set_cardinality(int cardinality)
 {

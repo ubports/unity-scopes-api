@@ -36,28 +36,37 @@ namespace scopes
 class PreviewReplyBase : public virtual ReplyBase
 {
 public:
-    virtual ~PreviewReplyBase() = default;
+    /// @cond
+    virtual ~PreviewReplyBase();
     PreviewReplyBase(PreviewReplyBase const&) = delete;
+    /// @endcond
 
     /**
      \brief Registers a list of column layouts for current preview.
-     Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
-     This method throws unity::LogicException if this constrains are violated.
+
+     Layouts need to be registered before pushing PreviewWidgetList, and must be
+     registered only once.
+     \return True if the query is still alive, false if the query failed or was cancelled.
+     \throws unity::LogicException register_layout() is called more than once.
      */
     virtual bool register_layout(ColumnLayoutList const& layouts) const = 0;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
+     \return True if the query is still alive, false if the query failed or was cancelled.
      */
     virtual bool push(PreviewWidgetList const& widget_list) const = 0;
 
     /**
      \brief Sends data for a preview widget attribute.
+     \return True if the query is still alive, false if the query failed or was cancelled.
      */
     virtual bool push(std::string const& key, Variant const& value) const = 0;
 
 protected:
-    PreviewReplyBase() = default;
+    /// @cond
+    PreviewReplyBase();
+    /// @endcond
 };
 
 } // namespace scopes

@@ -25,10 +25,19 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 FilterBase::FilterBase(internal::FilterBaseImpl *pimpl)
     : p(pimpl)
 {
 }
+
+VariantMap FilterBase::serialize() const
+{
+    return p->serialize();
+}
+
+FilterBase::~FilterBase() = default;
+/// @endcond
 
 std::string FilterBase::id() const
 {
@@ -39,13 +48,6 @@ std::string FilterBase::filter_type() const
 {
     return p->filter_type();
 }
-
-VariantMap FilterBase::serialize() const
-{
-    return p->serialize();
-}
-
-FilterBase::~FilterBase() = default;
 
 } // namespace scopes
 

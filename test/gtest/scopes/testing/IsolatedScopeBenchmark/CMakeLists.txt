@@ -1,0 +1,4 @@
+add_executable(IsolatedScopeBenchmark_test IsolatedScopeBenchmark_test.cpp scope.cpp)
+target_link_libraries(IsolatedScopeBenchmark_test ${TESTLIBS})
+
+add_test(IsolatedScopeBenchmark IsolatedScopeBenchmark_test)

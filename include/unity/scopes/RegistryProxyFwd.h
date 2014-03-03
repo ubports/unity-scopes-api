@@ -28,6 +28,9 @@ namespace scopes
 {
 
 class RegistryBase;
+/** \typedef RegistryProxy
+\brief Convenience type definition.
+*/
 typedef std::shared_ptr<RegistryBase> RegistryProxy;
 
 } // namespace scopes

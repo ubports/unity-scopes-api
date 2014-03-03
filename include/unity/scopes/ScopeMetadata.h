@@ -37,12 +37,19 @@ namespace testing
 class ScopeMetadataBuilder;
 } // namespace testing
 
+/**
+ \brief Holds scope attributes such as name, description, icon etc.
+ The information carried by ScopeMetadata comes from the .ini file of given scope (for local scopes)
+ or is fetched from the remote server (for scopes running on Smart Scopes Server).
+ Use unity::scopes::Registry to get ScopeMetadata for a specific scope or all scopes.
+ */
+
 class ScopeMetadata final
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(ScopeMetadata);
 
-    /// @cond
     ScopeMetadata(ScopeMetadata const& other);
     ScopeMetadata(ScopeMetadata&&);
     ~ScopeMetadata();
@@ -51,14 +58,64 @@ public:
     ScopeMetadata& operator=(ScopeMetadata&&);
     /// @endcond
 
+    /**
+     \brief Get the scope name.
+     \return The name of the scope.
+     */
     std::string scope_name() const;
+
+    /**
+     \brief Get the proxy object for this scope.
+     \return The scope proxy.
+     */
     ScopeProxy proxy() const;
+
+    /**
+     \brief Get the display name for this scope.
+     \return The scope display name.
+     */
     std::string display_name() const;   // localized
+
+    /**
+     \brief Get the description for this scope.
+     \return The scope description.
+     */
     std::string description() const;    // localized
+
+    /**
+     \brief Get the author for this scope.
+     \return The scope author.
+     */
+    std::string author() const;
+
+    /**
+     \brief Get the art for this scope.
+     \return The scope art.
+     */
     std::string art() const;            // optional
+
+    /**
+     \brief Get the icon for this scope.
+     \return The scope icon.
+    */
     std::string icon() const;           // optional
+
+    /**
+     \brief Get the search hint for this scope.
+     \return The search hint.
+    */
     std::string search_hint() const;    // localized, optional
+
+    /**
+     \brief Get the hot key for this scope.
+     \return The hot key.
+     */
     std::string hot_key() const;        // localized, optional
+
+    /**
+     \brief Check if this scope should be hidden in the Dash.
+     \return True if this scope is invisible.
+     */
     bool invisible() const;             // optional (default = false)
 
     /**

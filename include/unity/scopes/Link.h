@@ -55,14 +55,14 @@ public:
     /// @endcond
 
     /**
-     * \brief Returns label of this Link instance.
-     * \return a label
+     * \brief Returns the label of this Link instance.
+     * \return The label of this link instance.
      */
     std::string label() const;
 
     /**
      * \brief Returns a canned Query instance.
-     * \return a canned Query
+     * \return The canned Query.
      */
     Query query() const;
 

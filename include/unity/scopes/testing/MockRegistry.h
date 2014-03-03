@@ -32,6 +32,8 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 class MockRegistry : public RegistryBase
 {
 public:
@@ -41,6 +43,8 @@ public:
     MOCK_CONST_METHOD0(list, MetadataMap());
     MOCK_CONST_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
 };
+
+/// @endcond
 
 } // namespace testing
 

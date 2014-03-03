@@ -36,6 +36,8 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 template<typename Scope>
 struct ScopeTraits
 {
@@ -77,6 +79,8 @@ protected:
     unity::scopes::testing::MockRegistry registry;
     unity::scopes::RegistryProxy registry_proxy;
 };
+
+/// @endcond
 
 } // namespace testing
 

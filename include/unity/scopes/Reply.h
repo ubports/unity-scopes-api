@@ -35,12 +35,17 @@ class QueryObject;
 class ReplyImpl;
 }
 
+/**
+\brief Reply allows the results of a query to be sent to the source of the query.
+*/
+
 class Reply : public virtual ReplyBase, protected ObjectProxy
 {
 public:
 
     /**
     \brief Informs the source of a query that the query results are complete.
+
     Calling finished() informs the source of a query that the final result for the query
     was sent, that is, that the query is complete.
     The scope application code is responsible for calling finished() once it has sent the
@@ -53,6 +58,7 @@ public:
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
+
     Multiple calls to error() and calls to finished() after error() was called are ignored.
     \param ex An exception_ptr indicating the cause of the error. If ex is a `std::exception`,
               the return value of `what()` is made available to the query source. Otherwise,
@@ -62,18 +68,22 @@ public:
 
     /**
     \brief Destroys a Reply.
+
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
     ~Reply();
 
 protected:
+    /// @cond
     Reply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
     friend class internal::ReplyImpl;
 
     internal::ReplyImpl* fwd() const;
 
+    // TODO: This should be a member of the impl, not of the public class
     std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
                                                // forward cancellation.
+    /// @endcond
 };
 
 } // namespace scopes

@@ -114,6 +114,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
@@ -133,6 +134,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("dummy.scope", meta.scope_name());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 

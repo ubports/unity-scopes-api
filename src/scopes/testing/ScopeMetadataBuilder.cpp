@@ -13,7 +13,7 @@
  * You should have received a copy of the Lesser GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
 #include <unity/scopes/testing/ScopeMetadataBuilder.h>
@@ -23,6 +23,8 @@
 
 namespace internal = unity::scopes::internal;
 namespace testing = unity::scopes::testing;
+
+/// @cond
 
 struct testing::ScopeMetadataBuilder::Private
 {
@@ -125,3 +127,5 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
                 std::move(
                     std::unique_ptr<internal::ScopeMetadataImpl>{impl}));
 }
+
+/// @endcond

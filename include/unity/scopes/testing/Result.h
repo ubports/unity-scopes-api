@@ -30,15 +30,20 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 class Result : public unity::scopes::Result
 {
 public:
     Result();
 };
 
+/// @endcond
+
 } // namespace testing
 
 } // namespace scopes
 
 } // namespace unity
+
 #endif

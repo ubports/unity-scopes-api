@@ -34,6 +34,8 @@ namespace scopes
 namespace testing
 {
 
+/// @cond
+
 class MockSearchReply : public unity::scopes::SearchReplyBase
 {
 public:
@@ -56,6 +58,8 @@ public:
     MOCK_CONST_METHOD2(push, bool(Filters const&, FilterState const&));
     MOCK_CONST_METHOD1(register_annotation, bool(Annotation const& annotation));
 };
+
+/// @endcond
 
 } // namespace testing
 

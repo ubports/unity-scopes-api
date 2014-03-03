@@ -30,7 +30,9 @@ FilterOption::FilterOption(std::string const& id, std::string const& label)
 {
 }
 
+/// @cond
 FilterOption::~FilterOption() = default;
+/// @endcond
 
 std::string FilterOption::id() const
 {

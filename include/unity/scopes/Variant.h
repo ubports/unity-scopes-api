@@ -32,7 +32,15 @@ namespace scopes
 
 class Variant;
 
+/**
+ \typedef VariantMap
+ \brief A dictionary of (string, Variant) pairs.
+*/
 typedef std::map<std::string, Variant> VariantMap;
+
+/**
+ \brief An array of variants
+*/
 typedef std::vector<Variant> VariantArray;
 
 namespace internal
@@ -44,7 +52,7 @@ struct NullVariant;
 } // namespace internal
 
 /**
-\brief Simple variant class that can hold an integer, a boolean, a string, a double, a dictionary, an array or null value.
+\brief Simple variant class that can hold an integer, boolean, string, double, dictionary, array or null value.
 */
 
 class Variant final // LCOV_EXCL_LINE // lcov incorrectly reports this line as uncovered
@@ -53,14 +61,14 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Int, Bool, String, Double, Dict, Array, Null };
+    enum Type { Null, Int, Bool, String, Double, Dict, Array };
 
     /**@name Constructors and destructor
     */
     /**
     \brief The default constructor creates a Variant instance containing a null.
     */
-    Variant() noexcept;  // Makes an int variant
+    Variant() noexcept;
 
     /**
     \brief Creates a Variant instance that stores the supplied integer.
@@ -139,7 +147,8 @@ public:
     //@}
 
     /**@name Value accessors
-    \brief The accessor methods retrieve a value of the specified type.
+    The accessor methods retrieve a value of the specified type.
+
     If a Variant currently stores a value of different type, these methods throw `unity::LogicException`.
     */
     //{@
@@ -152,7 +161,7 @@ public:
 
     /**
     \brief Test if variant holds null value.
-    \return true if variant holds null.
+    \return True if variant holds null.
     */
     bool is_null() const;
     //@}
