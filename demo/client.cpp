@@ -335,24 +335,17 @@ int main(int argc, char* argv[])
     bool do_list = false;
 
     // poor man's getopt
-    if (argc > 3)
+    if (argc == 5)
     {
-        if (argc == 5)
+        if (strcmp(argv[3], "activate") == 0)
         {
-            if (strcmp(argv[3], "activate") == 0)
-            {
-                result_index = atoi(argv[4]);
-                result_op = ResultOperation::Activation;
-            }
-            else if (strcmp(argv[3], "preview") == 0)
-            {
-                result_index = atoi(argv[4]);
-                result_op = ResultOperation::Preview;
-            }
-            else
-            {
-                print_usage();
-            }
+            result_index = atoi(argv[4]);
+            result_op = ResultOperation::Activation;
+        }
+        else if (strcmp(argv[3], "preview") == 0)
+        {
+            result_index = atoi(argv[4]);
+            result_op = ResultOperation::Preview;
         }
         else
         {
