@@ -13,7 +13,7 @@ client (i.e. Unity Dash or another scope).
 \subsection scopebase Create a scope class that implements ScopeBase inteface.
 
 There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
-\link unity::scopes::ScopeBase::start() start\endlink and \link unity::scopes::ScopeBase::create_query() create_query\endlink  and
+\link unity::scopes::ScopeBase::start() start\endlink and unity::scopes::ScopeBase::search()  and
 unity::scopes::ScopeBase::preview() methods. 
 
 \code{.cpp}
@@ -23,12 +23,12 @@ public:
     virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override;
     virtual void stop() override;
     virtual void run() override;
-    virtual unity::scopes::SearchQuery::UPtr create_query(Query const& query, SearchMetadata const& metadata) override;
-    virtual unity::scopes::PreviewQuery::UPtr preview(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
+    virtual unity::scopes::SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override;
+    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
 }
 \endcode
 
-The \link unity::scopes::ScopeBase::start() start\endlink method must, at the very least return ScopeBase::VERSION, e.g.
+The \link unity::scopes::ScopeBase::start() start\endlink method must, at the very least return unity::scopes::ScopeBase::VERSION, e.g.
 
 \code{.cpp}
 int MyScope::start(string const&, unity::scopes::RegistryProxy const&)
@@ -43,25 +43,25 @@ is useful; for typical and simple cases the implementation of run can be an empt
 
 \subsection handlingsearch Handling search
 
-The \link unity::scopes::ScopeBase::create_query() create_query\endlink method of scope implementation is the entry point of every search - it receives
+The unity::scopes::ScopeBase::search() method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
-\link unity::scopes::SearchQuery SearchQuery\endlink interface, e.g:
+unity::scopes::SearchQueryBase interface, e.g:
 
 \code{.cpp}
-SearchQuery::UPtr MyScope::create_query(Query const& query, SearchMetadata const& metadata)
+SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
-    SearchQuery::UPtr q(new MyQuery(query));
+    SearchQueryBase::UPtr q(new MyQuery(query));
     return q;
 }
 \endcode
 
-\subsubsection querybase Create a query class that implements SearchQuery interface.
+\subsubsection querybase Create a query class that implements SearchQueryBase interface.
 
-The central and most important method that needs to be implemented in this interface is \link unity::scopes::SearchQuery run\endlink.
+The central and most important method that needs to be implemented in this interface is unity::scopes::SearchQueryBase::run().
 This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
 matching the query.
 
-The \link unity::scopes::SearchQuery run\endlink method gets passed an instance of SearchReplyProxy, which represents a receiver of query results. Please note
+The unity::scopes::SearchQueryBase::run() method gets passed an instance of SearchReplyProxy, which represents a receiver of query results. Please note
 that SearchReplyProxy is just a shared pointer for \link unity::scopes::SearchReply SearchReply\endlink object. The two most important
 methods of SearchReply object that every scope have to use are \link unity::scopes::SearchReply::register_category register_category\endlink
 and \link unity::scopes::SearchReply::push push\endlink.
@@ -112,25 +112,25 @@ class MyScope: public unity::scopes::ScopeBase
 {
 public:
     ...
-    virtual unity::scopes::PreviewQuery::UPtr preview(unitu::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
+    virtual unity::scopes::PreviewQueryBase::UPtr preview(unitu::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
     ...
 }
 \endcode
 
-This method must return an instance derived from unity::scopes::PreviewQuery. The implementation of unity::scopes::PreviewQuery interface is similar to
-unity::scopes::SearchQuery in that its central method is unity::scopes::PreviewQuery::run(). This method is responsible for gathering preview data (from
+This method must return an instance derived from unity::scopes::PreviewQueryBase. The implementation of unity::scopes::PreviewQueryBase interface is similar to
+unity::scopes::SearchQueryBase in that its central method is unity::scopes::PreviewQueryBase::run(). This method is responsible for gathering preview data (from
 local or remote sources) and passing it along with the definition of preview look to unity::scopes::PreviewReplyProxy (this is a pointer to
 unity::scopes::PreviewReplyBasel; the run() method receives a pointer to an instance of unity::scopes::PreviewReply).
 
 A preview consists of one or more preview widgets - these are the basic building blocks for previews, such as a header with a title and subtitle, an image, a
 gallery with multiple images, a list of audio tracks etc.; see unity::scopes::PreviewWidget for a detailed documentation and a list of supported widget types.
-So, the implementation of unity::scopes::PreviewQuery::run() needs to create and populate one or more instances of unity::scopes::PreviewWidget and push them to the
+So, the implementation of unity::scopes::PreviewQueryBase::run() needs to create and populate one or more instances of unity::scopes::PreviewWidget and push them to the
 client with unity::scopes::PreviewReply::push().
 
 Every unity::scopes::PreviewWidget has a unique identifier, a type name and a set of attributes determined by its type. For example, a widget of "image" type expects
 two attributes: "source", which should point to an image (an uri) and "zoomable" boolean flag, which determines if the image should be zoomable. Values of such
 attributes can either be specified directly, or they can reference values present already in the unity::scopes::Result instance, or pushed spearately during the
-execution of unity::scopes::PreviewQuery::run().
+execution of unity::scopes::PreviewQueryBase::run().
 
 Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute() method, e.g:
 
@@ -188,19 +188,19 @@ To handle activation of preview actions, scope needs to implement the following 
 \code{.cpp}
 class MyScope: public unity::scopes::ScopeBase
 {
-    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id) override
+    virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id) override
     ...
 }
 \endcode
 
 This method receives a widget identifier and action identifier that was activated. 
-This method needs to return an instance derived from unity::scopes::ActivationBase. The derived class needs to reimplement
-unity::scopes::ActivationBase::activate() method and put any activation logic in there. This method needs to respond with an instance of
+This method needs to return an instance derived from unity::scopes::ActivationQueryBase. The derived class needs to reimplement
+unity::scopes::ActivationQueryBase::activate() method and put any activation logic in there. This method needs to respond with an instance of
 unity::scopes::ActivationResponse, which informs the shell about status of activation and the expected behaviour of the UI. For example, activate() may request
 a new search query to be executed as follows:
 
 \code{.cpp}
-class MyActivation : public unity::scopes::ActivationBase
+class MyActivation : public unity::scopes::ActivationQueryBase
 {
     virtual unity::scopes::ActivationResponse activate() override
     {
@@ -225,7 +225,7 @@ unity::scopes::ScopeBase::activate() method:
 \code{.cpp}
 class MyScope : public ScopeBase
 {
-    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override;
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override;
     ...
 }
 \endcode
@@ -257,14 +257,14 @@ extern "C" {
 \section aggscope A simple aggregator scope which combines results from other scopes.
 
 Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
-implementation of run method of \link unity::scopes::SearchQuery SearchQuery\endlink and in the new class that has to implement
-\link unity::scopes::SearchListener SearchListener\endlink interface, which receives result from other scope(s).
+implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
+\link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
 
-\subsection subquery Query another scopes via SearchQuery::create_subquery()
+\subsection subquery Query another scopes via SearchQueryBase::subsearch()
 
-To send search query to another scope, use one of the `create_subquery()` overloads of \link unity::scopes::SearchQuery SearchQuery\endlink inside your implementation of SearchQuery.
+To send search query to another scope, use one of the `subsearch()` overloads of unity::scopes::SearchQueryBase inside your implementation of unity::scopes::SearchQueryBase.
 This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
-\link unity::scopes::SearchListener SearchListener\endlink interface. ScopeProxy can be obtained from unity::scopes::RegistryProxy and the right place to
+\link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface. ScopeProxy can be obtained from unity::scopes::RegistryProxy and the right place to
 do this is in the implementation of \link unity::scopes::ScopeBase::start() start()\endlink method of \link unity::scopes::ScopeBase ScopeBase\endlink interface.
 
 \code{.cpp}
@@ -273,7 +273,7 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
 {
     try
     {
-        scope_to_query_ = registry->find("scope-A"); // store the proxy for passing it further in create_query
+        scope_to_query_ = registry->find("scope-A"); // store the proxy for passing it further in search 
     }
     catch (NotFoundException const& e)
     {
@@ -282,7 +282,7 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::create_query(std::string const& query, unity::scopes::VariantMap const&)
+unity::scopes::QueryBase::UPtr MyScope::search(std::string const& query, unity::scopes::VariantMap const&)
 {
     QueryBase::UPtr q(new MyQuery(query, scope_to_query_));
     return q;
@@ -293,16 +293,16 @@ unity::scopes::QueryBase::UPtr MyScope::create_query(std::string const& query, u
 void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply) 
 {
     auto category = reply->register_category("recommended", "Recommended", icon, "");
-    SearchListener::SPtr reply(new MyReceiver(upstream_reply, category));
+    SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
     create_subquery(scope_to_query_, query_, VariantMap(), reply);
     ...
 }
 \endcode
 
-\subsubsection receiver Create a class that implements SearchListener interface
+\subsubsection receiver Create a class that implements SearchListenerBase interface
 
-The \link unity::scopes::SearchListener SearchListener\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
-implementation receive \link unity::scopes::SearchListener::push result items and categories\endlink returned by that query. A simple implementation of
+The \link unity::scopes::SearchListenerBase SearchListenerBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
+implementation receive \link unity::scopes::SearchListenerBase::push result items and categories\endlink returned by that query. A simple implementation of
 an aggregator scope may just register all categories it receives and push all received results upstream to the query originator, e.g.
 
 \code{.cpp}
@@ -312,7 +312,7 @@ virtual void push(Category::SCPtr category) override
     upstream_->register_category(category);
 }
 
-void MyReceiver::push(ResultItem result)
+void MyReceiver::push(CategorisedResult result)
 {
     upstream_->push(std::move(result));
 }
@@ -329,6 +329,35 @@ unity::scopes::ScopeBase for the scope that created results. Result activation w
 produced the result as long as it set interception flag for it. In other words, when aggreagor scope just forwards results (and makes only minor
 adjustements to them, such as category assignment), it is not involved in preview or activation handling at all.
 
-If, however, aggregator scope 
+If, however, aggregator scope changes attributes of results (or creates completely new results that "replace" received results), then some extra care needs to
+be taken:
+<ul>
+<li>if original scope should still handle preview (and activation) requests, then <b>aggregator has to store a copy of original result</b> in the modified (or brand
+new) result. This can be done with unity::scopes::Result::store method. Preview request for such result will automatically trigger a scope that created the most
+inner stored result, and that scope will receive the stored result. It will also do the same for activation as long as the original scope set interception flag
+on that result.
+
+\note Making substantial changes to received results and failing to store original results with them may result in unexpected behavior: a scope will
+suddenly receive a modified version of it and depending on the level of changes, it may or may not be able to correctly handle it.
+
+<li>if aggregator scope creates a completly new result that replaces original one, but doesn't store a copy of the original result, it is expected to handle
+preview (and potentially activation requests - if interception activation flag is set) - this is no different than for normal scopes, see \ref handlingpreview and \ref handlingactivation .
+</ul>
+
+Consider the following example of implementation of unity::scopes::SearchListenerBase interface that modifies results and stores their copies, so that original
+scope can handle previews and activation for them:
+
+\code{.cpp}
+void MyReceiver::push(CategorisedResult original_result)
+{
+    CategorisedResult result(agg_category); // agg_category is a category that aggregates all results from other scopes
+    result.set_uri(original_result.uri());
+    result.set_title(original_result.title() + "(aggregated)");
+    result.set_art(original_result.art());
+    result.store(original_result);
+
+    upstream_->push(std::move(result));
+}
+\endcode
 
 */
