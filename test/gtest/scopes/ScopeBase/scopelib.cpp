@@ -33,13 +33,13 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual unity::scopes::SearchQuery::UPtr create_query(unity::scopes::Query const&,
+    virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
             unity::scopes::SearchMetadata const&) override
     {
         return nullptr;
     }
 
-    virtual unity::scopes::PreviewQuery::UPtr preview(unity::scopes::Result const&,
+    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                    unity::scopes::ActionMetadata const&) override
     {
         return nullptr;

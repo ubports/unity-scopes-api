@@ -3,7 +3,7 @@ configure_file(scope-api-testconfig.h.in scope-api-testconfig.h @ONLY)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_subdirectory(gtest)
-if(${headertests})
+if(${slowtests})
   add_subdirectory(headers)
 endif()
 add_subdirectory(copyright)

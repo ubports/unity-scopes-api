@@ -40,8 +40,9 @@ public:
     // Remote operation implementation
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept = 0;
 
-    virtual void cancel(InvokeInfo const& info) = 0;                  // Called locally, by QueryCtrlObject
-    virtual bool pushable(InvokeInfo const& info) const noexcept = 0; // Called locally, by ReplyImpl
+    virtual void cancel(InvokeInfo const& info) = 0;                    // Called locally, by QueryCtrlObject
+    virtual bool pushable(InvokeInfo const& info) const noexcept = 0;   // Called locally, by ReplyImpl
+    virtual int cardinality(InvokeInfo const& info) const noexcept = 0; // Called locally, by ReplyImpl
 
     // Used to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.

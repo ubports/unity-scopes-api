@@ -30,7 +30,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::scopes::internal;
@@ -44,11 +43,16 @@ namespace scopes
 namespace internal
 {
 
-ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver,
+                                     RuntimeImpl const* runtime,
+                                     std::string const& scope_name,
+                                     int cardinality) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver),
     cat_registry_(new CategoryRegistry()),
-    runtime_(runtime)
+    runtime_(runtime),
+    cardinality_(cardinality),
+    num_pushes_(0)
 {
     assert(receiver_);
     assert(runtime);
@@ -58,7 +62,7 @@ ResultReplyObject::~ResultReplyObject()
 {
 }
 
-void ResultReplyObject::process_data(VariantMap const& data)
+bool ResultReplyObject::process_data(VariantMap const& data)
 {
     auto it = data.find("filters");
     if (it != data.end())
@@ -72,24 +76,12 @@ void ResultReplyObject::process_data(VariantMap const& data)
             {
                 filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
             }
-            try
-            {
-                auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
-                receiver_->push(filters, filter_state);
-            }
-            catch (std::exception const& e)
-            {
-                // TODO: log this
-                cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
-                finished(ListenerBase::Error, e.what());
-            }
+            auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
+            receiver_->push(filters, filter_state);
         }
         else
         {
-            // TODO: log this
-            const std::string msg("ReplyObject::push(): filters present but missing filter_state data");
-            cerr << msg << endl;
-            finished(ListenerBase::Error, msg);
+            throw InvalidArgumentException("ResultReplyObject::push(): filters present but missing filter_state data");
         }
     }
 
@@ -110,54 +102,46 @@ void ResultReplyObject::process_data(VariantMap const& data)
             departments.push_back(DepartmentImpl::create(dep.get_dict()));
         }
         it = data.find("current_department");
-        if (it == data.end())
+        if (it != data.end())
         {
+            receiver_->push(departments, it->second.get_string());
         }
-        receiver_->push(departments, it->second.get_string());
+        else
+        {
+            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
+        }
     }
 
     it = data.find("annotation");
     if (it != data.end())
     {
         auto result_var = it->second.get_dict();
-        try
-        {
-            Annotation annotation(new internal::AnnotationImpl(result_var));
-            receiver_->push(std::move(annotation));
-        }
-        catch (std::exception const& e)
-        {
-            // TODO: log this
-            cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
-            finished(ListenerBase::Error, e.what());
-        }
+        Annotation annotation(new internal::AnnotationImpl(result_var));
+        receiver_->push(std::move(annotation));
     }
 
     it = data.find("result");
     if (it != data.end())
     {
+        // Enforce cardinality limit.
+        if (cardinality_ != 0 && ++num_pushes_ > cardinality_)
+        {
+            return true;
+        }
         auto result_var = it->second.get_dict();
-        try
-        {
-            auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
+        auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
 
-            impl->set_runtime(runtime_);
-            // set result origin
-            if (impl->origin().empty())
-            {
-                impl->set_origin(origin_proxy());
-            }
-
-            CategorisedResult result(impl.release());
-            receiver_->push(std::move(result));
-        }
-        catch (std::exception const& e)
+        impl->set_runtime(runtime_);
+        // set result origin
+        if (impl->origin().empty())
         {
-            // TODO: log this
-            cerr << "ReplyObject::receiver_->push(): " << e.what() << endl;
-            finished(ListenerBase::Error, e.what());
+            impl->set_origin(origin_proxy());
         }
+
+        CategorisedResult result(impl.release());
+        receiver_->push(std::move(result));
     }
+    return false;
 }
 
 } // namespace internal

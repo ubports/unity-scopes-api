@@ -68,20 +68,20 @@ public:
     /**
     \brief Get real number of columns in this layout.
     Note, this is can be smaller than number of columns passed to the constructor and available via number_of_columns().
-    \return number of columns added with add_column().
+    \return The number of columns added with add_column().
      */
     int size() const noexcept;
 
     /**
     \brief Get number of columns expected by this layout and passed to the constructor.
-    \return number of columns expected by this layout
+    \return The number of columns expected by this layout.
     */
     int number_of_columns() const noexcept;
 
     /**
     \brief Retrieve list of widgets for given column. This can throw unity::InvalidArgumentException if the index is invalid.
     \param index index of a column
-    \return widget identifiers for given column index
+    \return The widget identifiers for the given column index.
     */
     std::vector<std::string> column(int index) const;
 

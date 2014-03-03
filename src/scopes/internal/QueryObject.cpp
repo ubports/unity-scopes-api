@@ -23,11 +23,10 @@
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/QueryBase.h>
-#include <unity/scopes/SearchQuery.h>
-#include <unity/scopes/PreviewQuery.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/SearchQueryBase.h>
+#include <unity/scopes/PreviewQueryBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
 #include <unity/Exception.h>
 
 #include <iostream>
@@ -48,15 +47,20 @@ namespace internal
 QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
-    QueryObjectBase(),
+    QueryObject(query_base, 0, reply, ctrl)
+{
+}
+
+QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+                         int cardinality,
+                         MWReplyProxy const& reply,
+                         MWQueryCtrlProxy const& ctrl) :
     query_base_(query_base),
     reply_(reply),
     ctrl_(ctrl),
-    pushable_(true)
+    pushable_(true),
+    cardinality_(cardinality)
 {
-    assert(query_base);
-    assert(reply);
-    assert(ctrl);
 }
 
 QueryObject::~QueryObject()
@@ -103,7 +107,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // On return, replies for the query may still be outstanding.
     try
     {
-        auto search_query = dynamic_pointer_cast<SearchQuery>(query_base_);
+        auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
         assert(search_query);
         search_query->run(reply_proxy);
     }
@@ -143,6 +147,11 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept
 {
     return pushable_;
+}
+
+int QueryObject::cardinality(InvokeInfo const& /* info */) const noexcept
+{
+    return cardinality_;
 }
 
 // The point of keeping a shared_ptr to ourselves is to make sure this QueryObject cannot

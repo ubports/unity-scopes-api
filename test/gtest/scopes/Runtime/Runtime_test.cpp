@@ -34,7 +34,8 @@
 
 #include <gtest/gtest.h>
 
-#include "scope.h"
+#include "TestScope.h"
+#include "PusherScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -47,9 +48,17 @@ TEST(Runtime, basic)
     rt->destroy();
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
+    Receiver() :
+        query_complete_(false),
+        count_(0),
+        dep_count_(0),
+        annotation_count_(0)
+    {
+    }
+
     virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
     {
         EXPECT_EQ(current_department_id, "news");
@@ -79,7 +88,7 @@ public:
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
         auto query = annotation.links().front()->query();
-        EXPECT_EQ("scope-A", query.scope_name());
+        EXPECT_EQ("scope-A", query.scope_id());
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
@@ -115,9 +124,15 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-class PreviewReceiver : public PreviewListener
+class PreviewReceiver : public PreviewListenerBase
 {
 public:
+    PreviewReceiver() :
+        query_complete_(false),
+        widgets_pushes_(0),
+        data_pushes_(0)
+    {
+    }
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
@@ -155,7 +170,49 @@ private:
     int data_pushes_;
 };
 
-TEST(Runtime, create_query)
+class PushReceiver : public SearchListenerBase
+{
+public:
+    PushReceiver(int pushes_expected)
+        : query_complete_(false),
+          pushes_expected_(pushes_expected),
+          count_(0)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+        if (++count_ > pushes_expected_)
+        {
+            FAIL();
+        }
+    }
+
+    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    {
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(pushes_expected_, count_);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+    atomic_int pushes_expected_;
+    atomic_int count_;
+};
+
+TEST(Runtime, search)
 {
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
@@ -165,7 +222,7 @@ TEST(Runtime, create_query)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("en", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
 
@@ -180,7 +237,7 @@ TEST(Runtime, preview)
 
     // run a query first, so we have a result to preview
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
@@ -194,19 +251,57 @@ TEST(Runtime, preview)
     previewer->wait_until_finished();
 }
 
+TEST(Runtime, cardinality)
+{
+    // connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("PusherScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "PusherScope");
+
+    // Run a query with unlimited cardinality. We check that the
+    // scope returns 100 results.
+    auto receiver = make_shared<PushReceiver>(100);
+    scope->search("test", SearchMetadata(100, "unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Run a query with 20 cardinality. We check that we receive only 20 results and,
+    // in the scope, check that push() returns true for the first 19, and false afterwards.
+    receiver = make_shared<PushReceiver>(20);
+    scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
+    receiver->wait_until_finished();
+}
+
 void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
     rt->run_scope(&scope);
 }
 
+void pusher_thread(RuntimeImpl::SPtr const& rt)
+{
+    PusherScope scope;
+    rt->run_scope(&scope);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
+
+    RuntimeImpl::SPtr srt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, srt);
+
+    RuntimeImpl::SPtr prt = move(RuntimeImpl::create("PusherScope", "Runtime.ini"));
+    std::thread pusher_t(pusher_thread, prt);
+
     auto rc = RUN_ALL_TESTS();
-    rt->destroy();
+
+    srt->destroy();
     scope_t.join();
+
+    prt->destroy();
+    pusher_t.join();
+
     return rc;
 }

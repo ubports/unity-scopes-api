@@ -31,7 +31,7 @@ namespace unity
 namespace scopes
 {
 
-class Query;
+class CannedQuery;
 class Department;
 
 /*! \typedef DepartmentList
@@ -55,16 +55,16 @@ public:
     /// @endcond
 
     /**
-    \brief Create deparment with given search Query and name.
+    \brief Create deparment with given search CannedQuery and name.
 
-    The identifier of this department instance will be that of Query instance (\link unity::scopes::Query::department_id()\endlink).
+    The identifier of this department instance will be that of CannedQuery instance (\link unity::scopes::CannedQuery::department_id()\endlink).
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
     \param label name of this department to be displayed in the UI
      */
-    Department(Query const& query, std::string const& label);
+    Department(CannedQuery const& query, std::string const& label);
 
     /**
-    \brief Create deparment with given department identifier, search Query and name.
+    \brief Create deparment with given department identifier, search CannedQuery and name.
 
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
@@ -72,10 +72,10 @@ public:
     \param query search query (and associated parameters such as filter state) to be executed when this department gets selected
     \param label name of this department to be displayed in the UI
      */
-    Department(std::string const& department_id, Query const& query, std::string const& label);
+    Department(std::string const& department_id, CannedQuery const& query, std::string const& label);
 
     /**
-    \brief Create deparment with given department identifier, search Query, name and subdepartments.
+    \brief Create deparment with given department identifier, search CannedQuery, name and subdepartments.
 
     The query object passed to the ctor will have its target department identifier updated with department_id.
     This constructor is convinient for creating multiple departments that use same query and only need different department identifier.
@@ -84,7 +84,7 @@ public:
     \param label name of this department to be displayed in the UI
     \param subdepartments sub-departments of this department
      */
-    Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments);
+    Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
 
     /// @cond
     Department(Department const& other);
@@ -103,25 +103,25 @@ public:
 
     /**
      \brief Get an identifier of this department.
-     \return department identifier
+     \return The department identifier.
      */
     std::string id() const;
 
     /**
-     \brief Get name of this department.
-     \return department name
+     \brief Get the label of this department.
+     \return The department label.
      */
     std::string label() const;
 
     /**
-     \brief Get query associated with this department.
-     \return query for this department
+     \brief Get the query associated with this department.
+     \return The query for this department.
      */
-    Query query() const;
+    CannedQuery query() const;
 
     /**
      \brief Get list of sub-departments of this department.
-     \return list of sub-departments.
+     \return The list of sub-departments.
     */
     DepartmentList subdepartments() const;
 

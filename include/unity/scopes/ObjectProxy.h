@@ -47,16 +47,19 @@ public:
 
     /**
     \brief Returns the endpoint this proxy connects to.
+    \return The endpoint of the proxy.
     */
     std::string endpoint() const;
 
     /**
     \brief Returns the identity of the target object of this proxy.
+    \return The identity of the target of the proxy.
     */
     std::string identity() const;
 
     /**
     \brief Returns the timeout in milliseconds if this proxy is a twoway proxy.
+
     For oneway proxies and twoway proxies without a timeout, the return value is -1.
     \return The timeout value in milliseconds (-1 if none or timeout does not apply).
     */
@@ -66,6 +69,7 @@ public:
     \brief converts a proxy into its string representation.
 
     A proxy string can be converted back into a proxy by calling Runtime::string_to_proxy().
+    \return The string representation of the proxy.
     */
     std::string to_string() const;
 

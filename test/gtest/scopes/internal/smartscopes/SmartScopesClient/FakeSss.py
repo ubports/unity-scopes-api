@@ -44,9 +44,21 @@ def response(environ, start_response):
 
     return ''
 
+serving = False
+port = 1024
+while serving == False:
+    try:
+        httpd = make_server('127.0.0.1', port, response)
+        serving = True
+    except:
+        port += 1
+
+print(str(port))
+sys.stdout.flush()
+
 remote_scopes_response = '\
-[{"base_url": "http://127.0.0.1/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "icon": "icon" },\
-{"base_url": "http://127.0.0.1/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "art": "art", "invisible": true }]'
+[{"base_url": "http://127.0.0.1:' + str(port) + '/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "author": "Mr.Fake", "icon": "icon" },\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true }]'
 
 search_response = '\
 {"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\
@@ -62,17 +74,5 @@ preview_response = '\
 preview_response2 = '\
 {"widget": {"id": "widget_id_A", "type": "text", "title": "Widget A", "text": "First widget."}}\r\n\
 {"widget": {"id": "widget_id_B", "type": "text", "title": "Widget B", "text": "Second widget."}}'
-
-serving = False
-port = 1024
-while serving == False:
-    try:
-        httpd = make_server('127.0.0.1', port, response)
-        serving = True
-    except:
-        port += 1
-
-print(str(port))
-sys.stdout.flush()
 
 httpd.serve_forever()

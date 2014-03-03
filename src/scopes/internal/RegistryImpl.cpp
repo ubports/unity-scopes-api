@@ -42,9 +42,9 @@ RegistryImpl::~RegistryImpl()
 {
 }
 
-ScopeMetadata RegistryImpl::get_metadata(std::string const& scope_name)
+ScopeMetadata RegistryImpl::get_metadata(std::string const& scope_id)
 {
-    return fwd()->get_metadata(scope_name);
+    return fwd()->get_metadata(scope_id);
 }
 
 MetadataMap RegistryImpl::list()
@@ -52,9 +52,9 @@ MetadataMap RegistryImpl::list()
     return fwd()->list();
 }
 
-ScopeProxy RegistryImpl::locate(std::string const& scope_name)
+ScopeProxy RegistryImpl::locate(std::string const& scope_id)
 {
-    return fwd()->locate(scope_name);
+    return fwd()->locate(scope_id);
 }
 
 MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)

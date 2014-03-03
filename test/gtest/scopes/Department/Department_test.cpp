@@ -18,7 +18,7 @@
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -27,12 +27,12 @@ using namespace unity::scopes::internal;
 
 TEST(Department, basic)
 {
-    Query query("fooscope", "foo", "dep1");
+    CannedQuery query("fooscope", "foo", "dep1");
     Department dep(query, "News");
 
     EXPECT_EQ("dep1", dep.id());
     EXPECT_EQ("dep1", dep.query().department_id());
-    EXPECT_EQ("fooscope", dep.query().scope_name());
+    EXPECT_EQ("fooscope", dep.query().scope_id());
     EXPECT_EQ("News", dep.label());
 
     dep.set_subdepartments({{"subdep1", query, "Europe"}});
@@ -46,7 +46,7 @@ TEST(Department, serialize_and_deserialize)
 {
     VariantMap var;
     {
-        Query query("fooscope", "foo", "dep1");
+        CannedQuery query("fooscope", "foo", "dep1");
         Department dep(query, "News");
         dep.set_subdepartments({{"subdep1", query, "Europe"},{"subdep2", query, "US"}});
 
@@ -57,7 +57,7 @@ TEST(Department, serialize_and_deserialize)
     auto dep2 = internal::DepartmentImpl::create(var);
     EXPECT_EQ("dep1", dep2.id());
     EXPECT_EQ("dep1", dep2.query().department_id());
-    EXPECT_EQ("fooscope", dep2.query().scope_name());
+    EXPECT_EQ("fooscope", dep2.query().scope_id());
     EXPECT_EQ("News", dep2.label());
     EXPECT_EQ(2u, dep2.subdepartments().size());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().id());

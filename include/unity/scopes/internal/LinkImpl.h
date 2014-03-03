@@ -21,7 +21,7 @@
 
 #include <string>
 #include <memory>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -36,15 +36,15 @@ namespace internal
 class LinkImpl
 {
 public:
-    LinkImpl(std::string const& label, Query const& query);
+    LinkImpl(std::string const& label, CannedQuery const& query);
     LinkImpl(VariantMap const& variant_map);
     std::string label() const;
-    Query query() const;
+    CannedQuery query() const;
     VariantMap serialize() const;
 
 private:
     std::string label_;
-    Query::SCPtr query_;
+    CannedQuery::SCPtr query_;
 };
 
 } // namespace internal

@@ -26,7 +26,7 @@ namespace unity
 namespace scopes
 {
 
-Link::Link(std::string const& label, Query const& query)
+Link::Link(std::string const& label, CannedQuery const& query)
     : p(new internal::LinkImpl(label, query))
 {
 }
@@ -66,7 +66,7 @@ std::string Link::label() const
     return p->label();
 }
 
-Query Link::query() const
+CannedQuery Link::query() const
 {
     return p->query();
 }

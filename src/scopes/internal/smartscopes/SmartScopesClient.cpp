@@ -89,37 +89,14 @@ void PreviewHandle::cancel_preview()
 
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      JsonNodeInterface::SPtr json_node,
-                                     std::string const& url,
-                                     uint port)
+                                     std::string const& url)
     : http_client_(http_client)
     , json_node_(json_node)
-    , port_(0)
     , have_latest_cache_(false)
     , query_counter_(0)
 {
-    try
-    {
-        // try to set url from url supplied
-        reset_url(url);
-    }
-    catch(...)
-    {
-        try
-        {
-            // url supplied failed, try to set url automatically
-            reset_url();
-        }
-        catch(...)
-        {
-            std::cerr << "SmartScopesClient::SmartScopesClient: Failed to initialise SSS url" << std::endl;
-        }
-    }
-
-    // force set a port only if one was explicitly provided
-    if (port != 0)
-    {
-        reset_port(port);
-    }
+    // initialise url_
+    reset_url(url);
 
     // initialise cached_scopes_
     read_cache();
@@ -146,69 +123,12 @@ void SmartScopesClient::reset_url(std::string const& url)
         }
     }
 
-    // find the last occurrence of ':' in the url in order to extract the port number
-    // * ignore the colon after "http" / "https"
-
-    const size_t hier_pos = strlen("https");
-    std::string::size_type port_pos = base_url.find_last_of(':');
-
-    // if there is a port specified in the url (i.e. a colon occurs after "http:" / "https:")
-    if (port_pos != std::string::npos && port_pos > hier_pos)
-    {
-        url_ = base_url.substr(0, port_pos);
-        std::string port_str;
-        std::string::size_type url_cont = base_url.find('/', port_pos);
-
-        // if the address continues after the port
-        if (url_cont != std::string::npos)
-        {
-            // extract port, and add the rest of the address to url_
-            url_ += base_url.substr(url_cont);
-            port_str = base_url.substr(port_pos + 1, url_cont - port_pos - 1);
-        }
-        // else if the remainder of the string is just the port
-        else
-        {
-            // extract port
-            port_str = base_url.substr(port_pos + 1);
-        }
-
-        // check if port_str is actually a number before setting port_
-        if (!port_str.empty() &&
-                std::find_if(begin(port_str), end(port_str),
-                             [](char const& c){ return !std::isdigit(c); }) == port_str.end())
-        {
-            port_ = std::stoi(port_str);
-        }
-        else
-        {
-            // the port supplied is not a number, don't trust the url either
-            url_ = "";
-            port_ = 0;
-            throw unity::InvalidArgumentException("Invalid url: " + url);
-        }
-    }
-    // else if there is no port specified in the url
-    else
-    {
-        url_ = base_url;
-        port_ = 0;
-    }
-}
-
-void SmartScopesClient::reset_port(uint port)
-{
-    port_ = port;
+    url_ = base_url;
 }
 
 std::string SmartScopesClient::url()
 {
     return url_;
-}
-
-uint SmartScopesClient::port()
-{
-    return port_;
 }
 
 // returns false if cache used
@@ -230,7 +150,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str());
         response->wait();
 
         response_str = response->get();
@@ -277,7 +197,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             RemoteScope scope;
 
             if (!child_node->has_node("id") || !child_node->has_node("name") ||
-                !child_node->has_node("base_url") || !child_node->has_node("description"))
+                !child_node->has_node("description") || !child_node->has_node("author") ||
+                !child_node->has_node("base_url"))
             {
                 break;
             }
@@ -285,6 +206,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.id = child_node->get_node("id")->as_string();
             scope.name = child_node->get_node("name")->as_string();
             scope.description = child_node->get_node("description")->as_string();
+            scope.author = child_node->get_node("author")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
             if (child_node->has_node("icon"))
@@ -364,7 +286,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str(), port_);
+    query_results_[search_id] = http_client_->get(search_uri.str());
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -402,7 +324,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     uint preview_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
+    query_results_[preview_id] = http_client_->get(preview_uri.str());
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }

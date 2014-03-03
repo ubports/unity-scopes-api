@@ -27,7 +27,7 @@ namespace unity
 
 namespace scopes
 {
-class ActivationBase;
+class ActivationQueryBase;
 
 namespace internal
 {
@@ -37,12 +37,12 @@ class ActivationQueryObject final : public QueryObject
 public:
     UNITY_DEFINES_PTRS(ActivationQueryObject);
 
-    ActivationQueryObject(std::shared_ptr<ActivationBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     virtual ~ActivationQueryObject();
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
 private:
-    std::shared_ptr<ActivationBase> act_base_;
+    std::shared_ptr<ActivationQueryBase> act_base_;
 };
 
 } // namespace internal

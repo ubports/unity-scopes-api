@@ -40,7 +40,7 @@ namespace scopes
 namespace internal
 {
 
-PreviewReplyObject::PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
+PreviewReplyObject::PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
     receiver_(receiver)
 {
@@ -51,7 +51,7 @@ PreviewReplyObject::~PreviewReplyObject()
 {
 }
 
-void PreviewReplyObject::process_data(VariantMap const& data)
+bool PreviewReplyObject::process_data(VariantMap const& data)
 {
     auto it = data.find("columns");
     if (it != data.end())
@@ -96,6 +96,8 @@ void PreviewReplyObject::process_data(VariantMap const& data)
             receiver_->push(it->first, it->second);
         }
     }
+
+    return false;
 }
 
 } // namespace internal

@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 
 namespace unity
 {
@@ -42,14 +42,14 @@ void ScopeBase::run()
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* metadata */)
+ActivationQueryBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
-    return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
 }
 
-ActivationBase::UPtr ScopeBase::perform_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* widget_id */, std::string const& /* action_id */)
+ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* widget_id */, std::string const& /* action_id */)
 {
-    return ActivationBase::UPtr(new ActivationBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
 }
 
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept

@@ -51,8 +51,8 @@ public:
     /// @endcond
 
     /**
-     \brief Get an identifier of this filter.
-     \return filter id
+     \brief Get the identifier of this filter.
+     \return The filter id.
     */
     std::string id() const;
 
@@ -61,8 +61,8 @@ public:
     /// @endcond
 
     /**
-     \brief Get type name of this filter.
-     \return filer type string
+     \brief Get the type name of this filter.
+     \return The filter type string.
      */
     std::string filter_type() const;
 

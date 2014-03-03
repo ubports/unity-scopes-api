@@ -21,7 +21,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 #include <iostream>
 #include <thread>
@@ -33,10 +33,10 @@ using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(Query const& query, CategoryRenderer const& renderer) :
+    MyQuery(CannedQuery const& query, CategoryRenderer const& renderer) :
         query_(query),
         renderer_(renderer)
     {
@@ -59,13 +59,14 @@ public:
         this_thread::sleep_for(chrono::seconds(20));
         auto cat = reply->register_category("cat1", "Category 1", "", renderer_);
         CategorisedResult result(cat);
+        result.set_uri("uri");
         result.set_title("scope-slow: result 1 for query \"" + query_.query_string() + "\"");
         reply->push(result);
         cout << "scope-slow: query \"" << query_.query_string() << "\" complete" << endl;
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
     CategoryRenderer renderer_;
 };
 
@@ -79,9 +80,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const& hints) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& hints) override
     {
-        SearchQuery::UPtr query(new MyQuery(q, renderer_));
+        SearchQueryBase::UPtr query(new MyQuery(q, renderer_));
         cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;
 
         if (hints.cardinality() > 0)
@@ -94,7 +95,7 @@ public:
         return query;
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

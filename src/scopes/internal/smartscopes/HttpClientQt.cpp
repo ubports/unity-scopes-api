@@ -48,12 +48,12 @@ HttpClientQt::~HttpClientQt()
 {
 }
 
-HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, uint port)
+HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url)
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
     // start new session
-    auto session = std::make_shared<HttpSession>(request_url, port, no_reply_timeout_);
+    auto session = std::make_shared<HttpSession>(request_url, no_reply_timeout_);
     sessions_[session_index_] = session;
 
     return std::make_shared<HttpResponseHandle>(shared_from_this(), session_index_++, session->get_future());
@@ -79,21 +79,16 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 //-- HttpClientQt::HttpSession
 
-HttpClientQt::HttpSession::HttpSession(std::string const& request_url, int port, uint timeout)
+HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout)
     : promise_(nullptr)
     , qt_thread_(nullptr)
 {
     promise_ = std::make_shared<std::promise<std::string>>();
 
     get_thread_ =
-        std::thread([this, request_url, port, timeout]()
+        std::thread([this, request_url, timeout]()
             {
                 QUrl url(request_url.c_str());
-
-                if (port != 0)
-                {
-                    url.setPort(port);
-                }
 
                 {
                     std::lock_guard<std::mutex> lock(qt_thread_mutex_);

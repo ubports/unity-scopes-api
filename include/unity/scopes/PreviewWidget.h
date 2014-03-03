@@ -70,7 +70,8 @@ public:
     /**
      \brief Adds an attribute definition and its value.
      */
-    void add_attribute(std::string const& key, Variant const& value);
+    void add_attribute_value(std::string const& key, Variant const& value);
+
     /**
      \brief Adds an attribute definition by using component mapping.
 
@@ -82,36 +83,39 @@ public:
      unity::scopes::PreviewReply::push(), otherwise the value is automatically
      mapped from the result.
      */
-    void add_component(std::string const& key, std::string const& field_name);
+    void add_attribute_mapping(std::string const& key, std::string const& field_name);
 
     /**
-     \brief Get identifier of this widget.
-     \return widget identifier
+     \brief Get the identifier of this widget.
+     \return The widget identifier.
      */
     std::string id() const;
 
     /**
      \brief Get type name of this widget.
-     \return widget type
+     \return The widget type.
      */
     std::string widget_type() const;
 
     /**
-     \brief Get components dictionary of this widget.
-     The returned map is a dictionary of (key, field name) pairs, as defined via calls to add_component() method.
-     \return components map
+     \brief Get the components of this widget.
+
+     The returned map is a dictionary of (key, field name) pairs, as defined via calls to add_attribute_mapping() method.
+     \return The components map.
      */
-    std::map<std::string, std::string> components() const;
+    std::map<std::string, std::string> attribute_mappings() const;
 
     /**
-     \brief Get attributes dictionary of this widget.
-     The returned map is a dictionary of (key, value) pairs, as defined via calls to add_attribute() method.
+     \brief Get the attributes of this widget.
+
+     The returned map is a dictionary of (key, value) pairs, as defined via calls to add_attribute_value() method.
+     \return The attribute map.
      */
-    VariantMap attributes() const;
+    VariantMap attribute_values() const;
 
     /**
-     \brief Get JSON representation of this widget.
-     \return JSON string
+     \brief Get a JSON representation of this widget.
+     \return The JSON string.
      */
     std::string data() const;
 

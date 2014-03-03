@@ -42,6 +42,7 @@ class QueryCtrl : public virtual ObjectProxy
 public:
     /**
     \brief Cancels an executing query.
+
     Calling cancel() informs the scope to which a query was sent that the query should be cancelled.
     Calling cancel() on a query that is complete has no effect.
     cancel() is guaranteed to not block the caller.
@@ -50,6 +51,7 @@ public:
 
     /**
     \brief Destroys a QueryCtrl.
+
     Letting a QueryCtrl go out of scope has no effect on the query, that is, the destructor does _not_
     implicitly call cancel().
     */

@@ -45,10 +45,11 @@ using namespace unity::scopes::internal::zmq_middleware;
 ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-    mi->set_scope_name(name);
+    mi->set_scope_id(name);
     mi->set_art("art " + name);
     mi->set_display_name("display name " + name);
     mi->set_description("description " + name);
+    mi->set_author("author " + name);
     mi->set_search_hint("search hint " + name);
     mi->set_hot_key("hot key " + name);
     ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
@@ -77,7 +78,7 @@ TEST(RegistryI, get_metadata)
 
     auto r = runtime->registry();
     auto scope = r->get_metadata("scope1");
-    EXPECT_EQ("scope1", scope.scope_name());
+    EXPECT_EQ("scope1", scope.scope_id());
 }
 
 TEST(RegistryI, list)

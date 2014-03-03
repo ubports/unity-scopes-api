@@ -51,14 +51,14 @@ public:
     /// @endcond
 
     /**
-     \brief Get locale string.
-     \return locale string
+     \brief Get the locale string.
+     \return The locale string
      */
     std::string locale() const;
 
     /**
-     \brief Get form factor string.
-     \return form factor string
+     \brief Get the form factor string.
+     \return The form factor string
      */
     std::string form_factor() const;
 

@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_LINK_H
 
 #include <unity/util/DefinesPtrs.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
@@ -38,7 +38,7 @@ class AnnotationImpl;
 }
 
 /**
- * \brief Represents a hyperlink (a label and canned Query)
+ * \brief Represents a hyperlink (a label and canned CannedQuery)
  */
 class Link final
 {
@@ -55,22 +55,22 @@ public:
     /// @endcond
 
     /**
-     * \brief Returns label of this Link instance.
-     * \return a label
+     * \brief Returns the label of this Link instance.
+     * \return The label of this link instance.
      */
     std::string label() const;
 
     /**
-     * \brief Returns a canned Query instance.
-     * \return a canned Query
+     * \brief Returns a canned CannedQuery instance.
+     * \return The canned CannedQuery.
      */
-    Query query() const;
+    CannedQuery query() const;
 
     /// @cond
     VariantMap serialize() const;
     /// @endcond
 private:
-    Link(std::string const& label, Query const& query);
+    Link(std::string const& label, CannedQuery const& query);
     Link(VariantMap const& variant_map);
     std::unique_ptr<internal::LinkImpl> p;
 

@@ -21,9 +21,9 @@
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/SearchListener.h>
-#include <unity/scopes/PreviewListener.h>
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/SearchListenerBase.h>
+#include <unity/scopes/PreviewListenerBase.h>
+#include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
@@ -53,18 +53,18 @@ public:
     /**
     \brief Initiates a search query.
 
-    The create_query() method expects a SearchListener, which it uses to return
-    the results for the query. create_query() may block for some time, for example,
+    The search() method expects a SearchListenerBase, which it uses to return
+    the results for the query. search() may block for some time, for example,
     if the target scope is not running and needs to be started first.
-    Results for the query may begin to arrive only after create_query() completes (but may
-    also arrive while create_query() is still running).
+    Results for the query may begin to arrive only after search() completes (but may
+    also arrive while search() is still running).
 
     \param query_string search string
     \param metadata additional data to pass to scope
     \param reply search response handler
     \return query handler
     */
-    QueryCtrlProxy create_query(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
     \brief Initiates a search query (overloaded method).
@@ -77,7 +77,7 @@ public:
     \param reply search response handler
     \return query handler
      */
-    QueryCtrlProxy create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
     \brief Initiates a search query (overloaded method).
@@ -91,7 +91,7 @@ public:
     \param reply search response handler
     \return query handler
      */
-    QueryCtrlProxy create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const;
+    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates activation of a search result.
@@ -100,7 +100,7 @@ public:
      \param reply activation response handler
      \return query handler
      */
-    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates activation of a preview action.
@@ -111,7 +111,8 @@ public:
      \param reply activation response handler
      \return query handler
      */
-    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const;
+    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+            ActivationListenerBase::SPtr const& reply) const;
 
     /**
      \brief Initiates preview request.
@@ -119,7 +120,7 @@ public:
      \param metadata additional data to pass to scope
      \param reply preview response handler
      */
-    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const;
+    QueryCtrlProxy preview(Result const& result, ActionMetadata const& metadata, PreviewListenerBase::SPtr const& reply) const;
 
     /**
     \brief Destroys a Scope.

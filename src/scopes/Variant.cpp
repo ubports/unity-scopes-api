@@ -48,7 +48,7 @@ struct NullVariant
 
 struct VariantImpl
 {
-    boost::variant<int, bool, string, double, VariantMap, VariantArray, NullVariant> v;
+    boost::variant<NullVariant, int, bool, string, double, VariantMap, VariantArray> v;
 };
 
 } // namespace internal
@@ -258,14 +258,15 @@ Variant::Type Variant::which() const noexcept
     return static_cast<Type>(w);
 }
 
-// @cond
-// For some reason, doxygen flags this as undocumented, even though it is documented in the header.
+void Variant::swap(Variant& other) noexcept
+{
+    p.swap(other.p);
+}
 
 void swap(Variant& lhs, Variant& rhs) noexcept
 {
-    lhs.p->v.swap(rhs.p->v);
+    lhs.swap(rhs);
 }
-// @endcond
 
 } // namespace scopes
 

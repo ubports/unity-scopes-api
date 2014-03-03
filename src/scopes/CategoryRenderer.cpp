@@ -30,7 +30,7 @@ namespace scopes
 
 This class specifies how is a particular category rendered by Unity. Note that the data is likely to change between major versions of Unity, and therefore the definition isn't strongly typed and provided by a scope author as a JSON string.
 
-A Category contains all the information needed by Unity to render results provided by a scope author (by handling unity::scopes::SearchQuery::run()) in a way that gives the user as much useful information as possible. When pushing results to the query originator (unity::scopes::SearchReply::push()), each result needs to have a category associated, and this association determines what will the result look like.
+A Category contains all the information needed by Unity to render results provided by a scope author (by handling unity::scopes::SearchQueryBase::run()) in a way that gives the user as much useful information as possible. When pushing results to the query originator (unity::scopes::SearchReply::push()), each result needs to have a category associated, and this association determines what will the result look like.
 
 The most important part of a category definition is the unity::scopes::CategoryRenderer instance. If you use the default constructor CategoryRenderer(), the renderer will use the following definition:
 

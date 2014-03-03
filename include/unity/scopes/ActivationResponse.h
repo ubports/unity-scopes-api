@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_ACTIVATIONRESPONSE_H
 
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <memory>
 
 namespace unity
@@ -49,23 +49,23 @@ public:
         ShowDash,    /**< Activation of this result was handled, show the Dash */
         HideDash,    /**< Activation of this result was handled, hide the Dash */
         ShowPreview, /**< Preview should be requested for this result */
-        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise */
+        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with CannedQuery object and is invalid otherwise */
     };
 
     /**
     \brief Creates ActivationResponse with given status.
     Throws unity::InvalidArgumentException if status is Status::PerformQuery - to
-    create ActivationResponse of that type, use ActivationResponse(Query const&)
+    create ActivationResponse of that type, use ActivationResponse(CannedQuery const&)
     constructor.
-    \param status activation status
+    \param status The activation status.
     */
     ActivationResponse(Status status);
 
     /**
     \brief Creates ActivationResponse with activation status of Status::PerformQuery and a search query to be executed.
-    \param query search query to be executed by client
+    \param query The search query to be executed by client.
      */
-    ActivationResponse(Query const& query);
+    ActivationResponse(CannedQuery const& query);
 
     /// @cond
     ~ActivationResponse();
@@ -77,14 +77,9 @@ public:
 
     /**
     \brief Get activation status.
-    \return activation status
+    \return The activation status.
     */
     ActivationResponse::Status status() const;
-
-    /**
-     \deprecated Attach arbitrary data to this response.  This method will be removed in version 0.4.0, please use set_scope_data instead.
-     */
-    void setHints(VariantMap const& hints);
 
     /**
      \brief Attach arbitrary data to this response.
@@ -95,28 +90,18 @@ public:
     void set_scope_data(Variant const& data);
 
     /**
-     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use scope_data instead.
-
-     This method returns data attached with setHints() or set_scope_data() call; this method returns empty VariantMap if the attached data was added with
-     set_scope_data() and it is is not of VariantMap type.
-
-     \return data attached to response
-     */
-    VariantMap hints() const;
-
-    /**
      \brief Get data attached to this response object.
-     \return data attached to response
+     \return The data attached to response.
      */
     Variant scope_data() const;
 
     /**
-     \brief Query to be executed if status is Status::PerformQuery.
+     \brief CannedQuery to be executed if status is Status::PerformQuery.
 
      This method throws unity::LogicException is status of this ActivationResponse is different than Status::PerformQuery.
-     \return query to be executed by client.
+     \return The query to be executed by the client.
     */
-    Query query() const;
+    CannedQuery query() const;
 
     /// @cond
     VariantMap serialize() const;

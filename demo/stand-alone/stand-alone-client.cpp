@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver()
@@ -101,7 +101,7 @@ int main()
         shared_ptr<Receiver> reply(new Receiver);
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
-        auto ctrl = sp->create_query("query string", metadata, reply); // May raise TimeoutException
+        auto ctrl = sp->search("query string", metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
