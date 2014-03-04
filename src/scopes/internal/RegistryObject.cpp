@@ -85,11 +85,11 @@ MetadataMap RegistryObject::list() const
     return all_scopes;
 }
 
-bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
-                                     std::vector<std::string> const& spawn_command)
+bool RegistryObject::add_local_scope(ScopeMetadata const& metadata, ScopeExecData const& exec_data)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     bool return_value = true;
+    std::string scope_name = metadata.scope_name();
     if (scope_name.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
@@ -101,11 +101,11 @@ bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadat
     if (scopes_.find(scope_name) != scopes_.end())
     {
         scopes_.erase(scope_name);
-        commands_.erase(scope_name);
+        exec_datas_.erase(scope_name);
         return_value = false;
     }
     scopes_.insert(make_pair(scope_name, metadata));
-    commands_[scope_name] = spawn_command;
+    exec_datas_.insert(make_pair(scope_name, exec_data));
     return return_value;
 }
 
@@ -118,7 +118,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
-    commands_.erase(scope_name);
+    exec_datas_.erase(scope_name);
     return scopes_.erase(scope_name) == 1;
 }
 

@@ -188,14 +188,17 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             catch (NotFoundException const&)
             {
             }
+
             ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
             mi->set_proxy(proxy);
             auto meta = ScopeMetadataImpl::create(move(mi));
-            vector<string> spawn_command;
-            spawn_command.push_back(scoperunner_path);
-            spawn_command.push_back(config_file);
-            spawn_command.push_back(pair.second);
-            registry->add_local_scope(pair.first, move(meta), spawn_command);
+
+            RegistryObject::ScopeExecData exec_data;
+            exec_data.scoperunner_path = scoperunner_path;
+            exec_data.config_file = config_file;
+            exec_data.scope_name = pair.second;
+
+            registry->add_local_scope(move(meta), exec_data);
         }
         catch (unity::Exception const& e)
         {

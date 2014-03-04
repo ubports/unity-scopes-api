@@ -33,12 +33,19 @@ namespace scopes
 namespace internal
 {
 
-// Maintains a map of <scope name, scope proxy> pairs.
-
 class RegistryObject : public RegistryObjectBase
 {
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
+
+    struct ScopeExecData
+    {
+        ScopeExecData() = default;
+        ScopeExecData(std::initializer_list<std::string> l) = delete;
+        std::string scoperunner_path;
+        std::string config_file;
+        std::string scope_name;
+    };
 
     RegistryObject();
     virtual ~RegistryObject();
@@ -49,15 +56,14 @@ public:
     virtual ScopeProxy locate(std::string const& scope_name) override;
 
     // Local methods
-    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
-                         std::vector<std::string> const& spawn_command);
+    bool add_local_scope(ScopeMetadata const& scope, ScopeExecData const& scope_exec_data);
     bool remove_local_scope(std::string const& scope_name);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
     mutable std::mutex mutex_;
     MetadataMap scopes_;
-    std::map<std::string, std::vector<std::string>> commands_;
+    std::map<std::string, ScopeExecData> exec_datas_;
     MWRegistryProxy remote_registry_;
 };
 
