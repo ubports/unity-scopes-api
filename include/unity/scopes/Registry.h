@@ -42,7 +42,7 @@ class RegistryImpl;
 typedef std::map<std::string, ScopeMetadata> MetadataMap;
 
 /**
-\brief RegistryProxy provides access to the available scopes.
+\brief White pages service for available scopes.
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
@@ -56,7 +56,7 @@ public:
     /// @endcond
 
     /**
-    \brief Returns the metadata for the scope with the given name.
+    \brief Returns the metadata for the scope with the given id.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
@@ -69,8 +69,8 @@ public:
     virtual MetadataMap list() const = 0;
 
     /**
-    \brief Returns a map containing only those scopes for which predicate returns true.
-    \param predicate a function object the must return true for each metadata item to be include in the map.
+    \brief Returns a map containing only those scopes for which `predicate` returns true.
+    \param predicate a function object that must return true for each metadata item to be included in the map.
     \return The metadata items for which the predicate returned true.
     */
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const = 0;
