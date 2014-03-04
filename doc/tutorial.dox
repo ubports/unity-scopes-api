@@ -3,7 +3,7 @@
 \page tutorial Tutorial
 
 This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples
-of various scopes see demo/scopes subdirectory.
+of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
 
 \section simplescope A simple scope which doesn't query other scopes.
 
@@ -307,7 +307,7 @@ an aggregator scope may just register all categories it receives and push all re
 
 \code{.cpp}
 
-virtual void push(Category::SCPtr category) override
+void push(Category::SCPtr category)
 {
     upstream_->register_category(category);
 }
@@ -360,4 +360,60 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
+\section scopetesting Testing
+
+Unity Scopes API provides testing helpers based on well-known and established testing frameworks:
+<a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
+Please see respective documentation of those projects for general information about how to use Google C++ Testing Framework.
+
+All the helper classes provided by Scopes API are located in unity::scopes::testing namespace. The most imporant ones are:
+<ul>
+<li>unity::scopes::testing::TypedScopeFixture - template class that takes your scope class name as a template argument and creates a test fixture that can be
+used in tests.
+<li>unity::scopes::testing::MockSearchReply - a mock of unity::scopes::SearchReply that makes it possible to intercept responses to search request sent from
+the scope to a client, making it easy to test if your scope returns all expected data.
+<li>unity::scopes::testing::MockPreviewReply - a mock of unity::scopes::PreviewReply that makes is possible to intercept and test responses to preview request
+sent from the scope to a client.
+<li>unity::scopes::testing::Result - a simple class defined on top of unity::scopes::Result that provides a default constructor, making it possible to create
+dummy results (with no attributes) for testing purposes.
+<li>unity::scopes::testing::category - a simple class defined on top of unity::scopes::Category that makes it possible to create dummy categories (which would
+otherwise require an instance of unity::scopes::SearchReply and a call to unity::scopes::SearchReply::register_category()).
+</ul>
+
+With the above classes a test case that checks if MyScope calls appropriate methods of unity::scopes::SearchReply may look like this (note that it just checks
+if proper methods get called and uses _ matchers that match any values; put actual values in there for stricts checks):
+\code{.cpp}
+typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixutre;
+using namespace ::testing;
+
+TEST_F(TestScopeFixutre, search_results)
+{
+    const unity::scopes::CategoryRenderer renderer;
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    EXPECT_CALL(reply, register_departments(_, _)).Times(1);
+    EXPECT_CALL(reply, register_category(_, _, _, _))
+            .Times(1)
+            .WillOnce(
+                Return(
+                    unity::scopes::Category::SCPtr(new unity::scopes::testing::Category("id", "title", "icon", renderer))
+                )
+            );
+    EXPECT_CALL(reply, register_annotation(_))
+            .Times(1)
+            .WillOnce(Return(true));
+    EXPECT_CALL(reply, push(_))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    unity::scopes::SearchReplyProxy reply_proxy(&reply, [](unity::scopes::SearchReplyBase*) {}); // note: this is a std::shared_ptr with empty deleter
+
+    unity::scopes::CannedQuery query(scope_id, "", "");
+    unity::scopes::SearchMetadata meta_data("en_EN", "phone");
+
+    auto search_query = scope->search(query, meta_data);
+    ASSERT_NE(nullptr, search_query);
+    search_query->run(reply_proxy);
+}
+\endcode
 */
