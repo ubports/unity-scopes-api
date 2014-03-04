@@ -16,6 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#include <unity/scopes/internal/ReplyImpl.h>
+
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
@@ -27,10 +29,9 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/SearchReply.h>
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/UnityExceptions.h>
 

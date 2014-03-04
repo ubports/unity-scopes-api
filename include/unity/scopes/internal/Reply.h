@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_REPLY_H
 
 #include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 namespace unity
@@ -38,7 +38,7 @@ class ReplyImpl;
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class Reply : public virtual ReplyBase, protected ObjectProxy
+class Reply : public virtual unity::scopes::Reply, protected ObjectProxy
 {
 public:
 

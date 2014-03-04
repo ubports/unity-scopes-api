@@ -16,10 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLYBASE_H
-#define UNITY_SCOPES_REPLYBASE_H
-
-#include <unity/SymbolExport.h>
+#ifndef UNITY_SCOPES_REPLY_H
+#define UNITY_SCOPES_REPLY_H
 
 #include <exception>
 
@@ -33,11 +31,11 @@ namespace scopes
 \brief Abstract base class to allow the results of a query to be sent to the source of the query.
 */
 
-class ReplyBase
+class Reply
 {
 public:
     // @cond
-    ReplyBase(ReplyBase const&) = delete;
+    Reply(Reply const&) = delete;
     // @endcond
 
     /**
@@ -71,11 +69,11 @@ public:
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished(),
     provided QueryBase::run() has returned.
     */
-    virtual ~ReplyBase();
+    virtual ~Reply();
 
 protected:
     /// @cond
-    ReplyBase();
+    Reply();
     /// @endcond
 };
 

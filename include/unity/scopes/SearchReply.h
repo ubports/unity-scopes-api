@@ -24,7 +24,7 @@
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
 
 namespace unity
 {
@@ -39,7 +39,7 @@ class Annotation;
 \brief Abstract base to allow the results of a search query to be sent to the source of a query.
 */
 
-class SearchReply : public virtual ReplyBase
+class SearchReply : public virtual Reply
 {
 public:
     /// @cond

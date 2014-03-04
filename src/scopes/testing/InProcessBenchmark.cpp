@@ -50,7 +50,7 @@ constexpr static const int metadata_idx = 1;
 constexpr static const int widget_idx = 2;
 constexpr static const int action_idx = 3;
 
-struct WaitableReply : public virtual unity::scopes::ReplyBase
+struct WaitableReply : public virtual unity::scopes::Reply
 {
     enum class State
     {

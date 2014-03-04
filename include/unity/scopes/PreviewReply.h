@@ -19,10 +19,9 @@
 #ifndef UNITY_SCOPES_PREVIEW_REPLY_H
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
 
 #include <string>
 
@@ -33,7 +32,7 @@ namespace scopes
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
 */
-class PreviewReply : public virtual ReplyBase
+class PreviewReply : public virtual Reply
 {
 public:
     /// @cond

@@ -27,14 +27,14 @@ namespace unity
 namespace scopes
 {
 
-class ReplyBase;
+class Reply;
 class SearchReply;
 class PreviewReply;
 
 /** \typedef ReplyBaseProxy
 \brief Convenience type definition.
 */
-typedef std::shared_ptr<ReplyBase> ReplyBaseProxy;
+typedef std::shared_ptr<Reply> ReplyBaseProxy;
 
 /** \typedef SearchReplyProxy
 \brief Convenience type definition.

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Reply.h>
 
 namespace unity
 {
@@ -26,9 +26,9 @@ namespace scopes
 
 /// @cond
 
-ReplyBase::ReplyBase() = default;
+Reply::Reply() = default;
 
-ReplyBase::~ReplyBase() = default;
+Reply::~Reply() = default;
 
 /// @endcond
 
