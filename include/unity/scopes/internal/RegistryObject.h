@@ -55,15 +55,8 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
-    void spawn_scope(std::string const& scope_name);
-    void shutdown();
-    static int kill_process(pid_t pid);
-    static bool is_dead(pid_t pid);
-
-private:
     mutable std::mutex mutex_;
     MetadataMap scopes_;
-    std::map<std::string, pid_t> scope_processes_;
     std::map<std::string, std::vector<std::string>> commands_;
     MWRegistryProxy remote_registry_;
 };

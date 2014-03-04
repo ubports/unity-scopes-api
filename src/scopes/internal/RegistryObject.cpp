@@ -22,11 +22,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <signal.h>
-#include <cassert>
-#include <sys/wait.h>
-#include <unistd.h>
-
 using namespace std;
 
 namespace unity
@@ -44,18 +39,6 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
-    try
-    {
-        shutdown();
-    }
-    catch (std::exception const& e)
-    {
-        fprintf(stderr, "scoperegistry: shutdown error: %s\n", e.what());
-    }
-    catch (...)
-    {
-        fprintf(stderr, "scoperegistry: unknown exception during shutdown\n");
-    }
 }
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
@@ -117,12 +100,6 @@ bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadat
 
     if (scopes_.find(scope_name) != scopes_.end())
     {
-        auto proc = scope_processes_.find(scope_name);
-        if (proc != scope_processes_.end())
-        {
-            kill_process(proc->second);
-            scope_processes_.erase(scope_name);
-        }
         scopes_.erase(scope_name);
         commands_.erase(scope_name);
         return_value = false;
@@ -156,91 +133,17 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_name.empty())
+    {
         throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
-    auto metadata = scopes_.find(scope_name);
-    if (metadata == scopes_.end())
+    }
+
+    auto it = scopes_.find(scope_name);
+    if (it == scopes_.end())
     {
         throw NotFoundException("Tried to obtain unknown scope", scope_name);
     }
-    auto search = scope_processes_.find(scope_name);
-    if (search == scope_processes_.end() || is_dead(search->second))
-    {
-        spawn_scope(scope_name);
-    }
-    return metadata->second.proxy();
-}
 
-void RegistryObject::spawn_scope(std::string const& scope_name)
-{
-    if (scopes_.find(scope_name) == scopes_.end())
-    {
-        throw NotFoundException("Tried to spawn an unknown scope.", scope_name);
-    }
-    auto process = scope_processes_.find(scope_name);
-    if (process != scope_processes_.end())
-    {
-        assert(is_dead(process->second));
-        int status;
-        waitpid(process->second, &status, 0);
-        if (status != 0)
-        {
-            printf("scope %s has exited with nonzero error status %d.\n", scope_name.c_str(), status);
-        }
-        scope_processes_.erase(scope_name);
-    }
-
-    pid_t pid;
-    switch (pid = fork())
-    {
-        case -1:
-        {
-            throw SyscallException("cannot fork", errno);
-        }
-        case 0: // child
-        {
-            const vector<string>& cmd = commands_[scope_name];
-            assert(cmd.size() == 3);
-            // Includes room for final NULL element.
-            unique_ptr<char const* []> argv(new char const*[4]);
-            argv[0] = cmd[0].c_str();
-            argv[1] = cmd[1].c_str();
-            argv[2] = cmd[2].c_str();
-            argv[3] = nullptr;
-            execv(argv[0], const_cast<char* const*>(argv.get()));
-            throw SyscallException("cannot exec scoperunner", errno);
-        }
-    }
-    const vector<string>& cmd = commands_[scope_name];
-    printf("spawning scope %s to process number %d with command line %s %s %s.\n",
-           scope_name.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
-    scope_processes_[scope_name] = pid;
-}
-
-void RegistryObject::shutdown()
-{
-    for (const auto &i : scope_processes_)
-    {
-        kill_process(i.second);
-        // If and when we move to graceful shutdown, check that exit status
-        // was zero and print error message here.
-    }
-    scope_processes_.clear();
-    commands_.clear();
-}
-
-int RegistryObject::kill_process(pid_t pid) {
-    int exitcode;
-    // Currently just shoot children dead.
-    // If we want to get fancy and give them a graceful
-    // warning, this is the place to do it.
-    kill(pid, SIGKILL);
-    waitpid(pid, &exitcode, 0);
-    return exitcode;
-}
-
-bool RegistryObject::is_dead(pid_t pid)
-{
-    return kill(pid, 0) < 0 && errno == ESRCH;
+    return it->second.proxy();
 }
 
 } // namespace internal
