@@ -244,7 +244,7 @@ void SSRegistryObject::get_remote_scopes()
 }
 
 // Must be called with scopes_mutex_ locked
-bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata)
+void SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata)
 {
     if (metadata.scope_name().empty())
     {
@@ -261,9 +261,7 @@ bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& m
         // Replace already existing entry with this one
         scopes_.erase(pair.first);
         scopes_.insert(make_pair(metadata.scope_name(), metadata));
-        return false;
     }
-    return true;
 }
 
 }  // namespace smartscopes
