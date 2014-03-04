@@ -20,7 +20,7 @@
 
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReplyBase.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/PreviewReply.h>
@@ -122,7 +122,7 @@ struct DevNullPreviewReply : public virtual unity::scopes::PreviewReply, public 
     }
 };
 
-struct DevNullSearchReply : public virtual unity::scopes::SearchReplyBase, public WaitableReply
+struct DevNullSearchReply : public virtual unity::scopes::SearchReply, public WaitableReply
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
@@ -196,7 +196,7 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
             q->run(unity::scopes::SearchReplyProxy
             {
                 &search_reply,
-                [](unity::scopes::SearchReplyBase* r)
+                [](unity::scopes::SearchReply* r)
                 {
                     r->finished();
                 }

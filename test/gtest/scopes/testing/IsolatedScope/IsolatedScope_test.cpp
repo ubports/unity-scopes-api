@@ -108,7 +108,7 @@ TEST_F(TestScopeFixutre,
 
     unity::scopes::SearchReplyProxy search_reply_proxy
     {
-        &reply, [](unity::scopes::SearchReplyBase*) {}
+        &reply, [](unity::scopes::SearchReply*) {}
     };
 
     unity::scopes::CannedQuery query{scope_id};

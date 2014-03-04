@@ -71,12 +71,12 @@ public:
 
 protected:
     /// @cond
-    Registry(internal::RegistryImpl* impl);          // Instantiated only by RegistryImpl
-    friend class internal::RegistryImpl;
+    Registry(RegistryImpl* impl);          // Instantiated only by RegistryImpl
+    friend class RegistryImpl;
     /// @endcond
 
 private:
-    internal::RegistryImpl* fwd() const;
+    RegistryImpl* fwd() const;
 };
 
 } // namespace internal

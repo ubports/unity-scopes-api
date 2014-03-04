@@ -81,8 +81,8 @@ public:
 
 protected:
     // @cond
-    PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
+    PreviewReply(ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    friend class ReplyImpl;
     // @endcond
 };
 

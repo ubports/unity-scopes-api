@@ -29,9 +29,9 @@
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/SearchReply.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>

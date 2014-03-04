@@ -41,7 +41,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Variant.cpp

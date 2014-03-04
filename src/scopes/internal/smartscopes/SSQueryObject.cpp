@@ -22,10 +22,10 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchQueryBase.h>
-#include <unity/scopes/SearchReply.h>
 
 #include <cassert>
 #include <iostream>

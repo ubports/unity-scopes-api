@@ -21,10 +21,10 @@
 #include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/SearchReply.h>
 
 #include <iostream>
 #include <cassert>
