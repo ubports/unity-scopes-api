@@ -16,26 +16,26 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/internal/MiddlewareBase.h>
-#include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryObjectBase.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/ReplyBase.h>
-#include <unity/UnityExceptions.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/SearchReply.h>
+#include <unity/UnityExceptions.h>
 
-#include <sstream>
 #include <cassert>
+#include <sstream>
 #include <iostream> // TODO: remove this once logging is added
 
 using namespace std;

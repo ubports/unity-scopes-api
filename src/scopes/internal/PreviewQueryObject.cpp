@@ -16,15 +16,16 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
 */
 
-#include <unity/scopes/internal/PreviewQueryObject.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/PreviewQueryObject.h>
+#include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
+
 #include <iostream>
 #include <cassert>
 

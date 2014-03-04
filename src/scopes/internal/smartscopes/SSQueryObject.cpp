@@ -18,17 +18,17 @@
 
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 
-#include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/internal/ReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
-#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchQueryBase.h>
+#include <unity/scopes/SearchReply.h>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <thread>
 
 using namespace std;

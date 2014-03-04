@@ -16,17 +16,16 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/Category.h>
+#include <unity/scopes/Annotation.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Annotation.h>
-
+#include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <iostream>
 

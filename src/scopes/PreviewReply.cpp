@@ -17,10 +17,6 @@
  */
 
 #include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/Result.h>
-#include <unity/scopes/PreviewWidget.h>
-
-#include <unity/scopes/internal/ReplyImpl.h>
 
 namespace unity
 {
@@ -28,32 +24,13 @@ namespace unity
 namespace scopes
 {
 
-//! @cond
+/// @cond
 
-PreviewReply::PreviewReply(internal::ReplyImpl* impl) : Reply(impl)
-{
-}
+PreviewReply::PreviewReply() = default;
 
-PreviewReply::~PreviewReply()
-{
-}
+PreviewReply::~PreviewReply() = default;
 
-bool PreviewReply::register_layout(ColumnLayoutList const& layouts) const
-{
-    return fwd()->register_layout(layouts);
-}
-
-bool PreviewReply::push(PreviewWidgetList const& widgets) const
-{
-    return fwd()->push(widgets);
-}
-
-bool PreviewReply::push(std::string const& key, Variant const& value) const
-{
-    return fwd()->push(key, value);
-}
-
-//! @endcond
+/// @endcond
 
 } // namespace scopes
 

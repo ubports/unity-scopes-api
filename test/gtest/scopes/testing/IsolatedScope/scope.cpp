@@ -17,14 +17,14 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/Category.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/CannedQuery.h>
-#include <unity/scopes/Department.h>
+#include <unity/scopes/SearchReply.h>
 
 #include "scope.h"
 
