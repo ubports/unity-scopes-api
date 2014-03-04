@@ -52,8 +52,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
 
     // Look for the scope in both the local and the remote map.
     // Local scopes take precedence over remote ones of the same
-    // name. (Ideally, this will never happen, except maybe
-    // during development.)
+    // name. (Ideally, this should never happen.)
     auto const& it = scopes_.find(scope_name);
     if (it != scopes_.end())
     {
@@ -142,6 +141,14 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
     {
         throw NotFoundException("Tried to obtain unknown scope", scope_name);
     }
+
+    // 1. check scope not already running.
+    //  1.1 if scope running, return proxy.
+    //  1.2 if scope running but is “stopping”, wait for it to stop (timeout?).
+    // 2. exec the scope.
+    // 3. wait 1.5s for "running" signal.
+    //  3.1 when ready, return proxy.
+    //  3.2 OR when timeout, kill process and throw.
 
     return it->second.proxy();
 }
