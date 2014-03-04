@@ -26,7 +26,7 @@
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/internal/Reply.h>
 
 namespace unity
 {

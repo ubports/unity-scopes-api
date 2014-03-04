@@ -21,13 +21,13 @@
 
 #include <unity/scopes/PreviewReply.h>
 
+#include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/internal/Reply.h>
 #include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/Reply.h>
-#include <unity/scopes/Result.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ReplyBase.h>
-#include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {

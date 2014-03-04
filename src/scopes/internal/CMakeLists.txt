@@ -50,6 +50,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/internal/Reply.h>
 
 #include <unity/scopes/internal/ReplyImpl.h>
 
@@ -26,6 +26,9 @@ namespace unity
 {
 
 namespace scopes
+{
+
+namespace internal
 {
 
 //! @cond
@@ -53,6 +56,8 @@ internal::ReplyImpl* Reply::fwd() const
 }
 
 //! @endcond
+
+} // namespace internal
 
 } // namespace scopes
 

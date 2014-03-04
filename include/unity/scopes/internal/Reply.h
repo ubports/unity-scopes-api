@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLY_H
-#define UNITY_SCOPES_REPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLY_H
+#define UNITY_SCOPES_INTERNAL_REPLY_H
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/ReplyBase.h>
@@ -33,7 +33,6 @@ namespace internal
 {
 class QueryObject;
 class ReplyImpl;
-}
 
 /**
 \brief Reply allows the results of a query to be sent to the source of the query.
@@ -85,6 +84,8 @@ protected:
                                                // forward cancellation.
     /// @endcond
 };
+
+} // namespace internal
 
 } // namespace scopes
 
