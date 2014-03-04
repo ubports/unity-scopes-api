@@ -21,7 +21,7 @@
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/ObjectProxyImpl.h>
-#include <unity/scopes/Registry.h>
+#include <unity/scopes/internal/Registry.h>
 
 namespace unity
 {

@@ -16,7 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/SearchReplyBase.h>
+#include <unity/scopes/internal/Reply.h>
+
+#include <unity/scopes/internal/ReplyImpl.h>
+
+#include <cassert>
 
 namespace unity
 {
@@ -24,13 +28,36 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+namespace internal
+{
 
-SearchReplyBase::SearchReplyBase() = default;
+//! @cond
 
-SearchReplyBase::~SearchReplyBase() = default;
+Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
+{
+    assert(impl);
+}
 
-/// @endcond
+Reply::~Reply() = default;
+
+void Reply::finished() const
+{
+    return fwd()->finished();
+}
+
+void Reply::error(std::exception_ptr ex) const
+{
+    return fwd()->error(ex);
+}
+
+internal::ReplyImpl* Reply::fwd() const
+{
+    return dynamic_cast<internal::ReplyImpl*>(pimpl());
+}
+
+//! @endcond
+
+} // namespace internal
 
 } // namespace scopes
 

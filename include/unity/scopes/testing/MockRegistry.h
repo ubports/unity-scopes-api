@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
 #define UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
 
-#include <unity/scopes/RegistryBase.h>
+#include <unity/scopes/Registry.h>
 
 #include <gmock/gmock.h>
 
@@ -34,7 +34,7 @@ namespace testing
 
 /// @cond
 
-class MockRegistry : public RegistryBase
+class MockRegistry : public Registry
 {
 public:
     MockRegistry() = default;

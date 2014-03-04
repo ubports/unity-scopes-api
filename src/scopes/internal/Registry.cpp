@@ -16,7 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/PreviewReplyBase.h>
+#include <unity/scopes/internal/Registry.h>
+
+#include <unity/scopes/internal/RegistryImpl.h>
 
 namespace unity
 {
@@ -24,13 +26,43 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+namespace internal
+{
 
-PreviewReplyBase::PreviewReplyBase() = default;
+//! @cond
 
-PreviewReplyBase::~PreviewReplyBase() = default;
+Registry::Registry(internal::RegistryImpl* impl) :
+    ObjectProxy(impl)
+{
+}
 
-/// @endcond
+Registry::~Registry()
+{
+}
+
+//! @endcond
+
+ScopeMetadata Registry::get_metadata(std::string const& scope_id) const
+{
+    return fwd()->get_metadata(scope_id);
+}
+
+MetadataMap Registry::list() const
+{
+    return fwd()->list();
+}
+
+MetadataMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
+{
+    return fwd()->list_if(predicate);
+}
+
+internal::RegistryImpl* Registry::fwd() const
+{
+    return dynamic_cast<internal::RegistryImpl*>(pimpl());
+}
+
+} // namespace internal
 
 } // namespace scopes
 

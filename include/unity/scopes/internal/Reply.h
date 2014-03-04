@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLYBASE_H
-#define UNITY_SCOPES_REPLYBASE_H
+#ifndef UNITY_SCOPES_INTERNAL_REPLY_H
+#define UNITY_SCOPES_INTERNAL_REPLY_H
 
-#include <unity/SymbolExport.h>
-
-#include <exception>
+#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/Reply.h>
+#include <unity/scopes/ReplyProxyFwd.h>
 
 namespace unity
 {
@@ -29,31 +29,31 @@ namespace unity
 namespace scopes
 {
 
+namespace internal
+{
+class QueryObject;
+class ReplyImpl;
+
 /**
-\brief Abstract base class to allow the results of a query to be sent to the source of the query.
+\brief Reply allows the results of a query to be sent to the source of the query.
 */
 
-class ReplyBase
+class Reply : public virtual unity::scopes::Reply, protected ObjectProxy
 {
 public:
-    // @cond
-    ReplyBase(ReplyBase const&) = delete;
-    // @endcond
 
     /**
     \brief Informs the source of a query that the query results are complete.
 
     Calling finished() informs the source of a query that the final result for the query
     was sent, that is, that the query is complete.
+    The scope application code is responsible for calling finished() once it has sent the
+    final result for a query.
     Multiple calls to finished() and calls to error() after finished() was called are ignored.
     The destructor implicitly calls finished() if a Reply goes out of scope without
-    a prior call to finished(). Similarly, QueryBase::run() implicitly calls finished() when
-    it returns, provided there are no more reply proxies in scope. In other words, calling
-    finished() is optional. The scopes run time ensures that the call happens automatically,
-    either when the last reply proxy goes out of scope, or when QueryBase::run() returns
-    (whichever happens last).
+    a prior call to finished().
     */
-    virtual void finished() const = 0;
+    void finished() const override;
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
@@ -63,21 +63,29 @@ public:
               the return value of `what()` is made available to the query source. Otherwise,
               the query source receives `"unknown exception"`.
     */
-    virtual void error(std::exception_ptr ex) const = 0;
+    void error(std::exception_ptr ex) const override;
 
     /**
     \brief Destroys a Reply.
 
-    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished(),
-    provided QueryBase::run() has returned.
+    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
-    virtual ~ReplyBase();
+    ~Reply();
 
 protected:
     /// @cond
-    ReplyBase();
+    Reply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    friend class internal::ReplyImpl;
+
+    internal::ReplyImpl* fwd() const;
+
+    // TODO: This should be a member of the impl, not of the public class
+    std::shared_ptr<internal::QueryObject> qo; // Points at the corresponding QueryObject, so we can
+                                               // forward cancellation.
     /// @endcond
 };
+
+} // namespace internal
 
 } // namespace scopes
 

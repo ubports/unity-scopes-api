@@ -16,15 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHREPLY_H
-#define UNITY_SCOPES_SEARCHREPLY_H
+#ifndef UNITY_SCOPES_INTERNAL_SEARCHREPLY_H
+#define UNITY_SCOPES_INTERNAL_SEARCHREPLY_H
+
+#include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/internal/Reply.h>
 
 namespace unity
 {
@@ -35,26 +37,41 @@ namespace scopes
 class CategorisedResult;
 class Annotation;
 
+namespace internal
+{
+
 /**
-\brief Abstract base to allow the results of a search query to be sent to the source of a query.
+\brief SearchReply allows the results of a search query to be sent to the source of a query.
 */
 
-class SearchReply : public virtual Reply
+class SearchReply : public virtual unity::scopes::SearchReply, public virtual Reply
 {
 public:
-    /// @cond
+    // @cond
     SearchReply(SearchReply const&) = delete;
-    /// @endcond
+    // @endcond
 
     /**
-     \brief Register departments for the current search reply and provide the current department.
+    \brief Register departments for the current search reply and provide the current department.
 
-     current_department_id should in most cases be the department returned by Query::department_id().
-     Pass an empty string for current_department_id to indicate no active department.
-     \param departments A list of departments.
-     \param current_department_id A department id that should be considered current.
-     */
-    virtual void register_departments(DepartmentList const& departments, std::string current_department_id = "") = 0;
+    current_department_id should in most cases be the department returned by CannedQuery::department_id().
+    Pass an empty string for current_department_id to indicate no active department.
+    \param departments A list of departments.
+    \param current_department_id A department id that should be considered current.
+    */
+
+    void register_departments(DepartmentList const& departments, std::string current_department_id = "") override;
+
+    /**
+    \brief Create and register a new Category.
+
+    The category is automatically sent to the source of the query.
+    \return The category instance.
+    */
+    Category::SCPtr register_category(std::string const& id,
+                                      std::string const& title,
+                                      std::string const &icon,
+                                      CategoryRenderer const& renderer_template = CategoryRenderer()) override;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.
@@ -62,35 +79,23 @@ public:
     The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
     results and categories from other scope(s).
     */
-    virtual Category::SCPtr register_category(std::string const& id,
-                                      std::string const& title,
-                                      std::string const &icon,
-                                      CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
-
-    /**
-    \brief Returns a previously registered category.
-    \return The category instance or `nullptr` if the category does not exist registered.
-    */
-    virtual void register_category(Category::SCPtr category) = 0;
+    void register_category(Category::SCPtr category) override;
 
     /**
     \brief Returns a previously registered category.
     \return The category instance or `nullptr` if the category does not exist.
     */
-    virtual Category::SCPtr lookup_category(std::string const& id) const = 0;
+    Category::SCPtr lookup_category(std::string const& id) const override;
 
     /**
     \brief Sends a single result to the source of a query.
 
     Any calls to push() after finished() was called are ignored.
     \return The return value is true if the result was accepted, false otherwise.
-    A false return value can be due to finished() having been called earlier,
-    or the client that sent the query having cancelled that query. The return
-    value is false also if the query has a cardinality limit and is reached
-    or exceeded. (The return value is false for the last valid push and
-    subsequent pushes.)
+    A false return value is due to either finished() having been called earlier,
+    or the client that sent the query having cancelled that query.
     */
-    virtual bool push(CategorisedResult const& result) const = 0;
+    bool push(CategorisedResult const& result) const override;
 
     /**
     \brief Register an annotation.
@@ -100,13 +105,13 @@ public:
     registering any categories.
     \note The Unity shell can ignore some or all annotations, depending on available screen real estate.
     */
-    virtual bool register_annotation(Annotation const& annotation) const = 0;
+    bool register_annotation(Annotation const& annotation) const override;
 
     /**
     \brief Sends all filters and their state to the source of a query.
-    \return True if the filters were accepted, false otherwise.
+    \return true if the filters were accepted, false otherwise.
     */
-    virtual bool push(Filters const& filters, FilterState const& filter_state) const = 0;
+    bool push(Filters const& filters, FilterState const& filter_state) const override;
 
     /**
     \brief Destroys a Reply.
@@ -117,9 +122,12 @@ public:
 
 protected:
     /// @cond
-    SearchReply();
+    SearchReply(ReplyImpl* impl);         // Instantiated only by ReplyImpl
     /// @endcond
+    friend class ReplyImpl;
 };
+
+} // namespace internal
 
 } // namespace scopes
 

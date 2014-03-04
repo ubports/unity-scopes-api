@@ -17,10 +17,6 @@
  */
 
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/Annotation.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/ReplyImpl.h>
 
 namespace unity
 {
@@ -28,53 +24,13 @@ namespace unity
 namespace scopes
 {
 
-//! @cond
+/// @cond
 
-SearchReply::SearchReply(internal::ReplyImpl* impl) :
-    SearchReplyBase(), Reply(impl)
-{
-}
+SearchReply::SearchReply() = default;
 
-SearchReply::~SearchReply()
-{
-}
+SearchReply::~SearchReply() = default;
 
-void SearchReply::register_departments(DepartmentList const& departments, std::string current_department_id)
-{
-    return fwd()->register_departments(departments, current_department_id);
-}
-
-Category::SCPtr SearchReply::register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
-{
-    return fwd()->register_category(id, title, icon, renderer_template);
-}
-
-void SearchReply::register_category(Category::SCPtr category)
-{
-    fwd()->register_category(category);
-}
-
-Category::SCPtr SearchReply::lookup_category(std::string const& id) const
-{
-    return fwd()->lookup_category(id);
-}
-
-bool SearchReply::push(CategorisedResult const& result) const
-{
-    return fwd()->push(result);
-}
-
-bool SearchReply::register_annotation(Annotation const& annotation) const
-{
-    return fwd()->register_annotation(annotation);
-}
-
-bool SearchReply::push(Filters const& filters, FilterState const& filter_state) const
-{
-    return fwd()->push(filters, filter_state);
-}
-
-//! @endcond
+/// @endcond
 
 } // namespace scopes
 

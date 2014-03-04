@@ -20,17 +20,17 @@
 // In this demo we include individual headers. You may also,
 // if you prefer, include just the unity-scopes.h convenience
 // header.
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/SearchReply.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchQueryBase.h>
 #include <unity/UnityExceptions.h>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
