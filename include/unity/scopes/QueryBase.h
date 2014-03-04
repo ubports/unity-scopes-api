@@ -54,7 +54,7 @@ class SSQueryObject;
 
 /**
 \brief Abstract server-side base interface for a query that is executed inside a scope.
-\see SearchQueryBase, PreviewQueryBase, ActivationQuery
+\see SearchQueryBase, PreviewQueryBase, ActivationQueryBase
 */
 
 class QueryBase
