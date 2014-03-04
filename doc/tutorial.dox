@@ -2,8 +2,7 @@
 
 \page tutorial Tutorial
 
-This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples
-of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
 
 \section simplescope A simple scope which doesn't query other scopes.
 
