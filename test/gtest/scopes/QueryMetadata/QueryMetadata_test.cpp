@@ -45,7 +45,18 @@ TEST(SearchMetadata, basic)
         SearchMetadata meta(50, "pl", "phone");
 
         meta.set_cardinality(100);
+        meta["foo"] = "bar";
+        meta.set_hint("baz", Variant(1000));
         EXPECT_EQ(100, meta.cardinality());
+        EXPECT_EQ("bar", meta["foo"].get_string());
+        EXPECT_EQ("bar", meta.hints()["foo"].get_string());
+        EXPECT_EQ(1000, meta.hints()["baz"].get_int());
+        EXPECT_TRUE(meta.contains_hint("foo"));
+    }
+    {
+        SearchMetadata const meta(50, "pl", "phone");
+        EXPECT_THROW(meta["foo"], unity::InvalidArgumentException);
+        EXPECT_FALSE(meta.contains_hint("foo"));
     }
 }
 
@@ -53,11 +64,13 @@ TEST(SearchMetadata, serialize)
 {
     {
         SearchMetadata meta("pl", "phone");
+        meta["foo"] = "bar";
 
         auto var = meta.serialize();
         EXPECT_EQ("search_metadata", var["type"].get_string());
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
     }
 }
 

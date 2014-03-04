@@ -79,6 +79,49 @@ public:
     */
     int cardinality() const;
 
+    /**
+     \brief Sets a hint.
+
+     \param key The name of the hint.
+     \param value Hint value
+     */
+    void set_hint(std::string const& key, Variant const& value);
+
+    /**
+     \brief Get all hints.
+
+     \return Hints dictionary.
+     */
+    VariantMap hints() const;
+
+    /**
+    \brief Check if this SearchMetadata has a hint.
+    \param key The hint name.
+    \return True if the hint is set.
+    */
+    bool contains_hint(std::string const& key) const;
+
+    /**
+     \brief Returns reference of a hint.
+
+      This method can be used to read or set hints.
+      Referencing a non-existing hint automatically creates it with a default value of Variant::Type::Null.
+      \param key The name of the hint.
+      \return A reference to the hint.
+     */
+    Variant& operator[](std::string const& key);
+
+    /**
+      \brief Returns a const reference to a hint.
+
+      This method can be used for read-only access to hints.
+      Referencing a non-existing hint throws unity::InvalidArgumentException.
+      \param key The name of the hint.
+      \return A const reference to the hint.
+      \throws unity::Invalidargument if hint with the given name exists.
+     */
+    Variant const& operator[](std::string const& key) const;
+
 private:
     SearchMetadata(internal::SearchMetadataImpl *impl);
     internal::SearchMetadataImpl* fwd() const;
