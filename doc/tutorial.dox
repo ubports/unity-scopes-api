@@ -366,7 +366,7 @@ Unity Scopes API provides testing helpers based on well-known and established te
 <a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
 Please see respective documentation of those projects for general information about how to use Google C++ Testing Framework.
 
-All the helper classes provided by Scopes API are located in unity::scopes::testing namespace. The most imporant ones are:
+All the helper classes provided by Scopes API are located in unity::scopes::testing namespace. The most important ones are:
 <ul>
 <li>unity::scopes::testing::TypedScopeFixture - template class that takes your scope class name as a template argument and creates a test fixture that can be
 used in tests.
