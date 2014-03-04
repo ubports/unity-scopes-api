@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        uint const no_reply_timeout = 20000;
+        uint const http_reply_timeout = 20000;
         uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
 
         // Instantiate SS registry and scopes runtimes
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
-                                                        no_reply_timeout, ss_reg_refresh_rate));
+                                                        http_reply_timeout, ss_reg_refresh_rate));
 
         // Instantiate a SS scope object
         SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));

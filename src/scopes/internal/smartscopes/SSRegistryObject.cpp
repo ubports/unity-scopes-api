@@ -44,12 +44,12 @@ namespace smartscopes
 
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& ss_scope_endpoint,
-                                   uint no_reply_timeout,
+                                   uint http_reply_timeout,
                                    uint refresh_rate_in_sec,
                                    std::string const& sss_url,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientQt>(no_reply_timeout),
+                    std::make_shared<HttpClientQt>(http_reply_timeout),
                     std::make_shared<JsonCppNode>(), sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)

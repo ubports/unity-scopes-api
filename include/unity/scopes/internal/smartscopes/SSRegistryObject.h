@@ -43,7 +43,7 @@ public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
-                     uint no_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
+                     uint http_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
                      bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
