@@ -139,6 +139,23 @@ enabled, use:
 
     $ TSAN_OPTIONS="suppressions=../tsan-suppress" make test
 
+Updating symbols file
+---------------------
+
+To easily spot new/removed/changed symbols in the library, the debian
+package is maintaining a .symbols file which lists all exported symbols
+present in the library .so. If you add new public symbols to the library,
+it's necessary to refresh the symbols file, otherwise the package will
+fail to build. The easiest way to do that is using bzr-builddeb:
+
+    $ bzr bd
+    $ # this will exit with an error if symbols file isn't up-to-date
+    $ cd ../build-area/unity-scopes-api-[version]
+    $ cat ./debian/libunity-scopes0/DEBIAN/symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes0.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
+    $ cd -
+    $ # review the symbol differences and if everything is ok, apply the diff
+    $ patch -p0 < /tmp/symbols.diff
+
 Debugging IPC
 -------------
 
