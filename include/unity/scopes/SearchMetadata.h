@@ -104,7 +104,8 @@ public:
     /**
      \brief Returns a reference to a hint.
 
-      This method can be used to read or set hints.
+      This method can be used to read or set hints. Setting a value of an existing hint overwrites
+      its previous value.
       Referencing a non-existing hint automatically creates it with a default value of Variant::Type::Null.
       \param key The name of the hint.
       \return A reference to the hint.
