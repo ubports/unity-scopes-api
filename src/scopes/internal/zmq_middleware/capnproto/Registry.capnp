@@ -63,7 +63,7 @@ struct ListRequest
 
 struct ListResponse
 {
-    returnValue @0 : List(ValueDict.ValueDict);
+    returnValue @0 : ValueDict.ValueDict;   # Dictionary of dictionaries: <scope_id, ScopeMetadata>
 }
 
 struct LocateRequest
