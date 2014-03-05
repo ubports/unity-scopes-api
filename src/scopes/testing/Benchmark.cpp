@@ -20,6 +20,8 @@
 
 #include <iostream>
 
+/// @cond
+
 std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity::scopes::testing::Benchmark::Result& result)
 {
     out << "{"
@@ -31,3 +33,5 @@ std::ostream& unity::scopes::testing::operator<<(std::ostream& out, const unity:
 
     return out;
 }
+
+/// @endcond
