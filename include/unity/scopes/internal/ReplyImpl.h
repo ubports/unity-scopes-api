@@ -19,17 +19,17 @@
 #ifndef UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 #define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/internal/ObjectProxyImpl.h>
-#include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/Category.h>
-#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/ColumnLayout.h>
-#include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/internal/ObjectImpl.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Reply.h>
 
 #include <atomic>
 
@@ -54,14 +54,17 @@ class QueryObjectBase;
 // Calls to push() after finished() was called are ignored.
 // If the proxy goes out of scope before finished was called, it implicitly calls finished().
 
-class ReplyImpl : public virtual ObjectProxyImpl
+class ReplyImpl : public virtual unity::scopes::Reply, public virtual ObjectImpl
 {
 public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~ReplyImpl();
 
     void register_departments(DepartmentList const& departments, std::string current_department_id);
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
+    Category::SCPtr register_category(std::string const& id,
+                                      std::string const& title,
+                                      std::string const &icon,
+                                      CategoryRenderer const& renderer_template);
     void register_category(Category::SCPtr category);
     Category::SCPtr lookup_category(std::string const& id) const;
 

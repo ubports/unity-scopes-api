@@ -61,12 +61,12 @@ void Runtime::run_scope(ScopeBase *const scope_base)
     p->run_scope(scope_base);
 }
 
-Proxy Runtime::string_to_proxy(string const& s) const
+ObjectProxy Runtime::string_to_proxy(string const& s) const
 {
     return p->string_to_proxy(s);
 }
 
-string Runtime::proxy_to_string(Proxy const& proxy) const
+string Runtime::proxy_to_string(ObjectProxy const& proxy) const
 {
     return p->proxy_to_string(proxy);
 }

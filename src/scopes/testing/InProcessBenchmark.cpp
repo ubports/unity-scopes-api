@@ -23,7 +23,7 @@
 #include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/PreviewReply.h>
 
 #include <unity/scopes/testing/Category.h>
 
@@ -91,38 +91,38 @@ struct WaitableReply : public virtual unity::scopes::Reply
         });
     }
 
-    void finished() const override
+    void finished() override
     {
         state.store(State::finished_with_success);
         wait_condition.notify_all();
     }
 
-    void error(std::exception_ptr) const override
+    void error(std::exception_ptr) override
     {
         state.store(State::finished_with_error);
         wait_condition.notify_all();
     }
 };
 
-struct DevNullPreviewReply : public virtual unity::scopes::PreviewReply, public WaitableReply
+struct DevNullPreviewReply : public unity::scopes::PreviewReply, public WaitableReply
 {
-    bool register_layout(unity::scopes::ColumnLayoutList const&) const override
+    bool register_layout(unity::scopes::ColumnLayoutList const&) override
     {
         return true;
     }
 
-    bool push(unity::scopes::PreviewWidgetList const&) const override
+    bool push(unity::scopes::PreviewWidgetList const&) override
     {
         return true;
     }
 
-    bool push(std::string const&, unity::scopes::Variant const&) const override
+    bool push(std::string const&, unity::scopes::Variant const&) override
     {
         return true;
     }
 };
 
-struct DevNullSearchReply : public virtual unity::scopes::SearchReply, public WaitableReply
+struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableReply
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 

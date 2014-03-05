@@ -47,8 +47,8 @@ public:
                      bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_id) const override;
-    MetadataMap list() const override;
+    ScopeMetadata get_metadata(std::string const& scope_id) override;
+    MetadataMap list() override;
 
     ScopeProxy locate(std::string const& scope_id) override;
 

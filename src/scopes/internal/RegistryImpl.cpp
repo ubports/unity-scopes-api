@@ -34,7 +34,7 @@ namespace internal
 {
 
 RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
-    ObjectProxyImpl(mw_proxy)
+    ObjectImpl(mw_proxy)
 {
 }
 
@@ -73,7 +73,7 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
 
 RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
 {
-    return RegistryProxy(new Registry(new RegistryImpl(mw_proxy, runtime)));
+    return make_shared<RegistryImpl>(mw_proxy, runtime);
 }
 
 MWRegistryProxy RegistryImpl::fwd() const

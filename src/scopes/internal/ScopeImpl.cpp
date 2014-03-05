@@ -18,19 +18,16 @@
 
 #include <unity/scopes/internal/ScopeImpl.h>
 
-#include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/PreviewReplyObject.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
-#include <unity/scopes/internal/ReplyObject.h>
-#include <unity/scopes/Scope.h>
-#include <unity/scopes/Result.h>
-#include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/internal/ActivationReplyObject.h>
-#include <unity/scopes/internal/ResultReplyObject.h>
-#include <unity/scopes/internal/PreviewReplyObject.h>
 
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
@@ -58,14 +55,21 @@ ScopeImpl::~ScopeImpl()
 {
 }
 
-QueryCtrlProxy ScopeImpl::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                 std::string const& department_id,
+                                 FilterState const& filter_state,
+                                 SearchMetadata const& metadata,
+                                 SearchListenerBase::SPtr const& reply)
 {
     CannedQuery query(scope_name_, query_string, department_id);
     query.set_filter_state(filter_state);
     return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                 FilterState const& filter_state,
+                                 SearchMetadata const& metadata,
+                                 SearchListenerBase::SPtr const& reply)
 {
     CannedQuery query(scope_name_);
     query.set_query_string(query_string);
@@ -73,14 +77,18 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string, FilterState co
     return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::search(string const& query_string, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(string const& query_string,
+                                 SearchMetadata const& metadata,
+                                 SearchListenerBase::SPtr const& reply)
 {
     CannedQuery query(scope_name_);
     query.set_query_string(query_string);
     return search(query, metadata, reply);
 }
 
-QueryCtrlProxy ScopeImpl::search(CannedQuery const& query, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
+                                 SearchMetadata const& metadata,
+                                 SearchListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
     {
@@ -114,7 +122,9 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query, SearchMetadata const&
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::activate(Result const& result,
+                                   ActionMetadata const& metadata,
+                                   ActivationListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
     {
@@ -149,8 +159,11 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result, ActionMetadata const& m
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
-        ActivationListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
+                                         ActionMetadata const& metadata,
+                                         std::string const& widget_id,
+                                         std::string const& action_id,
+                                         ActivationListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
     {
@@ -189,7 +202,9 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result, ActionMetadata co
     return ctrl;
 }
 
-QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hints, PreviewListenerBase::SPtr const& reply) const
+QueryCtrlProxy ScopeImpl::preview(Result const& result,
+                                  ActionMetadata const& hints,
+                                  PreviewListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
     {
@@ -233,7 +248,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result, ActionMetadata const& hi
 
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name)
 {
-    return ScopeProxy(new Scope(new ScopeImpl(mw_proxy, runtime, scope_name)));
+    return make_shared<ScopeImpl>(mw_proxy, runtime, scope_name);
 }
 
 MWScopeProxy ScopeImpl::fwd() const

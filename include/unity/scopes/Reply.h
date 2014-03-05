@@ -19,6 +19,9 @@
 #ifndef UNITY_SCOPES_REPLY_H
 #define UNITY_SCOPES_REPLY_H
 
+#include <unity/scopes/Object.h>
+#include <unity/scopes/ReplyProxyFwd.h>
+
 #include <exception>
 
 namespace unity
@@ -31,13 +34,9 @@ namespace scopes
 \brief Abstract base class to allow the results of a query to be sent to the source of the query.
 */
 
-class Reply
+class Reply : public virtual Object
 {
 public:
-    // @cond
-    Reply(Reply const&) = delete;
-    // @endcond
-
     /**
     \brief Informs the source of a query that the query results are complete.
 
@@ -51,7 +50,7 @@ public:
     either when the last reply proxy goes out of scope, or when QueryBase::run() returns
     (whichever happens last).
     */
-    virtual void finished() const = 0;
+    virtual void finished() = 0;
 
     /**
     \brief Informs the source of a query that the query was terminated due to an error.
@@ -61,7 +60,7 @@ public:
               the return value of `what()` is made available to the query source. Otherwise,
               the query source receives `"unknown exception"`.
     */
-    virtual void error(std::exception_ptr ex) const = 0;
+    virtual void error(std::exception_ptr ex) = 0;
 
     /**
     \brief Destroys a Reply.

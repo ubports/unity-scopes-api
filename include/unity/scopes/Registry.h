@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_REGISTRY_H
 #define UNITY_SCOPES_REGISTRY_H
 
-#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/Object.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ScopeMetadata.h>
 
@@ -46,13 +46,11 @@ typedef std::map<std::string, ScopeMetadata> MetadataMap;
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class Registry : public virtual ObjectProxy
+class Registry : public virtual Object
 {
 public:
     /// @cond
     virtual ~Registry();
-    Registry(const Registry&) = delete;
-    Registry(Registry&&) = delete;
     /// @endcond
 
     /**
@@ -60,23 +58,25 @@ public:
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) const = 0;
+    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
 
     /**
     \brief Returns a map containing the metadata for all scopes.
     \return The metadata for all scopes.
     */
-    virtual MetadataMap list() const = 0;
+    virtual MetadataMap list() = 0;
 
     /**
     \brief Returns a map containing only those scopes for which `predicate` returns true.
     \param predicate a function object that must return true for each metadata item to be included in the map.
     \return The metadata items for which the predicate returned true.
     */
-    virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const = 0;
+    virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) = 0;
 
 protected:
+    /// @cond
     Registry();
+    /// @endcond
 };
 
 } // namespace scopes

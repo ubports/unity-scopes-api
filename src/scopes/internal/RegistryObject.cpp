@@ -58,7 +58,7 @@ RegistryObject::~RegistryObject()
     }
 }
 
-ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
@@ -85,7 +85,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
     throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
 }
 
-MetadataMap RegistryObject::list() const
+MetadataMap RegistryObject::list()
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     MetadataMap all_scopes(scopes_);  // Local scopes

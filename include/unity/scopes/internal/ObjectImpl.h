@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
-#define UNITY_SCOPES_INTERNAL_OBJECTPROXYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
+#define UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
 
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
-#include<unity/scopes/ObjectProxyFwd.h>
+#include<unity/scopes/Object.h>
 
 namespace unity
 {
@@ -31,19 +31,19 @@ namespace scopes
 namespace internal
 {
 
-class ObjectProxyImpl
+class ObjectImpl : public virtual Object
 {
 public:
-    ObjectProxyImpl(MWProxy const& mw_proxy);
-    virtual ~ObjectProxyImpl();
+    ObjectImpl(MWProxy const& mw_proxy);
+    virtual ~ObjectImpl();
 
-    virtual std::string identity() const;
-    virtual std::string endpoint() const;
-    virtual int64_t timeout() const;
+    virtual std::string identity() override;
+    virtual std::string endpoint() override;
+    virtual int64_t timeout() override;
 
-    std::string to_string() const;
+    virtual std::string to_string() override;
 
-    // Remote operation
+    // Remote operation. Not part of the public API, hence not override.
     virtual void ping();
 
 protected:
@@ -52,7 +52,7 @@ protected:
                                             // that is called from within each operation to down-cast the MWProxy.
 
 private:
-    static Proxy create(MWProxy const& mw_proxy);
+    static ObjectProxy create(MWProxy const& mw_proxy);
     friend class RuntimeImpl;   // So RuntimeImpl can call create() from string_to_proxy()
 
     MWProxy mw_proxy_;

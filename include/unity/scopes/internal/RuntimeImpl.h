@@ -54,8 +54,8 @@ public:
     Reaper::SPtr reply_reaper() const;
     void run_scope(ScopeBase *const scope_base);
 
-    Proxy string_to_proxy(std::string const& s) const;
-    std::string proxy_to_string(Proxy const& proxy) const;
+    ObjectProxy string_to_proxy(std::string const& s) const;
+    std::string proxy_to_string(ObjectProxy const& proxy) const;
 
     ~RuntimeImpl();
 

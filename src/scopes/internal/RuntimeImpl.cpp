@@ -209,14 +209,14 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
     run_future.get();
 }
 
-Proxy RuntimeImpl::string_to_proxy(string const& s) const
+ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const
 {
     auto mw = middleware_factory_->find(s);
     assert(mw);
     return mw->string_to_proxy(s);
 }
 
-string RuntimeImpl::proxy_to_string(Proxy const& proxy) const
+string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 {
     if (proxy == nullptr)
     {

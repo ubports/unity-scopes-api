@@ -115,20 +115,20 @@ public:
     or an exception (for example, if the proxy string did not parse correctly, or if the proxy
     could not be instantiated due to incorrect values inside the string).
     */
-    Proxy string_to_proxy(std::string const& s) const;
+    ObjectProxy string_to_proxy(std::string const& s) const;
 
     /**
     \brief Converts a proxy to a string.
 
     proxy_to_string() converts the passed proxy to a string. Note that it is typically easier
-    to call the Proxy::to_string() method to achieve the same thing. However, proxy_to_string()
+    to call the ObjectProxy::to_string() method to achieve the same thing. However, proxy_to_string()
     is needed in order to obtain a string for a null proxy (because it is not possible to invoke
     a member function on a null proxy).
 
     \param proxy The proxy to convert to a string.
     \return The string representation of the proxy.
     */
-    std::string proxy_to_string(Proxy const& proxy) const;
+    std::string proxy_to_string(ObjectProxy const& proxy) const;
 
     /**
     \brief Destroys a Runtime instance.

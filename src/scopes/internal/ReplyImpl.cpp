@@ -27,12 +27,12 @@
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/PreviewReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/SearchReply.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Reply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
@@ -51,7 +51,7 @@ namespace internal
 {
 
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
-    ObjectProxyImpl(mw_proxy),
+    ObjectImpl(mw_proxy),
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
     finished_(false),
@@ -305,9 +305,12 @@ void ReplyImpl::error(exception_ptr ex)
 
 SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
 {
+    return make_shared<ReplyImpl>(mw_proxy, qo);
+#if 0
     auto reply_impl = new ReplyImpl(mw_proxy, qo);
     auto reply = new SearchReply(reply_impl);
     return SearchReplyProxy(reply);
+#endif
 }
 
 PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)

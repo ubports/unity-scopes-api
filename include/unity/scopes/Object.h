@@ -16,10 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_OBJECTPROXY_H
-#define UNITY_SCOPES_OBJECTPROXY_H
+#ifndef UNITY_SCOPES_OBJECT_H
+#define UNITY_SCOPES_OBJECT_H
 
 #include <unity/scopes/ObjectProxyFwd.h>
+#include <unity/util/NonCopyable.h>
 
 namespace unity
 {
@@ -27,35 +28,30 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-{
-class ObjectProxyImpl;
-class RuntimeImpl;
-}
-
 /**
 \brief The root base class for all proxies.
 */
 
-class ObjectProxy
+class Object
 {
 public:
     /// @cond
-    ObjectProxy();
-    virtual ~ObjectProxy();
+    NONCOPYABLE(Object);
+
+    virtual ~Object();
     /// @endcond
 
     /**
     \brief Returns the endpoint this proxy connects to.
     \return The endpoint of the proxy.
     */
-    std::string endpoint() const;
+    virtual std::string endpoint() = 0;
 
     /**
     \brief Returns the identity of the target object of this proxy.
     \return The identity of the target of the proxy.
     */
-    std::string identity() const;
+    virtual std::string identity() = 0;
 
     /**
     \brief Returns the timeout in milliseconds if this proxy is a twoway proxy.
@@ -63,7 +59,7 @@ public:
     For oneway proxies and twoway proxies without a timeout, the return value is -1.
     \return The timeout value in milliseconds (-1 if none or timeout does not apply).
     */
-    int64_t timeout() const;      // Timeout in milliseconds, -1 == no timeout
+    virtual int64_t timeout() = 0;      // Timeout in milliseconds, -1 == no timeout
 
     /**
     \brief converts a proxy into its string representation.
@@ -71,19 +67,12 @@ public:
     A proxy string can be converted back into a proxy by calling Runtime::string_to_proxy().
     \return The string representation of the proxy.
     */
-    std::string to_string() const;
+    virtual std::string to_string() = 0;
 
 protected:
     /// @cond
-    internal::ObjectProxyImpl* pimpl() const noexcept; // Non-virtual because we can't use covariance with incomplete types
-                                                       // Each derived proxy type implements a non-virtual fwd() method
-                                                       // that is called from within each operation to down-cast the pimpl().
-    ObjectProxy(internal::ObjectProxyImpl*);
-    friend class internal::ObjectProxyImpl; // Instantiated only by ObjectProxyImpl
+    Object();
     /// @endcond
-
-private:
-    std::unique_ptr<internal::ObjectProxyImpl> p;
 };
 
 } // namespace scopes

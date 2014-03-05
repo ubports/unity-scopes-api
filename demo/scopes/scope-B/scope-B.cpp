@@ -22,7 +22,7 @@
 // header.
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/SearchReply.h>
+#include <unity/scopes/SearchReply.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>

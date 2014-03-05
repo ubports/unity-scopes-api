@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLYPROXY_H
-#define UNITY_SCOPES_REPLYPROXY_H
+#ifndef UNITY_SCOPES_REPLYPROXYFWD_H
+#define UNITY_SCOPES_REPLYPROXYFWD_H
 
 #include <memory>
 
@@ -28,23 +28,11 @@ namespace scopes
 {
 
 class Reply;
-class SearchReply;
-class PreviewReply;
 
-/** \typedef ReplyBaseProxy
+/** \typedef ReplyProxy
 \brief Convenience type definition.
 */
-typedef std::shared_ptr<Reply> ReplyBaseProxy;
-
-/** \typedef SearchReplyProxy
-\brief Convenience type definition.
-*/
-typedef std::shared_ptr<SearchReply> SearchReplyProxy;
-
-/** \typedef PreviewReplyProxy
-\brief Convenience type definition.
-*/
-typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
+typedef std::shared_ptr<Reply> ReplyProxy;
 
 } // namespace scopes
 

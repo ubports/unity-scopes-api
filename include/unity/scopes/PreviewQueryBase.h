@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_PREVIEWQUERYBASE_H
 #define UNITY_SCOPES_PREVIEWQUERYBASE_H
 
+#include <unity/scopes/PreviewReplyProxyFwd.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/QueryBase.h>
