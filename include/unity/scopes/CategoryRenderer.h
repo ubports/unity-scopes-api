@@ -78,8 +78,9 @@ constexpr const char* MUSIC_GRID_RENDERER
 };
 
 /**
-\brief CategoryRenderer encapsulates category renderer template in JSON format.
+\brief A category renderer template in JSON format.
 */
+
 class CategoryRenderer
 {
 public:
@@ -88,29 +89,34 @@ public:
     /// @endcond
 
     /**
-     \brief Creates CategoryRenderer from a JSON data.
-     */
+    \brief Creates a CategoryRenderer from a JSON string.
+    */
+    // TODO: document exception thrown for invalid string.
     explicit CategoryRenderer(std::string const& json_text = DEFAULT_RENDERER);
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     CategoryRenderer(CategoryRenderer const&);
     CategoryRenderer& operator=(CategoryRenderer const&);
 
     CategoryRenderer(CategoryRenderer&&);
     CategoryRenderer& operator=(CategoryRenderer&&);
     virtual ~CategoryRenderer();
-    /// @endcond
+    //@}
 
     /**
-     \brief Creates CategoryRenderer from a text file.
-     \return The CategoryRenderer corresponding to the information in the file.
-     */
+    \brief Creates a CategoryRenderer from a text file.
+    \return The CategoryRenderer corresponding to the information in the file.
+    */
+    // TODO: document exception thrown for invalid string.
     static CategoryRenderer from_file(std::string const& path);
 
     /**
-     \brief Returns complete renderer template definition in JSON format.
-     \return The renderer template (JSON).
-     */
+    \brief Returns complete renderer template definition in JSON format.
+    \return The renderer template (JSON).
+    */
     std::string data() const;
 
 private:

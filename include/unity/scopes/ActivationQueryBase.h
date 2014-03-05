@@ -35,10 +35,12 @@ class ActivationQueryBaseImpl;
 }
 
 /**
-\brief Base class for a activation request that is executed inside a scope.
+\brief Base class for an activation request that is executed inside a scope.
+
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
 Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
+
 class ActivationQueryBase : public QueryBase
 {
 public:
@@ -55,6 +57,7 @@ public:
 
     /**
      \brief Return response to the activation request.
+
      The response is received by the originator of the request. Default implementation
      returns ActivationResponse(ActivationResponse::Status::NotHandled.
      \return The response to the activation request.

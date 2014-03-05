@@ -41,7 +41,7 @@ namespace internal
 {
 
 /**
-\brief SearchReply allows the results of a search query to be sent to the source of a query.
+\brief Allows the results of a search query to be sent to the source of a query.
 */
 
 class SearchReply : public virtual unity::scopes::SearchReply, public virtual Reply

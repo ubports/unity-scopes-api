@@ -31,6 +31,8 @@ class ScopeBase;
 namespace testing
 {
 
+/// @cond
+
 class InProcessBenchmark : public Benchmark
 {
 public:
@@ -48,6 +50,8 @@ public:
     virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                               ActionConfiguration activation_configuration) override;
 };
+
+/// @endcond
 
 } // namespace testing
 

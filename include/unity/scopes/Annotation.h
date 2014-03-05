@@ -39,8 +39,9 @@ class ResultReplyObject;
 }
 
 /**
- * \brief Handles a scope query link(s) that result in a new search query when clicked by user.
+ * \brief Query link(s) that result in a new search query when clicked by the user.
  */
+
 class Annotation final
 {
 public:

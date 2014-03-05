@@ -39,7 +39,7 @@ class CategorisedResult;
 class FilterState;
 
 /**
-\brief SearchListenerBase is an abstract base interface that a scope specializes to
+\brief Abstract base interface that a scope specializes to
 receive the results of a query.
 
 An instance of this interface must be passed to Scope::create_query().

@@ -39,8 +39,9 @@ namespace internal
 }
 
 /**
-   \brief Category represents a set of related results returned by scope
+   \brief A set of related results returned by a scope
    and displayed within a single pane in the Unity dash.
+
    To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
