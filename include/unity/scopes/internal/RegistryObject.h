@@ -41,7 +41,7 @@ public:
     struct ScopeExecData
     {
         ScopeExecData() = default;
-        ScopeExecData(std::initializer_list<std::string> l) = delete;
+        ScopeExecData(std::initializer_list<std::string>) = delete;
         std::string scoperunner_path;
         std::string config_file;
         std::string scope_name;

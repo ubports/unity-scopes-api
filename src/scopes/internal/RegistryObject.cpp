@@ -143,12 +143,12 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
     }
 
     // 1. check scope not already running.
-    //  1.1 if scope running, return proxy.
-    //  1.2 if scope running but is “stopping”, wait for it to stop (timeout?).
+    //  1.1. if scope running, return proxy.
+    //  1.2. if scope running but is “stopping”, wait for it to stop (timeout?).
     // 2. exec the scope.
     // 3. wait 1.5s for "running" signal.
-    //  3.1 when ready, return proxy.
-    //  3.2 OR when timeout, kill process and throw.
+    //  3.1. when ready, return proxy.
+    //  3.2. OR when timeout, kill process and throw.
 
     return it->second.proxy();
 }
