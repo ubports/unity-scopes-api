@@ -42,7 +42,7 @@ namespace smartscopes
 class RaiiServer
 {
 public:
-    RaiiServer(std::string const& server_path, std::string const& port = "")
+    RaiiServer(std::string const& server_path)
     {
         int pipefd[2];
         if (pipe(pipefd) < 0)
@@ -62,14 +62,7 @@ public:
                     throw unity::ResourceException("Write pipe duplication failed");
                 }
 
-                if (!port.empty())
-                {
-                    execl(server_path.c_str(), "", port.c_str(), NULL);
-                }
-                else
-                {
-                    execl(server_path.c_str(), "", NULL);
-                }
+                execl(server_path.c_str(), "", NULL);
                 throw unity::ResourceException("Failed to execute fake server script");
             default: // parent
                 close(pipefd[1]);       // close write

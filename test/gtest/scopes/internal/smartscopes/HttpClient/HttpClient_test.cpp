@@ -59,24 +59,15 @@ public:
 
 TEST_F(HttpClientTest, no_server)
 {
+    int dead_port;
     {
-        // spawn a server on port 1024
-        RaiiServer server(FAKE_SERVER_PATH, "1024");
-        EXPECT_EQ(1024, server.port_);
-
-        // first check that server does actually work
-        HttpResponseHandle::SPtr response = http_client_->get(test_url_);
-        response->wait();
-
-        std::string response_str;
-        EXPECT_NO_THROW(response_str = response->get());
-        EXPECT_EQ("Hello there", response_str);
-
+        // spawn a server, so it allocates a free port
+        RaiiServer server(FAKE_SERVER_PATH);
+        dead_port = server.port_;
         // RaiiServer goes out of scope, so it gets killed
     }
-
-    // now check that the server no longer exists
-    HttpResponseHandle::SPtr response = http_client_->get(c_test_url + ":1024");
+    // no server
+    HttpResponseHandle::SPtr response = http_client_->get(c_test_url + ":" + std::to_string(dead_port));
     response->wait();
 
     EXPECT_THROW(response->get(), unity::Exception);

@@ -19,6 +19,7 @@
 #
 
 from wsgiref.simple_server import make_server
+from random import randint
 import sys
 import time
 
@@ -36,18 +37,14 @@ def response(environ, start_response):
         start_response(status, response_headers)
         return 'Hello there'
 
-if len(sys.argv) > 1:
-    port = int(sys.argv[1])
-    httpd = make_server('127.0.0.1', port, response)
-else:
-    serving = False
-    port = 1025 # port 1024 reserved for "no_server" test
-    while serving == False:
-        try:
-            httpd = make_server('127.0.0.1', port, response)
-            serving = True
-        except:
-            port += 1
+serving = False
+port = randint(1024, 49151)
+while serving == False:
+    try:
+        httpd = make_server('127.0.0.1', port, response)
+        serving = True
+    except:
+        port = randint(1024, 49151)
 
 print(str(port))
 sys.stdout.flush()
