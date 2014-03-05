@@ -72,6 +72,32 @@ int SearchMetadata::cardinality() const
     return fwd()->cardinality();
 }
 
+void SearchMetadata::set_hint(std::string const& key, Variant const& value)
+{
+    fwd()->hint(key) = value;
+}
+
+VariantMap SearchMetadata::hints() const
+{
+    return fwd()->hints();
+}
+
+Variant& SearchMetadata::operator[](std::string const& key)
+{
+    return fwd()->hint(key);
+}
+
+Variant const& SearchMetadata::operator[](std::string const& key) const
+{
+    // force const hint() method
+    return (const_cast<internal::SearchMetadataImpl const *>(fwd()))->hint(key);
+}
+
+bool SearchMetadata::contains_hint(std::string const& key) const
+{
+    return fwd()->contains_hint(key);
+}
+
 internal::SearchMetadataImpl* SearchMetadata::fwd() const
 {
     return dynamic_cast<internal::SearchMetadataImpl*>(p.get());
