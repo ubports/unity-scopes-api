@@ -38,13 +38,13 @@ def response(environ, start_response):
         return 'Hello there'
 
 serving = False
-port = randint(1024, 49151)
+port = randint(1024, 65535)
 while serving == False:
     try:
         httpd = make_server('127.0.0.1', port, response)
         serving = True
     except:
-        port = randint(1024, 49151)
+        port = randint(1024, 65535)
 
 print(str(port))
 sys.stdout.flush()
