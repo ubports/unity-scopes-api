@@ -156,20 +156,20 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
     }
-    catch (std::exception const&)
+    catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
                   << url_ << c_remote_scopes_resource << std::endl;
 
         if (caching_enabled)
         {
+            std::cerr << e.what() << std::endl;
             std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
 
             response_str = read_cache();
             if (response_str.empty())
             {
-                std::cerr << "SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty" << std::endl;
-                throw;
+                throw ResourceException("SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty");
             }
 
             using_cache = true;
@@ -212,11 +212,21 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             scope.id = child_node->get_node("id")->as_string();
 
-            if (!child_node->has_node("name") || !child_node->has_node("description") ||
-                !child_node->has_node("author") || !child_node->has_node("base_url"))
+            bool err = false;
+            static std::array<char const*, 4> const mandatory { "name", "description", "author", "base_url" };
+            for (auto const& field : mandatory)
+            {
+                if (!child_node->has_node(field))
+                {
+                    std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                              << "\" has no \"" << field << "\" field" << std::endl;
+                    err = true;
+                }
+            }
+            if (err)
             {
                 std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
-                          << scope.id << "\" due to missing mandatory field(s)" << std::endl;
+                          << scope.id << "\"" << std::endl;
                 continue;
             }
 
@@ -240,10 +250,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             remote_scopes.push_back(scope);
         }
-        catch (std::exception const&)
+        catch (std::exception const& e)
         {
             std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
                       << scope.id << "\" due to a json parsing failure" << std::endl;
+            std::cerr << e.what() << std::endl;
         }
     }
 
@@ -260,10 +271,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             {
                 write_cache(response_str);
             }
-            catch (std::exception const&)
+            catch (std::exception const& e)
             {
                 std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to write to cache file: "
                           << c_scopes_cache_dir << c_scopes_cache_filename << std::endl;
+                std::cerr << e.what() << std::endl;
             }
         }
 
