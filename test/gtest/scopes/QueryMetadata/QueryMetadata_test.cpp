@@ -54,8 +54,9 @@ TEST(SearchMetadata, basic)
         EXPECT_TRUE(meta.contains_hint("foo"));
     }
     {
+        // referencing non-existing hint with a const object throws
         SearchMetadata const meta(50, "pl", "phone");
-        EXPECT_THROW(meta["foo"], unity::InvalidArgumentException);
+        EXPECT_THROW(meta["foo"], unity::LogicException);
         EXPECT_FALSE(meta.contains_hint("foo"));
     }
 }

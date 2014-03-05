@@ -78,7 +78,7 @@ Variant const& SearchMetadataImpl::hint(std::string const& key) const
     }
     std::ostringstream s;
     s << "SearchMetadataImpl::hint(): requested key " << key << " doesn't exist";
-    throw InvalidArgumentException(s.str());
+    throw unity::LogicException(s.str());
 }
 
 void SearchMetadataImpl::set_hint(std::string const& key, Variant const& value)

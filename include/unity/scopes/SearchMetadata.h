@@ -102,7 +102,7 @@ public:
     bool contains_hint(std::string const& key) const;
 
     /**
-     \brief Returns reference of a hint.
+     \brief Returns a reference to a hint.
 
       This method can be used to read or set hints.
       Referencing a non-existing hint automatically creates it with a default value of Variant::Type::Null.
@@ -118,7 +118,7 @@ public:
       Referencing a non-existing hint throws unity::InvalidArgumentException.
       \param key The name of the hint.
       \return A const reference to the hint.
-      \throws unity::Invalidargument if hint with the given name exists.
+      \throws unity::LogicException if no hint with the given name exists.
      */
     Variant const& operator[](std::string const& key) const;
 
