@@ -36,14 +36,18 @@ def response(environ, start_response):
         start_response(status, response_headers)
         return 'Hello there'
 
-serving = False
-port = 1024
-while serving == False:
-    try:
-        httpd = make_server('127.0.0.1', port, response)
-        serving = True
-    except:
-        port += 1
+if len(sys.argv) > 1:
+    port = int(sys.argv[1])
+    httpd = make_server('127.0.0.1', port, response)
+else:
+    serving = False
+    port = 1025 # port 1024 reserved for "no_server" test
+    while serving == False:
+        try:
+            httpd = make_server('127.0.0.1', port, response)
+            serving = True
+        except:
+            port += 1
 
 print(str(port))
 sys.stdout.flush()
