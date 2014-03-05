@@ -16,7 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/RegistryBase.h>
+#include <unity/scopes/internal/PreviewReply.h>
+
+#include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {
@@ -24,13 +28,37 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+namespace internal
+{
 
-RegistryBase::RegistryBase() = default;
+//! @cond
 
-RegistryBase::~RegistryBase() = default;
+PreviewReply::PreviewReply(internal::ReplyImpl* impl) : Reply(impl)
+{
+}
 
-/// @endcond
+PreviewReply::~PreviewReply()
+{
+}
+
+bool PreviewReply::register_layout(ColumnLayoutList const& layouts) const
+{
+    return fwd()->register_layout(layouts);
+}
+
+bool PreviewReply::push(PreviewWidgetList const& widgets) const
+{
+    return fwd()->push(widgets);
+}
+
+bool PreviewReply::push(std::string const& key, Variant const& value) const
+{
+    return fwd()->push(key, value);
+}
+
+//! @endcond
+
+} // namespace internal
 
 } // namespace scopes
 

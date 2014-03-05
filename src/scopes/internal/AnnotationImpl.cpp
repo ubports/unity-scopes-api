@@ -99,7 +99,7 @@ void AnnotationImpl::set_icon(std::string const& icon)
     icon_ = icon;
 }
 
-void AnnotationImpl::add_link(std::string const& label, Query const& query)
+void AnnotationImpl::add_link(std::string const& label, CannedQuery const& query)
 {
     if (annotation_type_ != Annotation::Type::GroupedLink && !links_.empty())
     {

@@ -25,7 +25,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -50,7 +50,7 @@ interface Reply;
 
 interface Scope
 {
-    QueryCtrl* create_query(string query, ValueDict hints, Reply* replyProxy);
+    QueryCtrl* search(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
@@ -73,12 +73,12 @@ ZmqScope::~ZmqScope()
 {
 }
 
-QueryCtrlProxy ZmqScope::create_query(Query const& query, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
     {
-        auto request = make_request_(request_builder, "create_query");
+        auto request = make_request_(request_builder, "search");
         auto in_params = request.initInParams().getAs<capnproto::Scope::CreateQueryRequest>();
         auto q = in_params.initQuery();
         to_value_dict(query.serialize(), q);

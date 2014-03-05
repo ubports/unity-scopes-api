@@ -16,11 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/internal/Reply.h>
 
-#include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/ReplyImpl.h>
 
-using namespace std;
+#include <cassert>
 
 namespace unity
 {
@@ -28,15 +28,36 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
-PreviewQuery::PreviewQuery() : QueryBase()
+namespace internal
 {
+
+//! @cond
+
+Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
+{
+    assert(impl);
 }
 
-PreviewQuery::~PreviewQuery()
+Reply::~Reply() = default;
+
+void Reply::finished() const
 {
+    return fwd()->finished();
 }
-/// @endcond
+
+void Reply::error(std::exception_ptr ex) const
+{
+    return fwd()->error(ex);
+}
+
+internal::ReplyImpl* Reply::fwd() const
+{
+    return dynamic_cast<internal::ReplyImpl*>(pimpl());
+}
+
+//! @endcond
+
+} // namespace internal
 
 } // namespace scopes
 

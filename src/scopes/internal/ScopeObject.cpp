@@ -142,14 +142,14 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     return ctrl_proxy;
 }
 
-MWQueryCtrlProxy ScopeObject::create_query(Query const& q,
+MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                            SearchMetadata const& hints,
                                            MWReplyProxy const& reply,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> SearchQuery::UPtr {
-                 auto search_query = this->scope_base_->create_query(q, hints);
+            [&q, &hints, this]() -> SearchQueryBase::UPtr {
+                 auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_metadata(hints);
                  return search_query;
             },
@@ -169,7 +169,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                 return this->scope_base_->activate(result, hints);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
                 return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }
@@ -188,7 +188,7 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
                 return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto activation_base = dynamic_pointer_cast<ActivationBase>(query_base);
+                auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
                 return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }
@@ -205,7 +205,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                 return this->scope_base_->preview(result, hints);
             },
             [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                auto preview_query = dynamic_pointer_cast<PreviewQuery>(query_base);
+                auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base);
                 assert(preview_query);
                 return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }

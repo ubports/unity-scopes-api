@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/PreviewListenerBase.h>
 
 namespace unity
 {
@@ -26,32 +26,12 @@ namespace scopes
 
 //! @cond
 
-SearchListener::SearchListener()
+PreviewListenerBase::PreviewListenerBase()
 {
 }
 
-SearchListener::~SearchListener()
+PreviewListenerBase::~PreviewListenerBase()
 {
-}
-
-void SearchListener::push(DepartmentList const& /* departments */, std::string const& /* current_department_id */)
-{
-    // Intentionally empty: "do nothing" default implementation.
-}
-
-void SearchListener::push(Filters const& /* filters */, FilterState const& /* filter_state */)
-{
-    // Intentionally empty: "do nothing" default implementation.
-}
-
-void SearchListener::push(Category::SCPtr /* category */)
-{
-    // Intentionally empty: "do nothing" default implementation.
-}
-
-void SearchListener::push(Annotation /* annotation */)
-{
-    // Intentionally empty: "do nothing" default implementation.
 }
 
 //! @endcond

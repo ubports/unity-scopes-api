@@ -117,7 +117,7 @@ std::string to_string(Variant const& var)
     return str.str();
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver(int index_to_save)
@@ -225,10 +225,10 @@ private:
     std::shared_ptr<Result> saved_result_;
 };
 
-class ActivationReceiver : public ActivationListener
+class ActivationReceiver : public ActivationListenerBase
 {
 public:
-    void activation_response(ActivationResponse const& response) override
+    void activated(ActivationResponse const& response) override
     {
         cout << "\tGot activation response: " << response.status() << endl;
     }
@@ -250,7 +250,7 @@ private:
     condition_variable condvar_;
 };
 
-class PreviewReceiver : public PreviewListener
+class PreviewReceiver : public PreviewListenerBase
 {
 public:
     void push(ColumnLayoutList const& columns) override
@@ -278,9 +278,9 @@ public:
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
             cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
-                 << "\t\t attributes: " << to_string(Variant(it->attributes())) << endl
+                 << "\t\t attributes: " << to_string(Variant(it->attribute_values())) << endl
                  << "\t\t components: {";
-            for (const auto kv: it->components())
+            for (const auto kv: it->attribute_mappings())
             {
                 cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
             }
@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
         print_usage();
     }
 
-    string scope_name = argv[1];
+    string scope_id = argv[1];
     string search_string = argv[2];
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
@@ -370,9 +370,9 @@ int main(int argc, char* argv[])
         Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
 
         RegistryProxy r = rt->registry();
-        auto meta = r->get_metadata(scope_name);
+        auto meta = r->get_metadata(scope_id);
         cout << "Scope metadata:   " << endl;
-        cout << "\tscope_name:     " << meta.scope_name() << endl;
+        cout << "\tscope_id:       " << meta.scope_id() << endl;
         cout << "\tdisplay_name:   " << meta.display_name() << endl;
         cout << "\tdescription:    " << meta.description() << endl;
         string tmp;
@@ -412,7 +412,7 @@ int main(int argc, char* argv[])
 
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
-        auto ctrl = meta.proxy()->create_query(search_string, metadata, reply); // May raise TimeoutException
+        auto ctrl = meta.proxy()->search(search_string, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

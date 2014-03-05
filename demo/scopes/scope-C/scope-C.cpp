@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/Query.h>
 
 #include <algorithm>
 #include <condition_variable>
@@ -126,10 +126,10 @@ private:
 // alive as long as it can still be cancelled, which is while there is at least one
 // SearchReplyProxy still in existence for this query.
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(Query const& query, Queue& queue) :
+    MyQuery(CannedQuery const& query, Queue& queue) :
         query_(query),
         queue_(queue)
     {
@@ -158,11 +158,11 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
     Queue& queue_;
 };
 
-class MyActivation : public ActivationBase
+class MyActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -218,19 +218,19 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
-        return SearchQuery::UPtr(new MyQuery(q, queue));
+        return SearchQueryBase::UPtr(new MyQuery(q, queue));
     }
 
-    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
     {
         cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
-        return ActivationBase::UPtr(new MyActivation());
+        return ActivationQueryBase::UPtr(new MyActivation());
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

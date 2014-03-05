@@ -73,7 +73,7 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 {
     unity::scopes::testing::OutOfProcessBenchmark benchmark;
 
-    unity::scopes::Query query{scope_name};
+    unity::scopes::CannedQuery query{scope_name};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
@@ -209,7 +209,7 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
 {
     unity::scopes::testing::InProcessBenchmark benchmark;
 
-    unity::scopes::Query query{scope_name};
+    unity::scopes::CannedQuery query{scope_name};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};

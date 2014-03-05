@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
 #define UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
 
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/Link.h>
@@ -43,7 +43,7 @@ public:
 
     void set_label(std::string const& label);
     void set_icon(std::string const& icon);
-    void add_link(std::string const& label, Query const& query);
+    void add_link(std::string const& label, CannedQuery const& query);
     std::string label() const;
     std::string icon() const;
     std::list<Link::SCPtr> links() const;

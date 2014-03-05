@@ -59,7 +59,7 @@ struct SSQuery
     std::shared_ptr<QueryBase> q_base;
     int q_cardinality;
     MWReplyProxy q_reply;
-    std::weak_ptr<ReplyBase> q_reply_proxy;
+    std::weak_ptr<unity::scopes::Reply> q_reply_proxy;
     bool q_pushable = true;
 };
 

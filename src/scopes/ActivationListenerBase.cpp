@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/ActivationListenerBase.h>
 
 namespace unity
 {
@@ -24,17 +24,25 @@ namespace unity
 namespace scopes
 {
 
-//! @cond
-
-PreviewListener::PreviewListener()
+/// @cond
+ActivationListenerBase::ActivationListenerBase()
 {
 }
 
-PreviewListener::~PreviewListener()
+ActivationListenerBase::~ActivationListenerBase()
 {
 }
+/// @endcond
 
-//! @endcond
+void ActivationListenerBase::activated(ActivationResponse const& /* response */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
+void ActivationListenerBase::finished(Reason /* r */, std::string const& /* error_message */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
 
 } // namespace scopes
 

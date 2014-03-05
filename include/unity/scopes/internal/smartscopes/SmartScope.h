@@ -16,18 +16,16 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/Query.h>
 #include <unity/scopes/Annotation.h>
-
+#include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/ScopeBase.h>
 
 #include <iostream>
 
@@ -43,10 +41,10 @@ namespace internal
 namespace smartscopes
 {
 
-class SmartQuery : public SearchQuery
+class SmartQuery : public SearchQueryBase
 {
 public:
-    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, Query const& query, SearchMetadata const& hints)
+    SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)
         : scope_id_(scope_id)
         , query_(query)
     {
@@ -105,11 +103,11 @@ public:
 
 private:
     std::string scope_id_;
-    Query query_;
+    CannedQuery query_;
     SearchHandle::UPtr search_handle_;
 };
 
-class SmartPreview : public PreviewQuery
+class SmartPreview : public PreviewQueryBase
 {
 public:
     SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
@@ -176,7 +174,7 @@ private:
     PreviewHandle::UPtr preview_handle_;
 };
 
-class NullActivation : public ActivationBase
+class NullActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -184,7 +182,7 @@ class NullActivation : public ActivationBase
     }
 };
 
-class SmartActivation : public ActivationBase
+class SmartActivation : public ActivationQueryBase
 {
     ActivationResponse activate() override
     {
@@ -201,7 +199,7 @@ public:
     {
     }
 
-    QueryBase::UPtr create_query(std::string const& scope_id, Query const& q, SearchMetadata const& hints)
+    QueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
     {
         QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
@@ -215,15 +213,15 @@ public:
         return preview;
     }
 
-    ActivationBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
+    ActivationQueryBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
     {
-        ActivationBase::UPtr activation(new NullActivation());
+        ActivationQueryBase::UPtr activation(new NullActivation());
         return activation;
     }
 
-    ActivationBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
+    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
     {
-        ActivationBase::UPtr activation(new SmartActivation());
+        ActivationQueryBase::UPtr activation(new SmartActivation());
         std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return activation;
     }

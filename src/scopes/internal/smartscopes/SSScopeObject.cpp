@@ -61,7 +61,7 @@ SSScopeObject::~SSScopeObject() noexcept
 {
 }
 
-MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
+MWQueryCtrlProxy SSScopeObject::search(CannedQuery const& q,
                                              SearchMetadata const& hints,
                                              MWReplyProxy const& reply,
                                              InvokeInfo const& info)
@@ -69,7 +69,7 @@ MWQueryCtrlProxy SSScopeObject::create_query(Query const& q,
     return query(info,
                  reply,
                  [&q, &hints, &info, this ]()->QueryBase::SPtr
-                     { return this->smartscope_->create_query(info.id, q, hints); },
+                     { return this->smartscope_->search(info.id, q, hints); },
                  [&reply, &hints, this](QueryBase::SPtr query_base)
                      { qo_->add_query(SSQuery::Query, query_base, hints.cardinality(), reply); });
 }

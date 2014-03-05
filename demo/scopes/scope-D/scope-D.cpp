@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/RegistryProxyFwd.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/Category.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <algorithm>
 #include <atomic>
@@ -122,11 +122,11 @@ private:
     std::condition_variable condvar_;
 };
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery(string const& scope_name,
-            Query const& query,
+            CannedQuery const& query,
             Queue& queue) :
         scope_name_(scope_name),
         query_(query),
@@ -166,7 +166,7 @@ public:
 
 private:
     string scope_name_;
-    Query query_;
+    CannedQuery query_;
     Queue& queue_;
 };
 
@@ -223,14 +223,14 @@ public:
         }
     }
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQuery::UPtr query(new MyQuery(scope_name_, q, queue_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
         cerr << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
         cout << scope_name_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;

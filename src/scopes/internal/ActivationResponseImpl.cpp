@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <cassert>
 
 namespace unity
@@ -35,13 +35,13 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
 {
     if (status == ActivationResponse::Status::PerformQuery)
     {
-        throw unity::InvalidArgumentException("ActivationResponse(): Status::PerformQuery allowed only with Query object");
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::PerformQuery allowed only with CannedQuery object");
     }
 }
 
-ActivationResponseImpl::ActivationResponseImpl(Query const& query)
+ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)
     : status_(ActivationResponse::Status::PerformQuery),
-      query_(std::make_shared<Query>(query))
+      query_(std::make_shared<CannedQuery>(query))
 {
 }
 
@@ -68,7 +68,7 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
         {
             throw LogicException("ActivationResponseImpl(): Invalid data, missing 'query'");
         }
-        query_ = std::make_shared<Query>(QueryImpl::create(it->second.get_dict()));
+        query_ = std::make_shared<CannedQuery>(CannedQueryImpl::create(it->second.get_dict()));
     }
 }
 
@@ -82,21 +82,12 @@ void ActivationResponseImpl::set_scope_data(Variant const& hints)
     scope_data_ = hints;
 }
 
-VariantMap ActivationResponseImpl::hints() const
-{
-    if (scope_data_.which() == Variant::Type::Dict)
-    {
-        return scope_data_.get_dict();
-    }
-    return VariantMap();
-}
-
 Variant ActivationResponseImpl::scope_data() const
 {
     return scope_data_;
 }
 
-Query ActivationResponseImpl::query() const
+CannedQuery ActivationResponseImpl::query() const
 {
     if (query_)
     {

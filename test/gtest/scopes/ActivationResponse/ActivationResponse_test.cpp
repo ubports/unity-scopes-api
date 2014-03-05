@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/ActivationResponse.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -45,26 +45,16 @@ TEST(ActivationResponse, basic)
         EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
         EXPECT_EQ(1u, resp.scope_data().get_dict().size());
         EXPECT_EQ("bar", resp.scope_data().get_dict()["foo"].get_string());
-        EXPECT_EQ("bar", resp.hints()["foo"].get_string());
         EXPECT_THROW(resp.query(), unity::LogicException);
     }
 
     {
-        ActivationResponse resp(ActivationResponse::Status::HideDash);
-        resp.set_scope_data(Variant("foo"));
-        EXPECT_EQ(ActivationResponse::Status::HideDash, resp.status());
-        // hints() with non-dict scope_data returns empty dict
-        EXPECT_EQ(0u, resp.hints().size());
-        EXPECT_EQ("foo", resp.scope_data().get_string());
-    }
-
-    {
-        Query const query("scope-foo");
+        CannedQuery const query("scope-foo");
         ActivationResponse resp(query);
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, resp.status());
     }
 
-    // Search only allowed with Query
+    // Search only allowed with CannedQuery
     {
         try
         {
@@ -89,7 +79,7 @@ TEST(ActivationResponse, serialize)
         EXPECT_EQ("bar", var["scope_data"].get_dict()["foo"].get_string());
     }
     {
-        Query const query("scope-foo");
+        CannedQuery const query("scope-foo");
         ActivationResponse resp(query);
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, static_cast<ActivationResponse::Status>(var["status"].get_int()));
@@ -162,7 +152,7 @@ TEST(ActivationResponse, deserialize)
 
     // valid variant
     {
-        Query query("scope-foo");
+        CannedQuery query("scope-foo");
         VariantMap var;
         var["scope_data"] = VariantMap();
         var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
@@ -171,7 +161,7 @@ TEST(ActivationResponse, deserialize)
         {
             internal::ActivationResponseImpl res(var);
             EXPECT_EQ(ActivationResponse::Status::PerformQuery, res.status());
-            EXPECT_EQ("scope-foo", res.query().scope_name());
+            EXPECT_EQ("scope-foo", res.query().scope_id());
         }
         catch (unity::LogicException const &e)
         {

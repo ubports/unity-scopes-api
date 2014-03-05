@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERY_H
-#define UNITY_SCOPES_QUERY_H
+#ifndef UNITY_SCOPES_CANNEDQUERY_H
+#define UNITY_SCOPES_CANNEDQUERY_H
 
 #include <unity/util/DefinesPtrs.h>
 #include <string>
@@ -33,38 +33,38 @@ namespace scopes
 
 namespace internal
 {
-class QueryImpl;
+class CannedQueryImpl;
 }
 
 /**
  * \brief Holds all parameters of a search query.
 
- * Holds all parameters of a search query: the target scope name, query string, department id, and
+ * Holds all parameters of a search query: the target scope id, query string, department id, and
  * state of the filters. Can be converted to/from scope:// uri schema string.
  */
-class Query final
+class CannedQuery final
 {
 public:
     /// @cond
-    UNITY_DEFINES_PTRS(Query);
+    UNITY_DEFINES_PTRS(CannedQuery);
     /// @endcond
 
     /**
      * \brief Creates a query for given scope with empty query string.
      */
-    explicit Query(std::string const& scope_name);
+    explicit CannedQuery(std::string const& scope_id);
 
     /**
      * \brief Creates a query for given scope with specific query string and in given department.
      */
-    Query(std::string const& scope_name, std::string const& query_str, std::string const& department_id);
+    CannedQuery(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
 
     /// @cond
-    Query(Query const &other);
-    Query(Query&&);
-    Query& operator=(Query const& other);
-    Query& operator=(Query&&);
-    ~Query();
+    CannedQuery(CannedQuery const &other);
+    CannedQuery(CannedQuery&&);
+    CannedQuery& operator=(CannedQuery const& other);
+    CannedQuery& operator=(CannedQuery&&);
+    ~CannedQuery();
     /// @endcond
 
     /**
@@ -83,19 +83,19 @@ public:
     void set_filter_state(FilterState const& filter_state);
 
     /**
-     * \brief Returns the scope name of this Query.
-     * \return The scope name.
+     * \brief Returns the scope identifier of this CannedQuery.
+     * \return The scope identifier.
      */
-    std::string scope_name() const;
+    std::string scope_id() const;
 
     /**
-     * \brief Returns the department id of this Query.
+     * \brief Returns the department id of this CannedQuery.
      * \return The department id.
      */
     std::string department_id() const;
 
     /**
-     * \brief Returns the query string of this Query.
+     * \brief Returns the query string of this CannedQuery.
      * \return The query string.
      */
     std::string query_string() const;
@@ -105,13 +105,13 @@ public:
     /// @endcond
 
     /**
-     * \brief Returns a string representation of this Query object as a URI using scope:// schema.
+     * \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
      * \return The URI for the query.
      */
     std::string to_string() const;
 
     /**
-     \brief Get state of the filters for this Query.
+     \brief Get state of the filters for this CannedQuery.
 
      Pass this state to methods of specific filter instances (such as
      unity::scopes::OptionSelectorFilter::active_options())to examine filter state.
@@ -120,18 +120,18 @@ public:
     FilterState filter_state() const;
 
     /**
-     * \brief Recreates a Query object from a scope:// URI.
+     * \brief Recreates a CannedQuery object from a scope:// URI.
 
      * May throw InvalidArgumentException on invalid schema.
-     * \return a Query instance
+     * \return a CannedQuery instance
      * \throws InvalidArgumentException of the URI cannot be parsed.
      */
-    static Query from_string();
+    static CannedQuery from_string();
 
 private:
-    Query(internal::QueryImpl *impl);
-    std::unique_ptr<internal::QueryImpl> p;
-    friend class internal::QueryImpl;
+    CannedQuery(internal::CannedQueryImpl *impl);
+    std::unique_ptr<internal::CannedQueryImpl> p;
+    friend class internal::CannedQueryImpl;
 };
 
 } // namespace scopes

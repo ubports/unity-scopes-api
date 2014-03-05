@@ -133,7 +133,7 @@ MetadataMap ZmqRegistry::list()
     for (size_t i = 0; i < list.size(); ++i)
     {
         VariantMap m = to_variant_map(list[i]);
-        string scope_name = m["scope_name"].get_string();
+        string scope_name = m["scope_id"].get_string();
         unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
         smdi->deserialize(m);
         ScopeMetadata d(ScopeMetadataImpl::create(move(smdi)));

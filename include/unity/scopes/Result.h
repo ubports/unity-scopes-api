@@ -130,7 +130,7 @@ public:
      Intercepting activation implies intercepting preview requests as well; this is important for scopes that
      forward results from other scopes and call set_intercept_activation() on these scopes.
      A scope that sets intercept activation flag for a result should re-implement ScopeBase::activate()
-     and provide an implementation of ActivationBase that handles the actual activation.
+     and provide an implementation of ActivationQueryBase that handles the actual activation.
      If not called, the result will be activated directly by the Unity shell whithout involving the scope,
      assuming an appropriate URI schema handler is present on the system.
      */

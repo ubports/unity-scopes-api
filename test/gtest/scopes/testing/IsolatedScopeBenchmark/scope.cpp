@@ -17,14 +17,14 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/Category.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/Department.h>
 
 #include "scope.h"
 
@@ -33,7 +33,7 @@
 namespace testing
 {
 
-class ActivationShowingDash : public unity::scopes::ActivationBase
+class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
 public:
     ActivationShowingDash()
@@ -47,7 +47,7 @@ public:
     }
 };
 
-class LongRunningActivation : public unity::scopes::ActivationBase
+class LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
 public:
     LongRunningActivation()
@@ -62,10 +62,10 @@ public:
     }
 };
 
-class Query : public unity::scopes::SearchQuery
+class Query : public unity::scopes::SearchQueryBase
 {
 public:
-    Query(unity::scopes::Query const& query)
+    Query(unity::scopes::CannedQuery const& query)
         : query_(query)
     {
     }
@@ -90,17 +90,17 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        unity::scopes::Query query("scope-A", "foo", "dep1");
+        unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
         unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->register_annotation(annotation);
     }
 
 private:
-    unity::scopes::Query query_;
+    unity::scopes::CannedQuery query_;
 };
 
-class Preview : public unity::scopes::PreviewQuery
+class Preview : public unity::scopes::PreviewQueryBase
 {
 public:
     void cancelled() override
@@ -135,32 +135,32 @@ void testing::Scope::run()
 {
 }
 
-unity::scopes::SearchQuery::UPtr testing::Scope::create_query(
-        unity::scopes::Query const& query,
+unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
+        unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &)
 {
-    return unity::scopes::SearchQuery::UPtr(new testing::Query(query));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::activate(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::ActivationShowingDash()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash()};
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&,
         std::string const&,
         std::string const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::LongRunningActivation()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation()};
 }
 
-unity::scopes::PreviewQuery::UPtr testing::Scope::preview(
+unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const &)
 {
-    return unity::scopes::PreviewQuery::UPtr(new testing::Preview());
+    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview());
 }
