@@ -150,26 +150,34 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 
 void RegistryObject::exec_scope(std::string const& scope_name)
 {
-    // 1. check if the scope is already running.
     auto proc_it = scope_processes_.find(scope_name);
-    if (proc_it != scope_processes_.end())
+    if (proc_it == scope_processes_.end())
     {
-        ScopeProcess& process = proc_it->second;
-        //  1.1. if scope running, just return proxy.
-        if (process.state() == ScopeProcess::Running)
-        {
-            return;
-        }
-        //  1.2. if scope running but is “stopping”, wait for it to stop (timeout?).
-        else if (process.state() == ScopeProcess::Stopping)
-        {
+        throw NotFoundException("Tried to exec unknown local scope", scope_name);
+    }
 
-        }
+    ScopeProcess& process = proc_it->second;
+
+    // 1. check if the scope is running.
+    //  1.1. if scope already running, return.
+    if (process.state() == ScopeProcess::Running)
+    {
+        return;
+    }
+    //  1.2. if scope running but is “stopping”, wait for it to stop.
+    else if (process.state() == ScopeProcess::Stopping)
+    {
+        ///! TODO: timeout (1.5s)
+        process.wait_for(ScopeProcess::Stopped);
     }
 
     // 2. exec the scope.
-    // 3. wait 1.5s for "running" signal.
-    //  3.1. when ready, return proxy.
+
+    // 3. wait for "running" signal.
+    ///! TODO: timeout (1.5s)
+    process.wait_for(ScopeProcess::Running);
+
+    //  3.1. when ready, return.
     //  3.2. OR when timeout, kill process and throw.
 }
 
@@ -178,19 +186,36 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
 {
 }
 
+RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
+    : exec_data_(other.exec_data_)
+{
+}
+
 RegistryObject::ScopeExecData RegistryObject::ScopeProcess::exec_data()
 {
     return exec_data_;
 }
 
-core::posix::ChildProcess const& RegistryObject::ScopeProcess::process()
-{
-    return process_;
-}
-
 RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
 {
+    std::lock_guard<std::mutex> lock(state_mutex_);
     return state_;
+}
+
+void RegistryObject::ScopeProcess::wait_for(ProcessState state)
+{
+    std::unique_lock<std::mutex> lock(state_mutex_);
+    while (state_ != state)
+    {
+        state_cond_.wait(lock);
+    }
+}
+
+void RegistryObject::ScopeProcess::update_state(ProcessState state)
+{
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    state_ = state;
+    state_cond_.notify_all();
 }
 
 } // namespace internal

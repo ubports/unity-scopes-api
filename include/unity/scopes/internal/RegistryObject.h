@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 
+#include <condition_variable>
 #include <mutex>
 
 namespace unity
@@ -75,15 +76,21 @@ private:
         };
 
         ScopeProcess(ScopeExecData exec_data);
+        ScopeProcess(ScopeProcess const& other);
 
         ScopeExecData exec_data();
-        core::posix::ChildProcess const& process();
         ProcessState state();
+        void wait_for(ProcessState state);
+
+    private:
+        void update_state(ProcessState state);
 
     private:
         ScopeExecData exec_data_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         ProcessState state_ = Stopped;
+        std::mutex state_mutex_;
+        std::condition_variable state_cond_;
     };
 
 private:
