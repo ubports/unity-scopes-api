@@ -175,8 +175,7 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop.
     else if (state() == ScopeProcess::Stopping)
     {
-        ///! TODO: timeout (1.5s)
-        wait_for(ScopeProcess::Stopped);
+        wait_for(ScopeProcess::Stopped, 1500);
     }
 
     // 2. exec the scope.
@@ -204,11 +203,19 @@ void RegistryObject::ScopeProcess::exec()
     update_state(Running);
 
     // 3. wait for scope to be "running".
-    ///! TODO: timeout (1.5s)
-    wait_for(ScopeProcess::Running);
-
     //  3.1. when ready, return.
     //  3.2. OR when timeout, kill process and throw.
+    if (!wait_for(ScopeProcess::Running, 1500))
+    {
+        throw unity::ResourceException("Registry: Aborting exec. Scope: \"" + exec_data_.scope_name +
+                                       "\" took too long to start.");
+        kill();
+    }
+}
+
+void RegistryObject::ScopeProcess::kill()
+{
+    ///! TODO
 }
 
 RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
@@ -217,13 +224,21 @@ RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
     return state_;
 }
 
-void RegistryObject::ScopeProcess::wait_for(ProcessState state)
+bool RegistryObject::ScopeProcess::wait_for(ProcessState state, int timeout_ms)
 {
     std::unique_lock<std::mutex> lock(state_mutex_);
-    while (state_ != state)
+    int time_left = timeout_ms;
+    while (state_ != state && time_left > 0)
     {
-        state_cond_.wait(lock);
+        auto start = std::chrono::high_resolution_clock::now();
+
+        state_cond_.wait_for(lock, std::chrono::milliseconds(time_left));
+
+        time_left -= std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::high_resolution_clock::now() - start).count();
     }
+
+    return state_ == state;
 }
 
 void RegistryObject::ScopeProcess::update_state(ProcessState state)

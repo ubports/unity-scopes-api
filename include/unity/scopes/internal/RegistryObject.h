@@ -76,8 +76,9 @@ private:
         ScopeProcess(ScopeProcess const& other);
 
         void exec();
+        void kill();
         ProcessState state();
-        void wait_for(ProcessState state);
+        bool wait_for(ProcessState state, int timeout_ms);
 
     private:
         void update_state(ProcessState state);
