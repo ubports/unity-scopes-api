@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
 #include <unity/scopes/internal/RegistryObject.h>
 
+#include <core/posix/fork.h>
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -53,10 +54,10 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
     // Look for the scope in both the local and the remote map.
     // Local scopes take precedence over remote ones of the same
     // name. (Ideally, this should never happen.)
-    auto const& it = scopes_.find(scope_name);
-    if (it != scopes_.end())
+    auto const& scope_it = scopes_.find(scope_name);
+    if (scope_it != scopes_.end())
     {
-        return it->second;
+        return scope_it->second;
     }
 
     if (remote_registry_)
@@ -84,6 +85,26 @@ MetadataMap RegistryObject::list() const
     return all_scopes;
 }
 
+ScopeProxy RegistryObject::locate(std::string const& scope_name)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+    // If the name is empty, it was sent as empty by the remote client.
+    if (scope_name.empty())
+    {
+        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+    }
+
+    auto scope_it = scopes_.find(scope_name);
+    if (scope_it == scopes_.end())
+    {
+        throw NotFoundException("Tried to locate unknown local scope", scope_name);
+    }
+
+    exec_scope(scope_name);
+
+    return scope_it->second.proxy();
+}
+
 bool RegistryObject::add_local_scope(ScopeMetadata const& metadata, ScopeExecData const& exec_data)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
@@ -100,11 +121,11 @@ bool RegistryObject::add_local_scope(ScopeMetadata const& metadata, ScopeExecDat
     if (scopes_.find(scope_name) != scopes_.end())
     {
         scopes_.erase(scope_name);
-        exec_datas_.erase(scope_name);
+        scope_processes_.erase(scope_name);
         return_value = false;
     }
     scopes_.insert(make_pair(scope_name, metadata));
-    exec_datas_.insert(make_pair(scope_name, exec_data));
+    scope_processes_.insert(make_pair(scope_name, ScopeProcess(exec_data)));
     return return_value;
 }
 
@@ -117,7 +138,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_name)
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
-    exec_datas_.erase(scope_name);
+    scope_processes_.erase(scope_name);
     return scopes_.erase(scope_name) == 1;
 }
 
@@ -127,30 +148,49 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-ScopeProxy RegistryObject::locate(std::string const& scope_name)
+void RegistryObject::exec_scope(std::string const& scope_name)
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    // 1. check if the scope is already running.
+    auto proc_it = scope_processes_.find(scope_name);
+    if (proc_it != scope_processes_.end())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+        ScopeProcess& process = proc_it->second;
+        //  1.1. if scope running, just return proxy.
+        if (process.state() == ScopeProcess::Running)
+        {
+            return;
+        }
+        //  1.2. if scope running but is “stopping”, wait for it to stop (timeout?).
+        else if (process.state() == ScopeProcess::Stopping)
+        {
+
+        }
     }
 
-    auto it = scopes_.find(scope_name);
-    if (it == scopes_.end())
-    {
-        throw NotFoundException("Tried to obtain unknown scope", scope_name);
-    }
-
-    // 1. check scope not already running.
-    //  1.1. if scope running, return proxy.
-    //  1.2. if scope running but is “stopping”, wait for it to stop (timeout?).
     // 2. exec the scope.
     // 3. wait 1.5s for "running" signal.
     //  3.1. when ready, return proxy.
     //  3.2. OR when timeout, kill process and throw.
+}
 
-    return it->second.proxy();
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
+    : exec_data_(exec_data)
+{
+}
+
+RegistryObject::ScopeExecData RegistryObject::ScopeProcess::exec_data()
+{
+    return exec_data_;
+}
+
+core::posix::ChildProcess const& RegistryObject::ScopeProcess::process()
+{
+    return process_;
+}
+
+RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
+{
+    return state_;
 }
 
 } // namespace internal

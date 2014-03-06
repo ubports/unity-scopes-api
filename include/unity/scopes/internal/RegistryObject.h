@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
+#include <core/posix/child_process.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 
@@ -36,8 +37,6 @@ namespace internal
 class RegistryObject : public RegistryObjectBase
 {
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
-
     struct ScopeExecData
     {
         ScopeExecData() = default;
@@ -46,6 +45,9 @@ public:
         std::string config_file;
         std::string scope_name;
     };
+
+public:
+    UNITY_DEFINES_PTRS(RegistryObject);
 
     RegistryObject();
     virtual ~RegistryObject();
@@ -61,9 +63,33 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
+    void exec_scope(std::string const& scope_name);
+
+private:
+    class ScopeProcess
+    {
+    public:
+        enum ProcessState
+        {
+            Stopped, Starting, Running, Stopping
+        };
+
+        ScopeProcess(ScopeExecData exec_data);
+
+        ScopeExecData exec_data();
+        core::posix::ChildProcess const& process();
+        ProcessState state();
+
+    private:
+        ScopeExecData exec_data_;
+        core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
+        ProcessState state_ = Stopped;
+    };
+
+private:
     mutable std::mutex mutex_;
     MetadataMap scopes_;
-    std::map<std::string, ScopeExecData> exec_datas_;
+    std::map<std::string, ScopeProcess> scope_processes_;
     MWRegistryProxy remote_registry_;
 };
 
