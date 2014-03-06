@@ -64,9 +64,6 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
-    void exec_scope(std::string const& scope_name);
-
-private:
     class ScopeProcess
     {
     public:
@@ -78,7 +75,7 @@ private:
         ScopeProcess(ScopeExecData exec_data);
         ScopeProcess(ScopeProcess const& other);
 
-        ScopeExecData exec_data();
+        void exec();
         ProcessState state();
         void wait_for(ProcessState state);
 

@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/RegistryObject.h>
 
-#include <core/posix/fork.h>
+#include <core/posix/exec.h>
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -100,7 +100,13 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
         throw NotFoundException("Tried to locate unknown local scope", scope_name);
     }
 
-    exec_scope(scope_name);
+    auto proc_it = scope_processes_.find(scope_name);
+    if (proc_it == scope_processes_.end())
+    {
+        throw NotFoundException("Tried to exec unknown local scope", scope_name);
+    }
+
+    proc_it->second.exec();
 
     return scope_it->second.proxy();
 }
@@ -148,39 +154,6 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-void RegistryObject::exec_scope(std::string const& scope_name)
-{
-    auto proc_it = scope_processes_.find(scope_name);
-    if (proc_it == scope_processes_.end())
-    {
-        throw NotFoundException("Tried to exec unknown local scope", scope_name);
-    }
-
-    ScopeProcess& process = proc_it->second;
-
-    // 1. check if the scope is running.
-    //  1.1. if scope already running, return.
-    if (process.state() == ScopeProcess::Running)
-    {
-        return;
-    }
-    //  1.2. if scope running but is “stopping”, wait for it to stop.
-    else if (process.state() == ScopeProcess::Stopping)
-    {
-        ///! TODO: timeout (1.5s)
-        process.wait_for(ScopeProcess::Stopped);
-    }
-
-    // 2. exec the scope.
-
-    // 3. wait for "running" signal.
-    ///! TODO: timeout (1.5s)
-    process.wait_for(ScopeProcess::Running);
-
-    //  3.1. when ready, return.
-    //  3.2. OR when timeout, kill process and throw.
-}
-
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
     : exec_data_(exec_data)
 {
@@ -191,9 +164,51 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
 {
 }
 
-RegistryObject::ScopeExecData RegistryObject::ScopeProcess::exec_data()
+void RegistryObject::ScopeProcess::exec()
 {
-    return exec_data_;
+    // 1. check if the scope is running.
+    //  1.1. if scope already running, return.
+    if (state() == ScopeProcess::Running)
+    {
+        return;
+    }
+    //  1.2. if scope running but is “stopping”, wait for it to stop.
+    else if (state() == ScopeProcess::Stopping)
+    {
+        ///! TODO: timeout (1.5s)
+        wait_for(ScopeProcess::Stopped);
+    }
+
+    // 2. exec the scope.
+    update_state(Starting);
+
+    const std::string program{exec_data_.scoperunner_path};
+    const std::vector<std::string> argv = {exec_data_.config_file, exec_data_.scope_name};
+
+    std::map<std::string, std::string> env;
+    core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
+    {
+        env.insert(std::make_pair(key, value));
+    });
+
+    process_ = core::posix::exec(program, argv, env, core::posix::StandardStream::empty);
+    if (process_.pid() <= 0)
+    {
+        update_state(Stopped);
+        throw unity::ResourceException("Registry: Failed to exec scope via command: \"" +
+                                       exec_data_.scoperunner_path + " " + exec_data_.config_file +
+                                       " " + exec_data_.scope_name + "\"");
+    }
+
+    ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
+    update_state(Running);
+
+    // 3. wait for scope to be "running".
+    ///! TODO: timeout (1.5s)
+    wait_for(ScopeProcess::Running);
+
+    //  3.1. when ready, return.
+    //  3.2. OR when timeout, kill process and throw.
 }
 
 RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
