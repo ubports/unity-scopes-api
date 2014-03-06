@@ -98,7 +98,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("cat1", results[0].category->id);
     EXPECT_EQ("Category 1", results[0].category->title);
     EXPECT_EQ("", results[0].category->icon);
-    EXPECT_EQ("", results[0].category->renderer_template);
+    EXPECT_EQ("{}", results[0].category->renderer_template);
 
     EXPECT_EQ("URI2", results[1].uri);
     EXPECT_EQ(nullptr, results[1].other_params["dnd_uri"]);
@@ -108,7 +108,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("cat1", results[1].category->id);
     EXPECT_EQ("Category 1", results[1].category->title);
     EXPECT_EQ("", results[1].category->icon);
-    EXPECT_EQ("", results[1].category->renderer_template);
+    EXPECT_EQ("{}", results[1].category->renderer_template);
 }
 
 TEST_F(SmartScopesClientTest, preview)

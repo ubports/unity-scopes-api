@@ -18,7 +18,9 @@
 
 #include <unity/scopes/internal/CategoryRendererImpl.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/util/FileIO.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -35,7 +37,18 @@ namespace internal
 CategoryRendererImpl::CategoryRendererImpl(std::string const& json_text)
     : data_(json_text)
 {
-    //TODO: json validation
+    try
+    {
+        const internal::JsonCppNode node(json_text);
+        if (node.type() != internal::JsonNodeInterface::NodeType::Object)
+        {
+            throw unity::InvalidArgumentException("CategoryRenderer(): invalid JSON definition, template is not a dictionary");
+        }
+    }
+    catch (unity::ResourceException const&)
+    {
+        throw unity::InvalidArgumentException("CategoryRenderer(): invalid JSON definition");
+    }
 }
 
 CategoryRenderer CategoryRendererImpl::from_file(std::string const& path)

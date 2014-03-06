@@ -156,7 +156,7 @@ public:
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
             EXPECT_EQ("", result.category()->icon());
-            EXPECT_EQ("", result.category()->renderer_template().data());
+            EXPECT_EQ("{}", result.category()->renderer_template().data());
         }
         else if (count_ == 1)
         {
@@ -167,7 +167,7 @@ public:
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
             EXPECT_EQ("", result.category()->icon());
-            EXPECT_EQ("", result.category()->renderer_template().data());
+            EXPECT_EQ("{}", result.category()->renderer_template().data());
         }
 
         count_++;
