@@ -25,6 +25,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 
 namespace unity
 {
@@ -64,6 +65,9 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
+    void on_process_death(core::posix::Process const& process);
+
+private:
     class ScopeProcess
     {
     public:
@@ -77,12 +81,12 @@ private:
 
         void exec();
         void kill();
-        ProcessState state();
-        bool wait_for(ProcessState state, int timeout_ms);
+        void on_process_death(core::posix::Process const& process);
 
     private:
+        ProcessState state();
+        bool wait_for_state(ProcessState state, int timeout_ms);
         void update_state(ProcessState state);
-        void on_death();
 
     private:
         ScopeExecData exec_data_;
@@ -98,6 +102,11 @@ private:
     MetadataMap scopes_;
     std::map<std::string, ScopeProcess> scope_processes_;
     MWRegistryProxy remote_registry_;
+
+    core::posix::ChildProcess::DeathObserver& death_observer_;
+    std::thread death_observer_thread_;
+    std::error_code death_observer_error_;
+    core::ScopedConnection process_death_conn_;
 };
 
 } // namespace internal
