@@ -1,7 +1,7 @@
 description "Smart scopes proxy"
 author "Marcus Tomlinson <marcus.tomlinson@canonical.com>"
 
-start on started dbus
+start on scope-ui-starting
 stop on desktop-end
 
 respawn
