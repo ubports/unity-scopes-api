@@ -194,11 +194,12 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             auto meta = ScopeMetadataImpl::create(move(mi));
 
             RegistryObject::ScopeExecData exec_data;
+            exec_data.scope_name = pair.first;
             exec_data.scoperunner_path = scoperunner_path;
-            exec_data.config_file = config_file;
-            exec_data.scope_name = pair.second;
+            exec_data.runtime_config = config_file;
+            exec_data.scope_config = pair.second;
 
-            registry->add_local_scope(pair.second, move(meta), exec_data);
+            registry->add_local_scope(pair.first, move(meta), exec_data);
         }
         catch (unity::Exception const& e)
         {
@@ -301,7 +302,7 @@ main(int argc, char* argv[])
             local_scopes[scope_name] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
             error("no remote registry configured, only local scopes will be available");

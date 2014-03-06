@@ -56,6 +56,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     }
 
     string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
+    configfile_ = config_file;
 
     try
     {
@@ -133,6 +134,11 @@ void RuntimeImpl::destroy()
 string RuntimeImpl::scope_name() const
 {
     return scope_name_;
+}
+
+string RuntimeImpl::configfile() const
+{
+    return configfile_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const

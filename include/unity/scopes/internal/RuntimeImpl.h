@@ -45,6 +45,7 @@ public:
     void destroy();
 
     std::string scope_name() const;
+    std::string configfile() const;
     MiddlewareFactory const* factory() const;
     RegistryProxy registry() const;
     std::string registry_configfile() const;
@@ -64,6 +65,7 @@ private:
 
     std::atomic_bool destroyed_;
     std::string scope_name_;
+    std::string configfile_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
     mutable RegistryProxy registry_;

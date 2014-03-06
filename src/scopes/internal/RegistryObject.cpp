@@ -220,7 +220,7 @@ void RegistryObject::ScopeProcess::exec()
     update_state(Starting);
 
     const std::string program{exec_data_.scoperunner_path};
-    const std::vector<std::string> argv = {exec_data_.config_file, exec_data_.scope_name};
+    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
@@ -236,8 +236,8 @@ void RegistryObject::ScopeProcess::exec()
             process_ = core::posix::ChildProcess::invalid();
             update_state(Stopped);
             throw unity::ResourceException("RegistryObject::ScopeProcess: Failed to exec scope via command: \"" +
-                                           exec_data_.scoperunner_path + " " + exec_data_.config_file +
-                                           " " + exec_data_.scope_name + "\"");
+                                           exec_data_.scoperunner_path + " " + exec_data_.runtime_config +
+                                           " " + exec_data_.scope_config + "\"");
         }
 
         // add this process to the death observer

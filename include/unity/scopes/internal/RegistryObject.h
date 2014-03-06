@@ -43,9 +43,10 @@ public:
     {
         ScopeExecData() = default;
         ScopeExecData(std::initializer_list<std::string>) = delete;
-        std::string scoperunner_path;
-        std::string config_file;
         std::string scope_name;
+        std::string scoperunner_path;
+        std::string runtime_config;
+        std::string scope_config;
     };
 
 public:
