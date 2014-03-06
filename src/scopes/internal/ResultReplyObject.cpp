@@ -43,7 +43,7 @@ namespace scopes
 namespace internal
 {
 
-ResultReplyObject::ResultReplyObject(SearchListener::SPtr const& receiver,
+ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver,
                                      RuntimeImpl const* runtime,
                                      std::string const& scope_name,
                                      int cardinality) :

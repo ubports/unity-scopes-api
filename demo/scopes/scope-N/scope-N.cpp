@@ -29,7 +29,7 @@ using namespace unity::scopes;
 // Simplest possible scope: does absolutely nothing other than to implement the pure virtuals
 // it inherits from its base classes. Despite this, the scope works correctly with a client.
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
     MyQuery()
@@ -63,12 +63,12 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr create_query(Query const&, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
     {
-        return SearchQuery::UPtr(new MyQuery);
+        return SearchQueryBase::UPtr(new MyQuery);
     }
 
-    virtual PreviewQuery::UPtr preview(Result const&, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
     }

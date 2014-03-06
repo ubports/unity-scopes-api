@@ -35,7 +35,7 @@ namespace scopes
 class ScopeBase;
 class ActionMetadata;
 class SearchMetadata;
-class Query;
+class CannedQuery;
 
 namespace internal
 {
@@ -48,7 +48,7 @@ class ScopeObjectBase : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(ScopeObjectBase);
 
-    virtual MWQueryCtrlProxy create_query(Query const& query,
+    virtual MWQueryCtrlProxy search(CannedQuery const& query,
                                           SearchMetadata const& hints,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) = 0;

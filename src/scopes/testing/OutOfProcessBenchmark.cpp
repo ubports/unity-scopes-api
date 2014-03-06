@@ -23,6 +23,8 @@
 #include <chrono>
 #include <iostream>
 
+/// @cond
+
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::QueryConfiguration config)
@@ -162,3 +164,5 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::OutOfProcessBe
 
     return result;
 }
+
+/// @endcond

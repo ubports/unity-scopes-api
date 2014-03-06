@@ -28,10 +28,10 @@ using namespace unity::scopes;
 
 // Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
 
-class MyQuery : public SearchQuery
+class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(Query const& query) :
+    MyQuery(CannedQuery const& query) :
         query_(query)
     {
     }
@@ -67,7 +67,7 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        Query q("scope-A", query_.query_string(), "");
+        CannedQuery q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
         reply->register_annotation(annotation);
@@ -76,10 +76,10 @@ public:
     }
 
 private:
-    Query query_;
+    CannedQuery query_;
 };
 
-class MyPreview : public PreviewQuery
+class MyPreview : public PreviewQueryBase
 {
 public:
     MyPreview(string const& uri) :
@@ -102,8 +102,8 @@ public:
         widgets.emplace_back(PreviewWidget(R"({"id": "img", "type": "image", "art": "screenshot-url"})"));
 
         PreviewWidget w("img2", "image");
-        w.add_attribute("zoomable", Variant(false));
-        w.add_component("art", "screenshot-url");
+        w.add_attribute_value("zoomable", Variant(false));
+        w.add_attribute_mapping("art", "screenshot-url");
         widgets.emplace_back(w);
 
         ColumnLayout layout1col(1);
@@ -139,16 +139,16 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQuery::UPtr create_query(Query const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQuery::UPtr query(new MyQuery(q));
+        SearchQueryBase::UPtr query(new MyQuery(q));
         cout << "scope-A: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        PreviewQuery::UPtr preview(new MyPreview(result.uri()));
+        PreviewQueryBase::UPtr preview(new MyPreview(result.uri()));
         cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
         return preview;
     }

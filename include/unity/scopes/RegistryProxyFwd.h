@@ -27,11 +27,11 @@ namespace unity
 namespace scopes
 {
 
-class RegistryBase;
+class Registry;
 /** \typedef RegistryProxy
 \brief Convenience type definition.
 */
-typedef std::shared_ptr<RegistryBase> RegistryProxy;
+typedef std::shared_ptr<Registry> RegistryProxy;
 
 } // namespace scopes
 

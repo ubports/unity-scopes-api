@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -31,39 +31,39 @@ namespace scopes
 namespace internal
 {
 
-QueryImpl::QueryImpl(std::string const& scope_name)
-    : scope_name_(scope_name)
+CannedQueryImpl::CannedQueryImpl(std::string const& scope_id)
+    : scope_id_(scope_id)
 {
-    if (scope_name_.empty())
+    if (scope_id_.empty())
     {
-        throw InvalidArgumentException("Query(): scope name cannot be empty");
+        throw InvalidArgumentException("CannedQuery(): scope name cannot be empty");
     }
 }
 
-QueryImpl::QueryImpl(std::string const& scope_name, std::string const& query_str, std::string const& department_id)
-    : scope_name_(scope_name),
+CannedQueryImpl::CannedQueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id)
+    : scope_id_(scope_id),
       query_string_(query_str),
       department_id_(department_id)
 {
 }
 
-QueryImpl::QueryImpl(VariantMap const& variant)
+CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
 {
     auto it = variant.find("scope");
     if (it == variant.end())
     {
-        throw InvalidArgumentException("Query(): scope name not set");
+        throw InvalidArgumentException("CannedQuery(): scope name not set");
     }
-    scope_name_ = it->second.get_string();
-    if (scope_name_.empty())
+    scope_id_ = it->second.get_string();
+    if (scope_id_.empty())
     {
-        throw InvalidArgumentException("Query(): scope name cannot be empty");
+        throw InvalidArgumentException("CannedQuery(): scope name cannot be empty");
     }
 
     it = variant.find("filter_state");
     if (it == variant.end())
     {
-        throw InvalidArgumentException("Query(): filter_state is missing");
+        throw InvalidArgumentException("CannedQuery(): filter_state is missing");
     }
     filter_state_ = internal::FilterStateImpl::deserialize(it->second.get_dict());
 
@@ -80,55 +80,55 @@ QueryImpl::QueryImpl(VariantMap const& variant)
     }
 }
 
-void QueryImpl::set_department_id(std::string const& dep_id)
+void CannedQueryImpl::set_department_id(std::string const& dep_id)
 {
     department_id_ = dep_id;
 }
 
-void QueryImpl::set_query_string(std::string const& query_str)
+void CannedQueryImpl::set_query_string(std::string const& query_str)
 {
     query_string_ = query_str;
 }
 
-void QueryImpl::set_filter_state(FilterState const& filter_state)
+void CannedQueryImpl::set_filter_state(FilterState const& filter_state)
 {
     filter_state_ = filter_state;
 }
 
-std::string QueryImpl::scope_name() const
+std::string CannedQueryImpl::scope_id() const
 {
-    return scope_name_;
+    return scope_id_;
 }
 
-std::string QueryImpl::department_id() const
+std::string CannedQueryImpl::department_id() const
 {
     return department_id_;
 }
 
-std::string QueryImpl::query_string() const
+std::string CannedQueryImpl::query_string() const
 {
     return query_string_;
 }
 
-FilterState QueryImpl::filter_state() const
+FilterState CannedQueryImpl::filter_state() const
 {
     return filter_state_;
 }
 
-VariantMap QueryImpl::serialize() const
+VariantMap CannedQueryImpl::serialize() const
 {
     VariantMap vm;
-    vm["scope"] = scope_name_;
+    vm["scope"] = scope_id_;
     vm["query_string"] = query_string_;
     vm["department_id"] = department_id_;
     vm["filter_state"] = filter_state_.serialize();
     return vm;
 }
 
-std::string QueryImpl::to_string() const
+std::string CannedQueryImpl::to_string() const
 {
     std::ostringstream s;
-    s << "scope://" << scope_name_;
+    s << "scope://" << scope_id_;
     s << "?q=" << query_string_; // FIXME: escape
     if (!department_id_.empty())
     {
@@ -137,15 +137,15 @@ std::string QueryImpl::to_string() const
     return s.str();
 }
 
-Query QueryImpl::create(VariantMap const& var)
+CannedQuery CannedQueryImpl::create(VariantMap const& var)
 {
-    return Query(new QueryImpl(var));
+    return CannedQuery(new CannedQueryImpl(var));
 }
 
-Query QueryImpl::from_string()
+CannedQuery CannedQueryImpl::from_string()
 {
     //TODO
-    Query q("");
+    CannedQuery q("");
     return q;
 }
 

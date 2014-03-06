@@ -58,7 +58,7 @@ class TypedScopeFixture : public ::testing::Test
 public:
     TypedScopeFixture()
         : scope(ScopeTraits<Scope>::construct()),
-          registry_proxy(&registry, [](unity::scopes::RegistryBase*) {})
+          registry_proxy(&registry, [](unity::scopes::Registry*) {})
     {
     }
 

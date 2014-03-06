@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
-#include <unity/scopes/PreviewReplyBase.h>
+#include <unity/scopes/internal/ActivationQueryBaseImpl.h>
 
 namespace unity
 {
@@ -24,13 +24,15 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+namespace internal
+{
 
-PreviewReplyBase::PreviewReplyBase() = default;
+ActivationResponse ActivationQueryBaseImpl::activate()
+{
+    return ActivationResponse(ActivationResponse::Status::NotHandled);
+}
 
-PreviewReplyBase::~PreviewReplyBase() = default;
-
-/// @endcond
+} // namespace internal
 
 } // namespace scopes
 

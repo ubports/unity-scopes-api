@@ -18,7 +18,7 @@
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 
 namespace unity
 {
@@ -26,17 +26,17 @@ namespace unity
 namespace scopes
 {
 
-Department::Department(Query const& query, std::string const& label)
+Department::Department(CannedQuery const& query, std::string const& label)
     : p(new internal::DepartmentImpl(query, label))
 {
 }
 
-Department::Department(std::string const& department_id, Query const& query, std::string const& label)
+Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label)
     : p(new internal::DepartmentImpl(department_id, query, label))
 {
 }
 
-Department::Department(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
+Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
     : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
 {
 }
@@ -84,7 +84,7 @@ std::string Department::label() const
     return p->label();
 }
 
-Query Department::query() const
+CannedQuery Department::query() const
 {
     return p->query();
 }

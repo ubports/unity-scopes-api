@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ * Authored by: Michi Henning <michi.henning@canonical.com>
+ */
 
-#include <unity/scopes/ActivationBase.h>
-#include <unity/scopes/internal/ActivationBaseImpl.h>
+#include <unity/scopes/internal/Registry.h>
+
+#include <unity/scopes/internal/RegistryImpl.h>
 
 namespace unity
 {
@@ -25,27 +26,43 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
-ActivationBase::ActivationBase() :
-    QueryBase(),
-    p(new internal::ActivationBaseImpl())
+namespace internal
+{
+
+//! @cond
+
+Registry::Registry(internal::RegistryImpl* impl) :
+    ObjectProxy(impl)
 {
 }
 
-ActivationBase::~ActivationBase()
+Registry::~Registry()
 {
-}
-/// @endcond
-
-void ActivationBase::cancelled()
-{
-    //default implementation does nothing
 }
 
-ActivationResponse ActivationBase::activate()
+//! @endcond
+
+ScopeMetadata Registry::get_metadata(std::string const& scope_id) const
 {
-    return p->activate();
+    return fwd()->get_metadata(scope_id);
 }
+
+MetadataMap Registry::list() const
+{
+    return fwd()->list();
+}
+
+MetadataMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
+{
+    return fwd()->list_if(predicate);
+}
+
+internal::RegistryImpl* Registry::fwd() const
+{
+    return dynamic_cast<internal::RegistryImpl*>(pimpl());
+}
+
+} // namespace internal
 
 } // namespace scopes
 

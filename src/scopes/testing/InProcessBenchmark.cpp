@@ -18,12 +18,12 @@
 
 #include <unity/scopes/testing/InProcessBenchmark.h>
 
-#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReplyBase.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/PreviewReply.h>
 
 #include <unity/scopes/testing/Category.h>
 
@@ -55,7 +55,7 @@ constexpr static const int metadata_idx = 1;
 constexpr static const int widget_idx = 2;
 constexpr static const int action_idx = 3;
 
-struct WaitableReply : public virtual unity::scopes::ReplyBase
+struct WaitableReply : public virtual unity::scopes::Reply
 {
     enum class State
     {
@@ -109,7 +109,7 @@ struct WaitableReply : public virtual unity::scopes::ReplyBase
     }
 };
 
-struct DevNullPreviewReply : public virtual unity::scopes::PreviewReplyBase, public WaitableReply
+struct DevNullPreviewReply : public virtual unity::scopes::PreviewReply, public WaitableReply
 {
     bool register_layout(unity::scopes::ColumnLayoutList const&) const override
     {
@@ -127,7 +127,7 @@ struct DevNullPreviewReply : public virtual unity::scopes::PreviewReplyBase, pub
     }
 };
 
-struct DevNullSearchReply : public virtual unity::scopes::SearchReplyBase, public WaitableReply
+struct DevNullSearchReply : public virtual unity::scopes::SearchReply, public WaitableReply
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
@@ -229,6 +229,8 @@ void fill_results_from_statistics(unity::scopes::testing::Benchmark::Result& res
 }
 }
 
+/// @cond
+
 unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBenchmark::for_query(
         const std::shared_ptr<unity::scopes::ScopeBase>& scope,
         unity::scopes::testing::Benchmark::QueryConfiguration config)
@@ -247,12 +249,12 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
         auto before = Clock::now();
         {
             auto sample = config.sampler();
-            auto q = scope->create_query(sample.first, sample.second);
+            auto q = scope->search(sample.first, sample.second);
 
             q->run(unity::scopes::SearchReplyProxy
             {
                 &search_reply,
-                [](unity::scopes::SearchReplyBase* r)
+                [](unity::scopes::SearchReply* r)
                 {
                     r->finished();
                 }
@@ -294,7 +296,7 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
                 q->run(unity::scopes::PreviewReplyProxy
                 {
                     &preview_reply,
-                    [](unity::scopes::PreviewReplyBase* r)
+                    [](unity::scopes::PreviewReply* r)
                     {
                         r->finished();
                     }
@@ -376,3 +378,5 @@ unity::scopes::testing::Benchmark::Result unity::scopes::testing::InProcessBench
 
     return benchmark_result;
 }
+
+/// @endcond

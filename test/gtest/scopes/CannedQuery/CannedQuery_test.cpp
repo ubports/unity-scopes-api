@@ -17,39 +17,39 @@
  */
 
 #include <gtest/gtest.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-// basic test of Query setters and getters
-TEST(Query, basic)
+// basic test of CannedQuery setters and getters
+TEST(CannedQuery, basic)
 {
     {
-        Query q("scope-A");
-        EXPECT_EQ("scope-A", q.scope_name());
+        CannedQuery q("scope-A");
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("", q.query_string());
         EXPECT_EQ("", q.department_id());
     }
     {
-        Query q("scope-A");
+        CannedQuery q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
-        EXPECT_EQ("scope-A", q.scope_name());
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
     }
 }
 
-TEST(Query, copy)
+TEST(CannedQuery, copy)
 {
     {
-        Query a("scope-A", "foo", "dep1");
-        Query b(a);
+        CannedQuery a("scope-A", "foo", "dep1");
+        CannedQuery b(a);
 
-        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.scope_id(), b.scope_id());
         EXPECT_EQ(a.department_id(), b.department_id());
         EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
@@ -59,10 +59,10 @@ TEST(Query, copy)
         EXPECT_EQ("dep1", b.department_id());
     }
     {
-        Query a("scope-A", "foo", "dep1");
-        Query b = a;
+        CannedQuery a("scope-A", "foo", "dep1");
+        CannedQuery b = a;
 
-        EXPECT_EQ(a.scope_name(), b.scope_name());
+        EXPECT_EQ(a.scope_id(), b.scope_id());
         EXPECT_EQ(a.department_id(), b.department_id());
         EXPECT_EQ(a.query_string(), b.query_string());
         a.set_query_string("bar");
@@ -74,23 +74,23 @@ TEST(Query, copy)
 }
 
 // test of serialization into a canned query string
-TEST(Query, to_string)
+TEST(CannedQuery, to_string)
 {
     {
-        Query q("scope-A");
+        CannedQuery q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
         EXPECT_EQ("scope://scope-A?q=foo&department=dep1", q.to_string());
     }
     {
-        Query q("scope-A");
+        CannedQuery q("scope-A");
         EXPECT_EQ("scope://scope-A?q=", q.to_string());
     }
 }
 
-TEST(Query, serialize)
+TEST(CannedQuery, serialize)
 {
-    Query q("scope-A");
+    CannedQuery q("scope-A");
     q.set_query_string("foo");
     q.set_department_id("dep1");
 
@@ -101,7 +101,7 @@ TEST(Query, serialize)
     EXPECT_TRUE(var.find("filter_state") != var.end());
 }
 
-TEST(Query, deserialize)
+TEST(CannedQuery, deserialize)
 {
     {
         VariantMap vm;
@@ -110,22 +110,22 @@ TEST(Query, deserialize)
         vm["department_id"] = "dep1";
         vm["filter_state"] = Variant(VariantMap());
 
-        auto q = internal::QueryImpl::create(vm);
-        EXPECT_EQ("scope-A", q.scope_name());
+        auto q = internal::CannedQueryImpl::create(vm);
+        EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
     }
 }
 
-TEST(Query, exceptions)
+TEST(CannedQuery, exceptions)
 {
-    EXPECT_THROW(Query(""), unity::InvalidArgumentException);
+    EXPECT_THROW(CannedQuery(""), unity::InvalidArgumentException);
     {
         VariantMap vm;
         try
         {
             // missing 'scope'
-            internal::QueryImpl::create(vm);
+            internal::CannedQueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -137,7 +137,7 @@ TEST(Query, exceptions)
         try
         {
             // empty 'scope' not allowed
-            internal::QueryImpl::create(vm);
+            internal::CannedQueryImpl::create(vm);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
@@ -148,7 +148,7 @@ TEST(Query, exceptions)
         vm["filter_state"] = Variant(VariantMap());
         try
         {
-            internal::QueryImpl::create(vm);
+            internal::CannedQueryImpl::create(vm);
         }
         catch (unity::InvalidArgumentException const& e)
         {

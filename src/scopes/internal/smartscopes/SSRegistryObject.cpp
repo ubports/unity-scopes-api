@@ -84,20 +84,20 @@ SSRegistryObject::~SSRegistryObject() noexcept
     refresh_thread_.join();
 }
 
-ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_name) const
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id) const
 {
     // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty name");
     }
 
     std::lock_guard<std::mutex> lock(scopes_mutex_);
 
-    auto const& it = scopes_.find(scope_name);
+    auto const& it = scopes_.find(scope_id);
     if (it == scopes_.end())
     {
-        throw NotFoundException("SSRegistryObject::get_metadata(): no such scope", scope_name);
+        throw NotFoundException("SSRegistryObject::get_metadata(): no such scope", scope_id);
     }
     return it->second;
 }
@@ -108,16 +108,16 @@ MetadataMap SSRegistryObject::list() const
     return scopes_;
 }
 
-ScopeProxy SSRegistryObject::locate(std::string const& /*scope_name*/)
+ScopeProxy SSRegistryObject::locate(std::string const& /*scope_id*/)
 {
     throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
 
-bool SSRegistryObject::has_scope(std::string const& scope_name) const
+bool SSRegistryObject::has_scope(std::string const& scope_id) const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
 
-    auto const& it = scopes_.find(scope_name);
+    auto const& it = scopes_.find(scope_id);
     if (it == scopes_.end())
     {
         return false;
@@ -125,18 +125,18 @@ bool SSRegistryObject::has_scope(std::string const& scope_name) const
     return true;
 }
 
-std::string SSRegistryObject::get_base_url(std::string const& scope_name) const
+std::string SSRegistryObject::get_base_url(std::string const& scope_id) const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
 
-    auto base_url = base_urls_.find(scope_name);
+    auto base_url = base_urls_.find(scope_id);
     if (base_url != end(base_urls_))
     {
         return base_url->second;
     }
     else
     {
-        throw NotFoundException("SSRegistryObject::get_base_url(): no such scope", scope_name);
+        throw NotFoundException("SSRegistryObject::get_base_url(): no such scope", scope_id);
     }
 }
 
@@ -207,7 +207,7 @@ void SSRegistryObject::get_remote_scopes()
             // construct a ScopeMetadata with remote scope info
             std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
 
-            metadata->set_scope_name(scope.id);
+            metadata->set_scope_id(scope.id);
             metadata->set_display_name(scope.name);
             metadata->set_description(scope.description);
             metadata->set_author(scope.author);
@@ -246,21 +246,21 @@ void SSRegistryObject::get_remote_scopes()
 // Must be called with scopes_mutex_ locked
 bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata)
 {
-    if (metadata.scope_name().empty())
+    if (metadata.scope_id().empty())
     {
         throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty name");
     }
 
     // store the base url under a scope name key
-    base_urls_[metadata.scope_name()] = remotedata.base_url;
+    base_urls_[metadata.scope_id()] = remotedata.base_url;
 
     // store the scope metadata in scopes_
-    auto const& pair = scopes_.insert(make_pair(metadata.scope_name(), metadata));
+    auto const& pair = scopes_.insert(make_pair(metadata.scope_id(), metadata));
     if (!pair.second)
     {
         // Replace already existing entry with this one
         scopes_.erase(pair.first);
-        scopes_.insert(make_pair(metadata.scope_name(), metadata));
+        scopes_.insert(make_pair(metadata.scope_id(), metadata));
         return false;
     }
     return true;

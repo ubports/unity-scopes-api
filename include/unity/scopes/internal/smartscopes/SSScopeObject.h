@@ -52,7 +52,7 @@ public:
     virtual ~SSScopeObject() noexcept;
 
     // Remote operation implementations
-    MWQueryCtrlProxy create_query(Query const& q,
+    MWQueryCtrlProxy search(CannedQuery const& q,
                                   SearchMetadata const& hints,
                                   MWReplyProxy const& reply,
                                   InvokeInfo const& info) override;

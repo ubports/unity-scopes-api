@@ -51,12 +51,12 @@ A scope must return an instance of this class from its implementation of ScopeBa
 constructor that might block.
 */
 
-class PreviewQuery: public QueryBase
+class PreviewQueryBase : public QueryBase
 {
 public:
     /// @cond
-    NONCOPYABLE(PreviewQuery);
-    UNITY_DEFINES_PTRS(PreviewQuery);
+    NONCOPYABLE(PreviewQueryBase);
+    UNITY_DEFINES_PTRS(PreviewQueryBase);
     /// @endcond
 
     /**
@@ -81,12 +81,12 @@ public:
     // TODO: Add a method for subpreview request?
 
     /// @cond
-    virtual ~PreviewQuery();
+    virtual ~PreviewQueryBase();
     /// @endcond
 
 protected:
     /// @cond
-    PreviewQuery();
+    PreviewQueryBase();
     /// @endcond
 };
 

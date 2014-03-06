@@ -42,6 +42,12 @@ public:
     void set_cardinality(int cardinality);
     int cardinality() const;
 
+    bool contains_hint(std::string const& key) const;
+    void set_hint(std::string const& key, Variant const& value);
+    VariantMap hints() const;
+    Variant& hint(std::string const& key);
+    Variant const& hint(std::string const& key) const;
+
     static SearchMetadata create(VariantMap const& var);
 
 protected:
@@ -52,6 +58,7 @@ protected:
 
 private:
     int cardinality_;
+    VariantMap hints_;
 };
 
 } // namespace internal

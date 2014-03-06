@@ -30,6 +30,6 @@ public:
 
     virtual void run() override;
 
-    virtual SearchQuery::UPtr create_query(Query const &, SearchMetadata const &) override;
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
+    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
 };

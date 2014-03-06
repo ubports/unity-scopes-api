@@ -17,14 +17,14 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/Category.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/Department.h>
 
 #include "scope.h"
 
@@ -33,7 +33,7 @@
 namespace testing
 {
 
-struct ActivationShowingDash : public unity::scopes::ActivationBase
+struct ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
     std::mt19937& gen;
     std::normal_distribution<>& normal;
@@ -56,7 +56,7 @@ struct ActivationShowingDash : public unity::scopes::ActivationBase
     }
 };
 
-struct LongRunningActivation : public unity::scopes::ActivationBase
+struct LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
     std::mt19937& gen;
     std::normal_distribution<>& normal;
@@ -80,7 +80,7 @@ struct LongRunningActivation : public unity::scopes::ActivationBase
     }
 };
 
-struct Query : public unity::scopes::SearchQuery
+struct Query : public unity::scopes::SearchQueryBase
 {
     std::mt19937& gen;
     std::normal_distribution<>& normal;
@@ -106,7 +106,7 @@ struct Query : public unity::scopes::SearchQuery
     }
 };
 
-struct Preview : public unity::scopes::PreviewQuery
+struct Preview : public unity::scopes::PreviewQueryBase
 {
     std::mt19937& gen;
     std::normal_distribution<>& normal;
@@ -155,32 +155,32 @@ void testing::Scope::run()
 {
 }
 
-unity::scopes::SearchQuery::UPtr testing::Scope::create_query(
-        unity::scopes::Query const&,
+unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
+        unity::scopes::CannedQuery const&,
         unity::scopes::SearchMetadata const &)
 {
-    return unity::scopes::SearchQuery::UPtr(new testing::Query{gen, normal});
+    return unity::scopes::SearchQueryBase::UPtr{new testing::Query(gen, normal)};
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::activate(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::ActivationShowingDash{gen, normal}};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(gen, normal)};
 }
 
-unity::scopes::ActivationBase::UPtr testing::Scope::perform_action(
+unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&,
         std::string const&,
         std::string const&)
 {
-    return unity::scopes::ActivationBase::UPtr{new testing::LongRunningActivation{gen, normal}};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(gen, normal)};
 }
 
-unity::scopes::PreviewQuery::UPtr testing::Scope::preview(
+unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const &)
 {
-    return unity::scopes::PreviewQuery::UPtr(new testing::Preview{gen, normal});
+    return unity::scopes::PreviewQueryBase::UPtr{new testing::Preview(gen, normal)};
 }

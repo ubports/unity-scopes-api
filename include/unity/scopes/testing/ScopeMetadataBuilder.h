@@ -81,7 +81,7 @@ public:
     ScopeMetadataBuilder();
     ~ScopeMetadataBuilder();
 
-    ScopeMetadataBuilder& scope_name(std::string const& value);
+    ScopeMetadataBuilder& scope_id(std::string const& value);
     ScopeMetadataBuilder& proxy(ScopeProxy const& value);
     ScopeMetadataBuilder& display_name(std::string const& value);
     ScopeMetadataBuilder& description(std::string const& value);

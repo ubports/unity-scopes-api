@@ -33,7 +33,7 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-class DummyReceiver : public SearchListener
+class DummyReceiver : public SearchListenerBase
 {
 public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
@@ -74,7 +74,7 @@ private:
 
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult result) override
@@ -90,10 +90,10 @@ public:
     std::shared_ptr<Result> result;
 };
 
-class ActivationReceiver : public ActivationListener, public WaitUntilFinished
+class ActivationReceiver : public ActivationListenerBase, public WaitUntilFinished
 {
 public:
-    virtual void activation_response(ActivationResponse const& response)
+    virtual void activated(ActivationResponse const& response) override
     {
         this->response = std::make_shared<ActivationResponse>(response);
     }
@@ -522,7 +522,7 @@ TEST(Activation, scope)
 
     VariantMap hints;
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->result;

@@ -18,41 +18,19 @@
 
 #include <unity/scopes/Reply.h>
 
-#include <unity/scopes/internal/ReplyImpl.h>
-
-#include <cassert>
-
 namespace unity
 {
 
 namespace scopes
 {
 
-//! @cond
+/// @cond
 
-Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
-{
-    assert(impl);
-}
+Reply::Reply() = default;
 
 Reply::~Reply() = default;
 
-void Reply::finished() const
-{
-    return fwd()->finished();
-}
-
-void Reply::error(std::exception_ptr ex) const
-{
-    return fwd()->error(ex);
-}
-
-internal::ReplyImpl* Reply::fwd() const
-{
-    return dynamic_cast<internal::ReplyImpl*>(pimpl());
-}
-
-//! @endcond
+/// @endcond
 
 } // namespace scopes
 

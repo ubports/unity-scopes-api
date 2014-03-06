@@ -18,17 +18,17 @@
 
 #include "PusherScope.h"
 
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/SearchReply.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/Query.h>
 
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity::scopes;
 
-class PusherQuery : public SearchQuery
+class PusherQuery : public SearchQueryBase
 {
 public:
     PusherQuery(int cardinality)
@@ -75,12 +75,12 @@ void PusherScope::run()
 {
 }
 
-SearchQuery::UPtr PusherScope::create_query(Query const& /* query */, SearchMetadata const& md)
+SearchQueryBase::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMetadata const& md)
 {
-    return SearchQuery::UPtr(new PusherQuery(md.cardinality()));
+    return SearchQueryBase::UPtr(new PusherQuery(md.cardinality()));
 }
 
-PreviewQuery::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
+PreviewQueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
     abort();  // Not called
 }

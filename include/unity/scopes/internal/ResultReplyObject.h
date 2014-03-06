@@ -21,7 +21,7 @@
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 
 namespace unity
 {
@@ -37,7 +37,7 @@ class RuntimeImpl;
 class ResultReplyObject : public ReplyObject
 {
 public:
-    ResultReplyObject(SearchListener::SPtr const& receiver,
+    ResultReplyObject(SearchListenerBase::SPtr const& receiver,
                       RuntimeImpl const* runtime,
                       std::string const& scope_name,
                       int cardinality);
@@ -46,7 +46,7 @@ public:
     virtual bool process_data(VariantMap const& data) override;
 
 private:
-    SearchListener::SPtr const receiver_;
+    SearchListenerBase::SPtr const receiver_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     RuntimeImpl const* runtime_;
     std::atomic_int cardinality_;

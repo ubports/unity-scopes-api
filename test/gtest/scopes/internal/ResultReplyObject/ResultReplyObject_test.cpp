@@ -20,7 +20,7 @@
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
@@ -28,7 +28,7 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-class DummyReceiver : public SearchListener
+class DummyReceiver : public SearchListenerBase
 {
 public:
     DummyReceiver(std::function<void(DepartmentList const&, std::string const&)> departments_push_func)
@@ -65,8 +65,8 @@ TEST(ResultReplyObject, departments_push)
         internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
-        Query const query1("scope-foo", "", "dep1");
-        Query const query2("scope-foo", "", "dep2");
+        CannedQuery const query1("scope-foo", "", "dep1");
+        CannedQuery const query2("scope-foo", "", "dep2");
 
         DepartmentList input_deps { Department(query1, "Dep1"), Department(query2, "Dep2") };
         std::string const input_current_dep("dep1");
@@ -93,7 +93,7 @@ TEST(ResultReplyObject, departments_push)
         internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
-        Query const query1("scope-foo", "", "dep1");
+        CannedQuery const query1("scope-foo", "", "dep1");
 
         DepartmentList input_deps { Department(query1, "Dep1") };
         std::string const input_current_dep("dep1");

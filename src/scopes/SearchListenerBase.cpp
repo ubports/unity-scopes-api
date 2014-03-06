@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ * Authored by: Michi Henning <michi.henning@canonical.com>
+ */
 
-#include <unity/scopes/ActivationListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 
 namespace unity
 {
@@ -24,25 +24,37 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
-ActivationListener::ActivationListener()
+//! @cond
+
+SearchListenerBase::SearchListenerBase()
 {
 }
 
-ActivationListener::~ActivationListener()
+SearchListenerBase::~SearchListenerBase()
 {
 }
-/// @endcond
 
-void ActivationListener::activation_response(ActivationResponse const& /* response */)
+void SearchListenerBase::push(DepartmentList const& /* departments */, std::string const& /* current_department_id */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void ActivationListener::finished(Reason /* r */, std::string const& /* error_message */)
+void SearchListenerBase::push(Filters const& /* filters */, FilterState const& /* filter_state */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
+
+void SearchListenerBase::push(Category::SCPtr /* category */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
+void SearchListenerBase::push(Annotation /* annotation */)
+{
+    // Intentionally empty: "do nothing" default implementation.
+}
+
+//! @endcond
 
 } // namespace scopes
 

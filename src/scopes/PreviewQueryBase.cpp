@@ -16,7 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/SearchReplyBase.h>
+#include <unity/scopes/PreviewQueryBase.h>
+
+#include <unity/scopes/internal/QueryBaseImpl.h>
+
+using namespace std;
 
 namespace unity
 {
@@ -25,11 +29,13 @@ namespace scopes
 {
 
 /// @cond
+PreviewQueryBase::PreviewQueryBase() : QueryBase()
+{
+}
 
-SearchReplyBase::SearchReplyBase() = default;
-
-SearchReplyBase::~SearchReplyBase() = default;
-
+PreviewQueryBase::~PreviewQueryBase()
+{
+}
 /// @endcond
 
 } // namespace scopes
