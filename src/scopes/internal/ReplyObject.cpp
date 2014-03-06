@@ -97,7 +97,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
         ++num_push_;
     }  // Forward invocations to application outside synchronization
 
-    bool stop;
+    bool stop = false;
     string error;
     try
     {
