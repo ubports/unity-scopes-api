@@ -31,8 +31,33 @@ class ScopeBase;
 namespace testing
 {
 
-/// @cond
-
+/**
+ * \brief The OutOfProcessBenchmark class provides scope authors
+ * with runtime benchmarking capabilities. The actual runs are executed in another process.
+ *
+ * Please note that this class provides better test isolation than the class InProcessBenchmark
+ * and we promote use of this implementation due to this feature. However, as the internal
+ * implementation relies on fork(), the results in case of multi-threaded environments that exist
+ * before the execution of the benchmark are undefined.
+ *
+ * \code
+ * unity::scopes::testing::OutOfProcessBenchmark benchmark;
+ *
+ * unity::scopes::Query query{scope_name};
+ * query.set_query_string(scope_query_string);
+ *
+ * unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
+ *
+ * unity::scopes::testing::Benchmark::QueryConfiguration config;
+ * config.sampler = [query, meta_data]()
+ * {
+ *     return std::make_pair(query, meta_data);
+ * };
+ *
+ * auto result = benchmark.for_query(scope, config);
+ * \endcode
+ *
+ */
 class OutOfProcessBenchmark : public InProcessBenchmark
 {
 public:
@@ -50,8 +75,6 @@ public:
     Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                       ActionConfiguration activation_configuration) override;
 };
-
-/// @endcond
 
 } // namespace testing
 

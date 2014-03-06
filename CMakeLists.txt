@@ -54,7 +54,7 @@ else()
 endif()
 
 include(FindPkgConfig)
-find_package(Boost COMPONENTS regex REQUIRED)
+find_package(Boost COMPONENTS regex serialization REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
@@ -100,7 +100,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -216,6 +216,7 @@ endif()
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    ${Boost_LIBRARIES}
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
