@@ -82,13 +82,15 @@ private:
 
     private:
         void update_state(ProcessState state);
+        void on_death();
 
     private:
         ScopeExecData exec_data_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         ProcessState state_ = Stopped;
+        std::mutex process_mutex_;
         std::mutex state_mutex_;
-        std::condition_variable state_cond_;
+        std::condition_variable state_change_cond_;
     };
 
 private:
