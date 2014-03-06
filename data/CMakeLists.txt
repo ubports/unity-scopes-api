@@ -21,6 +21,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scope-registry.conf DESTINATION ${CMAK
 # Empty directory for scopes to put their conf files into
 # If we start install our own conf files here, this can be
 # removed (installing files implicitly creates the subdirs)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scopes)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scopes
-DESTINATION ${SCOPES_DEFAULT_DATADIR})
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/unity-scopes)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/unity-scopes
+DESTINATION ${CMAKE_INSTALL_LIBDIR})
