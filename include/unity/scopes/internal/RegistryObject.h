@@ -60,7 +60,8 @@ public:
     virtual ScopeProxy locate(std::string const& scope_name) override;
 
     // Local methods
-    bool add_local_scope(ScopeMetadata const& scope, ScopeExecData const& scope_exec_data);
+    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
+                         ScopeExecData const& scope_exec_data);
     bool remove_local_scope(std::string const& scope_name);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 

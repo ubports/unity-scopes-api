@@ -198,7 +198,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             exec_data.config_file = config_file;
             exec_data.scope_name = pair.second;
 
-            registry->add_local_scope(move(meta), exec_data);
+            registry->add_local_scope(pair.second, move(meta), exec_data);
         }
         catch (unity::Exception const& e)
         {

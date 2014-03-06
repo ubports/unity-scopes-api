@@ -47,11 +47,22 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
+    // stop the death oberver first so we don't waste time with
+    // all the on_process_death signals we would soon recieve
     death_observer_.quit();
     if (death_observer_thread_.joinable())
     {
         death_observer_thread_.join();
     }
+
+    // kill all scope_processes_
+    for (auto& scope_process : scope_processes_)
+    {
+        scope_process.second.kill();
+    }
+
+    scopes_.clear();
+    scope_processes_.clear();
 }
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
@@ -123,11 +134,11 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
     return scope_it->second.proxy();
 }
 
-bool RegistryObject::add_local_scope(ScopeMetadata const& metadata, ScopeExecData const& exec_data)
+bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
+                                     ScopeExecData const& exec_data)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     bool return_value = true;
-    std::string scope_name = metadata.scope_name();
     if (scope_name.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
