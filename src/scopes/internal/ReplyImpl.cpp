@@ -195,7 +195,12 @@ bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
         arr.push_back(Variant(layout.serialize()));
     }
     vm["columns"] = arr;
-    return layouts_push_disallowed_ = push(vm);
+    if (!push(vm))
+    {
+        layouts_push_disallowed_ = false;
+        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
+    }
+    return true;
 }
 
 bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
