@@ -89,8 +89,7 @@ Variant& SearchMetadata::operator[](std::string const& key)
 
 Variant const& SearchMetadata::operator[](std::string const& key) const
 {
-    // force const hint() method
-    return (const_cast<internal::SearchMetadataImpl const *>(fwd()))->hint(key);
+    return fwd()->hint(key);
 }
 
 bool SearchMetadata::contains_hint(std::string const& key) const
