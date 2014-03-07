@@ -90,8 +90,10 @@ public:
 
     /**
     \brief Creates a CategoryRenderer from a JSON string.
+
+    \param json_text Renderer template in JSON format
+    \throws unity::InvalidArgumentException if json_text cannot be parsed
     */
-    // TODO: document exception thrown for invalid string.
     explicit CategoryRenderer(std::string const& json_text = DEFAULT_RENDERER);
 
     /**@name Copy and assignment

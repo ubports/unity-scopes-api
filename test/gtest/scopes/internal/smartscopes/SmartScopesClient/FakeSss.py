@@ -64,7 +64,7 @@ remote_scopes_response = '\
 {"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" }]'
 
 search_response = '\
-{"category": {"renderer_template": "", "id": "cat1", "title": "Category 1"}}\r\n\
+{"category": {"render_template": "{}", "id": "cat1", "title": "Category 1"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
 {"result": {"cat_id": "cat1", "icon": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}'
 
