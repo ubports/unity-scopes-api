@@ -22,16 +22,13 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/PreviewReplyImpl.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/SearchReplyImpl.h>
-#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Reply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/SearchReply.h>
@@ -57,7 +54,6 @@ ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBa
     qo_(qo),
     cat_registry_(new CategoryRegistry()),
     finished_(false),
-    layouts_push_disallowed_(false),
     cardinality_(qo->cardinality({ fwd()->identity(), fwd()->mw_base() })),
     num_pushes_(0)
 {
@@ -169,61 +165,6 @@ bool ReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::Filte
     var["filters"] = filters_var;
     var["filter_state"] = filter_state.serialize();
     return push(var);
-}
-
-bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
-{
-    if (layouts_push_disallowed_)
-    {
-        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
-    }
-
-    // basic check for consistency of layouts
-    try
-    {
-        ColumnLayoutImpl::validate_layouts(layouts);
-    }
-    catch (unity::LogicException const &e)
-    {
-        throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
-    }
-
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& layout: layouts)
-    {
-        arr.push_back(Variant(layout.serialize()));
-    }
-    vm["columns"] = arr;
-    if (!push(vm))
-    {
-        layouts_push_disallowed_ = false;
-        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
-    }
-    return true;
-}
-
-bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
-{
-    layouts_push_disallowed_ = true;
-
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& widget : widgets)
-    {
-        arr.push_back(Variant(widget.serialize()));
-    }
-    vm["widgets"] = arr;
-    return push(vm);
-}
-
-bool ReplyImpl::push(std::string const& key, Variant const& value)
-{
-    VariantMap vm;
-    VariantMap nested;
-    nested[key] = value;
-    vm["preview-data"] = nested;
-    return push(vm);
 }
 
 bool ReplyImpl::push(VariantMap const& variant_map)

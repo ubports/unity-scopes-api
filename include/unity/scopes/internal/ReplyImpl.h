@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 
 #include <unity/scopes/Category.h>
-#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
@@ -28,8 +27,6 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
 #include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/PreviewReplyProxyFwd.h>
-#include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Reply.h>
 #include <unity/scopes/SearchReplyProxyFwd.h>
 
@@ -66,9 +63,6 @@ public:
 
     bool push(unity::scopes::CategorisedResult const& result);
     bool register_annotation(unity::scopes::Annotation const& annotation);
-    bool register_layout(unity::scopes::ColumnLayoutList const& layouts);
-    bool push(unity::scopes::PreviewWidgetList const& widgets);
-    bool push(std::string const& key, Variant const& value);
     bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state);
 
     virtual void finished() override;
@@ -77,15 +71,16 @@ public:
 
     typedef std::function<void()> CleanupFunc;
 
-private:
+protected:
     bool push(Category::SCPtr category);
     bool push(VariantMap const& variant_map);
+
+private:
     MWReplyProxy fwd() const;
 
     std::shared_ptr<QueryObjectBase> qo_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
-    std::atomic_bool layouts_push_disallowed_;
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;

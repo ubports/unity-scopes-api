@@ -45,6 +45,9 @@ public:
     virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;
     virtual bool push(unity::scopes::PreviewWidgetList const& widgets) override;
     virtual bool push(std::string const& key, Variant const& value) override;
+
+private:
+    std::atomic_bool layouts_push_disallowed_;
 };
 
 } // namespace internal
