@@ -22,7 +22,7 @@
 This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++.
 For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
 
-A typical scope implementation needs to implement interfaces of the following class from scopes API:
+A typical scope implementation needs to implement interfaces of the following classes from the Scopes API:
 <ul>
 <li>unity::scopes::ScopeBase - the main scope class and an entry point for all incoming requests.
 <li>unity::scopes::SearchQueryBase - the handler of search request.
@@ -301,7 +301,8 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
 {
     try
     {
-        scope_to_query_ = registry->find("scope-A"); // store the proxy for passing it further in search 
+        auto meta = registry->get_metadata("scope-A");
+        scope_to_query_ = meta.proxy(); // store the proxy for passing it further in search 
     }
     catch (NotFoundException const& e)
     {
@@ -310,7 +311,7 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(std::string const& query, unity::scopes::SearchMetadata const&)
+unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const&)
 {
     SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
     return q;
