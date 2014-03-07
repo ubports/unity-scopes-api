@@ -36,7 +36,7 @@ class CategorisedResult;
 class Annotation;
 
 /**
-\brief Abstract base to allow the results of a search query to be sent to the source of a query.
+\brief Allows the results of a search query to be sent to the query source.
 */
 
 class SearchReply : public virtual Reply

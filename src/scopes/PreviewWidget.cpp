@@ -28,11 +28,22 @@ namespace scopes
 /*!
 \class PreviewWidget
 
-\brief This class describes an individual widget used when constructing a preview for a result item. Note that the data is likely to change between major versions of Unity, and therefore many of the definitions are Variant-based.
+\brief A widget for a preview.
 
-When Unity requests a preview for a particular result, the scope is expected to construct it from a few basic building blocks by instantiating unity::scopes::PreviewWidget. Each widget is identified by a free-form id, type of the widget and a number of attributes associated with a specific widget type.
+This class describes an individual widget used when constructing a preview for a result item.
+Note that the data is likely to change between major versions of Unity, and therefore many of
+the definitions are Variant-based.
 
-The attribute values can be either filled in directly before pushing the widget to Unity (using unity::scopes::PreviewWidget::add_attribute_value()), or they can be mapped from a result field in a similar fashion to the components mapping when specifying a unity::scopes::CategoryRenderer (see unity::scopes::PreviewWidget::add_attribute_mapping()). When using the add_component() method, the data is not required to be present in the result and the value can be pushed later using the unity::scopes::PreviewReply::push() method which accepts name of the field and its value as a unity::scopes::Variant.
+When Unity requests a preview for a particular result, the scope is expected to construct it
+from a few basic building blocks by instantiating a PreviewWidget. Each widget is identified
+by a free-form id, type of the widget, and a number of attributes associated with a specific widget type.
+
+The attribute values can be either filled in directly before pushing the widget to Unity
+(using add_attribute_value()), or they can be mapped from a result field in a
+similar fashion to the components mapping when specifying a CategoryRenderer
+(see add_attribute_mapping()). When using the add_attribute_mapping() method, the
+data is not required to be present in the result and the value can be pushed later
+using the PreviewReply::push() method, which accepts the name of the field and its value as a Variant.
 
 An example creating a basic preview demonstrating the three ways to associate preview widget attribute with a value:
 
@@ -63,7 +74,7 @@ void MyPreview::run(PreviewReplyProxy const& reply)
 
 \section previewtypes Recognized preview widget types and their attributes
 
-These widgets types are recognized by Unity:
+The following widgets types are recognized by Unity:
 \arg \c audio
 \arg \c video
 \arg \c image

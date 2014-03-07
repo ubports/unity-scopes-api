@@ -54,7 +54,7 @@ else()
 endif()
 
 include(FindPkgConfig)
-find_package(Boost COMPONENTS regex REQUIRED)
+find_package(Boost COMPONENTS regex serialization REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
@@ -100,7 +100,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -171,13 +171,12 @@ if(IPC_MONITORING)
     add_definitions(-DENABLE_IPC_MONITOR)
 endif()
 
-set(SCOPES_DEFAULT_DATADIR ${CMAKE_INSTALL_DATADIR}/unity)
 set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 3)
-set(UNITY_SCOPES_MICRO 2)
+set(UNITY_SCOPES_MINOR 4)
+set(UNITY_SCOPES_MICRO 0)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -216,6 +215,7 @@ endif()
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
+    ${Boost_LIBRARIES}
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
@@ -312,7 +312,7 @@ endif()
 # Here, we create an object library that then is used to link the normal and the test libraries.
 
 set(UNITY_SCOPES_LIB_OBJ ${UNITY_SCOPES_LIB}-obj)
-add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${SLICE_SRC} ${CAPNPROTO_SRC})
+add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${CAPNPROTO_SRC})
 set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 # Use the object files to make the normal library.
@@ -380,6 +380,7 @@ else()
     else()
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     endif()
+    configure_file(${PROJECT_SOURCE_DIR}/doc/index.html ${PROJECT_BINARY_DIR}/doc/index.html COPYONLY)
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile

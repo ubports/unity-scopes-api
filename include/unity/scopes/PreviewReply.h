@@ -31,8 +31,9 @@ namespace unity
 namespace scopes
 {
 /**
-\brief Allows the results of a preview to be sent to the source of the query.
+\brief Allows the results of a preview to be sent to the preview requester.
 */
+
 class PreviewReply : public virtual Reply
 {
 public:

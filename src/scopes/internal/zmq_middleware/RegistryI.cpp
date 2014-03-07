@@ -107,12 +107,14 @@ void RegistryI::list_(Current const&,
     auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     auto metadata_map = delegate->list();
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto rv = r.initPayload().getAs<capnproto::Registry::ListResponse>().initReturnValue(metadata_map.size());
+    auto list_response = r.initPayload().getAs<capnproto::Registry::ListResponse>();
+    auto dict = list_response.initReturnValue().initPairs(metadata_map.size());
     int i = 0;
     for (auto& pair : metadata_map)
     {
-        auto dict = rv[i];
-        to_value_dict(pair.second.serialize(), dict);
+        dict[i].setName(pair.first.c_str());            // Scope name
+        auto md = dict[i].initValue().initDictVal();
+        to_value_dict(pair.second.serialize(), md);     // Scope metadata
         ++i;
     }
 }

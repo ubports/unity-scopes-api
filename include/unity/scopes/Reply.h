@@ -31,7 +31,7 @@ namespace scopes
 {
 
 /**
-\brief Abstract base class to allow the results of a query to be sent to the source of the query.
+\brief Allows query termination to be sent to the source of a query.
 */
 
 class Reply : public virtual Object

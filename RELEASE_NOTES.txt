@@ -1,6 +1,46 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.4.0
+========================
+
+  * Renaming of various API elements for consistency and clarity:
+
+    PreviewWidget::add_attribute() -> PreviewWidget::add_attribute_value()
+    PreviewWidget::attributes() -> PreviewWidget::attribute_values()
+    PreviewWidget::add_component() -> PreviewWidget::add_attribute_mapping()
+    PreviewWidget::components() -> PreviewWidget::attribute_mappings()
+
+    ActivationListener -> ActivationListenerBase
+    ActivationListenerBase::activation_response() -> ActivationListenerBase::activated()
+
+    PreviewListener -> PreviewListenerBase
+
+    SearchListener -> SearchListenerBase
+
+    PreviewQuery -> PreviewQueryBase
+
+    SearchQuery -> SearchQueryBase
+
+    ActivationBase -> ActivationQueryBase
+
+    ReplyBase -> Reply
+
+    RegistryBase -> Registry
+
+    Query -> CannedQuery
+    CannedQuery::scope_name() -> CannedQuery::scope_id()
+
+    ScopeMetadata::scope_name() -> CannedQuery::scope_id()
+
+    Scope::create_query() -> Scope::search()
+
+    ScopeBase::create_query() -> ScopeBase::search()
+
+    SearchQuery::create_subquery() -> SearchQuery::subsearch()
+
+    Variant::Type: changed ordinal values of enumerators
+
 Changes in version 0.3.2
 ========================
 - ActivationResponse::set_scope_data(Variant const&) and scope_data() methods

@@ -38,7 +38,7 @@ class AnnotationImpl;
 }
 
 /**
- * \brief Represents a hyperlink (a label and canned CannedQuery)
+ * \brief A hyperlink (label and canned query).
  */
 class Link final
 {
@@ -46,12 +46,18 @@ public:
     /// @cond
     UNITY_DEFINES_PTRS(Link);
 
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     Link(Link const& other);
     Link(Link&&);
-    ~Link();
-
     Link& operator=(Link const& other);
     Link& operator=(Link&&);
+    //@}
+
+    /// @cond
+    ~Link();
     /// @endcond
 
     /**
@@ -61,14 +67,15 @@ public:
     std::string label() const;
 
     /**
-     * \brief Returns a canned CannedQuery instance.
-     * \return The canned CannedQuery.
+     * \brief Returns a CannedQuery instance.
+     * \return The canned query.
      */
     CannedQuery query() const;
 
     /// @cond
     VariantMap serialize() const;
     /// @endcond
+
 private:
     Link(std::string const& label, CannedQuery const& query);
     Link(VariantMap const& variant_map);

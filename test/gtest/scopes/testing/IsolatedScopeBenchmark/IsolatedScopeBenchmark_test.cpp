@@ -28,7 +28,41 @@
 
 #include <gtest/gtest.h>
 
+#include "config.h"
 #include "scope.h"
+
+#include <cstdio>
+#include <fstream>
+#include <random>
+
+namespace
+{
+std::chrono::milliseconds mean{10};
+std::chrono::milliseconds variance{1};
+}
+
+namespace unity
+{
+namespace scopes
+{
+namespace testing
+{
+template<>
+struct ScopeTraits<::testing::Scope>
+{
+    inline static const char* name()
+    {
+        return "BenchmarkingScope";
+    }
+
+    inline static std::shared_ptr<::testing::Scope> construct()
+    {
+        return std::make_shared<::testing::Scope>(mean, variance);
+    }
+};
+}
+}
+}
 
 namespace
 {
@@ -40,68 +74,144 @@ static const std::string scope_query_string{"does.not.exist.scope.query_string"}
 static const std::string default_locale{"C"};
 static const std::string default_form_factor{"SuperDuperPhablet"};
 
-static const double alpha = 0.05;
-
 static const std::size_t dont_care{0};
-unity::scopes::testing::Benchmark::Result reference_query_performance
-{
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
 
-unity::scopes::testing::Benchmark::Result reference_preview_performance
+unity::scopes::testing::Benchmark::Result reference_query_performance()
 {
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
 
-unity::scopes::testing::Benchmark::Result reference_activation_performance
-{
-    dont_care,
-    {std::chrono::milliseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    return result;
+}
 
-unity::scopes::testing::Benchmark::Result reference_action_performance
+unity::scopes::testing::Benchmark::Result reference_preview_performance()
 {
-    dont_care,
-    {std::chrono::microseconds{500}, std::chrono::microseconds{dont_care}}
-};
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
+
+    return result;
+}
+
+unity::scopes::testing::Benchmark::Result reference_activation_performance()
+{
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
+
+    return result;
+}
+
+unity::scopes::testing::Benchmark::Result reference_action_performance()
+{
+    unity::scopes::testing::Benchmark::Result result{};
+    result.timing.mean = mean;
+    result.timing.std_dev = variance;
+
+    return result;
+}
 
 }
 
+TEST(BenchmarkResult, saving_and_loading_works)
+{
+    const std::string fn{"test.result"};
+    std::remove(fn.c_str());
+
+    unity::scopes::testing::Benchmark::Result reference;
+    reference.sample_size = 100;
+
+    {
+        std::ofstream out{fn.c_str()};
+        ASSERT_NO_THROW(reference.save_to(out));
+    }
+
+    {
+        unity::scopes::testing::Benchmark::Result result;
+        std::ifstream in{fn.c_str()};
+        ASSERT_NO_THROW(result.load_from(in));
+        EXPECT_EQ(reference, result);
+    }
+}
+
+TEST(BenchmarkResultXml, saving_and_loading_works)
+{
+    const std::string fn{"test.result"};
+    std::remove(fn.c_str());
+
+    unity::scopes::testing::Benchmark::Result reference;
+    reference.sample_size = std::rand();
+
+    {
+        std::ofstream out{fn.c_str()};
+        ASSERT_NO_THROW(reference.save_to_xml(out));
+    }
+
+    {
+        unity::scopes::testing::Benchmark::Result result;
+        std::ifstream in{fn.c_str()};
+        ASSERT_NO_THROW(result.load_from_xml(in));
+        EXPECT_EQ(reference, result);
+    }
+}
+
+// This test relies on real world benchmarking data from previous runs to
+// ensure that the performance of the system does not degrade. For that, we work
+// under the hypothesis that a change will not result in any significant change in
+// performance. If it does result in a change, we fail the test and either have to
+// investigate why the performance degraded or take the new results as our new
+// performance baseline.
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
 {
     unity::scopes::testing::OutOfProcessBenchmark benchmark;
+
+    unity::scopes::testing::Benchmark::Result reference_result;
+    {
+        std::ifstream in{testing::reference_result_file};
+        reference_result.load_from_xml(in);
+    }
 
     unity::scopes::CannedQuery query{scope_name};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::QueryConfiguration config
+    unity::scopes::testing::Benchmark::QueryConfiguration config;
+    config.sampler = [query, meta_data]()
     {
-        [query, meta_data]() { return std::make_pair(query, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(query, meta_data);
     };
 
     auto result = benchmark.for_query(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_query_performance,
-                result);
+    // We store the potential new reference such that we can copy over if
+    // the last test fails.
+    std::ofstream out{"ref.xml"};
+    result.save_to_xml(out);
 
+    // We first check that our normality assumption of the data is valid
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
+              unity::scopes::testing::AndersonDarlingTest()
+              .for_normality(result.timing)
+              .data_fits_normal_distribution(
+                  unity::scopes::testing::Confidence::zero_point_five_percent));
+
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_result.timing,
+                result.timing);
+
+    // We work under the hypothesis that changes to the code did not result
+    // in a change in performance characteristics.
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
+    // And we certainly don't want to get worse
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    // If changes significantly improved the performance, we fail the test to
+    // make sure that we adjust the performance baselines.
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works)
@@ -111,30 +221,24 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    unity::scopes::testing::Benchmark::PreviewConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_preview(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_preview_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
@@ -144,30 +248,24 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    unity::scopes::testing::Benchmark::ActivationConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_activation(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_activation_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
@@ -179,30 +277,24 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
     static const std::string widget_id{"does.not.exist.widget"};
     static const std::string action_id{"does.not.exist.action"};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActionConfiguration config
+    unity::scopes::testing::Benchmark::ActionConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_tuple(search_result, meta_data, widget_id, action_id);
     };
 
     auto result = benchmark.for_action(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_action_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
@@ -214,30 +306,24 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::QueryConfiguration config
+    unity::scopes::testing::Benchmark::QueryConfiguration config;
+    config.sampler = [query, meta_data]()
     {
-        [query, meta_data]() { return std::make_pair(query, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(query, meta_data);
     };
 
     auto result = benchmark.for_query(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_query_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_query_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
@@ -247,30 +333,24 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::PreviewConfiguration config
+    unity::scopes::testing::Benchmark::PreviewConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
 
     auto result = benchmark.for_preview(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_preview_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_preview_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
@@ -280,30 +360,30 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     unity::scopes::testing::Result search_result;
     unity::scopes::ActionMetadata meta_data{default_locale, default_form_factor};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActivationConfiguration config
+    unity::scopes::testing::Benchmark::ActivationConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_pair(search_result, meta_data); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_pair(search_result, meta_data);
     };
+
+    config.trial_configuration.statistics_configuration.histogram_bin_count = 20;
 
     auto result = benchmark.for_activation(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_activation_performance,
-                result);
+    std::ofstream out("histogram.txt");
+    for (const auto& bin : result.timing.histogram)
+        out << bin.first.count() << " " << bin.second << std::endl;
+
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_activation_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
@@ -315,28 +395,22 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
     static const std::string widget_id{"does.not.exist.widget"};
     static const std::string action_id{"does.not.exist.action"};
 
-    static const std::size_t sample_size{10};
-    static const std::chrono::seconds per_trial_timeout{1};
-
-    unity::scopes::testing::Benchmark::ActionConfiguration config
+    unity::scopes::testing::Benchmark::ActionConfiguration config;
+    config.sampler = [search_result, meta_data]()
     {
-        [search_result, meta_data]() { return std::make_tuple(search_result, meta_data, widget_id, action_id); },
-        {
-            sample_size,
-            per_trial_timeout
-        }
+        return std::make_tuple(search_result, meta_data, widget_id, action_id);
     };
 
     auto result = benchmark.for_action(scope, config);
 
-    auto test_result = unity::scopes::testing::StudentsTTest().one_sample(
-                reference_action_performance,
-                result);
+    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
+                reference_action_performance().timing,
+                result.timing);
 
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_eq_to_reference(alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.sample_mean_is_gt_reference(alpha));
+              test_result.both_means_are_equal(testing::alpha));
     EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample_mean_is_lt_reference(alpha));
+              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
+    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
+              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
 }
