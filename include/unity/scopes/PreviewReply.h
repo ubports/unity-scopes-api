@@ -59,6 +59,10 @@ public:
      */
     virtual bool push(std::string const& key, Variant const& value) = 0;
 
+    /// @cond
+    virtual ~PreviewReply();
+    /// @endcond
+
 protected:
     /// @cond
     PreviewReply();

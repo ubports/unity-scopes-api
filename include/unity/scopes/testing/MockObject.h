@@ -13,13 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Thomas Voß <thomas.voss@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
-#define UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
+#ifndef UNITY_SCOPES_TESTING_MOCK_OBJECT_H
+#define UNITY_SCOPES_TESTING_MOCK_OBJECT_H
 
-#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Object.h>
 
 #include <gmock/gmock.h>
 
@@ -34,19 +34,15 @@ namespace testing
 
 /// @cond
 
-class MockPreviewReply : public unity::scopes::PreviewReply
+class MockObject : public virtual Object
 {
 public:
-    MockPreviewReply() = default;
+    MockObject() = default;
 
-    // From Reply
-    MOCK_METHOD0(finished, void());
-    MOCK_METHOD1(error, void(std::exception_ptr));
-
-    // From SearchReply
-    MOCK_METHOD1(register_layout, bool(ColumnLayoutList const&));
-    MOCK_METHOD1(push, bool(PreviewWidgetList const&));
-    MOCK_METHOD2(push, bool(std::string const&, Variant const&));
+    MOCK_METHOD0(endpoint, std::string());
+    MOCK_METHOD0(identity, std::string());
+    MOCK_METHOD0(timeout, int64_t());
+    MOCK_METHOD0(to_string, std::string());
 };
 
 /// @endcond
