@@ -41,10 +41,10 @@ public:
     NONCOPYABLE(RuntimeImpl);
     UNITY_DEFINES_PTRS(RuntimeImpl);
 
-    static UPtr create(std::string const& scope_name, std::string const& configfile = "");
+    static UPtr create(std::string const& scope_id, std::string const& configfile = "");
     void destroy();
 
-    std::string scope_name() const;
+    std::string scope_id() const;
     MiddlewareFactory const* factory() const;
     RegistryProxy registry() const;
     std::string registry_configfile() const;
@@ -60,10 +60,10 @@ public:
     ~RuntimeImpl();
 
 private:
-    RuntimeImpl(std::string const& scope_name, std::string const& configfile);
+    RuntimeImpl(std::string const& scope_id, std::string const& configfile);
 
     std::atomic_bool destroyed_;
-    std::string scope_name_;
+    std::string scope_id_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
     mutable RegistryProxy registry_;

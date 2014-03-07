@@ -58,7 +58,7 @@ public:
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
 
     /**
     \brief Returns a map containing the metadata for all scopes.

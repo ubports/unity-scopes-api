@@ -30,8 +30,8 @@ namespace scopes
 
 //! @cond
 
-Runtime::Runtime(string const& scope_name, string const& configfile) :
-    p(internal::RuntimeImpl::create(scope_name, configfile))
+Runtime::Runtime(string const& scope_id, string const& configfile) :
+    p(internal::RuntimeImpl::create(scope_id, configfile))
 {
 }
 

@@ -58,11 +58,11 @@ RegistryObject::~RegistryObject()
     }
 }
 
-ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
     }
@@ -71,7 +71,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
     // Local scopes take precedence over remote ones of the same
     // name. (Ideally, this will never happen, except maybe
     // during development.)
-    auto const& it = scopes_.find(scope_name);
+    auto const& it = scopes_.find(scope_id);
     if (it != scopes_.end())
     {
         return it->second;
@@ -79,10 +79,10 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name)
 
     if (remote_registry_)
     {
-        return remote_registry_->get_metadata(scope_name);
+        return remote_registry_->get_metadata(scope_id);
     }
 
-    throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
+    throw NotFoundException("Registry::get_metadata(): no such scope",  scope_id);
 }
 
 MetadataMap RegistryObject::list()
@@ -102,47 +102,47 @@ MetadataMap RegistryObject::list()
     return all_scopes;
 }
 
-bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
+bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      std::vector<std::string> const& spawn_command)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     bool return_value = true;
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
     }
-    if(scope_name.find('/') != std::string::npos) {
+    if(scope_id.find('/') != std::string::npos) {
         throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its name");
     }
 
-    if (scopes_.find(scope_name) != scopes_.end())
+    if (scopes_.find(scope_id) != scopes_.end())
     {
-        auto proc = scope_processes_.find(scope_name);
+        auto proc = scope_processes_.find(scope_id);
         if (proc != scope_processes_.end())
         {
             kill_process(proc->second);
-            scope_processes_.erase(scope_name);
+            scope_processes_.erase(scope_id);
         }
-        scopes_.erase(scope_name);
-        commands_.erase(scope_name);
+        scopes_.erase(scope_id);
+        commands_.erase(scope_id);
         return_value = false;
     }
-    scopes_.insert(make_pair(scope_name, metadata));
-    commands_[scope_name] = spawn_command;
+    scopes_.insert(make_pair(scope_id, metadata));
+    commands_[scope_id] = spawn_command;
     return return_value;
 }
 
-bool RegistryObject::remove_local_scope(std::string const& scope_name)
+bool RegistryObject::remove_local_scope(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
     }
 
-    commands_.erase(scope_name);
-    return scopes_.erase(scope_name) == 1;
+    commands_.erase(scope_id);
+    return scopes_.erase(scope_id) == 1;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
@@ -151,32 +151,32 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-ScopeProxy RegistryObject::locate(std::string const& scope_name)
+ScopeProxy RegistryObject::locate(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    if (scope_id.empty())
         throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
-    auto metadata = scopes_.find(scope_name);
+    auto metadata = scopes_.find(scope_id);
     if (metadata == scopes_.end())
     {
-        throw NotFoundException("Tried to obtain unknown scope", scope_name);
+        throw NotFoundException("Tried to obtain unknown scope", scope_id);
     }
-    auto search = scope_processes_.find(scope_name);
+    auto search = scope_processes_.find(scope_id);
     if (search == scope_processes_.end() || is_dead(search->second))
     {
-        spawn_scope(scope_name);
+        spawn_scope(scope_id);
     }
     return metadata->second.proxy();
 }
 
-void RegistryObject::spawn_scope(std::string const& scope_name)
+void RegistryObject::spawn_scope(std::string const& scope_id)
 {
-    if (scopes_.find(scope_name) == scopes_.end())
+    if (scopes_.find(scope_id) == scopes_.end())
     {
-        throw NotFoundException("Tried to spawn an unknown scope.", scope_name);
+        throw NotFoundException("Tried to spawn an unknown scope.", scope_id);
     }
-    auto process = scope_processes_.find(scope_name);
+    auto process = scope_processes_.find(scope_id);
     if (process != scope_processes_.end())
     {
         assert(is_dead(process->second));
@@ -184,9 +184,9 @@ void RegistryObject::spawn_scope(std::string const& scope_name)
         waitpid(process->second, &status, 0);
         if (status != 0)
         {
-            printf("scope %s has exited with nonzero error status %d.\n", scope_name.c_str(), status);
+            printf("scope %s has exited with nonzero error status %d.\n", scope_id.c_str(), status);
         }
-        scope_processes_.erase(scope_name);
+        scope_processes_.erase(scope_id);
     }
 
     pid_t pid;
@@ -198,7 +198,7 @@ void RegistryObject::spawn_scope(std::string const& scope_name)
         }
         case 0: // child
         {
-            const vector<string>& cmd = commands_[scope_name];
+            const vector<string>& cmd = commands_[scope_id];
             assert(cmd.size() == 3);
             // Includes room for final NULL element.
             unique_ptr<char const* []> argv(new char const*[4]);
@@ -210,10 +210,10 @@ void RegistryObject::spawn_scope(std::string const& scope_name)
             throw SyscallException("cannot exec scoperunner", errno);
         }
     }
-    const vector<string>& cmd = commands_[scope_name];
+    const vector<string>& cmd = commands_[scope_id];
     printf("spawning scope %s to process number %d with command line %s %s %s.\n",
-           scope_name.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
-    scope_processes_[scope_name] = pid;
+           scope_id.c_str(), (int)pid, cmd[0].c_str(), cmd[1].c_str(), cmd[2].c_str());
+    scope_processes_[scope_id] = pid;
 }
 
 void RegistryObject::shutdown()

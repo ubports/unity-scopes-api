@@ -139,7 +139,7 @@ public:
     ~Runtime();
 
 private:
-    Runtime(std::string const& scope_name, std::string const& configfile); // Instantiation only via create()
+    Runtime(std::string const& scope_id, std::string const& configfile); // Instantiation only via create()
 
     std::unique_ptr<internal::RuntimeImpl> p;
 };

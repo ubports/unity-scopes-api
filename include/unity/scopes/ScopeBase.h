@@ -146,7 +146,7 @@ public:
 
     The call to start() is made by the same thread that calls the create function.
 
-    \param scope_name The name of the scope as defined by the scope's configuration file.
+    \param scope_id The name of the scope as defined by the scope's configuration file.
 
     \param registry A proxy to the scope registry. This parameter is provided for aggregating
     scopes that need to retrieve proxies to their child scopes.
@@ -155,7 +155,7 @@ public:
     to refuse to load the scope. The return value is used to ensure that the shared library
     containing the scope is ABI compatible with the scopes run time.
     */
-    virtual int start(std::string const& scope_name, RegistryProxy const& registry) = 0;
+    virtual int start(std::string const& scope_id, RegistryProxy const& registry) = 0;
 
     /**
     \brief Called by the scopes run time when the scope should shut down.

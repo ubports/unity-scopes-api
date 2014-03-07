@@ -40,8 +40,8 @@ namespace scopes
 namespace internal
 {
 
-PreviewReplyObject::PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
+PreviewReplyObject::PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id),
     receiver_(receiver)
 {
     assert(receiver_);

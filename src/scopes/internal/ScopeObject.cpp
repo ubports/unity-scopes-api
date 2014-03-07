@@ -69,7 +69,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 
         // TODO: log error about incoming request containing an invalid reply proxy.
 
-        throw LogicException("Scope \"" + runtime_->scope_name() + "\": query() called with null reply proxy");
+        throw LogicException("Scope \"" + runtime_->scope_id() + "\": query() called with null reply proxy");
     }
 
     // Ask scope to instantiate a new query.
@@ -80,12 +80,12 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         if (!query_base)
         {
             // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_name() + "\" returned nullptr from query_factory_fun()");
+            throw ResourceException("Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()");
         }
     }
     catch (...)
     {
-        throw ResourceException("Scope \"" + runtime_->scope_name() + "\" threw an exception from query_factory_fun()");
+        throw ResourceException("Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()");
     }
 
     MWQueryCtrlProxy ctrl_proxy;

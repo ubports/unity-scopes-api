@@ -45,14 +45,14 @@ namespace scopes
 namespace internal
 {
 
-RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
+RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
     destroyed_(false),
-    scope_name_(scope_name)
+    scope_id_(scope_id)
 {
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
         UniqueID id;
-        scope_name_ = "c-" + id.gen();
+        scope_id_ = "c-" + id.gen();
     }
 
     string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
@@ -67,7 +67,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
 
-        middleware_ = middleware_factory_->create(scope_name_, default_middleware, middleware_configfile);
+        middleware_ = middleware_factory_->create(scope_id_, default_middleware, middleware_configfile);
         middleware_->start();
 
         if (registry_configfile_.empty() || registry_identity_.empty())
@@ -88,7 +88,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("Cannot instantiate run time for " + scope_name + ", config file: " + config_file);
+        throw ConfigException("Cannot instantiate run time for " + scope_id + ", config file: " + config_file);
     }
 }
 
@@ -110,9 +110,9 @@ RuntimeImpl::~RuntimeImpl()
     }
 }
 
-RuntimeImpl::UPtr RuntimeImpl::create(string const& scope_name, string const& configfile)
+RuntimeImpl::UPtr RuntimeImpl::create(string const& scope_id, string const& configfile)
 {
-    return UPtr(new RuntimeImpl(scope_name, configfile));
+    return UPtr(new RuntimeImpl(scope_id, configfile));
 }
 
 void RuntimeImpl::destroy()
@@ -130,9 +130,9 @@ void RuntimeImpl::destroy()
     }
 }
 
-string RuntimeImpl::scope_name() const
+string RuntimeImpl::scope_id() const
 {
-    return scope_name_;
+    return scope_id_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const
@@ -190,9 +190,9 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
 
 void RuntimeImpl::run_scope(ScopeBase *const scope_base)
 {
-    auto mw = factory()->create(scope_name_, "Zmq", "Zmq.ini");
+    auto mw = factory()->create(scope_id_, "Zmq", "Zmq.ini");
 
-    scope_base->start(scope_name_, registry());
+    scope_base->start(scope_id_, registry());
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
 
@@ -203,7 +203,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    auto proxy = mw->add_scope_object(scope_name_, move(scope));
+    auto proxy = mw->add_scope_object(scope_id_, move(scope));
 
     mw->wait_for_shutdown();
     run_future.get();

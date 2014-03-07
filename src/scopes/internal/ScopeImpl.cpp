@@ -43,10 +43,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name) :
+ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id) :
     ObjectImpl(mw_proxy),
     runtime_(runtime),
-    scope_name_(scope_name)
+    scope_id_(scope_id)
 {
     assert(runtime);
 }
@@ -61,7 +61,7 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_name_, query_string, department_id);
+    CannedQuery query(scope_id_, query_string, department_id);
     query.set_filter_state(filter_state);
     return search(query, metadata, reply);
 }
@@ -71,7 +71,7 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_name_);
+    CannedQuery query(scope_id_);
     query.set_query_string(query_string);
     query.set_filter_state(filter_state);
     return search(query, metadata, reply);
@@ -81,7 +81,7 @@ QueryCtrlProxy ScopeImpl::search(string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_name_);
+    CannedQuery query(scope_id_);
     query.set_query_string(query_string);
     return search(query, metadata, reply);
 }
@@ -246,9 +246,9 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
-ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name)
+ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id)
 {
-    return make_shared<ScopeImpl>(mw_proxy, runtime, scope_name);
+    return make_shared<ScopeImpl>(mw_proxy, runtime, scope_id);
 }
 
 MWScopeProxy ScopeImpl::fwd() const

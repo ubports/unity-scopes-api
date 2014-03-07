@@ -36,9 +36,9 @@ class MWRegistry : public virtual MWObjectProxy
 {
 public:
     // Remote operations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
-    virtual ScopeProxy locate(std::string const& scope_name) = 0;
+    virtual ScopeProxy locate(std::string const& scope_id) = 0;
 
     virtual ~MWRegistry();
 

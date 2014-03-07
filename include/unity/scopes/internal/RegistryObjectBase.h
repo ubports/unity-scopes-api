@@ -36,9 +36,9 @@ class RegistryObjectBase : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(RegistryObjectBase);
 
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
-    virtual ScopeProxy locate(std::string const& scope_name) = 0;
+    virtual ScopeProxy locate(std::string const& scope_id) = 0;
 };
 
 } // namespace internal

@@ -45,7 +45,7 @@ public:
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) override;
 
     // Remote operation. Not part of public API, hence not override.
-    ScopeProxy locate(std::string const& scope_name);
+    ScopeProxy locate(std::string const& scope_id);
 
 private:
     MWRegistryProxy fwd() const;
