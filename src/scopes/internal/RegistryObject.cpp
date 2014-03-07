@@ -64,7 +64,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id)
     // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("RegistryObject::get_metadata() Cannot search for scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::get_metadata(): Cannot search for scope with empty name");
     }
 
     // Look for the scope in both the local and the remote map.
