@@ -1,3 +1,11 @@
+unity-scopes-api (0.4.0+14.04.20140220.1-0ubuntu2) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski, Michi Henning ]
+  * Renamed various classes and methods in the public API
+    (see RELEASE_NOTES.txt for details).
+
+ -- Michi Henning <michi.henning@canonical.com>  Fri, 28 Feb 2014 08:22:14 +1000
+
 unity-scopes-api (0.3.2+14.04.20140220.1-0ubuntu1) trusty; urgency=low
 
   [ Pawel Stolowski ]

@@ -24,7 +24,7 @@
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -54,12 +54,12 @@ A scope must return an instance of this class from its implementation of ScopeBa
 constructor that might block.
 */
 
-class SearchQuery: public QueryBase
+class SearchQueryBase : public QueryBase
 {
 public:
     /// @cond
-    NONCOPYABLE(SearchQuery);
-    UNITY_DEFINES_PTRS(SearchQuery);
+    NONCOPYABLE(SearchQueryBase);
+    UNITY_DEFINES_PTRS(SearchQueryBase);
     /// @endcond
 
     /**
@@ -82,10 +82,10 @@ public:
     virtual void run(SearchReplyProxy const& reply) = 0;
 
     /** @name Subquery methods
-    The create_subquery() methods are for use by aggregating scopes.
+    The subsearch() methods are for use by aggregating scopes.
     When an aggregator passes a query to its child scopes, it should
-    use create_subquery() instead of the normal Scope::create_query()
-    that would be called by a client. create_subquery() takes care
+    use subsearch() instead of the normal Scope::search()
+    that would be called by a client. subsearch() takes care
     of automatically forwarding query cancellation to child scopes.
     This means that there is no need for an aggregating scope to
     explicitly forward cancellation to child scopes
@@ -93,33 +93,33 @@ public:
     run time.
     */
     //{@
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   SearchListener::SPtr const& reply);
-    QueryCtrlProxy create_subquery(ScopeProxy const& scope,
+                                   SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchMetadata const& hints,
-                                   SearchListener::SPtr const& reply);
+                                   SearchListenerBase::SPtr const& reply);
     //@}
 
     /// @cond
-    virtual ~SearchQuery();
+    virtual ~SearchQueryBase();
     /// @endcond
 
 protected:
     /// @cond
-    SearchQuery();
+    SearchQueryBase();
     /// @endcond
 };
 

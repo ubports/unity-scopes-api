@@ -34,9 +34,10 @@ class ActionMetadataImpl;
 }
 
 /**
-\brief Metadata passed to scopes as a part of unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate or
-unity::scopes::ScopeBase::perform_action requests.
+\brief Metadata passed to scopes for preview and activation.
+\see unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
 */
+
 class ActionMetadata : public QueryMetadata
 {
 public:

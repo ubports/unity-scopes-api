@@ -28,11 +28,22 @@ namespace scopes
 /*!
 \class PreviewWidget
 
-\brief This class describes an individual widget used when constructing a preview for a result item. Note that the data is likely to change between major versions of Unity, and therefore many of the definitions are Variant-based.
+\brief A widget for a preview.
 
-When Unity requests a preview for a particular result, the scope is expected to construct it from a few basic building blocks by instantiating unity::scopes::PreviewWidget. Each widget is identified by a free-form id, type of the widget and a number of attributes associated with a specific widget type.
+This class describes an individual widget used when constructing a preview for a result item.
+Note that the data is likely to change between major versions of Unity, and therefore many of
+the definitions are Variant-based.
 
-The attribute values can be either filled in directly before pushing the widget to Unity (using unity::scopes::PreviewWidget::add_attribute()), or they can be mapped from a result field in a similar fashion to the components mapping when specifying a unity::scopes::CategoryRenderer (see unity::scopes::PreviewWidget::add_component()). When using the add_component() method, the data is not required to be present in the result and the value can be pushed later using the unity::scopes::PreviewReply::push() method which accepts name of the field and its value as a unity::scopes::Variant.
+When Unity requests a preview for a particular result, the scope is expected to construct it
+from a few basic building blocks by instantiating a PreviewWidget. Each widget is identified
+by a free-form id, type of the widget, and a number of attributes associated with a specific widget type.
+
+The attribute values can be either filled in directly before pushing the widget to Unity
+(using add_attribute_value()), or they can be mapped from a result field in a
+similar fashion to the components mapping when specifying a CategoryRenderer
+(see add_attribute_mapping()). When using the add_attribute_mapping() method, the
+data is not required to be present in the result and the value can be pushed later
+using the PreviewReply::push() method, which accepts the name of the field and its value as a Variant.
 
 An example creating a basic preview demonstrating the three ways to associate preview widget attribute with a value:
 
@@ -41,13 +52,13 @@ void MyPreview::run(PreviewReplyProxy const& reply)
 {
     PreviewWidget w1("img", "image");
     // directly specify source URI for the image widget
-    w1.add_attribute("source", Variant("http://www.example.org/graphics.png"));
+    w1.add_attribute_value("source", Variant("http://www.example.org/graphics.png"));
 
     PreviewWidget w2("hdr", "header");
     // the result associated with this preview already had a title specified, so we'll just map it to the preview widget
-    w2.add_component("title", "title");
+    w2.add_attribute_mapping("title", "title");
     // description is not present in the result, but we'll push it later
-    w2.add_component("summary", "description");
+    w2.add_attribute_mapping("summary", "description");
 
     PreviewWidgetList widgets;
     widgets.push_back(w1);
@@ -63,7 +74,7 @@ void MyPreview::run(PreviewReplyProxy const& reply)
 
 \section previewtypes Recognized preview widget types and their attributes
 
-These widgets types are recognized by Unity:
+The following widgets types are recognized by Unity:
 \arg \c audio
 \arg \c video
 \arg \c image
@@ -101,7 +112,7 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
         {"length", Variant(207)}
     });
 
-    w1.add_attribute("tracks", builder.end());
+    w1.add_attribute_value("tracks", builder.end());
     ...
 }
 \endcode
@@ -119,7 +130,7 @@ List of attributes:
 {
     PreviewWidget w1("video1", "video");
 
-    w1.add_attribute("source", Variant("file:///tmp/video1.mp4"));
+    w1.add_attribute_value("source", Variant("file:///tmp/video1.mp4"));
     ...
 }
 \endcode
@@ -137,7 +148,7 @@ List of attributes:
 {
     PreviewWidget w1("img1", "image");
 
-    w1.add_attribute("source", Variant("file:///tmp/image.jpg"));
+    w1.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
     ...
 }
 \endcode
@@ -158,7 +169,7 @@ List of attributes:
     arr.push_back(Variant("file:///tmp/image1.jpg"));
     arr.push_back(Variant("file:///tmp/image2.jpg"));
     arr.push_back(Variant("file:///tmp/image3.jpg"));
-    w1.add_attribute("sources", Variant(arr));
+    w1.add_attribute_value("sources", Variant(arr));
     ...
 }
 \endcode
@@ -181,8 +192,8 @@ List of attributes:
 {
     PreviewWidget w1("hdr", "header");
 
-    w1.add_attribute("title", Variant("Result item"));
-    w1.add_attribute("mascot", Variant("file:///tmp/mascot.png"));
+    w1.add_attribute_value("title", Variant("Result item"));
+    w1.add_attribute_value("mascot", Variant("file:///tmp/mascot.png"));
     ...
 }
 \endcode
@@ -211,7 +222,7 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
         {"label", Variant("Download")}
     });
 
-    w1.add_attribute("actions", builder.end());
+    w1.add_attribute_value("actions", builder.end());
     ...
 }
 \endcode
@@ -233,7 +244,7 @@ List of attributes:
     VariantMap tuple;
     tuple["dbus-name"] = "com.canonical.DownloadManager";
     tuple["dbus-object"] = "/com/canonical/download/obj1";
-    w1.add_attribute("source", Variant(tuple));
+    w1.add_attribute_value("source", Variant(tuple));
     ...
 }
 \endcode
@@ -251,7 +262,7 @@ List of attributes:
 {
     PreviewWidget w1("summary", "text");
 
-    w1.add_attribute("text", Variant("Lorem Ipsum ..."));
+    w1.add_attribute_value("text", Variant("Lorem Ipsum ..."));
     ...
 }
 \endcode
@@ -276,10 +287,10 @@ List of attributes:
 {
     PreviewWidget w1("rating", "rating-input");
 
-    w1.add_attribute("visible", Variant("rating"));
-    w1.add_attribute("required", Variant("rating"));
-    w1.add_attribute("rating-icon-empty", Variant("file:///tmp/star-empty.svg"));
-    w1.add_attribute("rating-icon-full", Variant("file:///tmp/star-full.svg"));
+    w1.add_attribute_value("visible", Variant("rating"));
+    w1.add_attribute_value("required", Variant("rating"));
+    w1.add_attribute_value("rating-icon-empty", Variant("file:///tmp/star-empty.svg"));
+    w1.add_attribute_value("rating-icon-full", Variant("file:///tmp/star-full.svg"));
     ...
 }
 \endcode
@@ -301,8 +312,8 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
 {
     PreviewWidget w1("summary", "reviews");
 
-    w1.add_attribute("rating-icon-empty", Variant("file:///tmp/star-empty.svg"));
-    w1.add_attribute("rating-icon-full", Variant("file:///tmp/star-full.svg"));
+    w1.add_attribute_value("rating-icon-empty", Variant("file:///tmp/star-empty.svg"));
+    w1.add_attribute_value("rating-icon-full", Variant("file:///tmp/star-full.svg"));
 
     VariantBuilder builder;
     builder.add_tuple({
@@ -314,7 +325,7 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
         {"rating", Variant(5)}
     });
 
-    w1.add_attribute("reviews", builder.end());
+    w1.add_attribute_value("reviews", builder.end());
     ...
 }
 \endcode
@@ -361,14 +372,14 @@ VariantMap PreviewWidget::serialize() const
     return p->serialize();
 }
 
-void PreviewWidget::add_attribute(std::string const& key, Variant const& value)
+void PreviewWidget::add_attribute_value(std::string const& key, Variant const& value)
 {
-    p->add_attribute(key, value);
+    p->add_attribute_value(key, value);
 }
 
-void PreviewWidget::add_component(std::string const& key, std::string const& field_name)
+void PreviewWidget::add_attribute_mapping(std::string const& key, std::string const& field_name)
 {
-    p->add_component(key, field_name);
+    p->add_attribute_mapping(key, field_name);
 }
 
 std::string PreviewWidget::id() const
@@ -381,14 +392,14 @@ std::string PreviewWidget::widget_type() const
     return p->widget_type();
 }
 
-std::map<std::string, std::string> PreviewWidget::components() const
+std::map<std::string, std::string> PreviewWidget::attribute_mappings() const
 {
-    return p->components();
+    return p->attribute_mappings();
 }
 
-VariantMap PreviewWidget::attributes() const
+VariantMap PreviewWidget::attribute_values() const
 {
-    return p->attributes();
+    return p->attribute_values();
 }
 
 std::string PreviewWidget::data() const

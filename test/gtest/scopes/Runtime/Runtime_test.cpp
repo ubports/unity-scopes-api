@@ -48,7 +48,7 @@ TEST(Runtime, basic)
     rt->destroy();
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver() :
@@ -88,7 +88,7 @@ public:
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
         auto query = annotation.links().front()->query();
-        EXPECT_EQ("scope-A", query.scope_name());
+        EXPECT_EQ("scope-A", query.scope_id());
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
@@ -124,7 +124,7 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-class PreviewReceiver : public PreviewListener
+class PreviewReceiver : public PreviewListenerBase
 {
 public:
     PreviewReceiver() :
@@ -170,7 +170,7 @@ private:
     int data_pushes_;
 };
 
-class PushReceiver : public SearchListener
+class PushReceiver : public SearchListenerBase
 {
 public:
     PushReceiver(int pushes_expected)
@@ -212,7 +212,7 @@ private:
     atomic_int count_;
 };
 
-TEST(Runtime, create_query)
+TEST(Runtime, search)
 {
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
@@ -222,7 +222,7 @@ TEST(Runtime, create_query)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("en", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
 
@@ -237,7 +237,7 @@ TEST(Runtime, preview)
 
     // run a query first, so we have a result to preview
     auto receiver = make_shared<Receiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
@@ -263,13 +263,13 @@ TEST(Runtime, cardinality)
     // Run a query with unlimited cardinality. We check that the
     // scope returns 100 results.
     auto receiver = make_shared<PushReceiver>(100);
-    scope->create_query("test", SearchMetadata(100, "unused", "unused"), receiver);
+    scope->search("test", SearchMetadata(100, "unused", "unused"), receiver);
     receiver->wait_until_finished();
 
     // Run a query with 20 cardinality. We check that we receive only 20 results and,
     // in the scope, check that push() returns true for the first 19, and false afterwards.
     receiver = make_shared<PushReceiver>(20);
-    scope->create_query("test", SearchMetadata(20, "unused", "unused"), receiver);
+    scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
     receiver->wait_until_finished();
 }
 

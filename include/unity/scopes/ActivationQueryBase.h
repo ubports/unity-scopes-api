@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIVATIONBASE_H
-#define UNITY_SCOPES_ACTIVATIONBASE_H
+#ifndef UNITY_SCOPES_ACTIVATIONQUERYBASE_H
+#define UNITY_SCOPES_ACTIVATIONQUERYBASE_H
 
 #include <unity/scopes/QueryBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -31,21 +31,23 @@ namespace scopes
 
 namespace internal
 {
-class ActivationBaseImpl;
+class ActivationQueryBaseImpl;
 }
 
 /**
-\brief Base class for a activation request that is executed inside a scope.
+\brief Base class for an activation request that is executed inside a scope.
+
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
 Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
 */
-class ActivationBase : public QueryBase
+
+class ActivationQueryBase : public QueryBase
 {
 public:
     /// @cond
-    UNITY_DEFINES_PTRS(ActivationBase);
-    ActivationBase();
-    virtual ~ActivationBase();
+    UNITY_DEFINES_PTRS(ActivationQueryBase);
+    ActivationQueryBase();
+    virtual ~ActivationQueryBase();
     /// @endcond
 
     /**
@@ -55,6 +57,7 @@ public:
 
     /**
      \brief Return response to the activation request.
+
      The response is received by the originator of the request. Default implementation
      returns ActivationResponse(ActivationResponse::Status::NotHandled.
      \return The response to the activation request.
@@ -62,7 +65,7 @@ public:
     virtual ActivationResponse activate();
 
 private:
-    std::unique_ptr<internal::ActivationBaseImpl> p;
+    std::unique_ptr<internal::ActivationQueryBaseImpl> p;
 };
 
 } // namespace scopes

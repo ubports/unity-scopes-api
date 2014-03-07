@@ -19,36 +19,24 @@
 #ifndef UNITY_SCOPES_PREVIEW_REPLY_H
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
-#include <unity/scopes/PreviewReplyBase.h>
-
-#include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/Reply.h>
-#include <unity/scopes/Result.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Reply.h>
+
+#include <string>
 
 namespace unity
 {
-
 namespace scopes
 {
-
-namespace internal
-{
-class QueryObject;
-class ReplyImpl;
-}
-
 /**
-\brief Reply allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a query to be sent to the source of the query.
 */
-
-class PreviewReply : public virtual PreviewReplyBase, public Reply
+class PreviewReply : public virtual Reply
 {
 public:
     /// @cond
+    virtual ~PreviewReply();
     PreviewReply(PreviewReply const&) = delete;
     /// @endcond
 
@@ -60,31 +48,24 @@ public:
      \return True if the query is still alive, false if the query failed or was cancelled.
      \throws unity::LogicException register_layout() is called more than once.
      */
-    bool register_layout(ColumnLayoutList const& layouts) const override;
+    virtual bool register_layout(ColumnLayoutList const& layouts) const = 0;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
-     \throws unity::LogicException register_layout() is called more than once.
+     \return True if the query is still alive, false if the query failed or was cancelled.
      */
-    bool push(PreviewWidgetList const& widget_list) const override;
+    virtual bool push(PreviewWidgetList const& widget_list) const = 0;
+
     /**
      \brief Sends data for a preview widget attribute.
-     \throws unity::LogicException register_layout() is called more than once.
+     \return True if the query is still alive, false if the query failed or was cancelled.
      */
-    bool push(std::string const& key, Variant const& value) const override;
-
-    /**
-    \brief Destroys a Reply.
-
-    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
-    */
-    virtual ~PreviewReply();
+    virtual bool push(std::string const& key, Variant const& value) const = 0;
 
 protected:
-    // @cond
-    PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
-    // @endcond
+    /// @cond
+    PreviewReply();
+    /// @endcond
 };
 
 } // namespace scopes

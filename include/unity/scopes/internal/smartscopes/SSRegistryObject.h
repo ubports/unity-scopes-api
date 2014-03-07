@@ -47,13 +47,13 @@ public:
                      bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_name) const override;
+    ScopeMetadata get_metadata(std::string const& scope_id) const override;
     MetadataMap list() const override;
 
-    ScopeProxy locate(std::string const& scope_name) override;
+    ScopeProxy locate(std::string const& scope_id) override;
 
-    bool has_scope(std::string const& scope_name) const;
-    std::string get_base_url(std::string const& scope_name) const;
+    bool has_scope(std::string const& scope_id) const;
+    std::string get_base_url(std::string const& scope_id) const;
     SmartScopesClient::SPtr get_ssclient() const;
 
 private:

@@ -31,21 +31,21 @@ public:
 
     void run() override;
 
-    unity::scopes::SearchQuery::UPtr create_query(
-            unity::scopes::Query const &,
+    unity::scopes::SearchQueryBase::UPtr search(
+            unity::scopes::CannedQuery const &,
             unity::scopes::SearchMetadata const &) override;
 
-    unity::scopes::ActivationBase::UPtr activate(
+    unity::scopes::ActivationQueryBase::UPtr activate(
             unity::scopes::Result const& result,
             unity::scopes::ActionMetadata const& metadata) override;
 
-    unity::scopes::ActivationBase::UPtr perform_action(
+    unity::scopes::ActivationQueryBase::UPtr perform_action(
             unity::scopes::Result const& result,
             unity::scopes::ActionMetadata const& metadata,
             std::string const& widget_id,
             std::string const& action_id) override;
 
-    unity::scopes::PreviewQuery::UPtr preview(
+    unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
 };

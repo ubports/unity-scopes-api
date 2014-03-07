@@ -16,8 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REGISTRY_BASE_H
-#define UNITY_SCOPES_REGISTRY_BASE_H
+#ifndef UNITY_SCOPES_INTERNAL_REGISTRY_H
+#define UNITY_SCOPES_INTERNAL_REGISTRY_H
+
+#include <unity/scopes/Registry.h>
 
 #include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/RegistryProxyFwd.h>
@@ -34,50 +36,50 @@ namespace scopes
 namespace internal
 {
 class RegistryImpl;
-}
 
 /**
-\brief Map for scope name and metadata pairs.
-*/
-typedef std::map<std::string, ScopeMetadata> MetadataMap;
-
-/**
-\brief RegistryProxy provides access to the available scopes.
+\brief White pages service for available scopes.
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
-class RegistryBase : public virtual ObjectProxy
+class Registry : public unity::scopes::Registry
 {
 public:
     /// @cond
-    virtual ~RegistryBase();
-    RegistryBase(const RegistryBase&) = delete;
-    RegistryBase(RegistryBase&&) = delete;
+    virtual ~Registry();
     /// @endcond
 
     /**
-    \brief Returns the metadata for the scope with the given name.
+    \brief Returns the metadata for the scope with the given id.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) const = 0;
+    ScopeMetadata get_metadata(std::string const& scope_id) const override;
 
     /**
     \brief Returns a map containing the metadata for all scopes.
     \return The metadata for all scopes.
     */
-    virtual MetadataMap list() const = 0;
+    MetadataMap list() const override;
 
     /**
     \brief Returns a map containing only those scopes for which predicate returns true.
     \param predicate a function object the must return true for each metadata item to be include in the map.
     \return The metadata items for which the predicate returned true.
     */
-    virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const = 0;
+    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) const override;
 
 protected:
-    RegistryBase();
+    /// @cond
+    Registry(RegistryImpl* impl);          // Instantiated only by RegistryImpl
+    friend class RegistryImpl;
+    /// @endcond
+
+private:
+    RegistryImpl* fwd() const;
 };
+
+} // namespace internal
 
 } // namespace scopes
 

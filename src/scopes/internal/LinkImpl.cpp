@@ -16,7 +16,7 @@
  */
 
 #include <unity/scopes/internal/LinkImpl.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -28,9 +28,9 @@ namespace scopes
 namespace internal
 {
 
-LinkImpl::LinkImpl(std::string const& label, Query const& query)
+LinkImpl::LinkImpl(std::string const& label, CannedQuery const& query)
     : label_(label),
-      query_(std::make_shared<Query>(query))
+      query_(std::make_shared<CannedQuery>(query))
 {
 }
 
@@ -49,7 +49,7 @@ LinkImpl::LinkImpl(VariantMap const& variant_map)
         throw InvalidArgumentException("Invalid variant, 'query' is missing");
     }
 
-    query_.reset(new Query(internal::QueryImpl::create(it->second.get_dict())));
+    query_.reset(new CannedQuery(internal::CannedQueryImpl::create(it->second.get_dict())));
 }
 
 std::string LinkImpl::label() const
@@ -57,7 +57,7 @@ std::string LinkImpl::label() const
     return label_;
 }
 
-Query LinkImpl::query() const
+CannedQuery LinkImpl::query() const
 {
     return *query_;
 }

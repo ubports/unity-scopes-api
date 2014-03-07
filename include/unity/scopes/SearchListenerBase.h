@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHLISTENER_H
-#define UNITY_SCOPES_SEARCHLISTENER_H
+#ifndef UNITY_SCOPES_SEARCHLISTENERBASE_H
+#define UNITY_SCOPES_SEARCHLISTENERBASE_H
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -39,7 +39,7 @@ class CategorisedResult;
 class FilterState;
 
 /**
-\brief SearchListener is an abstract base interface that a scope specializes to
+\brief Abstract base interface that a scope specializes to
 receive the results of a query.
 
 An instance of this interface must be passed to Scope::create_query().
@@ -50,14 +50,14 @@ If a scope throw an exception from one of the push() methods, the scopes
 run time calls ListenerBase::finished() with an 'Error' reason.
 */
 
-class SearchListener : public ListenerBase
+class SearchListenerBase : public ListenerBase
 {
 public:
     /// @cond
-    NONCOPYABLE(SearchListener);
-    UNITY_DEFINES_PTRS(SearchListener);
+    NONCOPYABLE(SearchListenerBase);
+    UNITY_DEFINES_PTRS(SearchListenerBase);
 
-    virtual ~SearchListener();
+    virtual ~SearchListenerBase();
     /// @endcond
 
     /**
@@ -97,7 +97,7 @@ public:
 
 protected:
     /// @cond
-    SearchListener();
+    SearchListenerBase();
     /// @endcond
 };
 

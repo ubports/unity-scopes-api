@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
 #define UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
 
-#include <unity/scopes/SearchReplyBase.h>
+#include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/CategorisedResult.h>
 
@@ -36,16 +36,16 @@ namespace testing
 
 /// @cond
 
-class MockSearchReply : public unity::scopes::SearchReplyBase
+class MockSearchReply : public unity::scopes::SearchReply
 {
 public:
     MockSearchReply() = default;
 
-    // From ReplyBase
+    // From Reply
     MOCK_CONST_METHOD0(finished, void());
     MOCK_CONST_METHOD1(error, void(std::exception_ptr));
 
-    // From SearchReplyBase
+    // From SearchReply
     MOCK_METHOD2(register_departments, void(DepartmentList const&, std::string ));
     MOCK_METHOD4(register_category,
                  Category::SCPtr(std::string const&,

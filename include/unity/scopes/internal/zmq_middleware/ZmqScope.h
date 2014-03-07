@@ -45,7 +45,7 @@ public:
              int64_t timeout);
     virtual ~ZmqScope();
 
-    virtual QueryCtrlProxy create_query(Query const& query,
+    virtual QueryCtrlProxy search(CannedQuery const& query,
                                         VariantMap const& hints,
                                         MWReplyProxy const& reply) override;
 

@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <unity/scopes/SearchQuery.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/SearchQueryBase.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/RegistryProxyFwd.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/Version.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/ActionMetadata.h>
@@ -64,7 +64,7 @@ namespace unity
 namespace scopes
 {
 
-class Query;
+class CannedQuery;
 
 /**
 \file ScopeBase.h
@@ -187,37 +187,37 @@ public:
 
     This method must return an instance that is derived from QueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
-    initialization that is guaranteed to complete quickly. The call to create_query() is made
+    initialization that is guaranteed to complete quickly. The call to search() is made
     by an arbitrary thread.
     \param query The query string to be executed by the returned object instance.
     \param metadata additional data sent by the client.
     \return The query instance.
     */
-    virtual SearchQuery::UPtr create_query(Query const& query, SearchMetadata const& metadata) = 0;
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) = 0;
 
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
 
-    This method must return an instance that is derived from ActivationBase. The implementation
+    This method must return an instance that is derived from ActivationQueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
-    The default implementation returns an instance of ActivationBase that responds with
+    The default implementation returns an instance of ActivationQueryBase that responds with
     ActivationResponse::Status::NotHandled.
     \param result The result that should be activated.
     \param metadata additional data sent by the client.
     \return The activation instance.
      */
-    virtual ActivationBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
     /**
     \brief Invoked when a scope is requested to handle a preview action.
 
-    This method must return an instance that is derived from ActivationBase. The implementation
+    This method must return an instance that is derived from ActivationQueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
-    The default implementation returns an instance of ActivationBase that responds with
+    The default implementation returns an instance of ActivationQueryBase that responds with
     ActivationResponse::Status::NotHandled.
     \param result The result that was previewed.
     \param metadata Additional data sent by client.
@@ -225,12 +225,12 @@ public:
     \param action_id The identifier of the action that was activated.
     \return The activation instance.
      */
-    virtual ActivationBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
+    virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
 
-    This method must return an instance that is derived from PreviewQuery. The implementation
+    This method must return an instance that is derived from PreviewQueryBase. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -238,7 +238,7 @@ public:
     \param metadata Additional data sent by the client.
     \return The preview instance.
      */
-    virtual PreviewQuery::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
     \brief Returns the version information for the scopes API that the scope was linked with.

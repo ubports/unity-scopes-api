@@ -51,7 +51,7 @@ private:
     std::condition_variable cond_;
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult /* result */) override {}
@@ -88,7 +88,7 @@ TEST(Filters, scope)
 
     SearchMetadata hints("pl", "phone");
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", hints, receiver);
+    auto ctrl = scope->search("test", hints, receiver);
     receiver->wait_until_finished();
 
     auto filter_state = receiver->filter_state; // copy filter state, it will be sent with 2nd query
@@ -108,7 +108,7 @@ TEST(Filters, scope)
 
     // send 2nd query, this time with filter state (one active option)
     receiver = std::make_shared<SearchReceiver>();
-    ctrl = scope->create_query("test2", filter_state, hints, receiver);
+    ctrl = scope->search("test2", filter_state, hints, receiver);
     receiver->wait_until_finished();
     {
         auto filters = receiver->filters;

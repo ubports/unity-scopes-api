@@ -16,29 +16,38 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_REPLY_BASE_H
-#define UNITY_SCOPES_PREVIEW_REPLY_BASE_H
+#ifndef UNITY_SCOPES_PREVIEW_INTERNAL_REPLY_H
+#define UNITY_SCOPES_PREVIEW_INTERNAL_REPLY_H
 
-#include <unity/SymbolExport.h>
+#include <unity/scopes/PreviewReply.h>
+
 #include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/internal/Reply.h>
+#include <unity/scopes/ObjectProxy.h>
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/ReplyBase.h>
-
-#include <string>
+#include <unity/scopes/ReplyProxyFwd.h>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {
+
 namespace scopes
 {
+
+namespace internal
+{
+class QueryObject;
+class ReplyImpl;
+
 /**
-\brief Reply allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a query to be sent to the source of the query.
 */
-class PreviewReplyBase : public virtual ReplyBase
+
+class PreviewReply : public virtual unity::scopes::PreviewReply, public Reply
 {
 public:
     /// @cond
-    virtual ~PreviewReplyBase();
-    PreviewReplyBase(PreviewReplyBase const&) = delete;
+    PreviewReply(PreviewReply const&) = delete;
     /// @endcond
 
     /**
@@ -49,25 +58,34 @@ public:
      \return True if the query is still alive, false if the query failed or was cancelled.
      \throws unity::LogicException register_layout() is called more than once.
      */
-    virtual bool register_layout(ColumnLayoutList const& layouts) const = 0;
+    bool register_layout(ColumnLayoutList const& layouts) const override;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
-     \return True if the query is still alive, false if the query failed or was cancelled.
+     \throws unity::LogicException register_layout() is called more than once.
      */
-    virtual bool push(PreviewWidgetList const& widget_list) const = 0;
-
+    bool push(PreviewWidgetList const& widget_list) const override;
     /**
      \brief Sends data for a preview widget attribute.
-     \return True if the query is still alive, false if the query failed or was cancelled.
+     \throws unity::LogicException register_layout() is called more than once.
      */
-    virtual bool push(std::string const& key, Variant const& value) const = 0;
+    bool push(std::string const& key, Variant const& value) const override;
+
+    /**
+    \brief Destroys a Reply.
+
+    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
+    */
+    virtual ~PreviewReply();
 
 protected:
-    /// @cond
-    PreviewReplyBase();
-    /// @endcond
+    // @cond
+    PreviewReply(ReplyImpl* impl);         // Instantiated only by ReplyImpl
+    friend class ReplyImpl;
+    // @endcond
 };
+
+} // namespace internal
 
 } // namespace scopes
 

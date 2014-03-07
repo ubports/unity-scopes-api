@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIVATIONLISTENER_H
-#define UNITY_SCOPES_ACTIVATIONLISTENER_H
+#ifndef UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
+#define UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/NonCopyable.h>
@@ -30,27 +30,30 @@ namespace scopes
 class ActivationResponse;
 
 /**
-\brief Base class to receive response to the result activation request.
+\brief Base class to receive a response to a result activation request.
 */
-class ActivationListener: public ListenerBase
+
+class ActivationListenerBase: public ListenerBase
 {
 public:
     /// @cond
-    NONCOPYABLE(ActivationListener);
-    UNITY_DEFINES_PTRS(ActivationListener);
+    NONCOPYABLE(ActivationListenerBase);
+    UNITY_DEFINES_PTRS(ActivationListenerBase);
 
-    ~ActivationListener();
+    ~ActivationListenerBase();
     /// @endcond
 
     /**
     \brief Called once by the scopes run time with the activation response.
+
     Default implementation does nothing.
-    \param response response to the activation request, returned by scope from ActivationBase::activate().
+    \param response response to the activation request, returned by scope from ActivationQueryBase::activate().
     */
-    virtual void activation_response(ActivationResponse const& response);
+    virtual void activated(ActivationResponse const& response);
 
     /**
     \brief Called once by the scopes run time after receiving activation response.
+
     Exceptions thrown from finished() are ignored.
     Default implementation does nothing.
     \param r Indicates the cause for the call to finished().
@@ -61,7 +64,7 @@ public:
 
 protected:
     /// @cond
-    ActivationListener();
+    ActivationListenerBase();
     /// @endcond
 };
 

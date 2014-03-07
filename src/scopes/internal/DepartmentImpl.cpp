@@ -18,7 +18,7 @@
 
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <sstream>
 
 namespace unity
@@ -29,20 +29,20 @@ namespace scopes
 
 namespace internal
 {
-DepartmentImpl::DepartmentImpl(Query const& query, std::string const& label)
+DepartmentImpl::DepartmentImpl(CannedQuery const& query, std::string const& label)
     : query_(query),
       label_(label)
 {
 }
 
-DepartmentImpl::DepartmentImpl(std::string const& department_id, Query const& query, std::string const& label)
+DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label)
     : query_(query),
       label_(label)
 {
     query_.set_department_id(department_id);
 }
 
-DepartmentImpl::DepartmentImpl(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments)
+DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
     : query_(query),
       label_(label),
       departments_(subdepartments)
@@ -65,7 +65,7 @@ std::string DepartmentImpl::label() const
     return label_;
 }
 
-Query DepartmentImpl::query() const
+CannedQuery DepartmentImpl::query() const
 {
     return query_;
 }
@@ -108,7 +108,7 @@ Department DepartmentImpl::create(VariantMap const& var)
     {
         throw unity::InvalidArgumentException("DepartmentImpl::create(): missing 'query'");
     }
-    auto query = QueryImpl::create(it->second.get_dict());
+    auto query = CannedQueryImpl::create(it->second.get_dict());
 
     Department department(query, label);
 

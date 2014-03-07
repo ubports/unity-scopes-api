@@ -37,32 +37,33 @@ Scope::~Scope()
 {
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& query_string, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
-    return fwd()->create_query(query_string, metadata, reply);
+    return fwd()->search(query_string, metadata, reply);
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
-    return fwd()->create_query(query_string, filter_state, metadata, reply);
+    return fwd()->search(query_string, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::create_query(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListener::SPtr const& reply) const
+QueryCtrlProxy Scope::search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const
 {
-    return fwd()->create_query(query_string, department_id, filter_state, metadata, reply);
+    return fwd()->search(query_string, department_id, filter_state, metadata, reply);
 }
 
-QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const
 {
     return fwd()->activate(result, metadata, reply);
 }
 
-QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id, ActivationListener::SPtr const& reply) const
+QueryCtrlProxy Scope::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+        ActivationListenerBase::SPtr const& reply) const
 {
     return fwd()->perform_action(result, metadata, widget_id, action_id, reply);
 }
 
-QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListener::SPtr const& reply) const
+QueryCtrlProxy Scope::preview(Result const& result, ActionMetadata const& metadata, PreviewListenerBase::SPtr const& reply) const
 {
     return fwd()->preview(result, metadata, reply);
 }

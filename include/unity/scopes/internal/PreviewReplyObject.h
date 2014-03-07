@@ -21,7 +21,7 @@
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/PreviewListener.h>
+#include <unity/scopes/PreviewListenerBase.h>
 
 namespace unity
 {
@@ -37,13 +37,13 @@ class RuntimeImpl;
 class PreviewReplyObject : public ReplyObject
 {
 public:
-    PreviewReplyObject(PreviewListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
+    PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name);
     virtual ~PreviewReplyObject();
 
     virtual bool process_data(VariantMap const& data) override;
 
 private:
-    PreviewListener::SPtr const receiver_;
+    PreviewListenerBase::SPtr const receiver_;
 };
 
 } // namespace internal

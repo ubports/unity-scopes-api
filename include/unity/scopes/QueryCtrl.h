@@ -34,7 +34,7 @@ class QueryCtrlImpl;
 }
 
 /**
-\brief QueryCtrl allows a query to be cancelled.
+\brief Allows a query to be cancelled.
 */
 
 class QueryCtrl : public virtual ObjectProxy
