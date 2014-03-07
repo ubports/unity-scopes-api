@@ -51,6 +51,7 @@ public:
     virtual ~SearchReplyImpl();
 
     virtual void register_departments(DepartmentList const& departments, std::string current_department_id) override;
+
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
@@ -62,6 +63,14 @@ public:
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
+
+private:
+    bool push(Category::SCPtr category);
+
+    std::shared_ptr<CategoryRegistry> cat_registry_;
+
+    std::atomic_int cardinality_;
+    std::atomic_int num_pushes_;
 };
 
 } // namespace internal

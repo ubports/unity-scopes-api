@@ -19,16 +19,12 @@
 #ifndef UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 #define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
 
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Department.h>
-#include <unity/scopes/FilterBase.h>
-#include <unity/scopes/FilterState.h>
-#include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Reply.h>
 #include <unity/scopes/SearchReplyProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 #include <atomic>
 
@@ -37,10 +33,6 @@ namespace unity
 
 namespace scopes
 {
-
-class CategorisedResult;
-class CategoryRenderer;
-class Annotation;
 
 namespace internal
 {
@@ -53,18 +45,6 @@ public:
     ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~ReplyImpl();
 
-    void register_departments(DepartmentList const& departments, std::string current_department_id);
-    Category::SCPtr register_category(std::string const& id,
-                                      std::string const& title,
-                                      std::string const &icon,
-                                      CategoryRenderer const& renderer_template);
-    void register_category(Category::SCPtr category);
-    Category::SCPtr lookup_category(std::string const& id) const;
-
-    bool push(unity::scopes::CategorisedResult const& result);
-    bool register_annotation(unity::scopes::Annotation const& annotation);
-    bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state);
-
     virtual void finished() override;
     void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
@@ -72,18 +52,13 @@ public:
     typedef std::function<void()> CleanupFunc;
 
 protected:
-    bool push(Category::SCPtr category);
     bool push(VariantMap const& variant_map);
 
-private:
     MWReplyProxy fwd() const;
 
+private:
     std::shared_ptr<QueryObjectBase> qo_;
-    std::shared_ptr<CategoryRegistry> cat_registry_;
     std::atomic_bool finished_;
-
-    std::atomic_int cardinality_;
-    std::atomic_int num_pushes_;
 };
 
 } // namespace internal
