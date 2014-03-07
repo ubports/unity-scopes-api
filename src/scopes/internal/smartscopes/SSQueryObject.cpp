@@ -179,7 +179,7 @@ void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
 }
 
 void SSQueryObject::add_query(SSQuery::QueryType query_type,
-                              QueryBase::SPtr const& query_base,
+                              std::shared_ptr<QueryBase> const& query_base,
                               int cardinality,
                               MWReplyProxy const& reply)
 {
@@ -190,7 +190,7 @@ void SSQueryObject::add_query(SSQuery::QueryType query_type,
 }
 
 void SSQueryObject::add_query(SSQuery::QueryType query_type,
-                              QueryBase::SPtr const& query_base,
+                              std::shared_ptr<QueryBase> const& query_base,
                               MWReplyProxy const& reply)
 {
     add_query(query_type, query_base, 0, reply);

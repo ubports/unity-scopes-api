@@ -43,14 +43,14 @@ namespace scopes
 namespace internal
 {
 
-QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
     QueryObject(query_base, 0, reply, ctrl)
 {
 }
 
-QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
