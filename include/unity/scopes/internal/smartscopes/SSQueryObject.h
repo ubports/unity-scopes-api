@@ -49,7 +49,7 @@ struct SSQuery
         Query, Activation, Preview
     };
 
-    SSQuery(SSQuery::QueryType type, std::shared_ptr<QueryBase> base, int cardinality, MWReplyProxy reply)
+    SSQuery(QueryType type, std::shared_ptr<QueryBase> base, int cardinality, MWReplyProxy reply)
         : q_type(type),
           q_base(base),
           q_cardinality(cardinality),
