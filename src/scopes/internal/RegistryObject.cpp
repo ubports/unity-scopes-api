@@ -47,7 +47,7 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
-    // kill all scope_processes_
+    // kill all scope processes
     for (auto& scope_process : scope_processes_)
     {
         try
@@ -57,6 +57,16 @@ RegistryObject::~RegistryObject()
         catch(std::exception const& e)
         {
             cerr << "RegistryObject::~RegistryObject: " << e.what() << endl;
+        }
+    }
+
+    // wait for scope processes to terminate
+    for (auto& scope_process : scope_processes_)
+    {
+        if (!scope_process.second.wait_for_state(ScopeProcess::Stopped, 1000))
+        {
+            cerr << "RegistryObject::~RegistryObject: Scope: \"" << scope_process.second.scope_name()
+                 << " took too long to terminate. This process may still be active after shutdown.";
         }
     }
 
@@ -205,6 +215,37 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
 {
 }
 
+std::string RegistryObject::ScopeProcess::scope_name() const
+{
+    return exec_data_.scope_name;
+}
+
+RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state() const
+{
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return state_;
+}
+
+bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
+{
+    std::unique_lock<std::mutex> lock(state_mutex_);
+
+    // keep track of time left as process can undergo multiple state changes
+    // before reaching the state we want
+    int time_left = timeout_ms;
+    while (state_ != state && time_left > 0)
+    {
+        auto start = std::chrono::high_resolution_clock::now();
+        state_change_cond_.wait_for(lock, std::chrono::milliseconds(time_left));
+
+        // update time left
+        time_left -= std::chrono::duration_cast<std::chrono::milliseconds>(
+                     std::chrono::high_resolution_clock::now() - start).count();
+    }
+
+    return state_ == state;
+}
+
 void RegistryObject::ScopeProcess::exec()
 {
     // 1. check if the scope is running.
@@ -278,16 +319,8 @@ void RegistryObject::ScopeProcess::kill()
 
     try
     {
-        {
-            std::lock_guard<std::mutex> lock(process_mutex_);
-            process_.send_signal_or_throw(core::posix::Signal::sig_kill);
-        }
-
-        if (!wait_for_state(ScopeProcess::Stopped, 1000))
-        {
-            throw unity::ResourceException("RegistryObject::ScopeProcess: kill() aborted. Scope: \""
-                                           + exec_data_.scope_name + "\" took too long to close.");
-        }
+        std::lock_guard<std::mutex> lock(process_mutex_);
+        process_.send_signal_or_throw(core::posix::Signal::sig_kill);
     }
     catch (std::exception const&)
     {
@@ -295,39 +328,6 @@ void RegistryObject::ScopeProcess::kill()
              << exec_data_.scope_name << "\"" << endl;
         throw;
     }
-}
-
-RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
-{
-    std::lock_guard<std::mutex> lock(state_mutex_);
-    return state_;
-}
-
-bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms)
-{
-    std::unique_lock<std::mutex> lock(state_mutex_);
-
-    // keep track of time left as process can undergo multiple state changes
-    // before reaching the state we want
-    int time_left = timeout_ms;
-    while (state_ != state && time_left > 0)
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-        state_change_cond_.wait_for(lock, std::chrono::milliseconds(time_left));
-
-        // update time left
-        time_left -= std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start).count();
-    }
-
-    return state_ == state;
-}
-
-void RegistryObject::ScopeProcess::update_state(ProcessState state)
-{
-    std::lock_guard<std::mutex> lock(state_mutex_);
-    state_ = state;
-    state_change_cond_.notify_all();
 }
 
 bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
@@ -344,6 +344,13 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     }
 
     return false;
+}
+
+void RegistryObject::ScopeProcess::update_state(ProcessState state)
+{
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    state_ = state;
+    state_change_cond_.notify_all();
 }
 
 } // namespace internal

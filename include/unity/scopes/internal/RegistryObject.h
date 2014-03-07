@@ -81,22 +81,25 @@ private:
         ScopeProcess(ScopeExecData exec_data);
         ScopeProcess(ScopeProcess const& other);
 
+        std::string scope_name() const;
+        ProcessState state() const;
+        bool wait_for_state(ProcessState state, int timeout_ms) const;
+
         void exec();
         void kill();
+
         bool on_process_death(pid_t pid);
 
     private:
-        ProcessState state();
-        bool wait_for_state(ProcessState state, int timeout_ms);
         void update_state(ProcessState state);
 
     private:
         ScopeExecData exec_data_;
-        core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         ProcessState state_ = Stopped;
+        mutable std::mutex state_mutex_;
+        mutable std::condition_variable state_change_cond_;
+        core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         std::mutex process_mutex_;
-        std::mutex state_mutex_;
-        std::condition_variable state_change_cond_;
     };
 
 private:
