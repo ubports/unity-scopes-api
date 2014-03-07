@@ -83,6 +83,12 @@ SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata c
 }
 \endcode
 
+The search() method receives two arguments: a unity::scopes::CannedQuery query object that carries actual query string (among other information) and
+additional parameters of the search request, stored in unity::scopes::SearchMetadata - such as locale string, form factor string and cardinality.
+Cardinality is the maximum number of results expected from the scope (the value of 0 should be treated as if no limit was set). For optimal performance scopes
+should provide no more results than requested; if they however fail to handle cardinality constraint, any excessive results will be ignored by scopes API.
+
+
 \paragraph querybase Create a query class that implements SearchQueryBase interface.
 
 The central and most important method that needs to be implemented in this interface is unity::scopes::SearchQueryBase::run().
@@ -445,4 +451,8 @@ TEST_F(TestScopeFixutre, search_results)
     search_query->run(reply_proxy);
 }
 \endcode
+
+\subsection deployment Deployment
+
+...
 */
