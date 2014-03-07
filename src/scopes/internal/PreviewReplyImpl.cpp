@@ -54,13 +54,13 @@ bool PreviewReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& la
     }
     catch (unity::LogicException const &e)
     {
-        throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
+        throw unity::LogicException("PreviewReplyImpl::register_layout(): Failed to validate layouts");
     }
 
     // OK to set this now because what follows can't go wrong unless the query is dead.
     if (layouts_push_disallowed_.exchange(true))
     {
-        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered "
+        throw unity::LogicException("PreviewReplyImpl::register_layout(): column layouts can only be registered "
                                     "once and before pushing preview widgets");
     }
 

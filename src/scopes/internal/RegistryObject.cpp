@@ -61,10 +61,10 @@ RegistryObject::~RegistryObject()
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
+    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::get_metadata() Cannot search for scope with empty name");
     }
 
     // Look for the scope in both the local and the remote map.
@@ -82,7 +82,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id)
         return remote_registry_->get_metadata(scope_id);
     }
 
-    throw NotFoundException("Registry::get_metadata(): no such scope",  scope_id);
+    throw NotFoundException("RegistryObject::get_metadata(): no such scope: ",  scope_id);
 }
 
 MetadataMap RegistryObject::list()
@@ -109,10 +109,11 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     bool return_value = true;
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot add scope with empty name");
     }
     if(scope_id.find('/') != std::string::npos) {
-        throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its name");
+        throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot create a scope with "
+                                              "a slash in its name: " + scope_id);
     }
 
     if (scopes_.find(scope_id) != scopes_.end())
@@ -135,10 +136,11 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
 bool RegistryObject::remove_local_scope(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
+    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::remove_local_scope(): Cannot remove scope "
+                                              "with empty name");
     }
 
     commands_.erase(scope_id);
@@ -154,13 +156,13 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 ScopeProxy RegistryObject::locate(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
+    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
-        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::locate(): Cannot locate scope with empty name");
     auto metadata = scopes_.find(scope_id);
     if (metadata == scopes_.end())
     {
-        throw NotFoundException("Tried to obtain unknown scope", scope_id);
+        throw NotFoundException("RegistryObject::locate(): Tried to obtain unknown scope: ", scope_id);
     }
     auto search = scope_processes_.find(scope_id);
     if (search == scope_processes_.end() || is_dead(search->second))
@@ -174,7 +176,7 @@ void RegistryObject::spawn_scope(std::string const& scope_id)
 {
     if (scopes_.find(scope_id) == scopes_.end())
     {
-        throw NotFoundException("Tried to spawn an unknown scope.", scope_id);
+        throw NotFoundException("RegistryObject::spawn_scope(): Tried to spawn an unknown scope: ", scope_id);
     }
     auto process = scope_processes_.find(scope_id);
     if (process != scope_processes_.end())
@@ -194,7 +196,7 @@ void RegistryObject::spawn_scope(std::string const& scope_id)
     {
         case -1:
         {
-            throw SyscallException("cannot fork", errno);
+            throw SyscallException("RegistryObject::spawn_scope(): cannot fork", errno);
         }
         case 0: // child
         {
@@ -207,7 +209,7 @@ void RegistryObject::spawn_scope(std::string const& scope_id)
             argv[2] = cmd[2].c_str();
             argv[3] = nullptr;
             execv(argv[0], const_cast<char* const*>(argv.get()));
-            throw SyscallException("cannot exec scoperunner", errno);
+            throw SyscallException("REgistryObject::spawn_scope(): cannot exec scoperunner", errno);
         }
     }
     const vector<string>& cmd = commands_[scope_id];
