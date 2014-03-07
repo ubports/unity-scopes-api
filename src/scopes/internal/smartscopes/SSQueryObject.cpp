@@ -20,7 +20,8 @@
 
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/internal/PreviewReplyImpl.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -205,7 +206,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
@@ -227,7 +228,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = ReplyImpl::create_preview_reply(reply, shared_from_this());
+    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 

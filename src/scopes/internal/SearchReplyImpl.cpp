@@ -192,11 +192,6 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
 #endif
 }
 
-SearchReplyProxy SearchReplyImpl::create_search_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
-{
-    return make_shared<SearchReplyImpl>(mw_proxy, qo);
-}
-
 } // namespace internal
 
 } // namespace scopes

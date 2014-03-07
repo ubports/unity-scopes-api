@@ -47,8 +47,6 @@ public:
     // Remote operation. Not part of public API, hence not override.
     ScopeProxy locate(std::string const& scope_name);
 
-    static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
-
 private:
     MWRegistryProxy fwd() const;
 };

@@ -75,9 +75,6 @@ public:
     void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
 
-    static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
-    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
-
     typedef std::function<void()> CleanupFunc;
 
 private:

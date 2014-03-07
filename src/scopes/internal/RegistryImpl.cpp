@@ -71,11 +71,6 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
     return matching_entries;
 }
 
-RegistryProxy RegistryImpl::create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
-{
-    return make_shared<RegistryImpl>(mw_proxy, runtime);
-}
-
 MWRegistryProxy RegistryImpl::fwd() const
 {
     return dynamic_pointer_cast<MWRegistry>(proxy());

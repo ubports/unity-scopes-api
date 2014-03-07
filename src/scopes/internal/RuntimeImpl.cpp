@@ -83,7 +83,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_name, string const& configfile) :
             registry_endpoint_ = reg_config.endpoint();
             registry_endpointdir_ = reg_config.endpointdir();
             auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
-            registry_ = RegistryImpl::create(registry_mw_proxy, this);
+            registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
     }
     catch (unity::Exception const& e)

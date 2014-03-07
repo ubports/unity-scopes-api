@@ -641,7 +641,7 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     else if (category == "Registry")
     {
         auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
-        return RegistryImpl::create(p, runtime());
+        return make_shared<RegistryImpl>(p, runtime());
     }
     else
     {

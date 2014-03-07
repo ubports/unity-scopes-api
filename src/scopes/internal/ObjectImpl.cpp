@@ -40,11 +40,6 @@ ObjectImpl::~ObjectImpl()
 {
 }
 
-ObjectProxy ObjectImpl::create(MWProxy const& mw_proxy)
-{
-    return make_shared<ObjectImpl>(mw_proxy);
-}
-
 string ObjectImpl::identity()
 {
     return mw_proxy_->identity();

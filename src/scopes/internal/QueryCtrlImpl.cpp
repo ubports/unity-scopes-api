@@ -72,11 +72,6 @@ void QueryCtrlImpl::cancel()
     }
 }
 
-QueryCtrlProxy QueryCtrlImpl::create(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy)
-{
-    return make_shared<QueryCtrlImpl>(ctrl_proxy, reply_proxy);
-}
-
 MWQueryCtrlProxy QueryCtrlImpl::fwd() const
 {
     return dynamic_pointer_cast<MWQueryCtrl>(proxy());

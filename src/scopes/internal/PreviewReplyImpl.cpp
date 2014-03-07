@@ -103,11 +103,6 @@ bool PreviewReplyImpl::push(string const& key, Variant const& value)
 #endif
 }
 
-PreviewReplyProxy PreviewReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, shared_ptr<QueryObjectBase> const& qo)
-{
-    return make_shared<PreviewReplyImpl>(mw_proxy, qo);
-}
-
 } // namespace internal
 
 } // namespace scopes

@@ -62,8 +62,6 @@ public:
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
-
-    static SearchReplyProxy create_search_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
 };
 
 } // namespace internal

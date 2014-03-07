@@ -50,11 +50,6 @@ protected:
     MWProxy proxy() const;                  // Non-virtual because we cannot use covariance with incomplete types.
                                             // Each derived proxy implements a non-virtual fwd() method
                                             // that is called from within each operation to down-cast the MWProxy.
-
-private:
-    static ObjectProxy create(MWProxy const& mw_proxy);
-    friend class RuntimeImpl;   // So RuntimeImpl can call create() from string_to_proxy()
-
     MWProxy mw_proxy_;
 };
 

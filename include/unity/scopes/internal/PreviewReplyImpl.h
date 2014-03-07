@@ -45,8 +45,6 @@ public:
     virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;
     virtual bool push(unity::scopes::PreviewWidgetList const& widgets) override;
     virtual bool push(std::string const& key, Variant const& value) override;
-
-    static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
 };
 
 } // namespace internal

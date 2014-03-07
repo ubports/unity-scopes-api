@@ -47,8 +47,6 @@ public:
 
     void cancel();
 
-    static QueryCtrlProxy create(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
-
 private:
     MWQueryCtrlProxy fwd() const;
 

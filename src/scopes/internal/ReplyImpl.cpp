@@ -305,16 +305,6 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
-{
-    return make_shared<SearchReplyImpl>(mw_proxy, qo);
-}
-
-PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
-{
-    return make_shared<PreviewReplyImpl>(mw_proxy, qo);
-}
-
 MWReplyProxy ReplyImpl::fwd() const
 {
     return dynamic_pointer_cast<MWReply>(proxy());
