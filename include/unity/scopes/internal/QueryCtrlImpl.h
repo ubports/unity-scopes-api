@@ -45,7 +45,7 @@ public:
     QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
     virtual ~QueryCtrlImpl();
 
-    void cancel();
+    virtual void cancel() override;
 
 private:
     MWQueryCtrlProxy fwd() const;

@@ -36,7 +36,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
@@ -47,11 +46,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryConfig.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryObject.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
