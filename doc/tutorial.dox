@@ -2,14 +2,43 @@
 
 \page tutorial Tutorial
 
-This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+\subpage overview
 
-\section simplescope A simple scope which doesn't query other scopes.
+\subpage develop
+
+\page overview What are scopes
+
+...
+
+\page develop Developing scopes
+
+\section starting Getting started
+
+...
+
+
+\section impl Implementing scope
+
+This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++.
+For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+
+A typical scope implementation needs to implement interfaces of the following class from scopes API:
+<ul>
+<li>unity::scopes::ScopeBase - the main scope class and an entry point for all incoming requests.
+<li>unity::scopes::SearchQueryBase - the handler of search request.
+<li>unity::scopes::PreviewQueryBase - the handler of preview requests (only if handling previews).
+<li>unity::scopes::ActivationQueryBase - the handler of activation and preview action requests (only if handling previews and activation)
+<li>unity::scopes::SearchListenerBase - the handler of search replies (only in aggreagator scopes, to pull results from other scopes)
+</ul>
+
+The following sections show them in more detail.
+
+\subsection simplescope A simple scope which doesn't query other scopes.
 
 This is the typical case: a scope that connects to a remote or local backend, database etc. and provides results in response to search queries coming from a
 client (i.e. Unity Dash or another scope).
 
-\subsection scopebase Create a scope class that implements ScopeBase inteface.
+\subsubsection scopebase Create a scope class that implements ScopeBase inteface.
 
 There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
 \link unity::scopes::ScopeBase::start() start\endlink and unity::scopes::ScopeBase::search()  and
@@ -40,7 +69,7 @@ The \link unity::scopes::ScopeBase::stop() stop\endlink method should release an
 documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
-\subsection handlingsearch Handling search
+\subsubsection handlingsearch Handling search
 
 The unity::scopes::ScopeBase::search() method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
@@ -54,7 +83,7 @@ SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata c
 }
 \endcode
 
-\subsubsection querybase Create a query class that implements SearchQueryBase interface.
+\paragraph querybase Create a query class that implements SearchQueryBase interface.
 
 The central and most important method that needs to be implemented in this interface is unity::scopes::SearchQueryBase::run().
 This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
@@ -101,7 +130,7 @@ void MyQuery::run(SearchReplyProxy const& reply)
 }
 \endcode
 
-\subsection handlingpreview Handling previews
+\subsubsection handlingpreview Handling previews
 
 Scopes are responsible for handling preview requests for results they created; this needs to be implemented by overriding unity::scopes::ScopeBase::preview()
 method:
@@ -160,7 +189,7 @@ To push preview widgets to the client, use unity::scopes::PreviewReply::push():
     reply->push(widgets);
 \endcode
 
-\subsubsection previewactions Preview actions
+\paragraph previewactions Preview actions
 
 Previews can have actions (i.e. buttons) that user can activate - they are supported by unity::scopes::PreviewWidget of "actions" type. This type of widget
 takes one or more action button definitions, where every button is constituted by an unique identifier, a label and an optional icon. For example, a widget with
@@ -215,7 +244,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 }
 \endcode
 
-\subsection handlingactivation Handling result activation
+\subsubsection handlingactivation Handling result activation
 
 In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
 known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
@@ -233,7 +262,7 @@ and also call Result::set_intercept_activation() for all results that should tri
 unity::scopes::ScopeBase::activate() should follow the same guidelines as unity::scopes::ScopeBase::perform_action(), the only difference with result activation
 being the lack of widget or action identifiers, as those are specific to preview widgets.
 
-\subsection export Export the scope.
+\subsubsection export Exporting the scope
 
 The scope needs to be compiled into a .so shared library and to be succesfully
 loaded at runtime it must provide two C functions to create and destroy it - a
@@ -253,13 +282,13 @@ extern "C" {
 }
 \endcode
 
-\section aggscope A simple aggregator scope which combines results from other scopes.
+\subsection aggscope A simple aggregator scope which combines results from other scopes.
 
 Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
 implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
 \link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
 
-\subsection subquery Query another scopes via SearchQueryBase::subsearch()
+\subsubsection subquery Query another scopes via SearchQueryBase::subsearch()
 
 To send search query to another scope, use one of the `subsearch()` overloads of unity::scopes::SearchQueryBase inside your implementation of unity::scopes::SearchQueryBase.
 This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
@@ -298,7 +327,7 @@ void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply)
 }
 \endcode
 
-\subsubsection receiver Create a class that implements SearchListenerBase interface
+\paragraph receiver Create a class that implements SearchListenerBase interface
 
 The \link unity::scopes::SearchListenerBase SearchListenerBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
 implementation receive \link unity::scopes::SearchListenerBase::push result items and categories\endlink returned by that query. A simple implementation of
@@ -320,7 +349,7 @@ void MyReceiver::push(CategorisedResult result)
 A more sophisticated aggregator scope can rearrange results it receives into a different set of categories, alter or enrich the results before pushing them
 upstream etc.
 
-\subsection aggactiv Activation and previews of results processed by aggregator scopes
+\subsubsection aggactiv Activation and previews of results processed by aggregator scopes
 
 If an aggregator scope just forwards results it receives from other scopes, possibly only changing their category assignment, then there is nothing
 to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
@@ -359,7 +388,7 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
-\section scopetesting Testing
+\subsection scopetesting Testing
 
 Unity Scopes API provides testing helpers based on well-known and established testing frameworks:
 <a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
