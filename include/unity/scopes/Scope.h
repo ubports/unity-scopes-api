@@ -139,6 +139,11 @@ public:
     Destroying a Scope has no effect on any query that might still be in progress.
     */
     virtual ~Scope();
+
+protected:
+    /// @cond
+    Scope();
+    /// @endcond
 };
 
 } // namespace scopes

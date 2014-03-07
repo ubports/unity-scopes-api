@@ -1,5 +1,5 @@
 add_subdirectory(internal)
-add_subdirectory(testing)
+#add_subdirectory(testing)
 
 add_subdirectory(Runtime)
 add_subdirectory(Activation)

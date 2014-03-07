@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
 #include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/PreviewReplyProxyFwd.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Reply.h>
 
@@ -30,7 +31,7 @@ namespace unity
 namespace scopes
 {
 /**
-\brief Reply allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a preview to be sent to the source of the query.
 */
 class PreviewReply : public virtual Reply
 {

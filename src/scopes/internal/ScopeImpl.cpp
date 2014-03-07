@@ -44,7 +44,7 @@ namespace internal
 {
 
 ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name) :
-    ObjectProxyImpl(mw_proxy),
+    ObjectImpl(mw_proxy),
     runtime_(runtime),
     scope_name_(scope_name)
 {

@@ -51,6 +51,11 @@ public:
     implicitly call cancel().
     */
     virtual ~QueryCtrl();
+
+protected:
+    /// @cond
+    QueryCtrl();
+    /// @endcond
 };
 
 } // namespace scopes

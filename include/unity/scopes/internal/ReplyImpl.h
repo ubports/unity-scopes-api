@@ -28,8 +28,10 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/PreviewReplyProxyFwd.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Reply.h>
+#include <unity/scopes/SearchReplyProxyFwd.h>
 
 #include <atomic>
 
@@ -47,12 +49,6 @@ namespace internal
 {
 
 class QueryObjectBase;
-
-// Proxy used by a scope to push results for a query.
-// To indicate that it has sent the last result, the scope must call finished().
-// Subsequent calls to finished() are ignored.
-// Calls to push() after finished() was called are ignored.
-// If the proxy goes out of scope before finished was called, it implicitly calls finished().
 
 class ReplyImpl : public virtual unity::scopes::Reply, public virtual ObjectImpl
 {
@@ -75,9 +71,9 @@ public:
     bool push(std::string const& key, Variant const& value);
     bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state);
 
-    void finished();
+    virtual void finished() override;
     void finished(unity::scopes::ListenerBase::Reason reason);
-    void error(std::exception_ptr ex);
+    virtual void error(std::exception_ptr ex) override;
 
     static SearchReplyProxy create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);
     static PreviewReplyProxy create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo);

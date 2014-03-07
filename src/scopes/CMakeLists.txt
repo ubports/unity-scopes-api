@@ -1,5 +1,5 @@
 add_subdirectory(internal)
-add_subdirectory(testing)
+#add_subdirectory(testing)
 set(SLICE_FILES ${SLICE_FILES} PARENT_SCOPE)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
@@ -20,7 +20,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Object.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBase.cpp

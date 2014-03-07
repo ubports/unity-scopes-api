@@ -16,11 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ObjectProxy.h>
-
-#include <unity/scopes/internal/ObjectProxyImpl.h>
-
-using namespace std;
+#include <unity/scopes/Object.h>
 
 namespace unity
 {
@@ -28,51 +24,14 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-{
-
-class ObjectProxyImpl;
-
-} // namespace internal
-
 //! @cond
 
-ObjectProxy::ObjectProxy()
+Object::Object()
 {
 }
 
-ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
-    p(pimpl)
+Object::~Object()
 {
-}
-
-ObjectProxy::~ObjectProxy()
-{
-}
-
-string ObjectProxy::identity() const
-{
-    return p->identity();
-}
-
-string ObjectProxy::endpoint() const
-{
-    return p->endpoint();
-}
-
-int64_t ObjectProxy::timeout() const
-{
-    return p->timeout();
-}
-
-string ObjectProxy::to_string() const
-{
-    return p->to_string();
-}
-
-internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
-{
-    return p.get();
 }
 
 //! @endcond

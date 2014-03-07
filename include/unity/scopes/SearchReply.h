@@ -59,9 +59,9 @@ public:
     results and categories from other scope(s).
     */
     virtual Category::SCPtr register_category(std::string const& id,
-                                      std::string const& title,
-                                      std::string const &icon,
-                                      CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
     \brief Returns a previously registered category.

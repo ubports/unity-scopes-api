@@ -27,8 +27,10 @@
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/PreviewReplyImpl.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Reply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
@@ -305,19 +307,12 @@ void ReplyImpl::error(exception_ptr ex)
 
 SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
 {
-    return make_shared<ReplyImpl>(mw_proxy, qo);
-#if 0
-    auto reply_impl = new ReplyImpl(mw_proxy, qo);
-    auto reply = new SearchReply(reply_impl);
-    return SearchReplyProxy(reply);
-#endif
+    return make_shared<SearchReplyImpl>(mw_proxy, qo);
 }
 
 PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
 {
-    auto reply_impl = new ReplyImpl(mw_proxy, qo);
-    auto reply = new PreviewReply(reply_impl);
-    return PreviewReplyProxy(reply);
+    return make_shared<PreviewReplyImpl>(mw_proxy, qo);
 }
 
 MWReplyProxy ReplyImpl::fwd() const
