@@ -1,13 +1,10 @@
 Release Notes for unity-scopes-api
 ==================================
 
-Changes in version 0.5.0
-========================
-
-Re-factored proxy class implementation. These changes are API compatible, but not ABI compatible.
-
 Changes in version 0.4.0
 ========================
+
+  * Re-factored proxy class implementation. These changes are API compatible, but not ABI compatible.
 
   * Renaming of various API elements for consistency and clarity:
 
