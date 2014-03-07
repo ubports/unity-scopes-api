@@ -73,7 +73,7 @@ bool PreviewReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& la
     vm["columns"] = arr;
     if (!ReplyImpl::push(vm))
     {
-        throw unity::LogicException("Reply::register_layout(): cannot register layout with finished "
+        throw unity::LogicException("PreviewReplyImpl::register_layout(): cannot register layout with finished "
                                     "or cancelled query");
     }
     return true;
