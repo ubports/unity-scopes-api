@@ -47,18 +47,24 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
-    // stop the death oberver first so we don't waste time with
-    // all the on_process_death signals we would soon recieve
+    // kill all scope_processes_
+    for (auto& scope_process : scope_processes_)
+    {
+        try
+        {
+            scope_process.second.kill();
+        }
+        catch(std::exception const& e)
+        {
+            cerr << "RegistryObject::~RegistryObject: " << e.what() << endl;
+        }
+    }
+
+    // stop the death oberver
     death_observer_.quit();
     if (death_observer_thread_.joinable())
     {
         death_observer_thread_.join();
-    }
-
-    // kill all scope_processes_
-    for (auto& scope_process : scope_processes_)
-    {
-        scope_process.second.kill();
     }
 
     scopes_.clear();
@@ -181,9 +187,11 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 void RegistryObject::on_process_death(core::posix::Process const& process)
 {
     // broadcast message to all scope_processes_
+    pid_t pid = process.pid();
     for (auto& scope_process : scope_processes_)
     {
-        scope_process.second.on_process_death(process);
+        if (scope_process.second.on_process_death(pid))
+            break;
     }
 }
 
@@ -208,7 +216,7 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
     else if (state() == ScopeProcess::Stopping)
     {
-        if (!wait_for_state(ScopeProcess::Stopped, 1500))
+        if (!wait_for_state(ScopeProcess::Stopped, 1000))
         {
             cerr << "RegistryObject::ScopeProcess: Force killing process. Scope: \"" << exec_data_.scope_name
                  << "\" took too long to stop." << endl;
@@ -236,12 +244,9 @@ void RegistryObject::ScopeProcess::exec()
             process_ = core::posix::ChildProcess::invalid();
             update_state(Stopped);
             throw unity::ResourceException("RegistryObject::ScopeProcess: Failed to exec scope via command: \"" +
-                                           exec_data_.scoperunner_path + " " + exec_data_.runtime_config +
-                                           " " + exec_data_.scope_config + "\"");
+                                           exec_data_.scoperunner_path + " " + exec_data_.runtime_config + " " +
+                                           exec_data_.scope_config + "\"");
         }
-
-        // add this process to the death observer
-        core::posix::ChildProcess::DeathObserver::instance().add(process_);
     }
 
     ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
@@ -250,12 +255,17 @@ void RegistryObject::ScopeProcess::exec()
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
-    if (!wait_for_state(ScopeProcess::Running, 1500))
+    if (!wait_for_state(ScopeProcess::Running, 1000))
     {
         kill();
         throw unity::ResourceException("RegistryObject::ScopeProcess: exec() aborted. Scope: \""
                                        + exec_data_.scope_name + "\" took too long to start.");
     }
+
+    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_name << "\" started" << endl;
+
+    // 4. add the scope process to the death observer
+    core::posix::ChildProcess::DeathObserver::instance().add(process_);
 }
 
 void RegistryObject::ScopeProcess::kill()
@@ -273,7 +283,7 @@ void RegistryObject::ScopeProcess::kill()
             process_.send_signal_or_throw(core::posix::Signal::sig_kill);
         }
 
-        if (!wait_for_state(ScopeProcess::Stopped, 1500))
+        if (!wait_for_state(ScopeProcess::Stopped, 1000))
         {
             throw unity::ResourceException("RegistryObject::ScopeProcess: kill() aborted. Scope: \""
                                            + exec_data_.scope_name + "\" took too long to close.");
@@ -320,15 +330,20 @@ void RegistryObject::ScopeProcess::update_state(ProcessState state)
     state_change_cond_.notify_all();
 }
 
-void RegistryObject::ScopeProcess::on_process_death(core::posix::Process const& process)
+bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
 {
+    std::lock_guard<std::mutex> lock(process_mutex_);
+
     // check if this is the process reported to have died
-    if (process.pid() == process_.pid())
+    if (pid == process_.pid())
     {
-        std::lock_guard<std::mutex> lock(process_mutex_);
+        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_name << "\" terminated" << endl;
         process_ = core::posix::ChildProcess::invalid();
         update_state(Stopped);
+        return true;
     }
+
+    return false;
 }
 
 } // namespace internal

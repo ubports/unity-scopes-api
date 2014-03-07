@@ -83,7 +83,7 @@ private:
 
         void exec();
         void kill();
-        void on_process_death(core::posix::Process const& process);
+        bool on_process_death(pid_t pid);
 
     private:
         ProcessState state();
