@@ -21,8 +21,8 @@
 
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/SearchReplyProxyFwd.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/SearchListenerBase.h>
 

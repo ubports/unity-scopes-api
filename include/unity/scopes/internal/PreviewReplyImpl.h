@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,17 +16,14 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REPLYIMPL_H
-#define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
+#define UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
 
+#include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/internal/ObjectImpl.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Reply.h>
-#include <unity/scopes/SearchReplyProxyFwd.h>
-#include <unity/scopes/Variant.h>
-
-#include <atomic>
+#include <unity/scopes/internal/ReplyImpl.h>
+#include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/PreviewWidget.h>
 
 namespace unity
 {
@@ -39,26 +36,18 @@ namespace internal
 
 class QueryObjectBase;
 
-class ReplyImpl : public virtual unity::scopes::Reply, public virtual ObjectImpl
+class PreviewReplyImpl : public virtual unity::scopes::PreviewReply, public virtual ReplyImpl
 {
 public:
-    ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
-    virtual ~ReplyImpl();
+    PreviewReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
+    virtual ~PreviewReplyImpl();
 
-    virtual void finished() override;
-    void finished(unity::scopes::ListenerBase::Reason reason);
-    virtual void error(std::exception_ptr ex) override;
-
-    typedef std::function<void()> CleanupFunc;
-
-protected:
-    bool push(VariantMap const& variant_map);
-
-    MWReplyProxy fwd() const;
+    virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;
+    virtual bool push(unity::scopes::PreviewWidgetList const& widgets) override;
+    virtual bool push(std::string const& key, Variant const& value) override;
 
 private:
-    std::shared_ptr<QueryObjectBase> qo_;
-    std::atomic_bool finished_;
+    std::atomic_bool layouts_push_disallowed_;
 };
 
 } // namespace internal

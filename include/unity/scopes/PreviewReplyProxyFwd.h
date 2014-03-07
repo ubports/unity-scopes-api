@@ -16,11 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/Reply.h>
+#ifndef UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
+#define UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
 
-#include <unity/scopes/internal/ReplyImpl.h>
-
-#include <cassert>
+#include <memory>
 
 namespace unity
 {
@@ -28,37 +27,15 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-{
+class PreviewReply;
 
-//! @cond
-
-Reply::Reply(internal::ReplyImpl* impl) : ObjectProxy(impl)
-{
-    assert(impl);
-}
-
-Reply::~Reply() = default;
-
-void Reply::finished() const
-{
-    return fwd()->finished();
-}
-
-void Reply::error(std::exception_ptr ex) const
-{
-    return fwd()->error(ex);
-}
-
-internal::ReplyImpl* Reply::fwd() const
-{
-    return dynamic_cast<internal::ReplyImpl*>(pimpl());
-}
-
-//! @endcond
-
-} // namespace internal
+/** \typedef PreviewReplyProxy
+\brief Convenience type definition.
+*/
+typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

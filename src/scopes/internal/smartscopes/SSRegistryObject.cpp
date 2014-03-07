@@ -84,7 +84,7 @@ SSRegistryObject::~SSRegistryObject() noexcept
     refresh_thread_.join();
 }
 
-ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id) const
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id)
 {
     // If the name is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
@@ -102,7 +102,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id) const
     return it->second;
 }
 
-MetadataMap SSRegistryObject::list() const
+MetadataMap SSRegistryObject::list()
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
     return scopes_;

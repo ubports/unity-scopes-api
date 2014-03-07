@@ -20,15 +20,12 @@
 #define UNITY_SCOPES_INTERNAL_SCOPEIMPL_H
 
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
-#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/internal/ObjectImpl.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/PreviewListenerBase.h>
-#include <unity/scopes/Result.h>
-#include <unity/scopes/ScopeProxyFwd.h>
-#include <unity/scopes/Variant.h>
-#include <string>
+#include <unity/scopes/Scope.h>
 
 namespace unity
 {
@@ -46,28 +43,52 @@ namespace internal
 
 class RuntimeImpl;
 
-class ScopeImpl : public virtual ObjectProxyImpl
+class ScopeImpl : public virtual unity::scopes::Scope, public virtual ObjectImpl
 {
 public:
-    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
+    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
     virtual ~ScopeImpl();
 
-    QueryCtrlProxy search(std::string const& q, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy search(std::string const& query_string, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy search(std::string const& query_string, std::string const& department_id, FilterState const& filter_state, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy search(CannedQuery const& query, SearchMetadata const& metadata, SearchListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy activate(Result const& result, ActionMetadata const& metadata, ActivationListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id,
-            ActivationListenerBase::SPtr const& reply) const;
-    QueryCtrlProxy preview(Result const& result, ActionMetadata const& hints, PreviewListenerBase::SPtr const& reply) const;
+    virtual QueryCtrlProxy search(std::string const& q,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) override;
 
-    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_name);
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  FilterState const& filter_state,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) override;
+
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) override;
+
+    QueryCtrlProxy search(CannedQuery const& query,
+                          SearchMetadata const& metadata,
+                          SearchListenerBase::SPtr const& reply); // Not remote operation, hence not override
+
+    virtual QueryCtrlProxy activate(Result const& result,
+                                    ActionMetadata const& metadata,
+                                    ActivationListenerBase::SPtr const& reply) override;
+
+    virtual QueryCtrlProxy perform_action(Result const& result,
+                                          ActionMetadata const& hints,
+                                          std::string const& widget_id,
+                                          std::string const& action_id,
+                                          ActivationListenerBase::SPtr const& reply) override;
+
+    virtual QueryCtrlProxy preview(Result const& result,
+                                   ActionMetadata const& hints,
+                                   PreviewListenerBase::SPtr const& reply) override;
+
+    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
 
 private:
     MWScopeProxy fwd() const;
 
     RuntimeImpl* const runtime_;
-    std::string scope_name_;
+    std::string scope_id_;
 };
 
 } // namespace internal

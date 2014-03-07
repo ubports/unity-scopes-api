@@ -58,7 +58,7 @@ public:
     bool has_stored_result() const;
     Result retrieve() const;
     void set_runtime(RuntimeImpl const* runtime);
-    void set_origin(std::string const& scope_name);
+    void set_origin(std::string const& scope_id);
 
     void set_uri(std::string const& uri);
     void set_title(std::string const& title);

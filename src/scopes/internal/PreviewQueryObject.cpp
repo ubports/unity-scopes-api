@@ -19,10 +19,9 @@
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewQueryObject.h>
-#include <unity/scopes/internal/PreviewReply.h>
-#include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/internal/SearchReply.h>
+#include <unity/scopes/internal/PreviewReplyImpl.h>
 #include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
@@ -57,7 +56,7 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
 {
     assert(self_);
 
-    auto reply_proxy = ReplyImpl::create_preview_reply(reply, self_);
+    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 

@@ -23,8 +23,7 @@
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
-#include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/internal/SearchReply.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
@@ -44,14 +43,14 @@ namespace scopes
 namespace internal
 {
 
-QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
     QueryObject(query_base, 0, reply, ctrl)
 {
 }
 
-QueryObject::QueryObject(shared_ptr<QueryBase> const& query_base,
+QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
                          MWQueryCtrlProxy const& ctrl) :
@@ -94,7 +93,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = ReplyImpl::create(reply, self_);
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 

@@ -23,7 +23,7 @@
 #include <unity/scopes/SearchReply.h>
 
 #include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/internal/PreviewReply.h>
+#include <unity/scopes/PreviewReply.h>
 
 #include <unity/scopes/testing/Category.h>
 
@@ -55,7 +55,30 @@ constexpr static const int metadata_idx = 1;
 constexpr static const int widget_idx = 2;
 constexpr static const int action_idx = 3;
 
-struct WaitableReply : public virtual unity::scopes::Reply
+struct ObjectImpl : public virtual unity::scopes::Object
+{
+    std::string endpoint() override
+    {
+        return "";
+    }
+
+    std::string identity() override
+    {
+        return "";
+    }
+
+    int64_t timeout() override
+    {
+        return -1;
+    }
+
+    std::string to_string() override
+    {
+        return "";
+    }
+};
+
+struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
 {
     enum class State
     {
@@ -96,42 +119,42 @@ struct WaitableReply : public virtual unity::scopes::Reply
         });
     }
 
-    void finished() const override
+    void finished() override
     {
         state.store(State::finished_with_success);
         wait_condition.notify_all();
     }
 
-    void error(std::exception_ptr) const override
+    void error(std::exception_ptr) override
     {
         state.store(State::finished_with_error);
         wait_condition.notify_all();
     }
 };
 
-struct DevNullPreviewReply : public virtual unity::scopes::PreviewReply, public WaitableReply
+struct DevNullPreviewReply : public unity::scopes::PreviewReply, public WaitableReply
 {
-    bool register_layout(unity::scopes::ColumnLayoutList const&) const override
+    bool register_layout(unity::scopes::ColumnLayoutList const&) override
     {
         return true;
     }
 
-    bool push(unity::scopes::PreviewWidgetList const&) const override
+    bool push(unity::scopes::PreviewWidgetList const&) override
     {
         return true;
     }
 
-    bool push(std::string const&, unity::scopes::Variant const&) const override
+    bool push(std::string const&, unity::scopes::Variant const&) override
     {
         return true;
     }
 };
 
-struct DevNullSearchReply : public virtual unity::scopes::SearchReply, public WaitableReply
+struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableReply
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
-    void register_departments(unity::scopes::DepartmentList const&, std::string)
+    void register_departments(unity::scopes::DepartmentList const&, std::string) override
     {
     }
 
@@ -139,32 +162,32 @@ struct DevNullSearchReply : public virtual unity::scopes::SearchReply, public Wa
             std::string const& id,
             std::string const& title,
             std::string const& icon,
-            unity::scopes::CategoryRenderer const& renderer)
+            unity::scopes::CategoryRenderer const& renderer) override
     {
         return category_registry.register_category(id, title, icon, renderer);
     }
 
-    void register_category(unity::scopes::Category::SCPtr category)
+    void register_category(unity::scopes::Category::SCPtr category) override
     {
         category_registry.register_category(category);
     }
 
-    unity::scopes::Category::SCPtr lookup_category(std::string const& id) const
+    unity::scopes::Category::SCPtr lookup_category(std::string const& id) override
     {
         return category_registry.lookup_category(id);
     }
 
-    bool push(unity::scopes::CategorisedResult const&) const
+    bool push(unity::scopes::CategorisedResult const&) override
     {
         return true;
     }
 
-    bool push(unity::scopes::Filters const&, unity::scopes::FilterState const&) const
+    bool push(unity::scopes::Filters const&, unity::scopes::FilterState const&) override
     {
         return true;
     }
 
-    bool register_annotation(unity::scopes::Annotation const&) const
+    bool register_annotation(unity::scopes::Annotation const&) override
     {
         return true;
     }

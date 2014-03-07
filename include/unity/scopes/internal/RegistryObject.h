@@ -46,18 +46,18 @@ public:
     virtual ~RegistryObject();
 
     // Remote operation implementations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) const override;
-    virtual MetadataMap list() const override;
-    virtual ScopeProxy locate(std::string const& scope_name) override;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
+    virtual MetadataMap list() override;
+    virtual ScopeProxy locate(std::string const& scope_id) override;
 
     // Local methods
-    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
+    bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
                          std::vector<std::string> const& spawn_command);
-    bool remove_local_scope(std::string const& scope_name);
+    bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
-    void spawn_scope(std::string const& scope_name);
+    void spawn_scope(std::string const& scope_id);
     void shutdown();
     static int kill_process(pid_t pid);
     static bool is_dead(pid_t pid);

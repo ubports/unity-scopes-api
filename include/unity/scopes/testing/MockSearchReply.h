@@ -19,9 +19,10 @@
 #ifndef UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
 #define UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
 
+#include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/SearchReply.h>
 
-#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/testing/MockObject.h>
 
 #include <gmock/gmock.h>
 
@@ -36,14 +37,14 @@ namespace testing
 
 /// @cond
 
-class MockSearchReply : public unity::scopes::SearchReply
+class MockSearchReply : public unity::scopes::SearchReply, public virtual MockObject
 {
 public:
     MockSearchReply() = default;
 
     // From Reply
-    MOCK_CONST_METHOD0(finished, void());
-    MOCK_CONST_METHOD1(error, void(std::exception_ptr));
+    MOCK_METHOD0(finished, void());
+    MOCK_METHOD1(error, void(std::exception_ptr));
 
     // From SearchReply
     MOCK_METHOD2(register_departments, void(DepartmentList const&, std::string ));
@@ -53,10 +54,10 @@ public:
                                  std::string const&,
                                  CategoryRenderer const&));
     MOCK_METHOD1(register_category, void(Category::SCPtr category));
-    MOCK_CONST_METHOD1(lookup_category, Category::SCPtr(std::string const&));
-    MOCK_CONST_METHOD1(push, bool(CategorisedResult const&));
-    MOCK_CONST_METHOD2(push, bool(Filters const&, FilterState const&));
-    MOCK_CONST_METHOD1(register_annotation, bool(Annotation const& annotation));
+    MOCK_METHOD1(lookup_category, Category::SCPtr(std::string const&));
+    MOCK_METHOD1(push, bool(CategorisedResult const&));
+    MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
+    MOCK_METHOD1(register_annotation, bool(Annotation const& annotation));
 };
 
 /// @endcond

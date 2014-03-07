@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,11 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ObjectProxy.h>
+#ifndef UNITY_SCOPES_TESTING_MOCK_OBJECT_H
+#define UNITY_SCOPES_TESTING_MOCK_OBJECT_H
 
-#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/Object.h>
 
-using namespace std;
+#include <gmock/gmock.h>
 
 namespace unity
 {
@@ -28,55 +29,28 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
+namespace testing
 {
 
-class ObjectProxyImpl;
+/// @cond
 
-} // namespace internal
-
-//! @cond
-
-ObjectProxy::ObjectProxy()
+class MockObject : public virtual Object
 {
-}
+public:
+    MockObject() = default;
 
-ObjectProxy::ObjectProxy(internal::ObjectProxyImpl* pimpl) :
-    p(pimpl)
-{
-}
+    MOCK_METHOD0(endpoint, std::string());
+    MOCK_METHOD0(identity, std::string());
+    MOCK_METHOD0(timeout, int64_t());
+    MOCK_METHOD0(to_string, std::string());
+};
 
-ObjectProxy::~ObjectProxy()
-{
-}
+/// @endcond
 
-string ObjectProxy::identity() const
-{
-    return p->identity();
-}
-
-string ObjectProxy::endpoint() const
-{
-    return p->endpoint();
-}
-
-int64_t ObjectProxy::timeout() const
-{
-    return p->timeout();
-}
-
-string ObjectProxy::to_string() const
-{
-    return p->to_string();
-}
-
-internal::ObjectProxyImpl* ObjectProxy::pimpl() const noexcept
-{
-    return p.get();
-}
-
-//! @endcond
+} // namespace testing
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
 
 #include <unity/scopes/internal/MWObjectProxy.h>
-#include <unity/scopes/internal/Registry.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeMetadata.h>
 
 namespace unity
@@ -36,9 +36,9 @@ class MWRegistry : public virtual MWObjectProxy
 {
 public:
     // Remote operations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) = 0;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
-    virtual ScopeProxy locate(std::string const& scope_name) = 0;
+    virtual ScopeProxy locate(std::string const& scope_id) = 0;
 
     virtual ~MWRegistry();
 

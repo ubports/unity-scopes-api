@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEFWD_H
-#define UNITY_SCOPES_SCOPEFWD_H
+#ifndef UNITY_SCOPES_SCOPEPROXYFWD_H
+#define UNITY_SCOPES_SCOPEPROXYFWD_H
 
 #include <memory>
 

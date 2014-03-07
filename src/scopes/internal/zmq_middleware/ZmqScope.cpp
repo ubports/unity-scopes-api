@@ -103,7 +103,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return QueryCtrlImpl::create(p, reply_proxy);
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -135,7 +135,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return QueryCtrlImpl::create(p, reply_proxy);
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
@@ -171,7 +171,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return QueryCtrlImpl::create(p, reply_proxy);
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -203,7 +203,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return QueryCtrlImpl::create(p, reply_proxy);
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 } // namespace zmq_middleware

@@ -48,7 +48,7 @@ TEST(ZmqMiddleware, string_to_proxy)
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
                      (RuntimeImpl*)0x1);
 
-    Proxy p;
+    ObjectProxy p;
     ScopeProxy sp;
 
     p = mw.string_to_proxy("nullproxy:");

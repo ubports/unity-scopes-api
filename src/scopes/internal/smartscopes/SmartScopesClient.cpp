@@ -213,7 +213,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.id = child_node->get_node("id")->as_string();
 
             bool err = false;
-            static std::array<char const*, 4> const mandatory { "name", "description", "author", "base_url" };
+            static std::array<char const*, 4> const mandatory = { { "name", "description", "author", "base_url" } };
             for (auto const& field : mandatory)
             {
                 if (!child_node->has_node(field))
