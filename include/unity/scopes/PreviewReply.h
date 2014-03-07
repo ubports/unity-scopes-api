@@ -49,6 +49,8 @@ public:
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
+
+     This method can be called mutiple times to send widgets in stages.
      \return True if the query is still alive, false if the query failed or was cancelled.
      */
     virtual bool push(PreviewWidgetList const& widget_list) = 0;
