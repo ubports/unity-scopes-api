@@ -16,7 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/SearchReplyBase.h>
+#ifndef UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
+#define UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
+
+#include <memory>
 
 namespace unity
 {
@@ -24,14 +27,15 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+class PreviewReply;
 
-SearchReplyBase::SearchReplyBase() = default;
-
-SearchReplyBase::~SearchReplyBase() = default;
-
-/// @endcond
+/** \typedef PreviewReplyProxy
+\brief Convenience type definition.
+*/
+typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

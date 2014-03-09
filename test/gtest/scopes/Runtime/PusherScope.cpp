@@ -18,10 +18,10 @@
 
 #include "PusherScope.h"
 
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/CannedQuery.h>
 
 #include <gtest/gtest.h>
 

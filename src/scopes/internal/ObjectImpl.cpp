@@ -16,10 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/internal/ObjectImpl.h>
 
 #include <unity/scopes/internal/MWObjectProxy.h>
-#include <unity/scopes/ObjectProxy.h>
 
 using namespace std;
 
@@ -32,46 +31,41 @@ namespace scopes
 namespace internal
 {
 
-ObjectProxyImpl::ObjectProxyImpl(MWProxy const& mw_proxy) :
+ObjectImpl::ObjectImpl(MWProxy const& mw_proxy) :
     mw_proxy_(mw_proxy)
 {
 }
 
-ObjectProxyImpl::~ObjectProxyImpl()
+ObjectImpl::~ObjectImpl()
 {
 }
 
-Proxy ObjectProxyImpl::create(MWProxy const&)
-{
-    return make_shared<ObjectProxy>();
-}
-
-string ObjectProxyImpl::identity() const
+string ObjectImpl::identity()
 {
     return mw_proxy_->identity();
 }
 
-string ObjectProxyImpl::endpoint() const
+string ObjectImpl::endpoint()
 {
     return mw_proxy_->endpoint();
 }
 
-int64_t ObjectProxyImpl::timeout() const
+int64_t ObjectImpl::timeout()
 {
     return mw_proxy_->timeout();
 }
 
-string ObjectProxyImpl::to_string() const
+string ObjectImpl::to_string()
 {
     return mw_proxy_->to_string();
 }
 
-void ObjectProxyImpl::ping()
+void ObjectImpl::ping()
 {
     mw_proxy_->ping();
 }
 
-MWProxy ObjectProxyImpl::proxy() const
+MWProxy ObjectImpl::proxy() const
 {
     return mw_proxy_;
 }

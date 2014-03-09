@@ -1,0 +1,788 @@
+libunity-scopes.so.0 libunity-scopes0 #MINVER#
+ (c++)"unity::scopes::Annotation::add_link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation::Type)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation::Type)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::~Annotation()@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::set_subdepartments(std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::Department&&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::Department const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::Department&&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(unity::scopes::Department const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::~Department()@Base" 0replaceme
+ (c++)"unity::scopes::Department::operator=(unity::scopes::Department&&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::operator=(unity::scopes::Department const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::FilterBase(unity::scopes::internal::FilterBaseImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::~FilterBase()@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::from_string()@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::set_query_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::set_department_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::internal::CannedQueryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::internal::CannedQueryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::~CannedQuery()@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::remove(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState&&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::internal::FilterStateImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState()@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState&&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::internal::FilterStateImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::FilterState()@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::~FilterState()@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState&&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchReply::SearchReply()@Base" 0replaceme
+ (c++)"unity::scopes::SearchReply::~SearchReply()@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::add_column(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::ColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::internal::ColumnLayoutImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::ColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(int)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::ColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::internal::ColumnLayoutImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(unity::scopes::ColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::ColumnLayout(int)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::~ColumnLayout()@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::operator=(unity::scopes::ColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::operator=(unity::scopes::ColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterOption::FilterOption(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::FilterOption::~FilterOption()@Base" 0replaceme
+ (c++)"unity::scopes::ListenerBase::ListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewReply::~PreviewReply()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::add_attribute_value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::add_attribute_mapping(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::internal::PreviewWidgetImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::internal::PreviewWidgetImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::PreviewWidget(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::~PreviewWidget()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::~QueryMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::operator=(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::~ScopeMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::operator=(unity::scopes::ScopeMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::operator=(unity::scopes::ScopeMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::major_version()@Base" 0replaceme
+ (c++)"unity::scopes::micro_version()@Base" 0replaceme
+ (c++)"unity::scopes::minor_version()@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::set_scope_data(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::internal::ActionMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::internal::ActionMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::ActionMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::~ActionMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::set_cardinality(int)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::set_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::internal::SearchMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::internal::SearchMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::SearchMetadata(int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::~SearchMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::end()@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::add_tuple(std::initializer_list<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::add_tuple(std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder(unity::scopes::VariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder(unity::scopes::VariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder(unity::scopes::VariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder(unity::scopes::VariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::VariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::~VariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::operator=(unity::scopes::VariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::VariantBuilder::operator=(unity::scopes::VariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::version_string()@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::ConfigException(unity::scopes::ConfigException const&)@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::ConfigException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::ConfigException(unity::scopes::ConfigException const&)@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::ConfigException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::~ConfigException()@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::operator=(unity::scopes::ConfigException const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::SearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::~SearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::from_file(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(unity::scopes::CategoryRenderer&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(unity::scopes::CategoryRenderer&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::CategoryRenderer(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::~CategoryRenderer()@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::operator=(unity::scopes::CategoryRenderer&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::operator=(unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewQueryBase::PreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewQueryBase::~PreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::~TimeoutException()@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::operator=(unity::scopes::TimeoutException const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::set_category(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::internal::ResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::internal::ResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::CategorisedResult(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::~CategorisedResult()@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::operator=(unity::scopes::CategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::operator=(unity::scopes::CategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::NotFoundException(unity::scopes::NotFoundException const&)@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::NotFoundException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::NotFoundException(unity::scopes::NotFoundException const&)@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::NotFoundException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::~NotFoundException()@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::operator=(unity::scopes::NotFoundException const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::set_scope_data(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse::Status)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::internal::ActivationResponseImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse::Status)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::internal::ActivationResponseImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::~ActivationResponse()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse&&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::push(std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::SearchListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::~SearchListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationQueryBase::activate()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationQueryBase::cancelled()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationQueryBase::ActivationQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationQueryBase::~ActivationQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::MiddlewareException(unity::scopes::MiddlewareException const&)@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::MiddlewareException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::MiddlewareException(unity::scopes::MiddlewareException const&)@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::MiddlewareException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::~MiddlewareException()@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::operator=(unity::scopes::MiddlewareException const&)@Base" 0replaceme
+ (c++)"unity::scopes::PreviewListenerBase::PreviewListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::PreviewListenerBase::~PreviewListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::~OptionSelectorFilter()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationListenerBase::finished(unity::scopes::ListenerBase::Reason, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationListenerBase::activated(unity::scopes::ActivationResponse const&)@Base" 0replaceme
+ (c++)"unity::scopes::ActivationListenerBase::ActivationListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::ActivationListenerBase::~ActivationListenerBase()@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::ObjectNotExistException(unity::scopes::ObjectNotExistException const&)@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::ObjectNotExistException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::ObjectNotExistException(unity::scopes::ObjectNotExistException const&)@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::ObjectNotExistException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::~ObjectNotExistException()@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::operator=(unity::scopes::ObjectNotExistException const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(unity::scopes::Link&&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(unity::scopes::Link const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(unity::scopes::Link&&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(unity::scopes::Link const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Link::~Link()@Base" 0replaceme
+ (c++)"unity::scopes::Link::operator=(unity::scopes::Link const&)@Base" 0replaceme
+ (c++)"unity::scopes::swap(unity::scopes::Variant&, unity::scopes::Variant&)@Base" 0replaceme
+ (c++)"unity::scopes::Reply::Reply()@Base" 0replaceme
+ (c++)"unity::scopes::Reply::~Reply()@Base" 0replaceme
+ (c++)"unity::scopes::Scope::Scope()@Base" 0replaceme
+ (c++)"unity::scopes::Scope::~Scope()@Base" 0replaceme
+ (c++)"unity::scopes::Object::Object()@Base" 0replaceme
+ (c++)"unity::scopes::Object::~Object()@Base" 0replaceme
+ (c++)"unity::scopes::Result::set_dnd_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::set_intercept_activation()@Base" 0replaceme
+ (c++)"unity::scopes::Result::store(unity::scopes::Result const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::Result::set_art(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::set_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::set_title(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::Result&&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::internal::ResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::Result&&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::internal::ResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(unity::scopes::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::Result(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::~Result()@Base" 0replaceme
+ (c++)"unity::scopes::Result::operator=(unity::scopes::Result&&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::operator=(unity::scopes::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::destroy()@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*)@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::Runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::~Runtime()@Base" 0replaceme
+ (c++)"unity::scopes::Variant::null()@Base" 0replaceme
+ (c++)"unity::scopes::Variant::swap(unity::scopes::Variant&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::Variant&&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::internal::NullVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(bool)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(double)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(int)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant()@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::Variant&&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::internal::NullVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(bool)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(double)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant(int)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::Variant()@Base" 0replaceme
+ (c++)"unity::scopes::Variant::~Variant()@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(unity::scopes::Variant&&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(bool)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(double)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator=(int)@Base" 0replaceme
+ (c++)"unity::scopes::testing::StudentsTTest::one_sample(unity::scopes::testing::Sample const&, double, double)@Base" 0replaceme
+ (c++)"unity::scopes::testing::StudentsTTest::two_independent_samples(unity::scopes::testing::Sample const&, unity::scopes::testing::Sample const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::InProcessBenchmark::for_action(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActionConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::InProcessBenchmark::for_preview(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::PreviewConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::InProcessBenchmark::for_activation(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActivationConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::InProcessBenchmark::for_query(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::QueryConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::InProcessBenchmark::~InProcessBenchmark()@Base" 0replaceme
+ (c++)"unity::scopes::testing::AndersonDarlingTest::for_normality(unity::scopes::testing::Sample const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::description(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::search_hint(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::display_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::art(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::icon(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::hot_key(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::scope_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::invisible(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool>)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::ScopeMetadataBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::~ScopeMetadataBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_action(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActionConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_preview(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::PreviewConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_activation(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActivationConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_query(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::QueryConfiguration)@Base" 0replaceme
+ (c++)"unity::scopes::testing::OutOfProcessBenchmark::~OutOfProcessBenchmark()@Base" 0replaceme
+ (c++)"unity::scopes::testing::Result::Result()@Base" 0replaceme
+ (c++)"unity::scopes::testing::Result::~Result()@Base" 0replaceme
+ (c++)"unity::scopes::testing::Sample::~Sample()@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::save_to_xml(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::load_from_xml(std::basic_istream<char, std::char_traits<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::Timing::~Timing()@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::save_to(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::load_from(std::basic_istream<char, std::char_traits<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::~Benchmark()@Base" 0replaceme
+ (c++)"unity::scopes::testing::operator==(unity::scopes::testing::Benchmark::Result const&, unity::scopes::testing::Benchmark::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::operator<<(std::basic_ostream<char, std::char_traits<char> >&, unity::scopes::testing::Benchmark::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::Category::Category(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::Category::Category(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Category::Category(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::Category::Category(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Category::~Category()@Base" 0replaceme
+ (c++)"unity::scopes::Registry::Registry()@Base" 0replaceme
+ (c++)"unity::scopes::Registry::~Registry()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::destroy()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::run_scope(unity::scopes::ScopeBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::RuntimeImpl(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::~RuntimeImpl()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::ScopeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::~ScopeConfig()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::load(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::Registry> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::stop()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::start()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::unload()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::ScopeLoader(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::Registry> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::~ScopeLoader()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::query(std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::MiddlewareBase*, std::function<std::shared_ptr<unity::scopes::QueryBase> ()> const&, std::function<std::shared_ptr<unity::scopes::internal::QueryObjectBase> (std::shared_ptr<unity::scopes::QueryBase>, std::shared_ptr<unity::scopes::internal::MWQueryCtrl>)> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::ScopeObject(unity::scopes::internal::RuntimeImpl*, unity::scopes::ScopeBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeObject::~ScopeObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::query(unity::scopes::internal::InvokeInfo const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, std::function<std::shared_ptr<unity::scopes::QueryBase> ()> const&, std::function<void (std::shared_ptr<unity::scopes::QueryBase>)> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::SSScopeObject(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>, std::shared_ptr<unity::scopes::internal::smartscopes::SSRegistryObject>)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSScopeObject::~SSScopeObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::refresh_thread()@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_remote_scopes()@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::add(unity::scopes::internal::smartscopes::RemoteScope const&, unity::scopes::ScopeMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::list()@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::SSRegistryObject(std::shared_ptr<unity::scopes::internal::MiddlewareBase>, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int, unsigned int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::~SSRegistryObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareBase::MiddlewareBase(unity::scopes::internal::RuntimeImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareBase::~MiddlewareBase()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::REGISTRY_CONFIG_GROUP@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::RegistryConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::~RegistryConfig()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::spawn_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::kill_process(int)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::add_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::ScopeMetadata const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::list()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::is_dead(int)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::shutdown()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareData::~MiddlewareData()@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareFactory(unity::scopes::internal::RuntimeImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::~MiddlewareFactory()@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_author(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_hot_key(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_scope_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_invisible(bool)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_description(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_search_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_display_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::create(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_art(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(unity::scopes::internal::MiddlewareBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&, unity::scopes::internal::MiddlewareBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(unity::scopes::internal::MiddlewareBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&, unity::scopes::internal::MiddlewareBase*)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::operator=(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::PreviewListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::ScopeImpl(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::~ScopeImpl()@Base" 0replaceme
+ (c++)"unity::scopes::QueryBase::set_metadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryBase::cancel()@Base" 0replaceme
+ (c++)"unity::scopes::QueryBase::QueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::QueryBase::~QueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::QueryCtrl::QueryCtrl()@Base" 0replaceme
+ (c++)"unity::scopes::QueryCtrl::~QueryCtrl()@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::runtime_version(int&, int&, int&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::run()@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::ScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::ScopeBase::~ScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::to_string(unity::scopes::ListenerBase::Reason)@Base" 0replaceme
+ (c++)"unity::scopes::operator==(unity::scopes::CategoryRenderer const&, unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::annotation_type() const@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::label() const@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::links() const@Base" 0replaceme
+ (c++)"unity::scopes::Annotation::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::subdepartments() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::id() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::label() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::query() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::filter_type() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::id() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::query_string() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::department_id() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::scope_id() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::to_string() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::has_filter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::FilterState::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::number_of_columns() const@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::size() const@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::column(int) const@Base" 0replaceme
+ (c++)"unity::scopes::ColumnLayout::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterOption::id() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterOption::label() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::widget_type() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::attribute_values() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::attribute_mappings() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::id() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::data() const@Base" 0replaceme
+ (c++)"unity::scopes::PreviewWidget::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::form_factor() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::locale() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::art() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::proxy() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::author() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::hot_key() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::scope_id() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::invisible() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::scope_data() const@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::ConfigException::self() const@Base" 0replaceme
+ (c++)"unity::scopes::CategoryRenderer::data() const@Base" 0replaceme
+ (c++)"unity::scopes::TimeoutException::self() const@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::CategorisedResult::category() const@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::name() const@Base" 0replaceme
+ (c++)"unity::scopes::NotFoundException::self() const@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::scope_data() const@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::query() const@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::status() const@Base" 0replaceme
+ (c++)"unity::scopes::ActivationResponse::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::MiddlewareException::self() const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::multi_select() const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::active_options(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::label() const@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::options() const@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::id() const@Base" 0replaceme
+ (c++)"unity::scopes::ObjectNotExistException::self() const@Base" 0replaceme
+ (c++)"unity::scopes::Link::label() const@Base" 0replaceme
+ (c++)"unity::scopes::Link::query() const@Base" 0replaceme
+ (c++)"unity::scopes::Link::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::direct_activation() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::has_stored_result() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::target_scope_proxy() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::art() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::uri() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::title() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Result::dnd_uri() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::contains(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Result::retrieve() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::string_to_proxy(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::registry() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_double() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_string() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::which() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_int() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::is_null() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_bool() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_dict() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_array() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator==(unity::scopes::Variant const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::operator<(unity::scopes::Variant const&) const@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::Timing::get_variance() const@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::Timing::get_mean() const@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::Timing::get_size() const@Base" 0replaceme
+ (c++)"unity::scopes::testing::Benchmark::Result::Timing::enumerate(std::function<void (double)> const&) const@Base" 0replaceme
+ (c++)"unity::scopes::Category::renderer_template() const@Base" 0replaceme
+ (c++)"unity::scopes::Category::id() const@Base" 0replaceme
+ (c++)"unity::scopes::Category::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::Category::title() const@Base" 0replaceme
+ (c++)"unity::scopes::Category::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::reply_reaper() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::string_to_proxy(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::registry_endpoint() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::registry_identity() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::registry_endpointdir() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::scope_id() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::description() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::display_name() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::art() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::author() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::hot_key() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::invisible() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::scope_base() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::name() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeLoader::libpath() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_base_url(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_ssclient() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::has_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::endpointdir() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::oem_installdir() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::scope_installdir() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::scoperunner_path() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::ss_registry_endpoint() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::ss_registry_identity() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::mw_kind() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::endpoint() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::find_unlocked(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::find(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::find(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::MiddlewareFactory::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::description() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::search_hint() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::display_name() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::art() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::proxy() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::author() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::hot_key() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::scope_id() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::invisible() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::fwd() const@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Annotation@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::FilterBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::SearchReply@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::SearchMetadata@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ConfigException@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::CategoryRenderer@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::PreviewQueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::CategorisedResult@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::NotFoundException@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::SearchListenerBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ActivationQueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::MiddlewareException@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::PreviewListenerBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::OptionSelectorFilter@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ActivationListenerBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ObjectNotExistException@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Reply@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Scope@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Object@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Result@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::InProcessBenchmark@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::OutOfProcessBenchmark@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::Result@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::Sample@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::Benchmark::Result::Timing@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::Benchmark::Result@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::testing::Benchmark@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Category@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::Registry@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::QueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::QueryCtrl@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ScopeBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Annotation@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::FilterBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::SearchReply@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::SearchMetadata@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::CategoryRenderer@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::PreviewQueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::CategorisedResult@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::NotFoundException@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::SearchListenerBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ActivationQueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::MiddlewareException@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::PreviewListenerBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::OptionSelectorFilter@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ActivationListenerBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ObjectNotExistException@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Reply@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Scope@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Object@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Result@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::InProcessBenchmark@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::OutOfProcessBenchmark@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::Result@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::Sample@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::Benchmark::Result::Timing@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::Benchmark::Result@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::testing::Benchmark@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Category@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::Registry@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::QueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::QueryCtrl@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ScopeBase@Base" 0replaceme
+ (c++)"VTT for unity::scopes::SearchReply@Base" 0replaceme
+ (c++)"VTT for unity::scopes::PreviewReply@Base" 0replaceme
+ (c++)"VTT for unity::scopes::ConfigException@Base" 0replaceme
+ (c++)"VTT for unity::scopes::TimeoutException@Base" 0replaceme
+ (c++)"VTT for unity::scopes::NotFoundException@Base" 0replaceme
+ (c++)"VTT for unity::scopes::MiddlewareException@Base" 0replaceme
+ (c++)"VTT for unity::scopes::ObjectNotExistException@Base" 0replaceme
+ (c++)"VTT for unity::scopes::Reply@Base" 0replaceme
+ (c++)"VTT for unity::scopes::Scope@Base" 0replaceme
+ (c++)"VTT for unity::scopes::Registry@Base" 0replaceme
+ (c++)"VTT for unity::scopes::QueryCtrl@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Annotation@Base" 0replaceme
+ (c++)"vtable for unity::scopes::FilterBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::SearchReply@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ListenerBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::PreviewReply@Base" 0replaceme
+ (c++)"vtable for unity::scopes::PreviewWidget@Base" 0replaceme
+ (c++)"vtable for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"vtable for unity::scopes::SearchMetadata@Base" 0replaceme
+ (c++)"vtable for unity::scopes::VariantBuilder@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ConfigException@Base" 0replaceme
+ (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::CategoryRenderer@Base" 0replaceme
+ (c++)"vtable for unity::scopes::PreviewQueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::TimeoutException@Base" 0replaceme
+ (c++)"vtable for unity::scopes::CategorisedResult@Base" 0replaceme
+ (c++)"vtable for unity::scopes::NotFoundException@Base" 0replaceme
+ (c++)"vtable for unity::scopes::SearchListenerBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ActivationQueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::MiddlewareException@Base" 0replaceme
+ (c++)"vtable for unity::scopes::PreviewListenerBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::OptionSelectorFilter@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ActivationListenerBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ObjectNotExistException@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Reply@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Scope@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Object@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Result@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::InProcessBenchmark@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::OutOfProcessBenchmark@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::Result@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::Sample@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::Benchmark::Result::Timing@Base" 0replaceme
+ (c++)"vtable for unity::scopes::testing::Benchmark@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Category@Base" 0replaceme
+ (c++)"vtable for unity::scopes::Registry@Base" 0replaceme
+ (c++)"vtable for unity::scopes::QueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::QueryCtrl@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ScopeBase@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::SearchReply::~SearchReply()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::PreviewReply::~PreviewReply()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ConfigException::~ConfigException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::TimeoutException::~TimeoutException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::NotFoundException::~NotFoundException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::MiddlewareException::~MiddlewareException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ObjectNotExistException::~ObjectNotExistException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::Reply::~Reply()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::Scope::~Scope()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::Registry::~Registry()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::QueryCtrl::~QueryCtrl()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::TimeoutException::~TimeoutException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ObjectNotExistException::~ObjectNotExistException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ConfigException::self() const@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::TimeoutException::self() const@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::NotFoundException::self() const@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::MiddlewareException::self() const@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ObjectNotExistException::self() const@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ConfigException::~ConfigException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::TimeoutException::~TimeoutException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::NotFoundException::~NotFoundException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::MiddlewareException::~MiddlewareException()@Base" 0replaceme
+ (c++)"virtual thunk to unity::scopes::ObjectNotExistException::~ObjectNotExistException()@Base" 0replaceme

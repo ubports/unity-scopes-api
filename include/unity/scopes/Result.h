@@ -40,7 +40,7 @@ class ScopeImpl;
 }
 
 /**
-   \brief Result encapsulates the attributes of a result returned by a Scope.
+   \brief The attributes of a result returned by a Scope.
 
    The Result API provides convenience methods for some typical attributes (title,
    art), but scopes are free to add and use any custom attributes with `operator[]`.

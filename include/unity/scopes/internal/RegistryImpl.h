@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_REGISTRYIMPL_H
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
-#include <unity/scopes/internal/ObjectProxyImpl.h>
+#include <unity/scopes/internal/ObjectImpl.h>
 #include <unity/scopes/Registry.h>
 
 namespace unity
@@ -34,18 +34,18 @@ namespace internal
 
 class RuntimeImpl;
 
-class RegistryImpl : public virtual ObjectProxyImpl
+class RegistryImpl : public virtual unity::scopes::Registry, public virtual ObjectImpl
 {
 public:
     RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
     ~RegistryImpl();
 
-    ScopeMetadata get_metadata(std::string const& scope_id);
-    MetadataMap list();
-    MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate);
-    ScopeProxy locate(std::string const& scope_name);
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
+    virtual MetadataMap list() override;
+    virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) override;
 
-    static RegistryProxy create(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
+    // Remote operation. Not part of public API, hence not override.
+    ScopeProxy locate(std::string const& scope_id);
 
 private:
     MWRegistryProxy fwd() const;

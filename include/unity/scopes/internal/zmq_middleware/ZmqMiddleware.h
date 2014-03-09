@@ -27,6 +27,7 @@
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
+#include <unity/scopes/ObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
 
@@ -59,7 +60,7 @@ public:
     virtual void stop() override;
     virtual void wait_for_shutdown() override;
 
-    virtual Proxy string_to_proxy(std::string const& s) override;
+    virtual ObjectProxy string_to_proxy(std::string const& s) override;
     virtual std::string proxy_to_string(MWProxy const& proxy) override;
 
     virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
@@ -86,7 +87,7 @@ public:
     int64_t locate_timeout() const noexcept;
 
 private:
-    Proxy make_typed_proxy(std::string const& endpoint,
+    ObjectProxy make_typed_proxy(std::string const& endpoint,
                            std::string const& identity,
                            std::string const& category,
                            RequestMode mode,

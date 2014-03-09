@@ -16,11 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/Category.h>
 #include <unity/scopes/OptionSelectorFilter.h>
+#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/SearchReply.h>
 
 #ifndef UNITY_SCOPES_TEST_SCOPE_H
 #define UNITY_SCOPES_TEST_SCOPE_H

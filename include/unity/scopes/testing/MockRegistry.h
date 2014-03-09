@@ -19,7 +19,8 @@
 #ifndef UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
 #define UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
 
-#include <unity/scopes/RegistryBase.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/testing/MockObject.h>
 
 #include <gmock/gmock.h>
 
@@ -34,14 +35,14 @@ namespace testing
 
 /// @cond
 
-class MockRegistry : public RegistryBase
+class MockRegistry : public Registry, public virtual MockObject
 {
 public:
     MockRegistry() = default;
 
-    MOCK_CONST_METHOD1(get_metadata, ScopeMetadata(std::string const&));
-    MOCK_CONST_METHOD0(list, MetadataMap());
-    MOCK_CONST_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
+    MOCK_METHOD1(get_metadata, ScopeMetadata(std::string const&));
+    MOCK_METHOD0(list, MetadataMap());
+    MOCK_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
 };
 
 /// @endcond

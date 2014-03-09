@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,7 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/PreviewReplyBase.h>
+#ifndef UNITY_SCOPES_SEARCHREPLYPROXYFWD_H
+#define UNITY_SCOPES_SEARCHREPLYPROXYFWD_H
+
+#include <memory>
 
 namespace unity
 {
@@ -24,14 +27,15 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+class SearchReply;
 
-PreviewReplyBase::PreviewReplyBase() = default;
-
-PreviewReplyBase::~PreviewReplyBase() = default;
-
-/// @endcond
+/** \typedef SearchReplyProxy
+\brief Convenience type definition.
+*/
+typedef std::shared_ptr<SearchReply> SearchReplyProxy;
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif

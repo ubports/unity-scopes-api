@@ -17,14 +17,14 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/Category.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/SearchReply.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/CannedQuery.h>
-#include <unity/scopes/Department.h>
+#include <unity/scopes/SearchReply.h>
 
 #include "scope.h"
 
@@ -33,40 +33,62 @@
 namespace testing
 {
 
-class ActivationShowingDash : public unity::scopes::ActivationQueryBase
+struct ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
-public:
-    ActivationShowingDash()
+    std::mt19937& gen;
+    std::normal_distribution<>& normal;
+
+    ActivationShowingDash(std::mt19937& gen,
+                          std::normal_distribution<>& normal)
+        : gen(gen),
+          normal(normal)
     {
     }
 
     unity::scopes::ActivationResponse activate() override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{500});
+        std::this_thread::sleep_for(
+                    std::chrono::milliseconds
+                    {
+                        static_cast<std::chrono::milliseconds::rep>(normal(gen))
+                    });
         return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };
 
-class LongRunningActivation : public unity::scopes::ActivationQueryBase
+struct LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
-public:
-    LongRunningActivation()
+    std::mt19937& gen;
+    std::normal_distribution<>& normal;
+
+    LongRunningActivation(std::mt19937& gen,
+                          std::normal_distribution<>& normal)
+        : gen(gen),
+          normal(normal)
     {
     }
 
     unity::scopes::ActivationResponse activate() override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{500});
+        std::this_thread::sleep_for(
+                    std::chrono::milliseconds
+                    {
+                        static_cast<std::chrono::milliseconds::rep>(normal(gen))
+                    });
 
         return unity::scopes::ActivationResponse{unity::scopes::ActivationResponse::ShowDash};
     }
 };
 
-class Query : public unity::scopes::SearchQueryBase
+struct Query : public unity::scopes::SearchQueryBase
 {
-public:
-    Query(unity::scopes::CannedQuery const& query)
-        : query_(query)
+    std::mt19937& gen;
+    std::normal_distribution<>& normal;
+
+    Query(std::mt19937& gen,
+          std::normal_distribution<>& normal)
+        : gen(gen),
+          normal(normal)
     {
     }
 
@@ -74,53 +96,51 @@ public:
     {
     }
 
-    void run(unity::scopes::SearchReplyProxy const& reply) override
+    void run(unity::scopes::SearchReplyProxy const&) override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{500});
-
-        unity::scopes::Department dep("news", query_, "News");
-        dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
-        reply->register_departments({dep}, "news");
-
-        auto cat = reply->register_category("cat1", "Category 1", "");
-        unity::scopes::CategorisedResult res(cat);
-        res.set_uri("uri");
-        res.set_title("title");
-        res.set_art("art");
-        res.set_dnd_uri("dnd_uri");
-        reply->push(res);
-
-        unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
-        unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
-        annotation.add_link("Link1", query);
-        reply->register_annotation(annotation);
+        std::this_thread::sleep_for(
+                    std::chrono::milliseconds
+                    {
+                        static_cast<std::chrono::milliseconds::rep>(normal(gen))
+                    });
     }
-
-private:
-    unity::scopes::CannedQuery query_;
 };
 
-class Preview : public unity::scopes::PreviewQueryBase
+struct Preview : public unity::scopes::PreviewQueryBase
 {
-public:
+    std::mt19937& gen;
+    std::normal_distribution<>& normal;
+
+    Preview(std::mt19937& gen,
+            std::normal_distribution<>& normal)
+        : gen(gen),
+          normal(normal)
+    {
+    }
+
     void cancelled() override
     {
     }
 
-    void run(unity::scopes::PreviewReplyProxy const& reply) override
+    void run(unity::scopes::PreviewReplyProxy const&) override
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{500});
-
-        unity::scopes::PreviewWidgetList widgets;
-        widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
-        widgets.emplace_back(unity::scopes::PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
-        reply->push(widgets);
-        reply->push("author", unity::scopes::Variant("Foo"));
-        reply->push("rating", unity::scopes::Variant("Bar"));
+        std::this_thread::sleep_for(
+                    std::chrono::milliseconds
+                    {
+                        static_cast<std::chrono::milliseconds::rep>(normal(gen))
+                    });
     }
 };
 
 } // namespace testing
+
+testing::Scope::Scope(
+        const std::chrono::milliseconds& mean,
+        const std::chrono::milliseconds& variance)
+    : gen(0),
+      normal(mean.count(), variance.count())
+{
+}
 
 int testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &)
 {
@@ -136,17 +156,17 @@ void testing::Scope::run()
 }
 
 unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
-        unity::scopes::CannedQuery const& query,
+        unity::scopes::CannedQuery const&,
         unity::scopes::SearchMetadata const &)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
+    return unity::scopes::SearchQueryBase::UPtr{new testing::Query(gen, normal)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const&)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(gen, normal)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
@@ -155,12 +175,12 @@ unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
         std::string const&,
         std::string const&)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(gen, normal)};
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::Result const&,
         unity::scopes::ActionMetadata const &)
 {
-    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview());
+    return unity::scopes::PreviewQueryBase::UPtr{new testing::Preview(gen, normal)};
 }

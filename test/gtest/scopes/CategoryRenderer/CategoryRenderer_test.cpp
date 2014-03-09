@@ -42,3 +42,35 @@ TEST(CategoryRenderer, from_file)
     auto rdr = CategoryRenderer::from_file(input_file);
     EXPECT_FALSE(rdr.data().empty());
 }
+
+TEST(CategoryRenderer, exceptions)
+{
+    try
+    {
+        // only dict is allowed
+        CategoryRenderer rdr("[1,2]");
+        FAIL();
+    }
+    catch (unity::InvalidArgumentException const&)
+    {
+    }
+
+    try
+    {
+        // invalid JSON
+        CategoryRenderer rdr("{");
+        FAIL();
+    }
+    catch (unity::InvalidArgumentException const&)
+    {
+    }
+
+    try
+    {
+        CategoryRenderer rdr("{}");
+    }
+    catch (...)
+    {
+        FAIL();
+    }
+}

@@ -40,7 +40,7 @@ namespace internal
 {
 
 QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy) :
-    ObjectProxyImpl(ctrl_proxy),
+    ObjectImpl(ctrl_proxy),
     reply_proxy_(reply_proxy)
 {
     assert(ctrl_proxy);
@@ -70,11 +70,6 @@ void QueryCtrlImpl::cancel()
         cerr << e.what() << endl;
         // TODO: log error
     }
-}
-
-QueryCtrlProxy QueryCtrlImpl::create(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy)
-{
-    return QueryCtrlProxy(new QueryCtrl(new QueryCtrlImpl(ctrl_proxy, reply_proxy)));
 }
 
 MWQueryCtrlProxy QueryCtrlImpl::fwd() const

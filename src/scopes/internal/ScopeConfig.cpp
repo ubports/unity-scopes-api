@@ -38,7 +38,7 @@ namespace internal
 namespace
 {
     const string overrideable_str = "Override";
-    const string scope_name_str = "DisplayName";
+    const string scope_id_str = "DisplayName";
     const string description_str = "Description";
     const string author_str = "Author";
     const string art_str = "Art";
@@ -59,7 +59,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         overrideable_ = false;
     }
-    display_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_name_str);
+    display_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_id_str);
     description_ = parser()->get_string(SCOPE_CONFIG_GROUP, description_str);
     author_ = parser()->get_string(SCOPE_CONFIG_GROUP, author_str);
 

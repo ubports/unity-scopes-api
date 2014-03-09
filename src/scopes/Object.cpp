@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/ReplyBase.h>
+#include <unity/scopes/Object.h>
 
 namespace unity
 {
@@ -24,13 +24,17 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
+//! @cond
 
-ReplyBase::ReplyBase() = default;
+Object::Object()
+{
+}
 
-ReplyBase::~ReplyBase() = default;
+Object::~Object()
+{
+}
 
-/// @endcond
+//! @endcond
 
 } // namespace scopes
 

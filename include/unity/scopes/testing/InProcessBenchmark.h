@@ -30,9 +30,28 @@ class ScopeBase;
 
 namespace testing
 {
-
-/// @cond
-
+/**
+ * \brief The InProcessBenchmark class provides scope authors
+ * with runtime benchmarking capabilities. The actual runs are executed in the same process.
+ *
+ * \code
+ * unity::scopes::testing::InProcessBenchmark benchmark;
+ *
+ * unity::scopes::Query query{scope_id};
+ * query.set_query_string(scope_query_string);
+ *
+ * unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
+ *
+ * unity::scopes::testing::Benchmark::QueryConfiguration config;
+ * config.sampler = [query, meta_data]()
+ * {
+ *     return std::make_pair(query, meta_data);
+ * };
+ *
+ * auto result = benchmark.for_query(scope, config);
+ * \endcode
+ *
+ */
 class InProcessBenchmark : public Benchmark
 {
 public:
@@ -50,8 +69,6 @@ public:
     virtual Result for_action(const std::shared_ptr<unity::scopes::ScopeBase>& scope,
                               ActionConfiguration activation_configuration) override;
 };
-
-/// @endcond
 
 } // namespace testing
 

@@ -13,25 +13,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/RegistryBase.h>
+#ifndef CONFIG_H
+#define CONFIG_H
 
-namespace unity
+#include <sstream>
+
+namespace testing
 {
 
-namespace scopes
+double parse_double_from_cmake_variable()
 {
+    std::stringstream ss{"@STATISTICS_TEST_CONFIDENCE_LEVEL@"};
+    double result; ss >> result;
+    return result;
+}
 
-/// @cond
+const double alpha
+{
+    1. - parse_double_from_cmake_variable()
+};
 
-RegistryBase::RegistryBase() = default;
+} // namespace testing
 
-RegistryBase::~RegistryBase() = default;
-
-/// @endcond
-
-} // namespace scopes
-
-} // namespace unity
+#endif

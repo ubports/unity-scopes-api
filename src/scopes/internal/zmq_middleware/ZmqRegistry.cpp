@@ -78,12 +78,12 @@ ZmqRegistry::~ZmqRegistry()
 {
 }
 
-ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
+ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "get_metadata");
     auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
-    in_params.setName(scope_name.c_str());
+    in_params.setName(scope_id.c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     auto receiver = future.get();
@@ -99,8 +99,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_name)
         {
             auto md = get_metadata_response.getReturnValue();
             VariantMap m = to_variant_map(md);
-            unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
-            smdi->deserialize(m);
+            unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
             return ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
         }
         case capnproto::Registry::GetMetadataResponse::Response::NOT_FOUND_EXCEPTION:
@@ -128,26 +127,25 @@ MetadataMap ZmqRegistry::list()
     throw_if_runtime_exception(response);
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
-    auto list = list_response.getReturnValue();
+    auto list = list_response.getReturnValue().getPairs();
     MetadataMap sm;
     for (size_t i = 0; i < list.size(); ++i)
     {
-        VariantMap m = to_variant_map(list[i]);
-        string scope_name = m["scope_id"].get_string();
-        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(mw_base()));
-        smdi->deserialize(m);
+        string scope_id = list[i].getName();
+        VariantMap m = to_variant_map(list[i].getValue().getDictVal());
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
         ScopeMetadata d(ScopeMetadataImpl::create(move(smdi)));
-        sm.emplace(make_pair(move(scope_name), move(d)));
+        sm.emplace(make_pair(move(scope_id), move(d)));
     }
     return sm;
 }
 
-ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
+ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "locate");
     auto in_params = request.initInParams().getAs<capnproto::Registry::LocateRequest>();
-    in_params.setName(scope_name.c_str());
+    in_params.setName(scope_id.c_str());
 
     // locate uses a custom timeout because it needs to potentially fork/exec the scope.
     int64_t timeout = 1000; // TODO: get timeout from config
@@ -171,7 +169,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_name)
                                                    proxy.getIdentity(),
                                                    proxy.getCategory(),
                                                    proxy.getTimeout());
-            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_name);
+            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_id);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {
