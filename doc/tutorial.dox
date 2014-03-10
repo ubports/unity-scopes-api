@@ -196,21 +196,21 @@ two attributes: "source", which should point to an image (an uri) and "zoomable"
 attributes can either be specified directly, or they can reference values present already in the unity::scopes::Result instance, or pushed spearately during the
 execution of unity::scopes::PreviewQueryBase::run().
 
-Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute() method, e.g:
+Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute_value() method, e.g:
 
 \code{.cpp}
     PreviewWidget image_widget("myimage", "image");
 
-    image_widget.add_attribute("source", Variant("file:///tmp/image.jpg"));
-    image_widget.add_attribute("zoomable", Variant(false));
+    image_widget.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
+    image_widget.add_attribute_value("zoomable", Variant(false));
 \endcode
 
-To reference values from results or arbitrary values pushed separately, use unity::scopes::PreviewWidget::add_component() method:
+To reference values from results or arbitrary values pushed separately, use unity::scopes::PreviewWidget::add_attribute_mapping() method:
 
 \code{.cpp}
     PreviewWidget image_widget("myimage", "image");
-    image_widget.add_component("source", "art"); // use 'art' attribute from the result
-    image_widget.add_component("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
+    image_widget.add_attribute_mapping("source", "art"); // use 'art' attribute from the result
+    image_widget.add_attribute_mapping("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
     reply->push("myzoomable", Variant(true));
 \endcode
 
@@ -244,7 +244,7 @@ two buttons: "Open" and "Download" can be defined as follows (using unity::scope
         {"label", Variant("Download")}
     });
 
-    buttons.add_attribute("actions", builder.end());
+    buttons.add_attribute_value("actions", builder.end());
 \endcode
 
 To handle activation of preview actions, scope needs to implement the following method of unity::scopes::ScopeBase:
@@ -271,7 +271,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
         ...
         if (action_id == "search-grooveshark")
         {
-            Query query("com.canonical.scopes.grooveshark");
+            CannedQuery query("com.canonical.scopes.grooveshark");
             query.set_query_string("metal");
             return unity::scopes::ActivationResponse(query);
         }
