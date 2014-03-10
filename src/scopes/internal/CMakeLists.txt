@@ -33,10 +33,10 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ObjectProxyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBaseImpl.cpp
@@ -46,11 +46,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryConfig.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryObject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultImpl.cpp
@@ -63,7 +61,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp

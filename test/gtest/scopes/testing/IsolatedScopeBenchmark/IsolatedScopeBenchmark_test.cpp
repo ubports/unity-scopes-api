@@ -74,8 +74,6 @@ static const std::string scope_query_string{"does.not.exist.scope.query_string"}
 static const std::string default_locale{"C"};
 static const std::string default_form_factor{"SuperDuperPhablet"};
 
-static const std::size_t dont_care{0};
-
 unity::scopes::testing::Benchmark::Result reference_query_performance()
 {
     unity::scopes::testing::Benchmark::Result result{};

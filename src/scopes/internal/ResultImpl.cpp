@@ -105,9 +105,9 @@ void ResultImpl::set_runtime(RuntimeImpl const* runtime)
     runtime_ = runtime;
 }
 
-void ResultImpl::set_origin(std::string const& scope_name)
+void ResultImpl::set_origin(std::string const& scope_id)
 {
-    origin_ = scope_name;
+    origin_ = scope_id;
 }
 
 void ResultImpl::set_uri(std::string const& uri)

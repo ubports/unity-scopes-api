@@ -43,7 +43,7 @@ namespace testing
  * \code
  * unity::scopes::testing::OutOfProcessBenchmark benchmark;
  *
- * unity::scopes::Query query{scope_name};
+ * unity::scopes::Query query{scope_id};
  * query.set_query_string(scope_query_string);
  *
  * unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};

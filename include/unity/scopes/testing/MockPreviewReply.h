@@ -40,13 +40,13 @@ public:
     MockPreviewReply() = default;
 
     // From Reply
-    MOCK_CONST_METHOD0(finished, void());
-    MOCK_CONST_METHOD1(error, void(std::exception_ptr));
+    MOCK_METHOD0(finished, void());
+    MOCK_METHOD1(error, void(std::exception_ptr));
 
     // From SearchReply
-    MOCK_CONST_METHOD1(register_layout, bool(ColumnLayoutList const&));
-    MOCK_CONST_METHOD1(push, bool(PreviewWidgetList const&));
-    MOCK_CONST_METHOD2(push, bool(std::string const&, Variant const&));
+    MOCK_METHOD1(register_layout, bool(ColumnLayoutList const&));
+    MOCK_METHOD1(push, bool(PreviewWidgetList const&));
+    MOCK_METHOD2(push, bool(std::string const&, Variant const&));
 };
 
 /// @endcond

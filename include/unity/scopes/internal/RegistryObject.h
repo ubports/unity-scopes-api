@@ -43,7 +43,7 @@ public:
     {
         ScopeExecData() = default;
         ScopeExecData(std::initializer_list<std::string>) = delete;
-        std::string scope_name;
+        std::string scope_id;
         std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
@@ -56,14 +56,14 @@ public:
     virtual ~RegistryObject();
 
     // Remote operation implementations
-    virtual ScopeMetadata get_metadata(std::string const& scope_name) const override;
+    virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
-    virtual ScopeProxy locate(std::string const& scope_name) override;
+    virtual ScopeProxy locate(std::string const& scope_id) override;
 
     // Local methods
-    bool add_local_scope(std::string const& scope_name, ScopeMetadata const& scope,
+    bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
                          ScopeExecData const& scope_exec_data);
-    bool remove_local_scope(std::string const& scope_name);
+    bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
 private:
@@ -81,7 +81,7 @@ private:
         ScopeProcess(ScopeExecData exec_data);
         ScopeProcess(ScopeProcess const& other);
 
-        std::string scope_name() const;
+        std::string scope_id() const;
         ProcessState state() const;
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 

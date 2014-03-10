@@ -221,7 +221,7 @@ TEST(RegistryI, exceptions)
     catch (MiddlewareException const& e)
     {
         EXPECT_STREQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
-                     "Registry: Cannot search for scope with empty name",
+                     "RegistryObject::get_metadata(): Cannot search for scope with empty name",
                      e.what());
     }
 
@@ -233,7 +233,7 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::add_local_scope(): Cannot add scope with empty name",
                      e.what());
     }
 
@@ -244,7 +244,7 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::remove_local_scope(): Cannot remove scope with empty name",
                      e.what());
     }
 }
@@ -327,7 +327,7 @@ TEST(RegistryI, locate)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::add_local_scope(): Cannot add scope with empty name",
                      e.what());
     }
 
@@ -338,7 +338,7 @@ TEST(RegistryI, locate)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::remove_local_scope(): Cannot remove scope with empty name",
                      e.what());
     }
 }

@@ -36,16 +36,12 @@ class CategorisedResult;
 class Annotation;
 
 /**
-\brief Abstract base to allow the results of a search query to be sent to the source of a query.
+\brief Allows the results of a search query to be sent to the query source.
 */
 
 class SearchReply : public virtual Reply
 {
 public:
-    /// @cond
-    SearchReply(SearchReply const&) = delete;
-    /// @endcond
-
     /**
      \brief Register departments for the current search reply and provide the current department.
 
@@ -63,9 +59,9 @@ public:
     results and categories from other scope(s).
     */
     virtual Category::SCPtr register_category(std::string const& id,
-                                      std::string const& title,
-                                      std::string const &icon,
-                                      CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
     \brief Returns a previously registered category.
@@ -77,7 +73,7 @@ public:
     \brief Returns a previously registered category.
     \return The category instance or `nullptr` if the category does not exist.
     */
-    virtual Category::SCPtr lookup_category(std::string const& id) const = 0;
+    virtual Category::SCPtr lookup_category(std::string const& id) = 0;
 
     /**
     \brief Sends a single result to the source of a query.
@@ -90,7 +86,7 @@ public:
     or exceeded. (The return value is false for the last valid push and
     subsequent pushes.)
     */
-    virtual bool push(CategorisedResult const& result) const = 0;
+    virtual bool push(CategorisedResult const& result) = 0;
 
     /**
     \brief Register an annotation.
@@ -100,13 +96,13 @@ public:
     registering any categories.
     \note The Unity shell can ignore some or all annotations, depending on available screen real estate.
     */
-    virtual bool register_annotation(Annotation const& annotation) const = 0;
+    virtual bool register_annotation(Annotation const& annotation) = 0;
 
     /**
     \brief Sends all filters and their state to the source of a query.
     \return True if the filters were accepted, false otherwise.
     */
-    virtual bool push(Filters const& filters, FilterState const& filter_state) const = 0;
+    virtual bool push(Filters const& filters, FilterState const& filter_state) = 0;
 
     /**
     \brief Destroys a Reply.

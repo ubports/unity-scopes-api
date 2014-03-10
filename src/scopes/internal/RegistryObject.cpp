@@ -65,7 +65,7 @@ RegistryObject::~RegistryObject()
     {
         if (!scope_process.second.wait_for_state(ScopeProcess::Stopped, 1000))
         {
-            cerr << "RegistryObject::~RegistryObject: Scope: \"" << scope_process.second.scope_name()
+            cerr << "RegistryObject::~RegistryObject: Scope: \"" << scope_process.second.scope_id()
                  << " took too long to terminate. This process may still be active after shutdown.";
         }
     }
@@ -81,19 +81,19 @@ RegistryObject::~RegistryObject()
     scope_processes_.clear();
 }
 
-ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
+ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    // If the id is empty, it was sent as empty by the remote client.
+    if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot search for scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::get_metadata(): Cannot search for scope with empty id");
     }
 
     // Look for the scope in both the local and the remote map.
     // Local scopes take precedence over remote ones of the same
-    // name. (Ideally, this should never happen.)
-    auto const& scope_it = scopes_.find(scope_name);
+    // id. (Ideally, this should never happen.)
+    auto const& scope_it = scopes_.find(scope_id);
     if (scope_it != scopes_.end())
     {
         return scope_it->second;
@@ -101,10 +101,10 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_name) const
 
     if (remote_registry_)
     {
-        return remote_registry_->get_metadata(scope_name);
+        return remote_registry_->get_metadata(scope_id);
     }
 
-    throw NotFoundException("Registry::get_metadata(): no such scope",  scope_name);
+    throw NotFoundException("RegistryObject::get_metadata(): no such scope: ",  scope_id);
 }
 
 MetadataMap RegistryObject::list() const
@@ -112,9 +112,9 @@ MetadataMap RegistryObject::list() const
     lock_guard<decltype(mutex_)> lock(mutex_);
     MetadataMap all_scopes(scopes_);  // Local scopes
 
-    // If a remote scope has the same name as a local one,
+    // If a remote scope has the same id as a local one,
     // this will not overwrite a local scope with a remote
-    // one if they have the same name.
+    // one if they have the same id.
     if (remote_registry_)
     {
         MetadataMap remote_scopes = remote_registry_->list();
@@ -124,25 +124,25 @@ MetadataMap RegistryObject::list() const
     return all_scopes;
 }
 
-ScopeProxy RegistryObject::locate(std::string const& scope_name)
+ScopeProxy RegistryObject::locate(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    // If the id is empty, it was sent as empty by the remote client.
+    if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty name");
+        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty id");
     }
 
-    auto scope_it = scopes_.find(scope_name);
+    auto scope_it = scopes_.find(scope_id);
     if (scope_it == scopes_.end())
     {
-        throw NotFoundException("Tried to locate unknown local scope", scope_name);
+        throw NotFoundException("Tried to locate unknown local scope", scope_id);
     }
 
-    auto proc_it = scope_processes_.find(scope_name);
+    auto proc_it = scope_processes_.find(scope_id);
     if (proc_it == scope_processes_.end())
     {
-        throw NotFoundException("Tried to exec unknown local scope", scope_name);
+        throw NotFoundException("Tried to exec unknown local scope", scope_id);
     }
 
     proc_it->second.exec();
@@ -150,42 +150,43 @@ ScopeProxy RegistryObject::locate(std::string const& scope_name)
     return scope_it->second.proxy();
 }
 
-bool RegistryObject::add_local_scope(std::string const& scope_name, ScopeMetadata const& metadata,
+bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     bool return_value = true;
-    if (scope_name.empty())
+    if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot add scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot add scope with empty id");
     }
-    if (scope_name.find('/') != std::string::npos)
+    if (scope_id.find('/') != std::string::npos)
     {
-        throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its name");
+        throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its id");
     }
 
-    if (scopes_.find(scope_name) != scopes_.end())
+    if (scopes_.find(scope_id) != scopes_.end())
     {
-        scopes_.erase(scope_name);
-        scope_processes_.erase(scope_name);
+        scopes_.erase(scope_id);
+        scope_processes_.erase(scope_id);
         return_value = false;
     }
-    scopes_.insert(make_pair(scope_name, metadata));
-    scope_processes_.insert(make_pair(scope_name, ScopeProcess(exec_data)));
+    scopes_.insert(make_pair(scope_id, metadata));
+    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
     return return_value;
 }
 
-bool RegistryObject::remove_local_scope(std::string const& scope_name)
+bool RegistryObject::remove_local_scope(std::string const& scope_id)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the name is empty, it was sent as empty by the remote client.
-    if (scope_name.empty())
+    // If the id is empty, it was sent as empty by the remote client.
+    if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot remove scope with empty name");
+        throw unity::InvalidArgumentException("RegistryObject::remove_local_scope(): Cannot remove scope "
+                                              "with empty id");
     }
 
-    scope_processes_.erase(scope_name);
-    return scopes_.erase(scope_name) == 1;
+    scope_processes_.erase(scope_id);
+    return scopes_.erase(scope_id) == 1;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
@@ -215,9 +216,9 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
 {
 }
 
-std::string RegistryObject::ScopeProcess::scope_name() const
+std::string RegistryObject::ScopeProcess::scope_id() const
 {
-    return exec_data_.scope_name;
+    return exec_data_.scope_id;
 }
 
 RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state() const
@@ -259,7 +260,7 @@ void RegistryObject::ScopeProcess::exec()
     {
         if (!wait_for_state(ScopeProcess::Stopped, 1000))
         {
-            cerr << "RegistryObject::ScopeProcess: Force killing process. Scope: \"" << exec_data_.scope_name
+            cerr << "RegistryObject::ScopeProcess: Force killing process. Scope: \"" << exec_data_.scope_id
                  << "\" took too long to stop." << endl;
             kill();
         }
@@ -300,10 +301,10 @@ void RegistryObject::ScopeProcess::exec()
     {
         kill();
         throw unity::ResourceException("RegistryObject::ScopeProcess: exec() aborted. Scope: \""
-                                       + exec_data_.scope_name + "\" took too long to start.");
+                                       + exec_data_.scope_id + "\" took too long to start.");
     }
 
-    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_name << "\" started" << endl;
+    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
 
     // 4. add the scope process to the death observer
     core::posix::ChildProcess::DeathObserver::instance().add(process_);
@@ -325,7 +326,7 @@ void RegistryObject::ScopeProcess::kill()
     catch (std::exception const&)
     {
         cerr << "RegistryObject::ScopeProcess: Failed to kill scope: \""
-             << exec_data_.scope_name << "\"" << endl;
+             << exec_data_.scope_id << "\"" << endl;
         throw;
     }
 }
@@ -337,7 +338,7 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     // check if this is the process reported to have died
     if (pid == process_.pid())
     {
-        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_name << "\" terminated" << endl;
+        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" terminated" << endl;
         process_ = core::posix::ChildProcess::invalid();
         update_state(Stopped);
         return true;

@@ -27,11 +27,11 @@ namespace unity
 namespace scopes
 {
 
-class ObjectProxy;
-/** \typedef Proxy
+class Object;
+/** \typedef ObjectProxy
 \brief Convenience type definition for the proxy inheritance root.
 */
-typedef std::shared_ptr<ObjectProxy> Proxy;
+typedef std::shared_ptr<Object> ObjectProxy;
 
 } // namespace scopes
 

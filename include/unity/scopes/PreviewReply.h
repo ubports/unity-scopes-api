@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
 #include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/PreviewReplyProxyFwd.h>
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/Reply.h>
 
@@ -30,16 +31,12 @@ namespace unity
 namespace scopes
 {
 /**
-\brief Allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a preview to be sent to the preview requester.
 */
+
 class PreviewReply : public virtual Reply
 {
 public:
-    /// @cond
-    virtual ~PreviewReply();
-    PreviewReply(PreviewReply const&) = delete;
-    /// @endcond
-
     /**
      \brief Registers a list of column layouts for current preview.
 
@@ -48,19 +45,25 @@ public:
      \return True if the query is still alive, false if the query failed or was cancelled.
      \throws unity::LogicException register_layout() is called more than once.
      */
-    virtual bool register_layout(ColumnLayoutList const& layouts) const = 0;
+    virtual bool register_layout(ColumnLayoutList const& layouts) = 0;
 
     /**
      \brief Sends widget definitions to the sender of the preview query.
+
+     This method can be called mutiple times to send widgets in stages.
      \return True if the query is still alive, false if the query failed or was cancelled.
      */
-    virtual bool push(PreviewWidgetList const& widget_list) const = 0;
+    virtual bool push(PreviewWidgetList const& widget_list) = 0;
 
     /**
      \brief Sends data for a preview widget attribute.
      \return True if the query is still alive, false if the query failed or was cancelled.
      */
-    virtual bool push(std::string const& key, Variant const& value) const = 0;
+    virtual bool push(std::string const& key, Variant const& value) = 0;
+
+    /// @cond
+    virtual ~PreviewReply();
+    /// @endcond
 
 protected:
     /// @cond

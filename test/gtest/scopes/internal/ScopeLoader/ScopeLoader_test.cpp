@@ -59,7 +59,7 @@ char const* scopeB
 // Need to make a dummy registry proxy because, if we pass a null shared_ptr to load(),
 // load() throws an exception.
 
-RegistryProxy registry(RegistryImpl::create(nullptr, (RuntimeImpl*)0x1));
+RegistryProxy registry(make_shared<RegistryImpl>(nullptr, (RuntimeImpl*)0x1));
 
 // Basic test.
 

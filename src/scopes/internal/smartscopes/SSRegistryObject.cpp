@@ -86,10 +86,10 @@ SSRegistryObject::~SSRegistryObject() noexcept
 
 ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id) const
 {
-    // If the name is empty, it was sent as empty by the remote client.
+    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty name");
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty id");
     }
 
     std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -248,10 +248,10 @@ void SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& m
 {
     if (metadata.scope_id().empty())
     {
-        throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty name");
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty id");
     }
 
-    // store the base url under a scope name key
+    // store the base url under a scope id key
     base_urls_[metadata.scope_id()] = remotedata.base_url;
 
     // store the scope metadata in scopes_
