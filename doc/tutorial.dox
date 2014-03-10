@@ -30,7 +30,7 @@ and therefore, can only be run locally, while a remote scope can effectively be 
 When deciding on whether to write a local or remote scope, keep the user’s privacy in mind. For security reasons, a scope should
 not access the user’s personal data unless absolutely necessary (i.e. The scope requires account information or local data to
 perform searches). It is only in these situations that a scope should be written to run locally. <b>By default, a scope should
-be written with the intension of running remotely on the Smart Scopes Server.</b>
+be written with the intention of running remotely on the Smart Scopes Server.</b>
 
 (For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
 the SSS REST API see: <link_not_yet_available>)
