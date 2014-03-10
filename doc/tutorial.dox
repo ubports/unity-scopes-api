@@ -1,15 +1,86 @@
 /*!
+\mainpage notitle
 
-\page tutorial Tutorial
+\section overview What are scopes
 
-This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++. For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+\subsection intro Introduction
 
-\section simplescope A simple scope which doesn't query other scopes.
+One of Unity’s core features on the desktop is the Dash. The Dash allows users to search for and discover virtually anything
+from local files and applications, to web content and other online data. The Dash achieves this by interfacing with one or more
+search plug-ins called “scopes” (e.g. “Apps”, “Music”, “Videos”, or “Amazon”, “Wikipedia”, “Youtube”).
+
+On the phone and tablet, scopes make up the central user interface, as they provide everything a user needs from an operating
+system. Scopes enable users to locate and launch applications, access local files, play music and videos, search the web,
+manage their favourite social network, keep up with the latest news, and much more.
+
+Each scope is a dedicated search engine for the category / data source it represents. The data source could be a local database,
+a web service, or even an aggregation of other scopes (e.g. the “Music” scope aggregates “Local Music” and “Online Music”
+scopes). A scope is primarily responsible for performing the actual search logic and returning the best possible results for each
+query it receives.
+
+This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
+
+\subsection LvsR Local vs remote scopes
+
+Local scopes are scopes that are located and run on the user’s device, while remote scopes (or “Smart Scopes”) are scopes that
+are located and run remotely on the Ubuntu Smart Scopes Server (or “SSS”). (Note: Although local scopes execute as local
+processes, they may still query online services in order to retrieve search results). A local scope usually requires local data,
+and therefore, can only be run locally, while a remote scope can effectively be run both locally and remotely.
+
+When deciding on whether to write a local or remote scope, keep the user’s privacy in mind. For security reasons, a scope should
+not access the user’s personal data unless absolutely necessary (i.e. The scope requires account information or local data to
+perform searches). It is only in these situations that a scope should be written to run locally. <b>By default, a scope should
+be written with the intention of running remotely on the Smart Scopes Server.</b>
+
+(For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
+the SSS REST API see: <link_not_yet_available>)
+
+\section develop Developing scopes
+
+\subsection starting Getting started
+
+A simple C++ scope template with cmake build system is currently available
+on Launchpad, to use it install the packages required for scope development:
+
+\verbatim
+sudo apt-get install libunity-scopes-dev
+\endverbatim
+
+Clone the bazaar branch with the scope template and build the scope:
+
+\verbatim
+bzr branch lp:~jpakkane/+junk/scopetemplate
+cd scopetemplate
+mkdir build
+cd build
+cmake ..
+make
+\endverbatim
+
+Now you're ready to explore and modify the sample code in the src/ directory.
+
+\subsection impl Implementing scope
+
+This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++.
+For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+
+A typical scope implementation needs to implement interfaces of the following classes from the Scopes API:
+<ul>
+<li>unity::scopes::ScopeBase - the main scope class and an entry point for all incoming requests.
+<li>unity::scopes::SearchQueryBase - the handler of search request.
+<li>unity::scopes::PreviewQueryBase - the handler of preview requests (only if handling previews).
+<li>unity::scopes::ActivationQueryBase - the handler of activation and preview action requests (only if handling previews and activation)
+<li>unity::scopes::SearchListenerBase - the handler of search replies (only in aggreagator scopes, to pull results from other scopes)
+</ul>
+
+The following sections show them in more detail.
+
+\subsubsection simplescope Case 1: A simple scope which doesn't query other scopes.
 
 This is the typical case: a scope that connects to a remote or local backend, database etc. and provides results in response to search queries coming from a
 client (i.e. Unity Dash or another scope).
 
-\subsection scopebase Create a scope class that implements ScopeBase inteface.
+\paragraph scopebase Create a scope class that implements ScopeBase inteface.
 
 There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
 \link unity::scopes::ScopeBase::start() start\endlink and unity::scopes::ScopeBase::search()  and
@@ -40,7 +111,7 @@ The \link unity::scopes::ScopeBase::stop() stop\endlink method should release an
 documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
-\subsection handlingsearch Handling search
+\paragraph handlingsearch Handling search
 
 The unity::scopes::ScopeBase::search() method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
@@ -54,7 +125,13 @@ SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata c
 }
 \endcode
 
-\subsubsection querybase Create a query class that implements SearchQueryBase interface.
+The search() method receives two arguments: a unity::scopes::CannedQuery query object that carries actual query string (among other information) and
+additional parameters of the search request, stored in unity::scopes::SearchMetadata - such as locale string, form factor string and cardinality.
+Cardinality is the maximum number of results expected from the scope (the value of 0 should be treated as if no limit was set). For optimal performance scopes
+should provide no more results than requested; if they however fail to handle cardinality constraint, any excessive results will be ignored by scopes API.
+
+
+\paragraph querybase Create a query class that implements SearchQueryBase interface.
 
 The central and most important method that needs to be implemented in this interface is unity::scopes::SearchQueryBase::run().
 This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
@@ -101,7 +178,7 @@ void MyQuery::run(SearchReplyProxy const& reply)
 }
 \endcode
 
-\subsection handlingpreview Handling previews
+\paragraph handlingpreview Handling previews
 
 Scopes are responsible for handling preview requests for results they created; this needs to be implemented by overriding unity::scopes::ScopeBase::preview()
 method:
@@ -131,21 +208,21 @@ two attributes: "source", which should point to an image (an uri) and "zoomable"
 attributes can either be specified directly, or they can reference values present already in the unity::scopes::Result instance, or pushed spearately during the
 execution of unity::scopes::PreviewQueryBase::run().
 
-Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute() method, e.g:
+Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute_value() method, e.g:
 
 \code{.cpp}
     PreviewWidget image_widget("myimage", "image");
 
-    image_widget.add_attribute("source", Variant("file:///tmp/image.jpg"));
-    image_widget.add_attribute("zoomable", Variant(false));
+    image_widget.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
+    image_widget.add_attribute_value("zoomable", Variant(false));
 \endcode
 
-To reference values from results or arbitrary values pushed separately, use unity::scopes::PreviewWidget::add_component() method:
+To reference values from results or arbitrary values pushed separately, use unity::scopes::PreviewWidget::add_attribute_mapping() method:
 
 \code{.cpp}
     PreviewWidget image_widget("myimage", "image");
-    image_widget.add_component("source", "art"); // use 'art' attribute from the result
-    image_widget.add_component("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
+    image_widget.add_attribute_mapping("source", "art"); // use 'art' attribute from the result
+    image_widget.add_attribute_mapping("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
     reply->push("myzoomable", Variant(true));
 \endcode
 
@@ -160,7 +237,7 @@ To push preview widgets to the client, use unity::scopes::PreviewReply::push():
     reply->push(widgets);
 \endcode
 
-\subsubsection previewactions Preview actions
+\paragraph previewactions Preview actions
 
 Previews can have actions (i.e. buttons) that user can activate - they are supported by unity::scopes::PreviewWidget of "actions" type. This type of widget
 takes one or more action button definitions, where every button is constituted by an unique identifier, a label and an optional icon. For example, a widget with
@@ -179,7 +256,7 @@ two buttons: "Open" and "Download" can be defined as follows (using unity::scope
         {"label", Variant("Download")}
     });
 
-    buttons.add_attribute("actions", builder.end());
+    buttons.add_attribute_value("actions", builder.end());
 \endcode
 
 To handle activation of preview actions, scope needs to implement the following method of unity::scopes::ScopeBase:
@@ -206,7 +283,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
         ...
         if (action_id == "search-grooveshark")
         {
-            Query query("com.canonical.scopes.grooveshark");
+            CannedQuery query("com.canonical.scopes.grooveshark");
             query.set_query_string("metal");
             return unity::scopes::ActivationResponse(query);
         }
@@ -215,7 +292,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 }
 \endcode
 
-\subsection handlingactivation Handling result activation
+\paragraph handlingactivation Handling result activation
 
 In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
 known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
@@ -233,7 +310,7 @@ and also call Result::set_intercept_activation() for all results that should tri
 unity::scopes::ScopeBase::activate() should follow the same guidelines as unity::scopes::ScopeBase::perform_action(), the only difference with result activation
 being the lack of widget or action identifiers, as those are specific to preview widgets.
 
-\subsection export Export the scope.
+\paragraph export Exporting the scope
 
 The scope needs to be compiled into a .so shared library and to be succesfully
 loaded at runtime it must provide two C functions to create and destroy it - a
@@ -253,13 +330,13 @@ extern "C" {
 }
 \endcode
 
-\section aggscope A simple aggregator scope which combines results from other scopes.
+\subsubsection aggscope Case 2: A simple aggregator scope.
 
 Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
 implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
 \link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
 
-\subsection subquery Query another scopes via SearchQueryBase::subsearch()
+\paragraph subquery Query another scopes via SearchQueryBase::subsearch()
 
 To send search query to another scope, use one of the `subsearch()` overloads of unity::scopes::SearchQueryBase inside your implementation of unity::scopes::SearchQueryBase.
 This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
@@ -272,7 +349,8 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
 {
     try
     {
-        scope_to_query_ = registry->find("scope-A"); // store the proxy for passing it further in search 
+        auto meta = registry->get_metadata("scope-A");
+        scope_to_query_ = meta.proxy(); // store the proxy for passing it further in search 
     }
     catch (NotFoundException const& e)
     {
@@ -281,7 +359,7 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(std::string const& query, unity::scopes::SearchMetadata const&)
+unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const&)
 {
     SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
     return q;
@@ -298,7 +376,7 @@ void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply)
 }
 \endcode
 
-\subsubsection receiver Create a class that implements SearchListenerBase interface
+\paragraph receiver Create a class that implements SearchListenerBase interface
 
 The \link unity::scopes::SearchListenerBase SearchListenerBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
 implementation receive \link unity::scopes::SearchListenerBase::push result items and categories\endlink returned by that query. A simple implementation of
@@ -320,7 +398,7 @@ void MyReceiver::push(CategorisedResult result)
 A more sophisticated aggregator scope can rearrange results it receives into a different set of categories, alter or enrich the results before pushing them
 upstream etc.
 
-\subsection aggactiv Activation and previews of results processed by aggregator scopes
+\paragraph aggactiv Activation and previews of results processed by aggregator scopes
 
 If an aggregator scope just forwards results it receives from other scopes, possibly only changing their category assignment, then there is nothing
 to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
@@ -359,7 +437,7 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
-\section scopetesting Testing
+\subsection scopetesting Testing
 
 Unity Scopes API provides testing helpers based on well-known and established testing frameworks:
 <a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
@@ -415,4 +493,45 @@ TEST_F(TestScopeFixutre, search_results)
     search_query->run(reply_proxy);
 }
 \endcode
+
+\subsection deployment Deployment
+
+Installing a scope is as simple as running `make install` when using the scope
+template. You might need to restart the global scope registry when a new scope
+is installed by running: `restart scope-registry`.
+
+In the future it will be possible to create click packages with scopes.
+
+\subsection scopetool Previewing scope
+
+To help with the development of a scope and to be able to see how will the dash
+render the dynamically-specified categories (see unity::scopes::CategoryRenderer),
+a specialized tool to preview a scope is provided - the "Unity Scope Tool".
+
+You can install it from the Ubuntu archive using:
+\verbatim
+sudo apt-get install unity-scope-tool
+\endverbatim
+
+After installation, you can run the scope-tool with a parameter specifying
+path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`). If a binary for your scope can be found in the same
+directory (ie there's `~/dev/myscope/build/libmyscope.so`), the scope-tool will
+display surfacing and search results provided by your scope, and allow you to
+perform searches, invoke previews and actions within previews.
+
+Note that the scope-tool is using the same rendering mechanism as Unity
+itself, and therefore what you see in the scope-tool is what you get in Unity.
+It can also be used to fine-tune the category definitions, as it allows you
+to manipulate the definitions on the fly, and once you're happy with the result
+you can just copy the JSON definition back into your scope
+(see unity::scopes::CategoryRenderer::CategoryRenderer()).
+
+The scope-tool supports a few command line arguments:
+\arg by default (without any arguments) it will communicate with all scopes
+installed on the system and available on the smart scopes server.
+\arg When a path to a scope configuration file is provided, only that scope is
+initialized, but you can either pass multiple configuration files or
+the `--include-system-scopes` / `--include-server-scopes` option to allow
+development of aggregating scopes.
+
 */
