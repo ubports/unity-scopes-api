@@ -54,7 +54,7 @@ public:
 
     /**
     \brief Create a widget from a JSON definition.
-    \param `definition The JSON definition.
+    \param definition The JSON definition.
     */
     PreviewWidget(std::string const& definition);
 
