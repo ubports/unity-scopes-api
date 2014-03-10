@@ -487,7 +487,10 @@ To help with the development of a scope and to be able to see how will the dash
 render the dynamically-specified categories (see unity::scopes::CategoryRenderer),
 a specialized tool to preview a scope is provided - the "Unity Scope Tool".
 
-You can install it from the Ubuntu archive using: `sudo apt-get install unity-scope-tool`.
+You can install it from the Ubuntu archive using:
+\verbatim
+sudo apt-get install unity-scope-tool
+\endverbatim
 
 After installation, you can run the scope-tool with a parameter specifying
 path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`). If a binary for your scope can be found in the same
