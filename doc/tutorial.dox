@@ -485,4 +485,30 @@ TEST_F(TestScopeFixutre, search_results)
 \subsection deployment Deployment
 
 ...
+
+\section scopetool Previewing scope
+
+To help with the development of a scope and to be able to see how will the dash
+render the dynamically-specified categories, a specialized tool to preview
+a scope is provided - the "Unity Scope Tool".
+
+You can install it from the Ubuntu archive using: `sudo apt-get install unity-scope-tool`.
+
+After installation, you can run the scope-tool with a parameter specifying
+path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`). If a binary for your scope can be found in the same
+directory (ie there's `~/dev/myscope/build/libmyscope.so`), the scope-tool will
+display surfacing and search results provided by your scope, and allow you to
+perform searches, invoke previews and actions within previews.
+
+Note that the scope-tool is using the same rendering mechanism as Unity
+itself, and therefore what you see in the scope-tool is what you get in Unity.
+
+The scope-tool supports a few command line arguments:
+\arg by default (without any arguments) it will communicate with all scopes
+installed on the system and available on the smart scopes server.
+\arg When a path to a scope configuration file is provided, only that scope is
+initialized, but you can either pass multiple configuration files or
+the `--include-system-scopes` / `--include-server-scopes` option to allow
+development of aggregating scopes.
+
 */
