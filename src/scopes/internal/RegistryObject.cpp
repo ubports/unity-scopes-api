@@ -47,6 +47,13 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
+    // stop the death oberver
+    death_observer_.quit();
+    if (death_observer_thread_.joinable())
+    {
+        death_observer_thread_.join();
+    }
+
     // kill all scope processes
     for (auto& scope_process : scope_processes_)
     {
@@ -58,23 +65,6 @@ RegistryObject::~RegistryObject()
         {
             cerr << "RegistryObject::~RegistryObject: " << e.what() << endl;
         }
-    }
-
-    // wait for scope processes to terminate
-    for (auto& scope_process : scope_processes_)
-    {
-        if (!scope_process.second.wait_for_state(ScopeProcess::Stopped, 1000))
-        {
-            cerr << "RegistryObject::~RegistryObject: Scope: \"" << scope_process.second.scope_id()
-                 << " took too long to terminate. This process may still be active after shutdown.";
-        }
-    }
-
-    // stop the death oberver
-    death_observer_.quit();
-    if (death_observer_thread_.joinable())
-    {
-        death_observer_thread_.join();
     }
 
     scopes_.clear();
