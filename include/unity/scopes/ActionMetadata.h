@@ -90,7 +90,7 @@ public:
     //@}
 
     /// @cond
-    virtual VariantMap serialize() const;
+    VariantMap serialize() const;
     /// @endcond
 
 private:
