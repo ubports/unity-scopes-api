@@ -489,8 +489,8 @@ TEST_F(TestScopeFixutre, search_results)
 \section scopetool Previewing scope
 
 To help with the development of a scope and to be able to see how will the dash
-render the dynamically-specified categories, a specialized tool to preview
-a scope is provided - the "Unity Scope Tool".
+render the dynamically-specified categories (see unity::scopes::CategoryRenderer),
+a specialized tool to preview a scope is provided - the "Unity Scope Tool".
 
 You can install it from the Ubuntu archive using: `sudo apt-get install unity-scope-tool`.
 
@@ -502,6 +502,10 @@ perform searches, invoke previews and actions within previews.
 
 Note that the scope-tool is using the same rendering mechanism as Unity
 itself, and therefore what you see in the scope-tool is what you get in Unity.
+It can also be used to fine-tune the category definitions, as it allows you
+to manipulate the definitions on the fly, and once you're happy with the result
+you can just copy the JSON definition back into your scope
+(see unity::scopes::CategoryRenderer::CategoryRenderer()).
 
 The scope-tool supports a few command line arguments:
 \arg by default (without any arguments) it will communicate with all scopes
