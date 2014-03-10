@@ -31,23 +31,38 @@ class CategoryRenderer;
 namespace testing
 {
 
-/// @cond
+/**
+\brief Implementation of Category class for testing.
 
+This class inherits from the unity::scopes::Category and provides a public constructor that allows for creating categories with no need
+to register them via a real instance of unity::scopes::SearchReply.
+*/
 class Category : public unity::scopes::Category
 {
 public:
+    /**
+     \brief Creates category instance.
+
+     \param id The identifier of this category
+     \param title The title of this category
+     \param icon The icon of this category
+     \renderer_template The renderer template
+     */
     inline Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template) :
         unity::scopes::Category(id, title, icon, renderer_template)
     {
     }
 
+    /**
+     \brief Deserializes category from a variant data.
+
+     \param variant_map Serialized category
+     */
     inline Category(VariantMap const& variant_map) :
         unity::scopes::Category(variant_map)
     {
     }
 };
-
-/// @endcond
 
 } // namespace testing
 

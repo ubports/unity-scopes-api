@@ -30,15 +30,19 @@ namespace scopes
 namespace testing
 {
 
-/// @cond
+/**
+ \brief A simple class implementation of unity::scopes::Result that provides a default constructor.
 
+ This class makes it possible to create dummy results with no attributes, for testing purposes.
+*/
 class Result : public unity::scopes::Result
 {
 public:
+    /**
+     \brief Default constructor, creates Result instance with no attributes.
+     */
     Result();
 };
-
-/// @endcond
 
 } // namespace testing
 
