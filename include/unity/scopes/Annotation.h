@@ -64,12 +64,17 @@ public:
      */
     explicit Annotation(Type atype);
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     Annotation(Annotation const &other);
     Annotation(Annotation&&);
     Annotation& operator=(Annotation const& other);
     Annotation& operator=(Annotation&&);
+    //@}
 
+    /// @cond
     virtual ~Annotation();
     /// @endcond
 
@@ -111,7 +116,7 @@ public:
 
     /**
      * \brief Returns the type of this annotation.
-     * \return Teh type of the annotation.
+     * \return The type of the annotation.
      */
     Type annotation_type() const;
 

@@ -46,20 +46,23 @@ public:
     /**
     \brief Called once by the scopes run time with the activation response.
 
-    Default implementation does nothing.
-    \param response response to the activation request, returned by scope from ActivationQueryBase::activate().
+    The default implementation does nothing.
+    \param response The response to the activation request, returned by a scope from ActivationQueryBase::activate().
     */
     virtual void activated(ActivationResponse const& response);
 
     /**
-    \brief Called once by the scopes run time after receiving activation response.
+    \brief Called once by the scopes run time after receiving an activation response.
+
+    Default implementation does nothing.
+
+    Calls to finished() are made by an arbitrary thread.
 
     Exceptions thrown from finished() are ignored.
-    Default implementation does nothing.
     \param r Indicates the cause for the call to finished().
     \param error_message If r is set to Reason::Error, error_message contains further details.
            Otherwise, error_message is the empty string.
-     */
+    */
     virtual void finished(Reason r, std::string const& error_message) override;
 
 protected:

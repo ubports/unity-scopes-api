@@ -89,10 +89,10 @@ public:
     virtual void push(Category::SCPtr category);
 
     /**
-     \brief Called once by the scopes to send all the filters and their state.
+    \brief Called once by the scopes to send all the filters and their state.
 
-     The default implementation does nothing.
-     */
+    The default implementation does nothing.
+    */
     virtual void push(Filters const& filters, FilterState const& filter_state);
 
 protected:

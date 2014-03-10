@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_ACTIONMETADATA_H
 #define UNITY_SCOPES_ACTIONMETADATA_H
 
-#include <unity/scopes/QueryMetadata.h>
+#include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
 namespace unity
@@ -38,11 +38,13 @@ class ActionMetadataImpl;
 \see unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
 */
 
-class ActionMetadata : public QueryMetadata
+class ActionMetadata final
 {
 public:
     /// @cond
     UNITY_DEFINES_PTRS(ActionMetadata);
+
+    ~ActionMetadata();
     /// @endcond
 
     /**
@@ -51,6 +53,18 @@ public:
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
     ActionMetadata(std::string const& locale, std::string const& form_factor);
+
+    /**
+    \brief Get the locale string.
+    \return The locale string
+    */
+    std::string locale() const;
+
+    /**
+    \brief Get the form factor string.
+    \return The form factor string
+    */
+    std::string form_factor() const;
 
     /**
      \brief Attach arbitrary data to this ActionMetadata.
@@ -64,18 +78,25 @@ public:
      */
     Variant scope_data() const;
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     ActionMetadata(ActionMetadata const& other);
     ActionMetadata(ActionMetadata&&);
-    ~ActionMetadata();
 
     ActionMetadata& operator=(ActionMetadata const &other);
     ActionMetadata& operator=(ActionMetadata&&);
+    //@}
+
+    /// @cond
+    VariantMap serialize() const;
     /// @endcond
 
 private:
+    std::unique_ptr<internal::ActionMetadataImpl> p;
+
     ActionMetadata(internal::ActionMetadataImpl *impl);
-    internal::ActionMetadataImpl* fwd() const;
     friend class internal::ActionMetadataImpl;
 };
 

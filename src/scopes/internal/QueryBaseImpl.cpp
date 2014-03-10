@@ -95,19 +95,9 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     return qcp;
 }
 
-void QueryBaseImpl::set_metadata(QueryMetadata const& metadata)
+void QueryBaseImpl::set_metadata(SearchMetadata const& metadata)
 {
-    try
-    {
-        auto sm = dynamic_cast<SearchMetadata const&>(metadata);
-        search_metadata_.reset(new SearchMetadata(sm));
-    }
-    catch (std::bad_cast const& e) // this shouldn't really happen, if it does, that's a bug
-    {
-        // TODO: log this
-        std::cerr << "QueryBaseImpl()::set_metadata(): " << e.what() << std::endl;
-        throw;
-    }
+    search_metadata_.reset(new SearchMetadata(metadata));
 }
 
 void QueryBaseImpl::cancel()

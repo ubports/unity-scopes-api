@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/ActionMetadata.h>
+
 #include <unity/scopes/internal/ActionMetadataImpl.h>
 
 namespace unity
@@ -26,18 +27,18 @@ namespace scopes
 {
 
 ActionMetadata::ActionMetadata(std::string const& locale, std::string const& form_factor)
-    : QueryMetadata(new internal::ActionMetadataImpl(locale, form_factor))
+    : p(new internal::ActionMetadataImpl(locale, form_factor))
 {
 }
 
 /// @cond
 ActionMetadata::ActionMetadata(internal::ActionMetadataImpl *impl)
-    : QueryMetadata(impl)
+    : p(impl)
 {
 }
 
 ActionMetadata::ActionMetadata(ActionMetadata const& other)
-    : QueryMetadata(new internal::ActionMetadataImpl(*(other.fwd())))
+    : p(new internal::ActionMetadataImpl(*(other.p.get())))
 {
 }
 
@@ -51,28 +52,39 @@ ActionMetadata& ActionMetadata::operator=(ActionMetadata const &other)
 {
     if (this != &other)
     {
-        p.reset(new internal::ActionMetadataImpl(*(other.fwd())));
+        p.reset(new internal::ActionMetadataImpl(*(other.p.get())));
     }
     return *this;
 }
 
 ActionMetadata& ActionMetadata::operator=(ActionMetadata&&) = default;
 
+
+VariantMap ActionMetadata::serialize() const
+{
+    return p->serialize();
+}
+
 /// @endcond
+
+std::string ActionMetadata::locale() const
+{
+    return p->locale();
+}
+
+std::string ActionMetadata::form_factor() const
+{
+    return p->form_factor();
+}
 
 void ActionMetadata::set_scope_data(Variant const& data)
 {
-    fwd()->set_scope_data(data);
+    p->set_scope_data(data);
 }
 
 Variant ActionMetadata::scope_data() const
 {
-    return fwd()->scope_data();
-}
-
-internal::ActionMetadataImpl* ActionMetadata::fwd() const
-{
-    return dynamic_cast<internal::ActionMetadataImpl*>(p.get());
+    return p->scope_data();
 }
 
 } // namespace scopes

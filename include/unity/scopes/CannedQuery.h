@@ -60,11 +60,17 @@ public:
     */
     CannedQuery(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     CannedQuery(CannedQuery const &other);
     CannedQuery(CannedQuery&&);
     CannedQuery& operator=(CannedQuery const& other);
     CannedQuery& operator=(CannedQuery&&);
+    //@}
+
+    /// @cond
     ~CannedQuery();
     /// @endcond
 
@@ -124,7 +130,7 @@ public:
     \brief Recreates a CannedQuery object from a scope:// URI.
 
     \return a CannedQuery instance
-    \throws InvalidArgumentException of the URI cannot be parsed.
+    \throws InvalidArgumentException if the URI cannot be parsed.
     */
     static CannedQuery from_string();
 

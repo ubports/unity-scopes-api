@@ -93,16 +93,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::PreviewWidget::~PreviewWidget()@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget&&)@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget const&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::QueryMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::~QueryMetadata()@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::operator=(unity::scopes::QueryMetadata&&)@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0replaceme
@@ -455,7 +445,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeImpl::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::ScopeImpl(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::~ScopeImpl()@Base" 0replaceme
- (c++)"unity::scopes::QueryBase::set_metadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryBase::set_metadata(unity::scopes::SearchMetadata const&)@Base" 0replaceme
  (c++)"unity::scopes::QueryBase::cancel()@Base" 0replaceme
  (c++)"unity::scopes::QueryBase::QueryBase()@Base" 0replaceme
  (c++)"unity::scopes::QueryBase::~QueryBase()@Base" 0replaceme
@@ -502,9 +492,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::PreviewWidget::id() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::data() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::form_factor() const@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::locale() const@Base" 0replaceme
- (c++)"unity::scopes::QueryMetadata::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0replaceme
@@ -517,11 +504,15 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::invisible() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::ActionMetadata::scope_data() const@Base" 0replaceme
- (c++)"unity::scopes::ActionMetadata::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::form_factor() const@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::locale() const@Base" 0replaceme
+ (c++)"unity::scopes::ActionMetadata::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::form_factor() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
- (c++)"unity::scopes::SearchMetadata::fwd() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::locale() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::ConfigException::self() const@Base" 0replaceme
  (c++)"unity::scopes::CategoryRenderer::data() const@Base" 0replaceme
@@ -639,9 +630,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::QueryMetadata@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::ActionMetadata@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0replaceme
@@ -679,9 +667,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::QueryMetadata@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0replaceme
@@ -730,9 +715,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"vtable for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"vtable for unity::scopes::QueryMetadata@Base" 0replaceme
- (c++)"vtable for unity::scopes::ActionMetadata@Base" 0replaceme
- (c++)"vtable for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"vtable for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0replaceme
