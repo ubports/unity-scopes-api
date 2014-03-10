@@ -33,7 +33,7 @@ namespace unity
 namespace scopes
 {
 
-class QueryMetadata;
+class SearchMetadata;
 
 namespace internal
 {
@@ -88,7 +88,7 @@ protected:
     /// @endcond
 
 private:
-    void set_metadata(QueryMetadata const& metadata);
+    void set_metadata(SearchMetadata const& metadata);
 
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()

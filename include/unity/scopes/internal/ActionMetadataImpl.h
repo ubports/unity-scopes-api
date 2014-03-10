@@ -19,8 +19,8 @@
 #ifndef UNITY_INTERNAL_ACTIONMETADATAIMPL_H
 #define UNITY_INTERNAL_ACTIONMETADATAIMPL_H
 
-#include <unity/scopes/internal/QueryMetadataImpl.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/internal/QueryMetadataImpl.h>
 
 namespace unity
 {
@@ -36,16 +36,25 @@ class ActionMetadataImpl : public QueryMetadataImpl
 public:
     ActionMetadataImpl(std::string const& locale, std::string const& form_factor);
     ActionMetadataImpl(VariantMap const& var);
-    ~ActionMetadataImpl() = default;
+
+    ActionMetadataImpl(ActionMetadataImpl const&) = default;
+    ActionMetadataImpl(ActionMetadataImpl&&) = default;
+
+    ActionMetadataImpl& operator=(ActionMetadataImpl const&) = default;
+    ActionMetadataImpl& operator=(ActionMetadataImpl&&) = default;
+
+    virtual ~ActionMetadataImpl() = default;
 
     void set_scope_data(Variant const& data);
     Variant scope_data() const;
 
+    virtual VariantMap serialize() const override;
+
     static ActionMetadata create(VariantMap const& var);
 
 protected:
-    std::string metadata_type() const override;
-    void serialize(VariantMap &var) const override;
+    virtual void serialize(VariantMap &var) const override;
+    virtual std::string metadata_type() const override;
 
 private:
     Variant scope_data_;

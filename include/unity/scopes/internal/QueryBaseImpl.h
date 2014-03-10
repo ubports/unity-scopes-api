@@ -33,8 +33,6 @@ namespace unity
 namespace scopes
 {
 
-class SearchMetadata;
-
 namespace internal
 {
 
@@ -64,7 +62,7 @@ public:
                                    SearchListenerBase::SPtr const& reply);
 
     void cancel();
-    void set_metadata(QueryMetadata const& metadata);
+    void set_metadata(SearchMetadata const& metadata);
 
 private:
     SearchMetadata::UPtr search_metadata_;

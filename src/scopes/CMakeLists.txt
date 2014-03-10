@@ -28,7 +28,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp

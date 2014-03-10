@@ -143,9 +143,9 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 }
 
 MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
-                                           SearchMetadata const& hints,
-                                           MWReplyProxy const& reply,
-                                           InvokeInfo const& info)
+                                     SearchMetadata const& hints,
+                                     MWReplyProxy const& reply,
+                                     InvokeInfo const& info)
 {
     return query(reply, info.mw,
             [&q, &hints, this]() -> SearchQueryBase::UPtr {

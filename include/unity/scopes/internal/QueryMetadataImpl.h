@@ -36,14 +36,22 @@ class QueryMetadataImpl
 public:
     QueryMetadataImpl(std::string const& locale, std::string const& form_factor);
     QueryMetadataImpl(VariantMap const& var);
+
+    QueryMetadataImpl(QueryMetadataImpl const&) = default;
+    QueryMetadataImpl(QueryMetadataImpl&&) = default;
+
+    QueryMetadataImpl& operator=(QueryMetadataImpl const&) = default;
+    QueryMetadataImpl& operator=(QueryMetadataImpl&&) = default;
+
     virtual ~QueryMetadataImpl() = default;
+
     std::string locale() const;
     std::string form_factor() const;
-    VariantMap serialize() const;
 
 protected:
-    virtual void serialize(VariantMap &var) const;
-    virtual std::string metadata_type() const;
+    virtual VariantMap serialize() const = 0;
+    virtual void serialize(VariantMap &var) const = 0;
+    virtual std::string metadata_type() const = 0;
 
 private:
     std::string locale_;

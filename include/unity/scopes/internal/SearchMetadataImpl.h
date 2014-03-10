@@ -37,7 +37,14 @@ public:
     SearchMetadataImpl(std::string const& locale, std::string const& form_factor);
     SearchMetadataImpl(int cardinality, std::string const& locale, std::string const& form_factor);
     SearchMetadataImpl(VariantMap const& var);
-    ~SearchMetadataImpl() = default;
+
+    SearchMetadataImpl(SearchMetadataImpl const&) = default;
+    SearchMetadataImpl(SearchMetadataImpl&&) = default;
+
+    SearchMetadataImpl& operator=(SearchMetadataImpl const&) = default;
+    SearchMetadataImpl& operator=(SearchMetadataImpl&&) = default;
+
+    virtual ~SearchMetadataImpl() = default;
 
     void set_cardinality(int cardinality);
     int cardinality() const;
@@ -48,11 +55,13 @@ public:
     Variant& hint(std::string const& key);
     Variant const& hint(std::string const& key) const;
 
+    virtual VariantMap serialize() const override;
+
     static SearchMetadata create(VariantMap const& var);
 
 protected:
-    std::string metadata_type() const override;
-    void serialize(VariantMap &var) const override;
+    virtual std::string metadata_type() const override;
+    virtual void serialize(VariantMap &var) const override;
 
     void check_cardinality(std::string const& func_name, int cardinality);
 

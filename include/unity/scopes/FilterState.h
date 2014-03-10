@@ -38,35 +38,47 @@ class FilterBaseImpl;
 }
 
 /**
-  \brief Captures state of multiple filters.
-  State can be examined by passing an instance of FilterState to
-  appropriate methods of filters (FilterBase implementations).
-  */
+\brief Captures state of multiple filters.
+
+State can be examined by passing an instance of FilterState to
+appropriate methods of filters (FilterBase implementations).
+*/
+
 class FilterState final
 {
 public:
-/// @cond
+    /// @cond
     UNITY_DEFINES_PTRS(FilterState);
 
+    ~FilterState();
+    VariantMap serialize() const;
+    /// @endcond
+
+    /**
+    \brief Constructs a an empty filter state instance.
+    */
     FilterState();
+
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     FilterState(FilterState const& other);
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
-    ~FilterState();
-    VariantMap serialize() const;
-/// @endcond
+    //@}
 
     /**
-     \brief Check if state for the given filter has been stored.
-     \return True if state for a filter with the given ID is present; false otherwise.
-     */
+    \brief Check if state for the given filter has been stored.
+    \return True if state for a filter with the given ID is present; false otherwise.
+    */
     bool has_filter(std::string const& id) const;
 
     /**
-      \brief Removes the state for a specific filter.
-      \param id The identity of the filter to remove.
-     */
+    \brief Removes the state for a specific filter.
+    \param id The identity of the filter to remove.
+    */
     void remove(std::string const& id);
 
 private:

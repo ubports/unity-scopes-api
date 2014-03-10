@@ -58,14 +58,17 @@ public:
      */
     PreviewWidget(std::string const& definition);
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     PreviewWidget(PreviewWidget const& other);
     PreviewWidget(PreviewWidget&& other);
     virtual ~PreviewWidget();
 
     PreviewWidget& operator=(PreviewWidget const& other);
     PreviewWidget& operator=(PreviewWidget&& other);
-    /// @endcond
+    //@}
 
     /**
      \brief Adds an attribute definition and its value.

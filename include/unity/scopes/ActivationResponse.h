@@ -68,13 +68,16 @@ public:
      */
     ActivationResponse(CannedQuery const& query);
 
-    /// @cond
-    ~ActivationResponse();
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     ActivationResponse(ActivationResponse const& other);
     ActivationResponse(ActivationResponse&& other);
+
     ActivationResponse& operator=(ActivationResponse const& other);
     ActivationResponse& operator=(ActivationResponse&& other);
-    /// @endcond
+    //@}
 
     /**
     \brief Get activation status.
@@ -106,6 +109,8 @@ public:
 
     /// @cond
     VariantMap serialize() const;
+
+    ~ActivationResponse();
     /// @endcond
 
 private:

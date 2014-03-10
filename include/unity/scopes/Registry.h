@@ -43,6 +43,7 @@ typedef std::map<std::string, ScopeMetadata> MetadataMap;
 
 /**
 \brief White pages service for available scopes.
+
 You can obtain a proxy to the registry by calling Runtime::registry().
 */
 
