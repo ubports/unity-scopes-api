@@ -69,7 +69,7 @@ public:
 
     /**
      \brief Get icon of this Category
-     \return Teh category icon.
+     \return The category icon.
     */
     std::string icon() const;
 

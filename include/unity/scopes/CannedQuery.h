@@ -130,7 +130,7 @@ public:
     \brief Recreates a CannedQuery object from a scope:// URI.
 
     \return a CannedQuery instance
-    \throws InvalidArgumentException of the URI cannot be parsed.
+    \throws InvalidArgumentException if the URI cannot be parsed.
     */
     static CannedQuery from_string();
 

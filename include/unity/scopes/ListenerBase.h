@@ -32,16 +32,12 @@ namespace scopes
 
 //TODO: fix doc
 /**
-\brief Abstract base class to receive the results of a query.
+\brief Abstract base class to be notified of query completion.
 
-The scope application code must instantiate a class derived from ListenerBase and pass that instance as
-a parameter to the Scope::search() method. Once a query is sent, the scopes run time repeatedly
-invokes the push() method, once for each result returned by the query. Once a query is complete,
-the run time calls the finished() method once, to inform the caller that the query is complete.
+Once a query is complete, the run time calls the finished() method once,
+to inform the caller that the query is complete.
 
-Calls to push() and finished() are made by an arbitrary thread.
 */
-// TODO: add doc for thread pool and concurrent calls to push()
 
 class ListenerBase
 {
@@ -63,6 +59,8 @@ public:
 
     /**
     \brief Called once by the scopes run time after the final result for a query() was sent.
+
+    Calls to finished() are made by an arbitrary thread.
 
     Exceptions thrown from finished() are ignored.
     \param r Indicates the cause for the call to finished().

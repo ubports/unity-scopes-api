@@ -70,7 +70,7 @@ public:
     cancels a query.
 
     Your implementation of this method should ensure that the scope stops
-    processing the current query as soon as possible. Any calls to ReplyBase::push()
+    processing the current query as soon as possible. Any calls to a `push()` method
     once a query is cancelled are ignored, so continuing to push after cancellation
     only wastes CPU cycles.
     */

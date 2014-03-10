@@ -26,7 +26,7 @@ namespace unity
 namespace scopes
 {
 
-MiddlewareException::MiddlewareException(string const& reason) :
+MiddlewareException::MiddlewareException(std::string const& reason) :
     Exception("unity::scopes::MiddlewareException", reason)
 {
 }
@@ -47,7 +47,7 @@ exception_ptr MiddlewareException::self() const
     return make_exception_ptr(*this);
 }
 
-ObjectNotExistException::ObjectNotExistException(string const& reason, string const& id) :
+ObjectNotExistException::ObjectNotExistException(std::string const& reason, std::string const& id) :
     Exception("unity::scopes::ObjectNotExistException",
               reason + (reason.empty() ? "" : " ") + "(id = " + id + ")"),
     MiddlewareException("unity::scopes::ObjectNotExistException" +
@@ -77,7 +77,7 @@ string ObjectNotExistException::id() const
     return id_;
 }
 
-TimeoutException::TimeoutException(string const& reason) :
+TimeoutException::TimeoutException(std::string const& reason) :
     Exception("unity::scopes::TimeoutException", reason),
     MiddlewareException(reason)
 {
@@ -99,7 +99,7 @@ exception_ptr TimeoutException::self() const
     return make_exception_ptr(*this);
 }
 
-ConfigException::ConfigException(string const& reason) :
+ConfigException::ConfigException(std::string const& reason) :
     Exception("unity::scopes::ConfigException", reason)
 {
 }
@@ -122,7 +122,7 @@ self() const
     return make_exception_ptr(*this);
 }
 
-NotFoundException::NotFoundException(string const& reason, string const& name) :
+NotFoundException::NotFoundException(std::string const& reason, std::string const& name) :
     Exception("unity::scopes::NotFoundException",
               reason + (reason.empty() ? "" : " ") + "(name = " + name + ")"),
     name_(name)

@@ -35,9 +35,9 @@ namespace scopes
 {
 
 /**
-\brief Abstract base class for a scope to respond to previews.
+\brief Abstract base class for a scope to respond to preview requests.
 
-An instance of this class must be return from Scope::preview().
+An instance of this class must be returned from Scope::preview().
 */
 
 class PreviewListenerBase : public ListenerBase
@@ -51,7 +51,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called by the scopes runtime for each columns layout definition returned by preview().
+    \brief Called by the scopes runtime for each column layout definition returned by preview().
     */
     virtual void push(ColumnLayoutList const& layouts) = 0;
 

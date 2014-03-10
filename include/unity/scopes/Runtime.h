@@ -40,7 +40,7 @@ class RuntimeImpl;
 }
 
 /**
-\brief The main object to access the scopes run time.
+\brief The main object for query originators to access the scopes run time.
 
 All interactions with the scopes run time require a Runtime object to be instantiated first. The Runtime instance
 controls the overall life cycle; once a Runtime instance goes out of scope, the application must not make further
@@ -48,6 +48,8 @@ calls on any instance obtained via the destroyed Runtime.
 
 The application must instantiate a Runtime object only after `main()` is entered, and it must destroy the instance
 before leaving `main()`; failure to do so results in undefined behavior.
+
+Note that scope implementations do not need to instantiate a Runtime instance.
 */
 
 class Runtime

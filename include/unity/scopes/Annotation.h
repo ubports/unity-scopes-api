@@ -116,7 +116,7 @@ public:
 
     /**
      * \brief Returns the type of this annotation.
-     * \return Teh type of the annotation.
+     * \return The type of the annotation.
      */
     Type annotation_type() const;
 
