@@ -37,8 +37,8 @@
 
 namespace
 {
-std::chrono::milliseconds mean{10};
-std::chrono::milliseconds variance{1};
+std::chrono::milliseconds mean{100};
+std::chrono::milliseconds variance{20};
 }
 
 namespace unity
