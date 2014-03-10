@@ -62,7 +62,8 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c card-size Size of the result cards; possible values: \c "small", \c "medium" (default), \c "large"; when using <tt>"category-layout": "vertical-journal"</tt> any integer between 12 and 38
 \arg \c overlay Overlay text data on top of the art; boolean, default false
 \arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: 1 or 2 (only affects grid and journal)
-\arg \c card-background Background color for the cards; string; URI in the format `color:///#rrggbb` or `color:///color_name` or `gradient:///#rrggbb/#rrggbb` or an image URI (will be stretched)
+\arg \c card-background Background color for the cards; string; URI in the format \verbatim color:///#rrggbb \endverbatim or \verbatim color:///color_name
+\endverbatim or \verbatim gradient:///#rrggbb/#rrggbb \endverbatim or an image URI (will be stretched)
 
 \subsection components1 components keys
 
