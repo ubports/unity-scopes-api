@@ -8,7 +8,37 @@
 
 \page overview What are scopes
 
-...
+\section intro Introduction
+
+One of Unity’s core features on the desktop is the Dash. The Dash allows users to search for and discover virtually anything
+from local files and applications, to web content and other online data. The Dash achieves this by interfacing with one or more
+search plug-ins called “scopes” (e.g. “Apps”, “Music”, “Videos”, or “Amazon”, “Wikipedia”, “Youtube”).
+
+On the phone and tablet, scopes make up the central user interface, as they provide everything a user needs from an operating
+system. Scopes enable users to locate and launch applications, access local files, play music and videos, search the web,
+manage their favourite social network, keep up with the latest news, and much more.
+
+Each scope is a dedicated search engine for the category / data source it represents. The data source could be a local database,
+a web service, or even an aggregation of other scopes (e.g. the “Music” scope aggregates “Local Music” and “Online Music” scopes
+). A scope is primarily responsible for performing the actual search logic and returning the best possible results for each
+query it receives.
+
+This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
+
+\section LvsR Local vs remote scopes
+
+Local scopes are scopes that are located and run on the user’s device, while remote scopes (or “Smart Scopes”) are scopes that
+are located and run remotely on the Ubuntu Smart Scopes Server (or “SSS”). (Note: Although local scopes execute as local
+processes, they may still query online services in order to retrieve search results). A local scope usually requires local data,
+and therefore, can only be run locally, while a remote scope can effectively be run both locally and remotely.
+
+When deciding on whether to write a local or remote scope, keep the user’s privacy in mind. For security reasons, a scope should
+not access the user’s personal data unless absolutely necessary (i.e. The scope requires account information or local data to
+perform searches). It is only in these situations that a scope should be written to run locally. <b>By default, a scope should
+be written with the intension of running remotely on the Smart Scopes Server.</b>
+
+(For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
+the SSS REST API see: <link_not_yet_available>)
 
 \page develop Developing scopes
 
