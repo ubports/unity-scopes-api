@@ -1,14 +1,9 @@
 /*!
+\mainpage Scopes API
 
-\page tutorial Tutorial
+\section overview What are scopes
 
-\subpage overview
-
-\subpage develop
-
-\page overview What are scopes
-
-\section intro Introduction
+\subsection intro Introduction
 
 One of Unity’s core features on the desktop is the Dash. The Dash allows users to search for and discover virtually anything
 from local files and applications, to web content and other online data. The Dash achieves this by interfacing with one or more
@@ -25,7 +20,7 @@ query it receives.
 
 This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
 
-\section LvsR Local vs remote scopes
+\subsection LvsR Local vs remote scopes
 
 Local scopes are scopes that are located and run on the user’s device, while remote scopes (or “Smart Scopes”) are scopes that
 are located and run remotely on the Ubuntu Smart Scopes Server (or “SSS”). (Note: Although local scopes execute as local
@@ -40,14 +35,14 @@ be written with the intension of running remotely on the Smart Scopes Server.</b
 (For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
 the SSS REST API see: <link_not_yet_available>)
 
-\page develop Developing scopes
+\section develop Developing scopes
 
-\section starting Getting started
+\subsection starting Getting started
 
 ...
 
 
-\section impl Implementing scope
+\subsection impl Implementing scope
 
 This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++.
 For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
@@ -63,12 +58,12 @@ A typical scope implementation needs to implement interfaces of the following cl
 
 The following sections show them in more detail.
 
-\subsection simplescope A simple scope which doesn't query other scopes.
+\subsubsection simplescope Case 1: A simple scope which doesn't query other scopes.
 
 This is the typical case: a scope that connects to a remote or local backend, database etc. and provides results in response to search queries coming from a
 client (i.e. Unity Dash or another scope).
 
-\subsubsection scopebase Create a scope class that implements ScopeBase inteface.
+\paragraph scopebase Create a scope class that implements ScopeBase inteface.
 
 There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
 \link unity::scopes::ScopeBase::start() start\endlink and unity::scopes::ScopeBase::search()  and
@@ -99,7 +94,7 @@ The \link unity::scopes::ScopeBase::stop() stop\endlink method should release an
 documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
-\subsubsection handlingsearch Handling search
+\paragraph handlingsearch Handling search
 
 The unity::scopes::ScopeBase::search() method of scope implementation is the entry point of every search - it receives
 search queries from the Dash or other scopes. This method must return an instance of an object that implements
@@ -166,7 +161,7 @@ void MyQuery::run(SearchReplyProxy const& reply)
 }
 \endcode
 
-\subsubsection handlingpreview Handling previews
+\paragraph handlingpreview Handling previews
 
 Scopes are responsible for handling preview requests for results they created; this needs to be implemented by overriding unity::scopes::ScopeBase::preview()
 method:
@@ -280,7 +275,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 }
 \endcode
 
-\subsubsection handlingactivation Handling result activation
+\paragraph handlingactivation Handling result activation
 
 In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
 known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
@@ -298,7 +293,7 @@ and also call Result::set_intercept_activation() for all results that should tri
 unity::scopes::ScopeBase::activate() should follow the same guidelines as unity::scopes::ScopeBase::perform_action(), the only difference with result activation
 being the lack of widget or action identifiers, as those are specific to preview widgets.
 
-\subsubsection export Exporting the scope
+\paragraph export Exporting the scope
 
 The scope needs to be compiled into a .so shared library and to be succesfully
 loaded at runtime it must provide two C functions to create and destroy it - a
@@ -318,13 +313,13 @@ extern "C" {
 }
 \endcode
 
-\subsection aggscope A simple aggregator scope which combines results from other scopes.
+\subsubsection aggscope Case 2: A simple aggregator scope.
 
 Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
 implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
 \link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
 
-\subsubsection subquery Query another scopes via SearchQueryBase::subsearch()
+\paragraph subquery Query another scopes via SearchQueryBase::subsearch()
 
 To send search query to another scope, use one of the `subsearch()` overloads of unity::scopes::SearchQueryBase inside your implementation of unity::scopes::SearchQueryBase.
 This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
@@ -386,7 +381,7 @@ void MyReceiver::push(CategorisedResult result)
 A more sophisticated aggregator scope can rearrange results it receives into a different set of categories, alter or enrich the results before pushing them
 upstream etc.
 
-\subsubsection aggactiv Activation and previews of results processed by aggregator scopes
+\paragraph aggactiv Activation and previews of results processed by aggregator scopes
 
 If an aggregator scope just forwards results it receives from other scopes, possibly only changing their category assignment, then there is nothing
 to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
@@ -486,7 +481,7 @@ TEST_F(TestScopeFixutre, search_results)
 
 ...
 
-\section scopetool Previewing scope
+\subsection scopetool Previewing scope
 
 To help with the development of a scope and to be able to see how will the dash
 render the dynamically-specified categories (see unity::scopes::CategoryRenderer),
