@@ -19,8 +19,8 @@ system. Scopes enable users to locate and launch applications, access local file
 manage their favourite social network, keep up with the latest news, and much more.
 
 Each scope is a dedicated search engine for the category / data source it represents. The data source could be a local database,
-a web service, or even an aggregation of other scopes (e.g. the “Music” scope aggregates “Local Music” and “Online Music” scopes
-). A scope is primarily responsible for performing the actual search logic and returning the best possible results for each
+a web service, or even an aggregation of other scopes (e.g. the “Music” scope aggregates “Local Music” and “Online Music”
+scopes). A scope is primarily responsible for performing the actual search logic and returning the best possible results for each
 query it receives.
 
 This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
