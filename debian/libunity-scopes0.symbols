@@ -630,7 +630,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::ActionMetadata@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0replaceme
@@ -668,7 +667,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0replaceme
@@ -717,7 +715,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"vtable for unity::scopes::ListenerBase@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewReply@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewWidget@Base" 0replaceme
- (c++)"vtable for unity::scopes::ActionMetadata@Base" 0replaceme
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0replaceme
  (c++)"vtable for unity::scopes::ConfigException@Base" 0replaceme
  (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0replaceme
