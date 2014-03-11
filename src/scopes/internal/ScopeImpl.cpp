@@ -21,6 +21,7 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/internal/ActivationReplyObject.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/PreviewReplyObject.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
@@ -95,31 +96,45 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
         throw unity::InvalidArgumentException("Scope::search(): invalid SearchListenerBase (nullptr)");
     }
 
-    QueryCtrlProxy ctrl;
     ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality()));
-    try
-    {
-        MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
+    MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the search() method across the bus. This is a
-        // synchronous twoway interaction with the scope, so it can return
-        // the QueryCtrlProxy. This may block for some time, for example, if
-        // the scope is not running and needs to be activated by the registry first.
-        ctrl = fwd()->search(query, metadata.serialize(), rp);
-        assert(ctrl);
-    }
-    catch (std::exception const& e)
+    // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
+
+    auto send_create_query = [this, query, metadata, rp, ro, ctrl]()
     {
         try
         {
-            ro->finished(ListenerBase::Error, e.what());
+            // Forward the the search() method across the bus. This is a
+            // synchronous twoway interaction with the scope, so it can return
+            // the QueryCtrlProxy. This may block for some time, for example, if
+            // the scope is not running and needs to be activated by the registry first.
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->search(query, metadata.serialize(), rp));
+            assert(real_ctrl);
+
+            // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
+            // with the one that was returned.
+            auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
+            assert(new_proxy);
+            ctrl->set_proxy(new_proxy);
         }
-        catch (...)
+        catch (std::exception const& e)
         {
+            try
+            {
+                ro->finished(ListenerBase::Error, e.what());
+            }
+            catch (...)
+            {
+            }
+            throw;
         }
-        throw;
-    }
-    return ctrl;
+        return ctrl;
+    };
+
+    auto future = runtime_->pool()->submit(send_create_query);
+    return future.get();
 }
 
 QueryCtrlProxy ScopeImpl::activate(Result const& result,
@@ -251,7 +266,7 @@ ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime,
     return make_shared<ScopeImpl>(mw_proxy, runtime, scope_id);
 }
 
-MWScopeProxy ScopeImpl::fwd() const
+MWScopeProxy ScopeImpl::fwd()
 {
     return dynamic_pointer_cast<MWScope>(proxy());
 }

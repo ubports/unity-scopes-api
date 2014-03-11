@@ -122,6 +122,7 @@ void RuntimeImpl::destroy()
         // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
         // to terminate. Otherwise, it's possible that we exit while threads are still running
         // with undefined behavior.
+        pool_ = nullptr;
         registry_ = nullptr;
         middleware_->stop();
         middleware_ = nullptr;
@@ -186,6 +187,33 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
         reply_reaper_ = Reaper::create(10, 45); // TODO: configurable timeouts
     }
     return reply_reaper_;
+}
+
+ThreadPool::SPtr RuntimeImpl::pool() const
+{
+    // We lazily create the pool the first time we are asked for it, which happens when the first query is created.
+    lock_guard<mutex> lock(mutex_);
+    if (!pool_)
+    {
+        pool_ = make_shared<ThreadPool>(5); // TODO: configurable pool size
+    }
+    return pool_;
+}
+
+ThreadSafeQueue<future<QueryCtrl>>::SPtr RuntimeImpl::future_queue(thread waiter_thread) const
+{
+    // We lazily create the future queue the first time we are asked for it,
+    // which happens when the first query is created. The passed thread
+    // waits for futures to arrive on the queue. Each future returns the
+    // QueryCtrl that is returned by a create_{query,preview,activation}
+    // call.
+    lock_guard<mutex> lock(mutex_);
+    if (!future_queue_)
+    {
+        future_queue_ = make_shared<ThreadSafeQueue<future<QueryCtrl>>>();
+        waiter_thread_ = move(waiter_thread);
+    }
+    return future_queue_;
 }
 
 void RuntimeImpl::run_scope(ScopeBase *const scope_base)

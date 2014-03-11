@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/Reaper.h>
+#include <unity/scopes/internal/ThreadPool.h>
 #include <unity/scopes/Runtime.h>
 
 #include <atomic>
@@ -52,6 +53,8 @@ public:
     std::string registry_endpointdir() const;
     std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
+    ThreadPool::SPtr pool() const;
+    ThreadSafeQueue<std::future<QueryCtrl>>::SPtr future_queue(std::thread waiter_thread) const;
     void run_scope(ScopeBase *const scope_base);
 
     ObjectProxy string_to_proxy(std::string const& s) const;
@@ -72,7 +75,10 @@ private:
     mutable std::string registry_endpointdir_;
     mutable std::string registry_endpoint_;
     mutable Reaper::SPtr reply_reaper_;
-    mutable std::mutex mutex_;                          // For lazy initialization of reply_reaper_
+    mutable ThreadPool::SPtr pool_;
+    mutable ThreadSafeQueue<std::future<QueryCtrl>>::SPtr future_queue_;
+    mutable std::thread waiter_thread_;
+    mutable std::mutex mutex_;  // For lazy initialization of reply_reaper_, pool_, and queue_
 };
 
 } // namespace internal

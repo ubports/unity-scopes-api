@@ -48,7 +48,7 @@ public:
     ScopeProxy locate(std::string const& scope_id);
 
 private:
-    MWRegistryProxy fwd() const;
+    MWRegistryProxy fwd();
 };
 
 } // namespace internal

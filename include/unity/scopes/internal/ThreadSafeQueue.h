@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_THREADSAFEQUEUE_H
 #define UNITY_SCOPES_INTERNAL_THREADSAFEQUEUE_H
 
+#include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
 #include <atomic>
@@ -45,6 +46,8 @@ class ThreadSafeQueue final
 {
 public:
     NONCOPYABLE(ThreadSafeQueue);
+    UNITY_DEFINES_PTRS(ThreadSafeQueue);
+
     typedef T value_type;
 
     ThreadSafeQueue();
