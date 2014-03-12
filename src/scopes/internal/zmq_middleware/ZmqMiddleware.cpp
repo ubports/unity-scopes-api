@@ -112,7 +112,7 @@ void ZmqMiddleware::start()
             // TODO: get pool size from config
             {
                 lock_guard<mutex> lock(data_mutex_);
-                invokers_.reset(new ThreadPool(1));
+                invokers_.reset(new ThreadPool(2));     // TODO: dubious. How many threads to we really need?
             }
             state_ = Started;
             state_changed_.notify_all();

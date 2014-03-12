@@ -45,9 +45,12 @@ public:
     }
     virtual void run(SearchReplyProxy const& reply) override
     {
+cerr << "TestScope: running query" << endl;
         Department dep("news", query_, "News");
         dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
+cerr << "TestScope: register" << endl;
         reply->register_departments({dep}, "news");
+cerr << "TestScope: register cat" << endl;
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
@@ -55,12 +58,15 @@ public:
         res.set_title("title");
         res.set_art("art");
         res.set_dnd_uri("dnd_uri");
+cerr << "TestScope: push" << endl;
         reply->push(res);
 
         CannedQuery query("scope-A", "foo", "dep1");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
+cerr << "TestScope: reg ann" << endl;
         reply->register_annotation(annotation);
+cerr << "TestScope: query done" << endl;
     }
 
 private:

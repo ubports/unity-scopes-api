@@ -46,6 +46,41 @@ namespace internal
 namespace zmq_middleware
 {
 
+namespace pool_private
+{
+
+struct SocketData
+{
+    zmqpp::socket socket;
+    RequestMode mode;
+};
+
+typedef std::unordered_multimap<std::string, pool_private::SocketData> CPool;
+
+}
+
+class ConnectionPool;
+
+class Socket final
+{
+public:
+    Socket(Socket&&) = default;
+    Socket& operator=(Socket&&) = default;
+    ~Socket();
+
+    zmqpp::socket& zmqpp_socket();
+    void remove();
+
+private:
+    Socket(ConnectionPool* pool, pool_private::CPool::value_type pool_entry);  // Only instantiated by ConnectionPool
+
+    ConnectionPool* pool_;                        // Owning pool pointer
+    pool_private::CPool::value_type pool_entry_;
+    bool removed_;
+
+    friend class ConnectionPool;
+};
+
 class ConnectionPool final
 {
 public:
@@ -56,18 +91,23 @@ public:
     void remove(std::string const& endpoint);
     void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m);
 
-private:
-    struct Connection
-    {
-        zmqpp::socket socket;
-        RequestMode mode;
-    };
+    // Removes a twoway socket from the pool and returns it, creating the
+    // connection if none can be found. This gives exclusive use of the socket
+    // to an outgoing twoway request for the duration. The Socket destructor
+    // puts the entry back into the pool by calling put().
+    Socket take(std::string const& endpoint, int64_t timeout);
 
-    typedef std::unordered_map<std::string, Connection> CPool;
+private:
+    // Returns the passed entry back to the pool.
+    void put(pool_private::CPool::value_type entry);
+
+    pool_private::CPool::value_type create_connection(std::string const& endpoint, RequestMode m, int64_t timeout);
 
     zmqpp::context& context_;
-    CPool pool_;
+    pool_private::CPool pool_;
     std::mutex mutex_;
+
+    friend class Socket;
 };
 
 } // namespace zmq_middleware

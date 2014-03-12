@@ -72,7 +72,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
         if (it != data.end())
         {
             Filters filters;
-            for (auto const& f: filters_var)
+            for (auto const& f : filters_var)
             {
                 filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
             }
@@ -95,9 +95,9 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        auto const deparr = it->second.get_array();
+        auto const dept = it->second.get_array();
         DepartmentList departments;
-        for (auto const& dep: deparr)
+        for (auto const& dep : dept)
         {
             departments.push_back(DepartmentImpl::create(dep.get_dict()));
         }

@@ -27,6 +27,8 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
 
+#include <iostream> // TODO: remove this
+
 using namespace std;
 
 namespace unity
@@ -90,10 +92,16 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setCategory(reply_proxy->category().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+cerr << "queuing request" << endl;
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
 
-    auto receiver = future.get();
+cerr << "getting socket" << endl;
+    auto socket = future.get();
+cerr << "making receiver" << endl;
+    ZmqReceiver receiver(socket.zmqpp_socket());
+cerr << "calling receive" << endl;
     auto segments = receiver.receive();
+cerr << "receive OK" << endl;
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
@@ -122,9 +130,10 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
 
-    auto receiver = future.get();
+    auto socket = future.get();
+    ZmqReceiver receiver(socket.zmqpp_socket());
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
@@ -157,10 +166,11 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
     future.wait();
 
-    auto receiver = future.get();
+    auto socket = future.get();
+    ZmqReceiver receiver(socket.zmqpp_socket());
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
@@ -190,9 +200,10 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
 
-    auto receiver = future.get();
+    auto socket = future.get();
+    ZmqReceiver receiver(socket.zmqpp_socket());
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();

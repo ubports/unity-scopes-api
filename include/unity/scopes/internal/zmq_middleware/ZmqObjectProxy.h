@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
@@ -71,8 +72,11 @@ public:
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params, int64_t timeout);
+
+    void invoke_oneway(capnp::MessageBuilder& out_params);
+
+    Socket invoke_twoway(capnp::MessageBuilder& out_params);
+    Socket invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout);
 
 private:
     std::string endpoint_;

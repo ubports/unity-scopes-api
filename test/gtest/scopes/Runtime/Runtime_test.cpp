@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -74,6 +74,7 @@ public:
         EXPECT_EQ("US", subdeps.back().label());
         EXPECT_EQ("test", subdeps.back().query().query_string());
         dep_count_++;
+cerr << "Push dept arrived, testing OK" << endl;
     }
 
     virtual void push(CategorisedResult result) override
@@ -84,6 +85,7 @@ public:
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
         last_result_ = std::make_shared<Result>(result);
+cerr << "Push result arrived, testing OK" << endl;
     }
     virtual void push(Annotation annotation) override
     {
@@ -94,6 +96,7 @@ public:
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
+cerr << "Push ann arrived, testing OK" << endl;
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
@@ -105,12 +108,15 @@ public:
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
+cerr << "finished arrived, notifying" << endl;
         cond_.notify_one();
     }
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
+cerr << "wait_until" << endl;
         cond_.wait(lock, [this] { return this->query_complete_; });
+cerr << "wait_until returned" << endl;
     }
     std::shared_ptr<Result> last_result()
     {
@@ -247,7 +253,7 @@ TEST(Runtime, consecutive_search)
 
     std::vector<std::shared_ptr<Receiver>> replies;
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
         scope->search("test", SearchMetadata("en", "phone"), replies.back());
@@ -255,9 +261,9 @@ TEST(Runtime, consecutive_search)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 2; ++i)
     {
-    std::cerr << "wait" << std::endl;
+std::cerr << "wait" << std::endl;
         replies[i]->wait_until_finished();
     }
 }
