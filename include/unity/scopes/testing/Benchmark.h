@@ -40,6 +40,7 @@ class ScopeBase;
 
 namespace testing
 {
+
 /**
  * \brief The Benchmark class defines an interface to provide scope authors with runtime benchmarking capabilities
  * to be used in their own testing.
@@ -96,8 +97,8 @@ public:
              * \return true iff this timing sample is significantly faster than the reference sample.
              */
             bool is_significantly_faster_than_reference(
-                    const Seconds& mean,
-                    const Seconds& std_dev,
+                    double mean,
+                    double std_dev,
                     double alpha = 0.05) const;
 
             /**
@@ -120,8 +121,8 @@ public:
              * \return true iff this timing sample is significantly slower than the reference.
              */
             bool is_significantly_slower_than_reference(
-                    const Seconds& mean,
-                    const Seconds& std_dev,
+                    double mean,
+                    double std_dev,
                     double alpha = 0.05) const;
 
             /** Minimum execution time for the benchmarked operation. */

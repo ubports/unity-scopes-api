@@ -237,12 +237,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
     auto reference = reference_preview_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
@@ -262,12 +262,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
     auto reference = reference_activation_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
@@ -289,12 +289,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
     auto reference = reference_action_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
@@ -316,12 +316,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
     auto reference = reference_query_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
@@ -341,12 +341,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
     auto reference = reference_preview_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
@@ -373,12 +373,12 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     auto reference = reference_preview_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
@@ -400,10 +400,10 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
     auto reference = reference_preview_performance();
 
     EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 
     EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
-                     reference.first,
-                     reference.second));
+                     reference.first.count(),
+                     reference.second.count()));
 }
