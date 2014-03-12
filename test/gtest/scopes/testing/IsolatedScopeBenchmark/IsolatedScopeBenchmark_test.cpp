@@ -74,40 +74,68 @@ static const std::string scope_query_string{"does.not.exist.scope.query_string"}
 static const std::string default_locale{"C"};
 static const std::string default_form_factor{"SuperDuperPhablet"};
 
-unity::scopes::testing::Benchmark::Result reference_query_performance()
+std::pair<
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds,
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds
+> reference_query_performance()
 {
-    unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = mean;
-    result.timing.std_dev = variance;
-
-    return result;
+    return std::make_pair(
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    mean
+                },
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    std::sqrt(variance.count()) // We have to consider std. dev. for the statistical test.
+                });
 }
 
-unity::scopes::testing::Benchmark::Result reference_preview_performance()
+std::pair<
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds,
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds
+> reference_preview_performance()
 {
-    unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = mean;
-    result.timing.std_dev = variance;
-
-    return result;
+    return std::make_pair(
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    mean
+                },
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    std::sqrt(variance.count()) // We have to consider std. dev. for the statistical test.
+                });
 }
 
-unity::scopes::testing::Benchmark::Result reference_activation_performance()
+std::pair<
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds,
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds
+> reference_activation_performance()
 {
-    unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = mean;
-    result.timing.std_dev = variance;
-
-    return result;
+    return std::make_pair(
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    mean
+                },
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    std::sqrt(variance.count()) // We have to consider std. dev. for the statistical test.
+                });
 }
 
-unity::scopes::testing::Benchmark::Result reference_action_performance()
+std::pair<
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds,
+    unity::scopes::testing::Benchmark::Result::Timing::Seconds
+> reference_action_performance()
 {
-    unity::scopes::testing::Benchmark::Result result{};
-    result.timing.mean = mean;
-    result.timing.std_dev = variance;
-
-    return result;
+    return std::make_pair(
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    mean
+                },
+                unity::scopes::testing::Benchmark::Result::Timing::Seconds
+                {
+                    std::sqrt(variance.count()) // We have to consider std. dev. for the statistical test.
+                });
 }
 
 }
@@ -188,28 +216,8 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
     std::ofstream out{"ref.xml"};
     result.save_to_xml(out);
 
-    // We first check that our normality assumption of the data is valid
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              unity::scopes::testing::AndersonDarlingTest()
-              .for_normality(result.timing)
-              .data_fits_normal_distribution(
-                  unity::scopes::testing::Confidence::zero_point_five_percent));
-
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_result.timing,
-                result.timing);
-
-    // We work under the hypothesis that changes to the code did not result
-    // in a change in performance characteristics.
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    // And we certainly don't want to get worse
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    // If changes significantly improved the performance, we fail the test to
-    // make sure that we adjust the performance baselines.
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(reference_result.timing));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(reference_result.timing));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works)
@@ -226,17 +234,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_oop_works
     };
 
     auto result = benchmark.for_preview(scope, config);
+    auto reference = reference_preview_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_preview_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_works)
@@ -253,17 +259,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_oop_wo
     };
 
     auto result = benchmark.for_activation(scope, config);
+    auto reference = reference_activation_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_activation_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
@@ -282,17 +286,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_oop_works)
     };
 
     auto result = benchmark.for_action(scope, config);
+    auto reference = reference_action_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_action_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
@@ -311,17 +313,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
     };
 
     auto result = benchmark.for_query(scope, config);
+    auto reference = reference_query_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_query_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
@@ -338,17 +338,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_preview_performance_works)
     };
 
     auto result = benchmark.for_preview(scope, config);
+    auto reference = reference_preview_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_preview_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
@@ -372,16 +370,15 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_activation_performance_works)
     for (const auto& bin : result.timing.histogram)
         out << bin.first.count() << " " << bin.second << std::endl;
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_activation_performance().timing,
-                result.timing);
+    auto reference = reference_preview_performance();
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
+
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
 
 TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
@@ -400,15 +397,13 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_action_performance_works)
     };
 
     auto result = benchmark.for_action(scope, config);
+    auto reference = reference_preview_performance();
 
-    auto test_result = unity::scopes::testing::StudentsTTest().two_independent_samples(
-                reference_action_performance().timing,
-                result.timing);
+    EXPECT_FALSE(result.timing.is_significantly_faster_than_reference(
+                     reference.first,
+                     reference.second));
 
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::not_rejected,
-              test_result.both_means_are_equal(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_lt_sample2_mean(testing::alpha));
-    EXPECT_EQ(unity::scopes::testing::HypothesisStatus::rejected,
-              test_result.sample1_mean_gt_sample2_mean(testing::alpha));
+    EXPECT_FALSE(result.timing.is_significantly_slower_than_reference(
+                     reference.first,
+                     reference.second));
 }
