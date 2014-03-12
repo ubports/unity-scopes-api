@@ -102,7 +102,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_create_query = [this, query, metadata, rp, ro, ctrl]()
+    auto send_create_query = [this, query, metadata, rp, ro, ctrl]() -> void
     {
         try
         {
@@ -114,27 +114,28 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
             assert(real_ctrl);
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
-            // with the one that was returned.
+            // with the real proxy that was returned.
             auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
             assert(new_proxy);
             ctrl->set_proxy(new_proxy);
+cerr << "OK, set proxy" << endl;
         }
         catch (std::exception const& e)
         {
             try
             {
+cerr << "BAD: " << e.what() << endl;
                 ro->finished(ListenerBase::Error, e.what());
             }
             catch (...)
             {
             }
-            throw;
         }
-        return ctrl;
     };
 
     auto future = runtime_->pool()->submit(send_create_query);
-    return future.get();
+    runtime_->future_queue()->push(move(future));
+    return ctrl;
 }
 
 QueryCtrlProxy ScopeImpl::activate(Result const& result,

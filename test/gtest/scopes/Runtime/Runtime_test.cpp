@@ -41,12 +41,14 @@ using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
+#if 0
 TEST(Runtime, basic)
 {
     Runtime::UPtr rt = Runtime::create("Runtime.ini");
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
 }
+#endif
 
 class Receiver : public SearchListenerBase
 {
@@ -124,6 +126,7 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
+#if 0
 class PreviewReceiver : public PreviewListenerBase
 {
 public:
@@ -225,7 +228,41 @@ TEST(Runtime, search)
     auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
+#endif
 
+TEST(Runtime, consecutive_search)
+{
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    mw->start();
+
+    auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+
+#if 0
+    auto receiver = make_shared<Receiver>();
+    auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
+    receiver->wait_until_finished();
+#endif
+
+    std::vector<std::shared_ptr<Receiver>> replies;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        scope->search("test", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    for (int i = 0; i < 10; ++i)
+    {
+    std::cerr << "wait" << std::endl;
+        replies[i]->wait_until_finished();
+    }
+}
+
+#if 0
 TEST(Runtime, preview)
 {
     // connect to scope and run a query
@@ -272,6 +309,7 @@ TEST(Runtime, cardinality)
     scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
     receiver->wait_until_finished();
 }
+#endif
 
 void scope_thread(RuntimeImpl::SPtr const& rt)
 {

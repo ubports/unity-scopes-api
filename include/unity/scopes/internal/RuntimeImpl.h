@@ -54,7 +54,7 @@ public:
     std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr pool() const;
-    ThreadSafeQueue<std::future<QueryCtrl>>::SPtr future_queue(std::thread waiter_thread) const;
+    ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
     void run_scope(ScopeBase *const scope_base);
 
     ObjectProxy string_to_proxy(std::string const& s) const;
@@ -64,6 +64,7 @@ public:
 
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
+    void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const;
 
     std::atomic_bool destroyed_;
     std::string scope_id_;
@@ -75,8 +76,8 @@ private:
     mutable std::string registry_endpointdir_;
     mutable std::string registry_endpoint_;
     mutable Reaper::SPtr reply_reaper_;
-    mutable ThreadPool::SPtr pool_;
-    mutable ThreadSafeQueue<std::future<QueryCtrl>>::SPtr future_queue_;
+    mutable ThreadPool::SPtr pool_;                 // Pool of invocation threads for async query creation
+    mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;
     mutable std::thread waiter_thread_;
     mutable std::mutex mutex_;  // For lazy initialization of reply_reaper_, pool_, and queue_
 };

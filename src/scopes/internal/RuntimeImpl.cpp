@@ -122,12 +122,28 @@ void RuntimeImpl::destroy()
         // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
         // to terminate. Otherwise, it's possible that we exit while threads are still running
         // with undefined behavior.
+        // TODO: need a lock here: destroy() will be called from a thread that differs from the
+        // the threads that call constructor and do lazy initialization.
+        lock_guard<mutex> lock(mutex_);
+
+cerr << "use count: " << pool_.use_count() << endl;
+        if (future_queue_)
+        {
+            future_queue_->destroy();
+            future_queue_->wait_for_destroy();
+            future_queue_ = nullptr;
+        }
         pool_ = nullptr;
+            //future_queue_ = nullptr;
         registry_ = nullptr;
         middleware_->stop();
         middleware_ = nullptr;
         middleware_factory_.reset(nullptr);
         reply_reaper_ = nullptr;
+        if (waiter_thread_.joinable())
+        {
+            waiter_thread_.join();
+        }
     }
 }
 
@@ -189,30 +205,42 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     return reply_reaper_;
 }
 
+void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const
+{
+    for (;;)
+    {
+        try
+        {
+            auto future = queue->wait_and_pop();  // Throws runtime_error when queue is destroyed
+            future.get();
+        }
+        catch (std::runtime_error const&)
+        {
+            cerr << "waiter thread exiting" << endl;
+            break;
+        }
+    }
+}
+
 ThreadPool::SPtr RuntimeImpl::pool() const
 {
-    // We lazily create the pool the first time we are asked for it, which happens when the first query is created.
+    // We lazily create the async invocation pool the first time we are asked for it,
+    // which happens when the first query is created. We also create the future
+    // queue here and its waiter thread, so we can clean up once asynchronous
+    // queries complete.
     lock_guard<mutex> lock(mutex_);
     if (!pool_)
     {
-        pool_ = make_shared<ThreadPool>(5); // TODO: configurable pool size
+        pool_ = make_shared<ThreadPool>(20); // TODO: configurable pool size
+        future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
+        waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
     }
     return pool_;
 }
 
-ThreadSafeQueue<future<QueryCtrl>>::SPtr RuntimeImpl::future_queue(thread waiter_thread) const
+ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
 {
-    // We lazily create the future queue the first time we are asked for it,
-    // which happens when the first query is created. The passed thread
-    // waits for futures to arrive on the queue. Each future returns the
-    // QueryCtrl that is returned by a create_{query,preview,activation}
-    // call.
     lock_guard<mutex> lock(mutex_);
-    if (!future_queue_)
-    {
-        future_queue_ = make_shared<ThreadSafeQueue<future<QueryCtrl>>>();
-        waiter_thread_ = move(waiter_thread);
-    }
     return future_queue_;
 }
 

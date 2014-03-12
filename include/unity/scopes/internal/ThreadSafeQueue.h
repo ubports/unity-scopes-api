@@ -54,6 +54,7 @@ public:
     ~ThreadSafeQueue();
 
     void destroy() noexcept;
+    void wait_for_destroy() noexcept;
     void push(T const& item);
     void push(T&& item);
     T wait_and_pop();
@@ -101,6 +102,13 @@ void ThreadSafeQueue<T>::destroy() noexcept
 }
 
 template<typename T>
+void ThreadSafeQueue<T>::wait_for_destroy() noexcept
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    cond_.wait(lock, [this] { return num_waiters_ == 0; });
+}
+
+template<typename T>
 void ThreadSafeQueue<T>::push(T const& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -124,13 +132,18 @@ T ThreadSafeQueue<T>::wait_and_pop()
     cond_.wait(lock, [this] { return done_ || queue_.size() != 0; });
     if (done_)
     {
-        lock.unlock();
-        --num_waiters_;
+        if (--num_waiters_ == 0)
+        {
+            cond_.notify_all();
+        }
         throw std::runtime_error("ThreadSafeQueue: queue destroyed while thread was blocked in wait_and_pop()");
     }
     T item = std::move(queue_.front());
     queue_.pop();
-    --num_waiters_;
+    if (--num_waiters_ == 0)
+    {
+        cond_.notify_all();
+    }
     return item;
 }
 

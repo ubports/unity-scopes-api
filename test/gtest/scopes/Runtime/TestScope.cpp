@@ -27,6 +27,8 @@
 
 #include "TestScope.h"
 
+#include <iostream> // TODO: remove this
+
 using namespace std;
 using namespace unity::scopes;
 
@@ -97,6 +99,7 @@ void TestScope::run()
 
 SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
 {
+cerr << "TestScope: " << query.query_string() << endl;
     return SearchQueryBase::UPtr(new TestQuery(query));
 }
 

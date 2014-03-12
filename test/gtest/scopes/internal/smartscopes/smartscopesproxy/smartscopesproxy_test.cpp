@@ -77,11 +77,15 @@ public:
 
     ~smartscopesproxytest()
     {
+        scope_rt_->destroy();
+        reg_rt_->destroy();
+#if 0
         scope_mw_->stop();
         scope_mw_->wait_for_shutdown();
 
         reg_mw_->stop();
         reg_mw_->wait_for_shutdown();
+#endif
     }
 
 protected:
@@ -100,6 +104,7 @@ protected:
     SSScopeObject::UPtr scope_;
 };
 
+#if 0
 TEST_F(smartscopesproxytest, ss_registry)
 {
     // locate should throw (direct)
@@ -141,6 +146,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     // non-existant scope (via mw)
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
 }
+#endif
 
 class Receiver : public SearchListenerBase
 {
@@ -205,6 +211,7 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
+#if 0
 TEST_F(smartscopesproxytest, search)
 {
     auto reply = std::make_shared<Receiver>();
@@ -214,6 +221,7 @@ TEST_F(smartscopesproxytest, search)
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 }
+#endif
 
 TEST_F(smartscopesproxytest, consecutive_queries)
 {
@@ -226,12 +234,16 @@ TEST_F(smartscopesproxytest, consecutive_queries)
         meta.proxy()->search("search_string", SearchMetadata("en", "phone"), replies.back());
     }
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     for (int i = 0; i < 10; ++i)
     {
+    std::cerr << "wait" << std::endl;
         replies[i]->wait_until_finished();
     }
 }
 
+#if 0
 class PreviewerWithCols : public PreviewListenerBase
 {
 public:
@@ -417,5 +429,6 @@ TEST_F(smartscopesproxytest, preview)
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     previewer_no_cols->wait_until_finished();
 }
+#endif
 
 } // namespace
