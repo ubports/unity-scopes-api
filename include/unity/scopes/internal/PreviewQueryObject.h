@@ -20,7 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_PREVIEWQUERYOBJECT_H
 
 #include <unity/scopes/internal/QueryObject.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 
 namespace unity
@@ -28,7 +28,7 @@ namespace unity
 
 namespace scopes
 {
-class PreviewQuery;
+class PreviewQueryBase;
 
 namespace internal
 {
@@ -38,12 +38,12 @@ class PreviewQueryObject final : public QueryObject
 public:
     UNITY_DEFINES_PTRS(PreviewQueryObject);
 
-    PreviewQueryObject(std::shared_ptr<PreviewQuery> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
     virtual ~PreviewQueryObject();
     void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
 private:
-    std::shared_ptr<PreviewQuery> preview_base_;
+    std::shared_ptr<PreviewQueryBase> preview_base_;
 };
 
 } // namespace internal

@@ -31,6 +31,8 @@ FilterState::FilterState()
 {
 }
 
+/// @cond
+
 FilterState::FilterState(FilterState const& other)
     : p(new internal::FilterStateImpl(*(other.p)))
 {
@@ -40,6 +42,8 @@ FilterState::FilterState(internal::FilterStateImpl *pimpl)
     : p(pimpl)
 {
 }
+
+FilterState::~FilterState() = default;
 
 FilterState::FilterState(FilterState &&) = default;
 FilterState& FilterState::operator=(FilterState &&) = default;
@@ -57,6 +61,8 @@ VariantMap FilterState::serialize() const
 {
     return p->serialize();
 }
+
+/// @endcond
 
 bool FilterState::has_filter(std::string const& id) const
 {

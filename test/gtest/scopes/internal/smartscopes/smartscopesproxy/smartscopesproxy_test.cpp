@@ -26,7 +26,7 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/SearchListener.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
 #include "../RaiiServer.h"
@@ -40,8 +40,6 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
-
-///! TODO: more tests
 
 namespace
 {
@@ -69,7 +67,7 @@ public:
 
         // Instantiate a SS registry and scope objects
         reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 20000, 60,
-                                                           "http://127.0.0.1", server_.port_, false));
+                                                           "http://127.0.0.1:" + std::to_string(server_.port_), false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
         // Add objects to the middlewares
@@ -109,13 +107,14 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
-    EXPECT_EQ(scopes.size(), 2);
+    EXPECT_EQ(2u, scopes.size());
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_id());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
@@ -128,13 +127,14 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (via mw)
     scopes = mw_reg->list();
-    EXPECT_EQ(scopes.size(), 2);
+    EXPECT_EQ(2u, scopes.size());
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_name());
+    EXPECT_EQ("dummy.scope", meta.scope_id());
     EXPECT_EQ("Dummy Demo Scope", meta.display_name());
     EXPECT_EQ("Dummy demo scope.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
@@ -142,7 +142,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
 }
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     virtual void push(CategorisedResult result) override
@@ -156,7 +156,7 @@ public:
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
             EXPECT_EQ("", result.category()->icon());
-            EXPECT_EQ("", result.category()->renderer_template().data());
+            EXPECT_EQ("{}", result.category()->renderer_template().data());
         }
         else if (count_ == 1)
         {
@@ -167,7 +167,7 @@ public:
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
             EXPECT_EQ("", result.category()->icon());
-            EXPECT_EQ("", result.category()->renderer_template().data());
+            EXPECT_EQ("{}", result.category()->renderer_template().data());
         }
 
         count_++;
@@ -205,13 +205,13 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-TEST_F(smartscopesproxytest, create_query)
+TEST_F(smartscopesproxytest, search)
 {
     auto reply = std::make_shared<Receiver>();
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 }
 
@@ -223,7 +223,7 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     for (int i = 0; i < 10; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
-        meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), replies.back());
+        meta.proxy()->search("search_string", SearchMetadata("en", "phone"), replies.back());
     }
 
     for (int i = 0; i < 10; ++i)
@@ -232,33 +232,33 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     }
 }
 
-class PreviewerWithCols : public PreviewListener
+class PreviewerWithCols : public PreviewListenerBase
 {
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(3, widget_list.size());
+        EXPECT_EQ(3u, widget_list.size());
 
         // widget 1
         auto it = widget_list.begin();
         EXPECT_EQ("widget_id_A", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
 
         // widget 2
         std::advance(it, 1);
         EXPECT_EQ("widget_id_B", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         // widget 3
         std::advance(it, 1);
         EXPECT_EQ("widget_id_C", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget C", it->attributes()["title"].get_string());
-        EXPECT_EQ("Third widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
 
         widget_pushes_++;
     }
@@ -270,12 +270,12 @@ public:
 
     virtual void push(ColumnLayoutList const& column_list) override
     {
-        ASSERT_EQ(3, column_list.size());
+        ASSERT_EQ(3u, column_list.size());
 
         // column 1
         auto it = column_list.begin();
         ASSERT_EQ(1, it->number_of_columns());
-        ASSERT_EQ(3, it->column(0).size());
+        ASSERT_EQ(3u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
         EXPECT_EQ("widget_id_B", it->column(0)[1]);
         EXPECT_EQ("widget_id_C", it->column(0)[2]);
@@ -283,23 +283,23 @@ public:
         // column 2
         std::advance(it, 1);
         ASSERT_EQ(2, it->number_of_columns());
-        ASSERT_EQ(1, it->column(0).size());
+        ASSERT_EQ(1u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
 
-        ASSERT_EQ(2, it->column(1).size());
+        ASSERT_EQ(2u, it->column(1).size());
         EXPECT_EQ("widget_id_B", it->column(1)[0]);
         EXPECT_EQ("widget_id_C", it->column(1)[1]);
 
         // column 3
         std::advance(it, 1);
         ASSERT_EQ(3, it->number_of_columns());
-        ASSERT_EQ(1, it->column(0).size());
+        ASSERT_EQ(1u, it->column(0).size());
         EXPECT_EQ("widget_id_A", it->column(0)[0]);
 
-        ASSERT_EQ(1, it->column(1).size());
+        ASSERT_EQ(1u, it->column(1).size());
         EXPECT_EQ("widget_id_B", it->column(1)[0]);
 
-        ASSERT_EQ(1, it->column(2).size());
+        ASSERT_EQ(1u, it->column(2).size());
         EXPECT_EQ("widget_id_C", it->column(2)[0]);
 
         col_pushes_++;
@@ -332,26 +332,26 @@ private:
     std::condition_variable cond_;
 };
 
-class PreviewerNoCols : public PreviewListener
+class PreviewerNoCols : public PreviewListenerBase
 {
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(2, widget_list.size());
+        EXPECT_EQ(2u, widget_list.size());
 
         // widget 1
         auto it = widget_list.begin();
         EXPECT_EQ("widget_id_A", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attributes()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
 
         // widget 2
         std::advance(it, 1);
         EXPECT_EQ("widget_id_B", it->id());
         EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attributes()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attributes()["text"].get_string());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         widget_pushes_++;
     }
@@ -399,7 +399,7 @@ TEST_F(smartscopesproxytest, preview)
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
 
-    meta.proxy()->create_query("search_string", SearchMetadata("en", "phone"), reply);
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 
     auto result = reply->last_result();

@@ -45,10 +45,11 @@ using namespace unity::scopes::internal::zmq_middleware;
 ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-    mi->set_scope_name(name);
+    mi->set_scope_id(name);
     mi->set_art("art " + name);
     mi->set_display_name("display name " + name);
     mi->set_description("description " + name);
+    mi->set_author("author " + name);
     mi->set_search_hint("search hint " + name);
     mi->set_hot_key("hot key " + name);
     ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
@@ -77,7 +78,7 @@ TEST(RegistryI, get_metadata)
 
     auto r = runtime->registry();
     auto scope = r->get_metadata("scope1");
-    EXPECT_EQ("scope1", scope.scope_name());
+    EXPECT_EQ("scope1", scope.scope_id());
 }
 
 TEST(RegistryI, list)
@@ -104,12 +105,12 @@ TEST(RegistryI, list)
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
-    EXPECT_EQ(1, scopes.size());
+    EXPECT_EQ(1u, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
 
     ro->remove_local_scope("scope1");
     scopes = r->list();
-    EXPECT_EQ(0, scopes.size());
+    EXPECT_EQ(0u, scopes.size());
 
     set<string> ids;
     for (int i = 0; i < 10; ++i)
@@ -120,7 +121,7 @@ TEST(RegistryI, list)
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(10, scopes.size());
+    EXPECT_EQ(10u, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);
@@ -153,14 +154,14 @@ TEST(RegistryI, add_remove)
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
     scopes = r->list();
-    EXPECT_EQ(1, scopes.size());
+    EXPECT_EQ(1u, scopes.size());
     EXPECT_NE(scopes.end(), scopes.find("scope1"));
     EXPECT_FALSE(ro->add_local_scope("scope1", move(make_meta("scope1", proxy, middleware)),
             dummy_spawn_command));
 
     EXPECT_TRUE(ro->remove_local_scope("scope1"));
     scopes = r->list();
-    EXPECT_EQ(0, scopes.size());
+    EXPECT_EQ(0u, scopes.size());
     EXPECT_FALSE(ro->remove_local_scope("scope1"));
 
     set<string> ids;
@@ -172,7 +173,7 @@ TEST(RegistryI, add_remove)
         ids.insert(long_id);
     }
     scopes = r->list();
-    EXPECT_EQ(10, scopes.size());
+    EXPECT_EQ(10u, scopes.size());
     for (auto& id : ids)
     {
         auto it = scopes.find(id);
@@ -220,7 +221,7 @@ TEST(RegistryI, exceptions)
     catch (MiddlewareException const& e)
     {
         EXPECT_STREQ("unity::scopes::MiddlewareException: unity::InvalidArgumentException: "
-                     "Registry: Cannot search for scope with empty name",
+                     "RegistryObject::get_metadata(): Cannot search for scope with empty name",
                      e.what());
     }
 
@@ -232,7 +233,7 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::add_local_scope(): Cannot add scope with empty name",
                      e.what());
     }
 
@@ -243,7 +244,7 @@ TEST(RegistryI, exceptions)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::remove_local_scope(): Cannot remove scope with empty name",
                      e.what());
     }
 }
@@ -326,7 +327,7 @@ TEST(RegistryI, locate)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot add scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::add_local_scope(): Cannot add scope with empty name",
                      e.what());
     }
 
@@ -337,7 +338,7 @@ TEST(RegistryI, locate)
     }
     catch (InvalidArgumentException const& e)
     {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry: Cannot remove scope with empty name",
+        EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::remove_local_scope(): Cannot remove scope with empty name",
                      e.what());
     }
 }

@@ -99,9 +99,9 @@ void AnnotationImpl::set_icon(std::string const& icon)
     icon_ = icon;
 }
 
-void AnnotationImpl::add_link(std::string const& label, Query const& query)
+void AnnotationImpl::add_link(std::string const& label, CannedQuery const& query)
 {
-    if (annotation_type_ != Annotation::Type::GroupedLink && links_.size() > 0)
+    if (annotation_type_ != Annotation::Type::GroupedLink && !links_.empty())
     {
         throw InvalidArgumentException("Annotation::add_link(): multiple links are supported by GroupedLink only");
     }
@@ -138,7 +138,7 @@ Annotation::Type AnnotationImpl::annotation_type() const
 
 void AnnotationImpl::throw_if_inconsistent() const
 {
-    if (links_.size() == 0)
+    if (links_.empty())
     {
         throw InvalidArgumentException("No links present");
     }

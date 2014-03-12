@@ -72,7 +72,6 @@
     obj:/lib/x86_64-linux-gnu/ld-2.18.so
 }
 
-
 # False positives for memory leaks in Qt
 
 {
@@ -99,7 +98,6 @@
    ...
    fun:_ZN21QNetworkAccessManager13createRequestENS_9OperationERK15QNetworkRequestP9QIODevice
    fun:_ZN21QNetworkAccessManager3getERK15QNetworkRequest
-   fun:_ZN18HttpClientQtThread3runEv
 }
 
 {
@@ -108,4 +106,22 @@
    fun:*alloc
    ...
    fun:_ZNK14QFactoryLoader8instanceEi
+}
+
+# Bogus "invalid read" reports for ::putenv and ::genenv
+
+{
+   putenv_read
+   Memcheck:Addr1
+   ...
+   fun:putenv
+   ...
+}
+
+{
+   getenv_read
+   Memcheck:Addr2
+   ...
+   fun:getenv
+   ...
 }

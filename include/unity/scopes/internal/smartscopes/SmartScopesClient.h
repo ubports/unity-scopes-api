@@ -50,6 +50,7 @@ struct RemoteScope
     std::string id;
     std::string name;
     std::string description;
+    std::string author;
     std::string base_url;
     std::shared_ptr<std::string> icon;  // optional
     std::shared_ptr<std::string> art;  // optional
@@ -123,10 +124,12 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
-                      std::string const& url = "", // detect url
-                      uint port = 0);
+                      std::string const& url = ""); // detect url
 
     virtual ~SmartScopesClient();
+
+    void reset_url(std::string const& url = "");
+    std::string url();
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
@@ -166,7 +169,6 @@ private:
     JsonNodeInterface::SPtr json_node_;
 
     std::string url_;
-    uint port_;
 
     std::map<uint, HttpResponseHandle::SPtr> query_results_;
 

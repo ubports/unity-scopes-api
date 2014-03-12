@@ -17,25 +17,14 @@
  */
 
 #include <unity/scopes/internal/ReplyImpl.h>
+
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/Annotation.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/ReplyBase.h>
-#include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/Reply.h>
 #include <unity/UnityExceptions.h>
-#include <unity/scopes/SearchReply.h>
-#include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/CategoryRenderer.h>
-#include <unity/scopes/internal/FilterStateImpl.h>
-#include <unity/scopes/internal/ColumnLayoutImpl.h>
-#include <unity/scopes/internal/DepartmentImpl.h>
 
-#include <sstream>
 #include <cassert>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -51,14 +40,11 @@ namespace internal
 {
 
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
-    ObjectProxyImpl(mw_proxy),
+    ObjectImpl(mw_proxy),
     qo_(qo),
-    cat_registry_(new CategoryRegistry()),
-    finished_(false),
-    layouts_push_disallowed_(false)
+    finished_(false)
 {
     assert(mw_proxy);
-    assert(qo);
 }
 
 ReplyImpl::~ReplyImpl()
@@ -73,151 +59,6 @@ ReplyImpl::~ReplyImpl()
     }
 }
 
-void ReplyImpl::register_category(Category::SCPtr category)
-{
-    cat_registry_->register_category(category); // will throw if that category id has already been registered
-    push(category);
-}
-
-void ReplyImpl::register_departments(DepartmentList const& departments, std::string current_department_id)
-{
-    // basic consistency check
-    try
-    {
-        DepartmentImpl::validate_departments(departments, current_department_id);
-    }
-    catch (unity::LogicException const &e)
-    {
-        throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
-    }
-
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& dep: departments)
-    {
-        arr.push_back(Variant(dep.serialize()));
-    }
-    vm["departments"] = arr;
-    vm["current_department"] = current_department_id;
-    push(vm); // ignore return value?
-}
-
-Category::SCPtr ReplyImpl::register_category(std::string const& id,
-                                             std::string const& title,
-                                             std::string const &icon,
-                                             CategoryRenderer const& renderer_template)
-{
-    auto cat = cat_registry_->register_category(id, title, icon, renderer_template); // will throw if adding same category again
-
-    // return category instance only if pushed successfuly (i.e. search wasn't finished)
-    if (push(cat))
-    {
-        return cat;
-    }
-
-    return nullptr;
-}
-
-Category::SCPtr ReplyImpl::lookup_category(std::string const& id) const
-{
-    return cat_registry_->lookup_category(id);
-}
-
-bool ReplyImpl::push(unity::scopes::CategorisedResult const& result)
-{
-    // If this is an aggregator scope, it may be pushing result items obtained
-    // from ReplyObject without registering a category first.
-    auto cat = cat_registry_->lookup_category(result.category()->id());
-    if (cat == nullptr)
-    {
-        std::ostringstream s;
-        s << "Unknown category " << result.category()->id();
-        throw InvalidArgumentException(s.str());
-    }
-
-    VariantMap var;
-    var["result"] = result.serialize();
-    return push(var);
-}
-
-bool ReplyImpl::push(Category::SCPtr category)
-{
-    VariantMap var;
-    var["category"] = category->serialize();
-    return push(var);
-}
-
-bool ReplyImpl::register_annotation(unity::scopes::Annotation const& annotation)
-{
-    VariantMap var;
-    var["annotation"] = annotation.serialize();
-    return push(var);
-}
-
-bool ReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
-{
-    VariantMap var;
-    VariantArray filters_var;
-
-    for (auto const& f: filters)
-    {
-        filters_var.push_back(Variant(f->serialize()));
-    }
-    var["filters"] = filters_var;
-    var["filter_state"] = filter_state.serialize();
-    return push(var);
-}
-
-bool ReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& layouts)
-{
-    if (layouts_push_disallowed_)
-    {
-        throw unity::LogicException("Reply::register_layout(): column layouts can only be registered once and before pushing preview widgets");
-    }
-
-    // basic check for consistency of layouts
-    try
-    {
-        ColumnLayoutImpl::validate_layouts(layouts);
-    }
-    catch (unity::LogicException const &e)
-    {
-        throw unity::LogicException("Reply::register_layout(): Failed to validate layouts");
-    }
-
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& layout: layouts)
-    {
-        arr.push_back(Variant(layout.serialize()));
-    }
-    vm["columns"] = arr;
-    return layouts_push_disallowed_ = push(vm);
-}
-
-bool ReplyImpl::push(unity::scopes::PreviewWidgetList const& widgets)
-{
-    layouts_push_disallowed_ = true;
-
-    VariantMap vm;
-    VariantArray arr;
-    for (auto const& widget : widgets)
-    {
-        arr.push_back(Variant(widget.serialize()));
-    }
-    vm["widgets"] = arr;
-    return push(vm);
-}
-
-bool ReplyImpl::push(std::string const& key, Variant const& value)
-{
-    VariantMap vm;
-    VariantMap nested;
-    nested[key] = value;
-    vm["preview-data"] = nested;
-    return push(vm);
-}
-
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
     auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
@@ -227,21 +68,22 @@ bool ReplyImpl::push(VariantMap const& variant_map)
         return false; // Query was cancelled or had an error.
     }
 
-    if (!finished_.load())
+    if (finished_)
     {
-        try
-        {
-            fwd()->push(variant_map);
-            return true;
-        }
-        catch (MiddlewareException const& e)
-        {
-            // TODO: log error
-            error(current_exception());
-            return false;
-        }
+        return false;
     }
-    return false;
+
+    try
+    {
+        fwd()->push(variant_map);
+    }
+    catch (std::exception const&)
+    {
+        error(current_exception());
+        return false;
+    }
+
+    return true;
 }
 
 void ReplyImpl::finished()
@@ -257,7 +99,7 @@ void ReplyImpl::finished(ListenerBase::Reason reason)
         {
             fwd()->finished(reason, "");
         }
-        catch (MiddlewareException const& e)
+        catch (std::exception const& e)
         {
             // TODO: log error
             cerr << e.what() << endl;
@@ -267,6 +109,13 @@ void ReplyImpl::finished(ListenerBase::Reason reason)
 
 void ReplyImpl::error(exception_ptr ex)
 {
+    if (finished_.exchange(true))
+    {
+        // Only the first thread to encounter an error
+        // reports the error to the client.
+        return;
+    }
+
     string error_message;
     try
     {
@@ -280,30 +129,18 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
+    // TODO: log error
+    cerr << error_message << endl;
 
     try
     {
         fwd()->finished(ListenerBase::Error, error_message);
     }
-    catch (MiddlewareException const& e)
+    catch (std::exception const& e)
     {
         // TODO: log error
         cerr << e.what() << endl;
     }
-}
-
-SearchReplyProxy ReplyImpl::create(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
-{
-    auto reply_impl = new ReplyImpl(mw_proxy, qo);
-    auto reply = new SearchReply(reply_impl);
-    return SearchReplyProxy(reply);
-}
-
-PreviewReplyProxy ReplyImpl::create_preview_reply(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
-{
-    auto reply_impl = new ReplyImpl(mw_proxy, qo);
-    auto reply = new PreviewReply(reply_impl);
-    return PreviewReplyProxy(reply);
 }
 
 MWReplyProxy ReplyImpl::fwd() const

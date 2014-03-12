@@ -39,32 +39,60 @@ namespace internal
 }
 
 /**
-   \brief Category represents a set of related results returned by scope
+   \brief A set of related results returned by a scope
    and displayed within a single pane in the Unity dash.
+
    To create a Category, use ReplyProxy::register_category.
    \see ResultItem
 */
-class UNITY_API Category
+class Category
 {
 public:
-/// @cond
+    /// @cond
     NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
-/// @endcond
 
+    virtual ~Category();
+    /// @endcond
+
+    /**
+     \brief Get identifier of this Category
+     \return The category identifier.
+    */
     std::string id() const;
-    std::string title() const;
-    std::string icon() const;
-    CategoryRenderer const& renderer_template() const;
-    VariantMap serialize() const;
 
-private:
+    /**
+     \brief Get title of this Category
+     \return The category title.
+    */
+    std::string title() const;
+
+    /**
+     \brief Get icon of this Category
+     \return The category icon.
+    */
+    std::string icon() const;
+
+    /**
+     \brief Get renderer template of this Category
+     \return The category renderer template.
+     */
+    CategoryRenderer const& renderer_template() const;
+
+    // @cond
+    VariantMap serialize() const;
+    // @endcond
+
+protected:
+    /// @cond
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
-
-    std::shared_ptr<internal::CategoryImpl> p;
+    /// @endcond
 
     friend class internal::CategoryRegistry;
+
+private:
+    std::unique_ptr<internal::CategoryImpl> p;
 };
 
 } // namespace scopes

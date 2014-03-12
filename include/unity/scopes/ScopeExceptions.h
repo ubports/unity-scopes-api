@@ -31,7 +31,7 @@ namespace scopes
 \brief Exception to indicate that something went wrong with the middleware layer.
 */
 
-class UNITY_API MiddlewareException : public virtual unity::Exception
+class MiddlewareException : public virtual unity::Exception
 {
 public:
     /**
@@ -39,14 +39,22 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit MiddlewareException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     MiddlewareException(MiddlewareException const&);
     MiddlewareException& operator=(MiddlewareException const&);
+    //@}
+
+    /// @cond
     virtual ~MiddlewareException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -56,7 +64,7 @@ public:
        object with an unknown identity.
 */
 
-class UNITY_API ObjectNotExistException : public virtual MiddlewareException
+class ObjectNotExistException : public virtual MiddlewareException
 {
 public:
     /**
@@ -65,19 +73,28 @@ public:
     \param id The identity of the unknown object.
     */
     explicit ObjectNotExistException(std::string const& reason, std::string const& id);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     ObjectNotExistException(ObjectNotExistException const&);
     ObjectNotExistException& operator=(ObjectNotExistException const&);
+    //@}
+
+    /// @cond
     virtual ~ObjectNotExistException() noexcept;
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 
     /**
     \brief Returns the identity of the non-existent object.
+    \return The identity of the non-existent object.
     */
     virtual std::string id() const;
 
@@ -89,7 +106,7 @@ private:
 \brief Exception to indicate that a twoway request timed out.
 */
 
-class UNITY_API TimeoutException : public virtual MiddlewareException
+class TimeoutException : public virtual MiddlewareException
 {
 public:
     /**
@@ -97,14 +114,22 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit TimeoutException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     TimeoutException(TimeoutException const&);
     TimeoutException& operator=(TimeoutException const&);
+    //@}
+
+    /// @cond
     virtual ~TimeoutException() noexcept;
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -113,7 +138,7 @@ public:
 \brief Exception to indicate that something went wrong with the contents of configuration files.
 */
 
-class UNITY_API ConfigException : public virtual unity::Exception
+class ConfigException : public virtual unity::Exception
 {
 public:
     /**
@@ -121,14 +146,22 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit ConfigException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     ConfigException(ConfigException const&);
     ConfigException& operator=(ConfigException const&);
+    //@}
+
+    /// @cond
     virtual ~ConfigException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 };
@@ -137,7 +170,7 @@ public:
 \brief Exception to indicate that an object wasn't found by a lookup function.
 */
 
-class UNITY_API NotFoundException : public virtual unity::Exception
+class NotFoundException : public virtual unity::Exception
 {
 public:
     /**
@@ -146,19 +179,28 @@ public:
     \param name The name of the object that was not found.
     */
     explicit NotFoundException(std::string const& reason, std::string const& name);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     NotFoundException(NotFoundException const&);
     NotFoundException& operator=(NotFoundException const&);
+    //@}
+
+    /// @cond
     virtual ~NotFoundException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
+    \return <code>std::exception_ptr</code> to <code>this</code>.
     */
     virtual std::exception_ptr self() const override;
 
     /**
     \brief Returns the name that was passed to the constructor.
+    \return The name that was passed to the constructor.
     */
     virtual std::string name() const;
 

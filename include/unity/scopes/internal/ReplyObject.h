@@ -50,12 +50,13 @@ public:
     ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy);
     virtual ~ReplyObject();
 
-    virtual void process_data(VariantMap const& data) = 0;
+    virtual bool process_data(VariantMap const& data) = 0;
+
+    std::string origin_proxy() const;
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept override;
     void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
-    std::string origin_proxy() const;
 
 private:
     ListenerBase::SPtr const listener_base_;

@@ -18,8 +18,8 @@
 
 #include <gtest/gtest.h>
 #include <unity/scopes/Annotation.h>
-#include <unity/scopes/Query.h>
-#include <unity/scopes/internal/QueryImpl.h>
+#include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/UnityExceptions.h>
 
@@ -29,15 +29,15 @@ using namespace unity::scopes::internal;
 TEST(Annotation, link)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
 
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
 
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query.scope_name(), link->query().scope_name());
+        EXPECT_EQ(query.scope_id(), link->query().scope_id());
         EXPECT_EQ(query.department_id(), link->query().department_id());
         EXPECT_EQ(query.query_string(), link->query().query_string());
     }
@@ -47,17 +47,17 @@ TEST(Annotation, link)
 TEST(Annotation, emblemLink)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
 
         Annotation annotation(Annotation::Type::Link);
         annotation.set_icon("icon");
         annotation.add_link("Link1", query);
 
         EXPECT_EQ("icon", annotation.icon());
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         auto link = annotation.links().front();
         EXPECT_EQ("Link1", link->label());
-        EXPECT_EQ(query.scope_name(), link->query().scope_name());
+        EXPECT_EQ(query.scope_id(), link->query().scope_id());
         EXPECT_EQ(query.department_id(), link->query().department_id());
         EXPECT_EQ(query.query_string(), link->query().query_string());
     }
@@ -66,12 +66,12 @@ TEST(Annotation, emblemLink)
 TEST(Annotation, link_exceptions)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
 
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
         EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
-        EXPECT_EQ(1, annotation.links().size());
+        EXPECT_EQ(1u, annotation.links().size());
         EXPECT_NO_THROW(annotation.set_label("label"));
         // no design case for link with a label (makes sense for a group only), but we shouldn't throw
         EXPECT_NO_THROW(annotation.label());
@@ -81,8 +81,8 @@ TEST(Annotation, link_exceptions)
 TEST(Annotation, groupedLink)
 {
     {
-        Query query1("scope-A", "foo", "dep1");
-        Query query2("scope-B", "foo", "dep1");
+        CannedQuery query1("scope-A", "foo", "dep1");
+        CannedQuery query2("scope-B", "foo", "dep1");
 
         Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
@@ -90,15 +90,15 @@ TEST(Annotation, groupedLink)
         annotation.add_link("Link2", query2);
 
         EXPECT_EQ("Group", annotation.label());
-        EXPECT_EQ(2, annotation.links().size());
+        EXPECT_EQ(2u, annotation.links().size());
         auto link1 = annotation.links().front();
         auto link2 = annotation.links().back();
         EXPECT_EQ("Link1", link1->label());
-        EXPECT_EQ(query1.scope_name(), link1->query().scope_name());
+        EXPECT_EQ(query1.scope_id(), link1->query().scope_id());
         EXPECT_EQ(query1.department_id(), link1->query().department_id());
         EXPECT_EQ(query1.query_string(), link1->query().query_string());
         EXPECT_EQ("Link2", link2->label());
-        EXPECT_EQ(query2.scope_name(), link2->query().scope_name());
+        EXPECT_EQ(query2.scope_id(), link2->query().scope_id());
         EXPECT_EQ(query2.department_id(), link2->query().department_id());
         EXPECT_EQ(query2.query_string(), link2->query().query_string());
     }
@@ -107,8 +107,8 @@ TEST(Annotation, groupedLink)
 TEST(Annotation, groupedLink_exceptions)
 {
     {
-        Query query1("scope-A", "foo", "dep1");
-        Query query2("scope-B", "foo", "dep1");
+        CannedQuery query1("scope-A", "foo", "dep1");
+        CannedQuery query2("scope-B", "foo", "dep1");
 
         Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
@@ -123,7 +123,7 @@ TEST(Annotation, groupedLink_exceptions)
 TEST(Annotation, serialize)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
 
@@ -132,11 +132,11 @@ TEST(Annotation, serialize)
         EXPECT_TRUE(vm.find("label") == vm.end());
         EXPECT_TRUE(vm.find("icon") == vm.end());
         auto links = vm["links"].get_array();
-        EXPECT_EQ(1, links.size());
+        EXPECT_EQ(1u, links.size());
         auto linkvm = links[0].get_dict();
         EXPECT_EQ("Link1", linkvm["label"].get_string());
-        Query qout = internal::QueryImpl::create(linkvm["query"].get_dict());
-        EXPECT_EQ("scope-A", qout.scope_name());
+        CannedQuery qout = internal::CannedQueryImpl::create(linkvm["query"].get_dict());
+        EXPECT_EQ("scope-A", qout.scope_id());
         EXPECT_EQ("foo", qout.query_string());
         EXPECT_EQ("dep1", qout.department_id());
     }
@@ -144,7 +144,7 @@ TEST(Annotation, serialize)
 
 TEST(Annotation, deserialize)
 {
-    Query query("scope-A", "foo", "dep1");
+    CannedQuery query("scope-A", "foo", "dep1");
     {
         Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Foo");
@@ -164,7 +164,7 @@ TEST(Annotation, deserialize)
 TEST(Annotation, deserialize_exceptions)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
         {
             VariantMap var;
             try
@@ -244,7 +244,7 @@ TEST(Annotation, deserialize_exceptions)
 TEST(Annotation, copy)
 {
     {
-        Query query("scope-A", "foo", "dep1");
+        CannedQuery query("scope-A", "foo", "dep1");
         Annotation annotation(Annotation::Type::GroupedLink);
         annotation.set_label("Group");
         annotation.add_link("Link1", query);
@@ -253,6 +253,6 @@ TEST(Annotation, copy)
         EXPECT_EQ("Group", copy.label());
         EXPECT_EQ(Annotation::Type::GroupedLink, copy.annotation_type());
         annotation.add_link("Link2", query);
-        EXPECT_EQ(1, copy.links().size());
+        EXPECT_EQ(1u, copy.links().size());
     }
 }

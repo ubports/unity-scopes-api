@@ -16,11 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
-#define UNITY_API_SCOPES_PREVIEW_WIDGET_IMPL_H
+#ifndef UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
+#define UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
 
 #include <unity/scopes/PreviewWidget.h>
-#include <unity/SymbolExport.h>
 #include <string>
 
 namespace unity
@@ -39,16 +38,17 @@ public:
     PreviewWidgetImpl(std::string const& id, std::string const& widget_type);
     PreviewWidgetImpl(VariantMap const& var);
     PreviewWidgetImpl(PreviewWidgetImpl const& other) = default;
+    ~PreviewWidgetImpl() = default;
 
     void set_id(std::string const& id);
     void set_widget_type(std::string const &widget_type);
-    void add_attribute(std::string const& key, Variant const& value);
-    void add_component(std::string const& key, std::string const& field_name);
+    void add_attribute_value(std::string const& key, Variant const& value);
+    void add_attribute_mapping(std::string const& key, std::string const& field_name);
 
     std::string id() const;
     std::string widget_type() const;
-    std::map<std::string, std::string> components() const;
-    VariantMap attributes() const;
+    std::map<std::string, std::string> attribute_mappings() const;
+    VariantMap attribute_values() const;
     std::string data() const;
 
     VariantMap serialize() const;

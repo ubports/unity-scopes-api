@@ -44,16 +44,16 @@ public:
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
                      uint no_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
-                     uint sss_port = 0, bool caching_enabled = true);
+                     bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_name) override;
+    ScopeMetadata get_metadata(std::string const& scope_id) override;
     MetadataMap list() override;
 
-    ScopeProxy locate(std::string const& scope_name) override;
+    ScopeProxy locate(std::string const& scope_id) override;
 
-    bool has_scope(std::string const& scope_name) const;
-    std::string get_base_url(std::string const& scope_name) const;
+    bool has_scope(std::string const& scope_id) const;
+    std::string get_base_url(std::string const& scope_id) const;
     SmartScopesClient::SPtr get_ssclient() const;
 
 private:

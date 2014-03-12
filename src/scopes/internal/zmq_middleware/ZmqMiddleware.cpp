@@ -188,7 +188,7 @@ void bad_proxy_string(string const& msg)
 
 // Poor man's URI parser (no boost)
 
-Proxy ZmqMiddleware::string_to_proxy(string const& s)
+ObjectProxy ZmqMiddleware::string_to_proxy(string const& s)
 {
     if (s == "nullproxy:")
     {
@@ -621,11 +621,11 @@ int64_t ZmqMiddleware::locate_timeout() const noexcept
     return locate_timeout_;
 }
 
-Proxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
-                                      string const& identity,
-                                      string const& category,
-                                      RequestMode mode,
-                                      int64_t timeout)
+ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
+                                            string const& identity,
+                                            string const& category,
+                                            RequestMode mode,
+                                            int64_t timeout)
 {
     // For the time being we only support Scope and Registry types for proxy creation,
     // both of which are twoway interfaces.
@@ -641,7 +641,7 @@ Proxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     else if (category == "Registry")
     {
         auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
-        return RegistryImpl::create(p, runtime());
+        return make_shared<RegistryImpl>(p, runtime());
     }
     else
     {

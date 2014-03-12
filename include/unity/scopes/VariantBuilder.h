@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_VARIANTBUILDER_H
 #define UNITY_SCOPES_VARIANTBUILDER_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <vector>
@@ -43,12 +42,14 @@ class VariantBuilderImpl;
 The main purpose of this class is to ease creation of variant containers needed for PreviewWidget
 instances or any other classes that require non-trivial variant definitions.
 
-For example, the value of "rating" key of the following JSON template:
+For example, the value of the "rating" key of the following JSON template
+\code
 {
     "type": "reviews",
     ...
     "reviews": [{"rating": null, "review": null, "author": null}]
 }
+\endcode
 
 can be created with VariantBuilder as follows:
 
@@ -57,19 +58,27 @@ VariantBuilder builder;
 builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
 \endcode
 */
-class UNITY_API VariantBuilder
+
+class VariantBuilder
 {
 public:
     VariantBuilder();
+    virtual ~VariantBuilder();
+
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     VariantBuilder(VariantBuilder const& other);
     VariantBuilder(VariantBuilder&& other);
-    virtual ~VariantBuilder();
 
     VariantBuilder& operator=(VariantBuilder const& other);
     VariantBuilder& operator=(VariantBuilder&& other);
+    //@}
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
+
     It can be used multiple times to create an array of tuples, for example:
     \code
        [{"a": 1, "b": 2}, {"c": 2, "d" : 3}]
@@ -85,21 +94,23 @@ public:
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
-    This is and overloaded version of add_tupe that takes std::vector instead of std::initializer_list, making it more friendly for language
-    bindings.
+
+    This is an overloaded version of add_tuple that accepts `std::vector` instead of
+    `std::initializer_list`, making it more convenient for language bindings.
     */
     void add_tuple(std::vector<std::pair<std::string, Variant>> const& tuple);
 
     /**
-     \brief Retrieves created Variant.
-     Returns created Variant and resets the builder, so that it can be reused for creating a new Variant. Throw unity::LogicException if
-     no Variant has been created.
-     \return created variant
+     \brief Retrieves a completed variant.
+
+     Returns the completed variant and resets this builder, so the builder can be re-used.
+     \return The completed variant.
+     \throws unity::LogicException if the builder does not hold a variant.
     */
     Variant end();
 
 private:
-    std::shared_ptr<internal::VariantBuilderImpl> p;
+    std::unique_ptr<internal::VariantBuilderImpl> p;
 };
 
 } // namespace scopes

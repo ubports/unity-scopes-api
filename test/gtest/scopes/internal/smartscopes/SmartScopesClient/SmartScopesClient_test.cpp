@@ -45,10 +45,12 @@ public:
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH)
     {
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, "http://127.0.0.1", server_.port_);
+        sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, sss_url_);
     }
 
 protected:
+    std::string sss_url_;
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     SmartScopesClient::SPtr ssc_;
@@ -60,12 +62,13 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     std::vector<RemoteScope> scopes;
 
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
-    ASSERT_EQ(2, scopes.size());
+    ASSERT_EQ(2u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
     EXPECT_EQ("Dummy demo scope.", scopes[0].description);
-    EXPECT_EQ("http://127.0.0.1/demo", scopes[0].base_url);
+    EXPECT_EQ("Mr.Fake", scopes[0].author);
+    EXPECT_EQ(sss_url_ + "/demo", scopes[0].base_url);
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
@@ -73,7 +76,8 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
     EXPECT_EQ("Dummy demo scope 2.", scopes[1].description);
-    EXPECT_EQ("http://127.0.0.1/demo2", scopes[1].base_url);
+    EXPECT_EQ("Mr.Fake", scopes[1].author);
+    EXPECT_EQ(sss_url_ + "/demo2", scopes[1].base_url);
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
@@ -81,10 +85,10 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
-    ASSERT_EQ(2, results.size());
+    ASSERT_EQ(2u, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
     EXPECT_EQ(nullptr, results[0].other_params["dnd_uri"]);
@@ -94,7 +98,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("cat1", results[0].category->id);
     EXPECT_EQ("Category 1", results[0].category->title);
     EXPECT_EQ("", results[0].category->icon);
-    EXPECT_EQ("", results[0].category->renderer_template);
+    EXPECT_EQ("{}", results[0].category->renderer_template);
 
     EXPECT_EQ("URI2", results[1].uri);
     EXPECT_EQ(nullptr, results[1].other_params["dnd_uri"]);
@@ -104,47 +108,47 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("cat1", results[1].category->id);
     EXPECT_EQ("Category 1", results[1].category->title);
     EXPECT_EQ("", results[1].category->icon);
-    EXPECT_EQ("", results[1].category->renderer_template);
+    EXPECT_EQ("{}", results[1].category->renderer_template);
 }
 
 TEST_F(SmartScopesClientTest, preview)
 {
-    auto preview_handle = ssc_->preview("http://127.0.0.1/demo", "result", "session_id", "platform", 0);
+    auto preview_handle = ssc_->preview(sss_url_ + "/demo", "result", "session_id", "platform", 0);
 
     auto results = preview_handle->get_preview_results();
     PreviewHandle::Columns columns = results.first;
     PreviewHandle::Widgets widgets = results.second;
 
-    ASSERT_EQ(3, columns.size());
+    ASSERT_EQ(3u, columns.size());
 
     // column 1
-    ASSERT_EQ(1, columns[0].size());
-    ASSERT_EQ(3, columns[0][0].size());
+    ASSERT_EQ(1u, columns[0].size());
+    ASSERT_EQ(3u, columns[0][0].size());
     EXPECT_EQ("widget_id_A", columns[0][0][0]);
     EXPECT_EQ("widget_id_B", columns[0][0][1]);
     EXPECT_EQ("widget_id_C", columns[0][0][2]);
 
     // column 2
-    ASSERT_EQ(2, columns[1].size());
-    ASSERT_EQ(1, columns[1][0].size());
+    ASSERT_EQ(2u, columns[1].size());
+    ASSERT_EQ(1u, columns[1][0].size());
     EXPECT_EQ("widget_id_A", columns[1][0][0]);
 
-    ASSERT_EQ(2, columns[1][1].size());
+    ASSERT_EQ(2u, columns[1][1].size());
     EXPECT_EQ("widget_id_B", columns[1][1][0]);
     EXPECT_EQ("widget_id_C", columns[1][1][1]);
 
     // column 3
-    ASSERT_EQ(3, columns[2].size());
-    ASSERT_EQ(1, columns[2][0].size());
+    ASSERT_EQ(3u, columns[2].size());
+    ASSERT_EQ(1u, columns[2][0].size());
     EXPECT_EQ("widget_id_A", columns[2][0][0]);
 
-    ASSERT_EQ(1, columns[2][1].size());
+    ASSERT_EQ(1u, columns[2][1].size());
     EXPECT_EQ("widget_id_B", columns[2][1][0]);
 
-    ASSERT_EQ(1, columns[2][2].size());
+    ASSERT_EQ(1u, columns[2][2].size());
     EXPECT_EQ("widget_id_C", columns[2][2][0]);
 
-    ASSERT_EQ(3, widgets.size());
+    ASSERT_EQ(3u, widgets.size());
 
     EXPECT_EQ("{\"id\":\"widget_id_A\",\"text\":\"First widget.\",\"title\":\"Widget A\",\"type\":\"text\"}\n", widgets[0]);
     EXPECT_EQ("{\"id\":\"widget_id_B\",\"text\":\"Second widget.\",\"title\":\"Widget B\",\"type\":\"text\"}\n", widgets[1]);
@@ -153,41 +157,67 @@ TEST_F(SmartScopesClientTest, preview)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle2 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle3 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle4 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle5 = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle1 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle2 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle3 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
 
     results = search_handle2->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
 
     results = search_handle3->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
 
     results = search_handle4->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
 
     results = search_handle5->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
 }
 
 TEST_F(SmartScopesClientTest, consecutive_cancels)
 {
     for (int i = 0; i < 50; ++i)
     {
-        auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+        auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
         search_handle->cancel_search();
         EXPECT_THROW(search_handle->get_search_results(), std::exception);
     }
 
-    auto search_handle = ssc_->search("http://127.0.0.1/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
-    EXPECT_EQ(2, results.size());
+    EXPECT_EQ(2u, results.size());
+}
+
+TEST_F(SmartScopesClientTest, reset_url)
+{
+    // check initial values to be expected test values
+    EXPECT_EQ(sss_url_, ssc_->url());
+
+    // empty the environment var (in case there already is one set)
+    std::string server_url_env = "SMART_SCOPES_SERVER=";
+    ::putenv(const_cast<char*>(server_url_env.c_str()));
+
+    // reset url and check that we now have falback contant url
+    EXPECT_NO_THROW(ssc_->reset_url());
+    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2", ssc_->url());
+
+    // set the environment var
+    server_url_env = "SMART_SCOPES_SERVER=http://hello.com/there";
+    ::putenv(const_cast<char*>(server_url_env.c_str()));
+
+    // reset url and check that we now have the environment var url
+    EXPECT_NO_THROW(ssc_->reset_url());
+    EXPECT_EQ("http://hello.com/there", ssc_->url());
+
+    // force url
+    EXPECT_NO_THROW(ssc_->reset_url("http://hello.com:2000/there"));
+    EXPECT_EQ("http://hello.com:2000/there", ssc_->url());
 }
 
 } // namespace

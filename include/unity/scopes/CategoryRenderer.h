@@ -21,7 +21,7 @@
 
 #include <string>
 #include <memory>
-#include <unity/SymbolExport.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -37,46 +37,99 @@ namespace internal
 /**
   \brief A default template for generic use.
  */
-#define DEFAULT_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","art":"art"}})"
+constexpr const char* DEFAULT_RENDERER
+{
+    R"(
+    {
+        "schema-version":1,
+        "template":
+        {
+            "category-layout":"grid"
+        },
+        "components":
+        {
+            "title":"title",
+            "art":"art"
+        }
+    }
+    )"
+};
 
 /**
   \brief A template suitable for displaying music results.
  */
-#define MUSIC_GRID_RENDERER R"({"schema-version":1,"template":{"category-layout":"grid"},"components":{"title":"title","subtitle":"subtitle","art":"art"}})"
+constexpr const char* MUSIC_GRID_RENDERER
+{
+    R"(
+        {
+            "schema-version":1,
+            "template":
+            {
+                "category-layout":"grid"
+            },
+            "components":
+            {
+                "title":"title",
+                "subtitle":"subtitle",
+                "art":"art"
+            }
+        }
+    )"
+};
 
 /**
-   \brief CategoryRenderer encapsulates category renderer template in JSON format.
+\brief A category renderer template in JSON format.
 */
-class UNITY_API CategoryRenderer
+
+class CategoryRenderer
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(CategoryRenderer);
+    /// @endcond
+
     /**
-     \brief Creates CategoryRenderer from a JSON data.
-     */
+    \brief Creates a CategoryRenderer from a JSON string.
+
+    \param json_text Renderer template in JSON format
+    \throws unity::InvalidArgumentException if json_text cannot be parsed
+    */
     explicit CategoryRenderer(std::string const& json_text = DEFAULT_RENDERER);
 
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     CategoryRenderer(CategoryRenderer const&);
     CategoryRenderer& operator=(CategoryRenderer const&);
 
     CategoryRenderer(CategoryRenderer&&);
     CategoryRenderer& operator=(CategoryRenderer&&);
+    virtual ~CategoryRenderer();
+    //@}
 
     /**
-     \brief Creates CategoryRenderer from a text file.
-     */
+    \brief Creates a CategoryRenderer from a text file.
+    \return The CategoryRenderer corresponding to the information in the file.
+    */
+    // TODO: document exception thrown for invalid string.
     static CategoryRenderer from_file(std::string const& path);
 
     /**
-     \brief Returns complete renderer template definition in JSON format.
-     \return renderer template (JSON)
-     */
+    \brief Returns complete renderer template definition in JSON format.
+    \return The renderer template (JSON).
+    */
     std::string data() const;
 
 private:
-    std::shared_ptr<internal::CategoryRendererImpl> p;
+    std::unique_ptr<internal::CategoryRendererImpl> p;
 
     friend class internal::CategoryRendererImpl;
 };
+
+/// @cond
+bool operator==(const CategoryRenderer&, const CategoryRenderer&);
+/// @endcond
 
 } // namespace scopes
 

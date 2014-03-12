@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -38,6 +40,7 @@ SearchMetadataImpl::SearchMetadataImpl(int cardinality, std::string const& local
     : QueryMetadataImpl(locale, form_factor),
       cardinality_(cardinality)
 {
+    check_cardinality("SearchMetadataImpl()", cardinality);
 }
 
 SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
@@ -45,16 +48,52 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
 {
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
+    check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
+    it = find_or_throw("SearchMetadataImpl()", var, "hints");
+    hints_ = it->second.get_dict();
 }
 
 void SearchMetadataImpl::set_cardinality(int cardinality)
 {
+    check_cardinality("SearchMetadataImpl::set_cardinality()", cardinality);
     cardinality_ = cardinality;
 }
 
 int SearchMetadataImpl::cardinality() const
 {
     return cardinality_;
+}
+
+Variant& SearchMetadataImpl::hint(std::string const& key)
+{
+    return hints_[key];
+}
+
+Variant const& SearchMetadataImpl::hint(std::string const& key) const
+{
+    auto const& it = hints_.find(key);
+    if (it != hints_.end())
+    {
+        return it->second;
+    }
+    std::ostringstream s;
+    s << "SearchMetadataImpl::hint(): requested key " << key << " doesn't exist";
+    throw unity::LogicException(s.str());
+}
+
+void SearchMetadataImpl::set_hint(std::string const& key, Variant const& value)
+{
+    hints_[key] = value;
+}
+
+VariantMap SearchMetadataImpl::hints() const
+{
+    return hints_;
+}
+
+bool SearchMetadataImpl::contains_hint(std::string const& key) const
+{
+    return hints_.find(key) != hints_.end();
 }
 
 std::string SearchMetadataImpl::metadata_type() const
@@ -67,6 +106,22 @@ void SearchMetadataImpl::serialize(VariantMap &var) const
 {
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);
+    var["hints"] = hints_;
+}
+
+VariantMap SearchMetadataImpl::serialize() const
+{
+    VariantMap vm;
+    serialize(vm);
+    return vm;
+}
+
+void SearchMetadataImpl::check_cardinality(std::string const& func_name, int cardinality)
+{
+    if (cardinality < 0)
+    {
+        throw InvalidArgumentException(func_name + ": " + std::to_string(cardinality));
+    }
 }
 
 SearchMetadata SearchMetadataImpl::create(VariantMap const& var)

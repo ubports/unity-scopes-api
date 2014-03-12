@@ -51,7 +51,7 @@ private:
     std::condition_variable cond_;
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult /* result */) override {}
@@ -71,7 +71,7 @@ public:
     FilterState filter_state;
 };
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
     rt->run_scope(&scope);
@@ -88,19 +88,19 @@ TEST(Filters, scope)
 
     SearchMetadata hints("pl", "phone");
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", hints, receiver);
+    auto ctrl = scope->search("test", hints, receiver);
     receiver->wait_until_finished();
 
     auto filter_state = receiver->filter_state; // copy filter state, it will be sent with 2nd query
     {
         auto filters = receiver->filters;
-        EXPECT_EQ(1, filters.size());
+        EXPECT_EQ(1u, filters.size());
         EXPECT_EQ("f1", filters.front()->id());
         auto filter_type = filters.front()->filter_type();
         EXPECT_EQ("option_selector", filter_type);
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
-        EXPECT_EQ(2, selector->options().size());
-        EXPECT_EQ(0, selector->active_options(filter_state).size());
+        EXPECT_EQ(2u, selector->options().size());
+        EXPECT_EQ(0u, selector->active_options(filter_state).size());
 
         auto option1 = selector->options().front();
         selector->update_state(filter_state, option1, true); // activate filter option
@@ -108,13 +108,13 @@ TEST(Filters, scope)
 
     // send 2nd query, this time with filter state (one active option)
     receiver = std::make_shared<SearchReceiver>();
-    ctrl = scope->create_query("test2", filter_state, hints, receiver);
+    ctrl = scope->search("test2", filter_state, hints, receiver);
     receiver->wait_until_finished();
     {
         auto filters = receiver->filters;
         auto filter_state2 = receiver->filter_state;
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
-        EXPECT_EQ(1, selector->active_options(filter_state2).size());
+        EXPECT_EQ(1u, selector->active_options(filter_state2).size());
         auto option1 = *(selector->active_options(filter_state2).begin());
         EXPECT_EQ("o1", option1->id());
     }
@@ -123,7 +123,7 @@ TEST(Filters, scope)
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
     std::thread scope_t(scope_thread, rt);
     auto rc = RUN_ALL_TESTS();
     rt->destroy();

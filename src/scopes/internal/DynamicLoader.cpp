@@ -36,14 +36,15 @@ namespace internal
 DynamicLoader::LibraryHandles DynamicLoader::handles_;
 mutex DynamicLoader::mutex_;
 
-DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
-    path_(path),
-    handle_(nullptr),
-    unload_(ul)
+DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul)
 {
     // Prevent concurrent access to handles_ and guard against concurrent
     // calls to dlopen()/dlclose(), which are not thread-safe.
     lock_guard<decltype(mutex_)> lock(mutex_);
+
+    handle_ = nullptr;
+    path_ = path;
+    unload_ = ul;
 
     // If the caller doesn't want dlclose() to be called, we look whether we've loaded
     // this library previously and, if so, re-use its handle.
@@ -73,10 +74,11 @@ DynamicLoader::DynamicLoader(string const& path, Binding b, Unload ul) :
 
 DynamicLoader::~DynamicLoader()
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     if (unload_ == Unload::automatic)
     {
         assert(handle_);
-        lock_guard<decltype(mutex_)> lock(mutex_);
         dlclose(handle_);
     }
 }
@@ -96,6 +98,8 @@ DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 
 void* DynamicLoader::find_variable(string const& symbol)
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     dlerror();  // Clear any existing error
     void* p = dlsym(handle_, symbol.c_str());
     char const* error = dlerror();
@@ -108,6 +112,8 @@ void* DynamicLoader::find_variable(string const& symbol)
 
 string DynamicLoader::path() const
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     return path_;
 }
 

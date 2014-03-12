@@ -19,59 +19,56 @@
 #ifndef UNITY_SCOPES_PREVIEW_REPLY_H
 #define UNITY_SCOPES_PREVIEW_REPLY_H
 
-#include <unity/scopes/ObjectProxy.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/Result.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/ReplyBase.h>
 #include <unity/scopes/ColumnLayout.h>
+#include <unity/scopes/PreviewReplyProxyFwd.h>
+#include <unity/scopes/PreviewWidget.h>
+#include <unity/scopes/Reply.h>
+
+#include <string>
 
 namespace unity
 {
-
 namespace scopes
 {
-
-namespace internal
-{
-class QueryObject;
-class ReplyImpl;
-}
-
 /**
-\brief Reply allows the results of a query to be sent to the source of the query.
+\brief Allows the results of a preview to be sent to the preview requester.
 */
 
-class UNITY_API PreviewReply : public virtual ReplyBase
+class PreviewReply : public virtual Reply
 {
 public:
-    PreviewReply(PreviewReply const&) = delete;
+    /**
+    \brief Registers a list of column layouts for the current preview.
 
-    /**
-     \brief Registers a list of column layouts for current preview.
-     Layouts need to be registered before pushing PreviewWidgetList, and only once in the lieftime of this PreviewReply lifetime.
-     This method throws unity::LogicException if this constrains are violated.
-     */
-    bool register_layout(ColumnLayoutList const& layouts) const;
-
-    /**
-     \brief Sends widget definitions to the sender of the preview query.
-     */
-    bool push(PreviewWidgetList const& widget_list) const;
-    /**
-     \brief Sends data for a preview widget attribute.
-     */
-    bool push(std::string const& key, Variant const& value) const;
-
-    /**
-    \brief Destroys a Reply.
-    If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
+    Layouts must be registered before pushing a unity::scopes::PreviewWidgetList, and must be
+    registered only once.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    \throws unity::LogicException register_layout() is called more than once.
     */
+    virtual bool register_layout(ColumnLayoutList const& layouts) = 0;
+
+    /**
+    \brief Sends widget definitions to the sender of the preview query.
+
+    This method can be called mutiple times to send widgets in stages.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    */
+    virtual bool push(PreviewWidgetList const& widget_list) = 0;
+
+    /**
+    \brief Sends data for a preview widget attribute.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    */
+    virtual bool push(std::string const& key, Variant const& value) = 0;
+
+    /// @cond
     virtual ~PreviewReply();
+    /// @endcond
 
 protected:
-    PreviewReply(internal::ReplyImpl* impl);         // Instantiated only by ReplyImpl
-    friend class internal::ReplyImpl;
+    /// @cond
+    PreviewReply();
+    /// @endcond
 };
 
 } // namespace scopes

@@ -43,20 +43,22 @@ public:
     ScopeMetadataImpl& operator=(ScopeMetadataImpl const&);
     ScopeMetadataImpl& operator=(ScopeMetadataImpl&&) = default;
 
-    std::string scope_name() const;
+    std::string scope_id() const;
     ScopeProxy proxy() const;
     std::string display_name() const;   // localized
     std::string description() const;    // localized
+    std::string author() const;
     std::string art() const;            // optional
     std::string icon() const;           // optional
     std::string search_hint() const;    // localized, optional
     std::string hot_key() const;        // localized, optional
     bool invisible() const;             // optional (default = false)
 
-    void set_scope_name(std::string const& scope_name);
+    void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
     void set_display_name(std::string const& display_name);
     void set_description(std::string const& description);
+    void set_author(std::string const& author);
     void set_art(std::string const& art);
     void set_icon(std::string const& icon);
     void set_search_hint(std::string const& search_hint);
@@ -71,10 +73,11 @@ public:
 private:
 
     MiddlewareBase* mw_;
-    std::string scope_name_;
+    std::string scope_id_;
     ScopeProxy proxy_;
     std::string display_name_;
     std::string description_;
+    std::string author_;
     std::unique_ptr<std::string> art_;          // Optional, hence a pointer
     std::unique_ptr<std::string> icon_;         // Optional, hence a pointer
     std::unique_ptr<std::string> search_hint_;  // Optional, hence a pointer

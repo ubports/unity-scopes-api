@@ -19,14 +19,41 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
 
+// This hack allows unity-scopes-api to be built with
+// clang-3.4+ and versions of Qt before v5.1.1.
+#if QT_VERSION < 0x050101
+    #define register
+
+    #include <QThread>
+
+    #define qHash(x,y) qHash(const QUrl &url, uint seed)
+    #include <QUrl>
+    #undef qHash
+
+    #undef register
+#else
+    #include <QThread>
+    #include <QUrl>
+#endif
+
 #include <unity/util/NonCopyable.h>
 
-#include <QThread>
-#include <QUrl>
 #include <mutex>
 
 class QNetworkReply;
 class QNetworkAccessManager;
+
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace internal
+{
+
+namespace smartscopes
+{
 
 class Q_DECL_EXPORT HttpClientQtThread : public QThread
 {
@@ -59,5 +86,13 @@ private:
     bool success_;
     std::string reply_;
 };
+
+} // namespace smartscopes
+
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity
 
 #endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H

@@ -19,9 +19,8 @@
 #ifndef UNITY_SCOPES_ACTIVATIONRESPONSE_H
 #define UNITY_SCOPES_ACTIVATIONRESPONSE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <memory>
 
 namespace unity
@@ -36,13 +35,14 @@ class ActivationResponseImpl;
 }
 
 /**
-\brief Carries response to a Result activation request.
+\brief Response to a result activation.
 */
-class UNITY_API ActivationResponse final
+
+class ActivationResponse final
 {
 public:
-    /*!
-     \brief Status of an unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
+    /**
+     \brief Status of a unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
      */
     enum Status
     {
@@ -50,82 +50,72 @@ public:
         ShowDash,    /**< Activation of this result was handled, show the Dash */
         HideDash,    /**< Activation of this result was handled, hide the Dash */
         ShowPreview, /**< Preview should be requested for this result */
-        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with Query object and is invalid otherwise */
+        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with CannedQuery object and is invalid otherwise */
     };
 
     /**
     \brief Creates ActivationResponse with given status.
-    Throws unity::InvalidArgumentException if status is Status::PerformQuery - to
-    create ActivationResponse of that type, use ActivationResponse(Query const&)
+    \param status The activation status.
+    \throws unity::InvalidArgumentException if status is Status::PerformQuery. To
+    create an ActivationResponse of that type, use the ActivationResponse(CannedQuery const&)
     constructor.
-    \param status activation status
     */
     ActivationResponse(Status status);
 
     /**
-    \brief Creates ActivationResponse with activation status of Status::PerformQuery and a search query to be executed.
-    \param query search query to be executed by client
+    \brief Creates an ActivationResponse with status Status::PerformQuery and a search query to be executed.
+    \param query The search query to be executed by the client.
      */
-    ActivationResponse(Query const& query);
+    ActivationResponse(CannedQuery const& query);
 
-    /// @cond
-    ~ActivationResponse();
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     ActivationResponse(ActivationResponse const& other);
     ActivationResponse(ActivationResponse&& other);
+
     ActivationResponse& operator=(ActivationResponse const& other);
     ActivationResponse& operator=(ActivationResponse&& other);
-    /// @endcond
+    //@}
 
     /**
     \brief Get activation status.
-    \return activation status
+    \return The activation status.
     */
     ActivationResponse::Status status() const;
 
     /**
-     \deprecated Attach arbitrary data to this response.  This method will be removed in version 0.4.0, please use set_scope_data instead.
-     */
-    void setHints(VariantMap const& hints);
-
-    /**
      \brief Attach arbitrary data to this response.
 
-     The attached data will be sent back to the scope if status of this response is Status::ShowPreview.
+     The attached data is sent back to the scope if the status of this response is Status::ShowPreview.
      \param data arbitrary value attached to response
      */
     void set_scope_data(Variant const& data);
 
     /**
-     \deprecated Get data attached to this response object. This method will be removed in version 0.4.0, please use scope_data instead.
-
-     This method returns data attached with setHints() or set_scope_data() call; this method returns empty VariantMap if the attached data was added with
-     set_scope_data() and it is is not of VariantMap type.
-
-     \return data attached to response
-     */
-    VariantMap hints() const;
-
-    /**
      \brief Get data attached to this response object.
-     \return data attached to response
+     \return The data attached to response.
      */
     Variant scope_data() const;
 
     /**
-     \brief Query to be executed if status is Status::PerformQuery.
+     \brief A query to be executed if status is Status::PerformQuery.
 
-     This method throws unity::LogicException is status of this ActivationResponse is different than Status::PerformQuery.
-     \return query to be executed by client.
+     \throws unity::LogicException if the status of this ActivationResponse is anything other than Status::PerformQuery.
+     \return The query to be executed by the client.
     */
-    Query query() const;
+    CannedQuery query() const;
 
     /// @cond
     VariantMap serialize() const;
+
+    ~ActivationResponse();
     /// @endcond
 
 private:
-    std::shared_ptr<internal::ActivationResponseImpl> p;
-    ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl);
+    std::unique_ptr<internal::ActivationResponseImpl> p;
+    ActivationResponse(internal::ActivationResponseImpl* pimpl);
     friend class internal::ActivationResponseImpl;
 };
 

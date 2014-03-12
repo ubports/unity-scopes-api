@@ -317,7 +317,7 @@ TEST(CategorisedResult, deserialize)
         CategoryRegistry reg;
         CategoryRenderer rdr;
         auto cat = reg.register_category("1", "title", "icon", rdr);
-        auto result = internal::CategorisedResultImpl::create_result(std::make_shared<internal::CategorisedResultImpl>(cat, outer));
+        auto result = internal::CategorisedResultImpl::create_result(new CategorisedResultImpl(cat, outer));
 
         auto outer_var = result.serialize();
         auto var = outer_var["attrs"].get_dict();
@@ -344,7 +344,7 @@ TEST(CategorisedResult, deserialize)
         CategoryRegistry reg;
         CategoryRenderer rdr;
         auto cat = reg.register_category("1", "title", "icon", rdr);
-        auto result = internal::CategorisedResultImpl::create_result(std::make_shared<internal::CategorisedResultImpl>(cat, outer));
+        auto result = internal::CategorisedResultImpl::create_result(new internal::CategorisedResultImpl(cat, outer));
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
         EXPECT_EQ("http://canonical.com", result.dnd_uri());

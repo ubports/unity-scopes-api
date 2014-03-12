@@ -18,17 +18,18 @@
 
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 
+#include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/ReplyImpl.h>
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/scopes/ActivationBase.h>
+#include <unity/scopes/internal/PreviewReplyImpl.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
+#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/PreviewReply.h>
-#include <unity/scopes/PreviewQuery.h>
+#include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/SearchReply.h>
-#include <unity/scopes/SearchQuery.h>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <thread>
 
 using namespace std;
@@ -161,40 +162,56 @@ bool SSQueryObject::pushable(InvokeInfo const& info) const noexcept
     return query_it->second->q_pushable;
 }
 
+int SSQueryObject::cardinality(InvokeInfo const& info) const noexcept
+{
+    std::lock_guard<std::mutex> lock(queries_mutex_);
+
+    // find query in queries_ from reply ID
+    auto query_it = queries_.find(info.id);
+    assert(query_it != end(queries_));
+
+    return query_it->second->q_cardinality;
+}
+
 void SSQueryObject::set_self(QueryObjectBase::SPtr const& /*self*/) noexcept
 {
     ///! TODO: remove
 }
 
-void SSQueryObject::add_query(SSQuery::QueryType query_type, QueryBase::SPtr const& query_base,
+void SSQueryObject::add_query(SSQuery::QueryType query_type,
+                              std::shared_ptr<QueryBase> const& query_base,
+                              int cardinality,
                               MWReplyProxy const& reply)
 {
     std::unique_lock<std::mutex> lock(queries_mutex_);
 
     // add the new query struct to queries_
-    queries_[reply->identity()] = std::make_shared<SSQuery>(query_type, query_base, reply);
+    queries_[reply->identity()] = std::make_shared<SSQuery>(query_type, query_base, cardinality, reply);
+}
+
+void SSQueryObject::add_query(SSQuery::QueryType query_type,
+                              std::shared_ptr<QueryBase> const& query_base,
+                              MWReplyProxy const& reply)
+{
+    add_query(query_type, query_base, 0, reply);
 }
 
 void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     SearchReplyProxy q_reply_proxy;
-    SearchQuery::SPtr search_query;
+    SearchQueryBase::SPtr search_query;
 
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
+    q_base = query->q_base;
 
-        q_base = query->q_base;
+    // Create the reply proxy and keep a weak_ptr, which we will need
+    // if cancel() is called later.
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this());
+    assert(q_reply_proxy);
+    query->q_reply_proxy = q_reply_proxy;
 
-        // Create the reply proxy and keep a weak_ptr, which we will need
-        // if cancel() is called later.
-        q_reply_proxy = ReplyImpl::create(reply, shared_from_this());
-        assert(q_reply_proxy);
-        query->q_reply_proxy = q_reply_proxy;
-
-        search_query = dynamic_pointer_cast<SearchQuery>(q_base);
-        assert(search_query);
-    }
+    search_query = dynamic_pointer_cast<SearchQueryBase>(q_base);
+    assert(search_query);
 
     // Synchronous call into scope implementation.
     // On return, replies for the query may still be outstanding.
@@ -205,22 +222,18 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
     PreviewReplyProxy q_reply_proxy;
-    PreviewQuery::SPtr preview_query;
+    PreviewQueryBase::SPtr preview_query;
 
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
+    q_base = query->q_base;
 
-        q_base = query->q_base;
+    // Create the reply proxy and keep a weak_ptr, which we will need
+    // if cancel() is called later.
+    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this());
+    assert(q_reply_proxy);
+    query->q_reply_proxy = q_reply_proxy;
 
-        // Create the reply proxy and keep a weak_ptr, which we will need
-        // if cancel() is called later.
-        q_reply_proxy = ReplyImpl::create_preview_reply(reply, shared_from_this());
-        assert(q_reply_proxy);
-        query->q_reply_proxy = q_reply_proxy;
-
-        preview_query = dynamic_pointer_cast<PreviewQuery>(q_base);
-        assert(preview_query);
-    }
+    preview_query = dynamic_pointer_cast<PreviewQueryBase>(q_base);
+    assert(preview_query);
 
     // Synchronous call into scope implementation.
     // On return, replies for the query may still be outstanding.
@@ -230,16 +243,12 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
     QueryBase::SPtr q_base;
-    ActivationBase::SPtr activation_query;
+    ActivationQueryBase::SPtr activation_query;
 
-    {
-        std::lock_guard<std::mutex> lock(queries_mutex_);
+    q_base = query->q_base;
 
-        q_base = query->q_base;
-
-        activation_query = dynamic_pointer_cast<ActivationBase>(q_base);
-        assert(activation_query);
-    }
+    activation_query = dynamic_pointer_cast<ActivationQueryBase>(q_base);
+    assert(activation_query);
 
     // no need for intermediate proxy (like with ReplyImpl::create),
     // since we get single return value from the public API

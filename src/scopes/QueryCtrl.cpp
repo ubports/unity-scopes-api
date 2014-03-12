@@ -18,8 +18,6 @@
 
 #include <unity/scopes/QueryCtrl.h>
 
-#include <unity/scopes/internal/QueryCtrlImpl.h>
-
 namespace unity
 {
 
@@ -28,23 +26,12 @@ namespace scopes
 
 //! @cond
 
-QueryCtrl::QueryCtrl(internal::QueryCtrlImpl* impl)
-    : ObjectProxy(impl)
+QueryCtrl::QueryCtrl()
 {
 }
 
 QueryCtrl::~QueryCtrl()
 {
-}
-
-void QueryCtrl::cancel() const
-{
-    return fwd()->cancel();
-}
-
-internal::QueryCtrlImpl* QueryCtrl::fwd() const
-{
-    return dynamic_cast<internal::QueryCtrlImpl*>(pimpl());
 }
 
 //! @endcond

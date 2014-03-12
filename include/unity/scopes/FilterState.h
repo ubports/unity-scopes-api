@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_FILTERSTATE_H
 #define UNITY_SCOPES_FILTERSTATE_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 #include <memory>
 
 namespace unity
@@ -38,36 +38,52 @@ class FilterBaseImpl;
 }
 
 /**
-  \brief Captures state of multiple filters.
-  State can be examined by passing an instance of FilterState to
-  appropriate methods of filters (FilterBase implementations).
-  */
-class UNITY_API FilterState final
+\brief Captures state of multiple filters.
+
+State can be examined by passing an instance of FilterState to
+appropriate methods of filters (FilterBase implementations).
+*/
+
+class FilterState final
 {
 public:
-/// @cond
+    /// @cond
+    UNITY_DEFINES_PTRS(FilterState);
+
+    ~FilterState();
+    VariantMap serialize() const;
+    /// @endcond
+
+    /**
+    \brief Constructs a an empty filter state instance.
+    */
     FilterState();
+
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     FilterState(FilterState const& other);
     FilterState(FilterState &&);
     FilterState& operator=(FilterState const& other);
     FilterState& operator=(FilterState&& other);
-    VariantMap serialize() const;
-/// @endcond
+    //@}
 
     /**
-     \brief Check if state for given filter has been stored.
-     \return true if state for filter with id is present.
-     */
+    \brief Check if state for the given filter has been stored.
+    \return True if state for a filter with the given ID is present; false otherwise.
+    */
     bool has_filter(std::string const& id) const;
 
     /**
-      \brief Removes state for specific filter.
-     */
+    \brief Removes the state for a specific filter.
+    \param id The identity of the filter to remove.
+    */
     void remove(std::string const& id);
 
 private:
     FilterState(internal::FilterStateImpl *pimpl);
-    std::shared_ptr<internal::FilterStateImpl> p;
+    std::unique_ptr<internal::FilterStateImpl> p;
     friend class internal::FilterBaseImpl;
     friend class internal::FilterStateImpl;
 };

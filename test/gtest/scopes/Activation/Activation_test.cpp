@@ -33,7 +33,7 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-class DummyReceiver : public SearchListener
+class DummyReceiver : public SearchListenerBase
 {
 public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
@@ -74,7 +74,7 @@ private:
 
 };
 
-class SearchReceiver : public SearchListener, public WaitUntilFinished
+class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
     virtual void push(CategorisedResult result) override
@@ -90,10 +90,10 @@ public:
     std::shared_ptr<Result> result;
 };
 
-class ActivationReceiver : public ActivationListener, public WaitUntilFinished
+class ActivationReceiver : public ActivationListenerBase, public WaitUntilFinished
 {
 public:
-    virtual void activation_response(ActivationResponse const& response)
+    virtual void activated(ActivationResponse const& response) override
     {
         this->response = std::make_shared<ActivationResponse>(response);
     }
@@ -148,7 +148,7 @@ TEST(Activation, direct_activation)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -181,7 +181,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -203,7 +203,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -233,7 +233,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -255,7 +255,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -291,7 +291,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -314,7 +314,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -345,7 +345,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -368,7 +368,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -400,7 +400,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -423,7 +423,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -459,7 +459,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
                 {
                     received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope");
+        internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         {
@@ -482,7 +482,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
                 {
                     agg_received_result.reset(new CategorisedResult(result));
                 });
-        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope");
+        internal::ResultReplyObject aggreply(aggreceiver, runtime.get(), "ipc:///tmp/scope-bar#scope-bar!c=Scope", 0);
         aggreply.set_disconnect_function(df);
 
         {
@@ -504,7 +504,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
     rt->run_scope(&scope);
@@ -522,7 +522,7 @@ TEST(Activation, scope)
 
     VariantMap hints;
     auto receiver = std::make_shared<SearchReceiver>();
-    auto ctrl = scope->create_query("test", SearchMetadata("pl", "phone"), receiver);
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
     receiver->wait_until_finished();
 
     auto result = receiver->result;
@@ -574,7 +574,7 @@ TEST(Activation, scope)
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
     std::thread scope_t(scope_thread, rt);
     auto rc = RUN_ALL_TESTS();
     rt->destroy();

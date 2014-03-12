@@ -26,12 +26,11 @@ namespace scopes
 {
 
 /*!
-
 \class CategoryRenderer
 
 This class specifies how is a particular category rendered by Unity. Note that the data is likely to change between major versions of Unity, and therefore the definition isn't strongly typed and provided by a scope author as a JSON string.
 
-A Category contains all the information needed by Unity to render results provided by a scope author (by handling unity::scopes::SearchQuery::run()) in a way that gives the user as much useful information as possible. When pushing results to the query originator (unity::scopes::SearchReply::push()), each result needs to have a category associated, and this association determines what will the result look like.
+A Category contains all the information needed by Unity to render results provided by a scope author (by handling unity::scopes::SearchQueryBase::run()) in a way that gives the user as much useful information as possible. When pushing results to the query originator (unity::scopes::SearchReply::push()), each result needs to have a category associated, and this association determines what will the result look like.
 
 The most important part of a category definition is the unity::scopes::CategoryRenderer instance. If you use the default constructor CategoryRenderer(), the renderer will use the following definition:
 
@@ -63,6 +62,8 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c card-size Size of the result cards; possible values: \c "small", \c "medium" (default), \c "large"; when using <tt>"category-layout": "vertical-journal"</tt> any integer between 12 and 38
 \arg \c overlay Overlay text data on top of the art; boolean, default false
 \arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: 1 or 2 (only affects grid and journal)
+\arg \c card-background Background color for the cards; string; URI in the format \verbatim color:///#rrggbb \endverbatim or \verbatim color:///color_name
+\endverbatim or \verbatim gradient:///#rrggbb/#rrggbb \endverbatim or an image URI (will be stretched)
 
 \subsection components1 components keys
 
@@ -72,6 +73,7 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c mascot Mascot (secondary graphics), uri
 \arg \c emblem Emblem, uri
 \arg \c summary Text summary, string
+\arg \c background Card background, can override the default specified in the card-background field of the template section, string (same URI format as for card-background)
 \arg \c attribute-1 string
 \arg \c attribute-2 string
 \arg \c attribute-3 string
@@ -126,8 +128,22 @@ CategoryRenderer::CategoryRenderer(std::string const& json_text)
 {
 }
 
-CategoryRenderer::CategoryRenderer(CategoryRenderer const&) = default;
-CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const&) = default;
+CategoryRenderer::~CategoryRenderer() = default;
+
+CategoryRenderer::CategoryRenderer(CategoryRenderer const& other)
+    : p(new internal::CategoryRendererImpl(*(other.p)))
+{
+}
+
+CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::CategoryRendererImpl(*(other.p)));
+    }
+    return *this;
+}
+
 CategoryRenderer::CategoryRenderer(CategoryRenderer&&) = default;
 CategoryRenderer& CategoryRenderer::operator=(CategoryRenderer&&) = default;
 
@@ -139,6 +155,11 @@ CategoryRenderer CategoryRenderer::from_file(std::string const& path)
 std::string CategoryRenderer::data() const
 {
     return p->data();
+}
+
+bool operator==(const CategoryRenderer& lhs, const CategoryRenderer& rhs)
+{
+    return lhs.data() == rhs.data();
 }
 
 //! @endcond

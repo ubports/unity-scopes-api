@@ -40,7 +40,7 @@ class RuntimeImpl;
 }
 
 /**
-\brief The main object to access the scopes run time.
+\brief The main object for query originators to access the scopes run time.
 
 All interactions with the scopes run time require a Runtime object to be instantiated first. The Runtime instance
 controls the overall life cycle; once a Runtime instance goes out of scope, the application must not make further
@@ -48,9 +48,11 @@ calls on any instance obtained via the destroyed Runtime.
 
 The application must instantiate a Runtime object only after `main()` is entered, and it must destroy the instance
 before leaving `main()`; failure to do so results in undefined behavior.
+
+Note that scope implementations do not need to instantiate a Runtime instance.
 */
 
-class UNITY_API Runtime
+class Runtime
 {
 public:
     /// @cond
@@ -74,8 +76,6 @@ public:
     */
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
-
-    static UPtr create_scope_runtime(std::string const& scope_name, std::string const& configfile = "");
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
@@ -117,20 +117,20 @@ public:
     or an exception (for example, if the proxy string did not parse correctly, or if the proxy
     could not be instantiated due to incorrect values inside the string).
     */
-    Proxy string_to_proxy(std::string const& s) const;
+    ObjectProxy string_to_proxy(std::string const& s) const;
 
     /**
     \brief Converts a proxy to a string.
 
     proxy_to_string() converts the passed proxy to a string. Note that it is typically easier
-    to call the Proxy::to_string() method to achieve the same thing. However, proxy_to_string()
+    to call the ObjectProxy::to_string() method to achieve the same thing. However, proxy_to_string()
     is needed in order to obtain a string for a null proxy (because it is not possible to invoke
     a member function on a null proxy).
 
-    \param p The proxy to convert to a string.
+    \param proxy The proxy to convert to a string.
     \return The string representation of the proxy.
     */
-    std::string proxy_to_string(Proxy const& proxy) const;
+    std::string proxy_to_string(ObjectProxy const& proxy) const;
 
     /**
     \brief Destroys a Runtime instance.
@@ -141,7 +141,7 @@ public:
     ~Runtime();
 
 private:
-    Runtime(std::string const& scope_name, std::string const& configfile); // Instantiation only via create()
+    Runtime(std::string const& scope_id, std::string const& configfile); // Instantiation only via create()
 
     std::unique_ptr<internal::RuntimeImpl> p;
 };

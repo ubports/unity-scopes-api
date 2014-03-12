@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_ANNOTATION_H
 #define UNITY_SCOPES_ANNOTATION_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
+#include <unity/util/DefinesPtrs.h>
 #include <list>
 #include <memory>
 
@@ -30,7 +30,7 @@ namespace unity
 
 namespace scopes
 {
-class Query;
+class CannedQuery;
 
 namespace internal
 {
@@ -39,11 +39,16 @@ class ResultReplyObject;
 }
 
 /**
- * \brief Handles a scope query link(s) that result in a new search query when clicked by user.
+ * \brief Query link(s) that result in a new search query when clicked by the user.
  */
-class UNITY_API Annotation final
+
+class Annotation final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(Annotation);
+    /// @endcond
+
     /*!
      \brief Enumeration of supported Annotation types
      */
@@ -59,12 +64,17 @@ public:
      */
     explicit Annotation(Type atype);
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     Annotation(Annotation const &other);
     Annotation(Annotation&&);
     Annotation& operator=(Annotation const& other);
     Annotation& operator=(Annotation&&);
+    //@}
 
+    /// @cond
     virtual ~Annotation();
     /// @endcond
 
@@ -84,28 +94,29 @@ public:
      * and at least one for Type::GroupedLink. This method
      * throws InvalidArgumentException if these constraints are violated.
      */
-    void add_link(std::string const& label, Query const& query);
+    void add_link(std::string const& label, CannedQuery const& query);
 
     /**
      * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedLink only.
-     * \return label associated with this annotation
+     * \return label The label associated with this annotation.
      */
     std::string label() const;
 
     /**
      * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Link.
-     * \return icon associated with this annotation
+     * \return The icon associated with this annotation.
      */
     std::string icon() const;
 
     /**
      * \brief Returns all links assigned to given position of this annotation.
-     * \returns link at given position
+     * \return The link at the given position.
      */
     std::list<Link::SCPtr> links() const;
 
     /**
      * \brief Returns the type of this annotation.
+     * \return The type of the annotation.
      */
     Type annotation_type() const;
 
@@ -115,7 +126,7 @@ public:
 
 private:
     Annotation(internal::AnnotationImpl* impl);
-    std::shared_ptr<internal::AnnotationImpl> p;
+    std::unique_ptr<internal::AnnotationImpl> p;
 
     friend class internal::ResultReplyObject;
 };

@@ -31,7 +31,7 @@ Result (returned by serialize()):
 'internal' : {
     'result' : dictionary (serialized Result), optional
     'flags'  : integer, optional (activation/preview flags defined by ResultImpl::Flags enum)
-    'origin' : string (scope name)
+    'origin' : string (scope id)
 }
 
 CategorisedResult (returned by serialize()):
@@ -59,7 +59,7 @@ Department (returned by serialize()):
 
 ScopeMetadata (returned by serialize()):
 =====================================
- 'scope_name'   : string
+ 'scope_id'     : string
  'proxy'        : dictionary
     'identity'  : string
     'endpoint'  : string

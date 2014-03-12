@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
 
-#include <unity/SymbolExport.h>
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterBase.h>
 #include <string>
@@ -34,7 +33,7 @@ class FilterState;
 namespace internal
 {
 
-class UNITY_API FilterBaseImpl
+class FilterBaseImpl
 {
 public:
     FilterBaseImpl(std::string const& id);
@@ -44,6 +43,8 @@ public:
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
+    static VariantArray serialize_filters(Filters const& filters);
+    static Filters deserialize_filters(VariantArray const& var);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;

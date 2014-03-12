@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_QUERYCTRL_H
 #define UNITY_SCOPES_QUERYCTRL_H
 
-#include <unity/scopes/ObjectProxy.h>
+#include <unity/scopes/Object.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 
 namespace unity
@@ -28,39 +28,34 @@ namespace unity
 namespace scopes
 {
 
-namespace internal
-{
-class QueryCtrlImpl;
-}
-
 /**
 \brief QueryCtrl allows a query to be cancelled.
 */
 
-class UNITY_API QueryCtrl : public virtual ObjectProxy
+class QueryCtrl : public virtual Object
 {
 public:
     /**
     \brief Cancels an executing query.
+
     Calling cancel() informs the scope to which a query was sent that the query should be cancelled.
     Calling cancel() on a query that is complete has no effect.
     cancel() is guaranteed to not block the caller.
     */
-    void cancel() const;
+    virtual void cancel() = 0;
 
     /**
     \brief Destroys a QueryCtrl.
+
     Letting a QueryCtrl go out of scope has no effect on the query, that is, the destructor does _not_
     implicitly call cancel().
     */
     virtual ~QueryCtrl();
 
 protected:
-    QueryCtrl(internal::QueryCtrlImpl* impl);         // Instantiated only by QueryCtrlImpl
-    friend class internal::QueryCtrlImpl;
-
-private:
-    internal::QueryCtrlImpl* fwd() const;
+    /// @cond
+    QueryCtrl();
+    /// @endcond
 };
 
 } // namespace scopes

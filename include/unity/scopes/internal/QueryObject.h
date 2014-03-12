@@ -48,14 +48,19 @@ public:
     UNITY_DEFINES_PTRS(QueryObject);
 
     QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    QueryObject(std::shared_ptr<QueryBase> const& query_base,
+                int cardinality,
+                MWReplyProxy const& reply,
+                MWQueryCtrlProxy const& ctrl);
     virtual ~QueryObject();
 
     // Remote operation implementations
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
     // Local methods
-    virtual void cancel(InvokeInfo const& info) override;                   // Called locally, by QueryCtrlObject.
-    virtual bool pushable(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
+    virtual void cancel(InvokeInfo const& info) override;                     // Called locally, by QueryCtrlObject.
+    virtual bool pushable(InvokeInfo const& info) const noexcept override;    // Called locally, by ReplyImpl
+    virtual int cardinality(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
     // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
@@ -64,10 +69,11 @@ public:
 protected:
     std::shared_ptr<QueryBase> query_base_;
     MWReplyProxy reply_;
-    std::weak_ptr<ReplyBase> reply_proxy_;
+    std::weak_ptr<unity::scopes::Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     std::atomic_bool pushable_;
     QueryObjectBase::SPtr self_;
+    std::atomic_int cardinality_;
 };
 
 } // namespace internal

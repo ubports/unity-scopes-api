@@ -18,46 +18,19 @@
 
 #include <unity/scopes/Registry.h>
 
-#include <unity/scopes/internal/RegistryImpl.h>
-
 namespace unity
 {
 
 namespace scopes
 {
 
-//! @cond
+/// @cond
 
-Registry::Registry(internal::RegistryImpl* impl) :
-    ObjectProxy(impl)
-{
-}
+Registry::Registry() = default;
 
-Registry::~Registry()
-{
-}
+Registry::~Registry() = default;
 
-//! @endcond
-
-ScopeMetadata Registry::get_metadata(std::string const& scope_name) const
-{
-    return fwd()->get_metadata(scope_name);
-}
-
-MetadataMap Registry::list() const
-{
-    return fwd()->list();
-}
-
-MetadataMap Registry::list_if(std::function<bool(ScopeMetadata const& item)> predicate) const
-{
-    return fwd()->list_if(predicate);
-}
-
-internal::RegistryImpl* Registry::fwd() const
-{
-    return dynamic_cast<internal::RegistryImpl*>(pimpl());
-}
+/// @endcond
 
 } // namespace scopes
 

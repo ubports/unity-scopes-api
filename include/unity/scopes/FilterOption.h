@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_FILTEROPTION_H
 
 #include <unity/util/NonCopyable.h>
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <string>
 #include <memory>
@@ -40,21 +39,33 @@ class OptionSelectorFilterImpl;
 /**
 \brief Holds definition of filter option for OptionSelectorFilter.
 */
-class UNITY_API FilterOption final
+class FilterOption final
 {
 public:
-/// @cond
+    /// @cond
     UNITY_DEFINES_PTRS(FilterOption);
     NONCOPYABLE(FilterOption);
-/// @endcond
+    /// @endcond
 
+    /**
+     \brief Get the identifier of this filter option.
+     \return The option identifier.
+     */
     std::string id() const;
+
+    /**
+     \brief Get the label of this filter option.
+     \return The option label.
+    */
     std::string label() const;
+
+    /// @cond
     ~FilterOption();
+    /// @endcond
 
 private:
     FilterOption(std::string const& id, std::string const& label);
-    std::shared_ptr<internal::FilterOptionImpl> p;
+    std::unique_ptr<internal::FilterOptionImpl> p;
 
     friend class internal::OptionSelectorFilterImpl;
 };

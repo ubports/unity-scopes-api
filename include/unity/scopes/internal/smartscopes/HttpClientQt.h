@@ -23,7 +23,6 @@
 #include <map>
 
 class QCoreApplication;
-class HttpClientQtThread;
 
 namespace unity
 {
@@ -37,13 +36,15 @@ namespace internal
 namespace smartscopes
 {
 
+class HttpClientQtThread;
+
 class HttpClientQt : public HttpClientInterface
 {
 public:
     explicit HttpClientQt(uint no_reply_timeout);
     ~HttpClientQt();
 
-    HttpResponseHandle::SPtr get(std::string const& request_url, uint port) override;
+    HttpResponseHandle::SPtr get(std::string const& request_url) override;
 
     std::string to_percent_encoding(std::string const& string) override;
 
@@ -54,7 +55,7 @@ private:
     class HttpSession
     {
     public:
-        HttpSession(std::string const& request_url, int port, uint timeout);
+        HttpSession(std::string const& request_url, uint timeout);
         ~HttpSession();
 
         std::future<std::string> get_future();
@@ -65,7 +66,9 @@ private:
     private:
         std::shared_ptr<std::promise<std::string>> promise_;
         std::thread get_thread_;
-        std::unique_ptr<HttpClientQtThread> get_qt_thread_;
+        std::unique_ptr<HttpClientQtThread> qt_thread_;
+        std::mutex qt_thread_mutex_;
+        std::promise<void> qt_thread_ready_;
     };
 
 private:

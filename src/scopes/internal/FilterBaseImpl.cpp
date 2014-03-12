@@ -87,6 +87,26 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
     throw unity::LogicException("FilterBase: Missing 'filter_type'");
 }
 
+VariantArray FilterBaseImpl::serialize_filters(Filters const& filters)
+{
+    VariantArray var;
+    for (auto const& f: filters)
+    {
+        var.push_back(Variant(f->serialize()));
+    }
+    return var;
+}
+
+Filters FilterBaseImpl::deserialize_filters(VariantArray const& var)
+{
+    Filters filters;
+    for (auto const& f: var)
+    {
+        filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
+    }
+    return filters;
+}
+
 } // namespace internal
 
 } // namespace scopes

@@ -37,6 +37,10 @@ Category::Category(VariantMap const& variant_map)
 {
 }
 
+Category::~Category()
+{
+}
+
 std::string Category::id() const
 {
     return p->id();

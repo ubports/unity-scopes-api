@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEFWD_H
-#define UNITY_SCOPES_SCOPEFWD_H
+#ifndef UNITY_SCOPES_SCOPEPROXYFWD_H
+#define UNITY_SCOPES_SCOPEPROXYFWD_H
 
 #include <memory>
 
@@ -29,8 +29,8 @@ namespace scopes
 
 class Scope;
 
-/*! \typedef ScopeProxy
-\brief Pointer to unity::scopes::Scope object
+/** \typedef ScopeProxy
+\brief Convenience type definition.
 */
 typedef std::shared_ptr<Scope> ScopeProxy;
 

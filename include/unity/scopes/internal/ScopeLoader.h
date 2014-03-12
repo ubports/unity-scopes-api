@@ -34,7 +34,7 @@ namespace internal
 
 // ScopeLoader loads the .so for a scope and TODO: complete this and updated comments below.
 
-class UNITY_API ScopeLoader final
+class ScopeLoader final
 {
 public:
     NONCOPYABLE(ScopeLoader);
@@ -42,7 +42,7 @@ public:
 
     // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy
     // so we can pass it to the scope's start method.
-    static UPtr load(std::string const& scope_name, std::string const& libpath, RegistryProxy const& registry);
+    static UPtr load(std::string const& scope_id, std::string const& libpath, RegistryProxy const& registry);
 
     // unload() explicitly finalizes the scope. This is called by the destructor too, but calling it explicity
     // allows the caller to receive any exceptions that may have been produced by the scope thread.
@@ -66,7 +66,7 @@ public:
 private:
     ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);
 
-    std::string scope_name_;
+    std::string scope_id_;
     unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;
     unity::scopes::RegistryProxy registry_;
     std::exception_ptr exception_;

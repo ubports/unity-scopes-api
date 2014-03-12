@@ -1,0 +1,27 @@
+{
+global:
+    extern "C++" {
+        unity::scopes::[!i]*;
+        typeinfo?for?unity::scopes::[!i]*;
+        typeinfo?name?for?unity::scopes::[!i]*;
+        VTT?for?unity::scopes::[!i]*;
+        virtual?thunk?to?unity::scopes::[!i]*;
+        vtable?for?unity::scopes::[!i]*;
+        unity::scopes::internal::MiddlewareBase::*;
+        unity::scopes::internal::MiddlewareFactory::*;
+        unity::scopes::internal::RegistryConfig::*;
+        unity::scopes::internal::RegistryObject::*;
+        unity::scopes::internal::RuntimeImpl::*;
+        unity::scopes::internal::ScopeConfig::*;
+        unity::scopes::internal::ScopeImpl::*;
+        unity::scopes::internal::ScopeLoader::*;
+        unity::scopes::internal::ScopeMetadataImpl::*;
+        unity::scopes::internal::ScopeObject::*;
+        unity::scopes::internal::smartscopes::SSRegistryObject::*;
+        unity::scopes::internal::smartscopes::SSScopeObject::*;
+    };
+local:
+    extern "C++" {
+        *;
+    };
+};

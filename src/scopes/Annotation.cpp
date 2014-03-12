@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/Annotation.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
 
 namespace unity
@@ -31,6 +31,7 @@ Annotation::Annotation(Type atype)
 {
 }
 
+/// @cond
 Annotation::Annotation(Annotation const &other)
     : p(new internal::AnnotationImpl(*(other.p)))
 {
@@ -62,6 +63,7 @@ VariantMap Annotation::serialize() const
 {
     return p->serialize();
 }
+/// @endcond
 
 void Annotation::set_label(std::string const& label)
 {
@@ -73,7 +75,7 @@ void Annotation::set_icon(std::string const& icon)
     p->set_icon(icon);
 }
 
-void Annotation::add_link(std::string const& label, Query const& query)
+void Annotation::add_link(std::string const& label, CannedQuery const& query)
 {
     p->add_link(label, query);
 }

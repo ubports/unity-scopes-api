@@ -35,38 +35,48 @@ namespace internal
 }
 
 /**
-\brief CategorisedResult is a Result plus a category it belongs to.
+\brief A result, including the category it belongs to.
 */
 
-class UNITY_API CategorisedResult: public Result
+class CategorisedResult: public Result
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(CategorisedResult);
+    /// @endcond
 
     /**
-     \brief Creates a CategorisedResult instance assigned to given category, with all base attributes initially empty.
-     */
+    \brief Creates a CategorisedResult with given category,
+    with all base attributes initially empty.
+    \param category The category for the result.
+    */
     explicit CategorisedResult(Category::SCPtr category);
 
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     CategorisedResult(CategorisedResult const& other);
     CategorisedResult& operator=(CategorisedResult const& other);
     CategorisedResult(CategorisedResult&&);
     CategorisedResult& operator=(CategorisedResult&&);
+    //@}
 
     /**
-     \brief Set category of this result.
-     */
+    \brief Updates the category of this result.
+    \param category The category for the result.
+    */
     void set_category(Category::SCPtr category);
 
     /**
-     \brief Return category of this result.
-     Get category instance this result belongs to.
-     \return category instance
-     */
+    \brief Return category of this result.
+    Get the category instance this result belongs to.
+    \return The category instance.
+    */
     Category::SCPtr category() const;
 
 private:
-    CategorisedResult(std::shared_ptr<internal::ResultImpl> impl);
+    CategorisedResult(internal::ResultImpl* impl);
     internal::CategorisedResultImpl* fwd() const;
 
     friend class internal::CategorisedResultImpl;

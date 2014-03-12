@@ -34,7 +34,7 @@ namespace scopes
 namespace internal
 {
 
-class UNITY_API CategoryImpl
+class CategoryImpl
 {
 public:
     NONCOPYABLE(CategoryImpl);

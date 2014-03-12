@@ -19,8 +19,8 @@
 #ifndef UNITY_SCOPES_ACTIONMETADATA_H
 #define UNITY_SCOPES_ACTIONMETADATA_H
 
-#include <unity/SymbolExport.h>
-#include <unity/scopes/QueryMetadata.h>
+#include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
 
 namespace unity
 {
@@ -34,28 +34,69 @@ class ActionMetadataImpl;
 }
 
 /**
-\brief Metadata passed to scopes as a part of unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate or
-unity::scopes::ScopeBase::perform_action requests.
+\brief Metadata passed to scopes for preview and activation.
+\see unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
 */
-class UNITY_API ActionMetadata : public QueryMetadata
+
+class ActionMetadata final
 {
 public:
+    /// @cond
+    UNITY_DEFINES_PTRS(ActionMetadata);
+
+    ~ActionMetadata();
+    /// @endcond
+
+    /**
+    \brief Create ActionMetadata with given locale and form factor
+    \param locale locale string, eg. en_EN
+    \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
+    */
     ActionMetadata(std::string const& locale, std::string const& form_factor);
+
+    /**
+    \brief Get the locale string.
+    \return The locale string
+    */
+    std::string locale() const;
+
+    /**
+    \brief Get the form factor string.
+    \return The form factor string
+    */
+    std::string form_factor() const;
+
+    /**
+     \brief Attach arbitrary data to this ActionMetadata.
+     \param data The data value to attach.
+     */
     void set_scope_data(Variant const& data);
+
+    /**
+     \brief Get data attached to this ActionMetadata.
+     \return The attached data, or Variant::null.
+     */
     Variant scope_data() const;
 
-    /// @cond
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
     ActionMetadata(ActionMetadata const& other);
     ActionMetadata(ActionMetadata&&);
-    ~ActionMetadata();
 
     ActionMetadata& operator=(ActionMetadata const &other);
     ActionMetadata& operator=(ActionMetadata&&);
+    //@}
+
+    /// @cond
+    VariantMap serialize() const;
     /// @endcond
 
 private:
+    std::unique_ptr<internal::ActionMetadataImpl> p;
+
     ActionMetadata(internal::ActionMetadataImpl *impl);
-    internal::ActionMetadataImpl* fwd() const;
     friend class internal::ActionMetadataImpl;
 };
 

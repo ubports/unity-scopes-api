@@ -31,7 +31,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-class Receiver : public SearchListener
+class Receiver : public SearchListenerBase
 {
 public:
     Receiver()
@@ -90,10 +90,10 @@ int main()
         // "t=300"          - optional timeout (infinite if not specified)
         // "c=Scope"        - type of proxy (must be "c=Scope")
 
-        Proxy p = rt->string_to_proxy("ipc:///tmp/scope-A#scope-A!t=300!c=Scope");
+        ObjectProxy p = rt->string_to_proxy("ipc:///tmp/scope-A#scope-A!t=300!c=Scope");
         assert(p);
 
-        // The returned proxy is of type Proxy and must be down-cast to a scope proxy:
+        // The returned proxy is of type ObjectProxy and must be down-cast to a scope proxy:
         ScopeProxy sp = dynamic_pointer_cast<Scope>(p);
         assert(sp);
 
@@ -101,7 +101,7 @@ int main()
         shared_ptr<Receiver> reply(new Receiver);
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
-        auto ctrl = sp->create_query("query string", metadata, reply); // May raise TimeoutException
+        auto ctrl = sp->search("query string", metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;

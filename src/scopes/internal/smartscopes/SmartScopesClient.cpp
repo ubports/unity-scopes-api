@@ -89,43 +89,14 @@ void PreviewHandle::cancel_preview()
 
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      JsonNodeInterface::SPtr json_node,
-                                     std::string const& url,
-                                     uint port)
+                                     std::string const& url)
     : http_client_(http_client)
     , json_node_(json_node)
-    , url_(url)
-    , port_(port)
     , have_latest_cache_(false)
     , query_counter_(0)
 {
     // initialise url_
-    if (url_.empty())
-    {
-        char* base_url_env = ::getenv("SMART_SCOPES_SERVER");
-        std::string base_url = base_url_env ? base_url_env : "";
-        if (!base_url.empty())
-        {
-            // find the last occurrence of ':' in the url in order to extract the port number
-            // * ignore the colon after "http"/"https"
-
-            const size_t hier_pos = strlen("https");
-
-            uint64_t found = base_url.find_last_of(':');
-            if (found != std::string::npos && found > hier_pos)
-            {
-                url_ = base_url.substr(0, found);
-                port_ = std::stoi(base_url.substr(found + 1));
-            }
-            else
-            {
-                url_ = base_url;
-            }
-        }
-        else
-        {
-            url_ = c_base_url;
-        }
-    }
+    reset_url(url);
 
     // initialise cached_scopes_
     read_cache();
@@ -133,6 +104,31 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
 
 SmartScopesClient::~SmartScopesClient()
 {
+}
+
+void SmartScopesClient::reset_url(std::string const& url)
+{
+    std::string base_url = url;
+
+    // if a url was not provided, get the environment variable
+    if (base_url.empty())
+    {
+        char* sss_url_env = ::getenv("SMART_SCOPES_SERVER");
+        base_url = sss_url_env ? sss_url_env : "";
+
+        // if the env var was not provided, use the c_base_url constant
+        if (base_url.empty())
+        {
+            base_url = c_base_url;
+        }
+    }
+
+    url_ = base_url;
+}
+
+std::string SmartScopesClient::url()
+{
+    return url_;
 }
 
 // returns false if cache used
@@ -154,7 +150,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), port_);
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str());
         response->wait();
 
         response_str = response->get();
@@ -167,13 +163,13 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
         if (caching_enabled)
         {
+            std::cerr << e.what() << std::endl;
             std::cerr << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache" << std::endl;
 
             response_str = read_cache();
             if (response_str.empty())
             {
-                std::cerr << "SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty" << std::endl;
-                throw;
+                throw ResourceException("SmartScopesClient.get_remote_scopes(): Remote scopes cache is empty");
             }
 
             using_cache = true;
@@ -184,31 +180,60 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
     }
 
+    JsonNodeInterface::SPtr root_node;
+    JsonNodeInterface::SPtr child_node;
+
     try
     {
-        JsonNodeInterface::SPtr root_node;
-        JsonNodeInterface::SPtr child_node;
+        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        json_node_->read_json(response_str);
+        root_node = json_node_->get_node();
+    }
+    catch (std::exception const&)
+    {
+        std::cerr << "SmartScopesClient.get_remote_scopes() Failed to parse json response from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
+        throw;
+    }
 
-        {
-            std::lock_guard<std::mutex> lock(json_node_mutex_);
-            json_node_->read_json(response_str);
-            root_node = json_node_->get_node();
-        }
+    for (int i = 0; i < root_node->size(); ++i)
+    {
+        RemoteScope scope;
 
-        for (int i = 0; i < root_node->size(); ++i)
+        try
         {
             child_node = root_node->get_node(i);
-            RemoteScope scope;
 
-            if (!child_node->has_node("id") || !child_node->has_node("name") ||
-                !child_node->has_node("base_url") || !child_node->has_node("description"))
+            if (!child_node->has_node("id"))
             {
-                break;
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope with no id" << std::endl;
+                continue;
+            }
+
+            scope.id = child_node->get_node("id")->as_string();
+
+            bool err = false;
+            static std::array<char const*, 4> const mandatory = { { "name", "description", "author", "base_url" } };
+            for (auto const& field : mandatory)
+            {
+                if (!child_node->has_node(field))
+                {
+                    std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                              << "\" has no \"" << field << "\" field" << std::endl;
+                    err = true;
+                }
+            }
+            if (err)
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
+                          << scope.id << "\"" << std::endl;
+                continue;
             }
 
             scope.id = child_node->get_node("id")->as_string();
             scope.name = child_node->get_node("name")->as_string();
             scope.description = child_node->get_node("description")->as_string();
+            scope.author = child_node->get_node("author")->as_string();
             scope.base_url = child_node->get_node("base_url")->as_string();
 
             if (child_node->has_node("icon"))
@@ -225,29 +250,44 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             remote_scopes.push_back(scope);
         }
-
-        if (!using_cache)
+        catch (std::exception const& e)
         {
-            if (caching_enabled)
+            std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
+                      << scope.id << "\" due to a json parsing failure" << std::endl;
+            std::cerr << e.what() << std::endl;
+        }
+    }
+
+    if (remote_scopes.empty())
+    {
+        std::cerr << "SmartScopesClient.get_remote_scopes(): No valid remote scopes retrieved from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
+    }
+    else if (!using_cache)
+    {
+        if (caching_enabled)
+        {
+            try
             {
                 write_cache(response_str);
             }
-
-            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
-                      << url_ << c_remote_scopes_resource << std::endl;
+            catch (std::exception const& e)
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Failed to write to cache file: "
+                          << c_scopes_cache_dir << c_scopes_cache_filename << std::endl;
+                std::cerr << e.what() << std::endl;
+            }
         }
-        else
-        {
-            std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from cache" << std::endl;
-        }
 
-        return !using_cache;
+        std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << std::endl;
     }
-    catch (std::exception const& e)
+    else
     {
-        std::cerr << "SmartScopesClient.get_remote_scopes() failed." << std::endl;
-        throw;
+        std::cout << "SmartScopesClient.get_remote_scopes(): Retrieved remote scopes from cache" << std::endl;
     }
+
+    return !using_cache;
 }
 
 SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
@@ -288,7 +328,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str(), port_);
+    query_results_[search_id] = http_client_->get(search_uri.str());
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -326,7 +366,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     uint preview_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), port_);
+    query_results_[preview_id] = http_client_->get(preview_uri.str());
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }

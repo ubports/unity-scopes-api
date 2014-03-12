@@ -24,7 +24,6 @@
 #include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
-#include <unity/SymbolExport.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -34,7 +33,7 @@ namespace unity
 namespace scopes
 {
 
-class QueryMetadata;
+class SearchMetadata;
 
 namespace internal
 {
@@ -52,16 +51,29 @@ class SSQueryObject;
 
 } // namespace internal
 
-// Abstract server-side base interface for a query that is executed inside a scope.
 
-// TODO: documentation
+/**
+\brief Abstract server-side base interface for a query that is executed inside a scope.
+\see SearchQueryBase, PreviewQueryBase, ActivationQueryBase
+*/
 
-class UNITY_API QueryBase
+class QueryBase
 {
 public:
+    /// @cond
     NONCOPYABLE(QueryBase);
     UNITY_DEFINES_PTRS(QueryBase);
+    /// @endcond
 
+    /**
+    \brief Called by the scopes run time when the query originator
+    cancels a query.
+
+    Your implementation of this method should ensure that the scope stops
+    processing the current query as soon as possible. Any calls to a `push()` method
+    once a query is cancelled are ignored, so continuing to push after cancellation
+    only wastes CPU cycles.
+    */
     virtual void cancelled() = 0;                          // Originator cancelled the query
 
     /// @cond
@@ -71,14 +83,12 @@ public:
 protected:
     /// @cond
     QueryBase();
+    void cancel();
+    std::unique_ptr<internal::QueryBaseImpl> p;
     /// @endcond
 
-    void cancel();
-
-    std::unique_ptr<internal::QueryBaseImpl> p;
-
 private:
-    void set_metadata(QueryMetadata const& metadata);
+    void set_metadata(SearchMetadata const& metadata);
 
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()

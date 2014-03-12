@@ -82,7 +82,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     //
     // Calls to push() can be dispatched concurrently if the reply side is
     // configured with more than one thread. However, finished() is passed
-    // to the application only only once all executing concurrent push() calls have completed.
+    // to the application only once all executing concurrent push() calls have completed.
 
     if (finished_.load())
     {
@@ -91,42 +91,47 @@ void ReplyObject::push(VariantMap const& result) noexcept
 
     reap_item_->refresh();
 
-    unique_lock<mutex> lock(mutex_);
-    assert(num_push_ >= 0);
-    ++num_push_;
-    lock.unlock(); // Forward invocations to application outside synchronization
+    {
+        unique_lock<mutex> lock(mutex_);
+        assert(num_push_ >= 0);
+        ++num_push_;
+    }  // Forward invocations to application outside synchronization
+
+    bool stop = false;
+    string error;
     try
     {
-        process_data(result);
+        stop = process_data(result);  // Returns true if cardinality limit was reached
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << "ReplyObject::push(VariantMap): " << e.what() << endl;
-        try
-        {
-            finished(ListenerBase::Error, e.what());
-        }
-        catch (...)
-        {
-        }
+        error = string("ReplyObject::push(VariantMap): ") + e.what();
     }
     catch (...)
     {
-        // TODO: log error
-        cerr << "ReplyObject::push(VariantMap): unknown exception" << endl;
-        try
+        error = "ReplyObject::push(VariantMap): unknown exception";
+    }
+
+    // Decrement number of pushes before potentially calling finished(),
+    // because finished() waits for concurrent push() calls to complete.
+    {
+        unique_lock<mutex> lock(mutex_);
+        if (--num_push_ == 0)
         {
-            finished(ListenerBase::Error, "unknown exception");
-        }
-        catch (...)
-        {
+            idle_.notify_one();
         }
     }
-    lock.lock();
-    if (--num_push_ == 0)
+
+    // Safe to call finished now if something went wrong or cardinality was exceeded.
+    if (!error.empty())
     {
-        idle_.notify_one();
+        // TODO: log error
+        finished(ListenerBase::Error, error);
+    }
+    else if (stop)
+    {
+        // TODO: log error
+        finished(ListenerBase::Finished, "");
     }
 }
 

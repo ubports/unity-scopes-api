@@ -30,13 +30,14 @@ namespace scopes
 
 \brief Defines a layout for preview widgets with given column setup.
 
-ColumnLayout defines how widgets should be laid out on a display with given number of columns.
-In typical use cases, scope creates ColumnLayout instances for all supported setups (number of columns),
-and then for every instance defines what widgets belong to which columns. The shell will pick up the layout
-which is appropriate for the device in use.
-Column layouts definitions are optional but highly recommended for optimal result.
+ColumnLayout defines how widgets should be laid out on a display with a given number of columns.
+In typical use cases, a scope creates ColumnLayout instances for all supported displays (number of columns),
+and defines for every instance what widgets belong to which columns. The shell uses the layout
+that is most appropriate for the device in use.
+Column layout definitions are optional. However, we recommend that scopes define layouts for the best
+visual appearance.
 
-An example of creating two layouts - for a screen with one column and a screen with two columns.
+An example of creating two layouts, one for a screen with one column and and one for a screen with two columns.
 
 \code{.cpp}
 void MyPreview::run(PreviewReplyProxy const& reply)
@@ -62,6 +63,7 @@ ColumnLayout::ColumnLayout(int num_of_columns)
 {
 }
 
+/// @cond
 ColumnLayout::ColumnLayout(internal::ColumnLayoutImpl *impl)
     : p(impl)
 {
@@ -83,7 +85,16 @@ ColumnLayout& ColumnLayout::operator=(ColumnLayout const& other)
     return *this;
 }
 
+ColumnLayout::~ColumnLayout() = default;
+
 ColumnLayout& ColumnLayout::operator=(ColumnLayout&&) = default;
+
+VariantMap ColumnLayout::serialize() const
+{
+    return p->serialize();
+}
+
+/// @endcond
 
 void ColumnLayout::add_column(std::vector<std::string> widget_ids)
 {
@@ -104,12 +115,6 @@ std::vector<std::string> ColumnLayout::column(int index) const
 {
     return p->column(index);
 }
-
-VariantMap ColumnLayout::serialize() const
-{
-    return p->serialize();
-}
-
 } // namespace scopes
 
 } // namespace unity

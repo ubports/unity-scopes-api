@@ -30,17 +30,18 @@ namespace scopes
 namespace internal
 {
 
-ActivationReplyObject::ActivationReplyObject(ActivationListener::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_name) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_name),
+ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id),
     receiver_(receiver)
 {
     assert(receiver_);
 }
 
-void ActivationReplyObject::process_data(VariantMap const& data)
+bool ActivationReplyObject::process_data(VariantMap const& data)
 {
     ActivationResponse resp = ActivationResponseImpl::create(data);
-    receiver_->activation_response(resp);
+    receiver_->activated(resp);
+    return false;
 }
 
 } // namespace internal

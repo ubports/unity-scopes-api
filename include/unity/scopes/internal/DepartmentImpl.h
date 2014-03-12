@@ -20,7 +20,7 @@
 #define UNITY_INTERNAL_DEPARTMENTIMPL_H
 
 #include <unity/scopes/Department.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unordered_set>
 
 namespace unity
@@ -35,9 +35,9 @@ namespace internal
 class DepartmentImpl
 {
 public:
-    DepartmentImpl(Query const& query, std::string const& label);
-    DepartmentImpl(std::string const& department_id, Query const& query, std::string const& label);
-    DepartmentImpl(std::string const& department_id, Query const& query, std::string const& label, DepartmentList const& subdepartments);
+    DepartmentImpl(CannedQuery const& query, std::string const& label);
+    DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label);
+    DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
     DepartmentImpl(DepartmentImpl const&) = default;
     ~DepartmentImpl() = default;
 
@@ -47,16 +47,18 @@ public:
 
     std::string id() const;
     std::string label() const;
-    Query query() const;
+    CannedQuery query() const;
     DepartmentList subdepartments() const;
     VariantMap serialize() const;
 
     static Department create(VariantMap const& var);
     static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
+    static VariantMap serialize_departments(DepartmentList const& departments, std::string const& current_department_id);
+    static DepartmentList deserialize_departments(VariantArray const& var);
 
 private:
     static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);
-    Query query_;
+    CannedQuery query_;
     std::string label_;
     DepartmentList departments_;
 };

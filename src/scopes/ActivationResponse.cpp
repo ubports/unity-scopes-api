@@ -17,7 +17,7 @@
 */
 
 #include <unity/scopes/ActivationResponse.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 
 namespace unity
@@ -31,12 +31,13 @@ ActivationResponse::ActivationResponse(Status status)
 {
 }
 
-ActivationResponse::ActivationResponse(Query const& query)
+ActivationResponse::ActivationResponse(CannedQuery const& query)
     : p(new internal::ActivationResponseImpl(query))
 {
 }
 
-ActivationResponse::ActivationResponse(std::shared_ptr<internal::ActivationResponseImpl> pimpl)
+/// @cond
+ActivationResponse::ActivationResponse(internal::ActivationResponseImpl* pimpl)
     : p(pimpl)
 {
 }
@@ -61,10 +62,11 @@ ActivationResponse& ActivationResponse::operator=(ActivationResponse const& othe
 
 ActivationResponse& ActivationResponse::operator=(ActivationResponse&&) = default;
 
-void ActivationResponse::setHints(VariantMap const& hints)
+VariantMap ActivationResponse::serialize() const
 {
-    p->set_scope_data(Variant(hints));
+    return p->serialize();
 }
+/// @endcond
 
 void ActivationResponse::set_scope_data(Variant const& data)
 {
@@ -76,24 +78,14 @@ ActivationResponse::Status ActivationResponse::status() const
     return p->status();
 }
 
-VariantMap ActivationResponse::hints() const
-{
-    return p->hints();
-}
-
 Variant ActivationResponse::scope_data() const
 {
     return p->scope_data();
 }
 
-Query ActivationResponse::query() const
+CannedQuery ActivationResponse::query() const
 {
     return p->query();
-}
-
-VariantMap ActivationResponse::serialize() const
-{
-    return p->serialize();
 }
 
 } // namespace scopes

@@ -23,7 +23,7 @@
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/Query.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -40,7 +40,7 @@ class MWScope : public virtual MWObjectProxy
 public:
     virtual ~MWScope();
 
-    virtual QueryCtrlProxy create_query(Query const& query, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual QueryCtrlProxy search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy perform_action(VariantMap const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;

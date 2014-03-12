@@ -20,10 +20,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/SymbolExport.h>
-
-#ifndef UNITY_API_SCOPES_VERSION_H
-#define UNITY_API_SCOPES_VERSION_H
+#ifndef UNITY_SCOPES_VERSION_H
+#define UNITY_SCOPES_VERSION_H
 
 #ifndef UNITY_SCOPES_VERSION_MAJOR
 #    define UNITY_SCOPES_VERSION_MAJOR @UNITY_SCOPES_MAJOR@
@@ -76,9 +74,6 @@ Changes in the minor version number indicate feature additions that are binary c
 
 The major version number is also available as the macro <code>UNITY_SCOPES_VERSION_MAJOR</code>.
 */
-/// @cond
-UNITY_API
-/// @endcond
 int major_version();
 
 /**
@@ -86,9 +81,6 @@ int major_version();
 
 The minor version number is also available as the macro <code>UNITY_SCOPES_VERSION_MINOR</code>.
 */
-/// @cond
-UNITY_API
-/// @endcond
 int minor_version();
 
 /**
@@ -96,9 +88,6 @@ int minor_version();
 
 The micro version number is also available as the macro <code>UNITY_SCOPES_VERSION_MICRO</code>.
 */
-/// @cond
-UNITY_API
-/// @endcond
 int micro_version();
 
 /**
@@ -107,9 +96,6 @@ int micro_version();
 
 The version string is also available as the macro <code>UNITY_SCOPES_VERSION_STRING</code>.
 */
-/// @cond
-UNITY_API
-/// @endcond
 const char* version_string();    // Returns "major.minor.micro"
 
 /// }@
