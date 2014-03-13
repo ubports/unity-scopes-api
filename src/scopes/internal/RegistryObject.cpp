@@ -253,7 +253,8 @@ void RegistryObject::ScopeProcess::exec()
     });
 
     {
-        process_ = core::posix::exec(program, argv, env, core::posix::StandardStream::empty);
+        process_ = core::posix::exec(program, argv, env,
+                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)
         {
             process_ = core::posix::ChildProcess::invalid();
