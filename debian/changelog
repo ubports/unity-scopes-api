@@ -1,13 +1,5 @@
 unity-scopes-api (0.4.1-0ubuntu1) UNRELEASED; urgency=medium
 
-  [ Michi Henning ]
-  * Re-factored proxy class implementation.
-
-
-  [ Pawel Stolowski, Michi Henning ]
-  * Renamed various classes and methods in the public API
-    (see RELEASE_NOTES.txt for details).
-
   [ Pawel Stolowski ]
   * Added support for customization attributes to ScopeMetadata and scope .ini files.
 
