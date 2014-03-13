@@ -58,7 +58,6 @@ QueryCtrlImpl::~QueryCtrlImpl()
 
 void QueryCtrlImpl::cancel()
 {
-cerr << "QueryCtrlImpl::cancel" << endl;
     {
         lock_guard<mutex> lock(mutex_);
         if (!ready_)

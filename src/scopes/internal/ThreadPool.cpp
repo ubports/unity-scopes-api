@@ -21,7 +21,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 
@@ -93,17 +92,13 @@ void ThreadPool::run()
                     threads_ready_.set_value();
                 }
             }
-cerr << "Pool: getting task" << endl;
             task = queue_->wait_and_pop();
-cerr << "Pool: got task" << endl;
         }
         catch (runtime_error const&)
         {
             return; // wait_and_pop() throws if the queue is destroyed while threads are blocked on it.
         }
-cerr << "Pool: calling task" << endl;
         task();
-cerr << "Pool: task complete" << endl;
     }
 }
 

@@ -122,18 +122,13 @@ void RuntimeImpl::destroy()
         // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
         // to terminate. Otherwise, it's possible that we exit while threads are still running
         // with undefined behavior.
-        // TODO: need a lock here: destroy() will be called from a thread that differs from the
-        // the threads that call constructor and do lazy initialization.
+
         lock_guard<mutex> lock(mutex_);
 
-cerr << "use count: " << pool_.use_count() << endl;
         if (future_queue_)
         {
-cerr << "RuntimeImpl: destroying future queue" << endl;
             future_queue_->destroy();
             future_queue_->wait_for_destroy();
-cerr << "RuntimeImpl: future queue destroyed" << endl;
-            future_queue_ = nullptr;
         }
         pool_ = nullptr;
             //future_queue_ = nullptr;
@@ -213,15 +208,11 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
     {
         try
         {
-cerr << "waiter: wait_and_pop" << endl;
             auto future = queue->wait_and_pop();  // Throws runtime_error when queue is destroyed
-cerr << "waiter: got future" << endl;
             future.get();
-cerr << "waiter: future complete" << endl;
         }
         catch (std::runtime_error const&)
         {
-            cerr << "waiter thread exiting" << endl;
             break;
         }
     }
@@ -236,7 +227,7 @@ ThreadPool::SPtr RuntimeImpl::pool() const
     lock_guard<mutex> lock(mutex_);
     if (!pool_)
     {
-        pool_ = make_shared<ThreadPool>(2); // TODO: configurable pool size
+        pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
         future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
         waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
     }

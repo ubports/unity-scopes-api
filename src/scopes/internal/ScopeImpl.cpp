@@ -91,7 +91,6 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-cerr << "In search" << endl;
     if (reply == nullptr)
     {
         throw unity::InvalidArgumentException("Scope::search(): invalid SearchListenerBase (nullptr)");
@@ -111,24 +110,19 @@ cerr << "In search" << endl;
             // synchronous twoway interaction with the scope, so it can return
             // the QueryCtrlProxy. This may block for some time, for example, if
             // the scope is not running and needs to be activated by the registry first.
-cerr << "forwarding query" << endl;
             auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->search(query, metadata.serialize(), rp));
-cerr << "forwarding query returned" << endl;
             assert(real_ctrl);
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
             // with the real proxy that was returned.
             auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
             assert(new_proxy);
-cerr << "setting proxy" << endl;
             ctrl->set_proxy(new_proxy);
-cerr << "OK, set proxy" << endl;
         }
         catch (std::exception const& e)
         {
             try
             {
-cerr << "BAD: " << e.what() << endl;
                 ro->finished(ListenerBase::Error, e.what());
             }
             catch (...)
@@ -137,11 +131,9 @@ cerr << "BAD: " << e.what() << endl;
         }
     };
 
-cerr << "search submitting" << endl;
+    // Send the blocking twoway request asynchronously via the async invocation pool.
     auto future = runtime_->pool()->submit(send_create_query);
-cerr << "pushing future: " << runtime_->future_queue()->size() << endl;
     runtime_->future_queue()->push(move(future));
-cerr << "pushed future: " << runtime_->future_queue()->size() << endl;
     return ctrl;
 }
 
@@ -167,7 +159,6 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
     catch (std::exception const& e)
     {
         // TODO: log error
-        cerr << "activate(): " << e.what() << endl;
         try
         {
             ro->finished(ListenerBase::Error, e.what());
@@ -208,7 +199,6 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
     catch (std::exception const& e)
     {
         // TODO: log error
-        cerr << "perform_action(): " << e.what() << endl;
         try
         {
             // TODO: if things go wrong, we need to make sure that the reply object
@@ -254,7 +244,6 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     catch (std::exception const& e)
     {
         // TODO: log error
-        cerr << "preview(): " << e.what() << endl;
         try
         {
             ro->finished(ListenerBase::Error, e.what());

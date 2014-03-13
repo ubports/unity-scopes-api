@@ -92,16 +92,11 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setCategory(reply_proxy->category().c_str());
     }
 
-cerr << "queuing request" << endl;
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
 
-cerr << "getting socket" << endl;
     auto socket = future.get();
-cerr << "making receiver" << endl;
     ZmqReceiver receiver(socket.zmqpp_socket());
-cerr << "calling receive" << endl;
     auto segments = receiver.receive();
-cerr << "receive OK" << endl;
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);

@@ -27,8 +27,6 @@
 #include <zmqpp/poller.hpp>
 #include <zmqpp/socket.hpp>
 
-#include <iostream> // TODO: remove this
-
 using namespace std;
 
 namespace unity
@@ -129,7 +127,7 @@ void ZmqObjectProxy::ping()
     make_request_(request_builder, "ping");
 
     auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_twoway(request_builder); });
-    // TODO: dubious, waiter thread in runtimeImpl shoudl do this
+    // TODO: dubious, waiter thread in runtimeImpl should do this?
     future.wait();
 }
 
@@ -171,11 +169,9 @@ void ZmqObjectProxy::invoke_oneway(capnp::MessageBuilder& out_params)
 
     assert(mode_ == RequestMode::Oneway);
     zmqpp::socket& s = pool.find(endpoint_, mode_);
-    cerr << "oneway got socket for " << endpoint_ << endl;
     ZmqSender sender(s);
     auto segments = out_params.getSegmentsForOutput();
     sender.send(segments);
-    cerr << "finished sending oneway for " << endpoint_ << endl;
 
 #ifdef ENABLE_IPC_MONITOR
     if (true) {
@@ -194,7 +190,7 @@ Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params)
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 // Poll for the reply with the given timeout.
-// Return a socket for the response.
+// Return a socket for the response or throw if the timeout expires.
 
 Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout)
 {
@@ -202,11 +198,10 @@ Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t 
     thread_local static ConnectionPool pool(*mw_base()->context());
 
     assert(mode_ == RequestMode::Twoway);
-    Socket s = pool.take(endpoint_, timeout);
+    Socket s = pool.take(endpoint_, timeout);   // We now have exclusive use of this socket for this invocation
     ZmqSender sender(s.zmqpp_socket());
     auto segments = out_params.getSegmentsForOutput();
     sender.send(segments);
-cerr << "twoway: sent request" << endl;
 
 #ifdef ENABLE_IPC_MONITOR
     if (true) {
@@ -219,19 +214,15 @@ cerr << "twoway: sent request" << endl;
 
     zmqpp::poller p;
     p.add(s.zmqpp_socket());
-cerr << "twoway: polling: " << timeout << endl;
     p.poll(timeout);
-cerr << "twoway: poll returned" << endl;
     if (!p.has_input(s.zmqpp_socket()))
     {
-cerr << "twoway: timed out, calling remove" << endl;
         // If a request times out, we must close the corresponding socket, otherwise
         // zmq gets confused: the reply will never be read, so the socket ends up
         // in a bad state.
-        s.remove();
+        s.invalidate();
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }
-cerr << "twoway: returning s" << endl;
     return s;
 }
 

@@ -74,14 +74,26 @@ void waiter_thread(ThreadSafeQueue<string>* q)
 
 TEST(ThreadSafeQueue, exception)
 {
-    unique_ptr<ThreadSafeQueue<string>> q(new ThreadSafeQueue<string>);
-    q->push("fred");
-    auto f = waiter_ready.get_future();
-    auto t = thread(waiter_thread, q.get());
-    f.wait();
-    this_thread::sleep_for(chrono::milliseconds(50));   // Make sure child thread has time to call wait_and_pop()
-    q.reset();
-    t.join();
+    {
+        unique_ptr<ThreadSafeQueue<string>> q(new ThreadSafeQueue<string>);
+        q->push("fred");
+        auto f = waiter_ready.get_future();
+        auto t = thread(waiter_thread, q.get());
+        f.wait();
+        this_thread::sleep_for(chrono::milliseconds(50));   // Make sure child thread has time to call wait_and_pop()
+        q->destroy();
+        t.join();
+
+        try
+        {
+            q->push("fred");
+            FAIL();
+        }
+        catch (std::runtime_error const& e)
+        {
+            EXPECT_STREQ("ThreadSafeQueue: cannot push onto destroyed queue", e.what());
+        }
+    }
 }
 
 atomic_int count;
@@ -112,12 +124,52 @@ TEST(ThreadSafeQueue, wait_for_threads)
 
     // Destroy the queue while multiple threads are sleeping in wait_and_pop().
     q.destroy();
+    q.wait_for_destroy();
 
     for (auto& t : threads)
     {
         t.join();
     }
     EXPECT_EQ(20, count);
+}
+
+void destroy_thread(ThreadSafeQueue<int>* q)
+{
+    this_thread::sleep_for(chrono::milliseconds(100));
+    EXPECT_EQ(0u, q->size());
+    q->destroy();
+}
+
+TEST(ThreadSafeQueue, destroy_while_empty)
+{
+    ThreadSafeQueue<int> q;
+    thread t(destroy_thread, &q);
+    q.wait_for_destroy();
+    EXPECT_EQ(0u, q.size());
+    t.join();
+}
+
+void wait_for_destroy_thread(ThreadSafeQueue<int>* q)
+{
+    q->wait_for_destroy();
+}
+
+TEST(ThreadSafeQueue, destroy_while_waiting_for_destroy)
+{
+    ThreadSafeQueue<int> q;
+    q.push(42);
+    thread t(wait_for_destroy_thread, &q);
+    this_thread::sleep_for(chrono::milliseconds(100));
+    q.destroy();
+    t.join();
+
+    // Call destroy() and wait_for_destroy() again, to make sure they do nothing.
+    q.destroy();
+    q.wait_for_destroy();
+    q.destroy();
+    q.destroy();
+    q.wait_for_destroy();
+    q.wait_for_destroy();
 }
 
 class MoveOnly
@@ -156,4 +208,15 @@ TEST(ThreadSafeQueue, move_only)
     EXPECT_EQ("world", m.val());
     m = q.wait_and_pop();
     EXPECT_EQ("again", m.val());
+
+    q.destroy();
+    try
+    {
+        q.push(move(MoveOnly("no_push")));
+        FAIL();
+    }
+    catch (std::runtime_error const& e)
+    {
+        EXPECT_STREQ("ThreadSafeQueue: cannot push onto destroyed queue", e.what());
+    }
 }

@@ -21,7 +21,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 
@@ -42,30 +41,45 @@ namespace zmq_middleware
 Socket::Socket(ConnectionPool* pool, pool_private::CPool::value_type pool_entry)
     : pool_(pool)
     , pool_entry_(move(pool_entry))
-    , removed_(false)
+    , invalidated_(false)
 {
 }
 
+Socket::Socket(Socket&& other)
+    : pool_(other.pool_)
+    , pool_entry_(move(other.pool_entry_))
+    , invalidated_(other.invalidated_)
+{
+    other.invalidated_ = true;  // Prevent source socket from putting itself back into the pool after move.
+}
+
+Socket& Socket::operator=(Socket&& rhs)
+{
+    swap(*this, rhs);
+    rhs.invalidated_ = true;  // Prevent source socket from putting itself back into the pool after move.
+    return *this;
+}
+
 // Return ownership of the entry back to the pool if remove() wasn't called earlier.
-// If removed was called, the pool entry goes out of scope and closes the socket.
+// If removed() was called, the pool entry goes out of scope and closes the socket.
 
 Socket::~Socket()
 {
-    if (!removed_)
+    if (!invalidated_)
     {
         pool_->put(move(pool_entry_));
     }
 }
+
 
 zmqpp::socket& Socket::zmqpp_socket()
 {
     return pool_entry_.second.socket;
 }
 
-void Socket::remove()
+void Socket::invalidate()
 {
-cerr << "Remove " << pool_entry_.first << endl;
-    removed_ = true;
+    invalidated_ = true;
 }
 
 ConnectionPool::ConnectionPool(zmqpp::context& context) :
@@ -84,7 +98,7 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
 
     lock_guard<mutex> lock(mutex_);
 
-    // Look for existing connection. If there is one, but with the wrong type, we throw.
+    // Look for existing connection.
     auto const& it = pool_.find(endpoint);
     if (it != pool_.end())
     {
@@ -99,7 +113,7 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
 
     // No existing connection yet, establish one.
     auto entry = create_connection(endpoint, m, -1);
-    return pool_.emplace(move(entry))->second.socket;
+    return pool_.emplace(move(entry)).first->second.socket;
 }
 
 void ConnectionPool::remove(std::string const& endpoint)
@@ -125,7 +139,7 @@ void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket 
 
 Socket ConnectionPool::take(string const& endpoint, int64_t timeout)
 {
-    lock_guard<mutex> lock(mutex_);
+    unique_lock<mutex> lock(mutex_);
 
     auto it = pool_.find(endpoint);
     if (it != pool_.end())
@@ -136,12 +150,11 @@ Socket ConnectionPool::take(string const& endpoint, int64_t timeout)
                        " request via " + to_string(it->second.mode) + " connection (endpoint: " + endpoint + ")");
             throw MiddlewareException(msg);
         }
-        cerr << "take: returning existing socket for " << endpoint << endl;
         Socket s(this, move(*it));
         pool_.erase(it);
+        lock.unlock();
         return s;
     }
-    cerr << "take: returning new socket for " << endpoint << endl;
     return Socket(this, create_connection(endpoint, RequestMode::Twoway, timeout));
 }
 
@@ -159,7 +172,6 @@ pool_private::CPool::value_type ConnectionPool::create_connection(std::string co
     zmqpp::socket s(context_, stype);
     auto zmqpp_timeout = m == RequestMode::Twoway ? int32_t(timeout) : 0;
     s.set(zmqpp::socket_option::linger, zmqpp_timeout);
-    cerr << "connecting " << to_string(m) << " to " << endpoint << " (" << zmqpp_timeout << ")" << endl;
     s.connect(endpoint);
     return pool_private::CPool::value_type{ endpoint, pool_private::SocketData{ move(s), m } };
 }

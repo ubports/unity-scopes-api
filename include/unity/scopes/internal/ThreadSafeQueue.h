@@ -22,7 +22,6 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -66,13 +65,13 @@ private:
     std::queue<T> queue_;
     mutable std::mutex mutex_;
     std::condition_variable cond_;
-    bool done_;
-    std::atomic<int> num_waiters_;
+    bool destroyed_;
+    int num_waiters_;
 };
 
 template<typename T>
 ThreadSafeQueue<T>::ThreadSafeQueue() :
-    done_(false),
+    destroyed_(false),
     num_waiters_(0)
 {
 }
@@ -81,47 +80,50 @@ template<typename T>
 ThreadSafeQueue<T>::~ThreadSafeQueue()
 {
     destroy();
-
-    // Don't destroy the object while there are still threads in wait_and_pop(), otherwise
-    // a thread that wakes up in wait_and_pop() will try to re-lock the already-destroyed
-    // mutex.
-    while (num_waiters_.load() > 0)
-        std::this_thread::yield();  // LCOV_EXCL_LINE (impossible to reliably hit with a test)
+    wait_for_destroy();
 }
 
 template<typename T>
 void ThreadSafeQueue<T>::destroy() noexcept
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (done_)
+    if (destroyed_)
     {
         return;
     }
-    done_ = true;
-    cond_.notify_all(); // Wake up anyone asleep in wait_and_pop()
+    destroyed_ = true;
+    cond_.notify_all(); // Wake up anyone asleep in wait_and_pop() or wait_for_destroy()
 }
 
 template<typename T>
 void ThreadSafeQueue<T>::wait_for_destroy() noexcept
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return num_waiters_ == 0; });
+    cond_.wait(lock, [this] { return destroyed_ && num_waiters_ == 0; });
 }
 
 template<typename T>
 void ThreadSafeQueue<T>::push(T const& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (destroyed_)
+    {
+        throw std::runtime_error("ThreadSafeQueue: cannot push onto destroyed queue");
+    }
     queue_.push(item);
-    cond_.notify_one();
+    cond_.notify_all();
 }
 
 template<typename T>
 void ThreadSafeQueue<T>::push(T&& item)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (destroyed_)
+    {
+        throw std::runtime_error("ThreadSafeQueue: cannot push onto destroyed queue");
+    }
     queue_.emplace(std::move(item));
-    cond_.notify_one();
+    cond_.notify_all();
 }
 
 template<typename T>
@@ -129,8 +131,8 @@ T ThreadSafeQueue<T>::wait_and_pop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
     ++num_waiters_;
-    cond_.wait(lock, [this] { return done_ || queue_.size() != 0; });
-    if (done_)
+    cond_.wait(lock, [this] { return destroyed_ || queue_.size() != 0; });
+    if (destroyed_)
     {
         if (--num_waiters_ == 0)
         {

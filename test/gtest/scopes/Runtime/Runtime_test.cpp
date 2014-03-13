@@ -41,14 +41,12 @@ using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-#if 0
 TEST(Runtime, basic)
 {
     Runtime::UPtr rt = Runtime::create("Runtime.ini");
     EXPECT_TRUE(rt->registry().get() != nullptr);
     rt->destroy();
 }
-#endif
 
 class Receiver : public SearchListenerBase
 {
@@ -74,7 +72,6 @@ public:
         EXPECT_EQ("US", subdeps.back().label());
         EXPECT_EQ("test", subdeps.back().query().query_string());
         dep_count_++;
-cerr << "Push dept arrived, testing OK" << endl;
     }
 
     virtual void push(CategorisedResult result) override
@@ -85,7 +82,6 @@ cerr << "Push dept arrived, testing OK" << endl;
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
         last_result_ = std::make_shared<Result>(result);
-cerr << "Push result arrived, testing OK" << endl;
     }
     virtual void push(Annotation annotation) override
     {
@@ -96,7 +92,6 @@ cerr << "Push result arrived, testing OK" << endl;
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
-cerr << "Push ann arrived, testing OK" << endl;
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
@@ -108,15 +103,12 @@ cerr << "Push ann arrived, testing OK" << endl;
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
-cerr << "finished arrived, notifying" << endl;
         cond_.notify_one();
     }
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
-cerr << "wait_until" << endl;
         cond_.wait(lock, [this] { return this->query_complete_; });
-cerr << "wait_until returned" << endl;
     }
     std::shared_ptr<Result> last_result()
     {
@@ -132,7 +124,6 @@ private:
     std::shared_ptr<Result> last_result_;
 };
 
-#if 0
 class PreviewReceiver : public PreviewListenerBase
 {
 public:
@@ -234,7 +225,6 @@ TEST(Runtime, search)
     auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 }
-#endif
 
 TEST(Runtime, consecutive_search)
 {
@@ -245,30 +235,38 @@ TEST(Runtime, consecutive_search)
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
-#if 0
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
-#endif
 
     std::vector<std::shared_ptr<Receiver>> replies;
 
-    for (int i = 0; i < 2; ++i)
+    const int num_searches = 100;
+    for (int i = 0; i < num_searches; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
         scope->search("test", SearchMetadata("en", "phone"), replies.back());
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < num_searches; ++i)
     {
-std::cerr << "wait" << std::endl;
+        replies[i]->wait_until_finished();
+    }
+
+    // Do it again, to test that re-use of previously-created connections works.
+    replies.clear();
+    for (int i = 0; i < num_searches; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        scope->search("test", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    for (int i = 0; i < num_searches; ++i)
+    {
         replies[i]->wait_until_finished();
     }
 }
 
-#if 0
 TEST(Runtime, preview)
 {
     // connect to scope and run a query
@@ -315,7 +313,6 @@ TEST(Runtime, cardinality)
     scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
     receiver->wait_until_finished();
 }
-#endif
 
 void scope_thread(RuntimeImpl::SPtr const& rt)
 {

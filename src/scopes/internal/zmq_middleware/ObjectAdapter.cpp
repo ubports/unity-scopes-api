@@ -750,7 +750,6 @@ void ObjectAdapter::worker_thread()
                     current.id = req.getId().cStr();
                     current.category = req.getCat().cStr();
                     current.op_name = req.getOpName().cStr();
-                    cerr << "adapter: got " << current.op_name << endl;
                     auto mode = req.getMode();
                     if (current.id.empty() || current.op_name.empty() ||
                         (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))

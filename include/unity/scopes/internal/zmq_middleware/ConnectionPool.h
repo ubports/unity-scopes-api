@@ -55,7 +55,7 @@ struct SocketData
     RequestMode mode;
 };
 
-typedef std::unordered_multimap<std::string, pool_private::SocketData> CPool;
+typedef std::unordered_map<std::string, pool_private::SocketData> CPool;
 
 }
 
@@ -64,19 +64,19 @@ class ConnectionPool;
 class Socket final
 {
 public:
-    Socket(Socket&&) = default;
-    Socket& operator=(Socket&&) = default;
+    Socket(Socket&&);
+    Socket& operator=(Socket&&);
     ~Socket();
 
     zmqpp::socket& zmqpp_socket();
-    void remove();
+    void invalidate();
 
 private:
     Socket(ConnectionPool* pool, pool_private::CPool::value_type pool_entry);  // Only instantiated by ConnectionPool
 
     ConnectionPool* pool_;                        // Owning pool pointer
     pool_private::CPool::value_type pool_entry_;
-    bool removed_;
+    bool invalidated_;
 
     friend class ConnectionPool;
 };
