@@ -38,27 +38,27 @@ class PreviewReply : public virtual Reply
 {
 public:
     /**
-     \brief Registers a list of column layouts for current preview.
+    \brief Registers a list of column layouts for the current preview.
 
-     Layouts need to be registered before pushing PreviewWidgetList, and must be
-     registered only once.
-     \return True if the query is still alive, false if the query failed or was cancelled.
-     \throws unity::LogicException register_layout() is called more than once.
-     */
+    Layouts must be registered before pushing a unity::scopes::PreviewWidgetList, and must be
+    registered only once.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    \throws unity::LogicException register_layout() is called more than once.
+    */
     virtual bool register_layout(ColumnLayoutList const& layouts) = 0;
 
     /**
-     \brief Sends widget definitions to the sender of the preview query.
+    \brief Sends widget definitions to the sender of the preview query.
 
-     This method can be called mutiple times to send widgets in stages.
-     \return True if the query is still alive, false if the query failed or was cancelled.
-     */
+    This method can be called mutiple times to send widgets in stages.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    */
     virtual bool push(PreviewWidgetList const& widget_list) = 0;
 
     /**
-     \brief Sends data for a preview widget attribute.
-     \return True if the query is still alive, false if the query failed or was cancelled.
-     */
+    \brief Sends data for a preview widget attribute.
+    \return True if the query is still alive, false if the query failed or was cancelled.
+    */
     virtual bool push(std::string const& key, Variant const& value) = 0;
 
     /// @cond

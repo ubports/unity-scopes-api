@@ -39,11 +39,18 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit MiddlewareException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     MiddlewareException(MiddlewareException const&);
     MiddlewareException& operator=(MiddlewareException const&);
+    //@}
+
+    /// @cond
     virtual ~MiddlewareException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
@@ -66,11 +73,18 @@ public:
     \param id The identity of the unknown object.
     */
     explicit ObjectNotExistException(std::string const& reason, std::string const& id);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     ObjectNotExistException(ObjectNotExistException const&);
     ObjectNotExistException& operator=(ObjectNotExistException const&);
+    //@}
+
+    /// @cond
     virtual ~ObjectNotExistException() noexcept;
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
@@ -100,11 +114,18 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit TimeoutException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     TimeoutException(TimeoutException const&);
     TimeoutException& operator=(TimeoutException const&);
+    //@}
+
+    /// @cond
     virtual ~TimeoutException() noexcept;
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
@@ -125,11 +146,18 @@ public:
     \param reason Further details about the cause of the exception.
     */
     explicit ConfigException(std::string const& reason);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     ConfigException(ConfigException const&);
     ConfigException& operator=(ConfigException const&);
+    //@}
+
+    /// @cond
     virtual ~ConfigException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.
@@ -151,11 +179,18 @@ public:
     \param name The name of the object that was not found.
     */
     explicit NotFoundException(std::string const& reason, std::string const& name);
-    //! @cond
+
+    /**@name Copy and assignment
+    Copy constructor and assignment operator have the usual value semantics.
+    */
+    //{@
     NotFoundException(NotFoundException const&);
     NotFoundException& operator=(NotFoundException const&);
+    //@}
+
+    /// @cond
     virtual ~NotFoundException();
-    //! @endcond
+    /// @endcond
 
     /**
     \brief Returns a <code>std::exception_ptr</code> to <code>this</code>.

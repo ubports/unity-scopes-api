@@ -39,7 +39,7 @@ class ActionMetadata;
 class SearchMetadata;
 
 /**
-\brief Allows queries to be sent to a scope and results for the query to be retrieved.
+\brief Allows queries, preview requests, and activation requests to be sent to a scope.
 */
 
 class Scope : public virtual Object
@@ -56,8 +56,8 @@ public:
 
     \param query_string search string
     \param metadata additional data to pass to scope
-    \param reply search response handler
-    \return query handler
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
     */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   SearchMetadata const& metadata,
@@ -71,9 +71,9 @@ public:
     \param query_string search string
     \param filter_state state of filters
     \param metadata additional data to pass to scope
-    \param reply search response handler
-    \return query handler
-     */
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
+    */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   FilterState const& filter_state,
                                   SearchMetadata const& metadata,
@@ -88,9 +88,9 @@ public:
     \param department_id identifier of a department to search
     \param filter_state state of filters
     \param metadata additional data to pass to scope
-    \param reply search response handler
+    \param reply The callback object to receive replies
     \return query handler
-     */
+    */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   std::string const& department_id,
                                   FilterState const& filter_state,
@@ -98,25 +98,25 @@ public:
                                   SearchListenerBase::SPtr const& reply) = 0;
 
     /**
-     \brief Initiates activation of a search result.
-     \param result activated result
-     \param metadata additional data to pass to scope
-     \param reply activation response handler
-     \return query handler
-     */
+    \brief Initiates activation of a search result.
+    \param result activated result
+    \param metadata additional data to pass to scope
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
+    */
     virtual QueryCtrlProxy activate(Result const& result,
                                     ActionMetadata const& metadata,
                                     ActivationListenerBase::SPtr const& reply) = 0;
 
     /**
-     \brief Initiates activation of a preview action.
-     \param result Result that was previewed.
-     \param metadata additional data to pass to scope
-     \param widget_id identifier of 'actions' widget of activated action
-     \param action_id identifier of an action to activate
-     \param reply activation response handler
-     \return query handler
-     */
+    \brief Initiates activation of a preview action.
+    \param result Result that was previewed.
+    \param metadata additional data to pass to scope
+    \param widget_id identifier of 'actions' widget of activated action
+    \param action_id identifier of an action to activate
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
+    */
     virtual QueryCtrlProxy perform_action(Result const& result,
                                           ActionMetadata const& metadata,
                                           std::string const& widget_id,
@@ -124,11 +124,12 @@ public:
                                           ActivationListenerBase::SPtr const& reply) = 0;
 
     /**
-     \brief Initiates preview request.
-     \param result Result to be previewed
-     \param metadata additional data to pass to scope
-     \param reply preview response handler
-     */
+    \brief Initiates preview request.
+    \param result Result to be previewed
+    \param metadata additional data to pass to scope
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
+    */
     virtual QueryCtrlProxy preview(Result const& result,
                                    ActionMetadata const& metadata,
                                    PreviewListenerBase::SPtr const& reply) = 0;

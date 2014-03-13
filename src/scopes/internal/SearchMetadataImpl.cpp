@@ -109,6 +109,13 @@ void SearchMetadataImpl::serialize(VariantMap &var) const
     var["hints"] = hints_;
 }
 
+VariantMap SearchMetadataImpl::serialize() const
+{
+    VariantMap vm;
+    serialize(vm);
+    return vm;
+}
+
 void SearchMetadataImpl::check_cardinality(std::string const& func_name, int cardinality)
 {
     if (cardinality < 0)

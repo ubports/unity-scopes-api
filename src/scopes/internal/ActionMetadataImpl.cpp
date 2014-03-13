@@ -62,6 +62,13 @@ void ActionMetadataImpl::serialize(VariantMap &var) const
     var["scope_data"] = Variant(scope_data_);
 }
 
+VariantMap ActionMetadataImpl::serialize() const
+{
+    VariantMap vm;
+    serialize(vm);
+    return vm;
+}
+
 ActionMetadata ActionMetadataImpl::create(VariantMap const& var)
 {
     return ActionMetadata(new ActionMetadataImpl(var));

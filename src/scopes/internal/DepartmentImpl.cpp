@@ -174,6 +174,16 @@ VariantMap DepartmentImpl::serialize_departments(DepartmentList const& departmen
     return vm;
 }
 
+DepartmentList DepartmentImpl::deserialize_departments(VariantArray const& var)
+{
+    DepartmentList departments;
+    for (auto const& dep: var)
+    {
+        departments.push_back(DepartmentImpl::create(dep.get_dict()));
+    }
+    return departments;
+}
+
 } // namespace internal
 
 } // namespace scopes

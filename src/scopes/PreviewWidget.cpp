@@ -31,21 +31,22 @@ namespace scopes
 \brief A widget for a preview.
 
 This class describes an individual widget used when constructing a preview for a result item.
-Note that the data is likely to change between major versions of Unity, and therefore many of
-the definitions are Variant-based.
+Note that the data that applies to particular widget types is likely to change with different major
+versions of Unity; therefore, attributes are of type Variant, that is, loosely typed.
 
-When Unity requests a preview for a particular result, the scope is expected to construct it
-from a few basic building blocks by instantiating a PreviewWidget. Each widget is identified
-by a free-form id, type of the widget, and a number of attributes associated with a specific widget type.
+When Unity requests a preview for a particular result, the scope is expected to construct the preview
+by instantiating a PreviewWidget. Each widget has a free-form id, a type, and a number of attributes whose
+names and types depend on the specific widget type (see \link previewwidgets Preview Widgets\endlink).
 
-The attribute values can be either filled in directly before pushing the widget to Unity
+The attribute values can either be filled in directly before pushing the widget to Unity
 (using add_attribute_value()), or they can be mapped from a result field in a
 similar fashion to the components mapping when specifying a CategoryRenderer
-(see add_attribute_mapping()). When using the add_attribute_mapping() method, the
-data is not required to be present in the result and the value can be pushed later
+(see add_attribute_mapping()). When using add_attribute_mapping(), the corresponding
+attribute need not be present in the result; instead, its value can be pushed later
 using the PreviewReply::push() method, which accepts the name of the field and its value as a Variant.
 
-An example creating a basic preview demonstrating the three ways to associate preview widget attribute with a value:
+Here is an example that creates a preview and illustrates three ways to associate a preview widget attribute
+with its value:
 
 \code{.cpp}
 void MyPreview::run(PreviewReplyProxy const& reply)
@@ -71,10 +72,13 @@ void MyPreview::run(PreviewReplyProxy const& reply)
     reply->push("description", Variant(description));
 }
 \endcode
+*/
 
-\section previewtypes Recognized preview widget types and their attributes
+/**
+\page previewwidgets Preview widget types
+\section previewtypes Recognized preview widget types
 
-The following widgets types are recognized by Unity:
+The following widget types are recognized by Unity:
 \arg \c audio
 \arg \c video
 \arg \c image
@@ -88,13 +92,15 @@ The following widgets types are recognized by Unity:
 
 \subsection audio audio widget
 
-The audio widget displays a list of tracks with play / pause controls.
+The audio widget displays a list of tracks with play/pause controls.
 
 List of attributes:
 
-\arg \c tracks A composite attribute containing an array of tuples, where each tuple has up to four fields: \c title (mandatory string), \c subtitle (optional string), \c source (mandatory uri) and \c length (optional integer specifying the track length in seconds)
+\arg \c tracks A composite attribute containing an array of tuples, where each tuple has up to four
+fields: \c title (mandatory string), \c subtitle (optional string), \c source (mandatory URI),
+and \c length (optional integer specifying the track length in seconds)
 
-Composite attributes are easy to construct using the unity::scopes::VariantBuilder helper class:
+You can construct composite attributes with unity::scopes::VariantBuilder:
 
 \code{.cpp}
 {
@@ -123,8 +129,8 @@ The video widget displays a still from a video and allows playing the video.
 
 List of attributes:
 
-\arg \c source A uri pointing to the video
-\arg \c screenshot A uri pointing to a screenshot of the video (optional)
+\arg \c source A URI pointing to the video
+\arg \c screenshot A URI pointing to a screenshot of the video (optional)
 
 \code{.cpp}
 {
@@ -141,7 +147,7 @@ The image widget displays a single image.
 
 List of attributes:
 
-\arg \c source A uri pointing to the image
+\arg \c source A URI pointing to the image
 \arg \c zoomable A boolean specifying whether the image is zoomable (default: \c false)
 
 \code{.cpp}
@@ -159,7 +165,7 @@ The gallery widget displays a set of images.
 
 List of attributes:
 
-\arg \c sources An array of image uris
+\arg \c sources An array of image URIs
 
 \code{.cpp}
 {
@@ -180,13 +186,10 @@ The header widget displays basic infomation about the result.
 
 List of attributes:
 
-\arg \c title A string specifying title
-\arg \c subtitle A string specifying subtitle
-\arg \c mascot A uri specifying mascot
-\arg \c emblem A uri specifying emblem
-\arg \c attribute-1 TBD
-\arg \c attribute-2 TBD
-\arg \c attribute-3 TBD
+\arg \c title A string specifying the title
+\arg \c subtitle A string specifying the subtitle
+\arg \c mascot A URI specifying the mascot
+\arg \c emblem A URI specifying the emblem
 
 \code{.cpp}
 {
@@ -200,13 +203,15 @@ List of attributes:
 
 \subsection actions actions widget
 
-The actions widget displays a single or multiple buttons the user can invoke.
+The actions widget displays one or more buttons.
 
 List of attributes:
 
-\arg \c actions A composite attribute containing an array of tuples, where each tuple has at least these fields: \c id (mandatory string which will be passed to unity::scopes::ScopeBase::activate_preview_action()), \c label (mandatory string) and \c icon (optional uri).
+\arg \c actions A composite attribute containing an array of tuples, where each tuple has at least
+these fields: \c id (a mandatory string that is passed to unity::scopes::ScopeBase::activate_preview_action()),
+\c label (mandatory string), and \c icon (optional URI).
 
-Composite attributes are easy to construct using the unity::scopes::VariantBuilder helper class:
+You can construct composite attributes with unity::scopes::VariantBuilder:
 
 \code{.cpp}
 {
@@ -229,9 +234,10 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
 
 \subsection progress progress widget
 
-The progress widget displays progress of an action (for example download progress).
+The progress widget displays the progress of an action, such as download progress.
 
-Upon completion the scope will receive preview action activation with id \c "finished" or \c "failed" depending on the outcome of the operation.
+On completion, the scope receives a preview action activation with the id \c "finished" or \c "failed",
+depending on the outcome of the operation.
 
 List of attributes:
 
@@ -251,12 +257,12 @@ List of attributes:
 
 \subsection text text widget
 
-The text widget can be used for any length of text, although it may not be formatted.
+A text widget can be used for text of any length (without formatting).
 
 List of attributes:
 
 \arg \c title Optional string
-\arg \c text String containing the summary text
+\arg \c text A string containing the text
 
 \code{.cpp}
 {
@@ -269,17 +275,19 @@ List of attributes:
 
 \subsection rating-input rating-input widget
 
-The rating-input widget is used when the user can rate the content. It consists of two types of widget - a star-based rating and an input field where the user can type his/her review. It is possible to hide either and/or require both to be filled in.
+The rating-input widget allows users to rate content. It consists of two types of widget:
+a star-based rating and an input field for the user to enter his/her review.
+It is possible to hide each widget as well as to require them to be filled in.
 
-When user presses the send button, the scope will receive preview action activation with id \c "rated".
+When a user presses the "Send" button, the scope receives a preview action activation with the id \c "rated".
 
 List of attributes:
 
 \arg \c rating-label String for the star-based rating (default: "Rate this")
 \arg \c review-label String for the review input (default: "Add a review")
 \arg \c submit-label String for the confirmation button (default: "Send")
-\arg \c rating-icon-empty Uri for an empty rating icon
-\arg \c rating-icon-full Uri for a full rating icon
+\arg \c rating-icon-empty URI for an empty rating icon
+\arg \c rating-icon-full URI for a full rating icon
 \arg \c visible String specifying which of the two widgets are visible (\c "rating", \c "review" or default:\c "both")
 \arg \c required String specifying which of the two widgets are required to be filled in (\c "rating", \c "review" or default:\c "both")
 
@@ -297,16 +305,16 @@ List of attributes:
 
 \subsection reviews reviews widget
 
-The reviews widget is used to display a previously-rated content.
+The reviews widget is used to display previously-rated content.
 
 List of attributes:
 
-\arg \c rating-icon-empty Uri for an empty rating icon
-\arg \c rating-icon-half Uri for an half-full rating icon
-\arg \c rating-icon-full Uri for a full rating icon
+\arg \c rating-icon-empty URI for an empty rating icon
+\arg \c rating-icon-half URI for an half-full rating icon
+\arg \c rating-icon-full URI for a full rating icon
 \arg \c reviews A composite attribute containing an array of tuples, where each tuple has up to three fields: \c rating (optional integer specifying the number of stars), \c author (mandatory string) and \c review (optional string).
 
-Composite attributes are easy to construct using the unity::scopes::VariantBuilder helper class:
+You can construct composite attributes with unity::scopes::VariantBuilder:
 
 \code{.cpp}
 {
@@ -329,7 +337,6 @@ Composite attributes are easy to construct using the unity::scopes::VariantBuild
     ...
 }
 \endcode
-
 */
 
 //! @cond

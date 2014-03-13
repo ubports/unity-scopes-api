@@ -33,7 +33,7 @@ namespace unity
 namespace scopes
 {
 
-class QueryMetadata;
+class SearchMetadata;
 
 namespace internal
 {
@@ -70,7 +70,7 @@ public:
     cancels a query.
 
     Your implementation of this method should ensure that the scope stops
-    processing the current query as soon as possible. Any calls to ReplyBase::push()
+    processing the current query as soon as possible. Any calls to a `push()` method
     once a query is cancelled are ignored, so continuing to push after cancellation
     only wastes CPU cycles.
     */
@@ -88,7 +88,7 @@ protected:
     /// @endcond
 
 private:
-    void set_metadata(QueryMetadata const& metadata);
+    void set_metadata(SearchMetadata const& metadata);
 
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()

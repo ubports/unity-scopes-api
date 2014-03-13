@@ -38,10 +38,12 @@ class FilterBaseImpl;
 
 /**
 \brief Base class for all implementations of filters.
-All implementations of FilterBase define the "look" of
+
+All implementations of FilterBase define the "look" of a
 filter in the UI and do not hold any state information.
-Actual state of a filters is kept by a FilterState object.
+The actual state of a filters is kept by a FilterState object.
 */
+
 class FilterBase
 {
 public:

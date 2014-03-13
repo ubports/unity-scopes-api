@@ -60,26 +60,26 @@ public:
     static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
-     \brief Get the label of this filter.
-     \return The filter label.
+    \brief Get the label of this filter.
+    \return The filter label.
     */
     std::string label() const;
 
     /**
-     \brief Check if this filter supports multiple options to be selected.
-     \return True if multi-selection is enabled.
-     */
+    \brief Check if this filter supports multiple options to be selected.
+    \return True if multi-selection is enabled.
+    */
     bool multi_select() const;
 
     /**
-     \brief Add a new option to this filter.
-     \return The new option instance.
-     */
+    \brief Add a new option to this filter.
+    \return The new option instance.
+    */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
 
     /**
-     \brief Get all options of this filter, in the order they were added.
-     \return The list of options.
+    \brief Get all options of this filter, in the order they were added.
+    \return The list of options.
      */
     std::list<FilterOption::SCPtr> options() const;
 
@@ -90,11 +90,11 @@ public:
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
 
     /**
-     \brief Marks given FilterOption of this filter instance as active (or not active) in a FilterState object.
+    \brief Marks given FilterOption of this filter instance as active (or not active) in a FilterState object.
 
-     Records the given FilterOption as "selected" in the FilterState. This is meant to be used to modify a
-     FilterState received with a search request before sending it back to the client (UI shell).
-     */
+    Records the given FilterOption as "selected" in the FilterState. This is meant to be used to modify a
+    FilterState received with a search request before sending it back to the client (UI shell).
+    */
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
 
     /**

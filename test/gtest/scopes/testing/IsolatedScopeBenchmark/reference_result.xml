@@ -4,100 +4,100 @@
 <result class_id="0" tracking_level="0" version="0">
 	<sample_size>25</sample_size>
 	<timing.min class_id="1" tracking_level="0" version="0">
-		<seconds>0.0081944879999999998</seconds>
+		<seconds>0.064717161999999995</seconds>
 	</timing.min>
 	<timing.max>
-		<seconds>0.012256243999999999</seconds>
+		<seconds>0.14149899499999999</seconds>
 	</timing.max>
 	<timing.mean>
-		<seconds>0.010114238920000001</seconds>
+		<seconds>0.10772000999999999</seconds>
 	</timing.mean>
 	<timing.std_dev>
-		<seconds>0.0011356259843389607</seconds>
+		<seconds>0.019595591480048233</seconds>
 	</timing.std_dev>
 	<timing.kurtosis>
-		<seconds>-1.0250685336418652</seconds>
+		<seconds>-0.49701807910641982</seconds>
 	</timing.kurtosis>
 	<timing.skewness>
-		<seconds>-0.058286605772083257</seconds>
+		<seconds>-0.33652909226963756</seconds>
 	</timing.skewness>
 	<timing.sample class_id="2" tracking_level="0" version="0">
 		<count>25</count>
 		<item_version>0</item_version>
 		<item>
-			<seconds>0.011731681000000001</seconds>
+			<seconds>0.123679945</seconds>
 		</item>
 		<item>
-			<seconds>0.010166124</seconds>
+			<seconds>0.10672701699999999</seconds>
 		</item>
 		<item>
-			<seconds>0.01026262</seconds>
+			<seconds>0.101793199</seconds>
 		</item>
 		<item>
-			<seconds>0.010154513</seconds>
+			<seconds>0.102323816</seconds>
 		</item>
 		<item>
-			<seconds>0.0082074890000000001</seconds>
+			<seconds>0.072440738000000005</seconds>
 		</item>
 		<item>
-			<seconds>0.011241785000000001</seconds>
+			<seconds>0.130526225</seconds>
 		</item>
 		<item>
-			<seconds>0.0092020959999999999</seconds>
+			<seconds>0.095372340999999999</seconds>
 		</item>
 		<item>
-			<seconds>0.0091847040000000001</seconds>
+			<seconds>0.098436177</seconds>
 		</item>
 		<item>
-			<seconds>0.0092526090000000002</seconds>
+			<seconds>0.097431814000000005</seconds>
 		</item>
 		<item>
-			<seconds>0.0082350089999999997</seconds>
+			<seconds>0.064717161999999995</seconds>
 		</item>
 		<item>
-			<seconds>0.0092444980000000003</seconds>
+			<seconds>0.099288761000000003</seconds>
 		</item>
 		<item>
-			<seconds>0.011204353</seconds>
+			<seconds>0.12833877399999999</seconds>
 		</item>
 		<item>
-			<seconds>0.011249594999999999</seconds>
+			<seconds>0.122781996</seconds>
 		</item>
 		<item>
-			<seconds>0.0092017590000000003</seconds>
+			<seconds>0.093433830999999995</seconds>
 		</item>
 		<item>
-			<seconds>0.011224082</seconds>
+			<seconds>0.124227929</seconds>
 		</item>
 		<item>
-			<seconds>0.0081944879999999998</seconds>
+			<seconds>0.073763796000000006</seconds>
 		</item>
 		<item>
-			<seconds>0.010186333000000001</seconds>
+			<seconds>0.108859318</seconds>
 		</item>
 		<item>
-			<seconds>0.0092184580000000006</seconds>
+			<seconds>0.098337763999999994</seconds>
 		</item>
 		<item>
-			<seconds>0.011262932999999999</seconds>
+			<seconds>0.12838344400000001</seconds>
 		</item>
 		<item>
-			<seconds>0.0092403750000000003</seconds>
+			<seconds>0.097912972000000001</seconds>
 		</item>
 		<item>
-			<seconds>0.012256243999999999</seconds>
+			<seconds>0.14149899499999999</seconds>
 		</item>
 		<item>
-			<seconds>0.010243436999999999</seconds>
+			<seconds>0.105334833</seconds>
 		</item>
 		<item>
-			<seconds>0.010145612</seconds>
+			<seconds>0.113452682</seconds>
 		</item>
 		<item>
-			<seconds>0.011147771000000001</seconds>
+			<seconds>0.13246867700000001</seconds>
 		</item>
 		<item>
-			<seconds>0.011197405000000001</seconds>
+			<seconds>0.13146804400000001</seconds>
 		</item>
 	</timing.sample>
 	<timing.histogram class_id="3" tracking_level="0" version="0">
@@ -105,75 +105,75 @@
 		<item_version>0</item_version>
 		<item class_id="4" tracking_level="0" version="0">
 			<first>
-				<seconds>0.0078550697999999995</seconds>
+				<seconds>0.058136255699999993</seconds>
+			</first>
+			<second>0</second>
+		</item>
+		<item>
+			<first>
+				<seconds>0.064717161999999995</seconds>
 			</first>
 			<second>0.040000000000000001</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0082074890000000001</seconds>
+				<seconds>0.071298068299999989</seconds>
 			</first>
 			<second>0.080000000000000002</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0085599082000000007</seconds>
+				<seconds>0.077878974599999998</seconds>
 			</first>
 			<second>0</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0089123273999999995</seconds>
-			</first>
-			<second>0.28000000000000003</second>
-		</item>
-		<item>
-			<first>
-				<seconds>0.0092647466000000001</seconds>
+				<seconds>0.084459880899999992</seconds>
 			</first>
 			<second>0</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0096171658000000007</seconds>
+				<seconds>0.091040787200000001</seconds>
 			</first>
-			<second>0</second>
+			<second>0.12</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0099695849999999996</seconds>
+				<seconds>0.097621693499999995</seconds>
 			</first>
 			<second>0.23999999999999999</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0103220042</seconds>
+				<seconds>0.10420259979999999</seconds>
 			</first>
-			<second>0</second>
+			<second>0.12</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.010674423400000001</seconds>
+				<seconds>0.11078350609999998</seconds>
 			</first>
-			<second>0</second>
+			<second>0.040000000000000001</second>
 		</item>
 		<item>
 			<first>
-				<seconds>0.0110268426</seconds>
-			</first>
-			<second>0.28000000000000003</second>
-		</item>
-		<item>
-			<first>
-				<seconds>0.0113792618</seconds>
-			</first>
-			<second>0</second>
-		</item>
-		<item>
-			<first>
-				<seconds>0.011731681000000001</seconds>
+				<seconds>0.11736441239999999</seconds>
 			</first>
 			<second>0.080000000000000002</second>
+		</item>
+		<item>
+			<first>
+				<seconds>0.1239453187</seconds>
+			</first>
+			<second>0.12</second>
+		</item>
+		<item>
+			<first>
+				<seconds>0.130526225</seconds>
+			</first>
+			<second>0.16</second>
 		</item>
 	</timing.histogram>
 </result>

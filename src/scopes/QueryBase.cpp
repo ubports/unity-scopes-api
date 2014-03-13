@@ -45,7 +45,7 @@ void QueryBase::cancel()
 }
 /// @endcond
 
-void QueryBase::set_metadata(QueryMetadata const& metadata)
+void QueryBase::set_metadata(SearchMetadata const& metadata)
 {
     p->set_metadata(metadata);
 }
