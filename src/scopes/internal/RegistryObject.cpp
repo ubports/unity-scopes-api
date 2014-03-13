@@ -198,7 +198,9 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 
 void RegistryObject::on_process_death(core::posix::Process const& process)
 {
-    // broadcast message to all scope_processes_
+    // the death observer has signaled that a child has died.
+    // broadcast this message to each scope process until we have found the process in question.
+    // (this is slightly more efficient than just connecting the signal to every scope process)
     pid_t pid = process.pid();
     for (auto& scope_process : scope_processes_)
     {
