@@ -240,7 +240,17 @@ void RegistryObject::ScopeProcess::exec()
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
                  << exec_data_.scope_id << "\" took too long to stop." << endl;
-            in_lock_kill(lock);
+            try
+            {
+                in_lock_kill(lock);
+            }
+            catch(std::exception const& e)
+            {
+                // invalidate the process handle and move on, as the previous handle is
+                // clearly unrecoverable at this point.
+                cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+                in_lock_clear_handle();
+            }
         }
     }
 
@@ -261,8 +271,7 @@ void RegistryObject::ScopeProcess::exec()
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)
         {
-            process_ = core::posix::ChildProcess::invalid();
-            in_lock_update_state(Stopped);
+            in_lock_clear_handle();
             throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Failed to exec scope via command: \""
                                            + exec_data_.scoperunner_path + " " + exec_data_.runtime_config + " "
                                            + exec_data_.scope_config + "\"");
@@ -277,7 +286,17 @@ void RegistryObject::ScopeProcess::exec()
     //  3.2. OR if timeout, kill process and throw.
     if (!in_lock_wait_for_state(lock, ScopeProcess::Running, 1000))
     {
-        in_lock_kill(lock);
+        try
+        {
+            in_lock_kill(lock);
+        }
+        catch(std::exception const& e)
+        {
+            // invalidate the process handle and move on, as the previous handle is
+            // clearly unrecoverable at this point.
+            cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+            in_lock_clear_handle();
+        }
         throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
                                        + exec_data_.scope_id + "\" took too long to start.");
     }
@@ -303,12 +322,17 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     {
         cout << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \"" << exec_data_.scope_id
              << "\" terminated" << endl;
-        process_ = core::posix::ChildProcess::invalid();
-        in_lock_update_state(Stopped);
+        in_lock_clear_handle();
         return true;
     }
 
     return false;
+}
+
+void RegistryObject::ScopeProcess::in_lock_clear_handle()
+{
+    process_ = core::posix::ChildProcess::invalid();
+    in_lock_update_state(Stopped);
 }
 
 void RegistryObject::ScopeProcess::in_lock_update_state(ProcessState state)

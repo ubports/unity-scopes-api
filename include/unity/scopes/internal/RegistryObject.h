@@ -91,6 +91,7 @@ private:
 
     private:
         // the following methods must be called with process_mutex_ locked
+        void in_lock_clear_handle();
         void in_lock_update_state(ProcessState state);
         bool in_lock_wait_for_state(std::unique_lock<std::mutex>& lock,
                                     ProcessState state, int timeout_ms) const;
