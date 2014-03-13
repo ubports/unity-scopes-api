@@ -246,10 +246,7 @@ void RegistryObject::ScopeProcess::exec()
             }
             catch(std::exception const& e)
             {
-                // invalidate the process handle and move on, as the previous handle is
-                // clearly unrecoverable at this point.
                 cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
-                in_lock_clear_handle();
             }
         }
     }
@@ -292,10 +289,7 @@ void RegistryObject::ScopeProcess::exec()
         }
         catch(std::exception const& e)
         {
-            // invalidate the process handle and move on, as the previous handle is
-            // clearly unrecoverable at this point.
             cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
-            in_lock_clear_handle();
         }
         throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
                                        + exec_data_.scope_id + "\" took too long to start.");
@@ -380,6 +374,10 @@ void RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>& lo
     }
     catch (std::exception const&)
     {
+        // invalidate the process handle and move on, as the previous handle is clearly
+        // unrecoverable at this point.
+        in_lock_clear_handle();
+
         cerr << "RegistryObject::ScopeProcess::in_lock_kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
         throw;
