@@ -56,18 +56,7 @@ RegistryObject::~RegistryObject()
         }
         catch(std::exception const& e)
         {
-            cerr << "RegistryObject::~RegistryObject: " << e.what() << endl;
-        }
-    }
-
-    // wait for scope processes to terminate
-    for (auto& scope_process : scope_processes_)
-    {
-        if (!scope_process.second.wait_for_state(ScopeProcess::Stopped, 1000))
-        {
-            cerr << "RegistryObject::~RegistryObject: Scope: \"" << scope_process.second.scope_id()
-                 << "\" is taking longer than expected to terminate (This process is likely to close upon"
-                 << " termination of the parent application)." << endl;
+            cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
         }
     }
 
@@ -131,19 +120,19 @@ ScopeProxy RegistryObject::locate(std::string const& scope_id)
     // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("Registry: Cannot locate scope with empty id");
+        throw unity::InvalidArgumentException("Registry::locate(): Cannot locate scope with empty id");
     }
 
     auto scope_it = scopes_.find(scope_id);
     if (scope_it == scopes_.end())
     {
-        throw NotFoundException("Tried to locate unknown local scope", scope_id);
+        throw NotFoundException("Registry::locate(): Tried to locate unknown local scope", scope_id);
     }
 
     auto proc_it = scope_processes_.find(scope_id);
     if (proc_it == scope_processes_.end())
     {
-        throw NotFoundException("Tried to exec unknown local scope", scope_id);
+        throw NotFoundException("Registry::locate(): Tried to exec unknown local scope", scope_id);
     }
 
     proc_it->second.exec();
@@ -162,7 +151,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     }
     if (scope_id.find('/') != std::string::npos)
     {
-        throw unity::InvalidArgumentException("Registry: Cannot create a scope with a slash in its id");
+        throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot create a scope with '/' in its id");
     }
 
     if (scopes_.find(scope_id) != scopes_.end())
@@ -224,16 +213,108 @@ std::string RegistryObject::ScopeProcess::scope_id() const
     return exec_data_.scope_id;
 }
 
-RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state() const
-{
-    std::lock_guard<std::mutex> lock(state_mutex_);
-    return state_;
-}
-
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
 {
-    std::unique_lock<std::mutex> lock(state_mutex_);
+    std::unique_lock<std::mutex> lock(process_mutex_);
+    return in_lock_wait_for_state(lock, state, timeout_ms);
+}
 
+void RegistryObject::ScopeProcess::exec()
+{
+    std::unique_lock<std::mutex> lock(process_mutex_);
+
+    // 1. check if the scope is running.
+    //  1.1. if scope already running, return.
+    if (state_ == ScopeProcess::Running)
+    {
+        return;
+    }
+    //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
+    else if (state_ == ScopeProcess::Stopping)
+    {
+        if (!in_lock_wait_for_state(lock, ScopeProcess::Stopped, 1000))
+        {
+            cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
+                 << exec_data_.scope_id << "\" took too long to stop." << endl;
+            in_lock_kill(lock);
+        }
+    }
+
+    // 2. exec the scope.
+    in_lock_update_state(Starting);
+
+    const std::string program{exec_data_.scoperunner_path};
+    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+
+    std::map<std::string, std::string> env;
+    core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
+    {
+        env.insert(std::make_pair(key, value));
+    });
+
+    {
+        process_ = core::posix::exec(program, argv, env, core::posix::StandardStream::empty);
+        if (process_.pid() <= 0)
+        {
+            process_ = core::posix::ChildProcess::invalid();
+            in_lock_update_state(Stopped);
+            throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Failed to exec scope via command: \""
+                                           + exec_data_.scoperunner_path + " " + exec_data_.runtime_config + " "
+                                           + exec_data_.scope_config + "\"");
+        }
+    }
+
+    ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
+    in_lock_update_state(Running);
+
+    // 3. wait for scope to be "running".
+    //  3.1. when ready, return.
+    //  3.2. OR if timeout, kill process and throw.
+    if (!in_lock_wait_for_state(lock, ScopeProcess::Running, 1000))
+    {
+        in_lock_kill(lock);
+        throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
+                                       + exec_data_.scope_id + "\" took too long to start.");
+    }
+
+    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
+
+    // 4. add the scope process to the death observer
+    core::posix::ChildProcess::DeathObserver::instance().add(process_);
+}
+
+void RegistryObject::ScopeProcess::kill()
+{
+    std::unique_lock<std::mutex> lock(process_mutex_);
+    in_lock_kill(lock);
+}
+
+bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
+{
+    std::lock_guard<std::mutex> lock(process_mutex_);
+
+    // check if this is the process reported to have died
+    if (pid == process_.pid())
+    {
+        cout << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \"" << exec_data_.scope_id
+             << "\" terminated" << endl;
+        process_ = core::posix::ChildProcess::invalid();
+        in_lock_update_state(Stopped);
+        return true;
+    }
+
+    return false;
+}
+
+void RegistryObject::ScopeProcess::in_lock_update_state(ProcessState state)
+{
+    state_ = state;
+    state_change_cond_.notify_all();
+}
+
+bool RegistryObject::ScopeProcess::in_lock_wait_for_state(std::unique_lock<std::mutex>& lock,
+                                                          ProcessState state, int timeout_ms) const
+{
     // keep track of time left as process can undergo multiple state changes
     // before reaching the state we want
     int time_left = timeout_ms;
@@ -250,111 +331,30 @@ bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeou
     return state_ == state;
 }
 
-void RegistryObject::ScopeProcess::exec()
+void RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>& lock)
 {
-    // 1. check if the scope is running.
-    //  1.1. if scope already running, return.
-    if (state() == ScopeProcess::Running)
-    {
-        return;
-    }
-    //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
-    else if (state() == ScopeProcess::Stopping)
-    {
-        if (!wait_for_state(ScopeProcess::Stopped, 1000))
-        {
-            cerr << "RegistryObject::ScopeProcess: Force killing process. Scope: \"" << exec_data_.scope_id
-                 << "\" took too long to stop." << endl;
-            kill();
-        }
-    }
-
-    // 2. exec the scope.
-    update_state(Starting);
-
-    const std::string program{exec_data_.scoperunner_path};
-    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
-
-    std::map<std::string, std::string> env;
-    core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
-    {
-        env.insert(std::make_pair(key, value));
-    });
-
-    {
-        std::lock_guard<std::mutex> lock(process_mutex_);
-        process_ = core::posix::exec(program, argv, env, core::posix::StandardStream::empty);
-        if (process_.pid() <= 0)
-        {
-            process_ = core::posix::ChildProcess::invalid();
-            update_state(Stopped);
-            throw unity::ResourceException("RegistryObject::ScopeProcess: Failed to exec scope via command: \"" +
-                                           exec_data_.scoperunner_path + " " + exec_data_.runtime_config + " " +
-                                           exec_data_.scope_config + "\"");
-        }
-    }
-
-    ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
-    update_state(Running);
-
-    // 3. wait for scope to be "running".
-    //  3.1. when ready, return.
-    //  3.2. OR if timeout, kill process and throw.
-    if (!wait_for_state(ScopeProcess::Running, 1000))
-    {
-        kill();
-        throw unity::ResourceException("RegistryObject::ScopeProcess: exec() aborted. Scope: \""
-                                       + exec_data_.scope_id + "\" took too long to start.");
-    }
-
-    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
-
-    // 4. add the scope process to the death observer
-    core::posix::ChildProcess::DeathObserver::instance().add(process_);
-}
-
-void RegistryObject::ScopeProcess::kill()
-{
-    // if scope already stopped, return.
-    if (state() == ScopeProcess::Stopped)
+    if (state_ == Stopped)
     {
         return;
     }
 
     try
     {
-        std::lock_guard<std::mutex> lock(process_mutex_);
         process_.send_signal_or_throw(core::posix::Signal::sig_kill);
+
+        if (!in_lock_wait_for_state(lock, ScopeProcess::Stopped, 1000))
+        {
+            throw unity::ResourceException("Scope: \"" + exec_data_.scope_id
+                 + "\" is taking longer than expected to terminate (This process is "
+                 + "likely to close upon termination of the parent application).");
+        }
     }
     catch (std::exception const&)
     {
-        cerr << "RegistryObject::ScopeProcess: Failed to kill scope: \""
+        cerr << "RegistryObject::ScopeProcess::in_lock_kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
         throw;
     }
-}
-
-bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
-{
-    std::lock_guard<std::mutex> lock(process_mutex_);
-
-    // check if this is the process reported to have died
-    if (pid == process_.pid())
-    {
-        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" terminated" << endl;
-        process_ = core::posix::ChildProcess::invalid();
-        update_state(Stopped);
-        return true;
-    }
-
-    return false;
-}
-
-void RegistryObject::ScopeProcess::update_state(ProcessState state)
-{
-    std::lock_guard<std::mutex> lock(state_mutex_);
-    state_ = state;
-    state_change_cond_.notify_all();
 }
 
 } // namespace internal

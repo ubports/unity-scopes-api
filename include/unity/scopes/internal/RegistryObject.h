@@ -82,7 +82,6 @@ private:
         ScopeProcess(ScopeProcess const& other);
 
         std::string scope_id() const;
-        ProcessState state() const;
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
         void exec();
@@ -91,15 +90,18 @@ private:
         bool on_process_death(pid_t pid);
 
     private:
-        void update_state(ProcessState state);
+        // the following methods must be called with process_mutex_ locked
+        void in_lock_update_state(ProcessState state);
+        bool in_lock_wait_for_state(std::unique_lock<std::mutex>& lock,
+                                    ProcessState state, int timeout_ms) const;
+        void in_lock_kill(std::unique_lock<std::mutex>& lock);
 
     private:
-        ScopeExecData exec_data_;
+        const ScopeExecData exec_data_;
         ProcessState state_ = Stopped;
-        mutable std::mutex state_mutex_;
+        mutable std::mutex process_mutex_;
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
-        std::mutex process_mutex_;
     };
 
 private:
