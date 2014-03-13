@@ -60,11 +60,18 @@ RegistryObject::~RegistryObject()
         }
     }
 
-    // stop the death oberver
-    death_observer_.quit();
-    if (death_observer_thread_.joinable())
+    try
     {
-        death_observer_thread_.join();
+        // stop the death oberver
+        death_observer_.quit();
+        if (death_observer_thread_.joinable())
+        {
+            death_observer_thread_.join();
+        }
+    }
+    catch(std::exception const& e)
+    {
+        cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
     }
 
     scopes_.clear();
