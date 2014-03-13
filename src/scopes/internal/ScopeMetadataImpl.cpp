@@ -53,7 +53,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     display_name_(other.display_name_),
     description_(other.description_),
     author_(other.author_),
-    display_attributes_(other.display_attributes_)
+    appearance_attributes_(other.appearance_attributes_)
 {
     if (other.art_)
     {
@@ -92,7 +92,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
         hot_key_.reset(rhs.hot_key_ ? new string(*rhs.hot_key_) : nullptr);
         invisible_.reset(rhs.invisible_ ? new bool(*rhs.invisible_) : nullptr);
-        display_attributes_ = rhs.display_attributes_;
+        appearance_attributes_ = rhs.appearance_attributes_;
     }
     return *this;
 }
@@ -167,9 +167,9 @@ bool ScopeMetadataImpl::invisible() const
     return false;
 }
 
-VariantMap ScopeMetadataImpl::display_attributes() const
+VariantMap ScopeMetadataImpl::appearance_attributes() const
 {
-    return display_attributes_;
+    return appearance_attributes_;
 }
 
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
@@ -222,9 +222,9 @@ void ScopeMetadataImpl::set_invisible(bool invisible)
     invisible_.reset(new bool(invisible));
 }
 
-void ScopeMetadataImpl::set_display_attributes(VariantMap const& display_attributes)
+void ScopeMetadataImpl::set_appearance_attributes(VariantMap const& appearance_attributes)
 {
-    display_attributes_ = display_attributes;
+    appearance_attributes_ = appearance_attributes;
 }
 
 namespace
@@ -282,9 +282,9 @@ VariantMap ScopeMetadataImpl::serialize() const
     {
         var["invisible"] = *invisible_;
     }
-    if (display_attributes_.size() > 0)
+    if (appearance_attributes_.size() > 0)
     {
-        var["display_attributes"] = display_attributes_;
+        var["appearance_attributes"] = appearance_attributes_;
     }
 
     return var;
@@ -371,10 +371,10 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         invisible_.reset(new bool(it->second.get_bool()));
     }
 
-    it = var.find("display_attributes");
+    it = var.find("appearance_attributes");
     if (it != var.end())
     {
-        display_attributes_ = it->second.get_dict();
+        appearance_attributes_ = it->second.get_dict();
     }
 }
 

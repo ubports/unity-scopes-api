@@ -35,7 +35,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
 
-        auto attrs = cfg.display_attributes();
+        auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(2, attrs.size());
         EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
@@ -50,6 +50,6 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
 
-        EXPECT_EQ(0, cfg.display_attributes().size());
+        EXPECT_EQ(0, cfg.appearance_attributes().size());
     }
 }

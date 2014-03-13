@@ -7,6 +7,6 @@ Icon = an icon
 SearchHint = a search hint string
 HotKey = a key
 
-[Display]
+[Appearance]
 arbitrary_key = foo
 another_one = bar

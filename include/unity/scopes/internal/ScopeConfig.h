@@ -35,7 +35,7 @@ class ScopeConfig : public ConfigBase
 {
 public:
     static constexpr const char* SCOPE_CONFIG_GROUP = "ScopeConfig";
-    static constexpr const char* SCOPE_DISPLAY_GROUP = "Display";
+    static constexpr const char* SCOPE_DISPLAY_GROUP = "Appearance";
 
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig();
@@ -49,7 +49,7 @@ public:
     std::string search_hint() const;     // Optional, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
-    VariantMap display_attributes() const; // Optional, return empty map if no attributes are present
+    VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
 
 private:
     bool overrideable_;
@@ -61,7 +61,7 @@ private:
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
     std::unique_ptr<bool> invisible_;
-    VariantMap display_attributes_;
+    VariantMap appearance_attributes_;
 };
 
 } // namespace internal

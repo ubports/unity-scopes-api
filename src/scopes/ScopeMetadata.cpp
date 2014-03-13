@@ -116,9 +116,9 @@ bool ScopeMetadata::invisible() const
     return p->invisible();
 }
 
-VariantMap ScopeMetadata::display_attributes() const
+VariantMap ScopeMetadata::appearance_attributes() const
 {
-    return p->display_attributes();
+    return p->appearance_attributes();
 }
 
 VariantMap ScopeMetadata::serialize() const

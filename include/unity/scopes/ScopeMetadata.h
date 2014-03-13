@@ -127,10 +127,10 @@ public:
     /**
     \brief Get optional display attributes.
 
-    Display attributes define customized look of the scope in Scopes Scope.
+    Appearance attributes define customized look of the scope in Scopes Scope.
     \return Map of attributes (may be empty)
     */
-    VariantMap display_attributes() const;
+    VariantMap appearance_attributes() const;
 
     /**
     \brief Return a dictionary of all metadata attributes.

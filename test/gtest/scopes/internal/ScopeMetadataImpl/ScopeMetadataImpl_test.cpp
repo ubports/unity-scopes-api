@@ -57,7 +57,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", m.display_name());
     EXPECT_EQ("description", m.description());
     EXPECT_EQ("author", m.author());
-    EXPECT_EQ(0, m.display_attributes().size());
+    EXPECT_EQ(0, m.appearance_attributes().size());
 
     // Check that optional fields that are not set throw
     try
@@ -110,7 +110,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", mi2->display_name());
     EXPECT_EQ("description", mi2->description());
     EXPECT_EQ("author", mi2->author());
-    EXPECT_EQ(0, mi2->display_attributes().size());
+    EXPECT_EQ(0, mi2->appearance_attributes().size());
 
     VariantMap attrs;
     attrs["foo"] = "bar";
@@ -121,7 +121,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_search_hint("search_hint");
     mi2->set_hot_key("hot_key");
     mi2->set_invisible(true);
-    mi2->set_display_attributes(attrs);
+    mi2->set_appearance_attributes(attrs);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -131,7 +131,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("search_hint", m.search_hint());
     EXPECT_EQ("hot_key", m.hot_key());
     EXPECT_TRUE(m.invisible());
-    EXPECT_EQ("bar", m.display_attributes()["foo"].get_string());
+    EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -146,7 +146,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_search_hint("tmp search_hint");
     ti->set_hot_key("tmp hot_key");
     ti->set_invisible(true);
-    ti->set_display_attributes(attrs);
+    ti->set_appearance_attributes(attrs);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -161,7 +161,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", ci.icon());
     EXPECT_EQ("tmp search_hint", ci.search_hint());
     EXPECT_EQ("tmp hot_key", ci.hot_key());
-    EXPECT_EQ("bar", ci.display_attributes()["foo"].get_string());
+    EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
 
     // Check public assignment operator
@@ -177,7 +177,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", m.icon());
     EXPECT_EQ("tmp search_hint", m.search_hint());
     EXPECT_EQ("tmp hot_key", m.hot_key());
-    EXPECT_EQ("bar", m.display_attributes()["foo"].get_string());
+    EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(m.invisible());
 
     // Self-assignment
@@ -192,7 +192,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", tmp.icon());
     EXPECT_EQ("tmp search_hint", tmp.search_hint());
     EXPECT_EQ("tmp hot_key", tmp.hot_key());
-    EXPECT_EQ("bar", tmp.display_attributes()["foo"].get_string());
+    EXPECT_EQ("bar", tmp.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(tmp.invisible());
 
     // Copy constructor
@@ -207,7 +207,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", tmp2.icon());
     EXPECT_EQ("tmp search_hint", tmp2.search_hint());
     EXPECT_EQ("tmp hot_key", tmp2.hot_key());
-    EXPECT_EQ("bar", tmp2.display_attributes()["foo"].get_string());
+    EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(tmp2.invisible());
 }
 

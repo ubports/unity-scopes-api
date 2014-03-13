@@ -160,7 +160,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_description(sc.description());
             mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
-            mi->set_display_attributes(sc.display_attributes());
+            mi->set_appearance_attributes(sc.appearance_attributes());
             try
             {
                 mi->set_art(sc.art());
