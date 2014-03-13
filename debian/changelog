@@ -13,6 +13,21 @@ unity-scopes-api (0.4.1-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 12 Mar 2014 17:03:16 +0100
 
+unity-scopes-api (0.4.0+14.04.20140312.1-0ubuntu1) trusty; urgency=medium
+
+  [ Michi Henning ]
+  * Re-factored proxy class implementation.
+
+
+  [ Pawel Stolowski, Michi Henning ]
+  * Renamed various classes and methods in the public API
+    (see RELEASE_NOTES.txt for details).
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 12 Mar 2014 16:58:43 +0000
+
 unity-scopes-api (0.3.2+14.04.20140220.1-0ubuntu1) trusty; urgency=low
 
   [ Pawel Stolowski ]
