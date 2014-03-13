@@ -125,6 +125,14 @@ public:
     bool invisible() const;             // optional (default = false)
 
     /**
+    \brief Get optional display attributes.
+
+    Appearance attributes define customized look of the scope in Scopes Scope.
+    \return Map of attributes (may be empty)
+    */
+    VariantMap appearance_attributes() const;
+
+    /**
     \brief Return a dictionary of all metadata attributes.
     \return Dictionary of all metadata attributes.
     */

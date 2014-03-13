@@ -53,6 +53,7 @@ public:
     std::string search_hint() const;    // localized, optional
     std::string hot_key() const;        // localized, optional
     bool invisible() const;             // optional (default = false)
+    VariantMap appearance_attributes() const; // optional (default: empty map)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -64,6 +65,7 @@ public:
     void set_search_hint(std::string const& search_hint);
     void set_hot_key(std::string const& hot_key);
     void set_invisible(bool invisible);
+    void set_appearance_attributes(VariantMap const& appearance_attributes);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -83,6 +85,7 @@ private:
     std::unique_ptr<std::string> search_hint_;  // Optional, hence a pointer
     std::unique_ptr<std::string> hot_key_;      // Optional, hence a pointer
     std::unique_ptr<bool> invisible_;           // Optional, hence a pointer
+    VariantMap appearance_attributes_;
 };
 
 } // namespace internal
