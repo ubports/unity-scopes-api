@@ -398,10 +398,10 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryConfig::REGISTRY_CONFIG_GROUP@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::RegistryConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::~RegistryConfig()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::in_lock_clear_handle()@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::in_lock_update_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0replaceme
@@ -617,7 +617,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryConfig::endpoint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::in_lock_wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::scope_id() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::list() const@Base" 0replaceme

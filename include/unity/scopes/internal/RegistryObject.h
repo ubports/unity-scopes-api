@@ -91,11 +91,11 @@ private:
 
     private:
         // the following methods must be called with process_mutex_ locked
-        void in_lock_clear_handle();
-        void in_lock_update_state(ProcessState state);
-        bool in_lock_wait_for_state(std::unique_lock<std::mutex>& lock,
-                                    ProcessState state, int timeout_ms) const;
-        void in_lock_kill(std::unique_lock<std::mutex>& lock);
+        void clear_handle_unlocked();
+        void update_state_unlocked(ProcessState state);
+        bool wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
+                                     ProcessState state, int timeout_ms) const;
+        void kill_unlocked(std::unique_lock<std::mutex>& lock);
 
     private:
         const ScopeExecData exec_data_;

@@ -227,7 +227,7 @@ std::string RegistryObject::ScopeProcess::scope_id() const
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    return in_lock_wait_for_state(lock, state, timeout_ms);
+    return wait_for_state_unlocked(lock, state, timeout_ms);
 }
 
 void RegistryObject::ScopeProcess::exec()
@@ -243,13 +243,13 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
     else if (state_ == ScopeProcess::Stopping)
     {
-        if (!in_lock_wait_for_state(lock, ScopeProcess::Stopped, 1000))
+        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, 1000))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
                  << exec_data_.scope_id << "\" took too long to stop." << endl;
             try
             {
-                in_lock_kill(lock);
+                kill_unlocked(lock);
             }
             catch(std::exception const& e)
             {
@@ -259,7 +259,7 @@ void RegistryObject::ScopeProcess::exec()
     }
 
     // 2. exec the scope.
-    in_lock_update_state(Starting);
+    update_state_unlocked(Starting);
 
     const std::string program{exec_data_.scoperunner_path};
     const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
@@ -275,7 +275,7 @@ void RegistryObject::ScopeProcess::exec()
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)
         {
-            in_lock_clear_handle();
+            clear_handle_unlocked();
             throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Failed to exec scope via command: \""
                                            + exec_data_.scoperunner_path + " " + exec_data_.runtime_config + " "
                                            + exec_data_.scope_config + "\"");
@@ -283,16 +283,16 @@ void RegistryObject::ScopeProcess::exec()
     }
 
     ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
-    in_lock_update_state(Running);
+    update_state_unlocked(Running);
 
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
-    if (!in_lock_wait_for_state(lock, ScopeProcess::Running, 1000))
+    if (!wait_for_state_unlocked(lock, ScopeProcess::Running, 1000))
     {
         try
         {
-            in_lock_kill(lock);
+            kill_unlocked(lock);
         }
         catch(std::exception const& e)
         {
@@ -311,7 +311,7 @@ void RegistryObject::ScopeProcess::exec()
 void RegistryObject::ScopeProcess::kill()
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    in_lock_kill(lock);
+    kill_unlocked(lock);
 }
 
 bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
@@ -323,27 +323,27 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     {
         cout << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \"" << exec_data_.scope_id
              << "\" terminated" << endl;
-        in_lock_clear_handle();
+        clear_handle_unlocked();
         return true;
     }
 
     return false;
 }
 
-void RegistryObject::ScopeProcess::in_lock_clear_handle()
+void RegistryObject::ScopeProcess::clear_handle_unlocked()
 {
     process_ = core::posix::ChildProcess::invalid();
-    in_lock_update_state(Stopped);
+    update_state_unlocked(Stopped);
 }
 
-void RegistryObject::ScopeProcess::in_lock_update_state(ProcessState state)
+void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
 {
     state_ = state;
     state_change_cond_.notify_all();
 }
 
-bool RegistryObject::ScopeProcess::in_lock_wait_for_state(std::unique_lock<std::mutex>& lock,
-                                                          ProcessState state, int timeout_ms) const
+bool RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
+                                                           ProcessState state, int timeout_ms) const
 {
     // keep track of time left as process can undergo multiple state changes
     // before reaching the state we want
@@ -361,7 +361,7 @@ bool RegistryObject::ScopeProcess::in_lock_wait_for_state(std::unique_lock<std::
     return state_ == state;
 }
 
-void RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>& lock)
+void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& lock)
 {
     if (state_ == Stopped)
     {
@@ -372,7 +372,7 @@ void RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>& lo
     {
         process_.send_signal_or_throw(core::posix::Signal::sig_kill);
 
-        if (!in_lock_wait_for_state(lock, ScopeProcess::Stopped, 1000))
+        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, 1000))
         {
             throw unity::ResourceException("Scope: \"" + exec_data_.scope_id
                  + "\" is taking longer than expected to terminate (This process is "
@@ -383,7 +383,7 @@ void RegistryObject::ScopeProcess::in_lock_kill(std::unique_lock<std::mutex>& lo
     {
         // invalidate the process handle and move on, as the previous handle is clearly
         // unrecoverable at this point.
-        in_lock_clear_handle();
+        clear_handle_unlocked();
 
         cerr << "RegistryObject::ScopeProcess::in_lock_kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
