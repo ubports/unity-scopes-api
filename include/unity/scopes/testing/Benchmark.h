@@ -82,7 +82,7 @@ public:
              * statistically significantly faster than a reference timing sample.
              * \throw std::runtime_error if either this sample or the reference sample is not normally distributed.
              * \param reference The reference timing sample to compare to.
-             * \param alpha The confidence level for the statistical test.
+             * \param alpha The critical value of the statistical test. The lower, the stronger the relevance of the test.
              * \return true iff this timing sample is significantly faster than the reference sample.
              */
             bool is_significantly_faster_than_reference(const Timing& reference, double alpha = 0.05) const;
@@ -93,7 +93,7 @@ public:
              * \throw std::runtime_error if this sample is not normally distributed.
              * \param mean The reference mean to compare to.
              * \param std_dev The reference std. dev. to compare to.
-             * \param alpha The confidence level for the statistical test.
+             * \param alpha The critical value of the statistical test. The lower, the stronger the relevance of the test.
              * \return true iff this timing sample is significantly faster than the reference sample.
              */
             bool is_significantly_faster_than_reference(
@@ -106,7 +106,7 @@ public:
              * statistically significantly slower than a reference timing sample.
              * \throw std::runtime_error if either this sample or the reference sample is not normally distributed.
              * \param reference The reference timing sample to compare to.
-             * \param alpha The confidence level for the statistical test.
+             * \param alpha The critical value of the statistical test. The lower, the stronger the relevance of the test.
              * \return true iff this timing sample is significantly slower than the reference.
              */
             bool is_significantly_slower_than_reference(const Timing& reference, double alpha = 0.05) const;
@@ -117,7 +117,7 @@ public:
              * \throw std::runtime_error if this sample is not normally distributed.
              * \param mean The reference mean to compare to.
              * \param std_dev The reference std. dev. to compare to.
-             * \param alpha The confidence level for the statistical test.
+             * \param alpha The critical value of the statistical test. The lower, the stronger the relevance of the test.
              * \return true iff this timing sample is significantly slower than the reference.
              */
             bool is_significantly_slower_than_reference(
