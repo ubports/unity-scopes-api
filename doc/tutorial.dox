@@ -500,7 +500,39 @@ Installing a scope is as simple as running `make install` when using the scope
 template. You might need to restart the global scope registry when a new scope
 is installed by running: `restart scope-registry`.
 
-In the future it will be possible to create click packages with scopes.
+The scope will be installed under one of the "scopes directories"
+scanned by the scope registry.  Currently these default to:
+
+  * /usr/lib/${arch}/unity-scopes
+  * /custom/lib/${arch}/unity-scopes
+  * ??? Click packages?
+
+Individual scopes are installed into a subdirectory matching the
+scope's name.  At a minimum, the directory structure should contain
+the following:
+
+    -+- ${scopesdir}
+     `-+- scopename
+       |--- scopename.ini
+       `--- libscopename.so
+
+That is, a scope metadata file and a shared library containing the
+scope code.  The scope author is free to ship additional data in this
+directory (e.g. icons and screenshots).
+
+The scope metadata file uses the standard ini file format, with the
+following keys:
+
+    [ScopeConfig]
+    DisplayName = human readable name of scope
+    Description = description of scope
+    Author = Author
+    Icon = path to icon representing the scope
+    Art = path to screenshot of the scope
+    SearchHint = hint text displayed to user when viewing scope
+    HotKey =
+
+In addition to allowing the registry to make the scope available, this information controls how the scope appears in the "Scopes" scope.
 
 \subsection scopetool Previewing scope
 
