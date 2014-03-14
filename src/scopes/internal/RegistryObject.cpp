@@ -60,9 +60,9 @@ RegistryObject::~RegistryObject()
         }
     }
 
+    // stop the death oberver
     try
     {
-        // stop the death oberver
         death_observer_.quit();
         if (death_observer_thread_.joinable())
         {
@@ -72,6 +72,7 @@ RegistryObject::~RegistryObject()
     catch(std::exception const& e)
     {
         cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
+        death_observer_thread_.detach();
     }
 
     scopes_.clear();
@@ -302,7 +303,7 @@ void RegistryObject::ScopeProcess::exec()
                                        + exec_data_.scope_id + "\" took too long to start.");
     }
 
-    cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
+    cout << "RegistryObject::ScopeProcess::exec(): Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
 
     // 4. add the scope process to the death observer
     core::posix::ChildProcess::DeathObserver::instance().add(process_);
