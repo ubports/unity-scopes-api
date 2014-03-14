@@ -23,6 +23,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -127,13 +128,7 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
 {
     VariantMap var;
-    VariantArray filters_var;
-
-    for (auto const& f: filters)
-    {
-        filters_var.push_back(Variant(f->serialize()));
-    }
-    var["filters"] = filters_var;
+    var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
     return ReplyImpl::push(var);
 }

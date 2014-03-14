@@ -67,15 +67,10 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     auto it = data.find("filters");
     if (it != data.end())
     {
-        auto filters_var = it->second.get_array();
+        Filters const filters = FilterBaseImpl::deserialize_filters(it->second.get_array());
         it = data.find("filter_state");
         if (it != data.end())
         {
-            Filters filters;
-            for (auto const& f : filters_var)
-            {
-                filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
-            }
             auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
             receiver_->push(filters, filter_state);
         }
@@ -95,12 +90,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        auto const dept = it->second.get_array();
-        DepartmentList departments;
-        for (auto const& dep : dept)
-        {
-            departments.push_back(DepartmentImpl::create(dep.get_dict()));
-        }
+        DepartmentList const departments = DepartmentImpl::deserialize_departments(it->second.get_array());
         it = data.find("current_department");
         if (it != data.end())
         {

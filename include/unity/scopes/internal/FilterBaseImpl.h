@@ -43,6 +43,8 @@ public:
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
+    static VariantArray serialize_filters(Filters const& filters);
+    static Filters deserialize_filters(VariantArray const& var);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;
