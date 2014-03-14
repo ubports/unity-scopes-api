@@ -503,9 +503,11 @@ is installed by running: `restart scope-registry`.
 The scope will be installed under one of the "scopes directories"
 scanned by the scope registry.  Currently these default to:
 
-  * /usr/lib/${arch}/unity-scopes
-  * /custom/lib/${arch}/unity-scopes
-  * ??? Click packages?
+<ul>
+<li>/usr/lib/${arch}/unity-scopes</li>
+<li>/custom/lib/${arch}/unity-scopes</li>
+<!-- <li>??? Click packages?</li> -->
+</ul>
 
 Individual scopes are installed into a subdirectory matching the
 scope's name.  At a minimum, the directory structure should contain
