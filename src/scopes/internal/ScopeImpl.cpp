@@ -102,14 +102,11 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_create_query = [this, query, metadata, rp, ro, ctrl]() -> void
+    auto send_search = [this, query, metadata, rp, ro, ctrl]() -> void
     {
         try
         {
-            // Forward the the search() method across the bus. This is a
-            // synchronous twoway interaction with the scope, so it can return
-            // the QueryCtrlProxy. This may block for some time, for example, if
-            // the scope is not running and needs to be activated by the registry first.
+            // Forward the (synchronous) search() method across the bus.
             auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->search(query, metadata.serialize(), rp));
             assert(real_ctrl);
 
@@ -132,7 +129,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     };
 
     // Send the blocking twoway request asynchronously via the async invocation pool.
-    auto future = runtime_->pool()->submit(send_create_query);
+    auto future = runtime_->async_pool()->submit(send_search);
     runtime_->future_queue()->push(move(future));
     return ctrl;
 }
@@ -146,30 +143,43 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
         throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListenerBase (nullptr)");
     }
 
-    QueryCtrlProxy ctrl;
     ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
-    try
-    {
-        MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
+    MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the activate() method across the bus.
-        ctrl = fwd()->activate(result.p->activation_target(), metadata.serialize(), rp);
-        assert(ctrl);
-    }
-    catch (std::exception const& e)
+    // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
+
+    auto send_activate = [this, result, metadata, rp, ro, ctrl]() -> void
     {
-        // TODO: log error
         try
         {
-            ro->finished(ListenerBase::Error, e.what());
-            throw;
+
+            // Forward the (synchronous) method across the bus.
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->activate(result.p->activation_target(),
+                                                                                 metadata.serialize(),
+                                                                                 rp));
+
+            // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
+            // with the real proxy that was returned.
+            auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
+            assert(new_proxy);
+            ctrl->set_proxy(new_proxy);
         }
-        catch (...)
+        catch (std::exception const& e)
         {
-            cerr << "activate(): unknown exception" << endl;
+            try
+            {
+                ro->finished(ListenerBase::Error, e.what());
+            }
+            catch (...)
+            {
+            }
         }
-        throw;
-    }
+    };
+
+    // Send the blocking twoway request asynchronously via the async invocation pool.
+    auto future = runtime_->async_pool()->submit(send_activate);
+    runtime_->future_queue()->push(move(future));
     return ctrl;
 }
 
@@ -184,34 +194,44 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
         throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListenerBase (nullptr)");
     }
 
-    QueryCtrlProxy ctrl;
-    try
-    {
-        // Create a middleware server-side object that can receive incoming
-        // push() and finished() messages over the network.
-        ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
-        MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
+    ActivationReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
+    MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the activate() method across the bus.
-        ctrl = fwd()->perform_action(result.p->activation_target(), metadata.serialize(), widget_id, action_id, rp);
-        assert(ctrl);
-    }
-    catch (std::exception const& e)
+    // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
+
+    auto send_perform_action = [this, result, metadata, widget_id, action_id, rp, ro, ctrl]() -> void
     {
-        // TODO: log error
         try
         {
-            // TODO: if things go wrong, we need to make sure that the reply object
-            // is disconnected from the middleware, so it gets deallocated.
-            reply->finished(ListenerBase::Error, e.what());
-            throw;
+            // Forward the (synchronous) method across the bus.
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->perform_action(result.p->activation_target(),
+                                                   metadata.serialize(),
+                                                   widget_id,
+                                                   action_id,
+                                                   rp));
+
+            // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
+            // with the real proxy that was returned.
+            auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
+            assert(new_proxy);
+            ctrl->set_proxy(new_proxy);
         }
-        catch (...)
+        catch (std::exception const& e)
         {
-            cerr << "perform_action(): unknown exception" << endl;
+            try
+            {
+                ro->finished(ListenerBase::Error, e.what());
+            }
+            catch (...)
+            {
+            }
         }
-        throw;
-    }
+    };
+
+    // Send the blocking twoway request asynchronously via the async invocation pool.
+    auto future = runtime_->async_pool()->submit(send_perform_action);
+    runtime_->future_queue()->push(move(future));
     return ctrl;
 }
 
@@ -224,37 +244,41 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
         throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListenerBase (nullptr)");
     }
 
-    QueryCtrlProxy ctrl;
     PreviewReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
-    try
-    {
-        // Create a middleware server-side object that can receive incoming
-        // push() and finished() messages over the network.
-        MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
+    MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-        // Forward the search() method across the bus. This is a
-        // synchronous twoway interaction with the scope, so it can return
-        // the QueryCtrlProxy. Because the Scope implementation has a separate
-        // thread for search() calls, this is guaranteed not to block for
-        // any length of time. (No application code other than the QueryBase constructor
-        // is called by search() on the server side.)
-        ctrl = fwd()->preview(result.p->activation_target(), hints.serialize(), rp);
-        assert(ctrl);
-    }
-    catch (std::exception const& e)
+    // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
+
+    auto send_preview = [this, result, hints, rp, ro, ctrl]() -> void
     {
-        // TODO: log error
         try
         {
-            ro->finished(ListenerBase::Error, e.what());
-            throw;
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->preview(result.p->activation_target(),
+                                                                                hints.serialize(),
+                                                                                rp));
+
+            // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
+            // with the real proxy that was returned.
+            auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
+            assert(new_proxy);
+            ctrl->set_proxy(new_proxy);
         }
-        catch (...)
+        catch (std::exception const& e)
         {
-            cerr << "preview(): unknown exception" << endl;
+            try
+            {
+                ro->finished(ListenerBase::Error, e.what());
+            }
+            catch (...)
+            {
+            }
         }
-        throw;
-    }
+    };
+
+    // Send the blocking twoway request asynchronously via the async invocation pool.
+    auto future = runtime_->async_pool()->submit(send_preview);
+    runtime_->future_queue()->push(move(future));
     return ctrl;
 }
 

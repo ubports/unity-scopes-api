@@ -53,7 +53,7 @@ public:
     std::string registry_endpointdir() const;
     std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
-    ThreadPool::SPtr pool() const;
+    ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
     void run_scope(ScopeBase *const scope_base);
 
@@ -76,10 +76,10 @@ private:
     mutable std::string registry_endpointdir_;
     mutable std::string registry_endpoint_;
     mutable Reaper::SPtr reply_reaper_;
-    mutable ThreadPool::SPtr pool_;                 // Pool of invocation threads for async query creation
+    mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;
     mutable std::thread waiter_thread_;
-    mutable std::mutex mutex_;  // For lazy initialization of reply_reaper_, pool_, and queue_
+    mutable std::mutex mutex_;  // For lazy initialization of reply_reaper_, async_pool_, and queue_
 };
 
 } // namespace internal

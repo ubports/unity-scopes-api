@@ -72,17 +72,23 @@ public:
             cout << ": " << error_message;
         }
         cout << endl;
+        if (--num_children_ == 0)
+        {
+            upstream_->finished();  // Send finished once last child finishes
+        }
     }
 
-    Receiver(string const& scope_name, SearchReplyProxy const& upstream) :
+    Receiver(string const& scope_name, SearchReplyProxy const& upstream, int num_children) :
         scope_name_(scope_name),
-        upstream_(upstream)
+        upstream_(upstream),
+        num_children_(num_children)
     {
     }
 
 private:
     string scope_name_;
     SearchReplyProxy upstream_;
+    int num_children_;
 };
 
 class MyQuery : public SearchQueryBase
@@ -118,7 +124,7 @@ public:
             assert(0);
         }
 
-        SearchListenerBase::SPtr reply(new Receiver(scope_name_, upstream_reply));
+        SearchListenerBase::SPtr reply(new Receiver(scope_name_, upstream_reply, 2));
         subsearch(scope_c_, query_.query_string(), reply);
         subsearch(scope_d_, query_.query_string(), reply);
     }

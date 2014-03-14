@@ -130,8 +130,8 @@ void RuntimeImpl::destroy()
             future_queue_->destroy();
             future_queue_->wait_for_destroy();
         }
-        pool_ = nullptr;
-            //future_queue_ = nullptr;
+        async_pool_ = nullptr;
+
         registry_ = nullptr;
         middleware_->stop();
         middleware_ = nullptr;
@@ -218,20 +218,20 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
     }
 }
 
-ThreadPool::SPtr RuntimeImpl::pool() const
+ThreadPool::SPtr RuntimeImpl::async_pool() const
 {
     // We lazily create the async invocation pool the first time we are asked for it,
     // which happens when the first query is created. We also create the future
     // queue here and its waiter thread, so we can clean up once asynchronous
     // queries complete.
     lock_guard<mutex> lock(mutex_);
-    if (!pool_)
+    if (!async_pool_)
     {
-        pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
+        async_pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
         future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
         waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
     }
-    return pool_;
+    return async_pool_;
 }
 
 ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
