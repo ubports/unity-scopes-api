@@ -225,7 +225,6 @@ TEST_F(smartscopesproxytest, consecutive_queries)
 
     for (int i = 0; i < 10; ++i)
     {
-    std::cerr << "wait" << std::endl;
         replies[i]->wait_until_finished();
     }
 }
