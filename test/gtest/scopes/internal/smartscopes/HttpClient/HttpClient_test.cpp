@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/UnityExceptions.h>
 
 #include "../RaiiServer.h"
@@ -38,7 +38,7 @@ class HttpClientTest : public Test
 {
 public:
     HttpClientTest(uint no_reply_timeout = 20000)
-        : http_client_(new HttpClientQt(no_reply_timeout)),
+        : http_client_(new HttpClientNetCpp(no_reply_timeout)),
           server_(FAKE_SERVER_PATH)
     {
         test_url_ = c_test_url + ":" + std::to_string(server_.port_);

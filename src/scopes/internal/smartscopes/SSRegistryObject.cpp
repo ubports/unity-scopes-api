@@ -22,7 +22,7 @@
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -49,7 +49,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& sss_url,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientQt>(no_reply_timeout),
+                    std::make_shared<HttpClientNetCpp>(no_reply_timeout),
                     std::make_shared<JsonCppNode>(), sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)
