@@ -448,9 +448,9 @@ TEST(RegistryI, locate)
 
             // kill first scope
             int scope1_pid = first_child_pid();
-            int status;
+            int status = 0;
             kill(scope1_pid, SIGKILL);
-            waitpid(scope1_pid, &status, 0);
+            while (waitpid(scope1_pid, &status, 0) == 0);
 
             // check that the first scope is no longer running
             EXPECT_FALSE(reg->is_scope_running(scope_ids[0]));
