@@ -498,7 +498,11 @@ TEST_F(TestScopeFixutre, search_results)
 
 Installing a scope is as simple as running `make install` when using the scope
 template. You might need to restart the global scope registry when a new scope
-is installed by running: `restart scope-registry`.
+is installed by running:
+
+\verbatim
+restart scope-registry
+\endverbatim
 
 The scope will be installed under one of the "scopes directories"
 scanned by the scope registry.  Currently these default to:
