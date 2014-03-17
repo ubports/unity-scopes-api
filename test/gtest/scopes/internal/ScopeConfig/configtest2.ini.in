@@ -1,0 +1,8 @@
+[ScopeConfig]
+DisplayName = Scope name
+Description = Scope description
+Art = scope art
+Author = Canonical
+Icon = an icon
+SearchHint = a search hint string
+HotKey = a key

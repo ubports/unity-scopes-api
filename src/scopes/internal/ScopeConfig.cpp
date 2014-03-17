@@ -107,6 +107,18 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     catch (LogicException const&)
     {
     }
+
+    // read all display attributes from SCOPE_DISPLAY_GROUP config group
+    try
+    {
+        for (auto const& key: parser()->get_keys(SCOPE_DISPLAY_GROUP))
+        {
+            appearance_attributes_[key] = parser()->get_string(SCOPE_DISPLAY_GROUP, key);
+        }
+    }
+    catch (LogicException const&)
+    {
+    }
 }
 
 ScopeConfig::~ScopeConfig()
@@ -176,6 +188,11 @@ bool ScopeConfig::invisible() const
         return false;
     }
     return *invisible_;
+}
+
+VariantMap ScopeConfig::appearance_attributes() const
+{
+    return appearance_attributes_;
 }
 
 } // namespace internal
