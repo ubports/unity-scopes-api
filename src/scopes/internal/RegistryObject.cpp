@@ -197,6 +197,17 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
+bool RegistryObject::is_scope_process_running( std::string const& scope_id )
+{
+    auto it = scope_processes_.find( scope_id );
+    if (it != scope_processes_.end())
+    {
+        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+    }
+
+    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
 void RegistryObject::on_process_death(core::posix::Process const& process)
 {
     // the death observer has signaled that a child has died.
@@ -220,9 +231,10 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
 {
 }
 
-std::string RegistryObject::ScopeProcess::scope_id() const
+RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
 {
-    return exec_data_.scope_id;
+    std::lock_guard<std::mutex> lock(process_mutex_);
+    return state_;
 }
 
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
