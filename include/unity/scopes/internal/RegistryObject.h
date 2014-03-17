@@ -82,6 +82,7 @@ private:
 
         ScopeProcess(ScopeExecData exec_data);
         ScopeProcess(ScopeProcess const& other);
+        ~ScopeProcess();
 
         ProcessState state();
         bool wait_for_state(ProcessState state, int timeout_ms) const;

@@ -343,13 +343,12 @@ TEST(RegistryI, locate_mock)
     }
 }
 
-int process_count()
+std::string exec_cmd(std::string const& cmd)
 {
-    std::string cmd = "ps --ppid " + std::to_string(getpid()) + " | wc -l";
     FILE* pipe = popen(cmd.c_str(), "r");
     if (!pipe)
     {
-        return -1;
+        return "";
     }
 
     char buffer[128];
@@ -363,7 +362,17 @@ int process_count()
     }
     pclose(pipe);
 
-    return stoi(result);
+    return result;
+}
+
+int first_child_pid()
+{
+    return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));
+}
+
+int process_count()
+{
+    return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
 }
 
 TEST(RegistryI, locate)
@@ -371,8 +380,6 @@ TEST(RegistryI, locate)
     // get number of processes belonging to this test instance
     int start_process_count = process_count();
     int current_process_count = 0;
-    ASSERT_NE(-1, start_process_count);
-
     {
         // configure registry
         std::string rt_config = TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini";
@@ -414,41 +421,96 @@ TEST(RegistryI, locate)
             reg->add_local_scope(scope_id, move(meta), exec_data);
         }
 
-        // check that no scope processes are running
-        for (auto const& scope_id : scope_ids)
+        // test initial state
         {
-            EXPECT_FALSE(reg->is_scope_running(scope_id));
+            // check that no scope processes are running
+            for (auto const& scope_id : scope_ids)
+            {
+                EXPECT_FALSE(reg->is_scope_running(scope_id));
+            }
+
+            // check that no new processes have been started yet
+            current_process_count = process_count();
+            EXPECT_EQ(0, current_process_count - start_process_count);
         }
 
-        // check that no new processes have been started yet
-        current_process_count = process_count();
-        EXPECT_EQ(0, current_process_count - start_process_count);
-
-        // locate scopes (start scope processes)
-        for (auto const& scope_id : scope_ids)
+        // test scope death and re-locate
         {
-            EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
+            // locate first scope
+            EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+
+            // check that the first scope is running
+            EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
+
+            // check that 1 new process was started
+            current_process_count = process_count();
+            EXPECT_EQ(1, current_process_count - start_process_count);
+
+            // kill first scope
+            int scope1_pid = first_child_pid();
+            int status;
+            kill(scope1_pid, SIGKILL);
+            waitpid(scope1_pid, &status, 0);
+
+            // check that the first scope is no longer running
+            EXPECT_FALSE(reg->is_scope_running(scope_ids[0]));
+
+            // check that we now have no running scopes
+            current_process_count = process_count();
+            EXPECT_EQ(0, current_process_count - start_process_count);
+
+            // locate first scope
+            EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+
+            // check that the first scope is running
+            EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
+
+            // check that 1 new process was started
+            current_process_count = process_count();
+            EXPECT_EQ(1, current_process_count - start_process_count);
         }
 
-        // check that all scopes processes are running
-        for (auto const& scope_id : scope_ids)
+        // test locating all scopes
         {
-            EXPECT_TRUE(reg->is_scope_running(scope_id));
+            // locate all scopes (hense starting all scope processes)
+            for (auto const& scope_id : scope_ids)
+            {
+                EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
+            }
+
+            // check that all scopes processes are running
+            for (auto const& scope_id : scope_ids)
+            {
+                EXPECT_TRUE(reg->is_scope_running(scope_id));
+            }
+
+            // check that 6 new processes were started
+            current_process_count = process_count();
+            EXPECT_EQ(6, current_process_count - start_process_count);
         }
 
-        // check that 6 new processes were started
-        current_process_count = process_count();
-        EXPECT_EQ(6, current_process_count - start_process_count);
-
-        // locate the second scope multiple times
-        for (int i = 0; i < 1000; ++i)
+        // test locating the same scope multiple times
         {
-            EXPECT_EQ(proxies[scope_ids[1]], reg->locate(scope_ids[1]));
+            // locate the second scope multiple times
+            for (int i = 0; i < 1000; ++i)
+            {
+                EXPECT_EQ(proxies[scope_ids[1]], reg->locate(scope_ids[1]));
+            }
+
+            // check that no new processes were started
+            current_process_count = process_count();
+            EXPECT_EQ(6, current_process_count - start_process_count);
         }
 
-        // check that no new processes were started
-        current_process_count = process_count();
-        EXPECT_EQ(6, current_process_count - start_process_count);
+        // test removing a scope
+        {
+            // remove a scope (hense killing the process)
+            EXPECT_TRUE(reg->remove_local_scope(scope_ids[3]));
+
+            // check that we now have 5 scopes running
+            current_process_count = process_count();
+            EXPECT_EQ(5, current_process_count - start_process_count);
+        }
 
         // reg falls out of scope here and gets deleted (hense closing all scope processes)
     }
