@@ -34,6 +34,9 @@ namespace scopes
 namespace internal
 {
 
+///! TODO: get from config
+static const int c_process_wait_timeout = 1000;
+
 RegistryObject::RegistryObject()
     : death_observer_(
           core::posix::ChildProcess::DeathObserver::instance()),
@@ -256,7 +259,7 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
     else if (state_ == ScopeProcess::Stopping)
     {
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, 1000))
+        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
                  << exec_data_.scope_id << "\" took too long to stop." << endl;
@@ -301,7 +304,7 @@ void RegistryObject::ScopeProcess::exec()
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
-    if (!wait_for_state_unlocked(lock, ScopeProcess::Running, 1000))
+    if (!wait_for_state_unlocked(lock, ScopeProcess::Running, c_process_wait_timeout))
     {
         try
         {
@@ -383,10 +386,15 @@ void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& l
 
     try
     {
-        process_.send_signal_or_throw(core::posix::Signal::sig_kill);
+        // first try to close the scope process gracefully
+        process_.send_signal_or_throw(core::posix::Signal::sig_term);
 
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, 1000))
+        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
+            // scope is taking too long to close, send kill signal
+            std::error_code ec;
+            process_.send_signal(core::posix::Signal::sig_kill, ec);
+
             throw unity::ResourceException("Scope: \"" + exec_data_.scope_id
                  + "\" is taking longer than expected to terminate (This process is "
                  + "likely to close upon termination of the parent application).");
