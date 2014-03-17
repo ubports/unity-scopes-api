@@ -197,7 +197,7 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-bool RegistryObject::is_scope_process_running( std::string const& scope_id )
+bool RegistryObject::is_scope_running( std::string const& scope_id )
 {
     auto it = scope_processes_.find( scope_id );
     if (it != scope_processes_.end())

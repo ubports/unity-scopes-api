@@ -414,7 +414,7 @@ TEST(RegistryI, locate)
         // check that no scope processes are running
         for (auto const& scope_id : scope_ids)
         {
-            EXPECT_FALSE(reg->is_scope_process_running(scope_id));
+            EXPECT_FALSE(reg->is_scope_running(scope_id));
         }
 
         // check that no new processes have been started yet
@@ -430,7 +430,7 @@ TEST(RegistryI, locate)
         // check that all scopes processes are running
         for (auto const& scope_id : scope_ids)
         {
-            EXPECT_TRUE(reg->is_scope_process_running(scope_id));
+            EXPECT_TRUE(reg->is_scope_running(scope_id));
         }
 
         // check that 6 new processes were started
