@@ -353,10 +353,13 @@ int process_count()
     }
 
     char buffer[128];
-    std::string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
+    std::string result;
+    while (!feof(pipe))
+    {
+        if (fgets(buffer, 128, pipe) != NULL)
+        {
             result += buffer;
+        }
     }
     pclose(pipe);
 
