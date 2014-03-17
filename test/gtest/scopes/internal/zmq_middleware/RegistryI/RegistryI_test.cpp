@@ -448,12 +448,13 @@ TEST(RegistryI, locate)
 
             // kill first scope
             int scope1_pid = first_child_pid();
-            int status = 0;
             kill(scope1_pid, SIGKILL);
-            while (waitpid(scope1_pid, &status, 0) == 0);
 
-            // check that the first scope is no longer running
-            EXPECT_FALSE(reg->is_scope_running(scope_ids[0]));
+            // wait for the SIGCHLD signal to reach the registry
+            while (reg->is_scope_running(scope_ids[0]))
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds{10});
+            }
 
             // check that we now have no running scopes
             current_process_count = process_count();
@@ -505,7 +506,7 @@ TEST(RegistryI, locate)
         // test removing a scope
         {
             // remove a scope (hense killing the process)
-            EXPECT_TRUE(reg->remove_local_scope(scope_ids[3]));
+            EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
 
             // check that we now have 5 scopes running
             current_process_count = process_count();
