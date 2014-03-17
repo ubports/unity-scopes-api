@@ -62,6 +62,14 @@ struct CancellationRegistry
         return cr;
     }
 
+    std::pair<uint, std::shared_ptr<Cancelable>> add()
+    {
+        auto cancelable = std::make_shared<Cancelable>();
+        auto id = add(cancelable);
+
+        return std::make_pair(id, cancelable);
+    }
+
     uint add(const std::shared_ptr<Cancelable>& cancelable)
     {
         std::lock_guard<std::mutex> lg(guard);
@@ -116,38 +124,39 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
     auto promise = std::make_shared<std::promise<std::string>>();
     std::shared_future<std::string> future(promise->get_future());
 
-    auto cancelable = std::make_shared<Cancelable>();
-    auto id = CancellationRegistry::instance().add(cancelable);
+    auto id_and_cancelable = CancellationRegistry::instance().add();
 
     request->async_execute(
-                [cancelable](const http::Request::Progress&)
-                {
-                    return cancelable->is_cancelled() ? http::Request::Progress::Next::abort_operation :
-                                                        http::Request::Progress::Next::continue_operation;
-                },
-                [promise, request](const http::Response& response)
-                {
-                    if (response.status != http::Status::ok)
+                http::Request::Handler()
+                    .on_progress([id_and_cancelable](const http::Request::Progress&)
                     {
-                        std::ostringstream msg;
-                        msg << "HTTP request failed with: " << response.status << std::endl << response.body;
-                        unity::ResourceException e(msg.str());
+                        return id_and_cancelable.second->is_cancelled() ?
+                                    http::Request::Progress::Next::abort_operation :
+                                    http::Request::Progress::Next::continue_operation;
+                    })
+                    .on_response([promise, request](const http::Response& response)
+                    {
+                        if (response.status != http::Status::ok)
+                        {
+                            std::ostringstream msg;
+                            msg << "HTTP request failed with: " << response.status << std::endl << response.body;
+                            unity::ResourceException e(msg.str());
 
-                        promise->set_exception(std::make_exception_ptr(e));
-                    } else
+                            promise->set_exception(std::make_exception_ptr(e));
+                        } else
+                        {
+                            promise->set_value(response.body);
+                        }
+                    })
+                    .on_error([promise, request](const net::Error& e)
                     {
-                        promise->set_value(response.body);
-                    }
-                },
-                [promise, request](const net::Error& e)
-                {
-                    unity::ResourceException re(e.what());
-                    promise->set_exception(std::make_exception_ptr(re));
-                });
+                        unity::ResourceException re(e.what());
+                        promise->set_exception(std::make_exception_ptr(re));
+                    }));
 
     return std::make_shared<HttpResponseHandle>(
                 shared_from_this(),
-                id,
+                id_and_cancelable.first,
                 future);
 }
 
