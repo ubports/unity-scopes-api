@@ -273,7 +273,7 @@ public:
     }
 };
 
-TEST(RegistryI, locate)
+TEST(RegistryI, locate_mock)
 {
     RuntimeImpl::UPtr runtime = RuntimeImpl::create(
         "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
@@ -340,5 +340,53 @@ TEST(RegistryI, locate)
     {
         EXPECT_STREQ("unity::InvalidArgumentException: RegistryObject::remove_local_scope(): Cannot remove scope with empty id",
                      e.what());
+    }
+}
+
+TEST(RegistryI, locate)
+{
+    // configure registry
+    std::string rt_config = TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini";
+
+    RuntimeImpl::UPtr rt = RuntimeImpl::create("TestRegistry", rt_config);
+    string reg_id = rt->registry_identity();
+
+    RegistryConfig c(reg_id, rt->registry_configfile());
+    string mw_kind = c.mw_kind();
+    string scoperunner_path = c.scoperunner_path();
+
+    MiddlewareBase::SPtr mw = rt->factory()->find(reg_id, mw_kind);
+    RegistryObject::SPtr reg(new RegistryObject);
+    mw->add_registry_object(reg_id, reg);
+
+    // configure scopes
+    std::array<std::string, 6> scope_ids = {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"};
+    std::map<std::string, ScopeProxy> proxies;
+
+    for (auto& scope_id : scope_ids)
+    {
+        proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
+
+        unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+        mi->set_scope_id(scope_id);
+        mi->set_display_name(scope_id);
+        mi->set_description(scope_id);
+        mi->set_author("Canonical Ltd.");
+        mi->set_proxy(proxies[scope_id]);
+        auto meta = ScopeMetadataImpl::create(move(mi));
+
+        RegistryObject::ScopeExecData exec_data;
+        exec_data.scope_id = scope_id;
+        exec_data.scoperunner_path = scoperunner_path;
+        exec_data.runtime_config = rt_config;
+        exec_data.scope_config = TEST_BUILD_ROOT "/../demo/scopes/" + scope_id + "/" + scope_id + ".ini";
+
+        reg->add_local_scope(scope_id, move(meta), exec_data);
+    }
+
+    // locate scopes
+    for( auto& scope_id : scope_ids )
+    {
+        EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
     }
 }

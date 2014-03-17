@@ -7,4 +7,4 @@ Zmq.Endpoint = ipc:///tmp/TestRegistry
 Zmq.EndpointDir = /tmp
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /tmp
-Scoperunner.Path = /tmp
+Scoperunner.Path = @CMAKE_BINARY_DIR@/scoperunner/scoperunner
