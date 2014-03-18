@@ -50,9 +50,18 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
-    // destroy all scopes and processes
-    scopes_.clear();
-    scope_processes_.clear();
+    // kill all scope processes
+    for (auto& scope_process : scope_processes_)
+    {
+        try
+        {
+            scope_process.second.kill();
+        }
+        catch(std::exception const& e)
+        {
+            cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
+        }
+    }
 
     // stop the death oberver
     try
@@ -68,6 +77,10 @@ RegistryObject::~RegistryObject()
         cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
         death_observer_thread_.detach();
     }
+
+    // clear scope maps
+    scopes_.clear();
+    scope_processes_.clear();
 }
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
