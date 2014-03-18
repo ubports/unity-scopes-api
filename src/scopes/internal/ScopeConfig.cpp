@@ -46,6 +46,7 @@ namespace
     const string search_hint_str = "SearchHint";
     const string hot_key_str = "HotKey";
     const string invisible_str = "Invisible";
+    const string scope_runner_exec = "ScopeRunner";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -103,6 +104,16 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         string key = parser()->get_string(SCOPE_CONFIG_GROUP, invisible_str);
         std::transform(begin(key), end(key), begin(key), ::toupper);
         invisible_.reset(new bool(key == "TRUE"));
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    // custom scope runner executable is optional
+    try
+    {
+        string key = parser()->get_string(SCOPE_CONFIG_GROUP, scope_runner_exec);
+        scope_runner_.reset(new string(key));
     }
     catch (LogicException const&)
     {
@@ -188,6 +199,15 @@ bool ScopeConfig::invisible() const
         return false;
     }
     return *invisible_;
+}
+
+string ScopeConfig::scope_runner() const
+{
+    if (!scope_runner_)
+    {
+        throw NotFoundException("Key not set", scope_runner_exec);
+    }
+    return *scope_runner_;
 }
 
 VariantMap ScopeConfig::appearance_attributes() const
