@@ -134,7 +134,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
                                     http::Request::Progress::Next::abort_operation :
                                     http::Request::Progress::Next::continue_operation;
                     })
-                    .on_response([promise, request](const http::Response& response)
+                    .on_response([promise](const http::Response& response)
                     {
                         if (response.status != http::Status::ok)
                         {
@@ -148,7 +148,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
                             promise->set_value(response.body);
                         }
                     })
-                    .on_error([promise, request](const net::Error& e)
+                    .on_error([promise](const net::Error& e)
                     {
                         unity::ResourceException re(e.what());
                         promise->set_exception(std::make_exception_ptr(re));
