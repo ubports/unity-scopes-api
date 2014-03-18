@@ -256,7 +256,7 @@ RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    return wait_for_state_unlocked(lock, state, timeout_ms);
+    return wait_for_state(lock, state, timeout_ms);
 }
 
 void RegistryObject::ScopeProcess::exec()
@@ -272,13 +272,13 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
     else if (state_ == ScopeProcess::Stopping)
     {
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
+        if (!wait_for_state(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
                  << exec_data_.scope_id << "\" took too long to stop." << endl;
             try
             {
-                kill_unlocked(lock);
+                kill(lock);
             }
             catch(std::exception const& e)
             {
@@ -317,11 +317,11 @@ void RegistryObject::ScopeProcess::exec()
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
-    if (!wait_for_state_unlocked(lock, ScopeProcess::Running, c_process_wait_timeout))
+    if (!wait_for_state(lock, ScopeProcess::Running, c_process_wait_timeout))
     {
         try
         {
-            kill_unlocked(lock);
+            kill(lock);
         }
         catch(std::exception const& e)
         {
@@ -340,7 +340,7 @@ void RegistryObject::ScopeProcess::exec()
 void RegistryObject::ScopeProcess::kill()
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    kill_unlocked(lock);
+    kill(lock);
 }
 
 bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
@@ -371,8 +371,8 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     state_change_cond_.notify_all();
 }
 
-bool RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
-                                                           ProcessState state, int timeout_ms) const
+bool RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>& lock,
+                                                  ProcessState state, int timeout_ms) const
 {
     state_change_cond_.wait_for(lock,
                                 std::chrono::milliseconds(timeout_ms),
@@ -380,7 +380,7 @@ bool RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std:
     return state_ == state;
 }
 
-void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& lock)
+void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
 {
     if (state_ == Stopped)
     {
@@ -392,11 +392,11 @@ void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& l
         // first try to close the scope process gracefully
         process_.send_signal_or_throw(core::posix::Signal::sig_term);
 
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
+        if (!wait_for_state(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
             std::error_code ec;
 
-            cerr << "RegistryObject::ScopeProcess::kill_unlocked(): Scope: \"" << exec_data_.scope_id
+            cerr << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
                  << "\" is taking longer than expected to terminate gracefully. "
                  << "Killing the process instead." << endl;
 
@@ -406,7 +406,7 @@ void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& l
     }
     catch (std::exception const&)
     {
-        cerr << "RegistryObject::ScopeProcess::kill_unlocked(): Failed to kill scope: \""
+        cerr << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
         throw;
     }
