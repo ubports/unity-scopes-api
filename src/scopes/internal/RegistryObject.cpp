@@ -394,25 +394,26 @@ void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& l
 
         if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
-            // scope is taking too long to close, send kill signal
             std::error_code ec;
-            process_.send_signal(core::posix::Signal::sig_kill, ec);
 
-            throw unity::ResourceException("Scope: \"" + exec_data_.scope_id
-                 + "\" is taking longer than expected to terminate (This process is "
-                 + "likely to close upon termination of the parent application).");
+            cerr << "RegistryObject::ScopeProcess::kill_unlocked(): Scope: \"" << exec_data_.scope_id
+                 << "\" is taking longer than expected to terminate gracefully. "
+                 << "Killing the process instead." << endl;
+
+            // scope is taking too long to close, send kill signal
+            process_.send_signal(core::posix::Signal::sig_kill, ec);
         }
     }
     catch (std::exception const&)
     {
-        // invalidate the process handle and move on, as the previous handle is clearly
-        // unrecoverable at this point.
-        clear_handle_unlocked();
-
-        cerr << "RegistryObject::ScopeProcess::in_lock_kill(): Failed to kill scope: \""
+        cerr << "RegistryObject::ScopeProcess::kill_unlocked(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
         throw;
     }
+
+    // clear the process handle
+    // even on error, the previous handle will be unrecoverable at this point
+    clear_handle_unlocked();
 }
 
 } // namespace internal
