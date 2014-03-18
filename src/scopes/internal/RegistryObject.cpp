@@ -374,19 +374,9 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
 bool RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
                                                            ProcessState state, int timeout_ms) const
 {
-    // keep track of time left as process can undergo multiple state changes
-    // before reaching the state we want
-    int time_left = timeout_ms;
-    while (state_ != state && time_left > 0)
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-        state_change_cond_.wait_for(lock, std::chrono::milliseconds(time_left));
-
-        // update time left
-        time_left -= std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start).count();
-    }
-
+    state_change_cond_.wait_for(lock,
+                                std::chrono::milliseconds(timeout_ms),
+                                [this, &state]{return state_ == state;});
     return state_ == state;
 }
 
