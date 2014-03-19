@@ -36,6 +36,8 @@ static const std::string c_preview_resource = "/preview";
 static const std::string c_scopes_cache_dir = std::string(getenv("HOME")) + "/.cache/unity-scopes/";
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 
+static const char* c_dbussend_cmd = "dbus-send /com/canonical/unity/scopes com.canonical.unity.scopes.InvalidateResults string:smart-scopes";
+
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -609,6 +611,12 @@ void SmartScopesClient::cancel_query(uint query_id)
 
 void SmartScopesClient::write_cache(std::string const& scopes_json)
 {
+    if (scopes_json != cached_scopes_)
+    {
+        // something has changed, send invalidate signal
+        system(c_dbussend_cmd);
+    }
+
     // make cache directory (fails silently if already exists)
     mkdir(c_scopes_cache_dir.c_str(), 0755);
 
@@ -620,7 +628,8 @@ void SmartScopesClient::write_cache(std::string const& scopes_json)
         cache_file << scopes_json;
         cache_file.close();
 
-        have_latest_cache_ = false;
+        cached_scopes_ = scopes_json;
+        have_latest_cache_ = true;
     }
 }
 
