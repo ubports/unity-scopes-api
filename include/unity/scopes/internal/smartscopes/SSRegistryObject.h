@@ -58,6 +58,7 @@ public:
 
 private:
     void refresh_thread();
+    void send_invalidate_signal();
 
     void get_remote_scopes();
     bool add(RemoteScope const& remotedata, ScopeMetadata const& scope);
