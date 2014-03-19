@@ -279,8 +279,8 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::create_scope_runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Runtime::destroy()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::Runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
