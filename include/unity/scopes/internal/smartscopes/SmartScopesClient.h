@@ -135,6 +135,7 @@ public:
 
     SearchHandle::UPtr search(std::string const& base_url,
                               std::string const& query,
+                              std::string const& department_id,
                               std::string const& session_id,
                               uint query_id,
                               std::string const& platform,

@@ -85,7 +85,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     ASSERT_EQ(2u, results.size());
@@ -157,11 +157,11 @@ TEST_F(SmartScopesClientTest, preview)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle2 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle3 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle1 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle2 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle3 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
     EXPECT_EQ(2u, results.size());
@@ -183,12 +183,12 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
 {
     for (int i = 0; i < 50; ++i)
     {
-        auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+        auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
         search_handle->cancel_search();
         EXPECT_THROW(search_handle->get_search_results(), std::exception);
     }
 
-    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
     EXPECT_EQ(2u, results.size());
