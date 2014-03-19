@@ -161,6 +161,7 @@ private:
 
     void cancel_query(uint query_id);
 
+    void send_invalidate_signal();
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
 

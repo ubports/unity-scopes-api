@@ -29,7 +29,6 @@
 #include <iostream>
 
 static const uint c_failed_refresh_timeout = 10; ///! TODO get from config
-static const char* c_dbussend_cmd = "dbus-send /com/canonical/unity/scopes com.canonical.unity.scopes.InvalidateResults string:smart-scopes";
 
 namespace unity
 {
@@ -168,11 +167,6 @@ void SSRegistryObject::refresh_thread()
     }
 }
 
-void SSRegistryObject::send_invalidate_signal()
-{
-    system(c_dbussend_cmd);
-}
-
 // Must be called with refresh_mutex_ locked
 void SSRegistryObject::get_remote_scopes()
 {
@@ -185,7 +179,6 @@ void SSRegistryObject::get_remote_scopes()
         if (ssclient_->get_remote_scopes(remote_scopes, "", caching_enabled_))
         {
             next_refresh_timeout_ = regular_refresh_timeout_;
-            send_invalidate_signal();
         }
         else
         {
