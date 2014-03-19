@@ -17,7 +17,6 @@
  */
 
 #include "FindFiles.h"
-#include "SignalThread.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
@@ -28,6 +27,7 @@
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
@@ -248,7 +248,7 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
-    SignalThread signal_thread;
+    SigTermHandler sigterm_handler;
 
     try
     {
@@ -282,7 +282,7 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        signal_thread.activate([middleware]{ middleware->stop(); });
+        sigterm_handler.set_callback([middleware]{ middleware->stop(); });
 
         // The registry object stores the local and remote scopes
         RegistryObject::SPtr registry(new RegistryObject);

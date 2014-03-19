@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <SignalThread.h>
+#include <unity/scopes/internal/SigTermHandler.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -30,10 +30,16 @@
 using namespace std;
 using namespace unity;
 
-namespace scoperegistry
+namespace unity
 {
 
-SignalThread::SignalThread() :
+namespace scopes
+{
+
+namespace internal
+{
+
+SigTermHandler::SigTermHandler() :
     done_(false)
 {
     // Block signals in the caller, so they are delivered to the thread we are about to create.
@@ -48,27 +54,24 @@ SignalThread::SignalThread() :
         throw SyscallException("pthread_sigmask failed", err);
     }
 
-    // Make ourselves a process group leader.
-    setpgid(0, 0);
-
     // Run a signal handling thread that waits for any of the above signals.
     lock_guard<mutex> lock(mutex_);
     handler_thread_ = thread([this]{ this->wait_for_sigs(); });
 }
 
-SignalThread::~SignalThread()
+SigTermHandler::~SigTermHandler()
 {
     stop();
     handler_thread_.join();
 }
 
-void SignalThread::activate(function<void()> callback)
+void SigTermHandler::set_callback(function<void()> callback)
 {
     lock_guard<mutex> lock(mutex_);
     callback_ = callback;
 }
 
-void SignalThread::stop()
+void SigTermHandler::stop()
 {
     lock_guard<mutex> lock(mutex_);
     if (!done_)
@@ -82,7 +85,7 @@ void SignalThread::stop()
 // invoke the callback (if set). If we receive SIGUSR1 (because
 // we are terminating ourself, we exit the thread.
 
-void SignalThread::wait_for_sigs()
+void SigTermHandler::wait_for_sigs()
 {
     int signo;
     for (;;)
@@ -118,4 +121,8 @@ void SignalThread::wait_for_sigs()
     }
 }
 
-} // namespace scoperegistry
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity

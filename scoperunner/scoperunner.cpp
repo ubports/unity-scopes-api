@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -113,6 +114,9 @@ void scope_thread(string const& runtime_config,
         // Create a servant for the scope and register the servant.
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
         auto proxy = mw->add_scope_object(scope_name, move(scope));
+
+        SigTermHandler sigterm_handler;
+        sigterm_handler.set_callback([loader, mw]{ loader->stop(); mw->stop(); });
 
         mw->wait_for_shutdown();
 

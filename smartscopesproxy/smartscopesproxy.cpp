@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
@@ -92,6 +93,9 @@ int main(int argc, char* argv[])
         // Get middleware handles from runtimes
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
+
+        SigTermHandler sigterm_handler;
+        sigterm_handler.set_callback([reg_mw, scope_mw]{ scope_mw->stop(); reg_mw->stop(); });
 
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),

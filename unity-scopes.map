@@ -17,6 +17,7 @@ global:
         unity::scopes::internal::ScopeLoader::*;
         unity::scopes::internal::ScopeMetadataImpl::*;
         unity::scopes::internal::ScopeObject::*;
+        unity::scopes::internal::SigTermHandler::*;
         unity::scopes::internal::smartscopes::SSRegistryObject::*;
         unity::scopes::internal::smartscopes::SSScopeObject::*;
     };
