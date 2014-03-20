@@ -304,18 +304,17 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
-
     search_uri << "q=" << http_client_->to_percent_encoding(query);
-    if (!department_id.empty())
-    {
-        search_uri << "&department=" << http_client_->to_percent_encoding(department_id);
-    }
+
     search_uri << "&session_id=" << session_id;
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=" << platform;
 
     // optional parameters
-
+    if (!department_id.empty())
+    {
+        search_uri << "&department=" << http_client_->to_percent_encoding(department_id);
+    }
     if (!locale.empty())
     {
         search_uri << "&locale=" << locale;
