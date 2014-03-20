@@ -294,9 +294,12 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 
 \paragraph handlingactivation Handling result activation
 
-In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
-known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
-unity::scopes::ScopeBase::activate() method:
+In many cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema (such as "http://")
+of result's uri has a handler in the system. If this is the case, then there is nothing to do in terms of activation handling in the scope code. If however a scope relies
+on a schema handler that's not present in the system, the behavior is undefined - activating the offending result will most likely be ignored by Unity shell and do nothing.
+
+In cases where scope wants to intercept and handle activation request (e.g. when no handler for specifc type of uri exists, or to do some extra work on activation),
+it has to reimplement unity::scopes::ScopeBase::activate() method:
 
 \code{.cpp}
 class MyScope : public ScopeBase
@@ -404,7 +407,7 @@ If an aggregator scope just forwards results it receives from other scopes, poss
 to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
 unity::scopes::ScopeBase for the scope that created results. Result activation will trigger unity::scopes::ScopeBase::activate() method for the scope that
 produced the result as long as it set interception flag for it. In other words, when aggreagor scope just forwards results (and makes only minor
-adjustements to them, such as category assignment), it is not involved in preview or activation handling at all.
+adjustements to them, such as category assignment), it is not involved in preview or activation handling t all.
 
 If, however, aggregator scope changes attributes of results (or creates completely new results that "replace" received results), then some extra care needs to
 be taken:
