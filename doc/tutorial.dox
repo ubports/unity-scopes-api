@@ -296,7 +296,7 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 
 In many cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema (such as "http://")
 of result's uri has a handler in the system. If this is the case, then there is nothing to do in terms of activation handling in the scope code. If however a scope relies
-on a schema handler that's not present in the system, the behavior is undefined - activating the offending result will most likely be ignored by Unity shell and do nothing.
+on a schema handler that's not present in the system, the offending result will be ignored by Unity shell and nothing will happen on activation.
 
 In cases where scope wants to intercept and handle activation request (e.g. when no handler for specifc type of uri exists, or to do some extra work on activation),
 it has to reimplement unity::scopes::ScopeBase::activate() method:
