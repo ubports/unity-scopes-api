@@ -73,6 +73,8 @@ public:
         {
             if (!result.category)
             {
+                std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
+                          << "\" returned an invalid cat_id. Skipping result." << std::endl;
                 continue;
             }
 
