@@ -54,7 +54,9 @@ SigTermHandler::SigTermHandler() :
     sigaddset(&sigs_, SIGHUP);
     sigaddset(&sigs_, SIGTERM);
 
-    event_fd_ = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
+
+    static constexpr uint initial_value{0};
+    event_fd_ = ::eventfd(initial_value, EFD_CLOEXEC | EFD_NONBLOCK);
 
     if (event_fd_ == -1)
     {
