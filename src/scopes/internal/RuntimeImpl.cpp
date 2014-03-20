@@ -28,7 +28,10 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <signal.h>
+
 #include <cassert>
+#include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -111,8 +114,36 @@ RuntimeImpl::~RuntimeImpl()
     }
 }
 
+namespace
+{
+::sigset_t old_signal_disposition_mask;
+}
+
 RuntimeImpl::UPtr RuntimeImpl::create(string const& scope_id, string const& configfile)
 {
+    // We make sure that all the signals that:
+    //   * the SigTermCatcher
+    //   * the ChildDeathObserver
+    // are interested in are blocked for default disposition in the current thread.
+    // We furthermore assume that the current thread is the main thread.
+    //
+    // Please note that calling sigprocmask(...) results in undefined behavior in
+    // a multi-threaded process (see http://man7.org/linux/man-pages/man2/sigprocmask.2.html
+    ::sigset_t mask;
+
+    ::sigemptyset(&mask);
+    ::sigaddset(&mask, SIGINT);
+    ::sigaddset(&mask, SIGHUP);
+    ::sigaddset(&mask, SIGTERM);
+    ::sigaddset(&mask, SIGCHLD);
+
+    if (::pthread_sigmask(SIG_BLOCK, &mask, &old_signal_disposition_mask) == -1)
+    {
+        throw SyscallException(
+                    "RuntimeImpl::create: Could not block default signal disposition: " +
+                    std::string{std::strerror(errno)}, errno);
+    }
+
     return UPtr(new RuntimeImpl(scope_id, configfile));
 }
 
@@ -128,6 +159,15 @@ void RuntimeImpl::destroy()
         middleware_ = nullptr;
         middleware_factory_.reset(nullptr);
         reply_reaper_ = nullptr;
+
+        // And we ultimately restore the original signal mask.
+        if (::pthread_sigmask(SIG_BLOCK, &old_signal_disposition_mask, nullptr) == -1)
+        {
+            // We won't throw here:
+            std::cerr << "RuntimeImpl::destroy: Could not restore previous signal mask: "
+                      << std::strerror(errno)
+                      << std::endl;
+        }
     }
 }
 

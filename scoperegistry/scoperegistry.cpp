@@ -248,11 +248,11 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
-    SigTermHandler sigterm_handler;
-
     try
     {
         RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+
+        SigTermHandler sigterm_handler;
 
         string identity = runtime->registry_identity();
 

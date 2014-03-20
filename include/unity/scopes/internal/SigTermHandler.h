@@ -50,6 +50,7 @@ private:
     void wait_for_sigs();
 
     std::mutex mutex_;
+    int event_fd_;
     std::function<void()> callback_;
     bool done_;
     std::thread handler_thread_;

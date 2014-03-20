@@ -21,11 +21,16 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
+#include <cstring>
 #include <iostream>
 
 #include <signal.h>
-#include <string.h>
 #include <unistd.h>
+
+#include <poll.h>
+
+#include <sys/eventfd.h>
+#include <sys/signalfd.h>
 
 using namespace std;
 using namespace unity;
@@ -40,6 +45,7 @@ namespace internal
 {
 
 SigTermHandler::SigTermHandler() :
+    event_fd_(-1),
     done_(false)
 {
     // Block signals in the caller, so they are delivered to the thread we are about to create.
@@ -47,11 +53,12 @@ SigTermHandler::SigTermHandler() :
     sigaddset(&sigs_, SIGINT);
     sigaddset(&sigs_, SIGHUP);
     sigaddset(&sigs_, SIGTERM);
-    sigaddset(&sigs_, SIGUSR1);
-    int err = pthread_sigmask(SIG_BLOCK, &sigs_, nullptr);
-    if (err != 0)
+
+    event_fd_ = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
+
+    if (event_fd_ == -1)
     {
-        throw SyscallException("pthread_sigmask failed", err);
+        throw SyscallException("eventfd creation failed", errno);
     }
 
     // Run a signal handling thread that waits for any of the above signals.
@@ -77,46 +84,94 @@ void SigTermHandler::stop()
     if (!done_)
     {
         done_ = true;
-        kill(getpid(), SIGUSR1);
+        static const std::int64_t value = {1};
+        if (sizeof(value) != ::write(event_fd_, &value, sizeof(value)))
+            throw SyscallException("Signalling eventfd failed", errno);
     }
 }
 
 // Wait for termination signals. When a termination signal arrives, we
-// invoke the callback (if set). If we receive SIGUSR1 (because
-// we are terminating ourself, we exit the thread.
+// invoke the callback (if set).
 
 void SigTermHandler::wait_for_sigs()
 {
-    int signo;
+    // TODO[tvoss]: We really should factor this functionality into process-cpp
+    // and make it easily reusable.
+
+    static constexpr int signal_fd_idx = 0;
+    static constexpr int event_fd_idx = 1;
+
+    static constexpr int signal_info_buffer_size = 5;
+
+    // Better safe than sorry. We *theoretically* should inherit the blocked
+    // mask from our parent thread, but it does not hurt setting it up again.
+    if (::pthread_sigmask(SIG_BLOCK, &sigs_, nullptr) == -1)
+        throw SyscallException(
+                "pthread_sigmask failed: " + std::string{std::strerror(errno)},
+                errno);
+
+    auto signal_fd = ::signalfd(-1, &sigs_, SFD_CLOEXEC | SFD_NONBLOCK);
+
+    if (signal_fd == -1)
+    {
+        throw SyscallException(
+                    "signalfd creation failed" + std::string{std::strerror(errno)},
+                    errno);
+    }
+
+    pollfd fds[2];
+    signalfd_siginfo signal_info[signal_info_buffer_size];
+
     for (;;)
     {
-        int err = sigwait(&sigs_, &signo);
-        if (err != 0)
+        fds[signal_fd_idx] = {signal_fd, POLLIN, 0};
+        fds[event_fd_idx] = {event_fd_, POLLIN, 0};
+
+        auto rc = ::poll(fds, 2, -1);
+
+        if (rc == -1)
         {
-            cerr << "scoperegistry: sigwait failed: " << strerror(err) << endl;
-            _exit(1);
+            if (errno == EINTR)
+                continue;
+
+            break;
         }
-        switch (signo)
+
+        if (rc == 0)
+            continue;
+
+        if (fds[signal_fd_idx].revents & POLLIN)
         {
-            case SIGINT:
-            case SIGHUP:
-            case SIGTERM:
+            auto result = ::read(signal_fd, signal_info, sizeof(signal_info));
+
+            for (uint i = 0; i < result / sizeof(signalfd_siginfo); i++)
             {
-                lock_guard<mutex> lock(mutex_);
-                if (callback_)
+                switch (signal_info[i].ssi_signo)
                 {
-                    callback_();
+                case SIGINT:
+                case SIGHUP:
+                case SIGTERM:
+                {
+                    lock_guard<mutex> lock(mutex_);
+                    if (callback_)
+                    {
+                        callback_();
+                    }
+                    break;
                 }
-                break;
+                default:
+                    break;
+                }
             }
-            case SIGUSR1:
-            {
-                return;
-            }
-            default:
-            {
-                assert(false);
-            }
+        }
+
+        if (fds[event_fd_idx].revents & POLLIN)
+        {
+            std::int64_t value{1};
+            // Consciously void-ing the return value here.
+            // Not much we can do about an error.
+            (void)::read(event_fd_, &value, sizeof(value));
+            break;
         }
     }
 }
