@@ -69,7 +69,10 @@ SigTermHandler::SigTermHandler() :
 SigTermHandler::~SigTermHandler()
 {
     stop();
-    handler_thread_.join();
+    if (handler_thread_.joinable())
+        handler_thread_.join();
+
+    ::close(event_fd_);
 }
 
 void SigTermHandler::set_callback(function<void()> callback)
@@ -110,9 +113,20 @@ void SigTermHandler::wait_for_sigs()
                 "pthread_sigmask failed: " + std::string{std::strerror(errno)},
                 errno);
 
-    auto signal_fd = ::signalfd(-1, &sigs_, SFD_CLOEXEC | SFD_NONBLOCK);
+    // Make sure we clean up the signal fd whenever
+    // we leave the scope of wait_for_sigs.
+    struct Scope
+    {
+        ~Scope()
+        {
+            if (signal_fd != -1)
+                ::close(signal_fd);
+        }
 
-    if (signal_fd == -1)
+        int signal_fd;
+    } scope{::signalfd(-1, &sigs_, SFD_CLOEXEC | SFD_NONBLOCK)};
+
+    if (scope.signal_fd == -1)
     {
         throw SyscallException(
                     "signalfd creation failed" + std::string{std::strerror(errno)},
@@ -124,7 +138,7 @@ void SigTermHandler::wait_for_sigs()
 
     for (;;)
     {
-        fds[signal_fd_idx] = {signal_fd, POLLIN, 0};
+        fds[signal_fd_idx] = {scope.signal_fd, POLLIN, 0};
         fds[event_fd_idx] = {event_fd_, POLLIN, 0};
 
         auto rc = ::poll(fds, 2, -1);
@@ -142,7 +156,7 @@ void SigTermHandler::wait_for_sigs()
 
         if (fds[signal_fd_idx].revents & POLLIN)
         {
-            auto result = ::read(signal_fd, signal_info, sizeof(signal_info));
+            auto result = ::read(scope.signal_fd, signal_info, sizeof(signal_info));
 
             for (uint i = 0; i < result / sizeof(signalfd_siginfo); i++)
             {
