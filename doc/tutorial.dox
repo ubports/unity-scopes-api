@@ -407,7 +407,7 @@ If an aggregator scope just forwards results it receives from other scopes, poss
 to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
 unity::scopes::ScopeBase for the scope that created results. Result activation will trigger unity::scopes::ScopeBase::activate() method for the scope that
 produced the result as long as it set interception flag for it. In other words, when aggreagor scope just forwards results (and makes only minor
-adjustements to them, such as category assignment), it is not involved in preview or activation handling t all.
+adjustements to them, such as category assignment), it is not involved in preview or activation handling at all.
 
 If, however, aggregator scope changes attributes of results (or creates completely new results that "replace" received results), then some extra care needs to
 be taken:
