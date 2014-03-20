@@ -71,6 +71,11 @@ public:
 
         for (auto& result : results)
         {
+            if (!result.category)
+            {
+                continue;
+            }
+
             Category::SCPtr cat;
 
             auto cat_it = categories.find(result.category->id);
