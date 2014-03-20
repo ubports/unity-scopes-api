@@ -247,7 +247,7 @@ RegistryObject::ScopeProcess::~ScopeProcess()
     }
 }
 
-RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
+RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state() const
 {
     std::lock_guard<std::mutex> lock(process_mutex_);
     return state_;
