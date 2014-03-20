@@ -406,7 +406,6 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill()@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0replaceme
@@ -634,6 +633,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::list() const@Base" 0replaceme
  (c++)"unity::scopes::internal::MiddlewareFactory::find_unlocked(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
