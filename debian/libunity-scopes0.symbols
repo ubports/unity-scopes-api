@@ -279,8 +279,8 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::create_scope_runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Runtime::destroy()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::Runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -403,7 +403,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state()@Base" 0replaceme
@@ -419,13 +419,8 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::RegistryObject()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::SigTermHandler::set_callback(std::function<void ()>)@Base" 0replaceme
- (c++)"unity::scopes::internal::SigTermHandler::wait_for_sigs()@Base" 0replaceme
- (c++)"unity::scopes::internal::SigTermHandler::stop()@Base" 0replaceme
- (c++)"unity::scopes::internal::SigTermHandler::SigTermHandler()@Base" 0replaceme
- (c++)"unity::scopes::internal::SigTermHandler::~SigTermHandler()@Base" 0replaceme
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareData::~MiddlewareData()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareFactory(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1

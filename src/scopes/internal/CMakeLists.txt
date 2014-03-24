@@ -62,7 +62,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SigTermHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp

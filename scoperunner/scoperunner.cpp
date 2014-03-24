@@ -20,10 +20,11 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
-#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
+#include <core/posix/signal.h>
 
 #include <cassert>
 #include <future>
@@ -93,7 +94,8 @@ ThreadSafeQueue<thread::id> finished_threads;
 
 // Scope thread start function.
 
-void scope_thread(string const& runtime_config,
+void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
+                  string const& runtime_config,
                   string const& scope_name,
                   string const& lib_dir,
                   promise<void> finished_promise)
@@ -115,8 +117,11 @@ void scope_thread(string const& runtime_config,
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
         auto proxy = mw->add_scope_object(scope_name, move(scope));
 
-        SigTermHandler sigterm_handler;
-        sigterm_handler.set_callback([loader, mw]{ loader->stop(); mw->stop(); });
+        trap->signal_raised().connect([loader, mw](core::posix::Signal)
+        {
+            loader->stop();
+            mw->stop();
+        });
 
         mw->wait_for_shutdown();
 
@@ -139,6 +144,15 @@ void scope_thread(string const& runtime_config,
 
 int run_scopes(string const& runtime_config, vector<string> config_files)
 {
+    auto trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_int,
+        core::posix::Signal::sig_hup,
+        core::posix::Signal::sig_term
+    });
+
+    std::thread trap_worker([trap]() { trap->run(); });
+
     for (auto file : config_files)
     {
         string file_name = basename(const_cast<char*>(string(file).c_str()));    // basename() modifies its argument
@@ -156,7 +170,7 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         // We collect exit status from the thread via the future from each promise.
         promise<void> p;
         auto f = p.get_future();
-        thread t(scope_thread, runtime_config, scope_name, dir, move(p));
+        thread t(scope_thread, trap, runtime_config, scope_name, dir, move(p));
         auto id = t.get_id();
         threads[id] = ThreadFuture { move(t), move(f) };
     }
@@ -184,6 +198,12 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
             ++num_errors;
         }
     }
+
+    trap->stop();
+
+    if (trap_worker.joinable())
+        trap_worker.join();
+
     return num_errors;
 }
 

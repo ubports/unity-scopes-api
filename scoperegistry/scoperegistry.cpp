@@ -27,7 +27,6 @@
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
-#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
@@ -250,9 +249,17 @@ main(int argc, char* argv[])
 
     try
     {
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        auto trap = core::posix::trap_signals_for_all_subsequent_threads(
+        {
+            core::posix::Signal::sig_int,
+            core::posix::Signal::sig_hup,
+            core::posix::Signal::sig_term,
+            core::posix::Signal::sig_chld
+        });
 
-        SigTermHandler sigterm_handler;
+        auto death_observer = core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap);
+
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
 
         string identity = runtime->registry_identity();
 
@@ -282,10 +289,24 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        sigterm_handler.set_callback([middleware]{ middleware->stop(); });
+        trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        {
+            switch(signal)
+            {
+            case core::posix::Signal::sig_int:
+            case core::posix::Signal::sig_hup:
+            case core::posix::Signal::sig_term:
+                middleware->stop();
+                break;
+            default:
+                break;
+            }
+        });
+
+        std::thread trap_worker([trap]() { trap->run(); });
 
         // The registry object stores the local and remote scopes
-        RegistryObject::SPtr registry(new RegistryObject);
+        RegistryObject::SPtr registry(new RegistryObject(*death_observer));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
@@ -346,6 +367,12 @@ main(int argc, char* argv[])
 
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
+
+        trap->stop();
+
+        if (trap_worker.joinable())
+            trap_worker.join();
+
         exit_status = 0;
     }
     catch (std::exception const& e)

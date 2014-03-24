@@ -42,6 +42,30 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
+namespace
+{
+struct Scope
+{
+    Scope()
+        : trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld})),
+          death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap)),
+          worker([this]() { trap->run(); })
+    {
+    }
+
+    ~Scope()
+    {
+        trap->stop();
+
+        if (worker.joinable())
+            worker.join();
+    }
+
+    std::shared_ptr<core::posix::SignalTrap> trap;
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer;
+    std::thread worker;
+} scope;
+
 ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
@@ -55,6 +79,7 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
     ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
+}
 }
 
 TEST(RegistryI, get_metadata)
@@ -70,7 +95,7 @@ TEST(RegistryI, get_metadata)
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer));
     auto registry = middleware->add_registry_object(identity, ro);
     auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", p, middleware)),
@@ -93,7 +118,7 @@ TEST(RegistryI, list)
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer));
     auto registry = middleware->add_registry_object(identity, ro);
 
     auto r = runtime->registry();
@@ -142,7 +167,7 @@ TEST(RegistryI, add_remove)
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer));
     auto registry = middleware->add_registry_object(identity, ro);
 
     auto r = runtime->registry();
@@ -194,7 +219,7 @@ TEST(RegistryI, exceptions)
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    RegistryObject::SPtr ro(make_shared<RegistryObject>());
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer));
     RegistryObject::ScopeExecData dummy_exec_data;
     auto registry = middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
@@ -255,7 +280,8 @@ TEST(RegistryI, exceptions)
 class MockRegistryObject : public RegistryObject
 {
 public:
-    MockRegistryObject()
+    MockRegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
+        : RegistryObject(death_observer)
     {
     }
 
@@ -286,7 +312,7 @@ TEST(RegistryI, locate_mock)
     RegistryObject::ScopeExecData dummy_exec_data;
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    MockRegistryObject::SPtr mro(make_shared<MockRegistryObject>());
+    MockRegistryObject::SPtr mro(make_shared<MockRegistryObject>(*scope.death_observer));
     auto r = middleware->add_registry_object(identity, mro);
     auto r_proxy = dynamic_pointer_cast<ZmqRegistry>(r);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
@@ -393,7 +419,7 @@ TEST(RegistryI, locate)
 
         MiddlewareBase::SPtr mw = rt->factory()->find(reg_id, mw_kind);
 
-        RegistryObject::SPtr reg(new RegistryObject);
+        RegistryObject::SPtr reg(new RegistryObject(*scope.death_observer));
         mw->add_registry_object(reg_id, reg);
 
         // configure scopes

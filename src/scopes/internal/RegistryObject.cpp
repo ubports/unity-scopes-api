@@ -18,7 +18,9 @@
 
 #include <unity/scopes/internal/RegistryObject.h>
 
+#include <core/posix/child_process.h>
 #include <core/posix/exec.h>
+
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -37,14 +39,16 @@ namespace internal
 ///! TODO: get from config
 static const int c_process_wait_timeout = 1000;
 
-RegistryObject::RegistryObject()
-    : death_observer_(
-          core::posix::ChildProcess::DeathObserver::instance()),
-      death_observer_thread_(
-          [this]() { death_observer_.instance().run(death_observer_error_); }),
-      process_death_conn_(
-          death_observer_.instance().child_died().connect(
-          [this](const core::posix::ChildProcess& child) { on_process_death(child); }))
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
+    : death_observer_(death_observer),
+      death_observer_connection_
+      {
+          death_observer_.child_died().connect([this](const core::posix::ChildProcess& cp)
+          {
+              on_process_death(cp);
+          })
+      }
+
 {
 }
 
@@ -61,21 +65,6 @@ RegistryObject::~RegistryObject()
         {
             cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
         }
-    }
-
-    // stop the death oberver
-    try
-    {
-        death_observer_.quit();
-        if (death_observer_thread_.joinable())
-        {
-            death_observer_thread_.join();
-        }
-    }
-    catch(std::exception const& e)
-    {
-        cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
-        death_observer_thread_.detach();
     }
 
     // clear scope maps
@@ -152,7 +141,7 @@ ScopeProxy RegistryObject::locate(std::string const& scope_id)
         }
     }
 
-    proc_it->second.exec();
+    proc_it->second.exec(death_observer_);
     return scope_it->second.proxy();
 }
 
@@ -259,7 +248,7 @@ bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeou
     return wait_for_state(lock, state, timeout_ms);
 }
 
-void RegistryObject::ScopeProcess::exec()
+void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver& death_observer)
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
 
@@ -334,7 +323,7 @@ void RegistryObject::ScopeProcess::exec()
     cout << "RegistryObject::ScopeProcess::exec(): Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
 
     // 4. add the scope process to the death observer
-    core::posix::ChildProcess::DeathObserver::instance().add(process_);
+    death_observer.add(process_);
 }
 
 void RegistryObject::ScopeProcess::kill()
