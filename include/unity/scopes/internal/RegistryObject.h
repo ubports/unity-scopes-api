@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
 #include <core/posix/child_process.h>
+
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 
@@ -52,7 +53,7 @@ public:
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
-    RegistryObject();
+    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer);
     virtual ~RegistryObject();
 
     // Remote operation implementations
@@ -71,7 +72,6 @@ public:
 private:
     void on_process_death(core::posix::Process const& process);
 
-private:
     class ScopeProcess
     {
     public:
@@ -87,7 +87,7 @@ private:
         ProcessState state() const;
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
-        void exec();
+        void exec(core::posix::ChildProcess::DeathObserver& death_observer);
         void kill();
 
         bool on_process_death(pid_t pid);
@@ -110,15 +110,12 @@ private:
     };
 
 private:
+    core::posix::ChildProcess::DeathObserver& death_observer_;
+    core::ScopedConnection death_observer_connection_;
     mutable std::mutex mutex_;
     MetadataMap scopes_;
     std::map<std::string, ScopeProcess> scope_processes_;
     MWRegistryProxy remote_registry_;
-
-    core::posix::ChildProcess::DeathObserver& death_observer_;
-    std::thread death_observer_thread_;
-    std::error_code death_observer_error_;
-    core::ScopedConnection process_death_conn_;
 };
 
 } // namespace internal

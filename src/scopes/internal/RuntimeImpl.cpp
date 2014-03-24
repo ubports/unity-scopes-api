@@ -28,7 +28,10 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <signal.h>
+
 #include <cassert>
+#include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
