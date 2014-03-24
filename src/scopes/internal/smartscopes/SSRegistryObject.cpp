@@ -297,7 +297,7 @@ bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& m
         scopes.insert(make_pair(metadata.scope_id(), metadata));
         return false;
     }
-    scopes_.insert(make_pair(metadata.scope_id(), metadata));
+    return true;
 }
 
 }  // namespace smartscopes
