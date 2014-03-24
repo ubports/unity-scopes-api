@@ -247,28 +247,28 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
+    // We shutdown the runtime whenever these signals happen.
+    auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_int,
+        core::posix::Signal::sig_hup,
+        core::posix::Signal::sig_term
+    });
+
+    // And we maintain our list of processes with the help of sig_chld.
+    auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_chld
+    });
+
+    // The death observer is required to make sure that we reap all child processes
+    // whenever multiple sigchld's are compressed together.
+    auto death_observer =
+            core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(
+                child_trap);
+
     try
     {
-        // We shutdown the runtime whenever these signals happen.
-        auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_int,
-            core::posix::Signal::sig_hup,
-            core::posix::Signal::sig_term
-        });
-
-        // And we maintain our list of processes with the help of sig_chld.
-        auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_chld
-        });
-
-        // The death observer is required to make sure that we reap all child processes
-        // whenever multiple sigchld's are compressed together.
-        auto death_observer =
-                core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(
-                    child_trap);
-
         // Starting up both traps.
         std::thread termination_trap_worker([termination_trap]() { termination_trap->run(); });
         std::thread child_trap_worker([child_trap]() { child_trap->run(); });
@@ -304,19 +304,22 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        auto sc
         {
-            switch(signal)
+            termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
             {
-            case core::posix::Signal::sig_int:
-            case core::posix::Signal::sig_hup:
-            case core::posix::Signal::sig_term:
-                middleware->stop();
-                break;
-            default:
-                break;
-            }
-        });
+                switch(signal)
+                {
+                case core::posix::Signal::sig_int:
+                case core::posix::Signal::sig_hup:
+                case core::posix::Signal::sig_term:
+                    middleware->stop();
+                    break;
+                default:
+                    break;
+                }
+            })
+        };
 
         // The registry object stores the local and remote scopes
         RegistryObject::SPtr registry(new RegistryObject(*death_observer));
@@ -383,12 +386,13 @@ main(int argc, char* argv[])
 
         // Stopping both traps
         termination_trap->stop();
-        child_trap->stop();
-
-        // Shutting down both worker threads.
         if (termination_trap_worker.joinable())
             termination_trap_worker.join();
 
+        // Please note that the child_trap must only be stopped once the
+        // termination_trap thread has been joined. We otherwise will encounter
+        // a race between the middleware shutting down and not receiving sigchld anymore.
+        child_trap->stop();
         if (child_trap_worker.joinable())
             child_trap_worker.join();
 
