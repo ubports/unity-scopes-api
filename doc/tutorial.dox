@@ -294,9 +294,12 @@ class MyActivation : public unity::scopes::ActivationQueryBase
 
 \paragraph handlingactivation Handling result activation
 
-In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
-known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
-unity::scopes::ScopeBase::activate() method:
+In many cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema (such as "http://")
+of result's uri has a handler in the system. If this is the case, then there is nothing to do in terms of activation handling in the scope code. If however a scope relies
+on a schema handler that's not present in the system, the offending result will be ignored by Unity shell and nothing will happen on activation.
+
+In cases where scope wants to intercept and handle activation request (e.g. when no handler for specifc type of uri exists, or to do some extra work on activation),
+it has to reimplement unity::scopes::ScopeBase::activate() method:
 
 \code{.cpp}
 class MyScope : public ScopeBase
@@ -498,9 +501,47 @@ TEST_F(TestScopeFixutre, search_results)
 
 Installing a scope is as simple as running `make install` when using the scope
 template. You might need to restart the global scope registry when a new scope
-is installed by running: `restart scope-registry`.
+is installed by running:
 
-In the future it will be possible to create click packages with scopes.
+\verbatim
+restart scope-registry
+\endverbatim
+
+The scope will be installed under one of the "scopes directories"
+scanned by the scope registry.  Currently these default to:
+
+<ul>
+<li>/usr/lib/${arch}/unity-scopes</li>
+<li>/custom/lib/${arch}/unity-scopes</li>
+<!-- <li>??? Click packages?</li> -->
+</ul>
+
+Individual scopes are installed into a subdirectory matching the
+scope's name.  At a minimum, the directory structure should contain
+the following:
+
+    -+- ${scopesdir}
+     `-+- scopename
+       |--- scopename.ini
+       `--- libscopename.so
+
+That is, a scope metadata file and a shared library containing the
+scope code.  The scope author is free to ship additional data in this
+directory (e.g. icons and screenshots).
+
+The scope metadata file uses the standard ini file format, with the
+following keys:
+
+    [ScopeConfig]
+    DisplayName = human readable name of scope
+    Description = description of scope
+    Author = Author
+    Icon = path to icon representing the scope
+    Art = path to screenshot of the scope
+    SearchHint = hint text displayed to user when viewing scope
+    HotKey =
+
+In addition to allowing the registry to make the scope available, this information controls how the scope appears in the "Scopes" scope.
 
 \subsection scopetool Previewing scope
 

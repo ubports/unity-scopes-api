@@ -18,11 +18,12 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/SigTermHandler.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+
+#include <core/posix/signal.h>
 
 #include <cassert>
 #include <signal.h>
@@ -75,6 +76,13 @@ int main(int argc, char* argv[])
 
     try
     {
+        auto trap = core::posix::trap_signals_for_all_subsequent_threads(
+        {
+            core::posix::Signal::sig_int,
+            core::posix::Signal::sig_hup,
+            core::posix::Signal::sig_term
+        });
+
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
@@ -94,8 +102,13 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
-        SigTermHandler sigterm_handler;
-        sigterm_handler.set_callback([reg_mw, scope_mw]{ scope_mw->stop(); reg_mw->stop(); });
+        trap->signal_raised().connect([reg_mw, scope_mw](core::posix::Signal)
+        {
+            scope_mw->stop();
+            reg_mw->stop();
+        });
+
+        std::thread trap_worker([trap]() { trap->run(); });
 
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
@@ -117,6 +130,11 @@ int main(int argc, char* argv[])
         // Wait until shutdown
         scope_mw->wait_for_shutdown();
         reg_mw->wait_for_shutdown();
+
+        trap->stop();
+
+        if (trap_worker.joinable())
+            trap_worker.join();
 
         exit_status = 0;
     }
