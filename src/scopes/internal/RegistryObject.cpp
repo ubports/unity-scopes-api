@@ -363,10 +363,9 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
 bool RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>& lock,
                                                   ProcessState state, int timeout_ms) const
 {
-    state_change_cond_.wait_for(lock,
-                                std::chrono::milliseconds(timeout_ms),
-                                [this, &state]{return state_ == state;});
-    return state_ == state;
+    return state_change_cond_.wait_for(lock,
+                                       std::chrono::milliseconds(timeout_ms),
+                                       [this, &state]{return state_ == state;});
 }
 
 void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)

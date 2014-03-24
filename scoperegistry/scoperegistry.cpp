@@ -247,18 +247,25 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
+    auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_int,
+        core::posix::Signal::sig_hup,
+        core::posix::Signal::sig_term
+    });
+
+    auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_chld
+    });
+
+    auto death_observer = core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(child_trap);
+
+    std::thread termination_trap_worker([termination_trap]() { termination_trap->run(); });
+    std::thread child_trap_worker([child_trap]() { child_trap->run(); });
+
     try
     {
-        auto trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_int,
-            core::posix::Signal::sig_hup,
-            core::posix::Signal::sig_term,
-            core::posix::Signal::sig_chld
-        });
-
-        auto death_observer = core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap);
-
         RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
 
         string identity = runtime->registry_identity();
@@ -289,7 +296,7 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
         {
             switch(signal)
             {
@@ -302,8 +309,6 @@ main(int argc, char* argv[])
                 break;
             }
         });
-
-        std::thread trap_worker([trap]() { trap->run(); });
 
         // The registry object stores the local and remote scopes
         RegistryObject::SPtr registry(new RegistryObject(*death_observer));
@@ -368,11 +373,6 @@ main(int argc, char* argv[])
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
 
-        trap->stop();
-
-        if (trap_worker.joinable())
-            trap_worker.join();
-
         exit_status = 0;
     }
     catch (std::exception const& e)
@@ -391,6 +391,15 @@ main(int argc, char* argv[])
     {
         error("terminated due to unknown exception");
     }
+
+    termination_trap->stop();
+    child_trap->stop();
+
+    if (termination_trap_worker.joinable())
+        termination_trap_worker.join();
+
+    if (child_trap_worker.joinable())
+        child_trap_worker.join();
 
     return exit_status;
 }
