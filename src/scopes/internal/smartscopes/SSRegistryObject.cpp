@@ -274,7 +274,8 @@ void SSRegistryObject::get_remote_scopes()
     if (changed)
     {
         // something has changed, send invalidate signal
-        system(c_dbussend_cmd);
+        int result = system(c_dbussend_cmd);
+        (void)result;
     }
 }
 
