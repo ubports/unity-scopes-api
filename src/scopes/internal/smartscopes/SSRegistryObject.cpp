@@ -29,6 +29,7 @@
 #include <iostream>
 
 static const uint c_failed_refresh_timeout = 10; ///! TODO get from config
+static const char* c_dbussend_cmd = "dbus-send /com/canonical/unity/scopes com.canonical.unity.scopes.InvalidateResults string:smart-scopes";
 
 namespace unity
 {
@@ -193,11 +194,8 @@ void SSRegistryObject::get_remote_scopes()
         return;
     }
 
-    std::lock_guard<std::mutex> lock(scopes_mutex_);
-
-    // clear current collection of remote scopes
-    base_urls_.clear();
-    scopes_.clear();
+    MetadataMap new_scopes_;
+    std::map<std::string, std::string> new_base_urls_;
 
     // loop through all available scopes and add() each visible scope
     for (RemoteScope const& scope : remote_scopes)
@@ -233,7 +231,7 @@ void SSRegistryObject::get_remote_scopes()
             auto meta = ScopeMetadataImpl::create(move(metadata));
 
             // add scope info to collection
-            add(scope, std::move(meta));
+            add(scope, std::move(meta), new_scopes_, new_base_urls_);
         }
         catch (std::exception const& e)
         {
@@ -241,23 +239,63 @@ void SSRegistryObject::get_remote_scopes()
             std::cerr << "SSRegistryObject: skipping scope \"" << scope.id << "\"" << std::endl;
         }
     }
+
+    bool changed = false;
+    // replace previous scopes with new ones
+    {
+        std::lock_guard<std::mutex> lock(scopes_mutex_);
+
+        // check if base urls or list of available scopes has changed.
+        // the urls is a map of (string, string), so rely on == operator.
+        // when comparing scopes maps, only check if scope ids are same, i.e.
+        // changes to scope metadata attributes are not detected.
+        if (new_base_urls_ != base_urls_ ||
+            new_scopes_.size() != scopes_.size())
+        {
+            changed = true;
+        }
+        else
+        {
+            for (auto const& p: new_scopes_)
+            {
+                if (scopes_.find(p.first) == scopes_.end())
+                {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        // replace current collection of remote scopes
+        base_urls_ = new_base_urls_;
+        scopes_ = new_scopes_;
+    }
+
+    if (changed)
+    {
+        // something has changed, send invalidate signal
+        system(c_dbussend_cmd);
+    }
 }
 
-// Must be called with scopes_mutex_ locked
-void SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata)
+bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata, MetadataMap& scopes, std::map<std::string, std::string>& urls)
 {
     if (metadata.scope_id().empty())
     {
         throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty id");
     }
 
-    // store the base url under a scope id key
-    base_urls_[metadata.scope_id()] = remotedata.base_url;
+    // store the base url under a scope name key
+    urls[metadata.scope_id()] = remotedata.base_url;
 
     // store the scope metadata in scopes_
-    if (scopes_.find(metadata.scope_id()) != scopes_.end())
+    auto const& pair = scopes.insert(make_pair(metadata.scope_id(), metadata));
+    if (!pair.second)
     {
-        scopes_.erase(metadata.scope_id());
+        // Replace already existing entry with this one
+        scopes.erase(pair.first);
+        scopes.insert(make_pair(metadata.scope_id(), metadata));
+        return false;
     }
     scopes_.insert(make_pair(metadata.scope_id(), metadata));
 }
