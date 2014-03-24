@@ -624,7 +624,8 @@ void SmartScopesClient::write_cache(std::string const& scopes_json)
         cache_file << scopes_json;
         cache_file.close();
 
-        have_latest_cache_ = false;
+        cached_scopes_ = scopes_json;
+        have_latest_cache_ = true;
     }
 }
 
