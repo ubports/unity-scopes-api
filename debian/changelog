@@ -1,3 +1,10 @@
+unity-scopes-api (0.4.0+14.04.20140324-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Backport invalidation raciness fix.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 24 Mar 2014 13:06:04 +0000
+
 unity-scopes-api (0.4.0+14.04.20140319-0ubuntu1) trusty; urgency=low
 
   [ Michal Hruby ]
