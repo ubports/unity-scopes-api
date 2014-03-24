@@ -84,7 +84,7 @@ private:
         ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
-        ProcessState state();
+        ProcessState state() const;
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
         void exec();
@@ -96,9 +96,10 @@ private:
         // the following methods must be called with process_mutex_ locked
         void clear_handle_unlocked();
         void update_state_unlocked(ProcessState state);
-        bool wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
-                                     ProcessState state, int timeout_ms) const;
-        void kill_unlocked(std::unique_lock<std::mutex>& lock);
+
+        bool wait_for_state(std::unique_lock<std::mutex>& lock,
+                            ProcessState state, int timeout_ms) const;
+        void kill(std::unique_lock<std::mutex>& lock);
 
     private:
         const ScopeExecData exec_data_;

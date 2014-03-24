@@ -50,9 +50,18 @@ RegistryObject::RegistryObject()
 
 RegistryObject::~RegistryObject()
 {
-    // destroy all scopes and processes
-    scopes_.clear();
-    scope_processes_.clear();
+    // kill all scope processes
+    for (auto& scope_process : scope_processes_)
+    {
+        try
+        {
+            scope_process.second.kill();
+        }
+        catch(std::exception const& e)
+        {
+            cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
+        }
+    }
 
     // stop the death oberver
     try
@@ -68,6 +77,10 @@ RegistryObject::~RegistryObject()
         cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
         death_observer_thread_.detach();
     }
+
+    // clear scope maps
+    scopes_.clear();
+    scope_processes_.clear();
 }
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
@@ -234,7 +247,7 @@ RegistryObject::ScopeProcess::~ScopeProcess()
     }
 }
 
-RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
+RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state() const
 {
     std::lock_guard<std::mutex> lock(process_mutex_);
     return state_;
@@ -243,7 +256,7 @@ RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    return wait_for_state_unlocked(lock, state, timeout_ms);
+    return wait_for_state(lock, state, timeout_ms);
 }
 
 void RegistryObject::ScopeProcess::exec()
@@ -259,13 +272,13 @@ void RegistryObject::ScopeProcess::exec()
     //  1.2. if scope running but is “stopping”, wait for it to stop / kill it.
     else if (state_ == ScopeProcess::Stopping)
     {
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
+        if (!wait_for_state(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
                  << exec_data_.scope_id << "\" took too long to stop." << endl;
             try
             {
-                kill_unlocked(lock);
+                kill(lock);
             }
             catch(std::exception const& e)
             {
@@ -304,11 +317,11 @@ void RegistryObject::ScopeProcess::exec()
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
-    if (!wait_for_state_unlocked(lock, ScopeProcess::Running, c_process_wait_timeout))
+    if (!wait_for_state(lock, ScopeProcess::Running, c_process_wait_timeout))
     {
         try
         {
-            kill_unlocked(lock);
+            kill(lock);
         }
         catch(std::exception const& e)
         {
@@ -327,7 +340,7 @@ void RegistryObject::ScopeProcess::exec()
 void RegistryObject::ScopeProcess::kill()
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
-    kill_unlocked(lock);
+    kill(lock);
 }
 
 bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
@@ -358,26 +371,16 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     state_change_cond_.notify_all();
 }
 
-bool RegistryObject::ScopeProcess::wait_for_state_unlocked(std::unique_lock<std::mutex>& lock,
-                                                           ProcessState state, int timeout_ms) const
+bool RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>& lock,
+                                                  ProcessState state, int timeout_ms) const
 {
-    // keep track of time left as process can undergo multiple state changes
-    // before reaching the state we want
-    int time_left = timeout_ms;
-    while (state_ != state && time_left > 0)
-    {
-        auto start = std::chrono::high_resolution_clock::now();
-        state_change_cond_.wait_for(lock, std::chrono::milliseconds(time_left));
-
-        // update time left
-        time_left -= std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start).count();
-    }
-
+    state_change_cond_.wait_for(lock,
+                                std::chrono::milliseconds(timeout_ms),
+                                [this, &state]{return state_ == state;});
     return state_ == state;
 }
 
-void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& lock)
+void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
 {
     if (state_ == Stopped)
     {
@@ -389,27 +392,28 @@ void RegistryObject::ScopeProcess::kill_unlocked(std::unique_lock<std::mutex>& l
         // first try to close the scope process gracefully
         process_.send_signal_or_throw(core::posix::Signal::sig_term);
 
-        if (!wait_for_state_unlocked(lock, ScopeProcess::Stopped, c_process_wait_timeout))
+        if (!wait_for_state(lock, ScopeProcess::Stopped, c_process_wait_timeout))
         {
-            // scope is taking too long to close, send kill signal
             std::error_code ec;
-            process_.send_signal(core::posix::Signal::sig_kill, ec);
 
-            throw unity::ResourceException("Scope: \"" + exec_data_.scope_id
-                 + "\" is taking longer than expected to terminate (This process is "
-                 + "likely to close upon termination of the parent application).");
+            cerr << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
+                 << "\" is taking longer than expected to terminate gracefully. "
+                 << "Killing the process instead." << endl;
+
+            // scope is taking too long to close, send kill signal
+            process_.send_signal(core::posix::Signal::sig_kill, ec);
         }
     }
     catch (std::exception const&)
     {
-        // invalidate the process handle and move on, as the previous handle is clearly
-        // unrecoverable at this point.
-        clear_handle_unlocked();
-
-        cerr << "RegistryObject::ScopeProcess::in_lock_kill(): Failed to kill scope: \""
+        cerr << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
         throw;
     }
+
+    // clear the process handle
+    // even on error, the previous handle will be unrecoverable at this point
+    clear_handle_unlocked();
 }
 
 } // namespace internal

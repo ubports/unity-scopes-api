@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_SIGNAL_THREAD_H
-#define SCOPEREGISTRY_SIGNAL_THREAD_H
+#ifndef UNITY_SCOPES_INTERNAL_SIGTERMHANDLER_H
+#define UNITY_SCOPES_INTERNAL_SIGTERMHANDLER_H
 
 #include <unity/util/NonCopyable.h>
 
@@ -26,18 +26,24 @@
 
 #include <sys/types.h>
 
-namespace scoperegistry
+namespace unity
 {
 
-class SignalThread final
+namespace scopes
+{
+
+namespace internal
+{
+
+class SigTermHandler final
 {
 public:
-    NONCOPYABLE(SignalThread);
+    NONCOPYABLE(SigTermHandler);
 
-    SignalThread();
-    ~SignalThread();
+    SigTermHandler();
+    ~SigTermHandler();
 
-    void activate(std::function<void()> callback);
+    void set_callback(std::function<void()> callback);
     void stop();
 
 private:
@@ -50,6 +56,10 @@ private:
     sigset_t sigs_;
 };
 
-} // namespace scoperegistry
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity
 
 #endif
