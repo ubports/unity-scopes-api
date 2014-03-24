@@ -606,6 +606,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::display_name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeConfig::scope_runner() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::appearance_attributes() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::icon() const@Base" 0.4.0+14.04.20140312.1
