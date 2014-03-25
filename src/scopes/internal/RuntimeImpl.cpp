@@ -28,7 +28,10 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <signal.h>
+
 #include <cassert>
+#include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -56,6 +59,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
     }
 
     string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
+    configfile_ = config_file;
 
     try
     {
@@ -133,6 +137,11 @@ void RuntimeImpl::destroy()
 string RuntimeImpl::scope_id() const
 {
     return scope_id_;
+}
+
+string RuntimeImpl::configfile() const
+{
+    return configfile_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const
