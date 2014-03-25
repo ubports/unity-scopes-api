@@ -399,7 +399,9 @@ main(int argc, char* argv[])
         if (termination_trap_worker.joinable())
             termination_trap_worker.join();
 
-        // Stop child_trap
+        // Please note that the child_trap must only be stopped once the
+        // termination_trap thread has been joined. We otherwise will encounter
+        // a race between the middleware shutting down and not receiving sigchld anymore.
         child_trap->stop();
         if (child_trap_worker.joinable())
             child_trap_worker.join();
