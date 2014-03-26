@@ -71,6 +71,13 @@ public:
 
         for (auto& result : results)
         {
+            if (!result.category)
+            {
+                std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
+                          << "\" returned an invalid cat_id. Skipping result." << std::endl;
+                continue;
+            }
+
             Category::SCPtr cat;
 
             auto cat_it = categories.find(result.category->id);
