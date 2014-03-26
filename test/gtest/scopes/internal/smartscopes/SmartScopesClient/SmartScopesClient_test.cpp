@@ -88,7 +88,7 @@ TEST_F(SmartScopesClientTest, search)
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
-    ASSERT_EQ(2u, results.size());
+    ASSERT_EQ(3u, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
     EXPECT_EQ(nullptr, results[0].other_params["dnd_uri"]);
@@ -109,6 +109,13 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("Category 1", results[1].category->title);
     EXPECT_EQ("", results[1].category->icon);
     EXPECT_EQ("{}", results[1].category->renderer_template);
+
+    EXPECT_EQ("URI3", results[2].uri);
+    EXPECT_EQ(nullptr, results[2].other_params["dnd_uri"]);
+    EXPECT_EQ("Category Fail", results[2].other_params["title"]->as_string());
+    EXPECT_EQ(nullptr, results[2].other_params["icon"]);
+    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
+    EXPECT_EQ(nullptr, results[2].category);
 }
 
 TEST_F(SmartScopesClientTest, preview)
@@ -164,19 +171,19 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle1->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 
     results = search_handle2->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 
     results = search_handle3->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 
     results = search_handle4->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 
     results = search_handle5->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 }
 
 TEST_F(SmartScopesClientTest, consecutive_cancels)
@@ -191,7 +198,7 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
 
     std::vector<SearchResult> results = search_handle->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    EXPECT_EQ(3u, results.size());
 }
 
 TEST_F(SmartScopesClientTest, reset_url)
