@@ -19,8 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
 
-#include <unity/scopes/internal/MWSigReceiver.h>
-#include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/SigReceiverObject.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
@@ -35,30 +34,16 @@ namespace internal
 namespace zmq_middleware
 {
 
-// Server-side implementation of a Registry object, which maps scope names to scope proxies.
-// It provides remote lookup and listing of the map contents, and local methods to manipulate the map.
-//
-// This class is thread-safe: differnt threads can concurrently update the map while lookup operations
-// are in progress.
-
 class SigReceiverI : public ServantBase
 {
 public:
-    SigReceiverI(RegistryObjectBase::SPtr const& ro);
+    SigReceiverI(SigReceiverObject::SPtr const& sro);
     virtual ~SigReceiverI();
 
 private:
-    virtual void get_metadata_(Current const& current,
-                               capnp::AnyPointer::Reader& in_params,
-                               capnproto::Response::Builder& r);
-
-    virtual void list_(Current const& current,
-                       capnp::AnyPointer::Reader& in_params,
-                       capnproto::Response::Builder& r);
-
-    virtual void locate_(Current const& current,
-                         capnp::AnyPointer::Reader& in_params,
-                         capnproto::Response::Builder& r);
+    virtual void push_signal_(Current const& current,
+                              capnp::AnyPointer::Reader& in_params,
+                              capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware

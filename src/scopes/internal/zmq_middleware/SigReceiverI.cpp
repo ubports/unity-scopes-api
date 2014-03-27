@@ -18,18 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/SigReceiverI.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <unity/scopes/internal/RegistryException.h>
-#include <unity/scopes/internal/RegistryObjectBase.h>
-#include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
-#include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/scopes/ScopeExceptions.h>
-
-#include <cassert>
-
-using namespace std;
+#include <scopes/internal/zmq_middleware/capnproto/SigReceiver.capnp.h>
 
 namespace unity
 {
@@ -45,31 +34,14 @@ namespace zmq_middleware
 
 /*
 
-interface Scope;
-
-dictionary<string, VariantMap> MetadataMap;
-
-exception NotFoundException
-{
-    string scopeName;
-};
-
-interface Registry
-{
-    ScopeProxy get_metadata(string name) throws NotFoundException;
-    ScopeMap list();
-    ScopeProxy locate(string name) throws NotFoundException, RegistryException;
-};
+///! TODO
 
 */
 
 using namespace std::placeholders;
 
-SigReceiverI::SigReceiverI(RegistryObjectBase::SPtr const& ro) :
-    ServantBase(ro, { { "get_metadata", bind(&SigReceiverI::get_metadata_, this, _1, _2, _3) },
-                      { "list", bind(&SigReceiverI::list_, this, _1, _2, _3) },
-                      { "locate", bind(&SigReceiverI::locate_, this, _1, _2, _3) } })
-
+SigReceiverI::SigReceiverI(SigReceiverObject::SPtr const& sro) :
+    ServantBase(sro, { { "push_signal", bind(&SigReceiverI::push_signal_, this, _1, _2, _3) } })
 {
 }
 
@@ -77,78 +49,10 @@ SigReceiverI::~SigReceiverI()
 {
 }
 
-void SigReceiverI::get_metadata_(Current const&,
-                              capnp::AnyPointer::Reader& in_params,
-                              capnproto::Response::Builder& r)
+void SigReceiverI::push_signal_(Current const&,
+                                capnp::AnyPointer::Reader& in_params,
+                                capnproto::Response::Builder& r)
 {
-    auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
-    string name = req.getName().cStr();
-    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
-    try
-    {
-        auto meta = delegate->get_metadata(name);
-        r.setStatus(capnproto::ResponseStatus::SUCCESS);
-        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
-        auto dict = get_metadata_response.initReturnValue();
-        to_value_dict(meta.serialize(), dict);
-    }
-    catch (NotFoundException const& e)
-    {
-        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
-        get_metadata_response.initNotFoundException().setName(e.name().c_str());
-    }
-}
-
-void SigReceiverI::list_(Current const&,
-                      capnp::AnyPointer::Reader&,
-                      capnproto::Response::Builder& r)
-{
-    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
-    auto metadata_map = delegate->list();
-    r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto list_response = r.initPayload().getAs<capnproto::Registry::ListResponse>();
-    auto dict = list_response.initReturnValue().initPairs(metadata_map.size());
-    int i = 0;
-    for (auto& pair : metadata_map)
-    {
-        dict[i].setName(pair.first.c_str());            // Scope name
-        auto md = dict[i].initValue().initDictVal();
-        to_value_dict(pair.second.serialize(), md);     // Scope metadata
-        ++i;
-    }
-}
-
-void SigReceiverI::locate_(Current const&,
-                        capnp::AnyPointer::Reader& in_params,
-                        capnproto::Response::Builder& r)
-{
-    auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
-    string name = req.getName().cStr();
-    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
-    try
-    {
-        auto scope_proxy = delegate->locate(name);
-        r.setStatus(capnproto::ResponseStatus::SUCCESS);
-        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
-        auto proxy = locate_response.initReturnValue();
-        proxy.setIdentity(scope_proxy->identity());
-        proxy.setCategory("Scope");
-        proxy.setEndpoint(scope_proxy->endpoint());
-        proxy.setTimeout(scope_proxy->timeout());
-    }
-    catch (NotFoundException const& e)
-    {
-        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
-        locate_response.initNotFoundException().setName(e.name().c_str());
-    }
-    catch (RegistryException const& e)
-    {
-        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
-        auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
-        locate_response.initRegistryException().setReason(e.reason().c_str());
-    }
 }
 
 } // namespace zmq_middleware

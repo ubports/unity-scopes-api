@@ -20,8 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
 
 #include <unity/scopes/internal/MWObjectProxy.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/ScopeMetadata.h>
+#include <unity/scopes/internal/SigReceiverObject.h>
 
 namespace unity
 {
@@ -35,17 +34,7 @@ namespace internal
 class MWSigReceiver : public virtual MWObjectProxy
 {
 public:
-    enum Signal
-    {
-        ScopeStarting,
-        ScopeRunning,
-        ScopeStopping,
-    };
-
-    virtual void push_signal(Signal const& signal) = 0;
-    virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
-    virtual MetadataMap list() = 0;
-    virtual ScopeProxy locate(std::string const& scope_id) = 0;
+    virtual void push_signal(SigReceiverObject::Signal const& signal) = 0;
 
     virtual ~MWSigReceiver();
 

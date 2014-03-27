@@ -18,8 +18,6 @@
 
 #include <unity/scopes/internal/MWSigReceiver.h>
 
-using namespace std;
-
 namespace unity
 {
 
@@ -29,8 +27,8 @@ namespace scopes
 namespace internal
 {
 
-MWSigReceiver::MWSigReceiver(MiddlewareBase* mw_base) :
-    MWObjectProxy(mw_base)
+MWSigReceiver::MWSigReceiver(MiddlewareBase* mw_base)
+    : MWObjectProxy(mw_base)
 {
 }
 

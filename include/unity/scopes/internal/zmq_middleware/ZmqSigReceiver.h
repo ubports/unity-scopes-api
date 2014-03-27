@@ -22,7 +22,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSigReceiverProxyFwd.h>
 #include <unity/scopes/internal/MWSigReceiver.h>
-#include <unity/scopes/internal/MWRegistry.h>
 
 namespace unity
 {
@@ -36,24 +35,17 @@ namespace internal
 namespace zmq_middleware
 {
 
-// Client-side registry proxy for Zmq. The implementation forwards the invocations via Zmq,
-// and translates the parameters and return value between the Zmq types and the public types.
-
 class ZmqSigReceiver : public virtual ZmqObjectProxy, public virtual MWSigReceiver
 {
 public:
     ZmqSigReceiver(ZmqMiddleware* mw_base,
-                std::string const& endpoint,
-                std::string const& identity,
-                std::string const& category,
-                int64_t timeout);
+                   std::string const& endpoint,
+                   std::string const& identity,
+                   std::string const& category,
+                   int64_t timeout);
     virtual ~ZmqSigReceiver();
 
-    // Remote operations.
-    void push_signal(Signal const& signal) override;
-    virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
-    virtual MetadataMap list() override;
-    virtual ScopeProxy locate(std::string const& scope_id) override;
+    void push_signal(SigReceiverObject::Signal const& signal) override;
 };
 
 } // namespace zmq_middleware
