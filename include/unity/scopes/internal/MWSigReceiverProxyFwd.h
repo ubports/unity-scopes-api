@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWREGISTRYPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_MWREGISTRYPROXYFWD_H
+#ifndef UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H
 
 #include <memory>
 
@@ -30,8 +30,8 @@ namespace scopes
 namespace internal
 {
 
-class MWRegistry;
-typedef std::shared_ptr<MWRegistry> MWRegistryProxy;
+class MWSigReceiver;
+typedef std::shared_ptr<MWSigReceiver> MWSigReceiverProxy;
 
 } // namespace internal
 
@@ -39,4 +39,4 @@ typedef std::shared_ptr<MWRegistry> MWRegistryProxy;
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H

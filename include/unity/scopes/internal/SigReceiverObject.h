@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
+#define UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
 
 #include <core/posix/child_process.h>
 
@@ -37,7 +37,7 @@ namespace scopes
 namespace internal
 {
 
-class RegistryObject : public RegistryObjectBase
+class SigReceiverObject : public RegistryObjectBase
 {
 public:
     struct ScopeExecData
@@ -51,10 +51,10 @@ public:
     };
 
 public:
-    UNITY_DEFINES_PTRS(RegistryObject);
+    UNITY_DEFINES_PTRS(SigReceiverObject);
 
-    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer);
-    virtual ~RegistryObject();
+    SigReceiverObject(core::posix::ChildProcess::DeathObserver& death_observer);
+    virtual ~SigReceiverObject();
 
     // Remote operation implementations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
@@ -124,4 +124,4 @@ private:
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H

@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREGISTRYPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREGISTRYPROXYFWD_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H
 
 #include <memory>
 
@@ -33,8 +33,8 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqRegistry;
-typedef std::shared_ptr<ZmqRegistry> ZmqRegistryProxy;
+class ZmqSigReceiver;
+typedef std::shared_ptr<ZmqSigReceiver> ZmqSigReceiverProxy;
 
 } // namespace zmq_middleware
 
@@ -44,4 +44,4 @@ typedef std::shared_ptr<ZmqRegistry> ZmqRegistryProxy;
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H

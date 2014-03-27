@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/zmq_middleware/RegistryI.h>
+#include <unity/scopes/internal/zmq_middleware/SigReceiverI.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
@@ -65,19 +65,19 @@ interface Registry
 
 using namespace std::placeholders;
 
-RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
-    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
-                      { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
-                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) } })
+SigReceiverI::SigReceiverI(RegistryObjectBase::SPtr const& ro) :
+    ServantBase(ro, { { "get_metadata", bind(&SigReceiverI::get_metadata_, this, _1, _2, _3) },
+                      { "list", bind(&SigReceiverI::list_, this, _1, _2, _3) },
+                      { "locate", bind(&SigReceiverI::locate_, this, _1, _2, _3) } })
 
 {
 }
 
-RegistryI::~RegistryI()
+SigReceiverI::~SigReceiverI()
 {
 }
 
-void RegistryI::get_metadata_(Current const&,
+void SigReceiverI::get_metadata_(Current const&,
                               capnp::AnyPointer::Reader& in_params,
                               capnproto::Response::Builder& r)
 {
@@ -100,7 +100,7 @@ void RegistryI::get_metadata_(Current const&,
     }
 }
 
-void RegistryI::list_(Current const&,
+void SigReceiverI::list_(Current const&,
                       capnp::AnyPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
@@ -119,7 +119,7 @@ void RegistryI::list_(Current const&,
     }
 }
 
-void RegistryI::locate_(Current const&,
+void SigReceiverI::locate_(Current const&,
                         capnp::AnyPointer::Reader& in_params,
                         capnproto::Response::Builder& r)
 {

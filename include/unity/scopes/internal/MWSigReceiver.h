@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWREGISTRY_H
-#define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
+#ifndef UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
+#define UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/Registry.h>
@@ -32,7 +32,7 @@ namespace scopes
 namespace internal
 {
 
-class MWRegistry : public virtual MWObjectProxy
+class MWSigReceiver : public virtual MWObjectProxy
 {
 public:
     // Remote operations
@@ -40,10 +40,10 @@ public:
     virtual MetadataMap list() = 0;
     virtual ScopeProxy locate(std::string const& scope_id) = 0;
 
-    virtual ~MWRegistry();
+    virtual ~MWSigReceiver();
 
 protected:
-    MWRegistry(MiddlewareBase* mw_base);
+    MWSigReceiver(MiddlewareBase* mw_base);
 };
 
 } // namespace internal
@@ -52,4 +52,4 @@ protected:
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H

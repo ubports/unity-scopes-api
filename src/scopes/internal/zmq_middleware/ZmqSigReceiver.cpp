@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSigReceiver.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Registry.capnp.h>
 #include <unity/scopes/internal/RegistryException.h>
@@ -63,22 +63,22 @@ interface Registry
 
 */
 
-ZmqRegistry::ZmqRegistry(ZmqMiddleware* mw_base,
+ZmqSigReceiver::ZmqSigReceiver(ZmqMiddleware* mw_base,
                          string const& endpoint,
                          string const& identity,
                          string const& category,
                          int64_t timeout) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Twoway, timeout),
-    MWRegistry(mw_base)
+    MWSigReceiver(mw_base)
 {
 }
 
-ZmqRegistry::~ZmqRegistry()
+ZmqSigReceiver::~ZmqSigReceiver()
 {
 }
 
-ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
+ScopeMetadata ZmqSigReceiver::get_metadata(std::string const& scope_id)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "get_metadata");
@@ -114,7 +114,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     }
 }
 
-MetadataMap ZmqRegistry::list()
+MetadataMap ZmqSigReceiver::list()
 {
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
@@ -140,7 +140,7 @@ MetadataMap ZmqRegistry::list()
     return sm;
 }
 
-ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
+ScopeProxy ZmqSigReceiver::locate(std::string const& scope_id)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "locate");

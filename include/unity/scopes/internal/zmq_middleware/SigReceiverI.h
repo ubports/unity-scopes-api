@@ -13,13 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
 
-#include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/MWSigReceiver.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
@@ -41,11 +41,11 @@ namespace zmq_middleware
 // This class is thread-safe: differnt threads can concurrently update the map while lookup operations
 // are in progress.
 
-class RegistryI : public ServantBase
+class SigReceiverI : public ServantBase
 {
 public:
-    RegistryI(RegistryObjectBase::SPtr const& ro);
-    virtual ~RegistryI();
+    SigReceiverI(RegistryObjectBase::SPtr const& ro);
+    virtual ~SigReceiverI();
 
 private:
     virtual void get_metadata_(Current const& current,
@@ -69,4 +69,4 @@ private:
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H

@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/MWSigReceiver.h>
 
 using namespace std;
 
@@ -29,12 +29,12 @@ namespace scopes
 namespace internal
 {
 
-MWRegistry::MWRegistry(MiddlewareBase* mw_base) :
+MWSigReceiver::MWSigReceiver(MiddlewareBase* mw_base) :
     MWObjectProxy(mw_base)
 {
 }
 
-MWRegistry::~MWRegistry()
+MWSigReceiver::~MWSigReceiver()
 {
 }
 
