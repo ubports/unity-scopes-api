@@ -27,13 +27,7 @@ Build dependencies
 See debian/control for the list of packages required to build and test the code.
 
 Most notably:
-  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev libcapnp-dev
-
-Some dependencies need to be installed manually as they are not yet available in Ubuntu:
-
-- Zmqpp:
-  $ git clone https://github.com/benjamg/zmqpp.git
-  $ cd zmqpp && make && sudo mkdir -p /usr/local/include/zmqpp && sudo make install
+  $ sudo apt-get install libunity-api-dev liblttng-ust-dev libzmq3-dev libzmqpp-dev libcapnp-dev
 
 
 Building the code
