@@ -35,7 +35,14 @@ namespace internal
 class MWSigReceiver : public virtual MWObjectProxy
 {
 public:
-    // Remote operations
+    enum Signal
+    {
+        ScopeStarting,
+        ScopeRunning,
+        ScopeStopping,
+    };
+
+    virtual void push_signal(Signal const& signal) = 0;
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
     virtual ScopeProxy locate(std::string const& scope_id) = 0;

@@ -50,6 +50,7 @@ public:
     virtual ~ZmqSigReceiver();
 
     // Remote operations.
+    void push_signal(Signal const& signal) override;
     virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
     virtual MetadataMap list() override;
     virtual ScopeProxy locate(std::string const& scope_id) override;

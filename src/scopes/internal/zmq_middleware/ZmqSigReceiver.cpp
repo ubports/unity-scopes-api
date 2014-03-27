@@ -78,6 +78,11 @@ ZmqSigReceiver::~ZmqSigReceiver()
 {
 }
 
+void ZmqSigReceiver::push_signal(Signal const& signal)
+{
+
+}
+
 ScopeMetadata ZmqSigReceiver::get_metadata(std::string const& scope_id)
 {
     capnp::MallocMessageBuilder request_builder;
