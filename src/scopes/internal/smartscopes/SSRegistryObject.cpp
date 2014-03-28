@@ -45,12 +45,12 @@ namespace smartscopes
 
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& ss_scope_endpoint,
-                                   uint no_reply_timeout,
+                                   uint http_reply_timeout,
                                    uint refresh_rate_in_sec,
                                    std::string const& sss_url,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientQt>(no_reply_timeout),
+                    std::make_shared<HttpClientQt>(http_reply_timeout),
                     std::make_shared<JsonCppNode>(), sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)
@@ -85,12 +85,12 @@ SSRegistryObject::~SSRegistryObject() noexcept
     refresh_thread_.join();
 }
 
-ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id)
+ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id) const
 {
-    // If the name is empty, it was sent as empty by the remote client.
+    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
-        throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty name");
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot search for scope with empty id");
     }
 
     std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -103,7 +103,7 @@ ScopeMetadata SSRegistryObject::get_metadata(std::string const& scope_id)
     return it->second;
 }
 
-MetadataMap SSRegistryObject::list()
+MetadataMap SSRegistryObject::list() const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
     return scopes_;
@@ -274,7 +274,8 @@ void SSRegistryObject::get_remote_scopes()
     if (changed)
     {
         // something has changed, send invalidate signal
-        system(c_dbussend_cmd);
+        int result = system(c_dbussend_cmd);
+        (void)result;
     }
 }
 
@@ -282,7 +283,7 @@ bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& m
 {
     if (metadata.scope_id().empty())
     {
-        throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty name");
+        throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty id");
     }
 
     // store the base url under a scope name key

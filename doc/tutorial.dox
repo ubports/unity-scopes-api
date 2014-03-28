@@ -33,7 +33,7 @@ perform searches). It is only in these situations that a scope should be written
 be written with the intention of running remotely on the Smart Scopes Server.</b>
 
 (For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
-the SSS REST API see: <link_not_yet_available>)
+the SSS REST API see: <i>link_not_yet_available</i>)
 
 \section develop Developing scopes
 
