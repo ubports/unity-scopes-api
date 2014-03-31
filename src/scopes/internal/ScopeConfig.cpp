@@ -205,7 +205,7 @@ string ScopeConfig::scope_runner() const
 {
     if (!scope_runner_)
     {
-        throw NotFoundException("Key not set", scope_runner_exec);
+        throw NotFoundException("Runner binary not set", scope_runner_exec);
     }
     return *scope_runner_;
 }
