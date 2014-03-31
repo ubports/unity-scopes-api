@@ -1,6 +1,15 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.4.1
+========================
+
+  * Made the scope search, activate, perform_action, and preview methods non-blocking.
+    A (fake) QueryCtrl is returned immediately from these methods now. Calling cancel() before
+    the server has finished creating the query remembers the cancel and sends it to the
+    server once the server has returned the real QueryCtrl. This change should be transparent
+    to application code (the only difference being that these methods complete faster now).
+
 Changes in version 0.4.0
 ========================
 
