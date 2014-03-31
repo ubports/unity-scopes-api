@@ -228,9 +228,6 @@ void RegistryObject::on_signal_received(std::string const& scope_id, SigReceiver
     {
         switch (signal)
         {
-            case SigReceiverObject::ScopeStarting:
-                it->second.update_state(ScopeProcess::ProcessState::Starting);
-                break;
             case SigReceiverObject::ScopeRunning:
                 it->second.update_state(ScopeProcess::ProcessState::Running);
                 break;

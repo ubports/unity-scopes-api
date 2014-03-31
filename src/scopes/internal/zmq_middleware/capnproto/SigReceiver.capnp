@@ -24,9 +24,8 @@ $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::SigReceiver"
 
 enum Signal
 {
-    scopeStarting @0;
-    scopeRunning @1;
-    scopeStopping @2;
+    scopeRunning @0;
+    scopeStopping @1;
 }
 
 struct PushSignalRequest

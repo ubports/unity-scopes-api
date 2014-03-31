@@ -64,11 +64,6 @@ void SigReceiverI::push_signal_(Current const& current,
     SigReceiverObject::SignalType signal;
     switch (s)
     {
-        case capnproto::SigReceiver::Signal::SCOPE_STARTING:
-        {
-            signal = SigReceiverObject::ScopeStarting;
-            break;
-        }
         case capnproto::SigReceiver::Signal::SCOPE_RUNNING:
         {
             signal = SigReceiverObject::ScopeRunning;

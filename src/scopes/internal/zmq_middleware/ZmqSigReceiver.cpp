@@ -66,11 +66,6 @@ void ZmqSigReceiver::push_signal(SigReceiverObject::SignalType const& signal)
     capnproto::SigReceiver::Signal s;
     switch (signal)
     {
-        case SigReceiverObject::ScopeStarting:
-        {
-            s = capnproto::SigReceiver::Signal::SCOPE_STARTING;
-            break;
-        }
         case SigReceiverObject::ScopeRunning:
         {
             s = capnproto::SigReceiver::Signal::SCOPE_RUNNING;

@@ -41,7 +41,6 @@ public:
 
     enum SignalType
     {
-        ScopeStarting,
         ScopeRunning,
         ScopeStopping
     };
