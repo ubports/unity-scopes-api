@@ -36,7 +36,10 @@ namespace zmq_middleware
 
 /*
 
-///! TODO
+interface SigReceiver
+{
+    void push_signal(SigReceiverObject::Signal signal);  // oneway
+};
 
 */
 
@@ -57,6 +60,36 @@ ZmqSigReceiver::~ZmqSigReceiver()
 
 void ZmqSigReceiver::push_signal(SigReceiverObject::Signal const& signal)
 {
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "push_signal");
+    auto in_params = request.initInParams().getAs<capnproto::SigReceiver::PushSignalRequest>();
+    capnproto::SigReceiver::Signal s;
+    switch (signal)
+    {
+        case SigReceiverObject::ScopeStarting:
+        {
+            s = capnproto::SigReceiver::Signal::SCOPE_STARTING;
+            break;
+        }
+        case SigReceiverObject::ScopeRunning:
+        {
+            s = capnproto::SigReceiver::Signal::SCOPE_RUNNING;
+            break;
+        }
+        case SigReceiverObject::ScopeStopping:
+        {
+            s = capnproto::SigReceiver::Signal::SCOPE_STOPPING;
+            break;
+        }
+        default:
+        {
+            assert(false);
+        }
+    }
+    in_params.setSignal(s);
+
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    future.wait();
 }
 
 } // namespace zmq_middleware

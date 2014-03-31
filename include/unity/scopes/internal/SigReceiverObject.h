@@ -40,7 +40,7 @@ public:
     {
         ScopeStarting,
         ScopeRunning,
-        ScopeStopping,
+        ScopeStopping
     };
 
     SigReceiverObject();

@@ -37,6 +37,7 @@ SigReceiverObject::~SigReceiverObject()
 
 void SigReceiverObject::push_signal(Signal const& signal)
 {
+    ///! TODO
 }
 
 } // namespace internal
