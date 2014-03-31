@@ -423,6 +423,9 @@ TEST(RegistryI, locate)
         mw->add_registry_object(reg_id, reg);
 
         // configure scopes
+        ///! TODO: HACK:
+        /// we have to start scope-C and scope-D before starting scope-B here, as B aggregates C and D.
+        /// (When re-binding logic is introduced, this will be unnecessary)
         std::array<std::string, 6> scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
         std::map<std::string, ScopeProxy> proxies;
 
