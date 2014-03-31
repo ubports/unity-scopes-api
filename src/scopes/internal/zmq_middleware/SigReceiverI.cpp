@@ -20,6 +20,8 @@
 
 #include <scopes/internal/zmq_middleware/capnproto/SigReceiver.capnp.h>
 
+#include <cassert>
+
 namespace unity
 {
 
@@ -34,7 +36,10 @@ namespace zmq_middleware
 
 /*
 
-///! TODO
+interface SigReceiver
+{
+    void push_signal(SigReceiverObject::Signal signal);  // oneway
+};
 
 */
 
@@ -51,9 +56,35 @@ SigReceiverI::~SigReceiverI()
 
 void SigReceiverI::push_signal_(Current const&,
                                 capnp::AnyPointer::Reader& in_params,
-                                capnproto::Response::Builder& r)
+                                capnproto::Response::Builder&)
 {
-    ///! TODO
+    auto delegate = std::dynamic_pointer_cast<SigReceiverObject>(del());
+    auto req = in_params.getAs<capnproto::SigReceiver::PushSignalRequest>();
+    auto s = req.getSignal();
+    SigReceiverObject::Signal signal;
+    switch (s)
+    {
+        case capnproto::SigReceiver::Signal::SCOPE_STARTING:
+        {
+            signal = SigReceiverObject::ScopeStarting;
+            break;
+        }
+        case capnproto::SigReceiver::Signal::SCOPE_RUNNING:
+        {
+            signal = SigReceiverObject::ScopeRunning;
+            break;
+        }
+        case capnproto::SigReceiver::Signal::SCOPE_STOPPING:
+        {
+            signal = SigReceiverObject::ScopeStopping;
+            break;
+        }
+        default:
+        {
+            assert(false);
+        }
+    }
+    delegate->push_signal(signal);
 }
 
 } // namespace zmq_middleware
