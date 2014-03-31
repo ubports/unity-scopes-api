@@ -423,7 +423,7 @@ TEST(RegistryI, locate)
         mw->add_registry_object(reg_id, reg);
 
         // configure scopes
-        std::array<std::string, 6> scope_ids = {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"};
+        std::array<std::string, 6> scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
         std::map<std::string, ScopeProxy> proxies;
 
         for (auto& scope_id : scope_ids)
