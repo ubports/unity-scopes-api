@@ -292,6 +292,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
 SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              std::string const& query,
+                                             std::string const& department_id,
                                              std::string const& session_id,
                                              uint query_id,
                                              std::string const& platform,
@@ -303,14 +304,17 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
-
     search_uri << "q=" << http_client_->to_percent_encoding(query);
+
     search_uri << "&session_id=" << session_id;
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=" << platform;
 
     // optional parameters
-
+    if (!department_id.empty())
+    {
+        search_uri << "&department=" << http_client_->to_percent_encoding(department_id);
+    }
     if (!locale.empty())
     {
         search_uri << "&locale=" << locale;
@@ -620,7 +624,8 @@ void SmartScopesClient::write_cache(std::string const& scopes_json)
         cache_file << scopes_json;
         cache_file.close();
 
-        have_latest_cache_ = false;
+        cached_scopes_ = scopes_json;
+        have_latest_cache_ = true;
     }
 }
 

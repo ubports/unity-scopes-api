@@ -1,9 +1,38 @@
+unity-scopes-api (0.4.1+14.04.20140326.1-0ubuntu1) trusty; urgency=low
+
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 26 Mar 2014 17:57:37 +0000
+
 unity-scopes-api (0.4.1-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pawel Stolowski ]
   * Added support for customization attributes to ScopeMetadata and scope .ini files.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 12 Mar 2014 17:03:16 +0100
+
+unity-scopes-api (0.4.0+14.04.20140324-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Backport invalidation raciness fix.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 24 Mar 2014 13:06:04 +0000
+
+unity-scopes-api (0.4.0+14.04.20140319-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Backport the invalidation fix.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 24 Mar 2014 13:06:02 +0000
+
+unity-scopes-api (0.4.0+14.04.20140312.2-0ubuntu1) trusty; urgency=low
+
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 12 Mar 2014 20:26:50 +0000
 
 unity-scopes-api (0.4.0+14.04.20140312.1-0ubuntu1) trusty; urgency=medium
 

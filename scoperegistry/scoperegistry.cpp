@@ -17,7 +17,6 @@
  */
 
 #include "FindFiles.h"
-#include "SignalThread.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
@@ -74,7 +73,7 @@ string strip_suffix(string const& s, string const& suffix)
 
 // Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
 // If a Canonical scope is overrideable and the OEM has configured a scope with the
-// same name, the OEM scope overrides the Canonical one.
+// same id, the OEM scope overrides the Canonical one.
 
 map<string, string> find_local_scopes(string const& scope_installdir, string const& oem_installdir)
 {
@@ -90,22 +89,22 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     for (auto&& path : config_files)
     {
         string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-        string scope_name = strip_suffix(file_name, ".ini");
+        string scope_id = strip_suffix(file_name, ".ini");
         try
         {
             ScopeConfig config(path);
             if (config.overrideable())
             {
-                overrideable_scopes[scope_name] = path;
+                overrideable_scopes[scope_id] = path;
             }
             else
             {
-                fixed_scopes[scope_name] = path;
+                fixed_scopes[scope_id] = path;
             }
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + scope_name + "\": configuration error:\n" + e.what());
+            error("ignoring scope \"" + scope_id + "\": configuration error:\n" + e.what());
         }
     }
 
@@ -117,10 +116,10 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             for (auto&& path : oem_paths)
             {
                 string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-                string scope_name = strip_suffix(file_name, ".ini");
-                if (fixed_scopes.find(scope_name) == fixed_scopes.end())
+                string scope_id = strip_suffix(file_name, ".ini");
+                if (fixed_scopes.find(scope_id) == fixed_scopes.end())
                 {
-                    overrideable_scopes[scope_name] = path;  // Replaces scope if it was present already
+                    overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
                 }
                 else
                 {
@@ -189,14 +188,18 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             catch (NotFoundException const&)
             {
             }
+
             ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
             mi->set_proxy(proxy);
             auto meta = ScopeMetadataImpl::create(move(mi));
-            vector<string> spawn_command;
-            spawn_command.push_back(scoperunner_path);
-            spawn_command.push_back(config_file);
-            spawn_command.push_back(pair.second);
-            registry->add_local_scope(pair.first, move(meta), spawn_command);
+
+            RegistryObject::ScopeExecData exec_data;
+            exec_data.scope_id = pair.first;
+            exec_data.scoperunner_path = scoperunner_path;
+            exec_data.runtime_config = config_file;
+            exec_data.scope_config = pair.second;
+
+            registry->add_local_scope(pair.first, move(meta), exec_data);
         }
         catch (unity::Exception const& e)
         {
@@ -244,10 +247,33 @@ main(int argc, char* argv[])
     char const* const config_file = argc > 1 ? argv[1] : "";
     int exit_status = 1;
 
-    SignalThread signal_thread;
-
     try
     {
+        // We shutdown the runtime whenever these signals happen.
+        auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
+        {
+            core::posix::Signal::sig_int,
+            core::posix::Signal::sig_hup,
+            core::posix::Signal::sig_term
+        });
+
+        // And we maintain our list of processes with the help of sig_chld.
+        auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
+        {
+            core::posix::Signal::sig_chld
+        });
+
+        // The death observer is required to make sure that we reap all child processes
+        // whenever multiple sigchld's are compressed together.
+        auto death_observer =
+                core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(
+                    child_trap);
+
+        // Starting up both traps.
+        std::thread termination_trap_worker([termination_trap]() { termination_trap->run(); });
+        std::thread child_trap_worker([child_trap]() { child_trap->run(); });
+
+        // And finally creating our runtime.
         RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
 
         string identity = runtime->registry_identity();
@@ -278,10 +304,22 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        signal_thread.activate([middleware]{ middleware->stop(); });
+        termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        {
+            switch(signal)
+            {
+            case core::posix::Signal::sig_int:
+            case core::posix::Signal::sig_hup:
+            case core::posix::Signal::sig_term:
+                middleware->stop();
+                break;
+            default:
+                break;
+            }
+        });
 
         // The registry object stores the local and remote scopes
-        RegistryObject::SPtr registry(new RegistryObject);
+        RegistryObject::SPtr registry(new RegistryObject(*death_observer));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
@@ -295,11 +333,11 @@ main(int argc, char* argv[])
         for (auto i = 2; i < argc; ++i)
         {
             string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
-            string scope_name = strip_suffix(file_name, ".ini");
-            local_scopes[scope_name] = argv[i];                   // operator[] overwrites pre-existing entries
+            string scope_id = strip_suffix(file_name, ".ini");
+            local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
             error("no remote registry configured, only local scopes will be available");
@@ -342,6 +380,19 @@ main(int argc, char* argv[])
 
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
+
+        // Stop termination_trap
+        termination_trap->stop();
+        if (termination_trap_worker.joinable())
+            termination_trap_worker.join();
+
+        // Please note that the child_trap must only be stopped once the
+        // termination_trap thread has been joined. We otherwise will encounter
+        // a race between the middleware shutting down and not receiving sigchld anymore.
+        child_trap->stop();
+        if (child_trap_worker.joinable())
+            child_trap_worker.join();
+
         exit_status = 0;
     }
     catch (std::exception const& e)

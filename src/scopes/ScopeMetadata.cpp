@@ -42,6 +42,7 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     assert(p->proxy());
     assert(!p->display_name().empty());
     assert(!p->description().empty());
+    assert(!p->author().empty());
 }
 
 ScopeMetadata::ScopeMetadata(ScopeMetadata const& other) :

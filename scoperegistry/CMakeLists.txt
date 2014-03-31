@@ -1,7 +1,6 @@
 set(SRC
         FindFiles.cpp
         scoperegistry.cpp
-        SignalThread.cpp
         ScopeSet.cpp
 )
 

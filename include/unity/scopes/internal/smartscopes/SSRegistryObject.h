@@ -43,12 +43,12 @@ public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
     SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
-                     uint no_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
+                     uint http_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
                      bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
-    ScopeMetadata get_metadata(std::string const& scope_id) override;
-    MetadataMap list() override;
+    ScopeMetadata get_metadata(std::string const& scope_id) const override;
+    MetadataMap list() const override;
 
     ScopeProxy locate(std::string const& scope_id) override;
 
@@ -60,7 +60,7 @@ private:
     void refresh_thread();
 
     void get_remote_scopes();
-    bool add(RemoteScope const& remotedata, ScopeMetadata const& scope);
+    static bool add(RemoteScope const& remotedata, ScopeMetadata const& scope, MetadataMap& scopes, std::map<std::string, std::string>& urls);
 
 private:
     SmartScopesClient::SPtr ssclient_;
