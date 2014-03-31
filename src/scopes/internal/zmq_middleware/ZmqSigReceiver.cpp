@@ -58,7 +58,7 @@ ZmqSigReceiver::~ZmqSigReceiver()
 {
 }
 
-void ZmqSigReceiver::push_signal(SigReceiverObject::Signal const& signal)
+void ZmqSigReceiver::push_signal(SigReceiverObject::SignalType const& signal)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "push_signal");

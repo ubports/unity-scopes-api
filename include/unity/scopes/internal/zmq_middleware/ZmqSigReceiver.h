@@ -45,7 +45,7 @@ public:
                    int64_t timeout);
     virtual ~ZmqSigReceiver();
 
-    void push_signal(SigReceiverObject::Signal const& signal) override;
+    void push_signal(SigReceiverObject::SignalType const& signal) override;
 };
 
 } // namespace zmq_middleware

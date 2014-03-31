@@ -35,9 +35,14 @@ SigReceiverObject::~SigReceiverObject()
 {
 }
 
-void SigReceiverObject::push_signal(Signal const& signal)
+void SigReceiverObject::push_signal(SignalType const& signal)
 {
-    ///! TODO
+    signal_received_(signal);
+}
+
+core::Signal<SigReceiverObject::SignalType> const& SigReceiverObject::signal_received() const
+{
+    return signal_received_;
 }
 
 } // namespace internal

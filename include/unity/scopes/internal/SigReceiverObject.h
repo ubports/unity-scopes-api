@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/util/DefinesPtrs.h>
 
+#include <core/signal.h>
+
 namespace unity
 {
 
@@ -36,7 +38,7 @@ class SigReceiverObject : public AbstractObject
 public:
     UNITY_DEFINES_PTRS(SigReceiverObject);
 
-    enum Signal
+    enum SignalType
     {
         ScopeStarting,
         ScopeRunning,
@@ -46,9 +48,12 @@ public:
     SigReceiverObject();
     virtual ~SigReceiverObject();
 
-    void push_signal(Signal const& signal);
+    void push_signal(SignalType const& signal);
+
+    core::Signal<SignalType> const& signal_received() const;
 
 private:
+    core::Signal<SignalType> signal_received_;
 };
 
 } // namespace internal

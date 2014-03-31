@@ -61,7 +61,7 @@ void SigReceiverI::push_signal_(Current const&,
     auto delegate = std::dynamic_pointer_cast<SigReceiverObject>(del());
     auto req = in_params.getAs<capnproto::SigReceiver::PushSignalRequest>();
     auto s = req.getSignal();
-    SigReceiverObject::Signal signal;
+    SigReceiverObject::SignalType signal;
     switch (s)
     {
         case capnproto::SigReceiver::Signal::SCOPE_STARTING:
