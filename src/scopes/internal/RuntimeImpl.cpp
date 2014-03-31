@@ -45,11 +45,14 @@ namespace scopes
 namespace internal
 {
 
-RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
-    destroyed_(false),
-    scope_id_(scope_id)
+RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
-    if (scope_id.empty())
+    lock_guard<mutex> lock(mutex_);
+
+    destroyed_ = false;
+
+    scope_id_ = scope_id;
+    if (scope_id_.empty())
     {
         UniqueID id;
         scope_id_ = "c-" + id.gen();
@@ -117,41 +120,49 @@ RuntimeImpl::UPtr RuntimeImpl::create(string const& scope_id, string const& conf
 
 void RuntimeImpl::destroy()
 {
-    if (!destroyed_.exchange(true))
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
-        // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
-        // to terminate. Otherwise, it's possible that we exit while threads are still running
-        // with undefined behavior.
+        return;
+    }
+    destroyed_ = true;
 
-        lock_guard<mutex> lock(mutex_);
+    if (future_queue_)
+    {
+        future_queue_->destroy();
+        future_queue_->wait_for_destroy();
+    }
+    async_pool_ = nullptr;
 
-        if (future_queue_)
-        {
-            future_queue_->destroy();
-            future_queue_->wait_for_destroy();
-        }
-        async_pool_ = nullptr;
-
-        registry_ = nullptr;
-        middleware_->stop();
-        middleware_ = nullptr;
-        middleware_factory_.reset(nullptr);
+    if (reply_reaper_)
+    {
+        reply_reaper_->destroy();
         reply_reaper_ = nullptr;
-        if (waiter_thread_.joinable())
-        {
-            waiter_thread_.join();
-        }
+    }
+
+    registry_ = nullptr;
+    middleware_->stop();
+    middleware_->wait_for_shutdown();
+    middleware_ = nullptr;
+    middleware_factory_.reset(nullptr);
+    if (waiter_thread_.joinable())
+    {
+        waiter_thread_.join();
     }
 }
 
 string RuntimeImpl::scope_id() const
 {
+    lock_guard<mutex> lock(mutex_);
     return scope_id_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const
 {
-    if (destroyed_.load())
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
         throw LogicException("factory(): Cannot obtain factory for already destroyed run time");
     }
@@ -160,7 +171,9 @@ MiddlewareFactory const* RuntimeImpl::factory() const
 
 RegistryProxy RuntimeImpl::registry() const
 {
-    if (destroyed_.load())
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
         throw LogicException("registry(): Cannot obtain registry for already destroyed run time");
     }
@@ -173,21 +186,25 @@ RegistryProxy RuntimeImpl::registry() const
 
 string RuntimeImpl::registry_configfile() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_configfile_;
 }
 
 string RuntimeImpl::registry_identity() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_identity_;
 }
 
 string RuntimeImpl::registry_endpointdir() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_endpointdir_;
 }
 
 string RuntimeImpl::registry_endpoint() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_endpoint_;
 }
 

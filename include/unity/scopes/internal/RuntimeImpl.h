@@ -25,8 +25,6 @@
 #include <unity/scopes/internal/ThreadPool.h>
 #include <unity/scopes/Runtime.h>
 
-#include <atomic>
-
 namespace unity
 {
 
@@ -66,7 +64,7 @@ private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
     void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const;
 
-    std::atomic_bool destroyed_;
+    bool destroyed_;
     std::string scope_id_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;

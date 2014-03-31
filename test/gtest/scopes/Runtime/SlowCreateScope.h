@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TEST_PUSHERSCOPE_H
-#define TEST_PUSHERSCOPE_H
+#ifndef TEST_SLOWCREATESCOPE_H
+#define TEST_SLOWCREATESCOPE_H
 
 #include <unity/scopes/ScopeBase.h>
 
 using namespace std;
 using namespace unity::scopes;
 
-class PusherScope : public ScopeBase
+class SlowCreateScope : public ScopeBase
 {
 public:
     virtual int start(string const&, RegistryProxy const &) override;
@@ -34,7 +34,7 @@ public:
     virtual void run() override;
 
     virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override;
 };
 
 #endif

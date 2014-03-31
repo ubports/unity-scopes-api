@@ -22,20 +22,22 @@
 
 #include <mutex>
 
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/MWScope.h>
-#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Runtime.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
-#include "TestScope.h"
 #include "PusherScope.h"
+#include "SlowCreateScope.h"
+#include "TestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -83,6 +85,7 @@ public:
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
+
     virtual void push(Annotation annotation) override
     {
         EXPECT_EQ(1u, annotation.links().size());
@@ -93,6 +96,7 @@ public:
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
     }
+
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
@@ -105,15 +109,18 @@ public:
         query_complete_ = true;
         cond_.notify_one();
     }
+
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+
     std::shared_ptr<Result> last_result()
     {
         return last_result_;
     }
+
 private:
     bool query_complete_;
     mutex mutex_;
@@ -314,6 +321,58 @@ TEST(Runtime, cardinality)
     receiver->wait_until_finished();
 }
 
+class CancelReceiver : public SearchListenerBase
+{
+public:
+    CancelReceiver()
+        : query_complete_(false)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+        FAIL();
+    }
+
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    {
+        EXPECT_EQ(Cancelled, reason);
+        EXPECT_EQ("", error_message);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
+TEST(Runtime, early_cancel)
+{
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("SlowCreateScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("SlowCreateScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
+
+    // Check that, if a cancel is sent before search() returns on the server side, the
+    // cancel is correcly forwarded to the scope once the real reply proxy arrives
+    // over the wire.
+    auto receiver = make_shared<CancelReceiver>();
+    auto ctrl = scope->search("test", SearchMetadata("unused", "unused"), receiver);
+    ctrl->cancel();
+    receiver->wait_until_finished();
+}
+
 void scope_thread(RuntimeImpl::SPtr const& rt)
 {
     TestScope scope;
@@ -323,6 +382,12 @@ void scope_thread(RuntimeImpl::SPtr const& rt)
 void pusher_thread(RuntimeImpl::SPtr const& rt)
 {
     PusherScope scope;
+    rt->run_scope(&scope);
+}
+
+void slow_create_thread(RuntimeImpl::SPtr const& rt)
+{
+    SlowCreateScope scope;
     rt->run_scope(&scope);
 }
 
@@ -336,6 +401,9 @@ int main(int argc, char **argv)
     RuntimeImpl::SPtr prt = move(RuntimeImpl::create("PusherScope", "Runtime.ini"));
     std::thread pusher_t(pusher_thread, prt);
 
+    RuntimeImpl::SPtr scrt = move(RuntimeImpl::create("SlowCreateScope", "Runtime.ini"));
+    std::thread slow_create_t(slow_create_thread, scrt);
+
     auto rc = RUN_ALL_TESTS();
 
     srt->destroy();
@@ -343,6 +411,9 @@ int main(int argc, char **argv)
 
     prt->destroy();
     pusher_t.join();
+
+    scrt->destroy();
+    slow_create_t.join();
 
     return rc;
 }

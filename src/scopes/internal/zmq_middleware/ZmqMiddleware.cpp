@@ -416,9 +416,9 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
         auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir());
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", qci);
+        auto p = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
-        return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity(), "QueryCtrl"));
+        proxy = ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, p->endpoint(), p->identity(), "QueryCtrl"));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -458,9 +458,9 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
         auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", qi);
+        auto p = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
-        return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity(), "Query"));
+        proxy = ZmqQueryProxy(new ZmqQuery(this, p->endpoint(), p->identity(), "Query"));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -501,9 +501,9 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
         auto adapter = find_adapter(server_name_, runtime()->registry_endpointdir());
         function<void()> df;
-        auto proxy = safe_add(df, adapter, identity, ri);
+        auto p = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
-        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry", twoway_timeout_));
+        proxy = ZmqRegistryProxy(new ZmqRegistry(this, p->endpoint(), p->identity(), "Registry", twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -524,9 +524,9 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
         shared_ptr<ReplyI> ri(make_shared<ReplyI>(reply));
         auto adapter = find_adapter(server_name_ + reply_suffix, config_.public_dir());
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", ri);
+        auto p = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
-        return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity(), "Reply"));
+        proxy = ZmqReplyProxy(new ZmqReply(this, p->endpoint(), p->identity(), "Reply"));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -548,9 +548,9 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
         auto adapter = find_adapter(server_name_, config_.private_dir());
         function<void()> df;
-        auto proxy = safe_add(df, adapter, identity, si);
+        auto p = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
-        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope", twoway_timeout_));
+        proxy = ZmqScopeProxy(new ZmqScope(this, p->endpoint(), p->identity(), "Scope", twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
