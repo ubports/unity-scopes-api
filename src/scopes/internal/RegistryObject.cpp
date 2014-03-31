@@ -47,6 +47,14 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           {
               on_process_death(cp);
           })
+      },
+      signal_recevier_connection_
+      {
+          signal_recevier_.signal_received().connect([this](std::string const& id,
+                                                     SigReceiverObject::SignalType const& s)
+          {
+              on_signal_received(id, s);
+          })
       }
 {
 }
@@ -211,6 +219,13 @@ void RegistryObject::on_process_death(core::posix::Process const& process)
         if (scope_process.second.on_process_death(pid))
             break;
     }
+}
+
+void RegistryObject::on_signal_received(std::string const& scope_id, SigReceiverObject::SignalType const& signal)
+{
+    ///! TODO
+    (void)scope_id;
+    (void)signal;
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)

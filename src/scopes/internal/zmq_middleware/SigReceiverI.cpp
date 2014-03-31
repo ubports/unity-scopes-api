@@ -54,7 +54,7 @@ SigReceiverI::~SigReceiverI()
 {
 }
 
-void SigReceiverI::push_signal_(Current const&,
+void SigReceiverI::push_signal_(Current const& current,
                                 capnp::AnyPointer::Reader& in_params,
                                 capnproto::Response::Builder&)
 {
@@ -84,7 +84,7 @@ void SigReceiverI::push_signal_(Current const&,
             assert(false);
         }
     }
-    delegate->push_signal(signal);
+    delegate->push_signal(signal, to_info(current));
 }
 
 } // namespace zmq_middleware

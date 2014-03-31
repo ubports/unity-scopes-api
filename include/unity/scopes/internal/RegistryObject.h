@@ -23,6 +23,7 @@
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/SigReceiverObject.h>
 
 #include <condition_variable>
 #include <mutex>
@@ -71,6 +72,7 @@ public:
 
 private:
     void on_process_death(core::posix::Process const& process);
+    void on_signal_received(std::string const& scope_id, SigReceiverObject::SignalType const& signal);
 
     class ScopeProcess
     {
@@ -112,6 +114,10 @@ private:
 private:
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
+
+    SigReceiverObject signal_recevier_;
+    core::ScopedConnection signal_recevier_connection_;
+
     mutable std::mutex mutex_;
     MetadataMap scopes_;
     std::map<std::string, ScopeProcess> scope_processes_;

@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/util/DefinesPtrs.h>
 
 #include <core/signal.h>
@@ -48,12 +49,12 @@ public:
     SigReceiverObject();
     virtual ~SigReceiverObject();
 
-    void push_signal(SignalType const& signal);
+    void push_signal(SignalType const& signal, InvokeInfo const& info);
 
-    core::Signal<SignalType> const& signal_received() const;
+    core::Signal<std::string, SignalType> const& signal_received() const;
 
 private:
-    core::Signal<SignalType> signal_received_;
+    core::Signal<std::string, SignalType> signal_received_;
 };
 
 } // namespace internal

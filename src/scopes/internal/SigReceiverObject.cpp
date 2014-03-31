@@ -35,12 +35,12 @@ SigReceiverObject::~SigReceiverObject()
 {
 }
 
-void SigReceiverObject::push_signal(SignalType const& signal)
+void SigReceiverObject::push_signal(SignalType const& signal, const InvokeInfo &info)
 {
-    signal_received_(signal);
+    signal_received_(info.id, signal);
 }
 
-core::Signal<SigReceiverObject::SignalType> const& SigReceiverObject::signal_received() const
+core::Signal<std::string, SigReceiverObject::SignalType> const& SigReceiverObject::signal_received() const
 {
     return signal_received_;
 }
