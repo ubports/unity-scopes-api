@@ -197,9 +197,9 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-bool RegistryObject::is_scope_running( std::string const& scope_id )
+bool RegistryObject::is_scope_running(std::string const& scope_id)
 {
-    auto it = scope_processes_.find( scope_id );
+    auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
         return it->second.state() != ScopeProcess::ProcessState::Stopped;
@@ -223,9 +223,25 @@ void RegistryObject::on_process_death(core::posix::Process const& process)
 
 void RegistryObject::on_signal_received(std::string const& scope_id, SigReceiverObject::SignalType const& signal)
 {
-    ///! TODO
-    (void)scope_id;
-    (void)signal;
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        switch (signal)
+        {
+            case SigReceiverObject::ScopeStarting:
+                it->second.update_state(ScopeProcess::ProcessState::Starting);
+                break;
+            case SigReceiverObject::ScopeRunning:
+                it->second.update_state(ScopeProcess::ProcessState::Running);
+                break;
+            case SigReceiverObject::ScopeStopping:
+                it->second.update_state(ScopeProcess::ProcessState::Stopping);
+                break;
+            default:
+                std::cerr << "RegistryObject::on_signal_received(): unknown signal received from scope: " << scope_id;
+        }
+    }
+    // simply ignore signals from scopes the registry does not monitor
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
@@ -254,6 +270,12 @@ RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
 {
     std::lock_guard<std::mutex> lock(process_mutex_);
     return state_;
+}
+
+void RegistryObject::ScopeProcess::update_state(ProcessState state)
+{
+    std::lock_guard<std::mutex> lock(process_mutex_);
+    update_state_unlocked(state);
 }
 
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const

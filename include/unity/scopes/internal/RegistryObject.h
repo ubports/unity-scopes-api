@@ -68,7 +68,7 @@ public:
     bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
-    bool is_scope_running( std::string const& scope_id );
+    bool is_scope_running(std::string const& scope_id);
 
 private:
     void on_process_death(core::posix::Process const& process);
@@ -87,6 +87,7 @@ private:
         ~ScopeProcess();
 
         ProcessState state() const;
+        void update_state(ProcessState state);
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
         void exec(core::posix::ChildProcess::DeathObserver& death_observer);
