@@ -287,7 +287,8 @@ main(int argc, char* argv[])
         std::thread child_trap_worker([child_trap]() { child_trap->run(); });
 
         // And finally creating our runtime.
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        RuntimeConfig rt_config(config_file);
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
 

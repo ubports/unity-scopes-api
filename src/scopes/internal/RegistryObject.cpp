@@ -406,7 +406,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     else if (state == Stopped && state_ != Stopping )
     {
         cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
-             << "\" closed ungracefully. Either the process crashed or was killed forcefully." << endl;
+             << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
     }
     state_ = state;
     state_change_cond_.notify_all();

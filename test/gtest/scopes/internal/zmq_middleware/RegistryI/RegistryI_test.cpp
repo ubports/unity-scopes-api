@@ -421,6 +421,7 @@ TEST(RegistryI, locate)
 
         RegistryObject::SPtr reg(new RegistryObject(*scope.death_observer));
         mw->add_registry_object(reg_id, reg);
+        mw->add_sig_receiver_object("SigReceiver", reg->sig_receiver());
 
         // configure scopes
         ///! TODO: HACK:

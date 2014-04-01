@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/MWSigReceiver.h>
 #include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
@@ -164,8 +165,9 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
     std::thread trap_worker([trap]() { trap->run(); });
 
     // Retrieve the registry middleware and create a proxy to its signal receiver
-    auto reg_runtime = RuntimeImpl::create("Registry", runtime_config);
-    RegistryConfig reg_conf(reg_runtime->registry_identity(), reg_runtime->registry_configfile());
+    RuntimeConfig rt_config(runtime_config);
+    RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
+    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
     auto reg_sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");
 
