@@ -339,9 +339,6 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
         }
     }
 
-    ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
-    update_state_unlocked(Running);
-
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
     //  3.2. OR if timeout, kill process and throw.
@@ -430,17 +427,20 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
             // scope is taking too long to close, send kill signal
             process_.send_signal(core::posix::Signal::sig_kill, ec);
         }
+
+        // clear the process handle
+        clear_handle_unlocked();
     }
     catch (std::exception const&)
     {
         cerr << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
+
+        // clear the process handle
+        // even on error, the previous handle will be unrecoverable at this point
+        clear_handle_unlocked();
         throw;
     }
-
-    // clear the process handle
-    // even on error, the previous handle will be unrecoverable at this point
-    clear_handle_unlocked();
 }
 
 } // namespace internal

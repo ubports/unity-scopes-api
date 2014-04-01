@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/MWSigReceiver.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
@@ -105,7 +106,7 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_name, runtime_config);
-        auto mw = rt->factory()->create(scope_name, "Zmq", "Zmq.Config"); // TODO: get middleware from config
+        auto mw = rt->factory()->create(scope_name, "Zmq", "Zmq.Config"); ///!TODO: get middleware from config
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, lib_dir + "lib" + scope_name + ".so", rt->registry());
         loader->start();
 
@@ -117,11 +118,22 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
         auto proxy = mw->add_scope_object(scope_name, move(scope));
 
-        trap->signal_raised().connect([loader, mw](core::posix::Signal)
+        // Retrieve the registry middleware, then create a proxy to its signal receiver
+        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create("Registry", runtime_config);
+        MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find("Registry", "Zmq");///!TODO
+        auto sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");///!TODO
+
+        trap->signal_raised().connect([loader, mw, sig_receiver, scope_name](core::posix::Signal)
         {
+            // Inform the registry that this scope is shutting down
+            sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeStopping);
+
             loader->stop();
             mw->stop();
         });
+
+        // Inform the registry that this scope is now ready to service requests
+        sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeRunning);
 
         mw->wait_for_shutdown();
 

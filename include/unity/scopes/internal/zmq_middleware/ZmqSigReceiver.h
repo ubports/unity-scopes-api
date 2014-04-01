@@ -41,11 +41,10 @@ public:
     ZmqSigReceiver(ZmqMiddleware* mw_base,
                    std::string const& endpoint,
                    std::string const& identity,
-                   std::string const& category,
-                   int64_t timeout);
+                   std::string const& category);
     virtual ~ZmqSigReceiver();
 
-    void push_signal(SigReceiverObject::SignalType const& signal) override;
+    void push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal) override;
 };
 
 } // namespace zmq_middleware

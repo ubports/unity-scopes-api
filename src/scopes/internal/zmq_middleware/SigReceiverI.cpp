@@ -38,7 +38,7 @@ namespace zmq_middleware
 
 interface SigReceiver
 {
-    void push_signal(SigReceiverObject::Signal signal);  // oneway
+    void push_signal(std::string const& sender_id, SigReceiverObject::Signal signal);  // oneway
 };
 
 */
@@ -54,12 +54,13 @@ SigReceiverI::~SigReceiverI()
 {
 }
 
-void SigReceiverI::push_signal_(Current const& current,
+void SigReceiverI::push_signal_(Current const&,
                                 capnp::AnyPointer::Reader& in_params,
                                 capnproto::Response::Builder&)
 {
     auto delegate = std::dynamic_pointer_cast<SigReceiverObject>(del());
     auto req = in_params.getAs<capnproto::SigReceiver::PushSignalRequest>();
+    auto sender_id = req.getSenderId();
     auto s = req.getSignal();
     SigReceiverObject::SignalType signal;
     switch (s)
@@ -79,7 +80,7 @@ void SigReceiverI::push_signal_(Current const& current,
             assert(false);
         }
     }
-    delegate->push_signal(signal, to_info(current));
+    delegate->push_signal(sender_id, signal);
 }
 
 } // namespace zmq_middleware

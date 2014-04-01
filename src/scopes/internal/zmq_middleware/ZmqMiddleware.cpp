@@ -28,11 +28,13 @@
 #include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 #include <unity/scopes/internal/zmq_middleware/ReplyI.h>
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
+#include <unity/scopes/internal/zmq_middleware/SigReceiverI.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQuery.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSigReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/RethrowException.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -59,7 +61,7 @@ namespace
 char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
 char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
 char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
-char const* signal_suffix = "-s";  // Appended to server_name_ to create signal adapter name///!
+char const* signal_suffix = "-s"; // Appended to server_name_ to create signal adapter name
 
 } // namespace
 
@@ -407,9 +409,19 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
     return proxy;
 }
 
-MWSigReceiverProxy ZmqMiddleware::create_sig_receiver_proxy(std::string const& identity, std::string const& endpoint)
+MWSigReceiverProxy ZmqMiddleware::create_sig_receiver_proxy(std::string const& identity)
 {
-    ///! TODO
+    MWSigReceiverProxy proxy;
+    try
+    {
+        proxy.reset(new ZmqSigReceiver(this, "ipc://" + config_.private_dir() + "/" +  server_name_ + signal_suffix,
+                                       identity, "SigReceiver"));
+    }
+    catch (zmqpp::exception const& e)
+    {
+        rethrow_zmq_ex(e);
+    }
+    return proxy;
 }
 
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
@@ -588,8 +600,26 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
 
 MWSigReceiverProxy ZmqMiddleware::add_sig_receiver_object(std::string const& identity, SigReceiverObject::SPtr const& sig_receiver)
 {
-    ///! TODO
-    return MWSigReceiverProxy();
+    assert(!identity.empty());
+    assert(sig_receiver);
+
+    MWSigReceiverProxy proxy;
+    try
+    {
+        shared_ptr<SigReceiverI> sri(make_shared<SigReceiverI>(sig_receiver));
+        auto adapter = find_adapter(server_name_ + signal_suffix, config_.private_dir());
+        function<void()> df;
+        auto proxy = safe_add(df, adapter, identity, sri);
+        sig_receiver->set_disconnect_function(df);
+        return ZmqSigReceiverProxy(new ZmqSigReceiver(this, proxy->endpoint(), proxy->identity(), "SigReceiver"));
+    }
+    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    {
+        // TODO: log this
+        cerr << "unexpected exception in add_sig_receiver_object(): " << e.what() << endl;
+        throw;
+    }
+    return proxy;
 }
 
 std::string ZmqMiddleware::get_scope_endpoint()
@@ -710,7 +740,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         pool_size = 1;
         mode = RequestMode::Oneway;
     }
-    else if (has_suffix(name, signal_suffix))///!
+    else if (has_suffix(name, signal_suffix))
     {
         // The signal adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config

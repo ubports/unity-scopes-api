@@ -38,7 +38,7 @@ namespace zmq_middleware
 
 interface SigReceiver
 {
-    void push_signal(SigReceiverObject::Signal signal);  // oneway
+    void push_signal(std::string const& sender_id, SigReceiverObject::Signal signal);  // oneway
 };
 
 */
@@ -46,10 +46,9 @@ interface SigReceiver
 ZmqSigReceiver::ZmqSigReceiver(ZmqMiddleware* mw_base,
                                std::string const& endpoint,
                                std::string const& identity,
-                               std::string const& category,
-                               int64_t timeout) :
+                               std::string const& category) :
     MWObjectProxy(mw_base),
-    ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Twoway, timeout),
+    ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Oneway),
     MWSigReceiver(mw_base)
 {
 }
@@ -58,7 +57,7 @@ ZmqSigReceiver::~ZmqSigReceiver()
 {
 }
 
-void ZmqSigReceiver::push_signal(SigReceiverObject::SignalType const& signal)
+void ZmqSigReceiver::push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "push_signal");
@@ -82,6 +81,7 @@ void ZmqSigReceiver::push_signal(SigReceiverObject::SignalType const& signal)
         }
     }
     in_params.setSignal(s);
+    in_params.setSenderId(sender_id);
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
     future.wait();

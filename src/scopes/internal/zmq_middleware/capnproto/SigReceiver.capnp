@@ -30,5 +30,6 @@ enum Signal
 
 struct PushSignalRequest
 {
-    signal @0 : Signal;
+    senderId @0 : Text;
+    signal @1 : Signal;
 }

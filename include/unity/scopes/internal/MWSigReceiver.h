@@ -34,7 +34,7 @@ namespace internal
 class MWSigReceiver : public virtual MWObjectProxy
 {
 public:
-    virtual void push_signal(SigReceiverObject::SignalType const& signal) = 0;
+    virtual void push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal) = 0;
 
     virtual ~MWSigReceiver();
 

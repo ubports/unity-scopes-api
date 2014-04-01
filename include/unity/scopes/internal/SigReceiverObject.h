@@ -48,7 +48,7 @@ public:
     SigReceiverObject();
     virtual ~SigReceiverObject();
 
-    void push_signal(SignalType const& signal, InvokeInfo const& info);
+    void push_signal(std::string const& sender_id, SignalType const& signal);
 
     core::Signal<std::string, SignalType> const& signal_received() const;
 
