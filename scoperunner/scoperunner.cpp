@@ -124,9 +124,9 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
 
         trap->signal_raised().connect([loader, mw, reg_sig_receiver, scope_name](core::posix::Signal)
         {
+            // Inform the registry that this scope is shutting down
             reg_sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeStopping);
 
-            // Inform the registry that this scope is shutting down
             loader->stop();
             mw->stop();
         });
