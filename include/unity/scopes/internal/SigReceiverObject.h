@@ -41,14 +41,17 @@ public:
 
     enum SignalType
     {
-        ScopeRunning,
+        ScopeReady,
         ScopeStopping
     };
 
     SigReceiverObject();
     virtual ~SigReceiverObject();
 
+    // Remote operation implementations
     void push_signal(std::string const& sender_id, SignalType const& signal);
+
+    // Local methods
     core::Signal<std::string, SignalType> const& signal_received() const;
 
 private:

@@ -24,7 +24,7 @@ $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::SigReceiver"
 
 enum Signal
 {
-    scopeRunning @0;
+    scopeReady @0;
     scopeStopping @1;
 }
 

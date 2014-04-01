@@ -65,9 +65,9 @@ void ZmqSigReceiver::push_signal(std::string const& sender_id, SigReceiverObject
     capnproto::SigReceiver::Signal s;
     switch (signal)
     {
-        case SigReceiverObject::ScopeRunning:
+        case SigReceiverObject::ScopeReady:
         {
-            s = capnproto::SigReceiver::Signal::SCOPE_RUNNING;
+            s = capnproto::SigReceiver::Signal::SCOPE_READY;
             break;
         }
         case SigReceiverObject::ScopeStopping:

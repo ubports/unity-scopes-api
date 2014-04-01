@@ -37,7 +37,7 @@ namespace internal
 {
 
 ///! TODO: get from config
-static const int c_process_wait_timeout = 1000;
+static const int c_process_wait_timeout = 2000;
 
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
     : death_observer_(death_observer),
@@ -234,7 +234,7 @@ void RegistryObject::on_signal_received(std::string const& scope_id, SigReceiver
     {
         switch (signal)
         {
-            case SigReceiverObject::ScopeRunning:
+            case SigReceiverObject::ScopeReady:
                 it->second.update_state(ScopeProcess::ProcessState::Running);
                 break;
             case SigReceiverObject::ScopeStopping:

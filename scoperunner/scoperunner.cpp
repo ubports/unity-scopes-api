@@ -131,8 +131,8 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
             mw->stop();
         });
 
-        // Inform the registry that this scope is now ready to service requests
-        reg_sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeRunning);
+        // Inform the registry that this scope is now ready to process requests
+        reg_sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeReady);
 
         mw->wait_for_shutdown();
 
