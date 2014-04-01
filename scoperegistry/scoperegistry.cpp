@@ -195,7 +195,20 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
 
             RegistryObject::ScopeExecData exec_data;
             exec_data.scope_id = pair.first;
+            // get custom scope runner executable, if not set use default scoperunner
             exec_data.scoperunner_path = scoperunner_path;
+            try
+            {
+                auto custom_exec = sc.scope_runner();
+                if (custom_exec.empty())
+                {
+                    throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
+                }
+                exec_data.scoperunner_path = custom_exec;
+            }
+            catch (NotFoundException const&)
+            {
+            }
             exec_data.runtime_config = config_file;
             exec_data.scope_config = pair.second;
 
