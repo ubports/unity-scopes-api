@@ -395,11 +395,15 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::SSRegistryObject(std::shared_ptr<unity::scopes::internal::MiddlewareBase>, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int, unsigned int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::~SSRegistryObject()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeConfig::RUNTIME_CONFIG_GROUP@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::RuntimeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::~RuntimeConfig()@Base" 0replaceme
  (c++)"unity::scopes::internal::MiddlewareBase::MiddlewareBase(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareBase::~MiddlewareBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::REGISTRY_CONFIG_GROUP@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::RegistryConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::~RegistryConfig()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0replaceme
@@ -411,10 +415,12 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::~ScopeProcess()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::sig_receiver()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::~ScopeExecData()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::add_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::ScopeMetadata const&, unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::is_scope_running(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::on_process_death(core::posix::Process const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::on_signal_received(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::internal::SigReceiverObject::SignalType const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -444,6 +450,9 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::ScopeMetadataImpl(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&, unity::scopes::internal::MiddlewareBase*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::operator=(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::SigReceiverObject::push_signal(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::internal::SigReceiverObject::SignalType const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::SigReceiverObject::SigReceiverObject()@Base" 0replaceme
+ (c++)"unity::scopes::internal::SigReceiverObject::~SigReceiverObject()@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
@@ -616,6 +625,10 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_ssclient() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::list() const@Base" 0replaceme
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::has_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeConfig::registry_identity() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::default_middleware_configfile() const@Base" 0replaceme
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::endpointdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
@@ -648,6 +661,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::scope_id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::invisible() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::serialize() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::SigReceiverObject::signal_received() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
