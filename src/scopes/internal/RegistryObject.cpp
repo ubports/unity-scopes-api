@@ -48,10 +48,11 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
               on_process_death(cp);
           })
       },
-      signal_recevier_connection_
+      sig_receiver_(new SigReceiverObject()),
+      sig_receiver_connection_
       {
-          signal_recevier_.signal_received().connect([this](std::string const& id,
-                                                     SigReceiverObject::SignalType const& s)
+          sig_receiver_->signal_received().connect([this](std::string const& id,
+                                                   SigReceiverObject::SignalType const& s)
           {
               on_signal_received(id, s);
           })
@@ -206,6 +207,11 @@ bool RegistryObject::is_scope_running(std::string const& scope_id)
     }
 
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
+SigReceiverObject::SPtr RegistryObject::sig_receiver()
+{
+    return sig_receiver_;
 }
 
 void RegistryObject::on_process_death(core::posix::Process const& process)

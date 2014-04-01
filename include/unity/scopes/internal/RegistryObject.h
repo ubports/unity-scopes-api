@@ -69,6 +69,7 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
     bool is_scope_running(std::string const& scope_id);
+    SigReceiverObject::SPtr sig_receiver();
 
 private:
     void on_process_death(core::posix::Process const& process);
@@ -116,8 +117,8 @@ private:
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
 
-    SigReceiverObject signal_recevier_;
-    core::ScopedConnection signal_recevier_connection_;
+    SigReceiverObject::SPtr sig_receiver_;
+    core::ScopedConnection sig_receiver_connection_;
 
     mutable std::mutex mutex_;
     MetadataMap scopes_;

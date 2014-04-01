@@ -350,6 +350,7 @@ main(int argc, char* argv[])
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
+        middleware->add_sig_receiver_object("SigReceiver", registry->sig_receiver());///!
 
         // FIXME, HACK HACK HACK HACK
         // The middleware should spawn scope processes with lookup() on demand.

@@ -59,6 +59,7 @@ namespace
 char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
 char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
 char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
+char const* signal_suffix = "-s";  // Appended to server_name_ to create signal adapter name///!
 
 } // namespace
 
@@ -406,6 +407,11 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
     return proxy;
 }
 
+MWSigReceiverProxy ZmqMiddleware::create_sig_receiver_proxy(std::string const& identity, std::string const& endpoint)
+{
+    ///! TODO
+}
+
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
 {
     assert(ctrl);
@@ -580,6 +586,12 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     }
 }
 
+MWSigReceiverProxy ZmqMiddleware::add_sig_receiver_object(std::string const& identity, SigReceiverObject::SPtr const& sig_receiver)
+{
+    ///! TODO
+    return MWSigReceiverProxy();
+}
+
 std::string ZmqMiddleware::get_scope_endpoint()
 {
     return "ipc://" + config_.private_dir() + "/" +  server_name_;
@@ -694,6 +706,13 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     else if (has_suffix(name, reply_suffix))
     {
         // The reply adapter is single- or multi-threaded and supports oneway operations only.
+        // TODO: get pool size from config
+        pool_size = 1;
+        mode = RequestMode::Oneway;
+    }
+    else if (has_suffix(name, signal_suffix))///!
+    {
+        // The signal adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
         mode = RequestMode::Oneway;
