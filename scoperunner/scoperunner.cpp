@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/MWSigReceiver.h>
+#include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
@@ -96,6 +97,9 @@ ThreadSafeQueue<thread::id> finished_threads;
 // Scope thread start function.
 
 void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
+                  MWSigReceiverProxy reg_sig_receiver,
+                  string const& mw_kind,
+                  string const& mw_config,
                   string const& runtime_config,
                   string const& scope_name,
                   string const& lib_dir,
@@ -106,7 +110,7 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_name, runtime_config);
-        auto mw = rt->factory()->create(scope_name, "Zmq", "Zmq.Config"); ///!TODO: get middleware from config
+        auto mw = rt->factory()->create(scope_name, mw_kind, mw_config);
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, lib_dir + "lib" + scope_name + ".so", rt->registry());
         loader->start();
 
@@ -118,22 +122,17 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
         auto proxy = mw->add_scope_object(scope_name, move(scope));
 
-        // Retrieve the registry middleware, then create a proxy to its signal receiver
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create("Registry", runtime_config);
-        MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find("Registry", "Zmq");///!TODO
-        auto sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");///!TODO
-
-        trap->signal_raised().connect([loader, mw, sig_receiver, scope_name](core::posix::Signal)
+        trap->signal_raised().connect([loader, mw, reg_sig_receiver, scope_name](core::posix::Signal)
         {
             // Inform the registry that this scope is shutting down
-            sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeStopping);
+            reg_sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeStopping);
 
             loader->stop();
             mw->stop();
         });
 
         // Inform the registry that this scope is now ready to service requests
-        sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeRunning);
+        reg_sig_receiver->push_signal(scope_name, SigReceiverObject::SignalType::ScopeRunning);
 
         mw->wait_for_shutdown();
 
@@ -165,6 +164,12 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
 
     std::thread trap_worker([trap]() { trap->run(); });
 
+    // Retrieve the registry middleware and create a proxy to its signal receiver
+    auto reg_runtime = RuntimeImpl::create("Registry", runtime_config);
+    RegistryConfig reg_conf(reg_runtime->registry_identity(), reg_runtime->registry_configfile());
+    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
+    auto reg_sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");
+
     for (auto file : config_files)
     {
         string file_name = basename(const_cast<char*>(string(file).c_str()));    // basename() modifies its argument
@@ -182,7 +187,9 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         // We collect exit status from the thread via the future from each promise.
         promise<void> p;
         auto f = p.get_future();
-        thread t(scope_thread, trap, runtime_config, scope_name, dir, move(p));
+        thread t(scope_thread, trap, reg_sig_receiver, reg_conf.mw_kind(), reg_conf.mw_configfile(),
+                 runtime_config, scope_name, dir, move(p));
+
         auto id = t.get_id();
         threads[id] = ThreadFuture { move(t), move(f) };
     }
