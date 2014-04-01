@@ -94,7 +94,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ(nullptr, results[0].other_params["dnd_uri"]);
     EXPECT_EQ("Stuff", results[0].other_params["title"]->as_string());
     EXPECT_EQ(nullptr, results[0].other_params["icon"]);
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", results[0].other_params["art"]->as_string());
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/amazon.png", results[0].other_params["art"]->as_string());
     EXPECT_EQ("cat1", results[0].category->id);
     EXPECT_EQ("Category 1", results[0].category->title);
     EXPECT_EQ("", results[0].category->icon);
@@ -103,7 +103,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("URI2", results[1].uri);
     EXPECT_EQ(nullptr, results[1].other_params["dnd_uri"]);
     EXPECT_EQ("Things", results[1].other_params["title"]->as_string());
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", results[1].other_params["icon"]->as_string());
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/google.png", results[1].other_params["icon"]->as_string());
     EXPECT_EQ(nullptr, results[1].other_params["art"]);
     EXPECT_EQ("cat1", results[1].category->id);
     EXPECT_EQ("Category 1", results[1].category->title);
@@ -114,7 +114,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ(nullptr, results[2].other_params["dnd_uri"]);
     EXPECT_EQ("Category Fail", results[2].other_params["title"]->as_string());
     EXPECT_EQ(nullptr, results[2].other_params["icon"]);
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
     EXPECT_EQ(nullptr, results[2].category);
 }
 
@@ -212,7 +212,7 @@ TEST_F(SmartScopesClientTest, reset_url)
 
     // reset url and check that we now have falback contant url
     EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2", ssc_->url());
+    EXPECT_EQ("https://dash.ubuntu.com/smartscopes/v2", ssc_->url());
 
     // set the environment var
     server_url_env = "SMART_SCOPES_SERVER=http://hello.com/there";
