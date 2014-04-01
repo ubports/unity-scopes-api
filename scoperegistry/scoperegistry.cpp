@@ -154,6 +154,11 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             ScopeConfig sc(pair.second);
+
+            // dirname modifies its argument, so we need a copy of scope ini path.
+            std::vector<char> scope_ini(pair.second.c_str(), pair.second.c_str() + pair.second.size() + 1);
+            const std::string scope_dir(dirname(&scope_ini[0]));
+
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
             mi->set_description(sc.description());
@@ -203,6 +208,10 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 if (custom_exec.empty())
                 {
                     throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
+                }
+                if (custom_exec[0] != '/')
+                {
+                    custom_exec = scope_dir + "/" + custom_exec;
                 }
                 exec_data.scoperunner_path = custom_exec;
             }
