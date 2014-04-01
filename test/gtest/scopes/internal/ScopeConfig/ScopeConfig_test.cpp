@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <gtest/gtest.h>
 
 using namespace unity::scopes;
@@ -39,6 +40,8 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(2, attrs.size());
         EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
+
+        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
     {
         ScopeConfig cfg("configtest2.ini");
@@ -49,6 +52,19 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("an icon", cfg.icon());
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
+
+        EXPECT_EQ(0, cfg.appearance_attributes().size());
+    }
+    {
+        ScopeConfig cfg("configtest3.ini");
+
+        EXPECT_EQ("Scope name", cfg.display_name());
+        EXPECT_EQ("scope art", cfg.art());
+        EXPECT_EQ("Canonical", cfg.author());
+        EXPECT_EQ("an icon", cfg.icon());
+        EXPECT_EQ("a search hint string", cfg.search_hint());
+        EXPECT_EQ("a key", cfg.hot_key());
+        EXPECT_EQ("/my/scope/runner", cfg.scope_runner());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
     }
