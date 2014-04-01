@@ -155,6 +155,12 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
 
 int run_scopes(string const& runtime_config, vector<string> config_files)
 {
+    // Retrieve the registry middleware and create a proxy to its signal receiver
+    auto reg_runtime = RuntimeImpl::create("Registry", runtime_config);
+    RegistryConfig reg_conf(reg_runtime->registry_identity(), reg_runtime->registry_configfile());
+    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
+    auto reg_sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");
+
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
         core::posix::Signal::sig_hup,
@@ -162,12 +168,6 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
     });
 
     std::thread trap_worker([trap]() { trap->run(); });
-
-    // Retrieve the registry middleware and create a proxy to its signal receiver
-    auto reg_runtime = RuntimeImpl::create("Registry", runtime_config);
-    RegistryConfig reg_conf(reg_runtime->registry_identity(), reg_runtime->registry_configfile());
-    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
-    auto reg_sig_receiver = reg_mw->create_sig_receiver_proxy("SigReceiver");
 
     for (auto file : config_files)
     {
