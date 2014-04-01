@@ -71,6 +71,16 @@ string strip_suffix(string const& s, string const& suffix)
     return s;
 }
 
+// if path is an absolute path, just return it. otherwise, append it to scopedir.
+string relative_scope_path_to_abs_path(string const& path, string const& scopedir)
+{
+    if (path.size() > 0 && path[0] != '/')
+    {
+        return scopedir + "/" + path;
+    }
+    return path;
+}
+
 // Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
 // If a Canonical scope is overrideable and the OEM has configured a scope with the
 // same id, the OEM scope overrides the Canonical one.
@@ -167,14 +177,14 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_appearance_attributes(sc.appearance_attributes());
             try
             {
-                mi->set_art(sc.art());
+                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
             }
             catch (NotFoundException const&)
             {
             }
             try
             {
-                mi->set_icon(sc.icon());
+                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir));
             }
             catch (NotFoundException const&)
             {
@@ -209,11 +219,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 {
                     throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
                 }
-                if (custom_exec[0] != '/')
-                {
-                    custom_exec = scope_dir + "/" + custom_exec;
-                }
-                exec_data.scoperunner_path = custom_exec;
+                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir);
             }
             catch (NotFoundException const&)
             {
