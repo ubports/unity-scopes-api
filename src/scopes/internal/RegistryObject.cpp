@@ -67,6 +67,13 @@ RegistryObject::~RegistryObject()
     {
         try
         {
+            // at this point the registry middleware is shutting down, hence we will not receive
+            // "ScopeStopping" signals from dying scopes. We manually set it here as to avoid
+            // outputting bogus error messages.
+            if (is_scope_running(scope_process.first))
+            {
+                scope_process.second.update_state(ScopeProcess::Stopping);
+            }
             scope_process.second.kill();
         }
         catch(std::exception const& e)
@@ -392,6 +399,15 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
 
 void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
 {
+    if (state == state_)
+    {
+        return;
+    }
+    else if (state == Stopped && state_ != Stopping )
+    {
+        cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+             << "\" closed ungracefully. Either the process crashed or was killed forcefully." << endl;
+    }
     state_ = state;
     state_change_cond_.notify_all();
 }
