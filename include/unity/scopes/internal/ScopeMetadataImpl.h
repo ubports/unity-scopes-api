@@ -44,6 +44,7 @@ public:
     ScopeMetadataImpl& operator=(ScopeMetadataImpl&&) = default;
 
     std::string scope_id() const;
+    ScopeType type() const;
     ScopeProxy proxy() const;
     std::string display_name() const;   // localized
     std::string description() const;    // localized
@@ -57,6 +58,7 @@ public:
     std::string scope_directory() const;
 
     void set_scope_id(std::string const& scope_id);
+    void set_type(ScopeType scope_type);
     void set_proxy(ScopeProxy const& proxy);
     void set_display_name(std::string const& display_name);
     void set_description(std::string const& description);
@@ -78,6 +80,7 @@ private:
 
     MiddlewareBase* mw_;
     std::string scope_id_;
+    ScopeType type_;
     ScopeProxy proxy_;
     std::string display_name_;
     std::string description_;

@@ -6,3 +6,4 @@ Author = Canonical Ltd.
 Icon = scope-click.Icon
 SearchHint = scope-click.SearchHint
 HotKey = scope-click.HotKey
+Type = UntrustedLocal

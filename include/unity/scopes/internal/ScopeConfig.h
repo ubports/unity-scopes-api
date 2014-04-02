@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/ConfigBase.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 namespace unity
 {
@@ -41,6 +42,7 @@ public:
     ~ScopeConfig();
 
     bool overrideable() const;           // Optional, returns false if not present
+    ScopeType type() const;              // Optional, returns Trusted if not present
     std::string display_name() const;
     std::string description() const;
     std::string author() const;
@@ -54,6 +56,7 @@ public:
 
 private:
     bool overrideable_;
+    ScopeType type_;
     std::string display_name_;
     std::string description_;
     std::string author_;

@@ -195,7 +195,8 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       map<string, string> const& all_scopes,
                       MiddlewareBase::SPtr const& mw,
                       string const& scoperunner_path,
-                      string const& config_file)
+                      string const& config_file,
+                      bool click)
 {
     for (auto&& pair : all_scopes)
     {
@@ -215,6 +216,13 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
             mi->set_scope_directory(scope_dir);
+
+            if (click && (sc.type() == ScopeType::Trusted))
+            {
+                throw unity::InvalidArgumentException("Invalid type, Trusted for click scope: " + pair.first);
+            }
+            mi->set_type(sc.type());
+
             try
             {
                 mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
@@ -409,9 +417,8 @@ main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
-        // TODO Need to ensure these are run inside confinement
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile());
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile(), false);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile(), true);
         local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {

@@ -72,6 +72,11 @@ string ScopeMetadata::scope_id() const
     return p->scope_id();
 }
 
+ScopeType ScopeMetadata::type() const
+{
+    return p->type();
+}
+
 ScopeProxy ScopeMetadata::proxy() const
 {
     return p->proxy();

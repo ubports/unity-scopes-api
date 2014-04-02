@@ -27,8 +27,16 @@ namespace unity
 namespace scopes
 {
 
+enum class ScopeType
+{
+    Trusted,
+    UntrustedLocal,
+    UntrustedInternet
+};
+
 namespace internal
 {
+
 class ScopeMetadataImpl;
 } // namespace internal
 
@@ -69,6 +77,12 @@ public:
     \return The ID of the scope.
     */
     std::string scope_id() const;
+
+    /**
+    \brief Get the scope type.
+    \return The type of the scope.
+    */
+    ScopeType type() const;
 
     /**
     \brief Get the proxy object for this scope.
