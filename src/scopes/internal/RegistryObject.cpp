@@ -73,8 +73,8 @@ RegistryObject::~RegistryObject()
             if (is_scope_running(scope_process.first))
             {
                 scope_process.second.update_state(ScopeProcess::Stopping);
+                scope_process.second.kill();
             }
-            scope_process.second.kill();
         }
         catch(std::exception const& e)
         {
