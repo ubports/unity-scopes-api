@@ -1,8 +1,9 @@
-unity-scopes-api (0.4.2-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.4.2-0ubuntu2) UNRELEASED; urgency=low
 
   * Added ability for defining custom scope runner path, relative to scope's directories.
+  * Expose scope_directory in ScopeMetadata.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Tue, 01 Apr 2014 13:16:08 +0200
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 02 Apr 2014 19:14:57 +0200
 
 unity-scopes-api (0.4.1+14.04.20140326.1-0ubuntu1) trusty; urgency=low
 
