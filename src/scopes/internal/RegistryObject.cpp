@@ -251,7 +251,7 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
                 std::cerr << "RegistryObject::on_state_received(): unknown state received from scope: " << scope_id;
         }
     }
-    // simply ignore states from scopes the registry does not monitor
+    // simply ignore states from scopes the registry does not know about
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
