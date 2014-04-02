@@ -25,8 +25,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace std;
 using namespace unity;
+using namespace boost;
 
 namespace scoperegistry
 {
@@ -102,15 +105,17 @@ vector<string> find_scope_config_files(string const& install_dir, string const& 
     auto subdirs = find_entries(install_dir, Directory);
     for (auto subdir : subdirs)
     {
-        string scope_id = basename(const_cast<char*>(subdir.c_str()));    // basename() modifies its argument
         auto candidates = find_entries(subdir, File);
         for (auto c : candidates)
         {
-            string config_name = basename(const_cast<char*>(c.c_str()));    // basename() modifies its argument
-            if (config_name == scope_id + suffix)
-            {
-                files.emplace_back(c);
+            //TODO CHECK for multiple ini files
+
+            filesystem::path path(c);
+            if (path.extension() != suffix) {
+                continue;
             }
+
+            files.emplace_back(c);
         }
     }
 

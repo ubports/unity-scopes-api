@@ -39,12 +39,15 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace scoperegistry;
 using namespace std;
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::util;
+using namespace boost;
 
 char const* prog_name;
 
@@ -98,8 +101,9 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     auto config_files = find_scope_config_files(scope_installdir, ".ini");
     for (auto&& path : config_files)
     {
-        string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-        string scope_id = strip_suffix(file_name, ".ini");
+        filesystem::path p(path);
+        string file_name = p.filename().c_str();
+        string scope_id = p.stem().c_str();
         try
         {
             ScopeConfig config(path);
@@ -125,8 +129,9 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
             for (auto&& path : oem_paths)
             {
-                string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-                string scope_id = strip_suffix(file_name, ".ini");
+                filesystem::path p(path);
+                string file_name = p.filename().c_str();
+                string scope_id = p.stem().c_str();
                 if (fixed_scopes.find(scope_id) == fixed_scopes.end())
                 {
                     overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
@@ -147,6 +152,40 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     // Combine fixed_scopes and overrideable_scopes now.
     fixed_scopes.insert(overrideable_scopes.begin(), overrideable_scopes.end());
     return fixed_scopes;
+}
+
+map<string, string> find_click_scopes(map<string, string> const& local_scopes, string const& click_installdir)
+{
+    map<string, string> click_scopes;
+
+    if (!click_installdir.empty())
+    {
+        try
+        {
+            auto click_paths = find_scope_config_files(click_installdir, ".ini");
+            for (auto&& path : click_paths)
+            {
+                filesystem::path p(path);
+                string file_name = p.filename().c_str();
+                string scope_id = p.stem().c_str();
+                if (local_scopes.find(scope_id) == local_scopes.end())
+                {
+                    click_scopes[scope_id] = path;
+                }
+                else
+                {
+                    error("ignoring non-overrideable scope config \"" + file_name + "\" in click directory " + click_installdir);
+                }
+            }
+        }
+        catch (ResourceException const& e)
+        {
+            error(e.what());
+            error("could not open Click installation directory, ignoring Click scopes");
+        }
+    }
+
+    return click_scopes;
 }
 
 // For each scope, open the config file for the scope, create the metadata info from the config,
@@ -315,6 +354,7 @@ main(int argc, char* argv[])
         string mw_configfile;
         string scope_installdir;
         string oem_installdir;
+        string click_installdir;
         string scoperunner_path;
         string ss_reg_id;
         string ss_reg_endpoint;
@@ -325,6 +365,7 @@ main(int argc, char* argv[])
             mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
+            click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
             ss_reg_id = c.ss_registry_identity();
             ss_reg_endpoint = c.ss_registry_endpoint();
@@ -356,6 +397,7 @@ main(int argc, char* argv[])
         // they look for another scope in the registry.
 
         auto local_scopes = find_local_scopes(scope_installdir, oem_installdir);
+        auto click_scopes = find_click_scopes(local_scopes, click_installdir);
 
         // Before we add the local scopes, we check whether any scopes were explicitly specified
         // on the command line. If so, scopes on the command line override scopes in
@@ -368,6 +410,9 @@ main(int argc, char* argv[])
         }
 
         add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
+        // TODO Need to ensure these are run inside confinement
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile());
+        local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
             error("no remote registry configured, only local scopes will be available");

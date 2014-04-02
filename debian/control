@@ -2,6 +2,7 @@ Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
+               click-dev (>= 0.2.2),
                cmake,
                doxygen,
                google-mock,
@@ -11,6 +12,7 @@ Build-Depends: debhelper (>= 9),
                capnproto,
                libprocess-cpp-dev (>= 1.0.0),
                libunity-api-dev (>= 7.80.5~),
+               libboost-filesystem-dev,
                libboost-regex-dev,
                libboost-serialization-dev,
                libcapnp-dev (>= 0.4.0),
