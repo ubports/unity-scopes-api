@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     if (rpid == 0)
     {
         const char* const args[] = {"scoperegistry [Registry test]", TEST_RUNTIME_FILE, nullptr};
-        if (execv(TEST_RUNTIME_PATH "/../../../../scoperegistry/scoperegistry", const_cast<char* const*>(args)) < 0)
+        if (execv(TEST_REGISTRY_PATH "/scoperegistry", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperegistry:");
         }
