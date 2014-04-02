@@ -23,6 +23,7 @@
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/Runtime.h>
+#include <unity/scopes/PreviewReply.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -64,6 +65,7 @@ public:
     {
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
+        reply->push(widgets);
     }
 
 private:
@@ -80,7 +82,7 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
     {
         SearchQueryBase::UPtr query(new MyQuery());
         return query;
@@ -93,7 +95,7 @@ public:
     }
 };
 
-int main(int argc, char **argv)
+int main(int /* argc */, char ** /* argv */)
 {
     MyScope scope;
     auto runtime = Runtime::create_scope_runtime("testscopeB", TEST_RUNTIME_FILE);
