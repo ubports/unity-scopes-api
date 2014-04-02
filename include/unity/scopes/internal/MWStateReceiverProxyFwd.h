@@ -16,7 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/MWSigReceiver.h>
+#ifndef UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H
+
+#include <memory>
 
 namespace unity
 {
@@ -27,17 +30,13 @@ namespace scopes
 namespace internal
 {
 
-MWSigReceiver::MWSigReceiver(MiddlewareBase* mw_base)
-    : MWObjectProxy(mw_base)
-{
-}
-
-MWSigReceiver::~MWSigReceiver()
-{
-}
+class MWStateReceiver;
+typedef std::shared_ptr<MWStateReceiver> MWStateReceiverProxy;
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif // UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H

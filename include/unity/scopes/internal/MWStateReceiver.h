@@ -16,7 +16,11 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/SigReceiverObject.h>
+#ifndef UNITY_SCOPES_INTERNAL_MWSTATERECEIVER_H
+#define UNITY_SCOPES_INTERNAL_MWSTATERECEIVER_H
+
+#include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/StateReceiverObject.h>
 
 namespace unity
 {
@@ -27,26 +31,21 @@ namespace scopes
 namespace internal
 {
 
-SigReceiverObject::SigReceiverObject()
+class MWStateReceiver : public virtual MWObjectProxy
 {
-}
+public:
+    virtual void push_state(std::string const& sender_id, StateReceiverObject::State const& state) = 0;
 
-SigReceiverObject::~SigReceiverObject()
-{
-}
+    virtual ~MWStateReceiver();
 
-void SigReceiverObject::push_signal(std::string const& sender_id, SignalType const& signal)
-{
-    signal_received_(sender_id, signal);
-}
-
-core::Signal<std::string, SigReceiverObject::SignalType> const& SigReceiverObject::signal_received() const
-{
-    return signal_received_;
-}
+protected:
+    MWStateReceiver(MiddlewareBase* mw_base);
+};
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
+
+#endif // UNITY_SCOPES_INTERNAL_MWSTATERECEIVER_H

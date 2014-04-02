@@ -16,9 +16,9 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/zmq_middleware/SigReceiverI.h>
+#include <unity/scopes/internal/zmq_middleware/StateReceiverI.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/SigReceiver.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/StateReceiver.capnp.h>
 
 #include <cassert>
 
@@ -36,43 +36,43 @@ namespace zmq_middleware
 
 /*
 
-interface SigReceiver
+interface StateReceiver
 {
-    void push_signal(std::string const& sender_id, SigReceiverObject::Signal signal);  // oneway
+    void push_state(std::string const& sender_id, StateReceiverObject::State state);  // oneway
 };
 
 */
 
 using namespace std::placeholders;
 
-SigReceiverI::SigReceiverI(SigReceiverObject::SPtr const& sro) :
-    ServantBase(sro, { { "push_signal", bind(&SigReceiverI::push_signal_, this, _1, _2, _3) } })
+StateReceiverI::StateReceiverI(StateReceiverObject::SPtr const& sro) :
+    ServantBase(sro, { { "push_state", bind(&StateReceiverI::push_state_, this, _1, _2, _3) } })
 {
 }
 
-SigReceiverI::~SigReceiverI()
+StateReceiverI::~StateReceiverI()
 {
 }
 
-void SigReceiverI::push_signal_(Current const&,
-                                capnp::AnyPointer::Reader& in_params,
-                                capnproto::Response::Builder&)
+void StateReceiverI::push_state_(Current const&,
+                                 capnp::AnyPointer::Reader& in_params,
+                                 capnproto::Response::Builder&)
 {
-    auto delegate = std::dynamic_pointer_cast<SigReceiverObject>(del());
-    auto req = in_params.getAs<capnproto::SigReceiver::PushSignalRequest>();
+    auto delegate = std::dynamic_pointer_cast<StateReceiverObject>(del());
+    auto req = in_params.getAs<capnproto::StateReceiver::PushStateRequest>();
     auto sender_id = req.getSenderId();
-    auto s = req.getSignal();
-    SigReceiverObject::SignalType signal;
+    auto s = req.getState();
+    StateReceiverObject::State state;
     switch (s)
     {
-        case capnproto::SigReceiver::Signal::SCOPE_READY:
+        case capnproto::StateReceiver::State::SCOPE_READY:
         {
-            signal = SigReceiverObject::ScopeReady;
+            state = StateReceiverObject::ScopeReady;
             break;
         }
-        case capnproto::SigReceiver::Signal::SCOPE_STOPPING:
+        case capnproto::StateReceiver::State::SCOPE_STOPPING:
         {
-            signal = SigReceiverObject::ScopeStopping;
+            state = StateReceiverObject::ScopeStopping;
             break;
         }
         default:
@@ -80,7 +80,7 @@ void SigReceiverI::push_signal_(Current const&,
             assert(false);
         }
     }
-    delegate->push_signal(sender_id, signal);
+    delegate->push_state(sender_id, state);
 }
 
 } // namespace zmq_middleware

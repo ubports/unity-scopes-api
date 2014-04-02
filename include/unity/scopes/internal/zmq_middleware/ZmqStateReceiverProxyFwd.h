@@ -11,16 +11,15 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
-#define UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
 
-#include <unity/scopes/internal/MWObjectProxy.h>
-#include <unity/scopes/internal/SigReceiverObject.h>
+#include <memory>
 
 namespace unity
 {
@@ -31,16 +30,13 @@ namespace scopes
 namespace internal
 {
 
-class MWSigReceiver : public virtual MWObjectProxy
+namespace zmq_middleware
 {
-public:
-    virtual void push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal) = 0;
 
-    virtual ~MWSigReceiver();
+class ZmqStateReceiver;
+typedef std::shared_ptr<ZmqStateReceiver> ZmqStateReceiverProxy;
 
-protected:
-    MWSigReceiver(MiddlewareBase* mw_base);
-};
+} // namespace zmq_middleware
 
 } // namespace internal
 
@@ -48,4 +44,4 @@ protected:
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_MWSIGRECEIVER_H
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H

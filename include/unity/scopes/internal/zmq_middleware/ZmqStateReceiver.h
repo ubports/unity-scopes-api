@@ -16,12 +16,12 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVER_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqSigReceiverProxyFwd.h>
-#include <unity/scopes/internal/MWSigReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqStateReceiverProxyFwd.h>
+#include <unity/scopes/internal/MWStateReceiver.h>
 
 namespace unity
 {
@@ -35,16 +35,16 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqSigReceiver : public virtual ZmqObjectProxy, public virtual MWSigReceiver
+class ZmqStateReceiver : public virtual ZmqObjectProxy, public virtual MWStateReceiver
 {
 public:
-    ZmqSigReceiver(ZmqMiddleware* mw_base,
-                   std::string const& endpoint,
-                   std::string const& identity,
-                   std::string const& category);
-    virtual ~ZmqSigReceiver();
+    ZmqStateReceiver(ZmqMiddleware* mw_base,
+                     std::string const& endpoint,
+                     std::string const& identity,
+                     std::string const& category);
+    virtual ~ZmqStateReceiver();
 
-    void push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal) override;
+    void push_state(std::string const& sender_id, StateReceiverObject::State const& state) override;
 };
 
 } // namespace zmq_middleware
@@ -55,4 +55,4 @@ public:
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVER_H
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H

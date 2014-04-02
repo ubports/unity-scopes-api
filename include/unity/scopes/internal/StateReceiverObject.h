@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
-#define UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_STATERECEIVEROBJECT_H
+#define UNITY_SCOPES_INTERNAL_STATERECEIVEROBJECT_H
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/InvokeInfo.h>
@@ -34,28 +34,28 @@ namespace scopes
 namespace internal
 {
 
-class SigReceiverObject : public AbstractObject
+class StateReceiverObject : public AbstractObject
 {
 public:
-    UNITY_DEFINES_PTRS(SigReceiverObject);
+    UNITY_DEFINES_PTRS(StateReceiverObject);
 
-    enum SignalType
+    enum State
     {
         ScopeReady,
         ScopeStopping
     };
 
-    SigReceiverObject();
-    virtual ~SigReceiverObject();
+    StateReceiverObject();
+    virtual ~StateReceiverObject();
 
     // Remote operation implementations
-    void push_signal(std::string const& sender_id, SignalType const& signal);
+    void push_state(std::string const& sender_id, State const& state);
 
     // Local methods
-    core::Signal<std::string, SignalType> const& signal_received() const;
+    core::Signal<std::string, State> const& state_received() const;
 
 private:
-    core::Signal<std::string, SignalType> signal_received_;
+    core::Signal<std::string, State> state_received_;
 };
 
 } // namespace internal
@@ -64,4 +64,4 @@ private:
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_SIGRECEIVEROBJECT_H
+#endif // UNITY_SCOPES_INTERNAL_STATERECEIVEROBJECT_H

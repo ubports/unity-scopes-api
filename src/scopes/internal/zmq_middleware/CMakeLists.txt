@@ -13,7 +13,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ServantBase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SigReceiverI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantConverter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqConfig.cpp
@@ -27,6 +27,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqSender.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqSigReceiver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqStateReceiver.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

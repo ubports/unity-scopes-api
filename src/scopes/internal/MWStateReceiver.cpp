@@ -11,16 +11,12 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H
-
-#include <unity/scopes/internal/SigReceiverObject.h>
-#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/MWStateReceiver.h>
 
 namespace unity
 {
@@ -31,27 +27,17 @@ namespace scopes
 namespace internal
 {
 
-namespace zmq_middleware
+MWStateReceiver::MWStateReceiver(MiddlewareBase* mw_base)
+    : MWObjectProxy(mw_base)
 {
+}
 
-class SigReceiverI : public ServantBase
+MWStateReceiver::~MWStateReceiver()
 {
-public:
-    SigReceiverI(SigReceiverObject::SPtr const& sro);
-    virtual ~SigReceiverI();
-
-private:
-    virtual void push_signal_(Current const& current,
-                              capnp::AnyPointer::Reader& in_params,
-                              capnproto::Response::Builder& r);
-};
-
-} // namespace zmq_middleware
+}
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SIGRECEIVERI_H

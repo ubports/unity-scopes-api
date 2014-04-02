@@ -48,13 +48,13 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
               on_process_death(cp);
           })
       },
-      sig_receiver_(new SigReceiverObject()),
-      sig_receiver_connection_
+      state_receiver_(new StateReceiverObject()),
+      state_receiver_connection_
       {
-          sig_receiver_->signal_received().connect([this](std::string const& id,
-                                                   SigReceiverObject::SignalType const& s)
+          state_receiver_->state_received().connect([this](std::string const& id,
+                                                    StateReceiverObject::State const& s)
           {
-              on_signal_received(id, s);
+              on_state_received(id, s);
           })
       }
 {
@@ -68,7 +68,7 @@ RegistryObject::~RegistryObject()
         try
         {
             // at this point the registry middleware is shutting down, hence we will not receive
-            // "ScopeStopping" signals from dying scopes. We manually set it here as to avoid
+            // "ScopeStopping" states from dying scopes. We manually set it here as to avoid
             // outputting bogus error messages.
             if (is_scope_running(scope_process.first))
             {
@@ -216,9 +216,9 @@ bool RegistryObject::is_scope_running(std::string const& scope_id)
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
 }
 
-SigReceiverObject::SPtr RegistryObject::sig_receiver()
+StateReceiverObject::SPtr RegistryObject::state_receiver()
 {
-    return sig_receiver_;
+    return state_receiver_;
 }
 
 void RegistryObject::on_process_death(core::posix::Process const& process)
@@ -234,24 +234,24 @@ void RegistryObject::on_process_death(core::posix::Process const& process)
     }
 }
 
-void RegistryObject::on_signal_received(std::string const& scope_id, SigReceiverObject::SignalType const& signal)
+void RegistryObject::on_state_received(std::string const& scope_id, StateReceiverObject::State const& state)
 {
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
-        switch (signal)
+        switch (state)
         {
-            case SigReceiverObject::ScopeReady:
+            case StateReceiverObject::ScopeReady:
                 it->second.update_state(ScopeProcess::ProcessState::Running);
                 break;
-            case SigReceiverObject::ScopeStopping:
+            case StateReceiverObject::ScopeStopping:
                 it->second.update_state(ScopeProcess::ProcessState::Stopping);
                 break;
             default:
-                std::cerr << "RegistryObject::on_signal_received(): unknown signal received from scope: " << scope_id;
+                std::cerr << "RegistryObject::on_state_received(): unknown state received from scope: " << scope_id;
         }
     }
-    // simply ignore signals from scopes the registry does not monitor
+    // simply ignore states from scopes the registry does not monitor
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)

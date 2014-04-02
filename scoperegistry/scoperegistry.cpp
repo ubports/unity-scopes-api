@@ -365,9 +365,9 @@ main(int argc, char* argv[])
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
 
-        // We also add the registry's signal receiver to the middleware so that scopes can inform
+        // We also add the registry's state receiver to the middleware so that scopes can inform
         // the registry of state changes.
-        middleware->add_sig_receiver_object("SigReceiver", registry->sig_receiver());
+        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
         // FIXME, HACK HACK HACK HACK
         // The middleware should spawn scope processes with lookup() on demand.

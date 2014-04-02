@@ -16,10 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H
-
-#include <memory>
+#include <unity/scopes/internal/StateReceiverObject.h>
 
 namespace unity
 {
@@ -30,13 +27,26 @@ namespace scopes
 namespace internal
 {
 
-class MWSigReceiver;
-typedef std::shared_ptr<MWSigReceiver> MWSigReceiverProxy;
+StateReceiverObject::StateReceiverObject()
+{
+}
+
+StateReceiverObject::~StateReceiverObject()
+{
+}
+
+void StateReceiverObject::push_state(std::string const& sender_id, State const& state)
+{
+    state_received_(sender_id, state);
+}
+
+core::Signal<std::string, StateReceiverObject::State> const& StateReceiverObject::state_received() const
+{
+    return state_received_;
+}
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_MWSIGRECEIVERPROXYFWD_H

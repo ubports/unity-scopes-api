@@ -23,7 +23,7 @@
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
-#include <unity/scopes/internal/SigReceiverObject.h>
+#include <unity/scopes/internal/StateReceiverObject.h>
 
 #include <condition_variable>
 #include <mutex>
@@ -69,11 +69,11 @@ public:
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
     bool is_scope_running(std::string const& scope_id);
-    SigReceiverObject::SPtr sig_receiver();
+    StateReceiverObject::SPtr state_receiver();
 
 private:
     void on_process_death(core::posix::Process const& process);
-    void on_signal_received(std::string const& scope_id, SigReceiverObject::SignalType const& signal);
+    void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
 
     class ScopeProcess
     {
@@ -117,8 +117,8 @@ private:
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
 
-    SigReceiverObject::SPtr sig_receiver_;
-    core::ScopedConnection sig_receiver_connection_;
+    StateReceiverObject::SPtr state_receiver_;
+    core::ScopedConnection state_receiver_connection_;
 
     mutable std::mutex mutex_;
     MetadataMap scopes_;

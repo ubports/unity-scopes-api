@@ -20,16 +20,16 @@
 
 using Cxx = import "/capnp/c++.capnp";
 
-$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::SigReceiver");
+$Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::StateReceiver");
 
-enum Signal
+enum State
 {
     scopeReady @0;
     scopeStopping @1;
 }
 
-struct PushSignalRequest
+struct PushStateRequest
 {
     senderId @0 : Text;
-    signal @1 : Signal;
+    state @1 : State;
 }

@@ -16,9 +16,9 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/zmq_middleware/ZmqSigReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqStateReceiver.h>
 
-#include <scopes/internal/zmq_middleware/capnproto/SigReceiver.capnp.h>
+#include <scopes/internal/zmq_middleware/capnproto/StateReceiver.capnp.h>
 
 #include <capnp/message.h>
 
@@ -36,43 +36,43 @@ namespace zmq_middleware
 
 /*
 
-interface SigReceiver
+interface StateReceiver
 {
-    void push_signal(std::string const& sender_id, SigReceiverObject::Signal signal);  // oneway
+    void push_state(std::string const& sender_id, StateReceiverObject::State state);  // oneway
 };
 
 */
 
-ZmqSigReceiver::ZmqSigReceiver(ZmqMiddleware* mw_base,
-                               std::string const& endpoint,
-                               std::string const& identity,
-                               std::string const& category) :
+ZmqStateReceiver::ZmqStateReceiver(ZmqMiddleware* mw_base,
+                                   std::string const& endpoint,
+                                   std::string const& identity,
+                                   std::string const& category) :
     MWObjectProxy(mw_base),
     ZmqObjectProxy(mw_base, endpoint, identity, category, RequestMode::Oneway),
-    MWSigReceiver(mw_base)
+    MWStateReceiver(mw_base)
 {
 }
 
-ZmqSigReceiver::~ZmqSigReceiver()
+ZmqStateReceiver::~ZmqStateReceiver()
 {
 }
 
-void ZmqSigReceiver::push_signal(std::string const& sender_id, SigReceiverObject::SignalType const& signal)
+void ZmqStateReceiver::push_state(std::string const& sender_id, StateReceiverObject::State const& state)
 {
     capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "push_signal");
-    auto in_params = request.initInParams().getAs<capnproto::SigReceiver::PushSignalRequest>();
-    capnproto::SigReceiver::Signal s;
-    switch (signal)
+    auto request = make_request_(request_builder, "push_state");
+    auto in_params = request.initInParams().getAs<capnproto::StateReceiver::PushStateRequest>();
+    capnproto::StateReceiver::State s;
+    switch (state)
     {
-        case SigReceiverObject::ScopeReady:
+        case StateReceiverObject::ScopeReady:
         {
-            s = capnproto::SigReceiver::Signal::SCOPE_READY;
+            s = capnproto::StateReceiver::State::SCOPE_READY;
             break;
         }
-        case SigReceiverObject::ScopeStopping:
+        case StateReceiverObject::ScopeStopping:
         {
-            s = capnproto::SigReceiver::Signal::SCOPE_STOPPING;
+            s = capnproto::StateReceiver::State::SCOPE_STOPPING;
             break;
         }
         default:
@@ -80,7 +80,7 @@ void ZmqSigReceiver::push_signal(std::string const& sender_id, SigReceiverObject
             assert(false);
         }
     }
-    in_params.setSignal(s);
+    in_params.setState(s);
     in_params.setSenderId(sender_id);
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });

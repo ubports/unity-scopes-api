@@ -16,10 +16,11 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_STATERECEIVERI_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_STATERECEIVERI_H
 
-#include <memory>
+#include <unity/scopes/internal/StateReceiverObject.h>
+#include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
 namespace unity
 {
@@ -33,8 +34,17 @@ namespace internal
 namespace zmq_middleware
 {
 
-class ZmqSigReceiver;
-typedef std::shared_ptr<ZmqSigReceiver> ZmqSigReceiverProxy;
+class StateReceiverI : public ServantBase
+{
+public:
+    StateReceiverI(StateReceiverObject::SPtr const& sro);
+    virtual ~StateReceiverI();
+
+private:
+    virtual void push_state_(Current const& current,
+                             capnp::AnyPointer::Reader& in_params,
+                             capnproto::Response::Builder& r);
+};
 
 } // namespace zmq_middleware
 
@@ -44,4 +54,4 @@ typedef std::shared_ptr<ZmqSigReceiver> ZmqSigReceiverProxy;
 
 } // namespace unity
 
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSIGRECEIVERPROXYFWD_H
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_STATERECEIVERI_H
