@@ -180,6 +180,17 @@ public:
     */
     void swap(Variant& other) noexcept;
 
+    /**@name Serialisation
+    */
+    /**
+    \brief serializes the variant to a JSON encoded string.
+    */
+    std::string serialize_json() const;
+    /**
+    \brief deserializes a JSON encoded string to a Variant.
+    */
+    static Variant deserialize_json(std::string const& json_string);
+
 private:
     Variant(internal::NullVariant const&);
 
