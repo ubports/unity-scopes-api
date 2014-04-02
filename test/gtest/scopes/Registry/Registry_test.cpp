@@ -50,13 +50,13 @@ TEST(Registry, metadata)
     EXPECT_EQ("Canonical Ltd.", meta.author());
     EXPECT_EQ("scope-A.DisplayName", meta.display_name());
     EXPECT_EQ("scope-A.Description", meta.description());
-    EXPECT_EQ("/scope-A.Art", meta.art());
-    EXPECT_EQ("/scope-A.Icon", meta.icon());
+    EXPECT_EQ("/foo/scope-A.Art", meta.art());
+    EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
 
-    const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/scope-B.Art";
-    const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/scope-B.Icon";
+    const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
+    const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
 
     meta = r->get_metadata("testscopeB");
     EXPECT_EQ("testscopeB", meta.scope_id());

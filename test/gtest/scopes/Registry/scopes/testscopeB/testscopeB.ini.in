@@ -1,9 +1,9 @@
 [ScopeConfig]
 DisplayName = scope-B.DisplayName
 Description = scope-B.Description
-Art = scope-B.Art
+Art = data/scope-B.Art
 Author = Canonical Ltd.
-Icon = scope-B.Icon
+Icon = data/scope-B.Icon
 SearchHint = scope-B.SearchHint
 HotKey = scope-B.HotKey
 ScopeRunner = @CMAKE_CURRENT_BINARY_DIR@/testscopeB
