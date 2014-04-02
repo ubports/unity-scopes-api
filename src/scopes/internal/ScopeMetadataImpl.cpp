@@ -75,6 +75,10 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         invisible_.reset(new bool(*other.invisible_));
     }
+    if (other.scope_directory_)
+    {
+        scope_directory_.reset(new string(*other.scope_directory_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -93,6 +97,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         hot_key_.reset(rhs.hot_key_ ? new string(*rhs.hot_key_) : nullptr);
         invisible_.reset(rhs.invisible_ ? new bool(*rhs.invisible_) : nullptr);
         appearance_attributes_ = rhs.appearance_attributes_;
+        scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
     }
     return *this;
 }
@@ -172,6 +177,15 @@ VariantMap ScopeMetadataImpl::appearance_attributes() const
     return appearance_attributes_;
 }
 
+std::string ScopeMetadataImpl::scope_directory() const
+{
+    if (scope_directory_)
+    {
+        return *scope_directory_;
+    }
+   throw NotFoundException("scope directory not set", "scope_directory");
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -225,6 +239,11 @@ void ScopeMetadataImpl::set_invisible(bool invisible)
 void ScopeMetadataImpl::set_appearance_attributes(VariantMap const& appearance_attributes)
 {
     appearance_attributes_ = appearance_attributes;
+}
+
+void ScopeMetadataImpl::set_scope_directory(std::string const& path)
+{
+    scope_directory_.reset(new string(path));
 }
 
 namespace
@@ -281,6 +300,10 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (invisible_)
     {
         var["invisible"] = *invisible_;
+    }
+    if (scope_directory_)
+    {
+        var["scope_dir"] = *scope_directory_;
     }
     if (appearance_attributes_.size() > 0)
     {
@@ -363,6 +386,12 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         hot_key_.reset(new string(it->second.get_string()));
+    }
+
+    it = var.find("scope_dir");
+    if (it != var.end())
+    {
+        scope_directory_.reset(new string(it->second.get_string()));
     }
 
     it = var.find("invisible");

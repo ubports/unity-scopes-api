@@ -76,6 +76,7 @@ ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, Middlewar
     mi->set_author("author " + name);
     mi->set_search_hint("search hint " + name);
     mi->set_hot_key("hot key " + name);
+    mi->set_scope_directory("/foo");
     ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
@@ -439,6 +440,7 @@ TEST(RegistryI, locate)
             mi->set_description(scope_id);
             mi->set_author("Canonical Ltd.");
             mi->set_proxy(proxies[scope_id]);
+            mi->set_scope_directory("/foo");
             auto meta = ScopeMetadataImpl::create(move(mi));
 
             RegistryObject::ScopeExecData exec_data;

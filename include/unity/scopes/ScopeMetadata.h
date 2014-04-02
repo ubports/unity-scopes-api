@@ -133,6 +133,16 @@ public:
     VariantMap appearance_attributes() const;
 
     /**
+    \brief Get directory where scope config files and .so file lives.
+
+    Note that the directory is not set for remote scopes; in such case this method throws unity::scopes::NotFoundException.
+
+    \throws unity::scopes::NotFoundException if directory is not set
+    \return path string
+    */
+    std::string scope_directory() const;
+
+    /**
     \brief Return a dictionary of all metadata attributes.
     \return Dictionary of all metadata attributes.
     */
