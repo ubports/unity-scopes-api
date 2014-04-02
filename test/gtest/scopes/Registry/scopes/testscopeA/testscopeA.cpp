@@ -39,7 +39,7 @@ public:
     {
     }
 
-    virtual void run(SearchReplyProxy const& reply) override
+    virtual void run(SearchReplyProxy const&) override
     {
     }
 
@@ -54,7 +54,7 @@ public:
     {
     }
 
-    virtual void run(PreviewReplyProxy const& reply) override
+    virtual void run(PreviewReplyProxy const&) override
     {
     }
 };
