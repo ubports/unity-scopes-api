@@ -91,11 +91,8 @@ int main(int argc, char **argv)
     auto rpid = fork();
     if (rpid == 0)
     {
-        char *args[3];
-        args[0] = "scoperegistry [Registry test]";
-        args[1] = TEST_RUNTIME_FILE;
-        args[2] =  nullptr;
-        if (execv(TEST_RUNTIME_PATH "/../../../../scoperegistry/scoperegistry", args) < 0)
+        const char* const args[] = {"scoperegistry [Registry test]", TEST_RUNTIME_FILE, nullptr};
+        if (execv(TEST_RUNTIME_PATH "/../../../../scoperegistry/scoperegistry", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperegistry:");
         }
