@@ -33,7 +33,7 @@ public:
     virtual void cancelled() override
     {
     }
-    
+
     virtual void run(SearchReplyProxy const& reply) override
     {
         CategoryRenderer rdr;

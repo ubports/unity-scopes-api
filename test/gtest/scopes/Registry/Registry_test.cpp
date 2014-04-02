@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     else if (rpid > 0)
     {
         auto rc = RUN_ALL_TESTS();
-        kill(rpid, SIGSTOP);
+        kill(rpid, SIGTERM);
         return rc;
     }
     else
