@@ -570,6 +570,8 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::Variant::get_bool() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_dict() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_array() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Variant::deserialize_json(std::string const&)@Base" 0replaceme
+ (c++)"unity::scopes::Variant::serialize_json() const@Base" 0replaceme
  (c++)"unity::scopes::Variant::operator==(unity::scopes::Variant const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator<(unity::scopes::Variant const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0.4.0+14.04.20140312.1
