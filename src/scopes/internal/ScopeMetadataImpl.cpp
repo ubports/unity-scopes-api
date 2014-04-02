@@ -183,7 +183,7 @@ std::string ScopeMetadataImpl::scope_directory() const
     {
         return *scope_directory_;
     }
-   throw NotFoundException("scope directory not set", "scope_directory");
+   throw NotFoundException("attribute not set", "scope_directory");
 }
 
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)

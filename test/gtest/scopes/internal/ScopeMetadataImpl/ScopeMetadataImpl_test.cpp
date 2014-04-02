@@ -45,7 +45,6 @@ TEST(ScopeMetadataImpl, basic)
     mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_author("author");
-    mi->set_scope_directory("/foo");
 
     // Keep a copy for tests below
     unique_ptr<ScopeMetadataImpl> mi2(new ScopeMetadataImpl(*mi));
@@ -58,7 +57,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", m.display_name());
     EXPECT_EQ("description", m.description());
     EXPECT_EQ("author", m.author());
-    EXPECT_EQ("/foo", m.scope_directory());
     EXPECT_EQ(0, m.appearance_attributes().size());
 
     // Check that optional fields that are not set throw
@@ -102,6 +100,16 @@ TEST(ScopeMetadataImpl, basic)
         EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.what());
     }
 
+    try
+    {
+        m.scope_directory();
+        FAIL();
+    }
+    catch (NotFoundException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = scope_directory)", e.what());
+    }
+
     // when "invisible" is not set, false is returned
     EXPECT_FALSE(m.invisible());
 
@@ -112,7 +120,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", mi2->display_name());
     EXPECT_EQ("description", mi2->description());
     EXPECT_EQ("author", mi2->author());
-    EXPECT_EQ("/foo", mi2->scope_directory());
     EXPECT_EQ(0, mi2->appearance_attributes().size());
 
     VariantMap attrs;
@@ -125,6 +132,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_hot_key("hot_key");
     mi2->set_invisible(true);
     mi2->set_appearance_attributes(attrs);
+    mi2->set_scope_directory("/foo");
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
