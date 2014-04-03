@@ -134,7 +134,7 @@ void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
 
-    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope);
+    // clear the origin scope ID, ReplyObject with set it anew with correct scope ID (i.e. this scope);
     // this is needed to support the case where aggregator scope just passes the original result
     // upstream - in that case we want the original scope to receive activation.
     origin_.clear();

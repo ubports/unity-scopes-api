@@ -41,6 +41,7 @@ public:
 
     MOCK_METHOD0(endpoint, std::string());
     MOCK_METHOD0(identity, std::string());
+    MOCK_METHOD0(category, std::string());
     MOCK_METHOD0(timeout, int64_t());
     MOCK_METHOD0(to_string, std::string());
 };

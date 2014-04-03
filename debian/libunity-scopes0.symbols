@@ -620,8 +620,8 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::hot_key() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::invisible() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeLoader::scope_base() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeLoader::name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeLoader::libpath() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeLoader::scope_id() const@Base" 0replaceme
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_base_url(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_ssclient() const@Base" 0.4.0+14.04.20140312.1

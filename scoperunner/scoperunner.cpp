@@ -102,7 +102,7 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
                   string const& mw_kind,
                   string const& mw_config,
                   string const& runtime_config,
-                  string const& scope_name,
+                  string const& scope_id,
                   string const& lib_dir,
                   promise<void> finished_promise)
 {
@@ -110,9 +110,9 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
     {
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_name, runtime_config);
-        auto mw = rt->factory()->create(scope_name, mw_kind, mw_config);
-        ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, lib_dir + "lib" + scope_name + ".so", rt->registry());
+        auto rt = RuntimeImpl::create(scope_id, runtime_config);
+        auto mw = rt->factory()->create(scope_id, mw_kind, mw_config);
+        ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
         loader->start();
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
@@ -121,19 +121,19 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
 
         // Create a servant for the scope and register the servant.
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_name, move(scope));
+        auto proxy = mw->add_scope_object(scope_id, move(scope));
 
-        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_name](core::posix::Signal)
+        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_id](core::posix::Signal)
         {
             // Inform the registry that this scope is shutting down
-            reg_state_receiver->push_state(scope_name, StateReceiverObject::State::ScopeStopping);
+            reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
 
             loader->stop();
             mw->stop();
         });
 
         // Inform the registry that this scope is now ready to process requests
-        reg_state_receiver->push_state(scope_name, StateReceiverObject::State::ScopeReady);
+        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
 
         mw->wait_for_shutdown();
 
@@ -180,7 +180,7 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         {
             dir += "/";
         }
-        string scope_name = strip_suffix(file_name, ".ini");
+        string scope_id = strip_suffix(file_name, ".ini");
 
         // For each scope, create a thread that loads the scope and initializes it.
         // Each thread gets a promise to indicate when it is finished. When a thread
@@ -189,7 +189,7 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         promise<void> p;
         auto f = p.get_future();
         thread t(scope_thread, trap, reg_state_receiver, reg_conf.mw_kind(), reg_conf.mw_configfile(),
-                 runtime_config, scope_name, dir, move(p));
+                 runtime_config, scope_id, dir, move(p));
 
         auto id = t.get_id();
         threads[id] = ThreadFuture { move(t), move(f) };
