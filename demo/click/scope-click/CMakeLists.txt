@@ -8,7 +8,7 @@ if(CLICK_MODE)
 
     pkg_check_modules(UNITY_SCOPES REQUIRED libunity-scopes>=0.4.0)
     add_definitions(${UNITY_SCOPES_CFLAGS} ${UNITY_SCOPES_CFLAGS_OTHER})
-    
+
     add_definitions(-std=c++11)
 endif(CLICK_MODE)
 
