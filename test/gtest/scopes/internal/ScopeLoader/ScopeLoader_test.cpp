@@ -72,7 +72,7 @@ TEST(ScopeLoader, basic)
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
 
-        EXPECT_EQ("testScope", sl->name());
+        EXPECT_EQ("testScope", sl->scope_id());
         EXPECT_EQ(scope_lib, sl->libpath());
     }
     EXPECT_EQ(1, num_create());
