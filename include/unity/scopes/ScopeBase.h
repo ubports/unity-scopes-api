@@ -69,6 +69,7 @@ class CannedQuery;
 namespace internal
 {
 class ScopeBaseImpl;
+class ScopeLoader;
 }
 
 /**
@@ -262,6 +263,8 @@ protected:
     ScopeBase();
 private:
     std::unique_ptr<internal::ScopeBaseImpl> p;
+
+    friend class internal::ScopeLoader;
     /// @endcond
 };
 

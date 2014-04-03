@@ -74,6 +74,7 @@ TEST(ScopeLoader, basic)
 
         EXPECT_EQ("testScope", sl->name());
         EXPECT_EQ(scope_lib, sl->libpath());
+        EXPECT_EQ(TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader", sl->scope_base()->scope_directory());
     }
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());

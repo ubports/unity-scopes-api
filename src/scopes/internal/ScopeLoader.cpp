@@ -18,9 +18,11 @@
 
 #include <unity/scopes/internal/ScopeLoader.h>
 
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
 
+#include <libgen.h>
 #include <cassert>
 
 using namespace std;
@@ -53,6 +55,11 @@ ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProx
     {
         throw unity::ResourceException("Scope " + scope_id_ + " returned nullptr from " + UNITY_SCOPE_CREATE_SYMSTR);
     }
+
+    // dirname modifies its argument, so we need a copy of scope lib path
+    std::vector<char> scope_lib(libpath.c_str(), libpath.c_str() + libpath.size() + 1);
+    const std::string scope_dir(dirname(&scope_lib[0]));
+    scope_base_->p->set_scope_directory(scope_dir);
 }
 
 ScopeLoader::~ScopeLoader()
