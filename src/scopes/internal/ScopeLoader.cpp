@@ -38,8 +38,8 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProxy const& registry) :
-    scope_id_(name),
+ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath, RegistryProxy const& registry) :
+    scope_id_(scope_id),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
     registry_(registry),
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
@@ -75,9 +75,9 @@ ScopeLoader::~ScopeLoader()
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& name, string const& libpath, RegistryProxy const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath, RegistryProxy const& registry)
 {
-    return UPtr(new ScopeLoader(name, libpath, registry));
+    return UPtr(new ScopeLoader(scope_id, libpath, registry));
 }
 
 void ScopeLoader::unload()
@@ -176,7 +176,7 @@ void ScopeLoader::stop()
     }
 }
 
-string ScopeLoader::name() const noexcept
+string ScopeLoader::scope_id() const noexcept
 {
     return scope_id_;
 }

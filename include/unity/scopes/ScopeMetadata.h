@@ -66,7 +66,7 @@ public:
 
     /**
     \brief Get the scope identifier.
-    \return The name of the scope.
+    \return The ID of the scope.
     */
     std::string scope_id() const;
 

@@ -77,7 +77,7 @@ public:
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
 
-    static UPtr create_scope_runtime(std::string const& scope_name, std::string const& configfile = "");
+    static UPtr create_scope_runtime(std::string const& scope_id, std::string const& configfile = "");
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.

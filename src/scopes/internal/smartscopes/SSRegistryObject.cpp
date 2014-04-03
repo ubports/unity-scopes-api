@@ -109,7 +109,7 @@ MetadataMap SSRegistryObject::list() const
     return scopes_;
 }
 
-ScopeProxy SSRegistryObject::locate(std::string const& /*scope_id*/)
+ObjectProxy SSRegistryObject::locate(std::string const& /*identity*/)
 {
     throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
@@ -286,7 +286,7 @@ bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& m
         throw unity::InvalidArgumentException("SSRegistryObject: Cannot add scope with empty id");
     }
 
-    // store the base url under a scope name key
+    // store the base url under a scope ID key
     urls[metadata.scope_id()] = remotedata.base_url;
 
     // store the scope metadata in scopes_

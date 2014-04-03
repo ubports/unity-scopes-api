@@ -11,17 +11,15 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/lzmqnses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_OBJECT_H
-#define UNITY_SCOPES_TESTING_MOCK_OBJECT_H
+#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
+#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
 
-#include <unity/scopes/Object.h>
-
-#include <gmock/gmock.h>
+#include <memory>
 
 namespace unity
 {
@@ -29,29 +27,21 @@ namespace unity
 namespace scopes
 {
 
-namespace testing
+namespace internal
 {
 
-/// @cond
-
-class MockObject : public virtual Object
+namespace zmq_middleware
 {
-public:
-    MockObject() = default;
 
-    MOCK_METHOD0(endpoint, std::string());
-    MOCK_METHOD0(identity, std::string());
-    MOCK_METHOD0(category, std::string());
-    MOCK_METHOD0(timeout, int64_t());
-    MOCK_METHOD0(to_string, std::string());
-};
+class ZmqStateReceiver;
+typedef std::shared_ptr<ZmqStateReceiver> ZmqStateReceiverProxy;
 
-/// @endcond
+} // namespace zmq_middleware
 
-} // namespace testing
+} // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
 
-#endif
+#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
