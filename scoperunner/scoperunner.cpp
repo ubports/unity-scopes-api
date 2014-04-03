@@ -60,9 +60,7 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
-// One thread for each scope, plus a future that the thread sets when it finishes.
-
-// Run each of the scopes in config_files in a separate thread and wait for each thread to finish.
+// Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return the number of threads that did not terminate normally.
 
 int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
