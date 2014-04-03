@@ -102,8 +102,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     for (auto&& path : config_files)
     {
         filesystem::path p(path);
-        string file_name = p.filename().c_str();
-        string scope_id = p.stem().c_str();
+        string scope_id = p.stem().native();
         try
         {
             ScopeConfig config(path);
@@ -130,8 +129,8 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             for (auto&& path : oem_paths)
             {
                 filesystem::path p(path);
-                string file_name = p.filename().c_str();
-                string scope_id = p.stem().c_str();
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
                 if (fixed_scopes.find(scope_id) == fixed_scopes.end())
                 {
                     overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
@@ -166,8 +165,8 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
             for (auto&& path : click_paths)
             {
                 filesystem::path p(path);
-                string file_name = p.filename().c_str();
-                string scope_id = p.stem().c_str();
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
                 if (local_scopes.find(scope_id) == local_scopes.end())
                 {
                     click_scopes[scope_id] = path;
@@ -412,8 +411,8 @@ main(int argc, char* argv[])
         // configuration files.
         for (auto i = 2; i < argc; ++i)
         {
-            string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
-            string scope_id = strip_suffix(file_name, ".ini");
+            filesystem::path path(argv[i]);
+            string scope_id = path.stem().native();
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
