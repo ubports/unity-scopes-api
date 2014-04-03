@@ -38,7 +38,7 @@ public:
     // Remote operations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
-    virtual ScopeProxy locate(std::string const& scope_id) = 0;
+    virtual ObjectProxy locate(std::string const& identity) = 0;
 
     virtual ~MWRegistry();
 

@@ -50,7 +50,7 @@ public:
     ScopeMetadata get_metadata(std::string const& scope_id) const override;
     MetadataMap list() const override;
 
-    ScopeProxy locate(std::string const& scope_id) override;
+    ObjectProxy locate(std::string const& identity) override;
 
     bool has_scope(std::string const& scope_id) const;
     std::string get_base_url(std::string const& scope_id) const;
