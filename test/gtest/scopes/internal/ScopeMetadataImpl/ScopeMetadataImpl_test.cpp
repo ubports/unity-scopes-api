@@ -234,6 +234,7 @@ TEST(ScopeMetadataImpl, serialize)
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_id("scope_id");
+    mi->set_confinement_type(ConfinementType::UntrustedLocal);
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
     mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_id"));
     mi->set_display_name("display_name");
@@ -251,6 +252,7 @@ TEST(ScopeMetadataImpl, serialize)
     auto var = m.serialize();
     EXPECT_EQ(11u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
+    EXPECT_EQ(ConfinementType::UntrustedLocal, (ConfinementType) var["confinement_type"].get_int());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
     EXPECT_EQ("author", var["author"].get_string());
@@ -264,6 +266,7 @@ TEST(ScopeMetadataImpl, serialize)
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
     EXPECT_EQ("scope_id", c.scope_id());
+    EXPECT_EQ(ConfinementType::UntrustedLocal, c.confinement_type());
     EXPECT_EQ("identity", c.proxy()->identity());
     EXPECT_EQ("endpoint", c.proxy()->endpoint());
     EXPECT_EQ("display_name", c.display_name());
@@ -448,6 +451,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     m["author"] = "author";
 
     // Optional attributes
+    m["confinement_type"] = (int) ConfinementType::UntrustedLocal;
     m["art"] = "art";
     m["icon"] = "icon";
     m["search_hint"] = "search_hint";

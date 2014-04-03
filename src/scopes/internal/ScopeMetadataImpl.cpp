@@ -347,9 +347,6 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     scope_id_ = it->second.get_string();
     throw_on_empty("scope_id", scope_id_);
 
-    it = find_or_throw(var, "confinement_type");
-    confinement_type_ = (ConfinementType) it->second.get_int();
-
     it = find_or_throw(var, "proxy");
     auto proxy = it->second.get_dict();
     auto it2 = proxy.find("identity");
@@ -379,6 +376,9 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     author_ = it->second.get_string();
 
     // Optional fields
+
+    it = var.find("confinement_type");
+    confinement_type_ = (ConfinementType) it->second.get_int();
 
     it = var.find("art");
     if (it != var.end())
