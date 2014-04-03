@@ -27,15 +27,21 @@
 
 export LC_ALL=C
 
+if [ "$#" -ne 1 ]; then
+    echo "Usage: click-build.sh amd64|armhf|..."
+    exit 1
+fi
+
 BZR_SOURCE=${1:-lp:scope-click}
 
-CLICKARCH=amd64
+CLICKARCH="$1"
 rm -rf $CLICKARCH-build
 mkdir $CLICKARCH-build
 cd $CLICKARCH-build
 cmake .. \
     -DCMAKE_INSTALL_PREFIX:PATH=../package \
     -DCLICK_MODE=on \
+    -DCLICK_ARCH="$CLICKARCH" \
     -DBZR_REVNO=$(cd ..; bzr revno) \
     -DBZR_SOURCE="$BZR_SOURCE"
 make install

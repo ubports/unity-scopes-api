@@ -6,5 +6,4 @@ add_test(whitespace
   ${CMAKE_CURRENT_SOURCE_DIR}/check_whitespace.py
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_BINARY_DIR}
-  "${CMAKE_SOURCE_DIR}/demo/click/scope-click/click/manifest.json.in"
 )
