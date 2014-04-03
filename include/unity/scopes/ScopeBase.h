@@ -66,6 +66,11 @@ namespace scopes
 
 class CannedQuery;
 
+namespace internal
+{
+class ScopeBaseImpl;
+}
+
 /**
 \file ScopeBase.h
 \class ScopeBase
@@ -245,9 +250,18 @@ public:
     */
     static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
+    /**
+     \brief Returns directory where the scope files are.
+
+     Note, scope directory is only known after the scope has been instantantiated, e.g. it's not available in the constructor.
+     */
+    std::string scope_directory() const;
+
 protected:
     /// @cond
     ScopeBase();
+private:
+    std::unique_ptr<internal::ScopeBaseImpl> p;
     /// @endcond
 };
 
