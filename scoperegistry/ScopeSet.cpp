@@ -65,23 +65,23 @@ ScopeSet::ScopeSet(const RegistryConfig& c) : p(new ScopeSetPrivate())
         unique_ptr<ScopeConfig> sc(new ScopeConfig(path));
         // basename() modifies its argument
         string file_name = basename(const_cast<char*>(string(path).c_str()));
-        string scope_name = strip_suffix(file_name, ".ini");
+        string scope_id = strip_suffix(file_name, ".ini");
         if (sc->overrideable())
         {
             p->overridable_scopes.insert(path);
         }
-        p->scopes[scope_name] = move(sc);
+        p->scopes[scope_id] = move(sc);
     }
     for (const auto &path : oem_files)
     {
         unique_ptr<ScopeConfig> sc(new ScopeConfig(path));
         string file_name = basename(const_cast<char*>(string(path).c_str()));
-        string scope_name = strip_suffix(file_name, ".ini");
-        if (p->scopes.find(scope_name) != p->scopes.end())
+        string scope_id = strip_suffix(file_name, ".ini");
+        if (p->scopes.find(scope_id) != p->scopes.end())
         {
-            if (p->overridable_scopes.find(scope_name) != p->overridable_scopes.end())
+            if (p->overridable_scopes.find(scope_id) != p->overridable_scopes.end())
             {
-                p->scopes[scope_name] = move(sc);
+                p->scopes[scope_id] = move(sc);
             }
             else
             {
@@ -90,7 +90,7 @@ ScopeSet::ScopeSet(const RegistryConfig& c) : p(new ScopeSetPrivate())
         }
         else
         {
-            p->scopes[scope_name] = move(sc);
+            p->scopes[scope_id] = move(sc);
         }
     }
     // Add click scope parsing here.

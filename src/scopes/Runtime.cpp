@@ -46,9 +46,9 @@ Runtime::UPtr Runtime::create(string const& configfile)
     return UPtr(new Runtime("", configfile));
 }
 
-Runtime::UPtr Runtime::create_scope_runtime(string const& scope_name, string const& configfile)
+Runtime::UPtr Runtime::create_scope_runtime(string const& scope_id, string const& configfile)
 {
-    return UPtr(new Runtime(scope_name, configfile));
+    return UPtr(new Runtime(scope_id, configfile));
 }
 
 

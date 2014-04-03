@@ -173,9 +173,9 @@ class MyActivation : public ActivationQueryBase
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_name, RegistryProxy const&) override
+    virtual int start(string const& scope_id, RegistryProxy const&) override
     {
-        scope_name_ = scope_name;
+        scope_id_ = scope_id;
         return VERSION;
     }
 
@@ -220,13 +220,13 @@ public:
 
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
+        cout << scope_id_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return SearchQueryBase::UPtr(new MyQuery(q, queue));
     }
 
     virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
     {
-        cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
+        cout << scope_id_ << ": activate: \"" << result.uri() << "\"" << endl;
         return ActivationQueryBase::UPtr(new MyActivation());
     }
 
@@ -237,7 +237,7 @@ public:
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     Queue queue;
 };
 

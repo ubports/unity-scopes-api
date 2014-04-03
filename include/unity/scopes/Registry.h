@@ -37,7 +37,7 @@ class RegistryImpl;
 }
 
 /**
-\brief Map for scope name and metadata pairs.
+\brief Map for scope ID and metadata pairs.
 */
 typedef std::map<std::string, ScopeMetadata> MetadataMap;
 
@@ -55,7 +55,7 @@ public:
     /// @endcond
 
     /**
-    \brief Returns the metadata for the scope with the given id.
+    \brief Returns the metadata for the scope with the given ID.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */

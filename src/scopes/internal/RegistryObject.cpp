@@ -130,7 +130,7 @@ MetadataMap RegistryObject::list() const
     return all_scopes;
 }
 
-ScopeProxy RegistryObject::locate(std::string const& scope_id)
+ObjectProxy RegistryObject::locate(std::string const& identity)
 {
     decltype(scopes_.cbegin()) scope_it;
     decltype(scope_processes_.begin()) proc_it;
@@ -138,21 +138,21 @@ ScopeProxy RegistryObject::locate(std::string const& scope_id)
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
         // If the id is empty, it was sent as empty by the remote client.
-        if (scope_id.empty())
+        if (identity.empty())
         {
-            throw unity::InvalidArgumentException("Registry::locate(): Cannot locate scope with empty id");
+            throw unity::InvalidArgumentException("RegistryObject::locate(): Cannot locate scope with empty id");
         }
 
-        scope_it = scopes_.find(scope_id);
+        scope_it = scopes_.find(identity);
         if (scope_it == scopes_.end())
         {
-            throw NotFoundException("Registry::locate(): Tried to locate unknown local scope", scope_id);
+            throw NotFoundException("RegistryObject::locate(): Tried to locate unknown local scope", identity);
         }
 
-        proc_it = scope_processes_.find(scope_id);
+        proc_it = scope_processes_.find(identity);
         if (proc_it == scope_processes_.end())
         {
-            throw NotFoundException("Registry::locate(): Tried to exec unknown local scope", scope_id);
+            throw NotFoundException("RegistryObject::locate(): Tried to exec unknown local scope", identity);
         }
     }
 
