@@ -59,7 +59,7 @@ public:
     // Remote operation implementations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
-    virtual ScopeProxy locate(std::string const& scope_id) override;
+    virtual ObjectProxy locate(std::string const& identity) override;
 
     // Local methods
     bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,

@@ -66,17 +66,17 @@ struct Scope
     std::thread worker;
 } scope;
 
-ScopeMetadata make_meta(const string& name, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
+ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-    mi->set_scope_id(name);
-    mi->set_art("art " + name);
-    mi->set_display_name("display name " + name);
-    mi->set_description("description " + name);
-    mi->set_author("author " + name);
-    mi->set_search_hint("search hint " + name);
-    mi->set_hot_key("hot key " + name);
-    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), name);
+    mi->set_scope_id(scope_id);
+    mi->set_art("art " + scope_id);
+    mi->set_display_name("display name " + scope_id);
+    mi->set_description("description " + scope_id);
+    mi->set_author("author " + scope_id);
+    mi->set_search_hint("search hint " + scope_id);
+    mi->set_hot_key("hot key " + scope_id);
+    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), scope_id);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
 }
@@ -285,17 +285,17 @@ public:
     {
     }
 
-    virtual ScopeProxy locate(string const& scope_id) override
+    virtual ObjectProxy locate(string const& identity) override
     {
-        if (scope_id == "no_such_scope")
+        if (identity == "no_such_scope")
         {
-            throw NotFoundException("no can find", scope_id);
+            throw NotFoundException("no can find", identity);
         }
-        if (scope_id == "error_scope")
+        if (identity == "error_scope")
         {
             throw RegistryException("Couldn't start error_scope");
         }
-        return get_metadata(scope_id).proxy();
+        return get_metadata(identity).proxy();
     }
 };
 
@@ -330,7 +330,7 @@ TEST(RegistryI, locate_mock)
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::locate(): no such scope (name = no_such_scope)",
+        EXPECT_STREQ("unity::scopes::NotFoundException: Registry::locate(): no such object (name = no_such_scope)",
                      e.what());
     }
 
