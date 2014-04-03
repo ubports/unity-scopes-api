@@ -71,6 +71,16 @@ string strip_suffix(string const& s, string const& suffix)
     return s;
 }
 
+// if path is an absolute path, just return it. otherwise, append it to scopedir.
+string relative_scope_path_to_abs_path(string const& path, string const& scopedir)
+{
+    if (path.size() > 0 && path[0] != '/')
+    {
+        return scopedir + "/" + path;
+    }
+    return path;
+}
+
 // Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
 // If a Canonical scope is overrideable and the OEM has configured a scope with the
 // same id, the OEM scope overrides the Canonical one.
@@ -154,6 +164,11 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             ScopeConfig sc(pair.second);
+
+            // dirname modifies its argument, so we need a copy of scope ini path.
+            std::vector<char> scope_ini(pair.second.c_str(), pair.second.c_str() + pair.second.size() + 1);
+            const std::string scope_dir(dirname(&scope_ini[0]));
+
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
             mi->set_description(sc.description());
@@ -162,14 +177,14 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_appearance_attributes(sc.appearance_attributes());
             try
             {
-                mi->set_art(sc.art());
+                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
             }
             catch (NotFoundException const&)
             {
             }
             try
             {
-                mi->set_icon(sc.icon());
+                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir));
             }
             catch (NotFoundException const&)
             {
@@ -204,7 +219,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 {
                     throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
                 }
-                exec_data.scoperunner_path = custom_exec;
+                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir);
             }
             catch (NotFoundException const&)
             {
@@ -287,7 +302,8 @@ main(int argc, char* argv[])
         std::thread child_trap_worker([child_trap]() { child_trap->run(); });
 
         // And finally creating our runtime.
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        RuntimeConfig rt_config(config_file);
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
 
@@ -363,6 +379,10 @@ main(int argc, char* argv[])
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
+
+        // We also add the registry's state receiver to the middleware so that scopes can inform
+        // the registry of state changes.
+        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
         // FIXME, HACK HACK HACK HACK
         // The middleware should spawn scope processes with lookup() on demand.

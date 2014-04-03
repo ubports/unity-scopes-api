@@ -24,11 +24,13 @@
 #include <unity/scopes/internal/MWQueryProxyFwd.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
+#include <unity/scopes/internal/MWStateReceiverProxyFwd.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/QueryCtrlObjectBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/ReplyObjectBase.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
+#include <unity/scopes/internal/StateReceiverObject.h>
 
 namespace unity
 {
@@ -68,6 +70,7 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWQueryCtrlProxy create_query_ctrl_proxy(std::string const& identity, std::string const& endpoint) = 0;
+    virtual MWStateReceiverProxy create_state_receiver_proxy(std::string const& identity) = 0;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) = 0;
     virtual void add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) = 0;
@@ -77,6 +80,7 @@ public:
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) = 0;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
+    virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) = 0;
 
     virtual std::string get_scope_endpoint() = 0;
     virtual std::string get_query_endpoint() = 0;
