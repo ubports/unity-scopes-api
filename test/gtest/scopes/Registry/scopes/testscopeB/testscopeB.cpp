@@ -99,6 +99,6 @@ int main(int /* argc */, char ** /* argv */)
 {
     MyScope scope;
     auto runtime = Runtime::create_scope_runtime("testscopeB", TEST_RUNTIME_FILE);
-    runtime->run_scope(&scope);
+    runtime->run_scope(&scope, TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB.ini");
     return 0;
 }

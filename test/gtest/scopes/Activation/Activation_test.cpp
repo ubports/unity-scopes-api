@@ -507,7 +507,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
 void scope_thread(Runtime::SPtr const& rt)
 {
     TestScope scope;
-    rt->run_scope(&scope);
+    rt->run_scope(&scope, "/");
 }
 
 // does actual activation with a test scope

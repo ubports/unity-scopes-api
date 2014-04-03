@@ -70,6 +70,7 @@ namespace internal
 {
 class ScopeBaseImpl;
 class ScopeLoader;
+class RuntimeImpl;
 }
 
 /**
@@ -265,6 +266,7 @@ private:
     std::unique_ptr<internal::ScopeBaseImpl> p;
 
     friend class internal::ScopeLoader;
+    friend class internal::RuntimeImpl;
     /// @endcond
 };
 
