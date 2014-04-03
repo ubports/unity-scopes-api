@@ -1,4 +1,4 @@
-libunity-scopes.so.0 libunity-scopes0 #MINVER#
+libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Annotation::add_link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
