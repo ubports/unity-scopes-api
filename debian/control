@@ -29,7 +29,7 @@ Homepage: https://launchpad.net/unity-scopes-api
 Vcs-Bzr: lp:unity-scopes-api
 Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 
-Package: libunity-scopes0
+Package: libunity-scopes1
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
@@ -43,7 +43,7 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes0 (= ${binary:Version}),
+Depends: libunity-scopes1 (= ${binary:Version}),
          libunity-api-dev,
          ${misc:Depends},
 Description: Header files for Unity scopes API
