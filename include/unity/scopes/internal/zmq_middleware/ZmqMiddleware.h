@@ -68,6 +68,7 @@ public:
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWQueryCtrlProxy create_query_ctrl_proxy(std::string const& identity, std::string const& endpoint) override;
+    virtual MWStateReceiverProxy create_state_receiver_proxy(std::string const& identity) override;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
     virtual void add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
@@ -77,6 +78,7 @@ public:
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) override;
     virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) override;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
+    virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) override;
 
     virtual std::string get_scope_endpoint() override;
     virtual std::string get_query_endpoint() override;
