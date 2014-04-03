@@ -40,7 +40,7 @@ namespace
 {
     const string overrideable_str = "Override";
     const string scope_id_str = "DisplayName";
-    const string scope_type_str = "Type";
+    const string scope_confinement_type_str = "ConfinementType";
     const string description_str = "Description";
     const string author_str = "Author";
     const string art_str = "Art";
@@ -50,9 +50,9 @@ namespace
     const string invisible_str = "Invisible";
     const string scope_runner_exec = "ScopeRunner";
 
-    const string scope_type_trusted_str = "Trusted";
-    const string scope_type_untrusted_local_str = "UntrustedLocal";
-    const string scope_type_untrusted_internet_str = "UntrustedInternet";
+    const string scope_confinement_type_trusted_str = "Trusted";
+    const string scope_confinement_type_untrusted_local_str = "UntrustedLocal";
+    const string scope_confinement_type_untrusted_internet_str = "UntrustedInternet";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -67,21 +67,21 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         overrideable_ = false;
     }
 
-    type_ = ScopeType::Trusted;
+    confinement_type_ = ConfinementType::Trusted;
     try
     {
-        string type = parser()->get_string(SCOPE_CONFIG_GROUP, scope_type_str);
-        if (type == scope_type_trusted_str)
+        string confinement_type = parser()->get_string(SCOPE_CONFIG_GROUP, scope_confinement_type_str);
+        if (confinement_type == scope_confinement_type_trusted_str)
         {
-            type_ = ScopeType::Trusted;
+            confinement_type_ = ConfinementType::Trusted;
         }
-        else if (type == scope_type_untrusted_local_str)
+        else if (confinement_type == scope_confinement_type_untrusted_local_str)
         {
-            type_ = ScopeType::UntrustedLocal;
+            confinement_type_ = ConfinementType::UntrustedLocal;
         }
-        else if (type == scope_type_untrusted_internet_str)
+        else if (confinement_type == scope_confinement_type_untrusted_internet_str)
         {
-            type_ = ScopeType::UntrustedInternet;
+            confinement_type_ = ConfinementType::UntrustedInternet;
         }
     }
     catch (LogicException const& e)
@@ -169,9 +169,9 @@ bool ScopeConfig::overrideable() const
     return overrideable_;
 }
 
-ScopeType ScopeConfig::type() const
+ConfinementType ScopeConfig::confinement_type() const
 {
-    return type_;
+    return confinement_type_;
 }
 
 string ScopeConfig::display_name() const

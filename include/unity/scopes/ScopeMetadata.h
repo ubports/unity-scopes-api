@@ -27,7 +27,7 @@ namespace unity
 namespace scopes
 {
 
-enum class ScopeType
+enum class ConfinementType
 {
     Trusted,
     UntrustedLocal,
@@ -82,7 +82,7 @@ public:
     \brief Get the scope type.
     \return The type of the scope.
     */
-    ScopeType type() const;
+    ConfinementType confinement_type() const;
 
     /**
     \brief Get the proxy object for this scope.

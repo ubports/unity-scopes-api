@@ -26,7 +26,7 @@
 using namespace std;
 using namespace unity::scopes;
 
-// Example scope A: replies synchronously to a query. (Replies are returned before returning from the run() method.)
+// Example scope-click: Example of a click-packaged scope.
 
 class MyQuery : public SearchQueryBase
 {

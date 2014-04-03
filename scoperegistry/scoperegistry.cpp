@@ -60,26 +60,12 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
-string strip_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
-    {
-        if (s.compare(s_len - suffix_len, suffix_len, suffix) == 0)
-        {
-            return string(s, 0, s_len - suffix_len);
-        }
-    }
-    return s;
-}
-
 // if path is an absolute path, just return it. otherwise, append it to scopedir.
-string relative_scope_path_to_abs_path(string const& path, string const& scopedir)
+filesystem::path relative_scope_path_to_abs_path(filesystem::path const& path, filesystem::path const& scopedir)
 {
-    if (path.size() > 0 && path[0] != '/')
+    if (path.is_relative())
     {
-        return scopedir + "/" + path;
+        return scopedir / path;
     }
     return path;
 }
@@ -202,11 +188,11 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
         try
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-            ScopeConfig sc(pair.second);
+            string scope_config(pair.second);
+            ScopeConfig sc(scope_config);
 
-            // dirname modifies its argument, so we need a copy of scope ini path.
-            std::vector<char> scope_ini(pair.second.c_str(), pair.second.c_str() + pair.second.size() + 1);
-            const std::string scope_dir(dirname(&scope_ini[0]));
+            filesystem::path scope_path(scope_config);
+            filesystem::path scope_dir(scope_path.parent_path());
 
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
@@ -216,22 +202,22 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_appearance_attributes(sc.appearance_attributes());
             mi->set_scope_directory(scope_dir);
 
-            if (click && (sc.type() == ScopeType::Trusted))
+            if (click && (sc.confinement_type() == ConfinementType::Trusted))
             {
                 throw unity::InvalidArgumentException("Invalid type, Trusted for click scope: " + pair.first);
             }
-            mi->set_type(sc.type());
+            mi->set_confinement_type(sc.confinement_type());
 
             try
             {
-                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
+                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
             }
             try
             {
-                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir));
+                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
@@ -266,7 +252,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 {
                     throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
                 }
-                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir);
+                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
             }
             catch (NotFoundException const&)
             {

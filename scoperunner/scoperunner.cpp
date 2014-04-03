@@ -95,14 +95,14 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
 
         // Drop our privileges
         string profile;
-        switch (sc.type())
+        switch (sc.confinement_type())
         {
-            case ScopeType::Trusted:
+            case ConfinementType::Trusted:
                 break;
-            case ScopeType::UntrustedLocal:
+            case ConfinementType::UntrustedLocal:
                 profile = "unity-scope-local";
                 break;
-            case ScopeType::UntrustedInternet:
+            case ConfinementType::UntrustedInternet:
                 profile = "unity-scope-internet";
                 break;
         }

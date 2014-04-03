@@ -72,9 +72,9 @@ string ScopeMetadata::scope_id() const
     return p->scope_id();
 }
 
-ScopeType ScopeMetadata::type() const
+ConfinementType ScopeMetadata::confinement_type() const
 {
-    return p->type();
+    return p->confinement_type();
 }
 
 ScopeProxy ScopeMetadata::proxy() const
