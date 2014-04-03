@@ -65,9 +65,9 @@ remote_scopes_response = '\
 
 search_response = '\
 {"category": {"render_template": "{}", "id": "cat1", "title": "Category 1"}}\r\n\
-{"result": {"cat_id": "cat1", "art": "https://productsearch.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
-{"result": {"cat_id": "cat1", "icon": "https://productsearch.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}\r\n\
-{"result": {"cat_id": "cat2", "art": "https://productsearch.ubuntu.com/imgs/cat_fail.png", "uri": "URI3", "title": "Category Fail"}}'
+{"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
+{"result": {"cat_id": "cat1", "icon": "https://dash.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}\r\n\
+{"result": {"cat_id": "cat2", "art": "https://dash.ubuntu.com/imgs/cat_fail.png", "uri": "URI3", "title": "Category Fail"}}'
 
 preview_response = '\
 {"columns": [[["widget_id_A", "widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B"], ["widget_id_C"]]]}\r\n\
