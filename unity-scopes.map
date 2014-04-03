@@ -12,11 +12,13 @@ global:
         unity::scopes::internal::RegistryConfig::*;
         unity::scopes::internal::RegistryObject::*;
         unity::scopes::internal::RuntimeImpl::*;
+        unity::scopes::internal::RuntimeConfig::*;
         unity::scopes::internal::ScopeConfig::*;
         unity::scopes::internal::ScopeImpl::*;
         unity::scopes::internal::ScopeLoader::*;
         unity::scopes::internal::ScopeMetadataImpl::*;
         unity::scopes::internal::ScopeObject::*;
+        unity::scopes::internal::StateReceiverObject::*;
         unity::scopes::internal::smartscopes::SSRegistryObject::*;
         unity::scopes::internal::smartscopes::SSScopeObject::*;
     };

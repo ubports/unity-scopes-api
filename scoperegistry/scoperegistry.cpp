@@ -302,7 +302,8 @@ main(int argc, char* argv[])
         std::thread child_trap_worker([child_trap]() { child_trap->run(); });
 
         // And finally creating our runtime.
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        RuntimeConfig rt_config(config_file);
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
 
@@ -378,6 +379,10 @@ main(int argc, char* argv[])
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
+
+        // We also add the registry's state receiver to the middleware so that scopes can inform
+        // the registry of state changes.
+        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
         // FIXME, HACK HACK HACK HACK
         // The middleware should spawn scope processes with lookup() on demand.

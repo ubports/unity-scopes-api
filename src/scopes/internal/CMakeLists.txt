@@ -33,6 +33,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWStateReceiver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
@@ -62,6 +63,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
