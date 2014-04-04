@@ -61,7 +61,7 @@ void error(string const& msg)
 }
 
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
-// Return the number of threads that did not terminate normally.
+// Return exit status for main to use.
 
 int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
 {
@@ -83,7 +83,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     string lib_dir = scope_config.parent_path().native();
     string scope_id = scope_config.stem().native();
 
-    int num_errors = 0;
+    int exit_status = 1;
     try
     {
         // Instantiate the run time, create the middleware, load the scope from its
@@ -147,16 +147,16 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         // Collect exit status from the run thread. If this throws, the ScopeLoader
         // destructor will still call stop() on the scope.
         run_future.get();
+
+        exit_status = 0;
     }
     catch (std::exception const& e)
     {
         error(e.what());
-        ++num_errors;
     }
     catch (...)
     {
         error("unknown exception");
-        ++num_errors;
     }
 
     trap->stop();
@@ -164,7 +164,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     if (trap_worker.joinable())
         trap_worker.join();
 
-    return num_errors;
+    return exit_status;
 }
 
 } // namespace
