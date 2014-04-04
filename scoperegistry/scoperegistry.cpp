@@ -200,7 +200,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
-            mi->set_scope_directory(scope_dir);
+            mi->set_scope_directory(scope_dir.native());
 
             if (click && (sc.confinement_type() == ConfinementType::Trusted))
             {
