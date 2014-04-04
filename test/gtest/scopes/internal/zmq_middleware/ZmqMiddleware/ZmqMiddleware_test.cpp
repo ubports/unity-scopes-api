@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -44,9 +45,10 @@ TEST(ZmqMiddleware, basic)
 
 TEST(ZmqMiddleware, string_to_proxy)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope",
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     ObjectProxy p;
     ScopeProxy sp;

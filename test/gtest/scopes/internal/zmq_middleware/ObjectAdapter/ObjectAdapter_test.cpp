@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
@@ -281,8 +282,9 @@ public:
 
 TEST(ObjectAdapter, add_remove_find)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
@@ -568,8 +570,9 @@ TEST(ObjectAdapter, corrupt_header)
 
 TEST(ObjectAdapter, invoke_ok)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -620,8 +623,9 @@ public:
 
 TEST(ObjectAdapter, invoke_object_not_exist)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -665,8 +669,9 @@ TEST(ObjectAdapter, invoke_object_not_exist)
 
 TEST(ObjectAdapter, invoke_operation_not_exist)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -785,8 +790,9 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 
 TEST(ObjectAdapter, twoway_threading)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -819,8 +825,9 @@ TEST(ObjectAdapter, twoway_threading)
 
 TEST(ObjectAdapter, oneway_threading)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -890,8 +897,9 @@ public:
 
 TEST(ObjectAdapter, servant_map_destructor)
 {
+    auto rt = RuntimeImpl::create("testscope");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+                     rt.get());
 
     {
         wait();
