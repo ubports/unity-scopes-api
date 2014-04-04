@@ -4,7 +4,7 @@
     "architecture": "@CLICK_ARCH@",
     "hooks": {
         "scope-click": {
-            "unity-scope": "scope-click"
+            "scope": "scope-click"
         }
     },
     "icon": "@CLICK_SCOPE_ICON@",

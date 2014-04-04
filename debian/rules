@@ -16,4 +16,4 @@ override_dh_auto_test:
 	dh_auto_test --max-parallel=1 -- ARGS="--verbose"
 
 override_dh_click:
-	dh_click --name unity-scope
+	dh_click --name scope
