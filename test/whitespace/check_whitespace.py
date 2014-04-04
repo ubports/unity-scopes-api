@@ -102,8 +102,9 @@ try:
             path = os.path.join(root, file)
             ignored = False
             for ignore in ignores:
-                if not (ignore and path.startswith(os.path.abspath(ignore))):
+                if ignore and path.startswith(os.path.abspath(ignore)):
                     ignored = True
+                    break
             if not ignored and pat.match(file) and scan_for_bad_whitespace(path):
                 found_whitespace = True
 
