@@ -86,6 +86,8 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     int num_errors = 0;
     try
     {
+        // Instantiate the run time, create the middleware, load the scope from its
+        // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
