@@ -1,0 +1,8 @@
+[Registry]
+Middleware = Zmq
+Zmq.Endpoint = ipc:///tmp/RegistryTest
+Zmq.EndpointDir = /tmp
+Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
+Scope.InstallDir = @CMAKE_CURRENT_BINARY_DIR@/scopes
+OEM.InstallDir = /unused
+Scoperunner.Path = @PROJECT_BINARY_DIR@/scoperunner/scoperunner

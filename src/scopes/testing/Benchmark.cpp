@@ -167,6 +167,98 @@ void unity::scopes::testing::Benchmark::Result::Timing::enumerate(const unity::s
        enumerator(observation.count());
 }
 
+bool unity::scopes::testing::Benchmark::Result::Timing::is_significantly_faster_than_reference(
+        const unity::scopes::testing::Benchmark::Result::Timing& reference,
+        double alpha) const
+{
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(*this)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Timing sample is not normally distributed."};
+
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(reference)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Reference timing sample is not normally distributed."};
+
+    auto test_result = unity::scopes::testing::StudentsTTest()
+            .two_independent_samples(
+                reference,
+                *this);
+
+    return unity::scopes::testing::HypothesisStatus::not_rejected ==
+            test_result.sample1_mean_gt_sample2_mean(alpha);
+}
+
+bool unity::scopes::testing::Benchmark::Result::Timing::is_significantly_faster_than_reference(
+        double mean,
+        double std_dev,
+        double alpha) const
+{
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(*this)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Timing sample is not normally distributed."};
+
+    auto test_result = unity::scopes::testing::StudentsTTest()
+            .one_sample(*this, mean, std_dev);
+
+    return unity::scopes::testing::HypothesisStatus::not_rejected ==
+            test_result.sample1_mean_lt_sample2_mean(alpha);
+}
+
+bool unity::scopes::testing::Benchmark::Result::Timing::is_significantly_slower_than_reference(
+        const unity::scopes::testing::Benchmark::Result::Timing& reference,
+        double alpha) const
+{
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(*this)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Timing sample is not normally distributed."};
+
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(reference)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Reference timing sample is not normally distributed."};
+
+    auto test_result = unity::scopes::testing::StudentsTTest()
+            .two_independent_samples(
+                reference,
+                *this);
+
+    return unity::scopes::testing::HypothesisStatus::not_rejected ==
+            test_result.sample1_mean_lt_sample2_mean(alpha);
+}
+
+bool unity::scopes::testing::Benchmark::Result::Timing::is_significantly_slower_than_reference(
+        double mean,
+        double std_dev,
+        double alpha) const
+{
+    if (unity::scopes::testing::HypothesisStatus::rejected ==
+            unity::scopes::testing::AndersonDarlingTest()
+            .for_normality(*this)
+            .data_fits_normal_distribution(
+                unity::scopes::testing::Confidence::zero_point_five_percent))
+        throw std::runtime_error{"Timing sample is not normally distributed."};
+
+    auto test_result = unity::scopes::testing::StudentsTTest()
+            .one_sample(*this, mean, std_dev);
+
+    return unity::scopes::testing::HypothesisStatus::not_rejected ==
+            test_result.sample1_mean_gt_sample2_mean(alpha);
+}
+
 bool unity::scopes::testing::operator==(const unity::scopes::testing::Benchmark::Result& lhs, const unity::scopes::testing::Benchmark::Result& rhs)
 {
     return lhs.sample_size == rhs.sample_size &&

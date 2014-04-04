@@ -46,9 +46,9 @@ Runtime::UPtr Runtime::create(string const& configfile)
     return UPtr(new Runtime("", configfile));
 }
 
-Runtime::UPtr Runtime::create_scope_runtime(string const& scope_name, string const& configfile)
+Runtime::UPtr Runtime::create_scope_runtime(string const& scope_id, string const& configfile)
 {
-    return UPtr(new Runtime(scope_name, configfile));
+    return UPtr(new Runtime(scope_id, configfile));
 }
 
 
@@ -62,9 +62,9 @@ RegistryProxy Runtime::registry() const
     return p->registry();
 }
 
-void Runtime::run_scope(ScopeBase *const scope_base)
+void Runtime::run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)
 {
-    p->run_scope(scope_base);
+    p->run_scope(scope_base, scope_ini_file);
 }
 
 ObjectProxy Runtime::string_to_proxy(string const& s) const

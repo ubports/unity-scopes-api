@@ -23,6 +23,8 @@
 
 #include <unity/scopes/internal/DfltConfig.h>
 
+#include <core/posix/signal.h>
+
 #include <cassert>
 #include <signal.h>
 #include <libgen.h>
@@ -74,10 +76,17 @@ int main(int argc, char* argv[])
 
     try
     {
+        auto trap = core::posix::trap_signals_for_all_subsequent_threads(
+        {
+            core::posix::Signal::sig_int,
+            core::posix::Signal::sig_hup,
+            core::posix::Signal::sig_term
+        });
+
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
         std::string ss_scope_id = "SmartScope";
-        uint const no_reply_timeout = 20000;
+        uint const http_reply_timeout = 20000;
         uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
 
         // Instantiate SS registry and scopes runtimes
@@ -93,9 +102,17 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
+        trap->signal_raised().connect([reg_mw, scope_mw](core::posix::Signal)
+        {
+            scope_mw->stop();
+            reg_mw->stop();
+        });
+
+        std::thread trap_worker([trap]() { trap->run(); });
+
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
-                                                        no_reply_timeout, ss_reg_refresh_rate));
+                                                        http_reply_timeout, ss_reg_refresh_rate));
 
         // Instantiate a SS scope object
         SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
@@ -113,6 +130,11 @@ int main(int argc, char* argv[])
         // Wait until shutdown
         scope_mw->wait_for_shutdown();
         reg_mw->wait_for_shutdown();
+
+        trap->stop();
+
+        if (trap_worker.joinable())
+            trap_worker.join();
 
         exit_status = 0;
     }

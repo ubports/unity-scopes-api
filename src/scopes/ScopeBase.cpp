@@ -18,6 +18,7 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 
 namespace unity
 {
@@ -28,6 +29,7 @@ namespace scopes
 //! @cond
 
 ScopeBase::ScopeBase()
+    : p(new internal::ScopeBaseImpl())
 {
 }
 
@@ -57,6 +59,11 @@ void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexce
     v_major = unity::scopes::major_version();
     v_minor = unity::scopes::minor_version();
     v_micro = unity::scopes::micro_version();
+}
+
+std::string ScopeBase::scope_directory() const
+{
+    return p->scope_directory();
 }
 
 } // namespace scopes

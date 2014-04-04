@@ -56,7 +56,7 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS regex serialization REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
-pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
+pkg_check_modules(PROCESS_CPP process-cpp>=1.0.0 REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 find_program(LTTNG_EXECUTABLE lttng)
@@ -176,7 +176,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 4)
-set(UNITY_SCOPES_MICRO 0)
+set(UNITY_SCOPES_MICRO 2)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -316,17 +316,17 @@ add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${CAPNPROTO_S
 set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 # Use the object files to make the normal library.
-set(UNITY_SCOPES_SOVERSION 0)
+set(UNITY_SCOPES_SOVERSION 1)
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
 # Use the object files to make the test library.
 add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 

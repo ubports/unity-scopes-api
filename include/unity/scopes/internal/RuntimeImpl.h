@@ -45,6 +45,7 @@ public:
     void destroy();
 
     std::string scope_id() const;
+    std::string configfile() const;
     MiddlewareFactory const* factory() const;
     RegistryProxy registry() const;
     std::string registry_configfile() const;
@@ -52,7 +53,7 @@ public:
     std::string registry_endpointdir() const;
     std::string registry_endpoint() const;
     Reaper::SPtr reply_reaper() const;
-    void run_scope(ScopeBase *const scope_base);
+    void run_scope(ScopeBase *const scope_base, std::string const &scope_ini_file);
 
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
@@ -64,6 +65,7 @@ private:
 
     std::atomic_bool destroyed_;
     std::string scope_id_;
+    std::string configfile_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
     mutable RegistryProxy registry_;

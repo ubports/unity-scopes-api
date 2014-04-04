@@ -17,12 +17,17 @@
  */
 
 #include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/MWStateReceiver.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
+#include <core/posix/signal.h>
 
 #include <cassert>
 #include <future>
@@ -92,8 +97,12 @@ ThreadSafeQueue<thread::id> finished_threads;
 
 // Scope thread start function.
 
-void scope_thread(string const& runtime_config,
-                  string const& scope_name,
+void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
+                  MWStateReceiverProxy reg_state_receiver,
+                  string const& mw_kind,
+                  string const& mw_config,
+                  string const& runtime_config,
+                  string const& scope_id,
                   string const& lib_dir,
                   promise<void> finished_promise)
 {
@@ -101,9 +110,9 @@ void scope_thread(string const& runtime_config,
     {
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_name, runtime_config);
-        auto mw = rt->factory()->create(scope_name, "Zmq", "Zmq.Config"); // TODO: get middleware from config
-        ScopeLoader::SPtr loader = ScopeLoader::load(scope_name, lib_dir + "lib" + scope_name + ".so", rt->registry());
+        auto rt = RuntimeImpl::create(scope_id, runtime_config);
+        auto mw = rt->factory()->create(scope_id, mw_kind, mw_config);
+        ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
         loader->start();
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
@@ -112,7 +121,19 @@ void scope_thread(string const& runtime_config,
 
         // Create a servant for the scope and register the servant.
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_name, move(scope));
+        auto proxy = mw->add_scope_object(scope_id, move(scope));
+
+        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_id](core::posix::Signal)
+        {
+            // Inform the registry that this scope is shutting down
+            reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
+
+            loader->stop();
+            mw->stop();
+        });
+
+        // Inform the registry that this scope is now ready to process requests
+        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
 
         mw->wait_for_shutdown();
 
@@ -135,6 +156,21 @@ void scope_thread(string const& runtime_config,
 
 int run_scopes(string const& runtime_config, vector<string> config_files)
 {
+    auto trap = core::posix::trap_signals_for_all_subsequent_threads(
+    {
+        core::posix::Signal::sig_hup,
+        core::posix::Signal::sig_term
+    });
+
+    std::thread trap_worker([trap]() { trap->run(); });
+
+    // Retrieve the registry middleware and create a proxy to its state receiver
+    RuntimeConfig rt_config(runtime_config);
+    RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
+    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
+    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
+    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
+
     for (auto file : config_files)
     {
         string file_name = basename(const_cast<char*>(string(file).c_str()));    // basename() modifies its argument
@@ -144,7 +180,7 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         {
             dir += "/";
         }
-        string scope_name = strip_suffix(file_name, ".ini");
+        string scope_id = strip_suffix(file_name, ".ini");
 
         // For each scope, create a thread that loads the scope and initializes it.
         // Each thread gets a promise to indicate when it is finished. When a thread
@@ -152,7 +188,9 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
         // We collect exit status from the thread via the future from each promise.
         promise<void> p;
         auto f = p.get_future();
-        thread t(scope_thread, runtime_config, scope_name, dir, move(p));
+        thread t(scope_thread, trap, reg_state_receiver, reg_conf.mw_kind(), reg_conf.mw_configfile(),
+                 runtime_config, scope_id, dir, move(p));
+
         auto id = t.get_id();
         threads[id] = ThreadFuture { move(t), move(f) };
     }
@@ -180,6 +218,12 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
             ++num_errors;
         }
     }
+
+    trap->stop();
+
+    if (trap_worker.joinable())
+        trap_worker.join();
+
     return num_errors;
 }
 
@@ -188,6 +232,13 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
 int
 main(int argc, char* argv[])
 {
+    // sig masks are inherited by child processes when forked.
+    // we do not want to inherit our parent's (scoperegistry)
+    // sig mask, hence we clear it immediately on entry.
+    sigset_t set;
+    ::sigemptyset(&set);
+    ::pthread_sigmask(SIG_SETMASK, &set, nullptr);
+
     prog_name = basename(argv[0]);
     if (argc < 3)
     {

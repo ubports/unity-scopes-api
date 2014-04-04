@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,43 +13,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_SIGNAL_THREAD_H
-#define SCOPEREGISTRY_SIGNAL_THREAD_H
+#ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
+#define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
-#include <unity/util/NonCopyable.h>
+#include <string>
 
-#include <mutex>
-#include <thread>
-
-#include <sys/types.h>
-
-namespace scoperegistry
+namespace unity
 {
 
-class SignalThread final
+namespace scopes
+{
+
+namespace internal
+{
+
+class ScopeBaseImpl final
 {
 public:
-    NONCOPYABLE(SignalThread);
-
-    SignalThread();
-    ~SignalThread();
-
-    void activate(std::function<void()> callback);
-    void stop();
+    ScopeBaseImpl() = default;
+    ~ScopeBaseImpl() = default;
+    void set_scope_directory(std::string const &path);
+    std::string scope_directory() const;
 
 private:
-    void wait_for_sigs();
-
-    std::mutex mutex_;
-    std::function<void()> callback_;
-    bool done_;
-    std::thread handler_thread_;
-    sigset_t sigs_;
+    std::string scope_directory_;
 };
 
-} // namespace scoperegistry
+} // namespace internal
+
+} // namespace scopes
+
+} // namespace unity
 
 #endif

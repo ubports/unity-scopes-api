@@ -66,7 +66,7 @@ public:
 
     /**
     \brief Get the scope identifier.
-    \return The name of the scope.
+    \return The ID of the scope.
     */
     std::string scope_id() const;
 
@@ -123,6 +123,24 @@ public:
     \return True if this scope is invisible.
     */
     bool invisible() const;             // optional (default = false)
+
+    /**
+    \brief Get optional display attributes.
+
+    Appearance attributes define customized look of the scope in Scopes Scope.
+    \return Map of attributes (may be empty)
+    */
+    VariantMap appearance_attributes() const;
+
+    /**
+    \brief Get directory where scope config files and .so file lives.
+
+    Note that the directory is not set for remote scopes; in such case this method throws unity::scopes::NotFoundException.
+
+    \throws unity::scopes::NotFoundException if directory is not set
+    \return path string
+    */
+    std::string scope_directory() const;
 
     /**
     \brief Return a dictionary of all metadata attributes.

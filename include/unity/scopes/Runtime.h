@@ -77,7 +77,7 @@ public:
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
 
-    static UPtr create_scope_runtime(std::string const& scope_name, std::string const& configfile = "");
+    static UPtr create_scope_runtime(std::string const& scope_id, std::string const& configfile = "");
 
     /**
     \brief Shuts down the run time, reclaiming all associated resources.
@@ -102,8 +102,9 @@ public:
     This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
 
     \param scope_base The scope implementation
+    \param scope_ini_file The full path of scope configuration file
     */
-    void run_scope(ScopeBase *const scope_base);
+    void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file);
 
     // TODO: Flesh out documentation for this, especially syntax.
     /**

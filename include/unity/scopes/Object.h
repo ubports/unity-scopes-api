@@ -54,6 +54,12 @@ public:
     virtual std::string identity() = 0;
 
     /**
+    \brief Returns the category of the target object of this proxy.
+    \return The category of the target of the proxy.
+    */
+    virtual std::string category() = 0;
+
+    /**
     \brief Returns the timeout in milliseconds if this proxy is a twoway proxy.
 
     For oneway proxies and twoway proxies without a timeout, the return value is -1.

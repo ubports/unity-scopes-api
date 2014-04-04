@@ -67,6 +67,11 @@ struct ObjectImpl : public virtual unity::scopes::Object
         return "";
     }
 
+    std::string category() override
+    {
+        return "";
+    }
+
     int64_t timeout() override
     {
         return -1;

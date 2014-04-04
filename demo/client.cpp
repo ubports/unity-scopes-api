@@ -457,7 +457,7 @@ int main(int argc, char* argv[])
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
                 auto target_scope = result->target_scope_proxy();
-                cout << "\tactivation scope name: " << target_scope->to_string() << endl;
+                cout << "\tactivation scope ID: " << target_scope->to_string() << endl;
                 target_scope->preview(*result, metadata, preview_reply);
                 preview_reply->wait_until_finished();
             }

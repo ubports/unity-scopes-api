@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/RegistryConfig.h>
@@ -28,7 +29,11 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <signal.h>
+#include <libgen.h>
+
 #include <cassert>
+#include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
@@ -56,6 +61,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
     }
 
     string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
+    configfile_ = config_file;
 
     try
     {
@@ -135,6 +141,11 @@ string RuntimeImpl::scope_id() const
     return scope_id_;
 }
 
+string RuntimeImpl::configfile() const
+{
+    return configfile_;
+}
+
 MiddlewareFactory const* RuntimeImpl::factory() const
 {
     if (destroyed_.load())
@@ -188,9 +199,16 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     return reply_reaper_;
 }
 
-void RuntimeImpl::run_scope(ScopeBase *const scope_base)
+void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)
 {
     auto mw = factory()->create(scope_id_, "Zmq", "Zmq.ini");
+
+    {
+        // dirname modifies its argument, so we need a copy of scope lib path
+        std::vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
+        const std::string scope_dir(dirname(&scope_ini[0]));
+        scope_base->p->set_scope_directory(scope_dir);
+    }
 
     scope_base->start(scope_id_, registry());
     // Ensure the scope gets stopped.

@@ -40,7 +40,7 @@ public:
     NONCOPYABLE(ScopeLoader);
     UNITY_DEFINES_PTRS(ScopeLoader);
 
-    // Creates a ScopeLoader for a scope with the given name and library. We pass in the registry proxy
+    // Creates a ScopeLoader for a scope with the given ID and library. We pass in the registry proxy
     // so we can pass it to the scope's start method.
     static UPtr load(std::string const& scope_id, std::string const& libpath, RegistryProxy const& registry);
 
@@ -52,8 +52,8 @@ public:
     void start();
     void stop();
 
-    // Returns the scope name
-    std::string name() const noexcept;
+    // Returns the scope ID
+    std::string scope_id() const noexcept;
 
     // Returns the library path for the scope
     std::string libpath() const noexcept;
@@ -64,7 +64,7 @@ public:
     ~ScopeLoader();
 
 private:
-    ScopeLoader(std::string const& name, std::string const& path, RegistryProxy const& registry);
+    ScopeLoader(std::string const& scope_id, std::string const& path, RegistryProxy const& registry);
 
     std::string scope_id_;
     unity::scopes::internal::DynamicLoader::UPtr dyn_loader_;

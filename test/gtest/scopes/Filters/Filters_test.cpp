@@ -74,7 +74,7 @@ public:
 void scope_thread(Runtime::SPtr const& rt)
 {
     TestScope scope;
-    rt->run_scope(&scope);
+    rt->run_scope(&scope, "/");
 }
 
 TEST(Filters, scope)

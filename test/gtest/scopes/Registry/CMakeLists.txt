@@ -1,0 +1,15 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+configure_file(RegistryTest.ini.in ${CMAKE_CURRENT_BINARY_DIR}/RegistryTest.ini)
+configure_file(Runtime.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini)
+configure_file(Zmq.ini.in ${CMAKE_CURRENT_BINARY_DIR}/Zmq.ini)
+
+add_definitions(-DTEST_RUNTIME_PATH="${CMAKE_CURRENT_BINARY_DIR}")
+add_definitions(-DTEST_RUNTIME_FILE="${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini")
+add_definitions(-DTEST_REGISTRY_PATH="${PROJECT_BINARY_DIR}/scoperegistry")
+
+add_executable(Registry_test Registry_test.cpp)
+target_link_libraries(Registry_test ${TESTLIBS})
+
+add_test(Registry Registry_test)
+add_subdirectory(scopes)

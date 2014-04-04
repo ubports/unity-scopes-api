@@ -42,6 +42,7 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     assert(p->proxy());
     assert(!p->display_name().empty());
     assert(!p->description().empty());
+    assert(!p->author().empty());
 }
 
 ScopeMetadata::ScopeMetadata(ScopeMetadata const& other) :
@@ -114,6 +115,16 @@ string ScopeMetadata::hot_key() const
 bool ScopeMetadata::invisible() const
 {
     return p->invisible();
+}
+
+VariantMap ScopeMetadata::appearance_attributes() const
+{
+    return p->appearance_attributes();
+}
+
+std::string ScopeMetadata::scope_directory() const
+{
+    return p->scope_directory();
 }
 
 VariantMap ScopeMetadata::serialize() const
