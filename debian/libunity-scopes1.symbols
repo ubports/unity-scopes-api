@@ -1,4 +1,4 @@
-libunity-scopes.so.0 libunity-scopes0 #MINVER#
+libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Annotation::add_link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -282,7 +282,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::Runtime::create_scope_runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140324
  (c++)"unity::scopes::Runtime::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::destroy()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Runtime::Runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::~Runtime()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::null()@Base" 0.4.0+14.04.20140312.1
@@ -364,7 +364,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::Registry::~Registry()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::destroy()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::run_scope(unity::scopes::ScopeBase*)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeImpl::run_scope(unity::scopes::ScopeBase*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::RuntimeImpl(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::~RuntimeImpl()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::ScopeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -438,6 +438,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_description(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_search_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_display_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_scope_directory(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_appearance_attributes(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::create(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_art(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -513,6 +514,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ScopeMetadata::scope_directory() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::appearance_attributes() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::icon() const@Base" 0.4.0+14.04.20140312.1
@@ -654,6 +656,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::display_name() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::scope_directory() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::appearance_attributes() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::icon() const@Base" 0.4.0+14.04.20140312.1
@@ -665,6 +668,7 @@ libunity-scopes.so.0 libunity-scopes0 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::StateReceiverObject::state_received() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::fwd() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ScopeBase::scope_directory() const@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1

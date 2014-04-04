@@ -54,6 +54,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
+    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
 
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
@@ -67,6 +68,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(bicon, meta.icon());
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
+    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
 
     auto sp = meta.proxy();
 

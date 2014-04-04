@@ -56,6 +56,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp

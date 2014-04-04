@@ -69,6 +69,7 @@ struct Scope
 ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, MiddlewareBase::SPtr const& mw)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+
     mi->set_scope_id(scope_id);
     mi->set_art("art " + scope_id);
     mi->set_display_name("display name " + scope_id);
@@ -76,6 +77,7 @@ ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, Middl
     mi->set_author("author " + scope_id);
     mi->set_search_hint("search hint " + scope_id);
     mi->set_hot_key("hot key " + scope_id);
+    mi->set_scope_directory("/foo");
     ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), scope_id);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
@@ -440,6 +442,7 @@ TEST(RegistryI, locate)
             mi->set_description(scope_id);
             mi->set_author("Canonical Ltd.");
             mi->set_proxy(proxies[scope_id]);
+            mi->set_scope_directory("/foo");
             auto meta = ScopeMetadataImpl::create(move(mi));
 
             RegistryObject::ScopeExecData exec_data;

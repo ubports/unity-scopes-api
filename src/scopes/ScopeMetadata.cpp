@@ -122,6 +122,11 @@ VariantMap ScopeMetadata::appearance_attributes() const
     return p->appearance_attributes();
 }
 
+std::string ScopeMetadata::scope_directory() const
+{
+    return p->scope_directory();
+}
+
 VariantMap ScopeMetadata::serialize() const
 {
     return p->serialize();

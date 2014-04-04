@@ -175,6 +175,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
+            mi->set_scope_directory(scope_dir);
             try
             {
                 mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
