@@ -113,8 +113,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
                 ostringstream message;
                 message << "Couldn't change to AppArmor profile [" << profile
                         << "] error = [" << profile_change_code << "]";
-                error(message.str());
-                // FIXME Exit here
+                throw ConfigException(message.str());
             }
         }
 
