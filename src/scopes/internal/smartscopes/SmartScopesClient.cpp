@@ -28,7 +28,7 @@
 #include <sstream>
 #include <sys/stat.h>
 
-static const std::string c_base_url = "https://productsearch.ubuntu.com/smartscopes/v2";
+static const std::string c_base_url = "https://dash.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
 static const std::string c_search_resource = "/search";
 static const std::string c_preview_resource = "/preview";
