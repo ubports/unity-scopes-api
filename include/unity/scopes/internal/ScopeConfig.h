@@ -42,7 +42,7 @@ public:
     ~ScopeConfig();
 
     bool overrideable() const;           // Optional, returns false if not present
-    ConfinementType confinement_type() const;              // Optional, returns Trusted if not present
+    ConfinementType confinement_type() const; // Optional, returns Trusted if not present
     std::string display_name() const;
     std::string description() const;
     std::string author() const;
