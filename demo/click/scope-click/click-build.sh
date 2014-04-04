@@ -14,15 +14,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Authored by: Michi Henning <michi.henning@canonical.com>
+# Authored by: Pete Woods <pete.woods@canonical.com>
 
-# Simple script to run the code base through astyle, followed by clang-format (which
-# undoes some damage that's done by astyle, without wiping out astyle edits we want
-# to happen).
-#
-# If either program makes a mess of some file such that it won't compile anymore
-# or otherwise gets adorned with unacceptable edits, add the file to the list
-# of files to filter out (grep -v below).
+# Simple script to build a click packaged scope.
 
 
 export LC_ALL=C
@@ -34,16 +28,17 @@ fi
 
 BZR_SOURCE=${1:-lp:scope-click}
 
-CLICKARCH="$1"
-rm -rf $CLICKARCH-build
-mkdir $CLICKARCH-build
-cd $CLICKARCH-build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX:PATH=../package \
-    -DCLICK_MODE=on \
-    -DCLICK_ARCH="$CLICKARCH" \
-    -DBZR_REVNO=$(cd ..; bzr revno) \
-    -DBZR_SOURCE="$BZR_SOURCE"
-make install
-cd ..
+CLICK_ARCH="$1"
+rm -rf "$CLICK_ARCH-build"
+mkdir "$CLICK_ARCH-build"
+(
+    cd "$CLICK_ARCH-build"
+    cmake .. \
+        -DCMAKE_INSTALL_PREFIX:PATH=../package \
+        -DCLICK_MODE=on \
+        -DCLICK_ARCH="$CLICK_ARCH" \
+        -DBZR_REVNO=$(cd ..; bzr revno) \
+        -DBZR_SOURCE="$BZR_SOURCE"
+    make install
+)
 click build package
