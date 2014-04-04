@@ -6,7 +6,7 @@
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
 %:
-	dh $@ --parallel --fail-missing
+	dh $@ --parallel --fail-missing --with click
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DLIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
