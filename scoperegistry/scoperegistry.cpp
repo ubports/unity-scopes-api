@@ -39,12 +39,15 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace scoperegistry;
 using namespace std;
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::util;
+using namespace boost;
 
 char const* prog_name;
 
@@ -57,26 +60,12 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
-string strip_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
-    {
-        if (s.compare(s_len - suffix_len, suffix_len, suffix) == 0)
-        {
-            return string(s, 0, s_len - suffix_len);
-        }
-    }
-    return s;
-}
-
 // if path is an absolute path, just return it. otherwise, append it to scopedir.
-string relative_scope_path_to_abs_path(string const& path, string const& scopedir)
+filesystem::path relative_scope_path_to_abs_path(filesystem::path const& path, filesystem::path const& scopedir)
 {
-    if (path.size() > 0 && path[0] != '/')
+    if (path.is_relative())
     {
-        return scopedir + "/" + path;
+        return scopedir / path;
     }
     return path;
 }
@@ -98,8 +87,8 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     auto config_files = find_scope_config_files(scope_installdir, ".ini");
     for (auto&& path : config_files)
     {
-        string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-        string scope_id = strip_suffix(file_name, ".ini");
+        filesystem::path p(path);
+        string scope_id = p.stem().native();
         try
         {
             ScopeConfig config(path);
@@ -125,8 +114,9 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
             for (auto&& path : oem_paths)
             {
-                string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-                string scope_id = strip_suffix(file_name, ".ini");
+                filesystem::path p(path);
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
                 if (fixed_scopes.find(scope_id) == fixed_scopes.end())
                 {
                     overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
@@ -149,6 +139,40 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     return fixed_scopes;
 }
 
+map<string, string> find_click_scopes(map<string, string> const& local_scopes, string const& click_installdir)
+{
+    map<string, string> click_scopes;
+
+    if (!click_installdir.empty())
+    {
+        try
+        {
+            auto click_paths = find_scope_config_files(click_installdir, ".ini");
+            for (auto&& path : click_paths)
+            {
+                filesystem::path p(path);
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
+                if (local_scopes.find(scope_id) == local_scopes.end())
+                {
+                    click_scopes[scope_id] = path;
+                }
+                else
+                {
+                    error("ignoring non-overrideable scope config \"" + file_name + "\" in click directory " + click_installdir);
+                }
+            }
+        }
+        catch (ResourceException const& e)
+        {
+            error(e.what());
+            error("could not open Click installation directory, ignoring Click scopes");
+        }
+    }
+
+    return click_scopes;
+}
+
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
@@ -156,18 +180,19 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       map<string, string> const& all_scopes,
                       MiddlewareBase::SPtr const& mw,
                       string const& scoperunner_path,
-                      string const& config_file)
+                      string const& config_file,
+                      bool click)
 {
     for (auto&& pair : all_scopes)
     {
         try
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-            ScopeConfig sc(pair.second);
+            string scope_config(pair.second);
+            ScopeConfig sc(scope_config);
 
-            // dirname modifies its argument, so we need a copy of scope ini path.
-            std::vector<char> scope_ini(pair.second.c_str(), pair.second.c_str() + pair.second.size() + 1);
-            const std::string scope_dir(dirname(&scope_ini[0]));
+            filesystem::path scope_path(scope_config);
+            filesystem::path scope_dir(scope_path.parent_path());
 
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
@@ -175,17 +200,24 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
-            mi->set_scope_directory(scope_dir);
+            mi->set_scope_directory(scope_dir.native());
+
+            if (click && (sc.confinement_type() == ConfinementType::Trusted))
+            {
+                throw unity::InvalidArgumentException("Invalid type, Trusted for click scope: " + pair.first);
+            }
+            mi->set_confinement_type(sc.confinement_type());
+
             try
             {
-                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir));
+                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
             }
             try
             {
-                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir));
+                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
@@ -220,7 +252,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 {
                     throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
                 }
-                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir);
+                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
             }
             catch (NotFoundException const&)
             {
@@ -315,6 +347,7 @@ main(int argc, char* argv[])
         string mw_configfile;
         string scope_installdir;
         string oem_installdir;
+        string click_installdir;
         string scoperunner_path;
         string ss_reg_id;
         string ss_reg_endpoint;
@@ -325,6 +358,7 @@ main(int argc, char* argv[])
             mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
+            click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
             ss_reg_id = c.ss_registry_identity();
             ss_reg_endpoint = c.ss_registry_endpoint();
@@ -356,18 +390,21 @@ main(int argc, char* argv[])
         // they look for another scope in the registry.
 
         auto local_scopes = find_local_scopes(scope_installdir, oem_installdir);
+        auto click_scopes = find_click_scopes(local_scopes, click_installdir);
 
         // Before we add the local scopes, we check whether any scopes were explicitly specified
         // on the command line. If so, scopes on the command line override scopes in
         // configuration files.
         for (auto i = 2; i < argc; ++i)
         {
-            string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
-            string scope_id = strip_suffix(file_name, ".ini");
+            filesystem::path path(argv[i]);
+            string scope_id = path.stem().native();
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile(), false);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile(), true);
+        local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
             error("no remote registry configured, only local scopes will be available");

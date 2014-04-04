@@ -1,0 +1,19 @@
+{
+    "description": "A pretend click scope",
+    "framework": "ubuntu-sdk-14.04-dev1",
+    "architecture": "@CLICK_ARCH@",
+    "hooks": {
+        "scope-click": {
+            "scope": "scope-click"
+        }
+    },
+    "icon": "@CLICK_SCOPE_ICON@",
+    "maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+    "name": "com.ubuntu.scope-click",
+    "title": "Click Scope",
+    "version": "1.0.0.@BZR_REVNO@",
+    "x-source": {
+        "vcs-bzr": "@BZR_SOURCE@",
+        "vcs-bzr-revno": "@BZR_REVNO@"
+    }
+}

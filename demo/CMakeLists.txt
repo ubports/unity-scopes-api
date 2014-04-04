@@ -1,3 +1,4 @@
+add_subdirectory(click)
 add_subdirectory(scopes)
 add_subdirectory(stand-alone)
 
