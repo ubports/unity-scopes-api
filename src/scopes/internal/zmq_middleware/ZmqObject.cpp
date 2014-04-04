@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
@@ -62,9 +63,12 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(timeout >= -1);
     throw_if_bad_endpoint(endpoint);
 
-    if (identity != "Registry")
+    // retrieve the registry proxy if this object is not the registry itself
+    auto runtime = mw_base->runtime();
+    if (identity != runtime->registry_identity())
     {
-        registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base->create_registry_proxy("Registry", "ipc:///tmp/Registry"));
+        registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base->create_registry_proxy(
+                                                          runtime->registry_identity(), runtime->registry_endpoint()));
     }
 
     // Make sure that fields have consistent settings for null proxies.
