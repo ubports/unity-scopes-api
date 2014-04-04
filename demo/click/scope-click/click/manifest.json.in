@@ -6,7 +6,7 @@
         "scope-click": {
             "unity-scope": "scope-click"
         }
-    }, 
+    },
     "icon": "@CLICK_SCOPE_ICON@",
     "maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
     "name": "com.ubuntu.scope-click",
