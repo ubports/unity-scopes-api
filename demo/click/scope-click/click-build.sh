@@ -30,6 +30,7 @@ BZR_SOURCE=${1:-lp:scope-click}
 
 CLICK_ARCH="$1"
 rm -rf "$CLICK_ARCH-build"
+rm -rf "package"
 mkdir "$CLICK_ARCH-build"
 (
     cd "$CLICK_ARCH-build"
@@ -42,3 +43,5 @@ mkdir "$CLICK_ARCH-build"
     make install
 )
 click build package
+rm -rf "$CLICK_ARCH-build"
+rm -rf "package"
