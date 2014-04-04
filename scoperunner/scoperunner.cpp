@@ -65,7 +65,7 @@ void error(string const& msg)
 
 int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
 {
-    auto trap = core::posix::trap_signals_for_process(
+    auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
         core::posix::Signal::sig_hup,
         core::posix::Signal::sig_term
