@@ -384,27 +384,6 @@ main(int argc, char* argv[])
         // the registry of state changes.
         middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
-        // FIXME, HACK HACK HACK HACK
-        // The middleware should spawn scope processes with lookup() on demand.
-        // Because it currently does not have the plumbing, we start every scope immediately.
-        // When the plumbing appears, remove this.
-        for (auto&& pair : local_scopes)
-        {
-            try
-            {
-                registry->locate(pair.first);
-            }
-            catch (NotFoundException const&)
-            {
-                // We ignore this. If the scope config couldn't be found, add_local_scopes()
-                // has already printed an error message.
-            }
-            catch (std::exception const& e)
-            {
-                error("could not start scope " + pair.first + ": " + e.what());
-            }
-        }
-
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware
         // shuts down, it clears out the active servant map, which destroys the registry

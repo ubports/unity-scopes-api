@@ -95,7 +95,8 @@ private:
                            RequestMode mode,
                            int64_t timeout);
 
-    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
+    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir,
+                                                std::string const& category);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,
                       std::shared_ptr<ObjectAdapter> const& adapter,

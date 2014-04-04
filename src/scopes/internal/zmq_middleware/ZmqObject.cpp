@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/scopes/ScopeExceptions.h>
 
@@ -60,6 +61,11 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(m != Unknown);
     assert(timeout >= -1);
     throw_if_bad_endpoint(endpoint);
+
+    if (identity != "Registry")
+    {
+        registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base->create_registry_proxy("Registry", "ipc:///tmp/Registry"));
+    }
 
     // Make sure that fields have consistent settings for null proxies.
     if (endpoint.empty() || identity.empty())
@@ -165,11 +171,32 @@ ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
     return invoke_(out_params, timeout_);
 }
 
+ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params, int64_t timeout)
+{
+    try
+    {
+        return invoke__(out_params, timeout);
+    }
+    catch (TimeoutException const&)
+    {
+        if (!registry_)
+        {
+            throw;
+        }
+        ObjectProxy new_proxy = registry_->locate(identity_);
+        endpoint_ = new_proxy->endpoint();
+        identity_ = new_proxy->identity();
+        category_ = new_proxy->category();
+        timeout_ = new_proxy->timeout();
+        return invoke__(out_params, timeout);
+    }
+}
+
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 // For a twoway request, poll for the reply with the timeout set for this proxy.
 // Return a receiver for the response (whether this is a oneway or twoway request).
 
-ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke__(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
