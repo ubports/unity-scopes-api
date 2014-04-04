@@ -638,7 +638,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware_configfile() const@Base" 0replaceme
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryConfig::click_installdir()" const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryConfig::endpointdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::oem_installdir() const@Base" 0.4.0+14.04.20140312.1
