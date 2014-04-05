@@ -38,6 +38,8 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
+Replaces: libunity-scopes0,
+Conflicts: libunity-scopes0,
 Description: API for Unity scopes integration
  Library to integrate scopes with the Unity shell
 
