@@ -48,10 +48,15 @@ public:
         : scope_id_(scope_id)
         , query_(query)
     {
-        if (hints.contains_hint("no-internet") && hints["no-internet"].get_bool())
+        static const std::string no_net_hint("no-internet");
+        if (hints.contains_hint(no_net_hint))
         {
-            std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id << ", skipping" << std::endl;
-            return;
+            auto var = hints[no_net_hint];
+            if (var.which() == Variant::Type::Bool && var.get_bool())
+            {
+                std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id << ", skipping" << std::endl;
+                return;
+            }
         }
 
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
