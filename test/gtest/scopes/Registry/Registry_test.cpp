@@ -21,6 +21,9 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <functional>
 #include <gtest/gtest.h>
 #include <signal.h>
@@ -86,6 +89,23 @@ TEST(Registry, metadata)
     }
 }
 
+bool wait_for_registry()
+{
+    const int num_retries = 10;
+    const boost::filesystem::path path("/tmp/RegistryTest");
+    for (int i = 0; i<num_retries; i++)
+    {
+        if (boost::filesystem::exists(path))
+        {
+            boost::system::error_code error;
+            auto st = boost::filesystem::status(path, error).type();
+            return st == boost::filesystem::file_type::socket_file;
+        }
+        sleep(1);
+    }
+    return false;
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -102,6 +122,7 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        EXPECT_TRUE(wait_for_registry());
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;
