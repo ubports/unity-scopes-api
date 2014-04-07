@@ -82,7 +82,7 @@ public:
             // this can happen if networking is disabled
             return;
         }
-        
+
         std::vector<SearchResult> results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
