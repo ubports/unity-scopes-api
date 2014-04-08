@@ -25,25 +25,17 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace std;
 using namespace unity;
+using namespace boost;
 
 namespace scoperegistry
 {
 
 namespace
 {
-
-bool has_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
-    {
-        return s.compare(s_len - suffix_len, suffix_len, suffix) == 0;
-    }
-    return false;
-}
 
 // Return all paths underneath the given dir that are of the given type
 // or are a symbolic link.
@@ -91,7 +83,7 @@ vector<string> find_entries(string const& install_dir, EntryType type)
 
 } // namespace
 
-// Return all files of the form dir/<somescope>/<scomescope>.ini that are regular files or
+// Return all files of the form dir/*/<scomescope>.ini that are regular files or
 // symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 
@@ -102,32 +94,16 @@ vector<string> find_scope_config_files(string const& install_dir, string const& 
     auto subdirs = find_entries(install_dir, Directory);
     for (auto subdir : subdirs)
     {
-        string scope_id = basename(const_cast<char*>(subdir.c_str()));    // basename() modifies its argument
         auto candidates = find_entries(subdir, File);
         for (auto c : candidates)
         {
-            string config_name = basename(const_cast<char*>(c.c_str()));    // basename() modifies its argument
-            if (config_name == scope_id + suffix)
-            {
-                files.emplace_back(c);
+            // TODO Check for multiple ini files
+
+            filesystem::path path(c);
+            if (path.extension() != suffix) {
+                continue;
             }
-        }
-    }
 
-    return files;
-}
-
-// Return all files with the given suffix in dir.
-
-vector<string> find_files(string const& dir, string const& suffix)
-{
-    vector<string> files;
-
-    auto candidates = find_entries(dir, File);
-    for (auto c : candidates)
-    {
-        if (has_suffix(c, suffix))
-        {
             files.emplace_back(c);
         }
     }
