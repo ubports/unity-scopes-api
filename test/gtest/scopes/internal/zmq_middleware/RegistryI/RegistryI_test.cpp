@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/RegistryObject.h>
@@ -26,7 +28,7 @@
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -403,6 +405,12 @@ int process_count()
     return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
 }
 
+class ReceiverStub : public SearchListenerBase
+{
+    void push(CategorisedResult) override {}
+    void finished(Reason, std::string const&) override {}
+};
+
 TEST(RegistryI, locate)
 {
     // get number of processes belonging to this test instance
@@ -464,7 +472,7 @@ TEST(RegistryI, locate)
             EXPECT_EQ(0, current_process_count - start_process_count);
         }
 
-        // test scope death and re-locate
+        // test scope death and rebinding
         {
             // locate first scope
             EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
@@ -490,8 +498,9 @@ TEST(RegistryI, locate)
             current_process_count = process_count();
             EXPECT_EQ(0, current_process_count - start_process_count);
 
-            // locate first scope
-            EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+            // locate first scope indirectly via rebinding on scope request
+            auto receiver_stub = make_shared<ReceiverStub>();
+            EXPECT_NO_THROW(proxies[scope_ids[0]]->search("test", SearchMetadata("en", "phone"), receiver_stub));
 
             // check that the first scope is running
             EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
