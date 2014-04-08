@@ -326,7 +326,11 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     update_state_unlocked(Starting);
 
     const std::string program{exec_data_.scoperunner_path};
-    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    if (!exec_data_.confinement_profile.empty())
+    {
+        argv.push_back(exec_data_.confinement_profile);
+    }
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)

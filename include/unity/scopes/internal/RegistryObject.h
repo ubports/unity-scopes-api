@@ -49,6 +49,7 @@ public:
         std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
+        std::string confinement_profile;
     };
 
 public:

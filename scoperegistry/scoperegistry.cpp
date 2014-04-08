@@ -254,12 +254,6 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_appearance_attributes(sc.appearance_attributes());
             mi->set_scope_directory(scope_dir.native());
 
-            if (click && (sc.confinement_type() == ConfinementType::Trusted))
-            {
-                throw unity::InvalidArgumentException("Invalid type, Trusted for click scope: " + pair.first);
-            }
-            mi->set_confinement_type(sc.confinement_type());
-
             try
             {
                 mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
@@ -297,6 +291,13 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             exec_data.scope_id = pair.first;
             // get custom scope runner executable, if not set use default scoperunner
             exec_data.scoperunner_path = scoperunner_path;
+
+            if (click)
+            {
+                exec_data.confinement_profile =
+                        scope_path.parent_path().filename().native();
+            }
+
             try
             {
                 auto custom_exec = sc.scope_runner();

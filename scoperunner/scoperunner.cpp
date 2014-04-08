@@ -63,7 +63,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
+int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config, string const& profile)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -90,22 +90,6 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
-
-        ScopeConfig sc(scope_config.c_str());
-
-        // Drop our privileges
-        string profile;
-        switch (sc.confinement_type())
-        {
-            case ConfinementType::Trusted:
-                break;
-            case ConfinementType::UntrustedLocal:
-                profile = "unity-scope-local";
-                break;
-            case ConfinementType::UntrustedInternet:
-                profile = "unity-scope-internet";
-                break;
-        }
 
         if (!profile.empty())
         {
@@ -180,13 +164,18 @@ main(int argc, char* argv[])
     ::pthread_sigmask(SIG_SETMASK, &set, nullptr);
 
     prog_name = basename(argv[0]);
-    if (argc != 3)
+    if (argc < 3)
     {
-        cerr << "usage: " << prog_name << " runtime.ini configfile.ini" << endl;
+        cerr << "usage: " << prog_name << " runtime.ini configfile.ini [confinement_profile]" << endl;
         return 2;
     }
     char const* const runtime_config = argv[1];
     char const* const scope_config = argv[2];
+    string confinement_profile;
+    if (argc == 4)
+    {
+        confinement_profile = argv[3];
+    }
 
     int exit_status = 1;
     try
@@ -203,7 +192,7 @@ main(int argc, char* argv[])
             throw ConfigException(string("invalid scope config file name: \"") + scope_config + "\": missing .ini extension");
         }
 
-        exit_status = run_scope(runtime_path, scope_path);
+        exit_status = run_scope(runtime_path, scope_path, confinement_profile);
     }
     catch (std::exception const& e)
     {

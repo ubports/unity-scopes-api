@@ -4,4 +4,5 @@ Zmq.Endpoint = ipc:///tmp/socket_for_registry
 Zmq.EndpointDir = /tmp/socket_for_registry
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /SomeDir
+Click.InstallDir = /unused
 Scoperunner.Path = /SomeAbsolutePath
