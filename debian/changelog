@@ -1,3 +1,10 @@
+unity-scopes-api (0.4.2+14.04.20140408-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Merge r298 from devel branch.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 08 Apr 2014 13:41:30 +0000
+
 unity-scopes-api (0.4.2+14.04.20140404.2-0ubuntu1) trusty; urgency=low
 
   [ Pawel Stolowski ]
