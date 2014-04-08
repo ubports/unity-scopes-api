@@ -48,6 +48,17 @@ public:
         : scope_id_(scope_id)
         , query_(query)
     {
+        static const std::string no_net_hint("no-internet");
+        if (hints.contains_hint(no_net_hint))
+        {
+            auto var = hints[no_net_hint];
+            if (var.which() == Variant::Type::Bool && var.get_bool())
+            {
+                std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id << ", skipping" << std::endl;
+                return;
+            }
+        }
+
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
@@ -61,11 +72,20 @@ public:
 
     virtual void cancelled() override
     {
-        search_handle_->cancel_search();
+        if (search_handle_ != nullptr)
+        {
+            search_handle_->cancel_search();
+        }
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (search_handle_ == nullptr)
+        {
+            // this can happen if networking is disabled
+            return;
+        }
+
         std::vector<SearchResult> results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
