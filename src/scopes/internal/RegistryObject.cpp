@@ -37,7 +37,7 @@ namespace internal
 {
 
 ///! TODO: get from config
-static const int c_process_wait_timeout = 2000;
+static const int c_process_wait_timeout = 1500;
 
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
     : death_observer_(death_observer),

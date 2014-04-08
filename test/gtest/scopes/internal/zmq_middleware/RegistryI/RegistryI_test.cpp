@@ -426,10 +426,7 @@ TEST(RegistryI, locate)
         mw->add_state_receiver_object("StateReceiver", reg->state_receiver());
 
         // configure scopes
-        ///! TODO: HACK:
-        /// we have to start scope-C and scope-D before starting scope-B here, as B aggregates C and D.
-        /// (When re-binding logic is introduced, this will be unnecessary)
-        std::array<std::string, 6> scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
+        std::array<std::string, 6> scope_ids = {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"};
         std::map<std::string, ScopeProxy> proxies;
 
         for (auto& scope_id : scope_ids)

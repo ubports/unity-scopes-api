@@ -79,7 +79,7 @@ try :
     state_(Stopped),
     config_(configfile),
     twoway_timeout_(300),  // TODO: get timeout from config
-    locate_timeout_(1500)  // TODO: get timeout from config
+    locate_timeout_(2000)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
 }
