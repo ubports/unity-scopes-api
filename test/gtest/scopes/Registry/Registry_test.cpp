@@ -122,6 +122,7 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
         EXPECT_TRUE(wait_for_registry());
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
