@@ -72,7 +72,10 @@ public:
 
     virtual void cancelled() override
     {
-        search_handle_->cancel_search();
+        if (search_handle_ != nullptr)
+        {
+            search_handle_->cancel_search();
+        }
     }
 
     virtual void run(SearchReplyProxy const& reply) override
