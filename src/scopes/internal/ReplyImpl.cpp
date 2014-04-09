@@ -61,6 +61,9 @@ ReplyImpl::~ReplyImpl()
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
+    ///! TEST HACK
+    std::this_thread::sleep_for(std::chrono::milliseconds{50});
+
     auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
     assert(qo);
     if (!qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
