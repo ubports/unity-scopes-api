@@ -211,8 +211,33 @@ private:
     atomic_int count_;
 };
 
+template <typename ScopeType>
+struct RaiiScopeThread
+{
+    RaiiScopeThread(string const& scope_id, string const& configfile)
+        : runtime(move(Runtime::create_scope_runtime(scope_id, configfile))),
+          scope_thread(&RaiiScopeThread::run_thread, this) {}
+
+    ~RaiiScopeThread()
+    {
+        runtime->destroy();
+        scope_thread.join();
+    }
+
+    void run_thread()
+    {
+        runtime->run_scope(&scope, "/foo");
+    }
+
+    ScopeType scope;
+    Runtime::SPtr runtime;
+    std::thread scope_thread;
+};
+
 TEST(Runtime, search)
 {
+    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -227,6 +252,8 @@ TEST(Runtime, search)
 
 TEST(Runtime, preview)
 {
+    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -252,6 +279,8 @@ TEST(Runtime, preview)
 
 TEST(Runtime, cardinality)
 {
+    RaiiScopeThread<PusherScope> scope_thread("PusherScope", "Runtime.ini");
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
@@ -270,37 +299,4 @@ TEST(Runtime, cardinality)
     receiver = make_shared<PushReceiver>(20);
     scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
     receiver->wait_until_finished();
-}
-
-void scope_thread(Runtime::SPtr const& rt)
-{
-    TestScope scope;
-    rt->run_scope(&scope, "/foo");
-}
-
-void pusher_thread(Runtime::SPtr const& rt)
-{
-    PusherScope scope;
-    rt->run_scope(&scope, "/foo");
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-
-    Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, srt);
-
-    Runtime::SPtr prt = move(Runtime::create_scope_runtime("PusherScope", "Runtime.ini"));
-    std::thread pusher_t(pusher_thread, prt);
-
-    auto rc = RUN_ALL_TESTS();
-
-    srt->destroy();
-    scope_t.join();
-
-    prt->destroy();
-    pusher_t.join();
-
-    return rc;
 }
