@@ -147,9 +147,8 @@ class Receiver : public SearchListenerBase
 public:
     virtual void push(CategorisedResult result) override
     {
-        if (count_ == 0)
+        if (result.uri() == "URI")
         {
-            EXPECT_EQ("URI", result.uri());
             EXPECT_EQ("Stuff", result.title());
             EXPECT_EQ("https://dash.ubuntu.com/imgs/amazon.png", result.art());
             EXPECT_EQ("", result.dnd_uri());
@@ -158,9 +157,8 @@ public:
             EXPECT_EQ("", result.category()->icon());
             EXPECT_EQ("{}", result.category()->renderer_template().data());
         }
-        else if (count_ == 1)
+        else if (result.uri() == "URI2")
         {
-            EXPECT_EQ("URI2", result.uri());
             EXPECT_EQ("Things", result.title());
             EXPECT_EQ("", result.art());
             EXPECT_EQ("", result.dnd_uri());
@@ -168,6 +166,10 @@ public:
             EXPECT_EQ("Category 1", result.category()->title());
             EXPECT_EQ("", result.category()->icon());
             EXPECT_EQ("{}", result.category()->renderer_template().data());
+        }
+        else
+        {
+            FAIL();
         }
 
         count_++;
