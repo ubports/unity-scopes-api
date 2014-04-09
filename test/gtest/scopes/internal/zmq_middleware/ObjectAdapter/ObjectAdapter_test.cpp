@@ -282,7 +282,7 @@ public:
 
 TEST(ObjectAdapter, add_remove_find)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -570,7 +570,7 @@ TEST(ObjectAdapter, corrupt_header)
 
 TEST(ObjectAdapter, invoke_ok)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -623,7 +623,7 @@ public:
 
 TEST(ObjectAdapter, invoke_object_not_exist)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -669,7 +669,7 @@ TEST(ObjectAdapter, invoke_object_not_exist)
 
 TEST(ObjectAdapter, invoke_operation_not_exist)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -790,7 +790,7 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 
 TEST(ObjectAdapter, twoway_threading)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -825,7 +825,7 @@ TEST(ObjectAdapter, twoway_threading)
 
 TEST(ObjectAdapter, oneway_threading)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 
@@ -897,7 +897,7 @@ public:
 
 TEST(ObjectAdapter, servant_map_destructor)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
                      rt.get());
 

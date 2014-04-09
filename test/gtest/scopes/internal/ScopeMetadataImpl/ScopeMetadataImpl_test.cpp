@@ -36,7 +36,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ScopeMetadataImpl, basic)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      rt.get());
 
@@ -231,7 +231,7 @@ TEST(ScopeMetadataImpl, basic)
 
 TEST(ScopeMetadataImpl, serialize)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      rt.get());
 
@@ -284,7 +284,7 @@ TEST(ScopeMetadataImpl, serialize)
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      rt.get());
 
@@ -352,7 +352,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
 
 TEST(ScopeMetadataImpl, deserialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope");
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
     ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini",
                      rt.get());
 
