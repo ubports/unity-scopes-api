@@ -414,13 +414,13 @@ main(int argc, char* argv[])
             load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
         }
 
+        // Add the registry's state receiver to the middleware so that scopes can inform the
+        // registry of state changes.
+        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
+
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
-
-        // We also add the registry's state receiver to the middleware so that scopes can inform
-        // the registry of state changes.
-        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware
