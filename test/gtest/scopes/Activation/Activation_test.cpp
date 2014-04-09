@@ -508,24 +508,19 @@ TEST(Activation, agg_scope_stores_and_intercepts)
 template <typename ScopeType>
 struct RaiiScopeThread
 {
+    ScopeType scope;
+    Runtime::SPtr runtime;
+    std::thread scope_thread;
+
     RaiiScopeThread(string const& scope_id, string const& configfile)
-        : runtime(move(Runtime::create_scope_runtime(scope_id, configfile))),
-          scope_thread(&RaiiScopeThread::run_thread, this) {}
+        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
+          scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
 
     ~RaiiScopeThread()
     {
         runtime->destroy();
         scope_thread.join();
     }
-
-    void run_thread()
-    {
-        runtime->run_scope(&scope, "/foo");
-    }
-
-    ScopeType scope;
-    Runtime::SPtr runtime;
-    std::thread scope_thread;
 };
 
 // does actual activation with a test scope
