@@ -83,6 +83,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("category");
     if (it != data.end())
     {
+        lock_guard<mutex> lock(cat_registry_mutex_);
         auto cat = cat_registry_->register_category(it->second.get_dict());
         receiver_->push(cat);
     }
@@ -119,7 +120,12 @@ bool ResultReplyObject::process_data(VariantMap const& data)
             return true;
         }
         auto result_var = it->second.get_dict();
-        auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
+        std::unique_ptr<internal::CategorisedResultImpl> impl;
+
+        {
+            lock_guard<mutex> lock(cat_registry_mutex_);
+            impl.reset(new internal::CategorisedResultImpl(*cat_registry_, result_var));
+        }
 
         impl->set_runtime(runtime_);
         // set result origin

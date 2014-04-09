@@ -51,6 +51,7 @@ private:
     RuntimeImpl const* runtime_;
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
+    std::mutex cat_registry_mutex_;
 };
 
 } // namespace internal

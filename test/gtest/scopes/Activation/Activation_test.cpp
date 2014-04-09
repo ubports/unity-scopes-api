@@ -526,7 +526,7 @@ TEST(Activation, scope)
     receiver->wait_until_finished();
 
     auto result = receiver->result;
-    EXPECT_TRUE(result != nullptr);
+    ASSERT_TRUE(result != nullptr);
     EXPECT_FALSE(result->direct_activation());
     EXPECT_EQ("uri", result->uri());
     EXPECT_EQ("dnd_uri", result->dnd_uri());

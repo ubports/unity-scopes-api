@@ -46,9 +46,7 @@ TEST(ZmqMiddleware, basic)
 TEST(ZmqMiddleware, string_to_proxy)
 {
     auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     rt.get());
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini", rt.get());
 
     ObjectProxy p;
     ScopeProxy sp;
