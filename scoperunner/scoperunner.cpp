@@ -149,7 +149,7 @@ main(int argc, char* argv[])
     ::pthread_sigmask(SIG_SETMASK, &set, nullptr);
 
     prog_name = basename(argv[0]);
-    if (argc < 3)
+    if (argc != 3)
     {
         cerr << "usage: " << prog_name << " runtime.ini configfile.ini" << endl;
         return 2;
