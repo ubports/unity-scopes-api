@@ -66,6 +66,10 @@ private:
     std::condition_variable idle_;
     std::string origin_proxy_;
     int num_push_;
+
+    int pushes_busy_;
+    std::mutex push_mutex_;
+    std::condition_variable push_cond_;
 };
 
 } // namespace internal
