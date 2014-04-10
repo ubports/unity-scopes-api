@@ -51,7 +51,8 @@ using namespace std::placeholders;
 
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
-                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
+                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } }),
+    pushes_busy_(0)
 {
 }
 
@@ -63,16 +64,35 @@ void ReplyI::push_(Current const&,
                    capnp::AnyPointer::Reader& in_params,
                    capnproto::Response::Builder&)
 {
+    // Increment pushes_busy_
+    {
+        std::lock_guard<std::mutex> push_lock(push_mutex_);
+        ++pushes_busy_;
+    }
+
     auto req = in_params.getAs<capnproto::Reply::PushRequest>();
     auto result = req.getResult();
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     delegate->push(to_variant_map(result));
+
+    // Decrement pushes_busy_ and signal that a push completed
+    {
+        std::lock_guard<std::mutex> push_lock(push_mutex_);
+        --pushes_busy_;
+        push_cond_.notify_one();
+    }
 }
 
 void ReplyI::finished_(Current const&,
                        capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
 {
+    // If any pushes are currently busy, give them a second to complete
+    {
+        std::unique_lock<std::mutex> push_lock(push_mutex_);
+        push_cond_.wait_for(push_lock, std::chrono::seconds(1), [this] { return pushes_busy_ == 0; });
+    }
+
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
     auto r = req.getReason();

@@ -27,8 +27,6 @@
 #include <unity/scopes/Variant.h>
 
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
 
 namespace unity
 {
@@ -61,9 +59,6 @@ protected:
 private:
     std::shared_ptr<QueryObjectBase> qo_;
     std::atomic_bool finished_;
-    int pushes_busy_;
-    std::mutex push_mutex_;
-    std::condition_variable push_cond_;
 };
 
 } // namespace internal
