@@ -45,8 +45,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
-    num_push_(0),
-    pushes_busy_(0)
+    num_push_(0)
 {
     assert(receiver_base);
     assert(runtime);
@@ -70,12 +69,6 @@ ReplyObject::~ReplyObject()
 
 void ReplyObject::push(VariantMap const& result) noexcept
 {
-    // Increment pushes_busy_
-    {
-        std::lock_guard<std::mutex> push_lock(push_mutex_);
-        ++pushes_busy_;
-    }
-
     // We catch all exceptions so, if the application's push() method throws,
     // we can call finished(). Finished will be called exactly once, whether
     // push() or finished() throw or not.
@@ -119,13 +112,6 @@ void ReplyObject::push(VariantMap const& result) noexcept
         error = "ReplyObject::push(VariantMap): unknown exception";
     }
 
-    // Decrement pushes_busy_ and signal that a push completed
-    {
-        std::lock_guard<std::mutex> push_lock(push_mutex_);
-        --pushes_busy_;
-        push_cond_.notify_one();
-    }
-
     // Decrement number of pushes before potentially calling finished(),
     // because finished() waits for concurrent push() calls to complete.
     {
@@ -151,12 +137,6 @@ void ReplyObject::push(VariantMap const& result) noexcept
 
 void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) noexcept
 {
-    // If any pushes are currently busy, give them a second to complete
-    {
-        std::unique_lock<std::mutex> push_lock(push_mutex_);
-        push_cond_.wait_for(push_lock, std::chrono::seconds(1), [this] { return pushes_busy_ == 0; });
-    }
-
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
     // finished() concurrently with the QueryCtrl forwarding a cancel()
