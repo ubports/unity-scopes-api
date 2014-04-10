@@ -340,7 +340,7 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     {
         if (!exec_data_.confinement_profile.empty())
         {
-            if (aa_change_profile(exec_data_.confinement_profile.c_str()) != 0)
+            if (aa_change_onexec(exec_data_.confinement_profile.c_str()) != 0)
             {
                 string message =
                         "RegistryObject::ScopeProcess::exec(): Couldn't change to AppArmor profile ["
