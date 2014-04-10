@@ -263,11 +263,13 @@ public:
         EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
         EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
 
+        std::lock_guard<std::mutex> lock(mutex_);
         widget_pushes_++;
     }
 
     virtual void push(std::string const&, Variant const&) override
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         widget_pushes_++;
     }
 
@@ -305,6 +307,7 @@ public:
         ASSERT_EQ(1u, it->column(2).size());
         EXPECT_EQ("widget_id_C", it->column(2)[0]);
 
+        std::lock_guard<std::mutex> lock(mutex_);
         col_pushes_++;
     }
 
@@ -356,16 +359,19 @@ public:
         EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
         EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
+        std::lock_guard<std::mutex> lock(mutex_);
         widget_pushes_++;
     }
 
     virtual void push(std::string const&, Variant const&) override
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         widget_pushes_++;
     }
 
     virtual void push(ColumnLayoutList const&) override
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         col_pushes_++;
     }
 

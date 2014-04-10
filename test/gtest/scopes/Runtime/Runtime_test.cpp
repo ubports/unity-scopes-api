@@ -141,11 +141,13 @@ public:
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
+        lock_guard<mutex> lock(mutex_);
         widgets_pushes_++;
     }
     virtual void push(std::string const& key, Variant const&) override
     {
         EXPECT_TRUE(key == "author" || key == "rating");
+        lock_guard<mutex> lock(mutex_);
         data_pushes_++;
     }
     virtual void push(ColumnLayoutList const&) override
