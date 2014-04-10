@@ -26,8 +26,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <sys/apparmor.h>
-
-#include <sstream>
+#include <cerrno>
 
 using namespace std;
 
@@ -341,15 +340,24 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     {
         if (!exec_data_.confinement_profile.empty())
         {
-            int profile_change_code = aa_change_profile(exec_data_.confinement_profile.c_str());
-            if (profile_change_code != 0)
+            if (aa_change_profile(exec_data_.confinement_profile.c_str()) != 0)
             {
-                ostringstream message;
-                message
-                        << "RegistryObject::ScopeProcess::exec(): Couldn't change to AppArmor profile ["
-                        << exec_data_.confinement_profile << "] error = ["
-                        << profile_change_code << "]";
-                throw unity::ResourceException(message.str());
+                string message =
+                        "RegistryObject::ScopeProcess::exec(): Couldn't change to AppArmor profile ["
+                                + exec_data_.confinement_profile + "]. ";
+                switch (errno)
+                {
+                    case ENOENT:
+                    case EACCES:
+                        message.append("Profile does not exist");
+                        break;
+                    case EINVAL:
+                        message.append("AppArmor interface not available");
+                        break;
+                    default:
+                        message.append("Unknown error");
+                }
+                throw unity::ResourceException(message);
             }
         }
         process_ = core::posix::exec(program, argv, env,
