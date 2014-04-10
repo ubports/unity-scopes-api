@@ -172,6 +172,7 @@ public:
             FAIL();
         }
 
+        std::lock_guard<std::mutex> lock(mutex_);
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }

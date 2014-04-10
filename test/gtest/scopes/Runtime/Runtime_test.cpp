@@ -70,6 +70,8 @@ public:
         EXPECT_EQ("subdep2", subdeps.back().id());
         EXPECT_EQ("US", subdeps.back().label());
         EXPECT_EQ("test", subdeps.back().query().query_string());
+
+        lock_guard<mutex> lock(mutex_);
         dep_count_++;
     }
 
@@ -79,6 +81,8 @@ public:
         EXPECT_EQ("title", result.title());
         EXPECT_EQ("art", result.art());
         EXPECT_EQ("dnd_uri", result.dnd_uri());
+
+        lock_guard<mutex> lock(mutex_);
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
@@ -90,6 +94,8 @@ public:
         EXPECT_EQ("scope-A", query.scope_id());
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
+
+        lock_guard<mutex> lock(mutex_);
         annotation_count_++;
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
@@ -181,6 +187,7 @@ public:
 
     virtual void push(CategorisedResult /* result */) override
     {
+        lock_guard<mutex> lock(mutex_);
         if (++count_ > pushes_expected_)
         {
             FAIL();
