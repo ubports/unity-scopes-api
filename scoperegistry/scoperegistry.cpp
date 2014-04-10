@@ -70,6 +70,58 @@ filesystem::path relative_scope_path_to_abs_path(filesystem::path const& path, f
     return path;
 }
 
+// throwing an exception without joining with a thread is a bad, bad thing to do, so let's RAII to avoid doing it
+struct SignalThreadWrapper
+{
+    std::shared_ptr<core::posix::SignalTrap> termination_trap;
+    std::shared_ptr<core::posix::SignalTrap> child_trap;
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer;
+    std::thread termination_trap_worker;
+    std::thread child_trap_worker;
+
+    SignalThreadWrapper() :
+        // We shutdown the runtime whenever these signals happen.
+        termination_trap(core::posix::trap_signals_for_all_subsequent_threads(
+            {
+                core::posix::Signal::sig_int,
+                core::posix::Signal::sig_hup,
+                core::posix::Signal::sig_term
+            })),
+        // And we maintain our list of processes with the help of sig_chld.
+        child_trap(core::posix::trap_signals_for_all_subsequent_threads(
+            {
+                core::posix::Signal::sig_chld
+            })),
+        // The death observer is required to make sure that we reap all child processes
+        // whenever multiple sigchld's are compressed together.
+        death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(child_trap)),
+        // Starting up both traps.
+        termination_trap_worker([&]() { termination_trap->run(); }),
+        child_trap_worker([&]() { child_trap->run(); })
+    {
+    }
+
+    core::Signal<core::posix::Signal>& signal_raised()
+    {
+        return termination_trap->signal_raised();
+    }
+
+    ~SignalThreadWrapper()
+    {
+        // Stop termination_trap
+        termination_trap->stop();
+        if (termination_trap_worker.joinable())
+            termination_trap_worker.join();
+
+        // Please note that the child_trap must only be stopped once the
+        // termination_trap thread has been joined. We otherwise will encounter
+        // a race between the middleware shutting down and not receiving sigchld anymore.
+        child_trap->stop();
+        if (child_trap_worker.joinable())
+            child_trap_worker.join();
+    }
+};
+
 // Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
 // If a Canonical scope is overrideable and the OEM has configured a scope with the
 // same id, the OEM scope overrides the Canonical one.
@@ -310,29 +362,7 @@ main(int argc, char* argv[])
 
     try
     {
-        // We shutdown the runtime whenever these signals happen.
-        auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_int,
-            core::posix::Signal::sig_hup,
-            core::posix::Signal::sig_term
-        });
-
-        // And we maintain our list of processes with the help of sig_chld.
-        auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_chld
-        });
-
-        // The death observer is required to make sure that we reap all child processes
-        // whenever multiple sigchld's are compressed together.
-        auto death_observer =
-                core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(
-                    child_trap);
-
-        // Starting up both traps.
-        std::thread termination_trap_worker([termination_trap]() { termination_trap->run(); });
-        std::thread child_trap_worker([child_trap]() { child_trap->run(); });
+        SignalThreadWrapper signal_handler_wrapper;
 
         // And finally creating our runtime.
         RuntimeConfig rt_config(config_file);
@@ -368,7 +398,7 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        signal_handler_wrapper.signal_raised().connect([middleware](core::posix::Signal signal)
         {
             switch(signal)
             {
@@ -383,7 +413,7 @@ main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
-        RegistryObject::SPtr registry(new RegistryObject(*death_observer));
+        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
@@ -430,18 +460,6 @@ main(int argc, char* argv[])
 
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
-
-        // Stop termination_trap
-        termination_trap->stop();
-        if (termination_trap_worker.joinable())
-            termination_trap_worker.join();
-
-        // Please note that the child_trap must only be stopped once the
-        // termination_trap thread has been joined. We otherwise will encounter
-        // a race between the middleware shutting down and not receiving sigchld anymore.
-        child_trap->stop();
-        if (child_trap_worker.joinable())
-            child_trap_worker.join();
 
         exit_status = 0;
     }

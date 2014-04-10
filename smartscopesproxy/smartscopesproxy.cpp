@@ -41,6 +41,35 @@ static void error(std::string const& msg)
     std::cerr << "smartscopesproxy: " << msg << std::endl;
 }
 
+struct SignalThreadWrapper
+{
+    std::shared_ptr<core::posix::SignalTrap> termination_trap;
+    std::thread termination_trap_worker;
+
+    SignalThreadWrapper() :
+        termination_trap(core::posix::trap_signals_for_all_subsequent_threads(
+            {
+                core::posix::Signal::sig_int,
+                core::posix::Signal::sig_hup,
+                core::posix::Signal::sig_term
+            })),
+        termination_trap_worker([&]() { termination_trap->run(); })
+    {
+    }
+
+    core::Signal<core::posix::Signal>& signal_raised()
+    {
+        return termination_trap->signal_raised();
+    }
+
+    ~SignalThreadWrapper()
+    {
+        termination_trap->stop();
+        if (termination_trap_worker.joinable())
+            termination_trap_worker.join();
+    }
+};
+
 int main(int argc, char* argv[])
 {
     if (argc > 1 && (std::string("-h") == argv[1] || std::string("--help") == argv[1]))
@@ -76,12 +105,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        auto trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_int,
-            core::posix::Signal::sig_hup,
-            core::posix::Signal::sig_term
-        });
+        SignalThreadWrapper signal_handler;
 
         ///! TODO: get these from config
         std::string ss_reg_id = "SSRegistry";
@@ -102,13 +126,11 @@ int main(int argc, char* argv[])
         MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
         MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
 
-        trap->signal_raised().connect([reg_mw, scope_mw](core::posix::Signal)
+        signal_handler.signal_raised().connect([reg_mw, scope_mw](core::posix::Signal)
         {
             scope_mw->stop();
             reg_mw->stop();
         });
-
-        std::thread trap_worker([trap]() { trap->run(); });
 
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
@@ -130,11 +152,6 @@ int main(int argc, char* argv[])
         // Wait until shutdown
         scope_mw->wait_for_shutdown();
         reg_mw->wait_for_shutdown();
-
-        trap->stop();
-
-        if (trap_worker.joinable())
-            trap_worker.join();
 
         exit_status = 0;
     }
