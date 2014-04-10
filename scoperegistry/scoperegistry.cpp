@@ -414,7 +414,8 @@ main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
-        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer));
+        Executor::SPtr executor = make_shared<Executor>();
+        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if

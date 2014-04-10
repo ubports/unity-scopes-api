@@ -25,9 +25,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <sys/apparmor.h>
-#include <cerrno>
-
 using namespace std;
 
 namespace unity
@@ -42,7 +39,7 @@ namespace internal
 ///! TODO: get from config
 static const int c_process_wait_timeout = 2000;
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -59,7 +56,8 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           {
               on_state_received(id, s);
           })
-      }
+      },
+      executor_(executor)
 {
 }
 
@@ -159,7 +157,7 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
         }
     }
 
-    proc_it->second.exec(death_observer_);
+    proc_it->second.exec(death_observer_, executor_);
     return scope_it->second.proxy();
 }
 
@@ -297,7 +295,9 @@ bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeou
     return wait_for_state(lock, state, timeout_ms);
 }
 
-void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver& death_observer)
+void RegistryObject::ScopeProcess::exec(
+        core::posix::ChildProcess::DeathObserver& death_observer,
+        Executor::SPtr executor)
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
 
@@ -328,8 +328,20 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     // 2. exec the scope.
     update_state_unlocked(Starting);
 
-    const std::string program{exec_data_.scoperunner_path};
-    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    std::string program;
+    std::vector<std::string> argv;
+
+    if (exec_data_.confinement_profile.empty())
+    {
+        program = exec_data_.scoperunner_path;
+        argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    }
+    else
+    {
+        program = "/usr/sbin/aa-exec";
+        argv = {"-p", exec_data_.confinement_profile, exec_data_.scoperunner_path,
+                exec_data_.runtime_config, exec_data_.scope_config};
+    }
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
@@ -338,29 +350,7 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     });
 
     {
-        if (!exec_data_.confinement_profile.empty())
-        {
-            if (aa_change_onexec(exec_data_.confinement_profile.c_str()) != 0)
-            {
-                string message =
-                        "RegistryObject::ScopeProcess::exec(): Couldn't change to AppArmor profile ["
-                                + exec_data_.confinement_profile + "]. ";
-                switch (errno)
-                {
-                    case ENOENT:
-                    case EACCES:
-                        message.append("Profile does not exist");
-                        break;
-                    case EINVAL:
-                        message.append("AppArmor interface not available");
-                        break;
-                    default:
-                        message.append("Unknown error");
-                }
-                throw unity::ResourceException(message);
-            }
-        }
-        process_ = core::posix::exec(program, argv, env,
+        process_ = executor->exec(program, argv, env,
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)
         {

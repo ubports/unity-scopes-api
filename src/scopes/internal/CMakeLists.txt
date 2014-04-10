@@ -20,6 +20,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DepartmentImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Executor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp

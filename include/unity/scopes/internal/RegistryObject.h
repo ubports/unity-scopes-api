@@ -19,8 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
-#include <core/posix/child_process.h>
-
+#include <unity/scopes/internal/Executor.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/StateReceiverObject.h>
@@ -55,7 +54,7 @@ public:
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
-    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer);
+    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor);
     virtual ~RegistryObject();
 
     // Remote operation implementations
@@ -92,7 +91,8 @@ private:
         void update_state(ProcessState state);
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
-        void exec(core::posix::ChildProcess::DeathObserver& death_observer);
+        void exec(core::posix::ChildProcess::DeathObserver& death_observer,
+                Executor::SPtr executor);
         void kill();
 
         bool on_process_death(pid_t pid);
@@ -120,6 +120,8 @@ private:
 
     StateReceiverObject::SPtr state_receiver_;
     core::ScopedConnection state_receiver_connection_;
+
+    Executor::SPtr executor_;
 
     mutable std::mutex mutex_;
     MetadataMap scopes_;
