@@ -113,8 +113,7 @@ protected:
         mi->set_hot_key("hot key " + scope_id);
         mi->set_scope_directory("/foo");
 
-        shared_ptr<MockScope> scope(new ::testing::StrictMock<MockScope>());
-        mi->set_proxy(scope);
+        mi->set_proxy(make_shared<StrictMock<MockScope>>());
 
         return ScopeMetadataImpl::create(move(mi));
     }
@@ -167,7 +166,6 @@ std::shared_ptr<ChildProcess::DeathObserver> TestRegistryObject::death_observer_
 
 TEST_F(TestRegistryObject, basic)
 {
-    executor.reset(new ::testing::StrictMock<MockExecutor>());
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
                     {   "/path/runtime.ini", "/path/scope.ini"}, _,
