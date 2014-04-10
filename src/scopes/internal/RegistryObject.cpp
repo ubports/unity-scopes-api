@@ -25,6 +25,10 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <sys/apparmor.h>
+
+#include <sstream>
+
 using namespace std;
 
 namespace unity
@@ -327,10 +331,6 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
 
     const std::string program{exec_data_.scoperunner_path};
     std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
-    if (!exec_data_.confinement_profile.empty())
-    {
-        argv.push_back(exec_data_.confinement_profile);
-    }
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
@@ -339,6 +339,19 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     });
 
     {
+        if (!exec_data_.confinement_profile.empty())
+        {
+            int profile_change_code = aa_change_profile(exec_data_.confinement_profile.c_str());
+            if (profile_change_code != 0)
+            {
+                ostringstream message;
+                message
+                        << "RegistryObject::ScopeProcess::exec(): Couldn't change to AppArmor profile ["
+                        << exec_data_.confinement_profile << "] error = ["
+                        << profile_change_code << "]";
+                throw unity::ResourceException(message.str());
+            }
+        }
         process_ = core::posix::exec(program, argv, env,
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)

@@ -33,7 +33,6 @@
 #include <cassert>
 #include <future>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -41,8 +40,6 @@
 #include <libgen.h>
 
 #include <boost/filesystem/path.hpp>
-
-#include <sys/apparmor.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -63,7 +60,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config, string const& profile)
+int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -90,18 +87,6 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
-
-        if (!profile.empty())
-        {
-            int profile_change_code = aa_change_profile(profile.c_str());
-            if (profile_change_code != 0)
-            {
-                ostringstream message;
-                message << "Couldn't change to AppArmor profile [" << profile
-                        << "] error = [" << profile_change_code << "]";
-                throw ConfigException(message.str());
-            }
-        }
 
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "/lib" + scope_id + ".so", rt->registry());
         loader->start();
@@ -166,16 +151,11 @@ main(int argc, char* argv[])
     prog_name = basename(argv[0]);
     if (argc < 3)
     {
-        cerr << "usage: " << prog_name << " runtime.ini configfile.ini [confinement_profile]" << endl;
+        cerr << "usage: " << prog_name << " runtime.ini configfile.ini" << endl;
         return 2;
     }
     char const* const runtime_config = argv[1];
     char const* const scope_config = argv[2];
-    string confinement_profile;
-    if (argc == 4)
-    {
-        confinement_profile = argv[3];
-    }
 
     int exit_status = 1;
     try
@@ -192,7 +172,7 @@ main(int argc, char* argv[])
             throw ConfigException(string("invalid scope config file name: \"") + scope_config + "\": missing .ini extension");
         }
 
-        exit_status = run_scope(runtime_path, scope_path, confinement_profile);
+        exit_status = run_scope(runtime_path, scope_path);
     }
     catch (std::exception const& e)
     {
