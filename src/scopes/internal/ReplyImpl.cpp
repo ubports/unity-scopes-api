@@ -42,7 +42,8 @@ namespace internal
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
     ObjectImpl(mw_proxy),
     qo_(qo),
-    finished_(false)
+    finished_(false),
+    pushes_busy_(0)
 {
     assert(mw_proxy);
 }
@@ -61,29 +62,40 @@ ReplyImpl::~ReplyImpl()
 
 bool ReplyImpl::push(VariantMap const& variant_map)
 {
+    // Increment pushes_busy_
+    {
+        std::lock_guard<std::mutex> push_lock(push_mutex_);
+        ++pushes_busy_;
+    }
+
+    bool result = true;
     auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
     assert(qo);
-    if (!qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
+    if (finished_ || !qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
     {
-        return false; // Query was cancelled or had an error.
+        result = false; // Query was finished, cancelled or had an error.
+    }
+    else
+    {
+        try
+        {
+            fwd()->push(variant_map);
+        }
+        catch (std::exception const&)
+        {
+            error(current_exception());
+            result = false;
+        }
     }
 
-    if (finished_)
+    // Decrement pushes_busy_ and signal that a push completed
     {
-        return false;
+        std::lock_guard<std::mutex> push_lock(push_mutex_);
+        --pushes_busy_;
+        push_cond_.notify_one();
     }
 
-    try
-    {
-        fwd()->push(variant_map);
-    }
-    catch (std::exception const&)
-    {
-        error(current_exception());
-        return false;
-    }
-
-    return true;
+    return result;
 }
 
 void ReplyImpl::finished()
@@ -93,6 +105,12 @@ void ReplyImpl::finished()
 
 void ReplyImpl::finished(ListenerBase::Reason reason)
 {
+    // If any pushes are currently busy, give them a second to complete
+    {
+        std::unique_lock<std::mutex> push_lock(push_mutex_);
+        push_cond_.wait_for(push_lock, std::chrono::seconds(1), [this] { return pushes_busy_ == 0; });
+    }
+
     if (!finished_.exchange(true))
     {
         try
