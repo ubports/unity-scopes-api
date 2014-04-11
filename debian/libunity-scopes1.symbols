@@ -29,10 +29,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Department::operator=(unity::scopes::Department const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::FilterBase(unity::scopes::internal::FilterBaseImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::~FilterBase()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::CannedQuery::from_string()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_query_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_department_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::CannedQuery::from_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::internal::CannedQueryImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
@@ -496,9 +496,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::query_string() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::department_id() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::CannedQuery::to_uri() const@Base" 0replaceme
  (c++)"unity::scopes::CannedQuery::scope_id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::serialize() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::CannedQuery::to_string() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::has_filter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ColumnLayout::number_of_columns() const@Base" 0.4.0+14.04.20140312.1
