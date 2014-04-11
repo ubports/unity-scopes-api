@@ -125,6 +125,9 @@ TEST(CannedQuery, from_uri)
         EXPECT_THROW(CannedQuery::from_uri("http://foo.com"), unity::InvalidArgumentException);
     }
     {
+        EXPECT_THROW(CannedQuery::from_uri("scope://"), unity::InvalidArgumentException);
+    }
+    {
         auto q = CannedQuery::from_uri("scope://foo");
         EXPECT_EQ("foo", q.scope_id());
         EXPECT_EQ("", q.query_string());
@@ -153,6 +156,19 @@ TEST(CannedQuery, from_uri)
         auto actopts = filter->active_options(fstate);
         EXPECT_EQ(1, actopts.size());
         EXPECT_EQ("o1", (*(actopts.begin()))->id());
+    }
+    // no "q=" argument
+    {
+        auto q = CannedQuery::from_uri("scope://foo?dep=a");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("", q.query_string());
+        EXPECT_EQ("a", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?dep=a%20bc&q=Foo%20bar");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("Foo bar", q.query_string());
+        EXPECT_EQ("a bc", q.department_id());
     }
 }
 

@@ -166,7 +166,13 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
 
     size_t next = uri.find("?", pos);
 
-    CannedQuery q(from_percent_encoding(uri.substr(pos, next - pos)));
+    auto scope_id = uri.substr(pos, next - pos);
+    if (scope_id.empty())
+    {
+        throw InvalidArgumentException("CannedQuery()::from_uri(): scope id is empty");
+    }
+
+    CannedQuery q(from_percent_encoding(scope_id));
 
     if (next != std::string::npos) {
         ++next;
