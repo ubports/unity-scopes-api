@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
+#include <iomanip>
 
 namespace unity
 {
@@ -39,6 +40,51 @@ VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap 
         throw unity::InvalidArgumentException(str.str());
     }
     return it;
+}
+
+std::string to_percent_encoding(std::string const& str)
+{
+    std::ostringstream result;
+    for (auto const& c: str)
+    {
+        if ((!isalnum(c)))
+        {
+            result << '%' << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(static_cast<unsigned char>(c)) << std::nouppercase;
+        }
+        else
+        {
+            result << c;
+        }
+    }
+    return result.str();
+}
+
+std::string from_percent_encoding(std::string const& str)
+{
+    std::ostringstream result;
+    for (auto it = str.begin(); it != str.end(); it++)
+    {
+        auto c = *it;
+        if (c == '%')
+        {
+            // take two characters and covert them from hex to actual char
+            if (++it != str.end())
+            {
+                c = *it;
+                if (++it != str.end())
+                {
+                    std::string const hexnum { c, *it };
+                    auto k = std::stoi(hexnum, nullptr, 16);
+                    result << static_cast<char>(k);
+                }
+            }
+        }
+        else
+        {
+            result << c;
+        }
+    }
+    return result.str();
 }
 
 } // namespace internal

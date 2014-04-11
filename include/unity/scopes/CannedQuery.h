@@ -113,9 +113,16 @@ public:
 
     /**
     \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
+    This is the same as calling to_uri().
     \return The URI for the query.
     */
     std::string to_string() const;
+
+    /**
+    \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
+    \return The URI for the query.
+    */
+    std::string to_uri() const;
 
     /**
     \brief Get state of the filters for this CannedQuery.
@@ -132,7 +139,7 @@ public:
     \return a CannedQuery instance
     \throws InvalidArgumentException if the URI cannot be parsed.
     */
-    static CannedQuery from_string();
+    static CannedQuery from_uri(std::string const& uri);
 
 private:
     CannedQuery(internal::CannedQueryImpl *impl);

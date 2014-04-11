@@ -105,12 +105,17 @@ FilterState CannedQuery::filter_state() const
 
 std::string CannedQuery::to_string() const
 {
-    return p->to_string();
+    return p->to_uri();
 }
 
-CannedQuery CannedQuery::from_string()
+std::string CannedQuery::to_uri() const
 {
-    return internal::CannedQueryImpl::from_string();
+    return p->to_uri();
+}
+
+CannedQuery CannedQuery::from_uri(std::string const& uri)
+{
+    return internal::CannedQueryImpl::from_uri(uri);
 }
 
 } // namespace scopes

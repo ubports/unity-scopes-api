@@ -54,9 +54,11 @@ public:
     std::string query_string() const;
     FilterState filter_state() const;
     VariantMap serialize() const;
-    std::string to_string() const;
-    static CannedQuery from_string();
+    std::string to_uri() const;
+    static CannedQuery from_uri(std::string const& uri);
     static CannedQuery create(VariantMap const& var);
+
+    static const std::string scopes_schema;
 
 private:
     std::string scope_id_;
