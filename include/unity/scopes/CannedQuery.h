@@ -113,13 +113,6 @@ public:
 
     /**
     \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
-    This is the same as calling to_uri().
-    \return The URI for the query.
-    */
-    std::string to_string() const;
-
-    /**
-    \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
     \return The URI for the query.
     */
     std::string to_uri() const;

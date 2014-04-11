@@ -103,11 +103,6 @@ FilterState CannedQuery::filter_state() const
     return p->filter_state();
 }
 
-std::string CannedQuery::to_string() const
-{
-    return p->to_uri();
-}
-
 std::string CannedQuery::to_uri() const
 {
     return p->to_uri();

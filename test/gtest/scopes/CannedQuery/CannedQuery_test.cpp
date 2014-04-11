@@ -86,7 +86,7 @@ TEST(CannedQuery, to_uri)
     }
     {
         CannedQuery q("scope-A");
-        EXPECT_EQ("scope://scope%2DA?q=", q.to_string());
+        EXPECT_EQ("scope://scope%2DA?q=", q.to_uri());
     }
     {
         CannedQuery q("scope-A");

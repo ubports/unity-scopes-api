@@ -167,7 +167,7 @@ public:
              << endl;
         for (auto link: links)
         {
-            cout << "  " << link->query().to_string() << endl;
+            cout << "  " << link->query().to_uri() << endl;
         }
     }
 
