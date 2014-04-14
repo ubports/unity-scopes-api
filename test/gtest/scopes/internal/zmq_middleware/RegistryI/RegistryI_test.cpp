@@ -556,9 +556,9 @@ TEST_F(RegistryTest, locate_relocate)
     // check that the first scope is running
     EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
 
-            // check that 1 new process was started
+    // check that 1 new process was started
     EXPECT_EQ(1, process_count());
-        }
+}
 
 // test removing a scope
 TEST_F(RegistryTest, locate_remove)
@@ -575,7 +575,7 @@ TEST_F(RegistryTest, locate_remove)
     // remove a scope (hense killing the process)
     EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
 
-            // check that we now have 5 scopes running
+    // check that we now have 5 scopes running
     EXPECT_EQ(5, process_count());
 
     // when the registry is destroyed all scope processes are killed
