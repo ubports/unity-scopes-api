@@ -153,6 +153,11 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         queue_.put(this, query_.query_string(), reply);
         cerr << "scope-C: run() returning" << endl;
     }

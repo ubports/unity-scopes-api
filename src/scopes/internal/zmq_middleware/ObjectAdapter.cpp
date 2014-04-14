@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
+#include <unity/scopes/internal/zmq_middleware/StopPublisher.h>
 #include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
@@ -134,7 +135,7 @@ ZmqProxy ObjectAdapter::add(std::string const& id, std::shared_ptr<ServantBase> 
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-            throw_bad_state(state_);
+            throw_bad_state("add()", state_);
         }
     }
 
@@ -158,7 +159,7 @@ void ObjectAdapter::remove(std::string const& id)
             lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
             if (state_ == Destroyed || state_ == Failed)
             {
-                throw_bad_state(state_);
+                throw_bad_state("remove()", state_);
             }
         }
 
@@ -185,7 +186,8 @@ shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-            throw_bad_state(state_);
+// this_thread::sleep_for(chrono::seconds(10000)); // TODO: remove this
+            throw_bad_state("find()", state_);
         }
     }
 
@@ -210,7 +212,7 @@ void ObjectAdapter::add_dflt_servant(std::string const& category, std::shared_pt
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-            throw_bad_state(state_);
+            throw_bad_state("add_dflt_servant()", state_);
         }
     }
 
@@ -234,7 +236,7 @@ void ObjectAdapter::remove_dflt_servant(std::string const& category)
             lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
             if (state_ == Destroyed || state_ == Failed)
             {
-                throw_bad_state(state_);
+                throw_bad_state("remove_dflt_servant()", state_);
             }
         }
 
@@ -262,7 +264,8 @@ shared_ptr<ServantBase> ObjectAdapter::find_dflt_servant(std::string const& cate
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-            throw_bad_state(state_);
+// this_thread::sleep_for(chrono::seconds(10000)); // TODO: remove this
+            throw_bad_state("find_dflt_servant()", state_);
         }
     }
 
@@ -308,7 +311,7 @@ void ObjectAdapter::activate()
         case Destroyed:
         case Failed:
         {
-            throw_bad_state(state_);
+            throw_bad_state("activate()", state_);
         }
         default:
         {
@@ -329,7 +332,7 @@ void ObjectAdapter::shutdown()
         }
         case Failed:
         {
-            throw_bad_state(state_);
+            throw_bad_state("shutdown() [state_ == Failed]", state_);
         }
         case Inactive:
         {
@@ -349,7 +352,7 @@ void ObjectAdapter::shutdown()
             }
             if (state_ == Failed)
             {
-                throw_bad_state(state_);
+                throw_bad_state("shutdown() [state == Activating]", state_);
             }
             // LCOV_EXCL_STOP
 
@@ -358,7 +361,7 @@ void ObjectAdapter::shutdown()
         case Active:
         {
             state_ = Deactivating;
-            stop_workers();
+            stopper_->stop();
             state_changed_.notify_all();
             break;
         }
@@ -388,11 +391,11 @@ void ObjectAdapter::wait_for_shutdown()
 
     if (state == Failed)
     {
-        throw_bad_state(state);
+        throw_bad_state("wait_for_shutdown()", state);
     }
 }
 
-void ObjectAdapter::throw_bad_state(AdapterState state) const
+void ObjectAdapter::throw_bad_state(string const& label, AdapterState state) const
 {
     string bad_state;
     switch (state)
@@ -420,16 +423,31 @@ void ObjectAdapter::throw_bad_state(AdapterState state) const
             break;
         }
     }
-    MiddlewareException e("Object adapter in " + bad_state + " state (adapter: " + name_ + ")");
+    MiddlewareException e(label + ": Object adapter in " + bad_state + " state (adapter: " + name_ + ")");
     e.remember(exception_);  // Remember any exception encountered by the broker thread or a worker thread.
     throw e;
 }
 
 void ObjectAdapter::run_workers()
 {
+    {
+        lock_guard<mutex> state_lock(state_mutex_);
+        try
+        {
+            // Start the publisher for stop messages.
+            stopper_.reset(new StopPublisher(mw_.context(), name_ + "-stoppper"));
+        }
+        catch (...)
+        {
+            state_ = Failed;
+            state_changed_.notify_all();
+            throw MiddlewareException("ObjectAdapter::run_workers(): stop thread failure (adapter: " + name_ + ")"); // LCOV_EXCL_LINE
+        }
+    }
+
     // Start a broker thread to forward incoming messages to backend workers and
     // wait for the broker thread to finish its initialization. The broker
-    // signals after it has connected to the ctrl socket.
+    // signals after it has connected to the stop socket.
     {
         lock_guard<mutex> lock(ready_mutex_);
         ready_ = promise<void>();
@@ -469,54 +487,11 @@ void ObjectAdapter::run_workers()
         // LCOV_EXCL_START
         catch (...) //
         {
-            stop_workers();
+            stopper_->stop();
             throw MiddlewareException("ObjectAdapter::run_workers(): worker thread failure (adapter: " + name_ + ")");
         }
         // LCOV_EXCL_STOP
     }
-}
-
-void ObjectAdapter::init_ctrl_socket()
-{
-    lock_guard<mutex> lock(ctrl_mutex_);
-
-    // PUB socket to let the broker and workers know when it is time to shut down.
-    // Sending anything means the socket becomes ready for reading, which causes
-    // the broker and worker threads to finish.
-    ctrl_.reset(new zmqpp::socket(*mw_.context(), zmqpp::socket_type::publish));
-    ctrl_->set(zmqpp::socket_option::linger, 0);
-    ctrl_->bind("inproc://" + name_ + "_adapter_ctrl");
-}
-
-zmqpp::socket ObjectAdapter::subscribe_to_ctrl_socket()
-{
-    zmqpp::socket ctrl(*mw_.context(), zmqpp::socket_type::subscribe);
-    ctrl.set(zmqpp::socket_option::linger, 0);
-    ctrl.connect("inproc://" + name_ + "_adapter_ctrl"); // Once a thread can read from here, that's the command to stop.
-    ctrl.subscribe("");
-    return move(ctrl);
-}
-
-void ObjectAdapter::stop_workers() noexcept
-{
-    lock_guard<mutex> lock(ctrl_mutex_);
-
-    try
-    {
-        ctrl_->send("stop");
-    }
-    // LCOV_EXCL_START
-    catch (std::exception const& e)
-    {
-        // TODO: log this instead
-        cerr << "ObjectAdapter::stop_workers(): " << e.what() << endl;
-    }
-    catch (...)
-    {
-        // TODO: log this instead
-        cerr << "ObjectAdapter::stop_workers(): unknown exception" << endl;
-    }
-    // LCOV_EXCL_STOP
 }
 
 // For the ipc transport, zmq permits more than one server to bind to the same endpoint.
@@ -574,12 +549,8 @@ void ObjectAdapter::broker_thread()
 {
     try
     {
-        // Create the writing end of the ctrl socket. We need to do this before subscribing because, for inproc
-        // pub-sub sockets, the bind must happen before the connect.
-        init_ctrl_socket();
-
-        // Subscribe to ctrl socket. Once this socket becomes readable, that's the command to finish.
-        auto ctrl = subscribe_to_ctrl_socket();
+        // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
+        auto stop = stopper_->subscribe();
 
         // Set up message pump. Router-dealer for twoway adapter, pull-push for oneway adapter.
         auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
@@ -592,7 +563,7 @@ void ObjectAdapter::broker_thread()
 
         try
         {
-            poller.add(ctrl);
+            poller.add(stop);
 
             frontend.set(zmqpp::socket_option::linger, 0);
             // "Safe" bind: prevents two servers from binding to the same endpoint.
@@ -625,13 +596,13 @@ void ObjectAdapter::broker_thread()
         {
             zmqpp::message message;
             poller.poll();
-            if (poller.has_input(ctrl))
+            if (poller.has_input(stop))
             {
-                // When the ctrl socket becomes ready, we need to get out of here.
+                // When the stop socket becomes ready, we need to get out of here.
                 // We stop reading more requests from the router, but continue processing
                 // while there are still replies outstanding.
-                ctrl.receive(message);
-                ctrl.close();
+                poller.remove(stop);
+                stop.close();
                 shutting_down = true;
             }
             if (!shutting_down && poller.has_input(frontend)) // Once shutting down, we no longer read incoming messages.
@@ -696,9 +667,9 @@ void ObjectAdapter::worker_thread()
     {
         zmqpp::poller poller;
 
-        // Subscribe to ctrl socket. Once this socket becomes readable, that's the command to finish.
-        auto ctrl = subscribe_to_ctrl_socket();
-        poller.add(ctrl);
+        // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
+        auto stop = stopper_->subscribe();
+        poller.add(stop);
 
         auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
         zmqpp::socket s(*mw_.context(), socket_type);
@@ -728,11 +699,10 @@ void ObjectAdapter::worker_thread()
             }
 
             poller.poll();
-            if (poller.has_input(ctrl)) // Parent sent a stop message, so we are supposed to go away.
+            if (poller.has_input(stop)) // Parent sent a stop message, so we are supposed to go away.
             {
-                zmqpp::message message;
-                ctrl.receive(message);
-                ctrl.close();
+                poller.remove(stop);
+                stop.close();
                 finish = true;
             }
 
@@ -838,7 +808,7 @@ void ObjectAdapter::worker_thread()
     // LCOV_EXCL_START
     catch (...)
     {
-        stop_workers();  // Fatal error, we need to stop all other workers and the broker.
+        stopper_->stop();  // Fatal error, we need to stop all other workers and the broker.
         MiddlewareException e("ObjectAdapter: worker thread failure (adapter: " + name_ + ")");
         store_exception(e);
         // We may not have signaled the parent yet, depending on where things went wrong.

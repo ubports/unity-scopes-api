@@ -86,8 +86,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     in_params.setName(scope_id.c_str());
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
-    auto socket = future.get();
-    ZmqReceiver receiver(socket.zmqpp_socket());
+    auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
@@ -121,8 +120,7 @@ MetadataMap ZmqRegistry::list()
     make_request_(request_builder, "list");
 
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
-    auto socket = future.get();
-    ZmqReceiver receiver(socket.zmqpp_socket());
+    auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();
@@ -152,8 +150,7 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
     // locate uses a custom timeout because it needs to potentially fork/exec the scope.
     int64_t timeout = 1000; // TODO: get timeout from config
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder, timeout); });
-    auto socket = future.get();
-    ZmqReceiver receiver(socket.zmqpp_socket());
+    auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
     auto response = reader.getRoot<capnproto::Response>();

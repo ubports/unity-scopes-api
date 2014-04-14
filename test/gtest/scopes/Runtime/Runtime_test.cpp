@@ -368,6 +368,10 @@ TEST(Runtime, early_cancel)
     // over the wire.
     auto receiver = make_shared<CancelReceiver>();
     auto ctrl = scope->search("test", SearchMetadata("unused", "unused"), receiver);
+    // Allow some time for the search message to get there.
+    this_thread::sleep_for(chrono::milliseconds(100));
+    // search() in the scope doesn't return for some time, so the cancel() that follows
+    // is sent to the "fake" QueryCtrlProxy.
     ctrl->cancel();
     receiver->wait_until_finished();
 }
@@ -402,6 +406,10 @@ int main(int argc, char **argv)
 
     Runtime::SPtr scrt = move(Runtime::create_scope_runtime("SlowCreateScope", "Runtime.ini"));
     std::thread slow_create_t(slow_create_thread, scrt);
+
+    // Give threads some time to bind to their endpoints, to avoid getting ObjectNotExistException
+    // from a synchronous remote call.
+    this_thread::sleep_for(chrono::milliseconds(200));
 
     auto rc = RUN_ALL_TESTS();
 

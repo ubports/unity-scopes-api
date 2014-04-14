@@ -65,11 +65,18 @@ ThreadPool::ThreadPool(int size)
 ThreadPool::~ThreadPool()
 {
     queue_->destroy();
+
+    vector<thread> threads;
+    {
+        lock_guard<mutex> lock(mutex_);
+        threads.swap(threads_);
+    }
+
     try
     {
-        for (size_t i = 0; i < threads_.size(); ++i)
+        for (size_t i = 0; i < threads.size(); ++i)
         {
-            threads_[i].join();
+            threads[i].join();
         }
     }
     catch (...) // LCOV_EXCL_LINE

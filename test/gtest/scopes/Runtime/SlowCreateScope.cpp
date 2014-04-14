@@ -45,14 +45,21 @@ public:
     {
         lock_guard<mutex> lock(mutex_);
         cancelled_ = true;
-        cond_.notify_one();
+        cond_.notify_all();
     }
 
     virtual void run(SearchReplyProxy const&) override
     {
+        if (!valid())
+        {
+            return; // Query was cancelled already
+        }
+        // We time out the wait because, otherwise, the scope's object adapter can't shut down
+        // and the test hangs forever.
+        // If this fails, the cancelled method wasn't called after one second.
+        auto stop_time = chrono::steady_clock::now() + chrono::seconds(1);
         unique_lock<mutex> lock(mutex_);
-        EXPECT_FALSE(cancelled_);
-        cond_.wait(lock, [this]{ return cancelled_;});
+        EXPECT_TRUE(cond_.wait_until(lock, stop_time, [this]{ return cancelled_;}));
     }
 
 private:

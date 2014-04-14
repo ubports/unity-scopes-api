@@ -77,6 +77,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         middleware_ = middleware_factory_->create(scope_id_, default_middleware, middleware_configfile);
         middleware_->start();
 
+        async_pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
+        future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
+        waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
+
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
             cerr << "Warning: no registry configured" << endl;
@@ -132,12 +136,13 @@ void RuntimeImpl::destroy()
     }
     destroyed_ = true;
 
+    async_pool_ = nullptr;
+
     if (future_queue_)
     {
         future_queue_->destroy();
         future_queue_->wait_for_destroy();
     }
-    async_pool_ = nullptr;
 
     if (reply_reaper_)
     {
@@ -246,17 +251,7 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
 
 ThreadPool::SPtr RuntimeImpl::async_pool() const
 {
-    // We lazily create the async invocation pool the first time we are asked for it,
-    // which happens when the first query is created. We also create the future
-    // queue here and its waiter thread, so we can clean up once asynchronous
-    // queries complete.
     lock_guard<mutex> lock(mutex_);
-    if (!async_pool_)
-    {
-        async_pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
-        future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
-        waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
-    }
     return async_pool_;
 }
 

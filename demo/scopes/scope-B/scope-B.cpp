@@ -112,6 +112,11 @@ public:
 
     virtual void run(SearchReplyProxy const& upstream_reply)
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
         {

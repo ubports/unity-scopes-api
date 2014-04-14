@@ -176,7 +176,7 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: activate(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -194,25 +194,22 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): stop thread "
                          "failure (adapter: testscope):\n"
-                         "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                         "(adapter: testscope):\n"
+                         "    unity::scopes::MiddlewareException: StopPublisher(): publisher thread "
+                         "failed (endpoint: inproc://testscope-stoppper):\n"
                          "        Address already in use",
                          e.what());
         }
+
         try
         {
             b.shutdown();
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                         "    Exception history:\n"
-                         "        Exception #1:\n"
-                         "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                         "(adapter: testscope):\n"
-                         "                Address already in use",
+            EXPECT_STREQ("unity::scopes::MiddlewareException: shutdown() [state_ == Failed]: "
+                         "Object adapter in Failed state (adapter: testscope)",
                          e.what());
         }
         try
@@ -221,13 +218,9 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                          "    Exception history:\n"
-                          "        Exception #1:\n"
-                          "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                          "(adapter: testscope):\n"
-                          "                Address already in use",
-                          e.what());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: wait_for_shutdown(): "
+                         "Object adapter in Failed state (adapter: testscope)",
+                         e.what());
         }
     }
 }
@@ -907,7 +900,8 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                EXPECT_STREQ("unity::scopes::MiddlewareException: remove(): "
+                             "Object adapter in Destroyed state (adapter: testscope)",
                              e.what());
             }
         };
@@ -1005,7 +999,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: add(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -1016,7 +1010,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: find(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -1212,7 +1206,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: add_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 
@@ -1224,7 +1219,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: remove_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 
@@ -1236,7 +1232,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: find_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 }

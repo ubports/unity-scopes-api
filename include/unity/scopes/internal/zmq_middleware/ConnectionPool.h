@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -24,7 +24,6 @@
 
 #include <zmqpp/socket.hpp>
 
-#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -33,6 +32,8 @@
 // different threads to crash.
 // So, we maintain a pool of invocation threads, with each thread keeping its own cache of sockets.
 // Sockets are indexed by adapter name and created lazily.
+//
+// WARNING: No locking anywhere here. The pool is intended for us as a thread_local static member only.
 
 namespace unity
 {
@@ -46,41 +47,6 @@ namespace internal
 namespace zmq_middleware
 {
 
-namespace pool_private
-{
-
-struct SocketData
-{
-    zmqpp::socket socket;
-    RequestMode mode;
-};
-
-typedef std::unordered_map<std::string, pool_private::SocketData> CPool;
-
-}
-
-class ConnectionPool;
-
-class Socket final
-{
-public:
-    Socket(Socket&&);
-    Socket& operator=(Socket&&);
-    ~Socket();
-
-    zmqpp::socket& zmqpp_socket();
-    void invalidate();
-
-private:
-    Socket(ConnectionPool* pool, pool_private::CPool::value_type pool_entry);  // Only instantiated by ConnectionPool
-
-    ConnectionPool* pool_;                        // Owning pool pointer
-    pool_private::CPool::value_type pool_entry_;
-    bool invalidated_;
-
-    friend class ConnectionPool;
-};
-
 class ConnectionPool final
 {
 public:
@@ -91,23 +57,19 @@ public:
     void remove(std::string const& endpoint);
     void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m);
 
-    // Removes a twoway socket from the pool and returns it, creating the
-    // connection if none can be found. This gives exclusive use of the socket
-    // to an outgoing twoway request for the duration. The Socket destructor
-    // puts the entry back into the pool by calling put().
-    Socket take(std::string const& endpoint, int64_t timeout);
-
 private:
-    // Returns the passed entry back to the pool.
-    void put(pool_private::CPool::value_type entry);
+    struct SocketData
+    {
+        zmqpp::socket socket;
+        RequestMode mode;
+    };
 
-    pool_private::CPool::value_type create_connection(std::string const& endpoint, RequestMode m, int64_t timeout);
+    typedef std::unordered_map<std::string, SocketData> CPool;
+
+    CPool::value_type create_connection(std::string const& endpoint, RequestMode m, int64_t timeout);
 
     zmqpp::context& context_;
-    pool_private::CPool pool_;
-    std::mutex mutex_;
-
-    friend class Socket;
+    CPool pool_;
 };
 
 } // namespace zmq_middleware

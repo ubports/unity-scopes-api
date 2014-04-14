@@ -76,6 +76,16 @@ public:
     */
     virtual void cancelled() = 0;                          // Originator cancelled the query
 
+    /**
+    \brief Check whether this query is still valid.
+
+    valid() returns false if this query is finished or was cancelled earlier. Note that it is possible
+    that the run time may call SearchQueryBase::run(), ActivationQueryBase::activate(), or PreviewQueryBase::run()
+    \a after cancelled was called. Your implementation of these methods should check whether the query is still
+    valid and, if not, do nothing.
+    */
+    bool valid() const;
+
     /// @cond
     virtual ~QueryBase();
     /// @endcond

@@ -84,9 +84,10 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // completes, by which time the query for the later run() call may have been
     // cancelled already.
     // If the query was cancelled by the client before we even receive the
-    // run invocation, we never forward the run() to the implementation.
+    // run invocation, we never forward the run() call to the implementation.
     if (!pushable_)
     {
+        // TODO: Need to reset self_ and disconnect() here?
         return;
     }
 
@@ -102,12 +103,13 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     self_ = nullptr;
     disconnect();
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
     try
     {
         auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
         assert(search_query);
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the query may still be outstanding.
         search_query->run(reply_proxy);
     }
     catch (std::exception const& e)

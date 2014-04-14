@@ -46,6 +46,11 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         DepartmentList departments({{"news", query_, "News", {{"news-world", query_, "World"}, {"news-europe", query_, "Europe"}}},
                                     {"sport", query_, "Sport"}});
         reply->register_departments(departments);
@@ -56,7 +61,10 @@ public:
         filter->add_option("2", "Option 2");
         filters.push_back(filter);
         FilterState filter_state; // TODO: push real state from query obj
-        reply->push(filters, filter_state);
+        if (!reply->push(filters, filter_state))
+        {
+            return;  // Query was cancelled
+        }
 
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
@@ -65,7 +73,10 @@ public:
         res.set_title("scope-A: result 1 for query \"" + query_.query_string() + "\"");
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
-        reply->push(res);
+        if (!reply->push(res))
+        {
+            return;  // Query was cancelled
+        }
 
         CannedQuery q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
@@ -119,9 +130,18 @@ public:
         layout3col.add_column({"rating"});
 
         reply->register_layout({layout1col, layout2col, layout3col});
-        reply->push(widgets);
-        reply->push("author", Variant("Foo"));
-        reply->push("rating", Variant("4 blah"));
+        if (!reply->push(widgets))
+        {
+            return;  // Query was cancelled
+        }
+        if (!reply->push("author", Variant("Foo")))
+        {
+            return;  // Query was cancelled
+        }
+        if (!reply->push("rating", Variant("4 blah")))
+        {
+            return;  // Query was cancelled
+        }
         cout << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
     }
 

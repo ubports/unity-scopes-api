@@ -154,8 +154,8 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
     if (!monitor_initialized) {
         monitor_initialized = true;
         zmqpp::socket monitor_socket(context, zmqpp::socket_type::publish);
-        monitor_socket.connect(MONITOR_ENDPOINT);
         monitor_socket.set(zmqpp::socket_option::linger, 0);
+        monitor_socket.connect(MONITOR_ENDPOINT);
         pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket), RequestMode::Oneway);
     }
 }
@@ -183,7 +183,7 @@ void ZmqObjectProxy::invoke_oneway(capnp::MessageBuilder& out_params)
 #endif
 }
 
-Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params)
+ZmqReceiver ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params)
 {
     return invoke_twoway(out_params, timeout_);
 }
@@ -192,14 +192,14 @@ Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params)
 // Poll for the reply with the given timeout.
 // Return a socket for the response or throw if the timeout expires.
 
-Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
 
     assert(mode_ == RequestMode::Twoway);
-    Socket s = pool.take(endpoint_, timeout);   // We now have exclusive use of this socket for this invocation
-    ZmqSender sender(s.zmqpp_socket());
+    zmqpp::socket& s = pool.find(endpoint_, mode_);
+    ZmqSender sender(s);
     auto segments = out_params.getSegmentsForOutput();
     sender.send(segments);
 
@@ -213,17 +213,17 @@ Socket ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t 
 #endif
 
     zmqpp::poller p;
-    p.add(s.zmqpp_socket());
+    p.add(s);
     p.poll(timeout);
-    if (!p.has_input(s.zmqpp_socket()))
+    if (!p.has_input(s))
     {
         // If a request times out, we must close the corresponding socket, otherwise
         // zmq gets confused: the reply will never be read, so the socket ends up
         // in a bad state.
-        s.invalidate();
+        s.close();
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }
-    return s;
+    return ZmqReceiver(s);
 }
 
 } // namespace zmq_middleware
