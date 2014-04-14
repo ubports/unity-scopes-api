@@ -33,7 +33,6 @@
 #include <cassert>
 #include <future>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -41,8 +40,6 @@
 #include <libgen.h>
 
 #include <boost/filesystem/path.hpp>
-
-#include <sys/apparmor.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -90,34 +87,6 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
-
-        ScopeConfig sc(scope_config.c_str());
-
-        // Drop our privileges
-        string profile;
-        switch (sc.confinement_type())
-        {
-            case ConfinementType::Trusted:
-                break;
-            case ConfinementType::UntrustedLocal:
-                profile = "unity-scope-local";
-                break;
-            case ConfinementType::UntrustedInternet:
-                profile = "unity-scope-internet";
-                break;
-        }
-
-        if (!profile.empty())
-        {
-            int profile_change_code = aa_change_profile(profile.c_str());
-            if (profile_change_code != 0)
-            {
-                ostringstream message;
-                message << "Couldn't change to AppArmor profile [" << profile
-                        << "] error = [" << profile_change_code << "]";
-                throw ConfigException(message.str());
-            }
-        }
 
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "/lib" + scope_id + ".so", rt->registry());
         loader->start();

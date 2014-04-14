@@ -36,7 +36,7 @@ namespace internal
 {
 
 ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
-    mw_(mw), confinement_type_(ConfinementType::Trusted)
+    mw_(mw)
 {
 }
 
@@ -49,7 +49,6 @@ ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBa
 ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     mw_(other.mw_),
     scope_id_(other.scope_id_),
-    confinement_type_(other.confinement_type_),
     proxy_(other.proxy_),
     display_name_(other.display_name_),
     description_(other.description_),
@@ -88,7 +87,6 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
     {
         mw_ = rhs.mw_;
         scope_id_ = rhs.scope_id_;
-        confinement_type_ = rhs.confinement_type_;
         proxy_ = rhs.proxy_;
         display_name_ = rhs.display_name_;
         description_ = rhs.description_;
@@ -107,11 +105,6 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
 std::string ScopeMetadataImpl::scope_id() const
 {
     return scope_id_;
-}
-
-ConfinementType ScopeMetadataImpl::confinement_type() const
-{
-    return confinement_type_;
 }
 
 ScopeProxy ScopeMetadataImpl::proxy() const
@@ -198,11 +191,6 @@ void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
     scope_id_ = scope_id;
 }
 
-void ScopeMetadataImpl::set_confinement_type(ConfinementType confinement_type)
-{
-    confinement_type_ = confinement_type;
-}
-
 void ScopeMetadataImpl::set_proxy(ScopeProxy const& proxy)
 {
     proxy_ = proxy;
@@ -284,7 +272,6 @@ VariantMap ScopeMetadataImpl::serialize() const
 
     VariantMap var;
     var["scope_id"] = scope_id_;
-    var["confinement_type"] = (int) confinement_type_;
     VariantMap proxy;
     proxy["identity"] = proxy_->identity();
     proxy["endpoint"] = proxy_->endpoint();
@@ -376,9 +363,6 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     author_ = it->second.get_string();
 
     // Optional fields
-
-    it = var.find("confinement_type");
-    confinement_type_ = (ConfinementType) it->second.get_int();
 
     it = var.find("art");
     if (it != var.end())

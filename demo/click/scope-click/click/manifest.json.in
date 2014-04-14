@@ -1,10 +1,11 @@
 {
-    "description": "A pretend click scope",
+    "description": "A pretend click scope with filesystem access",
     "framework": "ubuntu-sdk-14.04-dev1",
     "architecture": "@CLICK_ARCH@",
     "hooks": {
         "scope-click": {
-            "scope": "scope-click"
+            "scope": "scope-click",
+            "apparmor": "scope-security.json"
         }
     },
     "icon": "@CLICK_SCOPE_ICON@",
