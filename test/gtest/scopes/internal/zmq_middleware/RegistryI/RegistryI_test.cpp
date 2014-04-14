@@ -471,18 +471,18 @@ protected:
     std::map<std::string, ScopeProxy> proxies;
 };
 
-        // test initial state
+// test initial state
 TEST_F(RegistryTest, locate_init)
-        {
-            // check that no scope processes are running
-            for (auto const& scope_id : scope_ids)
-            {
-                EXPECT_FALSE(reg->is_scope_running(scope_id));
-            }
+{
+    // check that no scope processes are running
+    for (auto const& scope_id : scope_ids)
+    {
+        EXPECT_FALSE(reg->is_scope_running(scope_id));
+    }
 
-            // check that no new processes have been started yet
+    // check that no new processes have been started yet
     EXPECT_EQ(0, process_count());
-        }
+}
 
 // test locating the same scope multiple times
 TEST_F(RegistryTest, locate_one)
@@ -525,36 +525,36 @@ TEST_F(RegistryTest, locate_all)
     EXPECT_EQ(6, process_count());
 }
 
-        // test scope death and re-locate
+// test scope death and re-locate
 TEST_F(RegistryTest, locate_relocate)
-        {
-            // locate first scope
-            EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+{
+    // locate first scope
+    EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
 
-            // check that the first scope is running
-            EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
+    // check that the first scope is running
+    EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
 
-            // check that 1 new process was started
+    // check that 1 new process was started
     EXPECT_EQ(1, process_count());
 
-            // kill first scope
-            int scope1_pid = first_child_pid();
-            kill(scope1_pid, SIGKILL);
+    // kill first scope
+    int scope1_pid = first_child_pid();
+    kill(scope1_pid, SIGKILL);
 
-            // wait for the SIGCHLD signal to reach the registry
-            while (reg->is_scope_running(scope_ids[0]))
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds{10});
-            }
+    // wait for the SIGCHLD signal to reach the registry
+    while (reg->is_scope_running(scope_ids[0]))
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    }
 
-            // check that we now have no running scopes
+    // check that we now have no running scopes
     EXPECT_EQ(0, process_count());
 
-            // locate first scope
-            EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+    // locate first scope
+    EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
 
-            // check that the first scope is running
-            EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
+    // check that the first scope is running
+    EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
 
             // check that 1 new process was started
     EXPECT_EQ(1, process_count());
@@ -562,18 +562,18 @@ TEST_F(RegistryTest, locate_relocate)
 
 // test removing a scope
 TEST_F(RegistryTest, locate_remove)
-        {
-            // locate all scopes (hense starting all scope processes)
-            for (auto const& scope_id : scope_ids)
-            {
-                EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
-            }
+{
+    // locate all scopes (hense starting all scope processes)
+    for (auto const& scope_id : scope_ids)
+    {
+        EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
+    }
 
-            // check that 6 new processes were started
+    // check that 6 new processes were started
     EXPECT_EQ(6, process_count());
 
-            // remove a scope (hense killing the process)
-            EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
+    // remove a scope (hense killing the process)
+    EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
 
             // check that we now have 5 scopes running
     EXPECT_EQ(5, process_count());
@@ -585,7 +585,7 @@ TEST_F(RegistryTest, locate_remove)
 
     // check that we are back to the original number of processes
     EXPECT_EQ(0, process_count());
-        }
+}
 
 // test custom scoperunner executable
 TEST_F(RegistryTest, locate_custom_exec)
