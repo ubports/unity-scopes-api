@@ -37,6 +37,7 @@
 #include <set>
 
 using namespace std;
+using namespace testing;
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -375,58 +376,27 @@ TEST(RegistryI, locate_mock)
     }
 }
 
-std::string exec_cmd(std::string const& cmd)
+class RegistryTest : public Test
 {
-    FILE* pipe = popen(cmd.c_str(), "r");
-    if (!pipe)
+public:
+    RegistryTest()
     {
-        return "";
-    }
+        start_process_count = process_count();
 
-    char buffer[128];
-    std::string result;
-    while (!feof(pipe))
-    {
-        if (fgets(buffer, 128, pipe) != NULL)
-        {
-            result += buffer;
-        }
-    }
-    pclose(pipe);
-
-    return result;
-}
-
-int first_child_pid()
-{
-    return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));
-}
-
-int process_count()
-{
-    return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
-}
-
-TEST(RegistryI, locate)
-{
-    // get number of processes belonging to this test instance
-    int start_process_count = process_count();
-    int current_process_count = 0;
-    {
         // configure registry
-        std::string rt_config = TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini";
+        rt_config = TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini";
 
-        RuntimeImpl::UPtr rt = RuntimeImpl::create("TestRegistry", rt_config);
-        string reg_id = rt->registry_identity();
+        rt = RuntimeImpl::create("TestRegistry", rt_config);
+        std::string reg_id = rt->registry_identity();
 
         RegistryConfig c(reg_id, rt->registry_configfile());
-        string mw_kind = c.mw_kind();
-        string scoperunner_path = c.scoperunner_path();
+        std::string mw_kind = c.mw_kind();
+        std::string scoperunner_path = c.scoperunner_path();
 
-        MiddlewareBase::SPtr mw = rt->factory()->find(reg_id, mw_kind);
+        mw = rt->factory()->find(reg_id, mw_kind);
 
         Executor::SPtr executor = make_shared<Executor>();
-        RegistryObject::SPtr reg(new RegistryObject(*scope.death_observer, executor));
+        reg = RegistryObject::SPtr(new RegistryObject(*scope.death_observer, executor));
         mw->add_registry_object(reg_id, reg);
         mw->add_state_receiver_object("StateReceiver", reg->state_receiver());
 
@@ -434,9 +404,7 @@ TEST(RegistryI, locate)
         ///! TODO: HACK:
         /// we have to start scope-C and scope-D before starting scope-B here, as B aggregates C and D.
         /// (When re-binding logic is introduced, this will be unnecessary)
-        std::array<std::string, 6> scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
-        std::map<std::string, ScopeProxy> proxies;
-
+        scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
         for (auto& scope_id : scope_ids)
         {
             proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
@@ -458,8 +426,53 @@ TEST(RegistryI, locate)
 
             reg->add_local_scope(scope_id, move(meta), exec_data);
         }
+    }
+
+    int first_child_pid()
+    {
+        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));
+    }
+
+    int process_count()
+    {
+        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
+        return current_process_count - start_process_count;
+    }
+
+protected:
+    std::string exec_cmd(std::string const& cmd)
+    {
+        FILE* pipe = popen(cmd.c_str(), "r");
+        if (!pipe)
+        {
+            return "";
+        }
+
+        char buffer[128];
+        std::string result;
+        while (!feof(pipe))
+        {
+            if (fgets(buffer, 128, pipe) != NULL)
+            {
+                result += buffer;
+            }
+        }
+        pclose(pipe);
+
+        return result;
+    }
+
+    int start_process_count = 0;
+    std::string rt_config;
+    RuntimeImpl::UPtr rt;
+    MiddlewareBase::SPtr mw;
+    RegistryObject::SPtr reg;
+    std::array<std::string, 6> scope_ids;
+    std::map<std::string, ScopeProxy> proxies;
+};
 
         // test initial state
+TEST_F(RegistryTest, locate_init)
         {
             // check that no scope processes are running
             for (auto const& scope_id : scope_ids)
@@ -468,11 +481,52 @@ TEST(RegistryI, locate)
             }
 
             // check that no new processes have been started yet
-            current_process_count = process_count();
-            EXPECT_EQ(0, current_process_count - start_process_count);
+    EXPECT_EQ(0, process_count());
         }
 
+// test locating the same scope multiple times
+TEST_F(RegistryTest, locate_one)
+{
+    // locate all scopes (hense starting all scope processes)
+    for (auto const& scope_id : scope_ids)
+    {
+        EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
+    }
+
+    // check that 6 new processes were started
+    EXPECT_EQ(6, process_count());
+
+    // locate the second scope multiple times
+    for (int i = 0; i < 1000; ++i)
+    {
+        EXPECT_EQ(proxies[scope_ids[1]], reg->locate(scope_ids[1]));
+    }
+
+    // check that no new processes were started
+    EXPECT_EQ(6, process_count());
+}
+
+// test locating all scopes
+TEST_F(RegistryTest, locate_all)
+{
+    // locate all scopes (hense starting all scope processes)
+    for (auto const& scope_id : scope_ids)
+    {
+        EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
+    }
+
+    // check that all scopes processes are running
+    for (auto const& scope_id : scope_ids)
+    {
+        EXPECT_TRUE(reg->is_scope_running(scope_id));
+    }
+
+    // check that 6 new processes were started
+    EXPECT_EQ(6, process_count());
+}
+
         // test scope death and re-locate
+TEST_F(RegistryTest, locate_relocate)
         {
             // locate first scope
             EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
@@ -481,8 +535,7 @@ TEST(RegistryI, locate)
             EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
 
             // check that 1 new process was started
-            current_process_count = process_count();
-            EXPECT_EQ(1, current_process_count - start_process_count);
+    EXPECT_EQ(1, process_count());
 
             // kill first scope
             int scope1_pid = first_child_pid();
@@ -495,8 +548,7 @@ TEST(RegistryI, locate)
             }
 
             // check that we now have no running scopes
-            current_process_count = process_count();
-            EXPECT_EQ(0, current_process_count - start_process_count);
+    EXPECT_EQ(0, process_count());
 
             // locate first scope
             EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
@@ -505,11 +557,11 @@ TEST(RegistryI, locate)
             EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
 
             // check that 1 new process was started
-            current_process_count = process_count();
-            EXPECT_EQ(1, current_process_count - start_process_count);
+    EXPECT_EQ(1, process_count());
         }
 
-        // test locating all scopes
+// test removing a scope
+TEST_F(RegistryTest, locate_remove)
         {
             // locate all scopes (hense starting all scope processes)
             for (auto const& scope_id : scope_ids)
@@ -517,44 +569,69 @@ TEST(RegistryI, locate)
                 EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
             }
 
-            // check that all scopes processes are running
-            for (auto const& scope_id : scope_ids)
-            {
-                EXPECT_TRUE(reg->is_scope_running(scope_id));
-            }
-
             // check that 6 new processes were started
-            current_process_count = process_count();
-            EXPECT_EQ(6, current_process_count - start_process_count);
-        }
+    EXPECT_EQ(6, process_count());
 
-        // test locating the same scope multiple times
-        {
-            // locate the second scope multiple times
-            for (int i = 0; i < 1000; ++i)
-            {
-                EXPECT_EQ(proxies[scope_ids[1]], reg->locate(scope_ids[1]));
-            }
-
-            // check that no new processes were started
-            current_process_count = process_count();
-            EXPECT_EQ(6, current_process_count - start_process_count);
-        }
-
-        // test removing a scope
-        {
             // remove a scope (hense killing the process)
             EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
 
             // check that we now have 5 scopes running
-            current_process_count = process_count();
-            EXPECT_EQ(5, current_process_count - start_process_count);
-        }
+    EXPECT_EQ(5, process_count());
 
-        // reg falls out of scope here and gets deleted (hense closing all scope processes)
-    }
+    // when the registry is destroyed all scope processes are killed
+    reg.reset();
+    mw.reset();
+    rt.reset();
 
     // check that we are back to the original number of processes
-    current_process_count = process_count();
-    EXPECT_EQ(0, current_process_count - start_process_count);
+    EXPECT_EQ(0, process_count());
+        }
+
+// test custom scoperunner executable
+TEST_F(RegistryTest, locate_custom_exec)
+{
+    std::string test_scope_id = "testscopeB";
+    ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
+
+    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+    mi->set_scope_id(test_scope_id);
+    mi->set_display_name(test_scope_id);
+    mi->set_description(test_scope_id);
+    mi->set_author("Canonical Ltd.");
+    mi->set_proxy(test_proxy);
+    mi->set_scope_directory("/foo");
+    auto meta = ScopeMetadataImpl::create(move(mi));
+
+    RegistryObject::ScopeExecData exec_data;
+    exec_data.scope_id = test_scope_id;
+    exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
+    exec_data.runtime_config = rt_config;
+    exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+
+    reg->add_local_scope(test_scope_id, move(meta), exec_data);
+
+    // check that no new processes have been started yet
+    EXPECT_EQ(0, process_count());
+
+    // locate scope
+    EXPECT_EQ(test_proxy, reg->locate(test_scope_id));
+
+    // check that the scope is running
+    EXPECT_TRUE(reg->is_scope_running(test_scope_id));
+
+    // check that 1 new process was started
+    EXPECT_EQ(1, process_count());
+
+    // kill scope
+    int scope1_pid = first_child_pid();
+    kill(scope1_pid, SIGKILL);
+
+    // wait for the SIGCHLD signal to reach the registry
+    while (reg->is_scope_running(test_scope_id))
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    }
+
+    // check that we now have no running scopes
+    EXPECT_EQ(0, process_count());
 }
