@@ -77,8 +77,8 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
-    string scope_id = scope_config.stem().native();
     string lib_dir = scope_config.parent_path().native();
+    string scope_id = scope_config.stem().native();
     if (!lib_dir.empty())
     {
       lib_dir += '/';
