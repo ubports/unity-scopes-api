@@ -23,8 +23,6 @@
 #include <unity/scopes/internal/ReplyObjectBase.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 
-#include <condition_variable>
-
 namespace unity
 {
 
@@ -50,10 +48,6 @@ private:
     virtual void finished_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r);
-
-    int pushes_busy_;
-    std::mutex push_mutex_;
-    std::condition_variable push_cond_;
 };
 
 } // namespace zmq_middleware

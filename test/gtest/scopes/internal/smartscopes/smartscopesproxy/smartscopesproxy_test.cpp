@@ -223,13 +223,13 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
     std::vector<std::shared_ptr<Receiver>> replies;
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
         meta.proxy()->search("search_string", SearchMetadata("en", "phone"), replies.back());
     }
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         replies[i]->wait_until_finished();
     }
