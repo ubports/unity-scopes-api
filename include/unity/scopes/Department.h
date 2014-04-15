@@ -112,6 +112,15 @@ public:
     void set_subdepartments(DepartmentList const& departments);
 
     /**
+     \brief Sets has_subdepartments flag of this department to true.
+
+     This flag is a display hint for the Shell that indicates if this department has sub-departments and as such should be displayed
+     in a way that suggests futher navigation to the user.
+     Setting this flag is not needed when sub-departments have been added with set_subdepartments() method.
+     */
+    void set_has_subdepartments();
+
+    /**
     \brief Get the identifier of this department.
     \return The department identifier.
     */
@@ -134,6 +143,12 @@ public:
     \return The list of sub-departments.
     */
     DepartmentList subdepartments() const;
+
+    /**
+     \brief Check if this department has subdepartments or has_subdepartments flag is set
+     \return true if this deparment has subdepartments or has_subdepartments flag is set
+     */
+    bool has_subdepartments() const;
 
     /// @cond
     VariantMap serialize() const;

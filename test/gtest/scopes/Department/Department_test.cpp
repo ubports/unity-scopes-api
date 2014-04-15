@@ -27,19 +27,31 @@ using namespace unity::scopes::internal;
 
 TEST(Department, basic)
 {
-    CannedQuery query("fooscope", "foo", "dep1");
-    Department dep(query, "News");
+    {
+        CannedQuery query("fooscope", "foo", "dep1");
+        Department dep(query, "News");
 
-    EXPECT_EQ("dep1", dep.id());
-    EXPECT_EQ("dep1", dep.query().department_id());
-    EXPECT_EQ("fooscope", dep.query().scope_id());
-    EXPECT_EQ("News", dep.label());
+        EXPECT_EQ("dep1", dep.id());
+        EXPECT_EQ("dep1", dep.query().department_id());
+        EXPECT_EQ("fooscope", dep.query().scope_id());
+        EXPECT_EQ("News", dep.label());
+        EXPECT_FALSE(dep.has_subdepartments());
 
-    dep.set_subdepartments({{"subdep1", query, "Europe"}});
-    EXPECT_EQ(1u, dep.subdepartments().size());
-    EXPECT_EQ("subdep1", dep.subdepartments().front().id());
-    EXPECT_EQ("subdep1", dep.subdepartments().front().query().department_id());
-    EXPECT_EQ("Europe", dep.subdepartments().front().label());
+        dep.set_subdepartments({{"subdep1", query, "Europe"}});
+        EXPECT_TRUE(dep.has_subdepartments());
+        EXPECT_EQ(1u, dep.subdepartments().size());
+        EXPECT_EQ("subdep1", dep.subdepartments().front().id());
+        EXPECT_EQ("subdep1", dep.subdepartments().front().query().department_id());
+        EXPECT_EQ("Europe", dep.subdepartments().front().label());
+    }
+    {
+        CannedQuery query("fooscope", "foo", "dep1");
+        Department dep(query, "News");
+        EXPECT_FALSE(dep.has_subdepartments());
+
+        dep.set_has_subdepartments();
+        EXPECT_TRUE(dep.has_subdepartments());
+    }
 }
 
 TEST(Department, serialize_and_deserialize)

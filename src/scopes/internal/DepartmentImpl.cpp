@@ -31,13 +31,15 @@ namespace internal
 {
 DepartmentImpl::DepartmentImpl(CannedQuery const& query, std::string const& label)
     : query_(query),
-      label_(label)
+      label_(label),
+      has_subdepartments_(false)
 {
 }
 
 DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label)
     : query_(query),
-      label_(label)
+      label_(label),
+      has_subdepartments_(false)
 {
     query_.set_department_id(department_id);
 }
@@ -45,9 +47,15 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
 DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
     : query_(query),
       label_(label),
-      departments_(subdepartments)
+      departments_(subdepartments),
+      has_subdepartments_(false)
 {
     query_.set_department_id(department_id);
+}
+
+void DepartmentImpl::set_has_subdepartments()
+{
+    has_subdepartments_ = true;
 }
 
 void DepartmentImpl::set_subdepartments(DepartmentList const& departments)
@@ -70,6 +78,11 @@ CannedQuery DepartmentImpl::query() const
     return query_;
 }
 
+bool DepartmentImpl::has_subdepartments() const
+{
+    return departments_.size() > 0 || has_subdepartments_;
+}
+
 DepartmentList DepartmentImpl::subdepartments() const
 {
     return departments_;
@@ -82,7 +95,14 @@ VariantMap DepartmentImpl::serialize() const
     vm["query"] = query_.serialize();
 
     // sub-departments are optional
-    if (!departments_.empty())
+    if (departments_.empty())
+    {
+        if (has_subdepartments_)
+        {
+            vm["has_subdepartments"] = Variant(has_subdepartments_);
+        }
+    }
+    else
     {
         VariantArray subdeparr;
         for (auto const& dep: departments_)
@@ -121,6 +141,15 @@ Department DepartmentImpl::create(VariantMap const& var)
             subdeps.push_back(create(dep.get_dict()));
         }
         department.set_subdepartments(subdeps);
+    }
+
+    it = var.find("has_subdepartments");
+    if (it != var.end())
+    {
+        if (it->second.get_bool())
+        {
+            department.set_has_subdepartments();
+        }
     }
     return department;
 }

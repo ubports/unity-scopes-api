@@ -69,6 +69,11 @@ VariantMap Department::serialize() const
 
 /// @endcond
 
+void Department::set_has_subdepartments()
+{
+    p->set_has_subdepartments();
+}
+
 void Department::set_subdepartments(DepartmentList const& departments)
 {
     p->set_subdepartments(departments);
@@ -87,6 +92,11 @@ std::string Department::label() const
 CannedQuery Department::query() const
 {
     return p->query();
+}
+
+bool Department::has_subdepartments() const
+{
+    return p->has_subdepartments();
 }
 
 DepartmentList Department::subdepartments() const

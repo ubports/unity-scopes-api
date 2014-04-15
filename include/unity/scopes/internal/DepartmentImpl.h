@@ -43,11 +43,13 @@ public:
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
+    void set_has_subdepartments();
     void set_subdepartments(DepartmentList const& departments);
 
     std::string id() const;
     std::string label() const;
     CannedQuery query() const;
+    bool has_subdepartments() const;
     DepartmentList subdepartments() const;
     VariantMap serialize() const;
 
@@ -61,6 +63,7 @@ private:
     CannedQuery query_;
     std::string label_;
     DepartmentList departments_;
+    bool has_subdepartments_;
 };
 
 } // namespace internal
