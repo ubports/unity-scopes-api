@@ -80,7 +80,7 @@ def scan_for_bad_whitespace(file_path):
 
 parser = argparse.ArgumentParser(description = 'Test that source files do not contain trailing whitespace.')
 parser.add_argument('dir', nargs = 1, help = 'The directory to (recursively) search for source files')
-parser.add_argument('ignore_prefix', nargs = '?', default=None,
+parser.add_argument('ignore_prefix', nargs = '+', default=None,
                     help = 'Ignore source files with a path that starts with the given prefix.')
 args = parser.parse_args()
 
@@ -93,16 +93,20 @@ pat = re.compile(file_pat)
 # directory and check them for trailing whitespace.
 
 directory = os.path.abspath(args.dir[0])
-ignore = args.ignore_prefix and os.path.abspath(args.ignore_prefix) or None
+ignores = args.ignore_prefix and args.ignore_prefix or []
 
 found_whitespace = False
 try:
     for root, dirs, files in os.walk(directory, onerror = raise_error):
         for file in files:
             path = os.path.join(root, file)
-            if not (ignore and path.startswith(ignore)) and pat.match(file):
-                if scan_for_bad_whitespace(path):
-                    found_whitespace = True
+            ignored = False
+            for ignore in ignores:
+                if ignore and path.startswith(os.path.abspath(ignore)):
+                    ignored = True
+                    break
+            if not ignored and pat.match(file) and scan_for_bad_whitespace(path):
+                found_whitespace = True
 
 except OSError as e:
     error("cannot create file list for \"" + dir + "\": " + e.strerror)

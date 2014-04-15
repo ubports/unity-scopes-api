@@ -39,9 +39,9 @@ TEST(ScopeMetadataImpl, basic)
                      (RuntimeImpl*)0x1);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
-    mi->set_scope_id("scope_name");
+    mi->set_scope_id("scope_id");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
+    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_id"));
     mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_author("author");
@@ -51,7 +51,7 @@ TEST(ScopeMetadataImpl, basic)
 
     // Create the public instance and check that the values match
     auto m = ScopeMetadataImpl::create(move(mi));
-    EXPECT_EQ("scope_name", m.scope_id());
+    EXPECT_EQ("scope_id", m.scope_id());
     EXPECT_EQ("identity", m.proxy()->identity());
     EXPECT_EQ("endpoint", m.proxy()->endpoint());
     EXPECT_EQ("display_name", m.display_name());
@@ -100,11 +100,21 @@ TEST(ScopeMetadataImpl, basic)
         EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = hot_key)", e.what());
     }
 
+    try
+    {
+        m.scope_directory();
+        FAIL();
+    }
+    catch (NotFoundException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = scope_directory)", e.what());
+    }
+
     // when "invisible" is not set, false is returned
     EXPECT_FALSE(m.invisible());
 
     // Check that the copy has the same values as the original
-    EXPECT_EQ("scope_name", mi2->scope_id());
+    EXPECT_EQ("scope_id", mi2->scope_id());
     EXPECT_EQ("identity", mi2->proxy()->identity());
     EXPECT_EQ("endpoint", mi2->proxy()->endpoint());
     EXPECT_EQ("display_name", mi2->display_name());
@@ -122,6 +132,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_hot_key("hot_key");
     mi2->set_invisible(true);
     mi2->set_appearance_attributes(attrs);
+    mi2->set_scope_directory("/foo");
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -135,9 +146,9 @@ TEST(ScopeMetadataImpl, basic)
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
-    ti->set_scope_id("tmp scope_name");
+    ti->set_scope_id("tmp scope_id");
     mw_proxy = mw.create_scope_proxy("tmp identity", "tmp endpoint");
-    ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "tmp scope_name"));
+    ti->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "tmp scope_id"));
     ti->set_display_name("tmp display_name");
     ti->set_description("tmp description");
     ti->set_author("tmp author");
@@ -146,12 +157,13 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_search_hint("tmp search_hint");
     ti->set_hot_key("tmp hot_key");
     ti->set_invisible(true);
+    ti->set_scope_directory("/foo");
     ti->set_appearance_attributes(attrs);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
     ci = *ti;
-    EXPECT_EQ("tmp scope_name", ci.scope_id());
+    EXPECT_EQ("tmp scope_id", ci.scope_id());
     EXPECT_EQ("tmp identity", ci.proxy()->identity());
     EXPECT_EQ("tmp endpoint", ci.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", ci.display_name());
@@ -161,13 +173,14 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", ci.icon());
     EXPECT_EQ("tmp search_hint", ci.search_hint());
     EXPECT_EQ("tmp hot_key", ci.hot_key());
+    EXPECT_EQ("/foo", ci.scope_directory());
     EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
     m = tmp;
-    EXPECT_EQ("tmp scope_name", m.scope_id());
+    EXPECT_EQ("tmp scope_id", m.scope_id());
     EXPECT_EQ("tmp identity", m.proxy()->identity());
     EXPECT_EQ("tmp endpoint", m.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", m.display_name());
@@ -177,12 +190,13 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", m.icon());
     EXPECT_EQ("tmp search_hint", m.search_hint());
     EXPECT_EQ("tmp hot_key", m.hot_key());
+    EXPECT_EQ("/foo", m.scope_directory());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(m.invisible());
 
     // Self-assignment
     tmp = tmp;
-    EXPECT_EQ("tmp scope_name", tmp.scope_id());
+    EXPECT_EQ("tmp scope_id", tmp.scope_id());
     EXPECT_EQ("tmp identity", tmp.proxy()->identity());
     EXPECT_EQ("tmp endpoint", tmp.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", tmp.display_name());
@@ -193,11 +207,12 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp search_hint", tmp.search_hint());
     EXPECT_EQ("tmp hot_key", tmp.hot_key());
     EXPECT_EQ("bar", tmp.appearance_attributes()["foo"].get_string());
+    EXPECT_EQ("/foo", tmp.scope_directory());
     EXPECT_TRUE(tmp.invisible());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
-    EXPECT_EQ("tmp scope_name", tmp2.scope_id());
+    EXPECT_EQ("tmp scope_id", tmp2.scope_id());
     EXPECT_EQ("tmp identity", tmp2.proxy()->identity());
     EXPECT_EQ("tmp endpoint", tmp2.proxy()->endpoint());
     EXPECT_EQ("tmp display_name", tmp2.display_name());
@@ -207,6 +222,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp icon", tmp2.icon());
     EXPECT_EQ("tmp search_hint", tmp2.search_hint());
     EXPECT_EQ("tmp hot_key", tmp2.hot_key());
+    EXPECT_EQ("/foo", tmp2.scope_directory());
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(tmp2.invisible());
 }
@@ -217,9 +233,9 @@ TEST(ScopeMetadataImpl, serialize)
                      (RuntimeImpl*)0x1);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
-    mi->set_scope_id("scope_name");
+    mi->set_scope_id("scope_id");
     auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
+    mi->set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_id"));
     mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_author("author");
@@ -227,13 +243,14 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_icon("icon");
     mi->set_search_hint("search_hint");
     mi->set_hot_key("hot_key");
+    mi->set_scope_directory("/foo");
     mi->set_invisible(false);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(10u, var.size());
-    EXPECT_EQ("scope_name", var["scope_id"].get_string());
+    EXPECT_EQ(11u, var.size());
+    EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
     EXPECT_EQ("author", var["author"].get_string());
@@ -241,11 +258,12 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("icon", var["icon"].get_string());
     EXPECT_EQ("search_hint", var["search_hint"].get_string());
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
+    EXPECT_EQ("/foo", var["scope_dir"].get_string());
     EXPECT_FALSE(var["invisible"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
-    EXPECT_EQ("scope_name", c.scope_id());
+    EXPECT_EQ("scope_id", c.scope_id());
     EXPECT_EQ("identity", c.proxy()->identity());
     EXPECT_EQ("endpoint", c.proxy()->endpoint());
     EXPECT_EQ("display_name", c.display_name());
@@ -277,7 +295,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
 
     try
     {
-        mi.set_scope_id("scope_name");
+        mi.set_scope_id("scope_id");
         mi.serialize();
         FAIL();
     }
@@ -290,7 +308,7 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
     try
     {
         auto mw_proxy = mw.create_scope_proxy("identity", "endpoint");
-        mi.set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_name"));
+        mi.set_proxy(ScopeImpl::create(mw_proxy, mw.runtime(), "scope_id"));
         mi.serialize();
         FAIL();
     }
@@ -344,7 +362,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
                      e.what());
     }
 
-    m["scope_id"] = "scope_name";
+    m["scope_id"] = "scope_id";
     try
     {
         ScopeMetadataImpl mi(m, &mw);
@@ -437,7 +455,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
 
     ScopeMetadataImpl mi(m, &mw);
     mi.deserialize(m);
-    EXPECT_EQ("scope_name", mi.scope_id());
+    EXPECT_EQ("scope_id", mi.scope_id());
     EXPECT_EQ("identity", mi.proxy()->identity());
     EXPECT_EQ("endpoint", mi.proxy()->endpoint());
     EXPECT_EQ("display_name", mi.display_name());

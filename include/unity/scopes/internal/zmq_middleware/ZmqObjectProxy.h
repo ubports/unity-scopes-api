@@ -73,10 +73,10 @@ public:
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
 
-    void invoke_oneway(capnp::MessageBuilder& out_params);
+    void invoke_oneway_(capnp::MessageBuilder& out_params);
 
-    ZmqReceiver invoke_twoway(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout);
+    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params);
+    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout);
 
 private:
     std::string endpoint_;

@@ -48,6 +48,11 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
     scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
     oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
+    click_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "Click.InstallDir");
+    if (click_installdir_.empty())
+    {
+        click_installdir_ = string(getenv("HOME")) + "/.local/share/unity-scopes/";
+    }
     scoperunner_path_ = get_string(REGISTRY_CONFIG_GROUP, "Scoperunner.Path");
     if (scoperunner_path_[0] != '/')
     {
@@ -94,6 +99,11 @@ string RegistryConfig::scope_installdir() const
 string RegistryConfig::oem_installdir() const
 {
     return oem_installdir_;
+}
+
+string RegistryConfig::click_installdir() const
+{
+    return click_installdir_;
 }
 
 string RegistryConfig::scoperunner_path() const

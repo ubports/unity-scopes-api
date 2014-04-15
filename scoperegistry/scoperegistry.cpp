@@ -39,12 +39,15 @@
 #include <libgen.h>
 #include <unistd.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace scoperegistry;
 using namespace std;
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::util;
+using namespace boost;
 
 char const* prog_name;
 
@@ -57,19 +60,67 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
-string strip_suffix(string const& s, string const& suffix)
+// if path is an absolute path, just return it. otherwise, append it to scopedir.
+filesystem::path relative_scope_path_to_abs_path(filesystem::path const& path, filesystem::path const& scopedir)
 {
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
+    if (path.is_relative())
     {
-        if (s.compare(s_len - suffix_len, suffix_len, suffix) == 0)
-        {
-            return string(s, 0, s_len - suffix_len);
-        }
+        return scopedir / path;
     }
-    return s;
+    return path;
 }
+
+// throwing an exception without joining with a thread is a bad, bad thing to do, so let's RAII to avoid doing it
+struct SignalThreadWrapper
+{
+    std::shared_ptr<core::posix::SignalTrap> termination_trap;
+    std::shared_ptr<core::posix::SignalTrap> child_trap;
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer;
+    std::thread termination_trap_worker;
+    std::thread child_trap_worker;
+
+    SignalThreadWrapper() :
+        // We shutdown the runtime whenever these signals happen.
+        termination_trap(core::posix::trap_signals_for_all_subsequent_threads(
+            {
+                core::posix::Signal::sig_int,
+                core::posix::Signal::sig_hup,
+                core::posix::Signal::sig_term
+            })),
+        // And we maintain our list of processes with the help of sig_chld.
+        child_trap(core::posix::trap_signals_for_all_subsequent_threads(
+            {
+                core::posix::Signal::sig_chld
+            })),
+        // The death observer is required to make sure that we reap all child processes
+        // whenever multiple sigchld's are compressed together.
+        death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(child_trap)),
+        // Starting up both traps.
+        termination_trap_worker([&]() { termination_trap->run(); }),
+        child_trap_worker([&]() { child_trap->run(); })
+    {
+    }
+
+    core::Signal<core::posix::Signal>& signal_raised()
+    {
+        return termination_trap->signal_raised();
+    }
+
+    ~SignalThreadWrapper()
+    {
+        // Stop termination_trap
+        termination_trap->stop();
+        if (termination_trap_worker.joinable())
+            termination_trap_worker.join();
+
+        // Please note that the child_trap must only be stopped once the
+        // termination_trap thread has been joined. We otherwise will encounter
+        // a race between the middleware shutting down and not receiving sigchld anymore.
+        child_trap->stop();
+        if (child_trap_worker.joinable())
+            child_trap_worker.join();
+    }
+};
 
 // Return a map of <scope, config_file> pairs for all scopes (Canonical and OEM scopes).
 // If a Canonical scope is overrideable and the OEM has configured a scope with the
@@ -88,8 +139,8 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     auto config_files = find_scope_config_files(scope_installdir, ".ini");
     for (auto&& path : config_files)
     {
-        string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-        string scope_id = strip_suffix(file_name, ".ini");
+        filesystem::path p(path);
+        string scope_id = p.stem().native();
         try
         {
             ScopeConfig config(path);
@@ -115,8 +166,9 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
             for (auto&& path : oem_paths)
             {
-                string file_name = basename(const_cast<char*>(string(path).c_str()));    // basename() modifies its argument
-                string scope_id = strip_suffix(file_name, ".ini");
+                filesystem::path p(path);
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
                 if (fixed_scopes.find(scope_id) == fixed_scopes.end())
                 {
                     overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
@@ -139,6 +191,40 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     return fixed_scopes;
 }
 
+map<string, string> find_click_scopes(map<string, string> const& local_scopes, string const& click_installdir)
+{
+    map<string, string> click_scopes;
+
+    if (!click_installdir.empty())
+    {
+        try
+        {
+            auto click_paths = find_scope_config_files(click_installdir, ".ini");
+            for (auto&& path : click_paths)
+            {
+                filesystem::path p(path);
+                string file_name = p.filename().native();
+                string scope_id = p.stem().native();
+                if (local_scopes.find(scope_id) == local_scopes.end())
+                {
+                    click_scopes[scope_id] = path;
+                }
+                else
+                {
+                    error("ignoring non-overrideable scope config \"" + file_name + "\" in click directory " + click_installdir);
+                }
+            }
+        }
+        catch (ResourceException const& e)
+        {
+            error(e.what());
+            error("could not open Click installation directory, ignoring Click scopes");
+        }
+    }
+
+    return click_scopes;
+}
+
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
@@ -146,30 +232,38 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       map<string, string> const& all_scopes,
                       MiddlewareBase::SPtr const& mw,
                       string const& scoperunner_path,
-                      string const& config_file)
+                      string const& config_file,
+                      bool click)
 {
     for (auto&& pair : all_scopes)
     {
         try
         {
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-            ScopeConfig sc(pair.second);
+            string scope_config(pair.second);
+            ScopeConfig sc(scope_config);
+
+            filesystem::path scope_path(scope_config);
+            filesystem::path scope_dir(scope_path.parent_path());
+
             mi->set_scope_id(pair.first);
             mi->set_display_name(sc.display_name());
             mi->set_description(sc.description());
             mi->set_author(sc.author());
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
+            mi->set_scope_directory(scope_dir.native());
+
             try
             {
-                mi->set_art(sc.art());
+                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
             }
             try
             {
-                mi->set_icon(sc.icon());
+                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
             }
             catch (NotFoundException const&)
             {
@@ -195,7 +289,27 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
 
             RegistryObject::ScopeExecData exec_data;
             exec_data.scope_id = pair.first;
+            // get custom scope runner executable, if not set use default scoperunner
             exec_data.scoperunner_path = scoperunner_path;
+
+            if (click)
+            {
+                exec_data.confinement_profile =
+                        scope_path.parent_path().filename().native();
+            }
+
+            try
+            {
+                auto custom_exec = sc.scope_runner();
+                if (custom_exec.empty())
+                {
+                    throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
+                }
+                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+            }
+            catch (NotFoundException const&)
+            {
+            }
             exec_data.runtime_config = config_file;
             exec_data.scope_config = pair.second;
 
@@ -249,32 +363,11 @@ main(int argc, char* argv[])
 
     try
     {
-        // We shutdown the runtime whenever these signals happen.
-        auto termination_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_int,
-            core::posix::Signal::sig_hup,
-            core::posix::Signal::sig_term
-        });
-
-        // And we maintain our list of processes with the help of sig_chld.
-        auto child_trap = core::posix::trap_signals_for_all_subsequent_threads(
-        {
-            core::posix::Signal::sig_chld
-        });
-
-        // The death observer is required to make sure that we reap all child processes
-        // whenever multiple sigchld's are compressed together.
-        auto death_observer =
-                core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(
-                    child_trap);
-
-        // Starting up both traps.
-        std::thread termination_trap_worker([termination_trap]() { termination_trap->run(); });
-        std::thread child_trap_worker([child_trap]() { child_trap->run(); });
+        SignalThreadWrapper signal_handler_wrapper;
 
         // And finally creating our runtime.
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create("Registry", config_file);
+        RuntimeConfig rt_config(config_file);
+        RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
 
@@ -285,6 +378,7 @@ main(int argc, char* argv[])
         string mw_configfile;
         string scope_installdir;
         string oem_installdir;
+        string click_installdir;
         string scoperunner_path;
         string ss_reg_id;
         string ss_reg_endpoint;
@@ -295,6 +389,7 @@ main(int argc, char* argv[])
             mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
+            click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
             ss_reg_id = c.ss_registry_identity();
             ss_reg_endpoint = c.ss_registry_endpoint();
@@ -304,7 +399,7 @@ main(int argc, char* argv[])
 
         // Inform the signal thread that it should shutdown the middleware
         // if we get a termination signal.
-        termination_trap->signal_raised().connect([middleware](core::posix::Signal signal)
+        signal_handler_wrapper.signal_raised().connect([middleware](core::posix::Signal signal)
         {
             switch(signal)
             {
@@ -319,25 +414,29 @@ main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
-        RegistryObject::SPtr registry(new RegistryObject(*death_observer));
+        Executor::SPtr executor = make_shared<Executor>();
+        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
         // they look for another scope in the registry.
 
         auto local_scopes = find_local_scopes(scope_installdir, oem_installdir);
+        auto click_scopes = find_click_scopes(local_scopes, click_installdir);
 
         // Before we add the local scopes, we check whether any scopes were explicitly specified
         // on the command line. If so, scopes on the command line override scopes in
         // configuration files.
         for (auto i = 2; i < argc; ++i)
         {
-            string file_name = basename(const_cast<char*>(string(argv[i]).c_str()));  // basename() modifies its argument
-            string scope_id = strip_suffix(file_name, ".ini");
+            filesystem::path path(argv[i]);
+            string scope_id = path.stem().native();
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile());
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile(), false);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile(), true);
+        local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty() || ss_reg_endpoint.empty())
         {
             error("no remote registry configured, only local scopes will be available");
@@ -346,6 +445,10 @@ main(int argc, char* argv[])
         {
             load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
         }
+
+        // Let's add the registry's state receiver to the middleware so that scopes can inform
+        // the registry of state changes.
+        middleware->add_state_receiver_object("StateReceiver", registry->state_receiver());
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
@@ -380,18 +483,6 @@ main(int argc, char* argv[])
 
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
-
-        // Stop termination_trap
-        termination_trap->stop();
-        if (termination_trap_worker.joinable())
-            termination_trap_worker.join();
-
-        // Please note that the child_trap must only be stopped once the
-        // termination_trap thread has been joined. We otherwise will encounter
-        // a race between the middleware shutting down and not receiving sigchld anymore.
-        child_trap->stop();
-        if (child_trap_worker.joinable())
-            child_trap_worker.join();
 
         exit_status = 0;
     }

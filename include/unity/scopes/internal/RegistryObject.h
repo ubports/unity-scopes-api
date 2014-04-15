@@ -19,10 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
-#include <core/posix/child_process.h>
-
+#include <unity/scopes/internal/Executor.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/StateReceiverObject.h>
 
 #include <condition_variable>
 #include <mutex>
@@ -48,18 +48,19 @@ public:
         std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
+        std::string confinement_profile;
     };
 
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
-    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer);
+    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor);
     virtual ~RegistryObject();
 
     // Remote operation implementations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
-    virtual ScopeProxy locate(std::string const& scope_id) override;
+    virtual ObjectProxy locate(std::string const& identity) override;
 
     // Local methods
     bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
@@ -67,10 +68,12 @@ public:
     bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
-    bool is_scope_running( std::string const& scope_id );
+    bool is_scope_running(std::string const& scope_id);
+    StateReceiverObject::SPtr state_receiver();
 
 private:
     void on_process_death(core::posix::Process const& process);
+    void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
 
     class ScopeProcess
     {
@@ -85,9 +88,11 @@ private:
         ~ScopeProcess();
 
         ProcessState state() const;
+        void update_state(ProcessState state);
         bool wait_for_state(ProcessState state, int timeout_ms) const;
 
-        void exec(core::posix::ChildProcess::DeathObserver& death_observer);
+        void exec(core::posix::ChildProcess::DeathObserver& death_observer,
+                Executor::SPtr executor);
         void kill();
 
         bool on_process_death(pid_t pid);
@@ -112,6 +117,12 @@ private:
 private:
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
+
+    StateReceiverObject::SPtr state_receiver_;
+    core::ScopedConnection state_receiver_connection_;
+
+    Executor::SPtr executor_;
+
     mutable std::mutex mutex_;
     MetadataMap scopes_;
     std::map<std::string, ScopeProcess> scope_processes_;

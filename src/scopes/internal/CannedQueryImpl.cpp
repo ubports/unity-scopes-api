@@ -36,7 +36,7 @@ CannedQueryImpl::CannedQueryImpl(std::string const& scope_id)
 {
     if (scope_id_.empty())
     {
-        throw InvalidArgumentException("CannedQuery(): scope name cannot be empty");
+        throw InvalidArgumentException("CannedQuery(): scope ID cannot be empty");
     }
 }
 
@@ -52,12 +52,12 @@ CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
     auto it = variant.find("scope");
     if (it == variant.end())
     {
-        throw InvalidArgumentException("CannedQuery(): scope name not set");
+        throw InvalidArgumentException("CannedQuery(): scope ID not set");
     }
     scope_id_ = it->second.get_string();
     if (scope_id_.empty())
     {
-        throw InvalidArgumentException("CannedQuery(): scope name cannot be empty");
+        throw InvalidArgumentException("CannedQuery(): scope ID cannot be empty");
     }
 
     it = variant.find("filter_state");

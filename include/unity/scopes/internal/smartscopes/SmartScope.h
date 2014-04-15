@@ -48,11 +48,22 @@ public:
         : scope_id_(scope_id)
         , query_(query)
     {
+        static const std::string no_net_hint("no-internet");
+        if (hints.contains_hint(no_net_hint))
+        {
+            auto var = hints[no_net_hint];
+            if (var.which() == Variant::Type::Bool && var.get_bool())
+            {
+                std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id << ", skipping" << std::endl;
+                return;
+            }
+        }
+
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, query_id, locale, country
-        search_handle_ = ss_client->search(base_url, query_.query_string(), query.department_id(), "session_id", 0, hints.form_factor(), "", "", hints.cardinality());
+        ///! TODO: session_id, query_id, country
+        search_handle_ = ss_client->search(base_url, query_.query_string(), query.department_id(), "session_id", 0, hints.form_factor(), hints.locale(), "", hints.cardinality());
     }
 
     ~SmartQuery() noexcept
@@ -61,11 +72,20 @@ public:
 
     virtual void cancelled() override
     {
-        search_handle_->cancel_search();
+        if (search_handle_ != nullptr)
+        {
+            search_handle_->cancel_search();
+        }
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (search_handle_ == nullptr)
+        {
+            // this can happen if networking is disabled
+            return;
+        }
+
         std::vector<SearchResult> results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
@@ -124,8 +144,8 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, "", "");
+        ///! TODO: session_id, widgets_api_version, country
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
     }
 
     ~SmartPreview()

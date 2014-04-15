@@ -65,6 +65,7 @@ ScopeMetadata (returned by serialize()):
     'endpoint'  : string
  'display_name' : string
  'description'  : string
+ 'scope_dir'    : string, optional
  'art'          : string, optional
  'icon'         : string, optional
  'search_hint'  : string, optional

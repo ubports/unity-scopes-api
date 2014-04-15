@@ -51,14 +51,14 @@ dictionary<string, ScopeMetadata> MetadataMap;
 
 exception NotFoundException
 {
-    string scopeName;
+    string identity;
 };
 
 interface Registry
 {
-    ScopeMetadata get_metadata(string name) throws NotFoundException;
-    ScopeDict list();
-    ScopeProxy string( name) throws NotFoundException, RegistryException;
+    ScopeMetadata get_metadata(string scope_id) throws NotFoundException;
+    MetadataMap list();
+    ObjectProxy locate(string identity) throws NotFoundException, RegistryException;
 };
 
 */
@@ -83,9 +83,9 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "get_metadata");
     auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
-    in_params.setName(scope_id.c_str());
+    in_params.setIdentity(scope_id.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -105,7 +105,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
         case capnproto::Registry::GetMetadataResponse::Response::NOT_FOUND_EXCEPTION:
         {
             auto ex = get_metadata_response.getNotFoundException();
-            throw NotFoundException("Registry::get_metadata(): no such scope", ex.getName().cStr());
+            throw NotFoundException("Registry::get_metadata(): no such scope", ex.getIdentity().cStr());
         }
         default:
         {
@@ -119,7 +119,7 @@ MetadataMap ZmqRegistry::list()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -140,16 +140,16 @@ MetadataMap ZmqRegistry::list()
     return sm;
 }
 
-ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
+ObjectProxy ZmqRegistry::locate(std::string const& identity)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "locate");
     auto in_params = request.initInParams().getAs<capnproto::Registry::LocateRequest>();
-    in_params.setName(scope_id.c_str());
+    in_params.setIdentity(identity.c_str());
 
-    // locate uses a custom timeout because it needs to potentially fork/exec the scope.
+    // locate uses a custom timeout because it needs to potentially fork/exec a scope.
     int64_t timeout = 1000; // TODO: get timeout from config
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway(request_builder, timeout); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -169,12 +169,12 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
                                                    proxy.getIdentity(),
                                                    proxy.getCategory(),
                                                    proxy.getTimeout());
-            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_id);
+            return ScopeImpl::create(zmq_proxy, mw->runtime(), identity);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {
             auto ex = locate_response.getNotFoundException();
-            throw NotFoundException("Registry::locate(): no such scope", ex.getName().cStr());
+            throw NotFoundException("Registry::locate(): no such object", ex.getIdentity().cStr());
         }
         case capnproto::Registry::LocateResponse::Response::REGISTRY_EXCEPTION:
         {

@@ -52,9 +52,9 @@ MetadataMap RegistryImpl::list()
     return fwd()->list();
 }
 
-ScopeProxy RegistryImpl::locate(std::string const& scope_id)
+ObjectProxy RegistryImpl::locate(std::string const& identity)
 {
-    return fwd()->locate(scope_id);
+    return fwd()->locate(identity);
 }
 
 MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)

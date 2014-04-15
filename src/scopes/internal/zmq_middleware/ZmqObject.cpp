@@ -126,7 +126,7 @@ void ZmqObjectProxy::ping()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "ping");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_twoway(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_twoway_(request_builder); });
     // TODO: dubious, waiter thread in runtimeImpl should do this?
     future.wait();
 }
@@ -162,7 +162,7 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 
-void ZmqObjectProxy::invoke_oneway(capnp::MessageBuilder& out_params)
+void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& out_params)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
@@ -183,16 +183,16 @@ void ZmqObjectProxy::invoke_oneway(capnp::MessageBuilder& out_params)
 #endif
 }
 
-ZmqReceiver ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params)
+ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params)
 {
-    return invoke_twoway(out_params, timeout_);
+    return invoke_twoway_(out_params, timeout_);
 }
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 // Poll for the reply with the given timeout.
 // Return a socket for the response or throw if the timeout expires.
 
-ZmqReceiver ZmqObjectProxy::invoke_twoway(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());

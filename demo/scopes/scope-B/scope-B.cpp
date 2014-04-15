@@ -52,7 +52,7 @@ public:
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result from " << scope_name_ << ": " << result.uri() << ", " << result.title() << endl;
+        cout << "received result from " << scope_id_ << ": " << result.uri() << ", " << result.title() << endl;
         try
         {
             result.set_category(upstream_->lookup_category("catB"));
@@ -66,7 +66,7 @@ public:
 
     virtual void finished(Reason reason, string const& error_message) override
     {
-        cout << "query to " << scope_name_ << " complete, status: " << to_string(reason);
+        cout << "query to " << scope_id_ << " complete, status: " << to_string(reason);
         if (reason == ListenerBase::Error)
         {
             cout << ": " << error_message;
@@ -78,15 +78,15 @@ public:
         }
     }
 
-    Receiver(string const& scope_name, SearchReplyProxy const& upstream, int num_children) :
-        scope_name_(scope_name),
+    Receiver(string const& scope_id, SearchReplyProxy const& upstream, int num_children) :
+        scope_id_(scope_id),
         upstream_(upstream),
         num_children_(num_children)
     {
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     SearchReplyProxy upstream_;
     int num_children_;
 };
@@ -94,11 +94,11 @@ private:
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(string const& scope_name,
+    MyQuery(string const& scope_id,
             CannedQuery const& query,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
-        scope_name_(scope_name),
+        scope_id_(scope_id),
         query_(query),
         scope_c_(scope_c),
         scope_d_(scope_d)
@@ -107,7 +107,7 @@ public:
 
     virtual void cancelled()
     {
-        cout << "query to " << scope_name_ << " was cancelled" << endl;
+        cout << "query to " << scope_id_ << " was cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& upstream_reply)
@@ -129,13 +129,13 @@ public:
             assert(0);
         }
 
-        SearchListenerBase::SPtr reply(new Receiver(scope_name_, upstream_reply, 2));
+        SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply, 2));
         subsearch(scope_c_, query_.query_string(), reply);
         subsearch(scope_d_, query_.query_string(), reply);
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     CannedQuery query_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
@@ -146,13 +146,13 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_name, RegistryProxy const& registry) override
+    virtual int start(string const& scope_id, RegistryProxy const& registry) override
     {
-        scope_name_ = scope_name;
+        scope_id_ = scope_id;
 
         if (!registry)
         {
-            throw ConfigException(scope_name + ": No registry available, cannot locate child scopes");
+            throw ConfigException(scope_id + ": No registry available, cannot locate child scopes");
         }
         // Lock up scopes C and D in the registry and remember their proxies.
         auto meta_c = registry->get_metadata("scope-C");
@@ -167,7 +167,7 @@ public:
 
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_name_, q, scope_c_, scope_d_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, scope_c_, scope_d_));
         cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
@@ -179,7 +179,7 @@ public:
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };

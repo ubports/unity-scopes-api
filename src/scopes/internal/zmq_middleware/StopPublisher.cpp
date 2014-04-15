@@ -48,7 +48,7 @@ StopPublisher::StopPublisher(zmqpp::context* context, string const& inproc_name)
     thread_ = thread(&StopPublisher::stopper_thread, this);
 
     unique_lock<mutex> lock(m_);
-    cond_.wait(lock, [this]{ return state_ == Started || state_ == Failed; });
+    cond_.wait(lock, [this] { return state_ == Started || state_ == Failed; });
 
     if (state_ == Failed)
     {
@@ -109,8 +109,9 @@ zmqpp::socket StopPublisher::subscribe()
         case Stopping:
         case Stopped:
         {
-            throw MiddlewareException("StopPublisher::subscribe(): cannot subscribe to stopped publisher "
-                                      "(endpoint: " + endpoint_ + ")");
+            throw MiddlewareException(
+                "StopPublisher::subscribe(): cannot subscribe to stopped publisher "
+                "(endpoint: " + endpoint_ + ")");
         }
         // LCOV_EXCL_START
         case Failed:
@@ -121,8 +122,9 @@ zmqpp::socket StopPublisher::subscribe()
             }
             catch (...)
             {
-                throw MiddlewareException("StopPublisher::subscribe(): cannot subscribe to failed publisher "
-                                          "(endpoint: " + endpoint_ + ")");
+                throw MiddlewareException(
+                    "StopPublisher::subscribe(): cannot subscribe to failed publisher "
+                    "(endpoint: " + endpoint_ + ")");
             }
         }
         // LCOV_EXCL_STOP
@@ -195,7 +197,7 @@ void StopPublisher::stopper_thread() noexcept
 
         // Wait until we are told to stop.
         lock.lock();
-        cond_.wait(lock, [this]{ return state_ == Stopping; });
+        cond_.wait(lock, [this] { return state_ == Stopping; });
 
         // Write the stop message for the subscribers and close.
         // Sending an empty string is OK; the receiver will get a zero-length message.
@@ -214,10 +216,10 @@ void StopPublisher::stopper_thread() noexcept
     assert(state_ == Stopped || state_ == Failed);
 }
 
-} // namespace zmq_middleware
+}  // namespace zmq_middleware
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity

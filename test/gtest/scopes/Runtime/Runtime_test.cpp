@@ -379,19 +379,19 @@ TEST(Runtime, early_cancel)
 void scope_thread(Runtime::SPtr const& rt)
 {
     TestScope scope;
-    rt->run_scope(&scope);
+    rt->run_scope(&scope, "/foo");
 }
 
 void pusher_thread(Runtime::SPtr const& rt)
 {
     PusherScope scope;
-    rt->run_scope(&scope);
+    rt->run_scope(&scope, "/foo");
 }
 
 void slow_create_thread(Runtime::SPtr const& rt)
 {
     SlowCreateScope scope;
-    rt->run_scope(&scope);
+    rt->run_scope(&scope, "/foo");
 }
 
 int main(int argc, char **argv)

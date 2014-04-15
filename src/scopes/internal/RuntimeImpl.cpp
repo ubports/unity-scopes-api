@@ -17,8 +17,10 @@
  */
 
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/MWStateReceiver.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
@@ -29,6 +31,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <signal.h>
+#include <libgen.h>
 
 #include <cassert>
 #include <cstring>
@@ -261,9 +264,22 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;
 }
 
-void RuntimeImpl::run_scope(ScopeBase *const scope_base)
+void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)
 {
-    auto mw = factory()->create(scope_id_, "Zmq", "Zmq.ini");
+    // Retrieve the registry middleware and create a proxy to its state receiver
+    RegistryConfig reg_conf(registry_identity_, registry_configfile_);
+    auto reg_runtime = create(registry_identity_, configfile_);
+    auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
+    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
+
+    auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
+
+    {
+        // dirname modifies its argument, so we need a copy of scope lib path
+        std::vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
+        const std::string scope_dir(dirname(&scope_ini[0]));
+        scope_base->p->set_scope_directory(scope_dir);
+    }
 
     scope_base->start(scope_id_, registry());
     // Ensure the scope gets stopped.
@@ -278,7 +294,14 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base)
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
     auto proxy = mw->add_scope_object(scope_id_, move(scope));
 
+    // Inform the registry that this scope is now ready to process requests
+    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+
     mw->wait_for_shutdown();
+
+    // Inform the registry that this scope is shutting down
+    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
+
     run_future.get();
 }
 

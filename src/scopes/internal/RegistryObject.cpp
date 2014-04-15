@@ -37,9 +37,9 @@ namespace internal
 {
 
 ///! TODO: get from config
-static const int c_process_wait_timeout = 1000;
+static const int c_process_wait_timeout = 2000;
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -47,8 +47,17 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           {
               on_process_death(cp);
           })
-      }
-
+      },
+      state_receiver_(new StateReceiverObject()),
+      state_receiver_connection_
+      {
+          state_receiver_->state_received().connect([this](std::string const& id,
+                                                    StateReceiverObject::State const& s)
+          {
+              on_state_received(id, s);
+          })
+      },
+      executor_(executor)
 {
 }
 
@@ -59,7 +68,14 @@ RegistryObject::~RegistryObject()
     {
         try
         {
-            scope_process.second.kill();
+            // at this point the registry middleware is shutting down, hence we will not receive
+            // "ScopeStopping" states from dying scopes. We manually set it here as to avoid
+            // outputting bogus error messages.
+            if (is_scope_running(scope_process.first))
+            {
+                scope_process.second.update_state(ScopeProcess::Stopping);
+                scope_process.second.kill();
+            }
         }
         catch(std::exception const& e)
         {
@@ -115,7 +131,7 @@ MetadataMap RegistryObject::list() const
     return all_scopes;
 }
 
-ScopeProxy RegistryObject::locate(std::string const& scope_id)
+ObjectProxy RegistryObject::locate(std::string const& identity)
 {
     decltype(scopes_.cbegin()) scope_it;
     decltype(scope_processes_.begin()) proc_it;
@@ -123,25 +139,25 @@ ScopeProxy RegistryObject::locate(std::string const& scope_id)
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
         // If the id is empty, it was sent as empty by the remote client.
-        if (scope_id.empty())
+        if (identity.empty())
         {
-            throw unity::InvalidArgumentException("Registry::locate(): Cannot locate scope with empty id");
+            throw unity::InvalidArgumentException("RegistryObject::locate(): Cannot locate scope with empty id");
         }
 
-        scope_it = scopes_.find(scope_id);
+        scope_it = scopes_.find(identity);
         if (scope_it == scopes_.end())
         {
-            throw NotFoundException("Registry::locate(): Tried to locate unknown local scope", scope_id);
+            throw NotFoundException("RegistryObject::locate(): Tried to locate unknown local scope", identity);
         }
 
-        proc_it = scope_processes_.find(scope_id);
+        proc_it = scope_processes_.find(identity);
         if (proc_it == scope_processes_.end())
         {
-            throw NotFoundException("Registry::locate(): Tried to exec unknown local scope", scope_id);
+            throw NotFoundException("RegistryObject::locate(): Tried to exec unknown local scope", identity);
         }
     }
 
-    proc_it->second.exec(death_observer_);
+    proc_it->second.exec(death_observer_, executor_);
     return scope_it->second.proxy();
 }
 
@@ -190,15 +206,20 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
     remote_registry_ = remote_registry;
 }
 
-bool RegistryObject::is_scope_running( std::string const& scope_id )
+bool RegistryObject::is_scope_running(std::string const& scope_id)
 {
-    auto it = scope_processes_.find( scope_id );
+    auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
         return it->second.state() != ScopeProcess::ProcessState::Stopped;
     }
 
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
+StateReceiverObject::SPtr RegistryObject::state_receiver()
+{
+    return state_receiver_;
 }
 
 void RegistryObject::on_process_death(core::posix::Process const& process)
@@ -212,6 +233,26 @@ void RegistryObject::on_process_death(core::posix::Process const& process)
         if (scope_process.second.on_process_death(pid))
             break;
     }
+}
+
+void RegistryObject::on_state_received(std::string const& scope_id, StateReceiverObject::State const& state)
+{
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        switch (state)
+        {
+            case StateReceiverObject::ScopeReady:
+                it->second.update_state(ScopeProcess::ProcessState::Running);
+                break;
+            case StateReceiverObject::ScopeStopping:
+                it->second.update_state(ScopeProcess::ProcessState::Stopping);
+                break;
+            default:
+                std::cerr << "RegistryObject::on_state_received(): unknown state received from scope: " << scope_id;
+        }
+    }
+    // simply ignore states from scopes the registry does not know about
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
@@ -242,13 +283,21 @@ RegistryObject::ScopeProcess::ProcessState RegistryObject::ScopeProcess::state()
     return state_;
 }
 
+void RegistryObject::ScopeProcess::update_state(ProcessState state)
+{
+    std::lock_guard<std::mutex> lock(process_mutex_);
+    update_state_unlocked(state);
+}
+
 bool RegistryObject::ScopeProcess::wait_for_state(ProcessState state, int timeout_ms) const
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
     return wait_for_state(lock, state, timeout_ms);
 }
 
-void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver& death_observer)
+void RegistryObject::ScopeProcess::exec(
+        core::posix::ChildProcess::DeathObserver& death_observer,
+        Executor::SPtr executor)
 {
     std::unique_lock<std::mutex> lock(process_mutex_);
 
@@ -279,8 +328,20 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     // 2. exec the scope.
     update_state_unlocked(Starting);
 
-    const std::string program{exec_data_.scoperunner_path};
-    const std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    std::string program;
+    std::vector<std::string> argv;
+
+    if (exec_data_.confinement_profile.empty())
+    {
+        program = exec_data_.scoperunner_path;
+        argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    }
+    else
+    {
+        program = "/usr/sbin/aa-exec";
+        argv = {"-p", exec_data_.confinement_profile, exec_data_.scoperunner_path,
+                exec_data_.runtime_config, exec_data_.scope_config};
+    }
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
@@ -289,7 +350,7 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
     });
 
     {
-        process_ = core::posix::exec(program, argv, env,
+        process_ = executor->exec(program, argv, env,
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
         if (process_.pid() <= 0)
         {
@@ -299,9 +360,6 @@ void RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver
                                            + exec_data_.scope_config + "\"");
         }
     }
-
-    ///! TODO: This should not be here. A ready signal from the scope should trigger "running".
-    update_state_unlocked(Running);
 
     // 3. wait for scope to be "running".
     //  3.1. when ready, return.
@@ -356,6 +414,15 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
 
 void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
 {
+    if (state == state_)
+    {
+        return;
+    }
+    else if (state == Stopped && state_ != Stopping )
+    {
+        cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+             << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
+    }
     state_ = state;
     state_change_cond_.notify_all();
 }
@@ -391,17 +458,20 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
             // scope is taking too long to close, send kill signal
             process_.send_signal(core::posix::Signal::sig_kill, ec);
         }
+
+        // clear the process handle
+        clear_handle_unlocked();
     }
     catch (std::exception const&)
     {
         cerr << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \""
              << exec_data_.scope_id << "\"" << endl;
+
+        // clear the process handle
+        // even on error, the previous handle will be unrecoverable at this point
+        clear_handle_unlocked();
         throw;
     }
-
-    // clear the process handle
-    // even on error, the previous handle will be unrecoverable at this point
-    clear_handle_unlocked();
 }
 
 } // namespace internal

@@ -51,6 +51,11 @@ string ObjectImpl::identity()
     return mw_proxy_->identity();
 }
 
+string ObjectImpl::category()
+{
+    return mw_proxy_->category();
+}
+
 string ObjectImpl::endpoint()
 {
     check_proxy();

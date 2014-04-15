@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/ConfigBase.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 namespace unity
 {
@@ -49,6 +50,7 @@ public:
     std::string search_hint() const;     // Optional, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
+    std::string scope_runner() const;    // Optional, throws NotFoundException if not present
     VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
 
 private:
@@ -61,6 +63,7 @@ private:
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
     std::unique_ptr<bool> invisible_;
+    std::unique_ptr<std::string> scope_runner_;
     VariantMap appearance_attributes_;
 };
 

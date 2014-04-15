@@ -86,7 +86,7 @@ int main()
         //
         // "ipc://"         - prefix for all proxies
         // "/tmp/scope-A    - endpoint at which the scope listens
-        // "scope-A         - scope name (must be the same as last component of endpoint path)
+        // "scope-A         - scope ID (must be the same as last component of endpoint path)
         // "t=300"          - optional timeout (infinite if not specified)
         // "c=Scope"        - type of proxy (must be "c=Scope")
 

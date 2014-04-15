@@ -35,7 +35,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-// Server-side implementation of a Registry object, which maps scope names to scope proxies.
+// Server-side implementation of a Registry object, which maps scope IDs to scope proxies.
 // It provides remote lookup and listing of the map contents, and local methods to manipulate the map.
 //
 // This class is thread-safe: differnt threads can concurrently update the map while lookup operations

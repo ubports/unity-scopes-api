@@ -68,7 +68,7 @@ namespace
 {
 typedef unity::scopes::testing::TypedScopeFixture<testing::Scope> BenchmarkScopeFixture;
 
-static const std::string scope_name{"does.not.exist.scope"};
+static const std::string scope_id{"does.not.exist.scope"};
 static const std::string scope_query_string{"does.not.exist.scope.query_string"};
 
 static const std::string default_locale{"C"};
@@ -198,7 +198,7 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_oop_works)
         reference_result.load_from_xml(in);
     }
 
-    unity::scopes::CannedQuery query{scope_name};
+    unity::scopes::CannedQuery query{scope_id};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
@@ -301,7 +301,7 @@ TEST_F(BenchmarkScopeFixture, benchmarking_a_scope_query_performance_works)
 {
     unity::scopes::testing::InProcessBenchmark benchmark;
 
-    unity::scopes::CannedQuery query{scope_name};
+    unity::scopes::CannedQuery query{scope_id};
     query.set_query_string(scope_query_string);
 
     unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
