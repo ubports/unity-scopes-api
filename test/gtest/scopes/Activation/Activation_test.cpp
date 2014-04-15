@@ -30,7 +30,6 @@
 #include <gtest/gtest.h>
 #include <TestScope.h>
 
-using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
@@ -512,7 +511,7 @@ struct RaiiScopeThread
     Runtime::SPtr runtime;
     std::thread scope_thread;
 
-    RaiiScopeThread(string const& scope_id, string const& configfile)
+    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
         : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
           scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
 

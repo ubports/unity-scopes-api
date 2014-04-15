@@ -70,7 +70,6 @@ public:
         EXPECT_EQ("subdep2", subdeps.back().id());
         EXPECT_EQ("US", subdeps.back().label());
         EXPECT_EQ("test", subdeps.back().query().query_string());
-
         dep_count_++;
     }
 
@@ -80,7 +79,6 @@ public:
         EXPECT_EQ("title", result.title());
         EXPECT_EQ("art", result.art());
         EXPECT_EQ("dnd_uri", result.dnd_uri());
-
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
@@ -92,7 +90,6 @@ public:
         EXPECT_EQ("scope-A", query.scope_id());
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
-
         annotation_count_++;
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
@@ -221,7 +218,7 @@ struct RaiiScopeThread
     Runtime::SPtr runtime;
     std::thread scope_thread;
 
-    RaiiScopeThread(string const& scope_id, string const& configfile)
+    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
         : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
           scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
 
