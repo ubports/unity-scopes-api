@@ -285,6 +285,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Runtime::run_scope(unity::scopes::ScopeBase*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::Runtime::Runtime(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Runtime::~Runtime()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Variant::deserialize_json(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Variant::null()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::swap(unity::scopes::Variant&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(unity::scopes::Variant&&)@Base" 0.4.0+14.04.20140312.1
@@ -454,6 +455,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::StateReceiverObject::push_state(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::internal::StateReceiverObject::State const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::StateReceiverObject::StateReceiverObject()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::StateReceiverObject::~StateReceiverObject()@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::Executor::exec(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, core::posix::StandardStream const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::Executor::Executor()@Base" 0replaceme
+ (c++)"unity::scopes::internal::Executor::~Executor()@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::fwd()@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -576,14 +580,13 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Runtime::registry() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_double() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_string() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Variant::serialize_json() const@Base" 0replaceme
  (c++)"unity::scopes::Variant::which() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_int() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::is_null() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_bool() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_dict() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_array() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Variant::deserialize_json(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::Variant::serialize_json() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::Variant::operator==(unity::scopes::Variant const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator<(unity::scopes::Variant const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0.4.0+14.04.20140312.1
@@ -600,10 +603,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Category::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::title() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::serialize() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::Executor::exec(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, core::posix::StandardStream const&)@Base" 0replaceme
- (c++)"unity::scopes::internal::Executor::Executor()@Base" 0replaceme
- (c++)"unity::scopes::internal::Executor::~Executor()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::configfile() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::reply_reaper() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::waiter_thread(std::shared_ptr<unity::scopes::internal::ThreadSafeQueue<std::future<void> > > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
@@ -639,10 +641,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware_configfile() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryConfig::endpointdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::oem_installdir() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryConfig::scope_installdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::scoperunner_path() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::ss_registry_endpoint() const@Base" 0.4.0+14.04.20140312.1
@@ -673,7 +675,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::invisible() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::StateReceiverObject::state_received() const@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::ScopeImpl::fwd() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::QueryBase::valid() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeBase::scope_directory() const@Base" 0.4.2+14.04.20140404.2
  (c++)"typeinfo for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
