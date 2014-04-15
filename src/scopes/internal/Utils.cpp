@@ -67,6 +67,7 @@ std::string from_percent_encoding(std::string const& str)
         auto c = *it;
         if (c == '%')
         {
+            bool valid = false;
             // take two characters and covert them from hex to actual char
             if (++it != str.end())
             {
@@ -74,9 +75,21 @@ std::string from_percent_encoding(std::string const& str)
                 if (++it != str.end())
                 {
                     std::string const hexnum { c, *it };
-                    auto k = std::stoi(hexnum, nullptr, 16);
-                    result << static_cast<char>(k);
+                    try
+                    {
+                        auto k = std::stoi(hexnum, nullptr, 16);
+                        result << static_cast<char>(k);
+                        valid = true;
+                    }
+                    catch (std::logic_error const& e) // covers both std::invalid_argument and std::out_of_range
+                    {
+                        throw unity::InvalidArgumentException("from_percent_encoding(): unsupported conversion");
+                    }
                 }
+            }
+            if (!valid)
+            {
+                throw unity::InvalidArgumentException("from_percent_encoding(): too few characters for percent-encoded value");
             }
         }
         else

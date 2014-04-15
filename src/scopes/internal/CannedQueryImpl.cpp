@@ -207,8 +207,8 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
                     {
                         throw InvalidArgumentException("CannedQuery::from_uri(): invalid filters data");
                     }
-                }
-            }
+                } // else - unknown keys are ignored
+            } // else - the string with no '=' is ignored
         }
     }
 

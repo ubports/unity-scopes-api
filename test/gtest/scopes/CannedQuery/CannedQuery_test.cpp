@@ -127,8 +127,50 @@ TEST(CannedQuery, from_uri)
     {
         EXPECT_THROW(CannedQuery::from_uri("scope://"), unity::InvalidArgumentException);
     }
+    // missing argument for percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?q=%");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value", e.what());
+        }
+    }
+    // missing character in percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?q=%0");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value", e.what());
+        }
+    }
+    // non-hex value in percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?q=%qy");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion:\n    stoi", e.what());
+        }
+    }
     {
         auto q = CannedQuery::from_uri("scope://foo");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("", q.query_string());
+        EXPECT_EQ("", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?q=");
         EXPECT_EQ("foo", q.scope_id());
         EXPECT_EQ("", q.query_string());
         EXPECT_EQ("", q.department_id());
