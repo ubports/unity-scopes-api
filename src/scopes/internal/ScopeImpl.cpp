@@ -101,12 +101,17 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_search = [this, query, metadata, rp, ro, ctrl]() -> void
+    // We pass a shared pointer to the lambda to keep ourselves alive until after the lambda fires.
+    // Otherwise, if the ScopeProxy for this invocation goes out of scope before the invocation is
+    // sent in the new thread, the lambda will call into this by now destroyed instance.
+    auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
+
+    auto send_search = [impl, query, metadata, rp, ro, ctrl]() -> void
     {
         try
         {
             // Forward the (synchronous) search() method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->search(query, metadata.serialize(), rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query, metadata.serialize(), rp));
             assert(real_ctrl);
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
@@ -148,15 +153,20 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_activate = [this, result, metadata, rp, ro, ctrl]() -> void
+    // We pass a shared pointer to the lambda to keep ourselves alive until after the lambda fires.
+    // Otherwise, if the ScopeProxy for this invocation goes out of scope before the invocation is
+    // sent in the new thread, the lambda will call into this by now destroyed instance.
+    auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
+
+    auto send_activate = [impl, result, metadata, rp, ro, ctrl]() -> void
     {
         try
         {
 
             // Forward the (synchronous) method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->activate(result.p->activation_target(),
-                                                                                 metadata.serialize(),
-                                                                                 rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->activate(result.p->activation_target(),
+                                                                                       metadata.serialize(),
+                                                                                       rp));
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
             // with the real proxy that was returned.
@@ -199,16 +209,22 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_perform_action = [this, result, metadata, widget_id, action_id, rp, ro, ctrl]() -> void
+    // We pass a shared pointer to the lambda to keep ourselves alive until after the lambda fires.
+    // Otherwise, if the ScopeProxy for this invocation goes out of scope before the invocation is
+    // sent in the new thread, the lambda will call into this by now destroyed instance.
+    auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
+
+    auto send_perform_action = [impl, result, metadata, widget_id, action_id, rp, ro, ctrl]() -> void
     {
         try
         {
             // Forward the (synchronous) method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->perform_action(result.p->activation_target(),
-                                                   metadata.serialize(),
-                                                   widget_id,
-                                                   action_id,
-                                                   rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->perform_action(
+                                                                               result.p->activation_target(),
+                                                                               metadata.serialize(),
+                                                                               widget_id,
+                                                                               action_id,
+                                                                               rp));
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
             // with the real proxy that was returned.
@@ -249,13 +265,18 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
-    auto send_preview = [this, result, hints, rp, ro, ctrl]() -> void
+    // We pass a shared pointer to the lambda to keep ourselves alive until after the lambda fires.
+    // Otherwise, if the ScopeProxy for this invocation goes out of scope before the invocation is
+    // sent in the new thread, the lambda will call into this by now destroyed instance.
+    auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
+
+    auto send_preview = [impl, result, hints, rp, ro, ctrl]() -> void
     {
         try
         {
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(fwd()->preview(result.p->activation_target(),
-                                                                                hints.serialize(),
-                                                                                rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->preview(result.p->activation_target(),
+                                                                                      hints.serialize(),
+                                                                                      rp));
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
             // with the real proxy that was returned.

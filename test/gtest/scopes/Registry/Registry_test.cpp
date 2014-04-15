@@ -79,6 +79,9 @@ TEST(Registry, metadata)
     SearchMetadata metadata("C", "desktop");
 
     // search would fail if testscopeB can't be executed
+
+    // TODO: This needs to be rewritten because search now always succeeds immediately
+    // and delivers timeout errors to the finished() callback instead.
     try
     {
         auto ctrl = sp->search("foo", metadata, reply);

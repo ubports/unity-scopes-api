@@ -33,7 +33,7 @@ namespace scopes
 namespace internal
 {
 
-class ObjectImpl : public virtual Object
+class ObjectImpl : public virtual Object, public virtual std::enable_shared_from_this<ObjectImpl>
 {
 public:
     ObjectImpl(MWProxy const& mw_proxy);

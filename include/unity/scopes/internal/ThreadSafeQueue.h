@@ -59,12 +59,13 @@ public:
     T wait_and_pop();
     bool try_pop(T& item);
     bool empty() const noexcept;
+    void wait_until_empty() const noexcept;
     size_t size() const noexcept;
 
 private:
     std::queue<T> queue_;
     mutable std::mutex mutex_;
-    std::condition_variable cond_;
+    mutable std::condition_variable cond_;
     bool destroyed_;
     int num_waiters_;
 };
@@ -142,7 +143,7 @@ T ThreadSafeQueue<T>::wait_and_pop()
     }
     T item = std::move(queue_.front());
     queue_.pop();
-    if (--num_waiters_ == 0)
+    if (--num_waiters_ == 0 || queue_.empty())
     {
         cond_.notify_all();
     }
@@ -159,6 +160,10 @@ bool ThreadSafeQueue<T>::try_pop(T& item)
     }
     item = std::move(queue_.front());
     queue_.pop();
+    if (queue_.empty())
+    {
+        cond_.notify_all();
+    }
     return true;
 }
 
@@ -167,6 +172,13 @@ bool ThreadSafeQueue<T>::empty() const noexcept
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return queue_.empty();
+}
+
+template<typename T>
+void ThreadSafeQueue<T>::wait_until_empty() const noexcept
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    cond_.wait(lock, [this] { return queue_.empty(); });
 }
 
 template<typename T>

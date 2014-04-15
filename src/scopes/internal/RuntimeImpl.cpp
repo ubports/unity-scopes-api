@@ -139,29 +139,38 @@ void RuntimeImpl::destroy()
     }
     destroyed_ = true;
 
-    async_pool_ = nullptr;
-
-    if (future_queue_)
-    {
-        future_queue_->destroy();
-        future_queue_->wait_for_destroy();
-    }
-
+    // Stop the reaper. Any ReplyObject instances that may still
+    // be hanging around will be cleaned up when the server side
+    // is shut down.
     if (reply_reaper_)
     {
         reply_reaper_->destroy();
         reply_reaper_ = nullptr;
     }
 
-    registry_ = nullptr;
-    middleware_->stop();
-    middleware_->wait_for_shutdown();
-    middleware_ = nullptr;
-    middleware_factory_.reset(nullptr);
+    // No more outgoing invocations.
+    async_pool_ = nullptr;
+
+    // Wait for any twoway operations that were invoked asynchronously to complete.
+    if (future_queue_)
+    {
+        future_queue_->wait_until_empty();
+        future_queue_->destroy();
+        future_queue_->wait_for_destroy();
+    }
+
     if (waiter_thread_.joinable())
     {
         waiter_thread_.join();
     }
+
+    // Shut down server-side.
+    middleware_->stop();
+    middleware_->wait_for_shutdown();
+    middleware_ = nullptr;
+    middleware_factory_.reset(nullptr);
+
+    registry_ = nullptr;
 }
 
 string RuntimeImpl::scope_id() const
