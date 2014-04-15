@@ -1,7 +1,7 @@
 Release Notes for unity-scopes-api
 ==================================
 
-Changes in version 0.4.1
+Changes in version 0.4.3
 ========================
 
   * Made the scope search, activate, perform_action, and preview methods non-blocking.
