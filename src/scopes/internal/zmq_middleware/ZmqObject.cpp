@@ -53,6 +53,7 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
                                RequestMode m,
                                int64_t timeout) :
     MWObjectProxy(mw_base),
+    registry_(nullptr),
     endpoint_(endpoint),
     identity_(identity),
     category_(category),
@@ -64,8 +65,8 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     throw_if_bad_endpoint(endpoint);
 
     // retrieve the registry proxy if this object is not the registry itself
-    auto runtime = mw_base->runtime();
-    if (identity != runtime->registry_identity())
+    auto runtime = mw_base ? mw_base->runtime() : nullptr;
+    if (runtime && identity != runtime->registry_identity())
     {
         registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base->create_registry_proxy(
                                                           runtime->registry_identity(), runtime->registry_endpoint()));
