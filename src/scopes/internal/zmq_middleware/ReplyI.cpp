@@ -73,7 +73,6 @@ void ReplyI::finished_(Current const&,
                        capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
     auto r = req.getReason();
