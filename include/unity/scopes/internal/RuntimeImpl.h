@@ -63,7 +63,7 @@ public:
 
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
-    void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const;
+    void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept;
 
     bool destroyed_;
     std::string scope_id_;

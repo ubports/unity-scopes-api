@@ -236,7 +236,7 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     return reply_reaper_;
 }
 
-void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const
+void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept
 {
     for (;;)
     {
@@ -246,6 +246,10 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
             future.get();
         }
         catch (std::runtime_error const&)
+        {
+            break;
+        }
+        catch (std::future_error const&)
         {
             break;
         }
