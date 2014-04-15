@@ -27,13 +27,6 @@ namespace unity
 namespace scopes
 {
 
-enum class ConfinementType
-{
-    Trusted,
-    UntrustedLocal,
-    UntrustedInternet
-};
-
 namespace internal
 {
 
@@ -77,12 +70,6 @@ public:
     \return The ID of the scope.
     */
     std::string scope_id() const;
-
-    /**
-    \brief Get the scope type.
-    \return The type of the scope.
-    */
-    ConfinementType confinement_type() const;
 
     /**
     \brief Get the proxy object for this scope.

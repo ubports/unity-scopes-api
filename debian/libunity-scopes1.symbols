@@ -407,7 +407,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor>)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0.4.2+14.04.20140404.2
@@ -424,14 +424,12 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareData::~MiddlewareData()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareFactory(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::~MiddlewareFactory()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeMetadataImpl::set_confinement_type(unity::scopes::ConfinementType)@Base" 0replaceme
- (c++)"unity::scopes::internal::ScopeMetadataImpl::confinement_type() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_author(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_hot_key(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -513,7 +511,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::PreviewWidget::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::data() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::serialize() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ScopeMetadata::confinement_type() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0.4.0+14.04.20140312.1
@@ -602,6 +599,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Category::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::title() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::serialize() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::Executor::exec(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, core::posix::StandardStream const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::Executor::Executor()@Base" 0replaceme
+ (c++)"unity::scopes::internal::Executor::~Executor()@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::configfile() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeImpl::reply_reaper() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
@@ -613,7 +613,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::scope_id() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeConfig::confinement_type() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::display_name() const@Base" 0.4.0+14.04.20140312.1

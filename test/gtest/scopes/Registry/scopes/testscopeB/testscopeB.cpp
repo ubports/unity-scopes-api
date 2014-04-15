@@ -95,10 +95,13 @@ public:
     }
 };
 
-int main(int /* argc */, char ** /* argv */)
+int main(int argc, char** argv)
 {
+    char const* const rt_config = argc > 1 ? argv[1] : TEST_RUNTIME_FILE;
+    char const* const scope_config = argc > 2 ? argv[2] : TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB.ini";
+
     MyScope scope;
-    auto runtime = Runtime::create_scope_runtime("testscopeB", TEST_RUNTIME_FILE);
-    runtime->run_scope(&scope, TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB.ini");
+    auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
+    runtime->run_scope(&scope, scope_config);
     return 0;
 }
