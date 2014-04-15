@@ -71,7 +71,6 @@ public:
         EXPECT_EQ("US", subdeps.back().label());
         EXPECT_EQ("test", subdeps.back().query().query_string());
 
-        lock_guard<mutex> lock(mutex_);
         dep_count_++;
     }
 
@@ -82,7 +81,6 @@ public:
         EXPECT_EQ("art", result.art());
         EXPECT_EQ("dnd_uri", result.dnd_uri());
 
-        lock_guard<mutex> lock(mutex_);
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
@@ -95,7 +93,6 @@ public:
         EXPECT_EQ("foo", query.query_string());
         EXPECT_EQ("dep1", query.department_id());
 
-        lock_guard<mutex> lock(mutex_);
         annotation_count_++;
     }
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
@@ -141,13 +138,11 @@ public:
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
-        lock_guard<mutex> lock(mutex_);
         widgets_pushes_++;
     }
     virtual void push(std::string const& key, Variant const&) override
     {
         EXPECT_TRUE(key == "author" || key == "rating");
-        lock_guard<mutex> lock(mutex_);
         data_pushes_++;
     }
     virtual void push(ColumnLayoutList const&) override
@@ -189,7 +184,6 @@ public:
 
     virtual void push(CategorisedResult /* result */) override
     {
-        lock_guard<mutex> lock(mutex_);
         if (++count_ > pushes_expected_)
         {
             FAIL();
