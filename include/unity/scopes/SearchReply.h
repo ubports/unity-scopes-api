@@ -45,7 +45,32 @@ public:
     /**
      \brief Register departments for the current search reply and provide the current department.
 
-     current_department_id should in most cases be the department returned by Query::department_id().
+     Departments are optional. If scope supports departments, it is expected to register a DepartmentList in one of the following ways,
+     depending on what is the current department user is facing:
+     <ul>
+     <li>if user is facing the root of the departments hierarchy (i.e. no department is selected), just register a single department that corresponds to "all
+     departments", and add to it sub-departments corresponding to top-level departments. For every department on the list call unity::scopes::Department::set_has_subdepartments() if it
+     has subdepartments.
+     <li>if user is visiting a department, you need to create parent department - current department - sub-departments hierarchy as follows:
+        <ul>
+        <li>create a Department instance for current department and append all relevant sub-departments of it using unity::scopes::Department::set_subdepartments() method.
+        For every sub-department use unity::scopes::Department::set_has_subdepartments() if it has subdepartments.
+        <li>create a Department instance that is a parent of current department and add current department to it using set_subdepartments().
+        <li>register a unity::scopes::DepartmentList that has just the parent department in it.
+        </ul>
+     </ul>
+
+     For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
+     that registers departments for current search in "History" may look like this:
+     \code{.cpp}
+     unity::scopes::Department books("books", query, "Books"); // the parent of "History"
+     unity::scopes::DepartmentList history_depts({"history", query, "History"}, {"ww2", query, "World War Two"}, {"ancient", query, "Ancient"});
+     books.set_subdepartments(history_depts);
+     unity::scopes::DepartmentList books_depts({books});
+     reply->register_departments(books_depts, "history");
+     \endcode
+
+     current_department_id should in most cases be the department returned by unity::scopes::CannedQuery::department_id().
      Pass an empty string for current_department_id to indicate no active department.
      \param departments A list of departments.
      \param current_department_id A department id that should be considered current.
