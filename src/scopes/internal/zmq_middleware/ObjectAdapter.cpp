@@ -186,7 +186,6 @@ shared_ptr<ServantBase> ObjectAdapter::find(std::string const& id) const
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-// this_thread::sleep_for(chrono::seconds(10000)); // TODO: remove this
             throw_bad_state("find()", state_);
         }
     }
@@ -264,7 +263,6 @@ shared_ptr<ServantBase> ObjectAdapter::find_dflt_servant(std::string const& cate
         lock_guard<mutex> state_lock(state_mutex_, adopt_lock);
         if (state_ == Destroyed || state_ == Failed)
         {
-// this_thread::sleep_for(chrono::seconds(10000)); // TODO: remove this
             throw_bad_state("find_dflt_servant()", state_);
         }
     }
@@ -780,7 +778,16 @@ void ObjectAdapter::worker_thread()
                 }
 
                 // Look for a servant with matching id.
-                auto servant = find_servant(current.id, current.category);
+                shared_ptr<ServantBase> servant;
+                try
+                {
+                    servant = find_servant(current.id, current.category);
+                }
+                catch (std::exception const&)
+                {
+                    // Ignore failure to find servant during destruction phase.
+                }
+
                 if (!servant)
                 {
                     if (mode_ == RequestMode::Twoway)

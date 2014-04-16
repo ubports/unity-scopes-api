@@ -56,8 +56,8 @@ public:
         }
         // We time out the wait because, otherwise, the scope's object adapter can't shut down
         // and the test hangs forever.
-        // If this fails, the cancelled method wasn't called after one second.
-        auto stop_time = chrono::steady_clock::now() + chrono::seconds(1);
+        // If this fails, the cancelled method wasn't called after five seconds.
+        auto stop_time = chrono::steady_clock::now() + chrono::seconds(5);
         unique_lock<mutex> lock(mutex_);
         EXPECT_TRUE(cond_.wait_until(lock, stop_time, [this]{ return cancelled_;}));
     }

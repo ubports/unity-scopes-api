@@ -374,6 +374,12 @@ TEST(Runtime, early_cancel)
     // is sent to the "fake" QueryCtrlProxy.
     ctrl->cancel();
     receiver->wait_until_finished();
+    // The receiver receives its cancel from the client-side run time instead of the
+    // scope because the run time short-cuts sending the cancel locally instead
+    // of waiting for the cancel message from the scope. Allow some time for the
+    // cancel to reach the scope before shutting down the run time, so the scope
+    // can test that it received the cancel.
+    this_thread::sleep_for(chrono::milliseconds(200));
 }
 
 void scope_thread(Runtime::SPtr const& rt)

@@ -258,10 +258,6 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
         {
             break;
         }
-        catch (std::future_error const&)
-        {
-            break;
-        }
     }
 }
 
