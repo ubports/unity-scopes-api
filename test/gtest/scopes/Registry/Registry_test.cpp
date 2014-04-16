@@ -48,11 +48,12 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message ) override
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
         EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
         finished_ok_ = reason == Finished;
         done_ = true;
         cond_.notify_all();

@@ -63,14 +63,6 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
     assert(timeout >= -1);
     throw_if_bad_endpoint(endpoint);
 
-    // retrieve the registry proxy if this object is not the registry itself
-    auto runtime = mw_base ? mw_base->runtime() : nullptr;
-    if (runtime && identity != runtime->registry_identity())
-    {
-        registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base->create_registry_proxy(
-                                                          runtime->registry_identity(), runtime->registry_endpoint()));
-    }
-
     // Make sure that fields have consistent settings for null proxies.
     if (endpoint.empty() || identity.empty())
     {
@@ -206,10 +198,31 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     }
     catch (TimeoutException const&)
     {
+        // retrieve the registry proxy if we haven't already done so
         if (!registry_)
         {
-            throw;
+            // Check first that this object is not the registry itself
+            auto runtime = mw_base() ? mw_base()->runtime() : nullptr;
+            if (!runtime || identity_ == runtime->registry_identity())
+            {
+                throw;
+            }
+
+            // we must do this via lazy initialization as attempting to do this in
+            // the constructor causes a deadlock when accessing runtime methods
+            registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base()->create_registry_proxy(
+                                                              runtime->registry_identity(),
+                                                              runtime->registry_endpoint()));
+
+            // this really shouldn't happen but if we do fail to retrieve the
+            // registry proxy, just rethrow the exception
+            if (!registry_)
+            {
+                throw;
+            }
         }
+
+        // rebind and try invoke again
         ObjectProxy new_proxy = registry_->locate(identity_);
         endpoint_ = new_proxy->endpoint();
         identity_ = new_proxy->identity();

@@ -526,8 +526,27 @@ TEST_F(RegistryTest, locate_all)
 
 class ReceiverStub : public SearchListenerBase
 {
+public:
     void push(CategorisedResult) override {}
-    void finished(Reason, std::string const&) override {}
+
+    void finished(Reason, std::string const&) override
+    {
+        // Signal that the query is complete
+        unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
 };
 
 // test scope death and rebinding
@@ -558,6 +577,7 @@ TEST_F(RegistryTest, locate_rebinding)
     // locate first scope indirectly via rebinding on scope request
     auto receiver_stub = make_shared<ReceiverStub>();
     EXPECT_NO_THROW(proxies[scope_ids[0]]->search("test", SearchMetadata("en", "phone"), receiver_stub));
+    receiver_stub->wait_until_finished();
 
     // check that the first scope is running
     EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));
