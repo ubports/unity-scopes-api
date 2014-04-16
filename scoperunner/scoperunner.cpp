@@ -79,6 +79,10 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
 
     string lib_dir = scope_config.parent_path().native();
     string scope_id = scope_config.stem().native();
+    if (!lib_dir.empty())
+    {
+      lib_dir += '/';
+    }
 
     int exit_status = 1;
     try
@@ -88,7 +92,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
-        ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "/lib" + scope_id + ".so", rt->registry());
+        ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
         loader->start();
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
