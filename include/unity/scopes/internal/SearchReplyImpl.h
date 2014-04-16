@@ -65,8 +65,9 @@ public:
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
 
 private:
-    std::shared_ptr<CategoryRegistry> local_cat_reg_;
-    std::shared_ptr<CategoryRegistry> remote_cat_reg_;
+    bool push(Category::SCPtr category);
+
+    std::shared_ptr<CategoryRegistry> cat_registry_;
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;

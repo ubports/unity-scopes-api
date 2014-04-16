@@ -41,8 +41,7 @@ namespace internal
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
     ObjectImpl(mw_proxy),
     ReplyImpl(mw_proxy, qo),
-    local_cat_reg_(new CategoryRegistry()),
-    remote_cat_reg_(new CategoryRegistry()),
+    cat_registry_(new CategoryRegistry()),
     cardinality_(qo->cardinality({ fwd()->identity(), fwd()->mw_base() })),
     num_pushes_(0)
 {
@@ -69,7 +68,8 @@ void SearchReplyImpl::register_departments(DepartmentList const& departments, st
 
 void SearchReplyImpl::register_category(Category::SCPtr category)
 {
-    local_cat_reg_->register_category(category); // will throw if that category id has already been registered
+    cat_registry_->register_category(category); // will throw if that category id has already been registered
+    push(category);
 }
 
 Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
@@ -78,13 +78,14 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
                                              CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
-    auto cat = local_cat_reg_->register_category(id, title, icon, renderer_template);
+    auto cat = cat_registry_->register_category(id, title, icon, renderer_template);
+    push(cat);
     return cat;
 }
 
 Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
 {
-    return local_cat_reg_->lookup_category(id);
+    return cat_registry_->lookup_category(id);
 }
 
 bool SearchReplyImpl::register_annotation(unity::scopes::Annotation const& annotation)
@@ -98,21 +99,12 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
     // If this is an aggregator scope, it may be pushing result items obtained
     // from ReplyObject without registering a category first.
-    if (local_cat_reg_->lookup_category(result.category()->id()) == nullptr)
+    if (cat_registry_->lookup_category(result.category()->id()) == nullptr)
     {
         register_category(result.category());
     }
 
     VariantMap var;
-
-    // If we have not yet sent this category to the reply object, include it in the
-    // payload (avoids a race between registering a category and pushing a result)
-    if (remote_cat_reg_->lookup_category(result.category()->id()) == nullptr)
-    {
-        remote_cat_reg_->register_category(result.category());
-        var["category"] = result.category()->serialize();
-    }
-
     var["result"] = result.serialize();
     if (!ReplyImpl::push(var))
     {
@@ -138,6 +130,13 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     VariantMap var;
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
+    return ReplyImpl::push(var);
+}
+
+bool SearchReplyImpl::push(Category::SCPtr category)
+{
+    VariantMap var;
+    var["category"] = category->serialize();
     return ReplyImpl::push(var);
 }
 
