@@ -54,7 +54,7 @@ public:
 protected:
     bool push(VariantMap const& variant_map);
 
-    MWReplyProxy fwd() const;
+    MWReplyProxy fwd();
 
 private:
     std::shared_ptr<QueryObjectBase> qo_;

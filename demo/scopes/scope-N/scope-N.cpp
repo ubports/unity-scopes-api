@@ -47,6 +47,11 @@ public:
 
     virtual void run(SearchReplyProxy const&) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         cerr << "scope-no-op: received query" << endl;
         this_thread::sleep_for(chrono::seconds(3));
         cerr << "scope-no-op: query complete" << endl;

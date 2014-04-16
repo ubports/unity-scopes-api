@@ -37,6 +37,7 @@ namespace internal
 {
 
 QueryBaseImpl::QueryBaseImpl()
+    : valid_(true)
 {
 }
 
@@ -102,14 +103,23 @@ void QueryBaseImpl::set_metadata(SearchMetadata const& metadata)
 
 void QueryBaseImpl::cancel()
 {
+    if (!valid_.exchange(false))
+    {
+        return;
+    }
     for (auto& ctrl : subqueries_)
     {
         ctrl->cancel(); // Forward the cancellation to any subqueries that might be active
     }
     // We release the memory for the subquery controls here. That's just a micro-optimization
-    // because this QueryBase will be destroyed shortly anyway, once the cancelled() method
-    // of the application returns. (Not deallocating here would work too.)
+    // because this QueryBase will be destroyed shortly anyway, once the cancelled() (and possibly
+    // run()) methods of the application return. (Not deallocating here would work too.)
     vector<QueryCtrlProxy>().swap(subqueries_);
+}
+
+bool QueryBaseImpl::valid() const
+{
+    return valid_;
 }
 
 } // namespace internal

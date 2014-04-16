@@ -156,6 +156,11 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         // The query can do anything it likes with this method, that is, run() can push results
         // directly on the provided reply, or it can save the reply for later use and return from
         // run(). It is OK to push results on the reply from a different thread.

@@ -68,7 +68,6 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         // to be safe, we don't assert, in case someone is running a broken client.
 
         // TODO: log error about incoming request containing an invalid reply proxy.
-
         throw LogicException("Scope \"" + runtime_->scope_id() + "\": query() called with null reply proxy");
     }
 

@@ -46,6 +46,7 @@ namespace zmq_middleware
 {
 
 class ServantBase;
+class StopPublisher;
 class ZmqMiddleware;
 
 class ObjectAdapter final
@@ -89,12 +90,12 @@ private:
     // The Failed state is reachable from any of the other states and indicates
     // a fatal error condition.
     enum AdapterState { Inactive, Activating, Active, Deactivating, Destroyed, Failed };
-    void throw_bad_state(AdapterState state) const;
+    void throw_bad_state(std::string const& label, AdapterState state) const;
 
     void run_workers();
-    void init_ctrl_socket();
-    zmqpp::socket subscribe_to_ctrl_socket();
-    void stop_workers() noexcept;
+    // void init_ctrl_socket();
+    // zmqpp::socket subscribe_to_ctrl_socket();
+    // void stop_workers() noexcept;
 
     void safe_bind(zmqpp::socket& s, std::string const& endpoint);
 
@@ -114,8 +115,9 @@ private:
     std::string endpoint_;
     RequestMode mode_;
     int pool_size_;
-    std::unique_ptr<zmqpp::socket> ctrl_;       // PUB socket to signal when to deactivate
-    std::mutex ctrl_mutex_;                     // Synchronizes access to ctrl_ when sending
+    // std::unique_ptr<zmqpp::socket> ctrl_;       // PUB socket to signal when to deactivate
+    // std::mutex ctrl_mutex_;                     // Synchronizes access to ctrl_ when sending
+    std::unique_ptr<StopPublisher> stopper_;    // Used to signal threads when it's time to terminate
     std::thread broker_;                        // Connects router with dealer
     std::vector<std::thread> workers_;          // Threads for incoming invocations
     std::atomic_int num_workers_;               // For handshake with parent

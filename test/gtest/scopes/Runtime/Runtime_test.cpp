@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -22,20 +22,22 @@
 
 #include <mutex>
 
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/MWScope.h>
-#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/ListenerBase.h>
+#include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Runtime.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
 
-#include "TestScope.h"
 #include "PusherScope.h"
+#include "SlowCreateScope.h"
+#include "TestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -82,6 +84,7 @@ public:
         count_++;
         last_result_ = std::make_shared<Result>(result);
     }
+
     virtual void push(Annotation annotation) override
     {
         EXPECT_EQ(1u, annotation.links().size());
@@ -92,6 +95,7 @@ public:
         EXPECT_EQ("dep1", query.department_id());
         annotation_count_++;
     }
+
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
@@ -104,15 +108,18 @@ public:
         query_complete_ = true;
         cond_.notify_one();
     }
+
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+
     std::shared_ptr<Result> last_result()
     {
         return last_result_;
     }
+
 private:
     bool query_complete_;
     mutex mutex_;
@@ -245,6 +252,47 @@ TEST(Runtime, search)
     receiver->wait_until_finished();
 }
 
+TEST(Runtime, consecutive_search)
+{
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    mw->start();
+
+    auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+
+    auto receiver = make_shared<Receiver>();
+    auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
+    receiver->wait_until_finished();
+
+    std::vector<std::shared_ptr<Receiver>> replies;
+
+    const int num_searches = 100;
+    for (int i = 0; i < num_searches; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        scope->search("test", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    for (int i = 0; i < num_searches; ++i)
+    {
+        replies[i]->wait_until_finished();
+    }
+
+    // Do it again, to test that re-use of previously-created connections works.
+    replies.clear();
+    for (int i = 0; i < num_searches; ++i)
+    {
+        replies.push_back(std::make_shared<Receiver>());
+        scope->search("test", SearchMetadata("en", "phone"), replies.back());
+    }
+
+    for (int i = 0; i < num_searches; ++i)
+    {
+        replies[i]->wait_until_finished();
+    }
+}
+
 TEST(Runtime, preview)
 {
     RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
@@ -294,4 +342,115 @@ TEST(Runtime, cardinality)
     receiver = make_shared<PushReceiver>(20);
     scope->search("test", SearchMetadata(20, "unused", "unused"), receiver);
     receiver->wait_until_finished();
+}
+
+class CancelReceiver : public SearchListenerBase
+{
+public:
+    CancelReceiver()
+        : query_complete_(false)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+        FAIL();
+    }
+
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    {
+        EXPECT_EQ(Cancelled, reason);
+        EXPECT_EQ("", error_message);
+        // Signal that the query has completed.
+        unique_lock<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
+TEST(Runtime, early_cancel)
+{
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("SlowCreateScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("SlowCreateScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
+
+    // Check that, if a cancel is sent before search() returns on the server side, the
+    // cancel is correcly forwarded to the scope once the real reply proxy arrives
+    // over the wire.
+    auto receiver = make_shared<CancelReceiver>();
+    auto ctrl = scope->search("test", SearchMetadata("unused", "unused"), receiver);
+    // Allow some time for the search message to get there.
+    this_thread::sleep_for(chrono::milliseconds(100));
+    // search() in the scope doesn't return for some time, so the cancel() that follows
+    // is sent to the "fake" QueryCtrlProxy.
+    ctrl->cancel();
+    receiver->wait_until_finished();
+    // The receiver receives its cancel from the client-side run time instead of the
+    // scope because the run time short-cuts sending the cancel locally instead
+    // of waiting for the cancel message from the scope. Allow some time for the
+    // cancel to reach the scope before shutting down the run time, so the scope
+    // can test that it received the cancel.
+    this_thread::sleep_for(chrono::milliseconds(200));
+}
+
+void scope_thread(Runtime::SPtr const& rt)
+{
+    TestScope scope;
+    rt->run_scope(&scope, "/foo");
+}
+
+void pusher_thread(Runtime::SPtr const& rt)
+{
+    PusherScope scope;
+    rt->run_scope(&scope, "/foo");
+}
+
+void slow_create_thread(Runtime::SPtr const& rt)
+{
+    SlowCreateScope scope;
+    rt->run_scope(&scope, "/foo");
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+
+    Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    std::thread scope_t(scope_thread, srt);
+
+    Runtime::SPtr prt = move(Runtime::create_scope_runtime("PusherScope", "Runtime.ini"));
+    std::thread pusher_t(pusher_thread, prt);
+
+    Runtime::SPtr scrt = move(Runtime::create_scope_runtime("SlowCreateScope", "Runtime.ini"));
+    std::thread slow_create_t(slow_create_thread, scrt);
+
+    // Give threads some time to bind to their endpoints, to avoid getting ObjectNotExistException
+    // from a synchronous remote call.
+    this_thread::sleep_for(chrono::milliseconds(200));
+
+    auto rc = RUN_ALL_TESTS();
+
+    srt->destroy();
+    scope_t.join();
+
+    prt->destroy();
+    pusher_t.join();
+
+    scrt->destroy();
+    slow_create_t.join();
+
+    return rc;
 }

@@ -33,11 +33,7 @@ namespace scopes
 namespace internal
 {
 
-// Proxy used by a scope to push results for a query.
-// To indicate that it has sent the last result, the scope must call finished().
-// Subsequent calls to finished() are ignored.
-// Calls to push() after finished() was called are ignored.
-// If the proxy goes out of scope before finished was called, it implicitly calls finished().
+class ScopeImpl;
 
 class QueryCtrlImpl : public virtual unity::scopes::QueryCtrl, public virtual ObjectImpl
 {
@@ -47,10 +43,17 @@ public:
 
     virtual void cancel() override;
 
+    void set_proxy(MWQueryCtrlProxy const& p);
+
 private:
-    MWQueryCtrlProxy fwd() const;
+    MWQueryCtrlProxy fwd();
 
     MWReplyProxy reply_proxy_;
+    bool ready_;                // True once ObjectImpl::set_proxy() was called
+    bool cancelled_;            // True if cancel() is called before set_proxy() was called
+    std::mutex mutex_;          // Protects ready_ and cancelled_
+
+    friend class ScopeImpl;     // Allows ScopeImpl to call set_proxy()
 };
 
 } // namespace internal

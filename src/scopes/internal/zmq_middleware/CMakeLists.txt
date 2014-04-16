@@ -13,6 +13,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/RethrowException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ServantBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/StopPublisher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Util.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantConverter.cpp

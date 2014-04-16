@@ -19,7 +19,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
@@ -138,7 +137,7 @@ void ZmqObjectProxy::ping()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "ping");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { this->invoke_twoway_(request_builder); });
     future.wait();
 }
 
@@ -165,22 +164,45 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
     if (!monitor_initialized) {
         monitor_initialized = true;
         zmqpp::socket monitor_socket(context, zmqpp::socket_type::publish);
-        monitor_socket.connect(MONITOR_ENDPOINT);
         monitor_socket.set(zmqpp::socket_option::linger, 0);
+        monitor_socket.connect(MONITOR_ENDPOINT);
         pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket), RequestMode::Oneway);
     }
 }
 
-ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params)
+// Get a socket to the endpoint for this proxy and write the request on the wire.
+
+void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& out_params)
 {
-    return invoke_(out_params, timeout_);
+    // Each calling thread gets its own pool because zmq sockets are not thread-safe.
+    thread_local static ConnectionPool pool(*mw_base()->context());
+
+    assert(mode_ == RequestMode::Oneway);
+    zmqpp::socket& s = pool.find(endpoint_, mode_);
+    ZmqSender sender(s);
+    auto segments = out_params.getSegmentsForOutput();
+    sender.send(segments);
+
+#ifdef ENABLE_IPC_MONITOR
+    if (true) {
+        register_monitor_socket(pool, *mw_base()->context());
+        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT, RequestMode::Oneway);
+        auto word_arr = capnp::messageToFlatArray(segments);
+        monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
+    }
+#endif
 }
 
-ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params)
+{
+    return invoke_twoway_(out_params, timeout_);
+}
+
+ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     try
     {
-        return invoke__(out_params, timeout);
+        return invoke_twoway__(out_params, timeout);
     }
     catch (TimeoutException const&)
     {
@@ -193,19 +215,20 @@ ZmqReceiver ZmqObjectProxy::invoke_(capnp::MessageBuilder& out_params, int64_t t
         identity_ = new_proxy->identity();
         category_ = new_proxy->category();
         timeout_ = new_proxy->timeout();
-        return invoke__(out_params, timeout);
+        return invoke_twoway__(out_params, timeout);
     }
 }
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
-// For a twoway request, poll for the reply with the timeout set for this proxy.
-// Return a receiver for the response (whether this is a oneway or twoway request).
+// Poll for the reply with the given timeout.
+// Return a socket for the response or throw if the timeout expires.
 
-ZmqReceiver ZmqObjectProxy::invoke__(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
 
+    assert(mode_ == RequestMode::Twoway);
     zmqpp::socket& s = pool.find(endpoint_, mode_);
     ZmqSender sender(s);
     auto segments = out_params.getSegmentsForOutput();
@@ -220,19 +243,16 @@ ZmqReceiver ZmqObjectProxy::invoke__(capnp::MessageBuilder& out_params, int64_t 
     }
 #endif
 
-    if (mode_ == RequestMode::Twoway)
+    zmqpp::poller p;
+    p.add(s);
+    p.poll(timeout);
+    if (!p.has_input(s))
     {
-        zmqpp::poller p;
-        p.add(s);
-        p.poll(timeout);
-        if (!p.has_input(s))
-        {
-            // If a request times out, we must close the corresponding socket, otherwise
-            // zmq gets confused: the reply will never be read, so the socket ends up
-            // in a bad state.
-            pool.remove(endpoint_);
-            throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
-        }
+        // If a request times out, we must close the corresponding socket, otherwise
+        // zmq gets confused: the reply will never be read, so the socket ends up
+        // in a bad state.
+        s.close();
+        throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }
     return ZmqReceiver(s);
 }

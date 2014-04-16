@@ -55,6 +55,11 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         cerr << "scope-slow: run called for \"" << query_.query_string() << "\"" << endl;
         this_thread::sleep_for(chrono::seconds(20));
         auto cat = reply->register_category("cat1", "Category 1", "", renderer_);

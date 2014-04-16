@@ -143,7 +143,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-MWReplyProxy ReplyImpl::fwd() const
+MWReplyProxy ReplyImpl::fwd()
 {
     return dynamic_pointer_cast<MWReply>(proxy());
 }

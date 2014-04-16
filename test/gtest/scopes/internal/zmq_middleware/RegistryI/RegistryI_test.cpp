@@ -508,7 +508,7 @@ TEST_F(RegistryTest, locate_one)
 // test locating all scopes
 TEST_F(RegistryTest, locate_all)
 {
-    // locate all scopes (hense starting all scope processes)
+    // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
     {
         EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));

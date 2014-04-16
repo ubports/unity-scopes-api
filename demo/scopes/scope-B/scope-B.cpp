@@ -72,17 +72,23 @@ public:
             cout << ": " << error_message;
         }
         cout << endl;
+        if (--num_children_ == 0)
+        {
+            upstream_->finished();  // Send finished once last child finishes
+        }
     }
 
-    Receiver(string const& scope_id, SearchReplyProxy const& upstream) :
+    Receiver(string const& scope_id, SearchReplyProxy const& upstream, int num_children) :
         scope_id_(scope_id),
-        upstream_(upstream)
+        upstream_(upstream),
+        num_children_(num_children)
     {
     }
 
 private:
     string scope_id_;
     SearchReplyProxy upstream_;
+    int num_children_;
 };
 
 class MyQuery : public SearchQueryBase
@@ -106,6 +112,11 @@ public:
 
     virtual void run(SearchReplyProxy const& upstream_reply)
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
         {
@@ -118,7 +129,7 @@ public:
             assert(0);
         }
 
-        SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply));
+        SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply, 2));
         subsearch(scope_c_, query_.query_string(), reply);
         subsearch(scope_d_, query_.query_string(), reply);
     }

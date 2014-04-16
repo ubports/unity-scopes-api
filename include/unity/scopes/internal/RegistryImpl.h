@@ -48,7 +48,7 @@ public:
     ObjectProxy locate(std::string const& identity);
 
 private:
-    MWRegistryProxy fwd() const;
+    MWRegistryProxy fwd();
 };
 
 } // namespace internal

@@ -23,10 +23,15 @@
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
 
+#include <atomic>
+
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity::scopes;
+
+namespace
+{
 
 class PusherQuery : public SearchQueryBase
 {
@@ -59,8 +64,10 @@ public:
     }
 
 private:
-    int cardinality_;
+    atomic_int cardinality_;
 };
+
+}  // namespace
 
 int PusherScope::start(string const&, RegistryProxy const &)
 {
