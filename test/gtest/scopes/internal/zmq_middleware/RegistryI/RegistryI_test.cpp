@@ -403,7 +403,7 @@ public:
         mw->add_state_receiver_object("StateReceiver", reg->state_receiver());
 
         // configure scopes
-        scope_ids = {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"};
+        scope_ids = { {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"} };
         for (auto& scope_id : scope_ids)
         {
             proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
