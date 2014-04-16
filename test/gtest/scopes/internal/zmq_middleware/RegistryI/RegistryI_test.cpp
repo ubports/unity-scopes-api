@@ -524,7 +524,7 @@ TEST_F(RegistryTest, locate_all)
     EXPECT_EQ(6, process_count());
 }
 
-class ReceiverStub : public SearchListenerBase
+class Receiver : public SearchListenerBase
 {
 public:
     void push(CategorisedResult) override {}
@@ -575,9 +575,9 @@ TEST_F(RegistryTest, locate_rebinding)
     EXPECT_EQ(0, process_count());
 
     // locate first scope indirectly via rebinding on scope request
-    auto receiver_stub = make_shared<ReceiverStub>();
-    EXPECT_NO_THROW(proxies[scope_ids[0]]->search("test", SearchMetadata("en", "phone"), receiver_stub));
-    receiver_stub->wait_until_finished();
+    auto receiver = make_shared<Receiver>();
+    EXPECT_NO_THROW(proxies[scope_ids[0]]->search("test", SearchMetadata("en", "phone"), receiver));
+    receiver->wait_until_finished();
 
     // check that the first scope is running
     EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));

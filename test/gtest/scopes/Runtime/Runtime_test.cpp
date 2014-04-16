@@ -218,28 +218,8 @@ private:
     atomic_int count_;
 };
 
-template <typename ScopeType>
-struct RaiiScopeThread
-{
-    ScopeType scope;
-    Runtime::SPtr runtime;
-    std::thread scope_thread;
-
-    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
-        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
-          scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
-
-    ~RaiiScopeThread()
-    {
-        runtime->destroy();
-        scope_thread.join();
-    }
-};
-
 TEST(Runtime, search)
 {
-    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
-
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -295,8 +275,6 @@ TEST(Runtime, consecutive_search)
 
 TEST(Runtime, preview)
 {
-    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
-
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -322,8 +300,6 @@ TEST(Runtime, preview)
 
 TEST(Runtime, cardinality)
 {
-    RaiiScopeThread<PusherScope> scope_thread("PusherScope", "Runtime.ini");
-
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
