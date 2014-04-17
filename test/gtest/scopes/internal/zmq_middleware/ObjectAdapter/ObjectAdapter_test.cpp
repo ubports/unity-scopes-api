@@ -197,7 +197,7 @@ TEST(ObjectAdapter, state_change)
             EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): stop thread "
                          "failure (adapter: testscope):\n"
                          "    unity::scopes::MiddlewareException: StopPublisher(): publisher thread "
-                         "failed (endpoint: inproc://testscope-stoppper):\n"
+                         "failed (endpoint: inproc://testscope-stopper):\n"
                          "        Address already in use",
                          e.what());
         }
