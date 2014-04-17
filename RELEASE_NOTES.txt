@@ -1,6 +1,11 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.4.3
+========================
+  * CannedQuery class can now be converted to and from a scopes:// uri with to_uri() and from_uri() methods.
+    These methods replace to_string() and from_string() methods that got removed.
+
 Changes in version 0.4.0
 ========================
 
