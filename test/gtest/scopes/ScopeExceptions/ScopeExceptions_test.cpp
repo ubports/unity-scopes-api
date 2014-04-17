@@ -60,3 +60,32 @@ TEST(NotFoundException, state)
         EXPECT_EQ(e.name(), e2.name());
     }
 }
+
+TEST(ObjectNotExistException, state)
+{
+    {
+        ObjectNotExistException e("some error", "some id");
+        EXPECT_STREQ("unity::scopes::ObjectNotExistException: some error (id = some id)", e.what());
+        EXPECT_EQ("unity::scopes::ObjectNotExistException", e.name());
+        EXPECT_EQ("some id", e.id());
+        EXPECT_THROW(rethrow_exception(e.self()), ObjectNotExistException);
+        ObjectNotExistException e2("blah", "some id");
+        e2 = e;
+        EXPECT_EQ(e.reason(), e2.reason());
+        EXPECT_EQ(e.name(), e2.name());
+    }
+}
+
+TEST(TimeoutException, state)
+{
+    {
+        TimeoutException e("some error");
+        EXPECT_STREQ("unity::scopes::TimeoutException: some error", e.what());
+        EXPECT_EQ("unity::scopes::TimeoutException", e.name());
+        EXPECT_THROW(rethrow_exception(e.self()), TimeoutException);
+        TimeoutException e2("blah");
+        e2 = e;
+        EXPECT_EQ(e.reason(), e2.reason());
+        EXPECT_EQ(e.name(), e2.name());
+    }
+}
