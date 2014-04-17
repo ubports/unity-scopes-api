@@ -1,0 +1,8 @@
+[Registry]
+Middleware = Zmq
+Zmq.Endpoint = ipc:///tmp/socket_for_registry
+Zmq.EndpointDir = /tmp
+Zmq.ConfigFile = Zmq.ini
+Scope.InstallDir = /unused
+Click.InstallDir = /unused
+Scoperunner.Path = /unused

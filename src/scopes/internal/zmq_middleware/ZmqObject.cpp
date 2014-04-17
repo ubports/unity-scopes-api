@@ -165,6 +165,7 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
     return request;
 }
 
+#ifdef ENABLE_IPC_MONITOR
 void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& context)
 {
     thread_local static bool monitor_initialized = false;
@@ -176,6 +177,7 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
         pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket), RequestMode::Oneway);
     }
 }
+#endif
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 
@@ -307,7 +309,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
     p.poll(timeout);
     if (!p.has_input(s))
     {
-        // If a request times out, we must close the corresponding socket, otherwise
+        // If a request times out, we must trash the corresponding socket, otherwise
         // zmq gets confused: the reply will never be read, so the socket ends up
         // in a bad state.
         // (removing a socket from the connection pool deletes it, hense closing the socket)
