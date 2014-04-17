@@ -72,7 +72,8 @@ public:
     Your implementation of this method should ensure that the scope stops
     processing the current query as soon as possible. Any calls to a `push()` method
     once a query is cancelled are ignored, so continuing to push after cancellation
-    only wastes CPU cycles.
+    only wastes CPU cycles. (`push()` returns `false` once a query is cancelled or
+    exceeds its cardinality limit.)
     */
     virtual void cancelled() = 0;                          // Originator cancelled the query
 
@@ -81,8 +82,15 @@ public:
 
     valid() returns false if this query is finished or was cancelled earlier. Note that it is possible
     that the run time may call SearchQueryBase::run(), ActivationQueryBase::activate(), or PreviewQueryBase::run()
-    \a after cancelled was called. Your implementation of these methods should check whether the query is still
+    \a after cancelled() was called. Your implementation of these methods should check whether the query is still
     valid and, if not, do nothing.
+
+    This method is provided mainly for convenience: it can be used in your s `run()` or `activate()` implementation to
+    avoid doing a lot of work setting up a query that was cancelled earlier. Note that, because cancellation
+    can happen at any time during query execution, your implementation should always test the return value
+    of `push()`. If `push()` returns `false`, the query was either cancelled or exceeded its cardinality limit.
+    Either way, there is no point in continuing to push more results because, once `push()` returns `false`,
+    the scopes run time discards all subsequent results for the query.
     */
     bool valid() const;
 
