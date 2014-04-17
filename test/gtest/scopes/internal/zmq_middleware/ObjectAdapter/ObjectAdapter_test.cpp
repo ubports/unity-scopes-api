@@ -44,7 +44,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 // an occastional "address in use" exception because the new socket
 // tries to bind while the old one is still in the process of destroying itself.
 
-void wait(int millisec = 20)
+void wait(int millisec = 200)
 {
     this_thread::sleep_for(chrono::milliseconds(millisec));
 }
