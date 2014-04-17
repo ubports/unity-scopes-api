@@ -93,7 +93,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         {
             // Create the registry proxy.
             RegistryConfig reg_config(registry_identity_, registry_configfile_);
-            string reg_mw_configfile = reg_config.mw_configfile();
             registry_endpoint_ = reg_config.endpoint();
             registry_endpointdir_ = reg_config.endpointdir();
             auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);

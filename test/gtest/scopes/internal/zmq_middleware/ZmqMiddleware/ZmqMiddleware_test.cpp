@@ -23,7 +23,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -34,9 +33,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ZmqMiddleware, basic)
 {
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
     mw.start();
     sleep(1);
     mw.stop();
@@ -44,9 +41,7 @@ TEST(ZmqMiddleware, basic)
 
 TEST(ZmqMiddleware, string_to_proxy)
 {
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
 
     ObjectProxy p;
     ScopeProxy sp;
@@ -84,9 +79,7 @@ TEST(ZmqMiddleware, string_to_proxy)
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
 {
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
 
     try
     {

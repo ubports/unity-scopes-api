@@ -63,8 +63,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         }
         registry_configfile_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
         default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
-        default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
-                                                    default_middleware_ + "." + default_middleware_configfile_str);
+        default_middleware_configfile_ =
+            get_optional_string(RUNTIME_CONFIG_GROUP, default_middleware_ + "." + default_middleware_configfile_str);
     }
 }
 

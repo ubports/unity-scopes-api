@@ -39,7 +39,7 @@ class ConfigBase
 {
 public:
     ConfigBase();
-    ConfigBase(std::string const& configfile);
+    ConfigBase(std::string const& configfile, std::string const& dflt_file = "");
     virtual ~ConfigBase();
 
     unity::util::IniParser::SPtr parser() const;

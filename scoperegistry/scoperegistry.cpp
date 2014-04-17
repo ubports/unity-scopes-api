@@ -375,7 +375,6 @@ main(int argc, char* argv[])
 
         string mw_kind;
         string mw_endpoint;
-        string mw_configfile;
         string scope_installdir;
         string oem_installdir;
         string click_installdir;
@@ -386,7 +385,6 @@ main(int argc, char* argv[])
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
             mw_endpoint = c.endpoint();
-            mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
             click_installdir = c.click_installdir();

@@ -18,6 +18,10 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
+
+#include <unistd.h>
+
 using namespace std;
 
 namespace unity
@@ -38,17 +42,37 @@ namespace
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
-    ConfigBase(configfile)
+    ConfigBase(configfile, DFLT_ZMQ_MIDDLEWARE_INI)
 {
-    if (configfile.empty())
+    if (!configfile.empty())
     {
-        public_dir_ = "/tmp";
-        private_dir_ = "/tmp";
+        public_dir_ = get_optional_string(ZMQ_CONFIG_GROUP, public_dir_str);
+        private_dir_ = get_optional_string(ZMQ_CONFIG_GROUP, private_dir_str);
     }
-    else
+
+    // Set the endpoint directories if they were not set explicitly.
+    // We look for the XDG_RUNTIME_DIR env variable. If that is not
+    // set, we default to DFLT_ENDPOINT_DIR_BASE/<effective UID>/zmq.
+    if (public_dir_.empty() || private_dir_.empty())
     {
-        public_dir_ = get_string(ZMQ_CONFIG_GROUP, public_dir_str);
-        private_dir_ = get_string(ZMQ_CONFIG_GROUP, private_dir_str);
+        string basedir;
+        char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
+        if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
+        {
+            basedir = string(DFLT_ENDPOINT_DIR_BASE) + "/" + std::to_string(geteuid());
+        }
+        else
+        {
+            basedir = string(xdg_runtime_dir) + "/zmq";
+        }
+        if (public_dir_.empty())
+        {
+            public_dir_ = basedir;
+        }
+        if (private_dir_.empty())
+        {
+            private_dir_ = basedir + "/priv";
+        }
     }
 }
 

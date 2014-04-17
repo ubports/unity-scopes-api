@@ -50,20 +50,6 @@ TEST(RuntimeConfig, BadRegistryID)
     }
 }
 
-TEST(RuntimeConfig, MiddlewareEmpty)
-{
-    try
-    {
-        RuntimeConfig c("MWEmpty.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"MWEmpty.ini\": Illegal empty value for Default.Middleware",
-                     e.what());
-    }
-}
-
 TEST(RuntimeConfig, BadMiddleware)
 {
     try

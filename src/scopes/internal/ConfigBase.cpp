@@ -22,6 +22,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/IniParser.h>
 
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -37,13 +38,26 @@ namespace internal
 // If configfile is the empty string, we create a default instance that returns "Zmq" for the middleware
 // and throws for the other methods.
 
-ConfigBase::ConfigBase(string const& configfile) :
+ConfigBase::ConfigBase(string const& configfile, string const& dflt_file) :
     parser_(nullptr),
     configfile_(configfile)
 {
-    if (!configfile.empty())
+    // If no configfile was specified, we check whether dflt_file exists.
+    // If so, we use it. Otherwise, we don't have a configfile at all and run
+    // with defaults.
+    string file = configfile;
+    if (file.empty() && !dflt_file.empty())
     {
-        parser_ = make_shared<util::IniParser>(configfile.c_str());
+        struct stat st;
+        if (stat(dflt_file.c_str(), &st) == 0)
+        {
+            file = dflt_file;
+        }
+    }
+    if (!file.empty())
+    {
+        configfile_ = file;
+        parser_ = make_shared<util::IniParser>(file.c_str());
     }
 }
 
@@ -88,7 +102,11 @@ string ConfigBase::get_middleware(string const& group, string const& key) const
     {
         return "Zmq";
     }
-    string val = get_string(group, key);
+    string val = get_optional_string(group, key);
+    if (val.empty())
+    {
+        return "Zmq";
+    }
     if (val != "Zmq" && val != "REST")
     {
         throw_ex("Illegal value for " + key + ": \"" + val +

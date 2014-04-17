@@ -45,7 +45,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     mw_kind_ = get_middleware(REGISTRY_CONFIG_GROUP, "Middleware");
     endpointdir_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".EndpointDir");
     endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
-    mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
+    mw_configfile_ = get_optional_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
     scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
     oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
     click_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "Click.InstallDir");

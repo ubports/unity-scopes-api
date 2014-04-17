@@ -40,6 +40,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <iostream>  // TODO: remove this once logging is added
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -63,9 +64,22 @@ char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control 
 char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 char const* state_suffix = "-s";  // Appended to server_name_ to create state adapter name
 
+// Create a directory with mode rwx------t if it doesn't exist yet.
+// We set the sticky bit to prevent the directory from being deleted:
+// if it happens to be under $XDG_RUNTIME_DIR and is not accessed
+// for more than six hours, the system may delete it.
+
+void create_dir(string const& dir)
+{
+    if (mkdir(dir.c_str(), 0700 | S_ISVTX) == -1 && errno != EEXIST)
+    {
+        throw FileException("cannot create public endpoint directory " + dir, errno);
+    }
+}
+
 } // namespace
 
-ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile, RuntimeImpl* runtime)
+ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile)
 try :
     MiddlewareBase(runtime),
     server_name_(server_name),
@@ -75,6 +89,19 @@ try :
     locate_timeout_(1500)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
+
+    // Create the endpoint dirs if they don't exist.
+    try
+    {
+        create_dir(config_.public_dir());
+        create_dir(config_.private_dir());
+    }
+    catch (...)
+    {
+        throw MiddlewareException("cannot initialize zmq middleware for scope " + server_name);
+    }
+    cerr << "dir: " << config_.public_dir() << endl;
+    cerr << "priv: " << config_.private_dir() << endl;
 }
 catch (zmqpp::exception const& e)
 {
