@@ -82,7 +82,6 @@ protected:
 private:
     ZmqReceiver invoke_twoway__(capnp::MessageBuilder& out_params, int64_t timeout);
 
-    ZmqRegistryProxy registry_;
     std::string endpoint_;
     std::string identity_;
     std::string category_;

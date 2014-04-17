@@ -43,6 +43,15 @@ namespace internal
 namespace zmq_middleware
 {
 
+namespace
+{
+    // this mutex protects all members of all ZmqObjectProxies
+    std::mutex shared_mutex;
+
+    // There is only one registry proxy, so share it across all ZmqObjectProxies
+    ZmqRegistryProxy shared_reg_proxy = nullptr;
+}
+
 #define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
 
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
@@ -52,7 +61,6 @@ ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
                                RequestMode m,
                                int64_t timeout) :
     MWObjectProxy(mw_base),
-    registry_(nullptr),
     endpoint_(endpoint),
     identity_(identity),
     category_(category),
@@ -83,26 +91,31 @@ ZmqMiddleware* ZmqObjectProxy::mw_base() const noexcept
 
 string ZmqObjectProxy::endpoint() const
 {
+    lock_guard<mutex> lock(shared_mutex);
     return endpoint_;
 }
 
 string ZmqObjectProxy::identity() const
 {
+    lock_guard<mutex> lock(shared_mutex);
     return identity_;
 }
 
 string ZmqObjectProxy::category() const
 {
+    lock_guard<mutex> lock(shared_mutex);
     return category_;
 }
 
 int64_t ZmqObjectProxy::timeout() const noexcept
 {
+    lock_guard<mutex> lock(shared_mutex);
     return timeout_;
 }
 
 string ZmqObjectProxy::to_string() const
 {
+    lock_guard<mutex> lock(shared_mutex);
     if (endpoint_.empty() || identity_.empty())
     {
         return "nullproxy:";
@@ -135,6 +148,7 @@ void ZmqObjectProxy::ping()
 
 RequestMode ZmqObjectProxy::mode() const
 {
+    lock_guard<mutex> lock(shared_mutex);
     return mode_;
 }
 
@@ -142,6 +156,7 @@ RequestMode ZmqObjectProxy::mode() const
 
 capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const
 {
+    lock_guard<mutex> lock(shared_mutex);
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(mode_ == RequestMode::Oneway ? capnproto::RequestMode::ONEWAY : capnproto::RequestMode::TWOWAY);
     request.setOpName(operation_name.c_str());
@@ -168,6 +183,8 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& out_params)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
+
+    lock_guard<mutex> lock(shared_mutex);
 
     assert(mode_ == RequestMode::Oneway);
     zmqpp::socket& s = pool.find(endpoint_, mode_);
@@ -199,35 +216,56 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     catch (TimeoutException const&)
     {
         // retrieve the registry proxy if we haven't already done so
-        if (!registry_)
         {
-            // Check first that this object is not the registry itself
-            auto runtime = mw_base() ? mw_base()->runtime() : nullptr;
-            if (!runtime || identity_ == runtime->registry_identity())
+            lock_guard<mutex> lock(shared_mutex);
+            if (!shared_reg_proxy)
             {
-                throw;
-            }
+                auto runtime = mw_base() ? mw_base()->runtime() : nullptr;
+                if (!runtime)
+                {
+                    throw;
+                }
 
-            // we must do this via lazy initialization as attempting to do this in
-            // the constructor causes a deadlock when accessing runtime methods
-            registry_ = dynamic_pointer_cast<ZmqRegistry>(mw_base()->create_registry_proxy(
-                                                              runtime->registry_identity(),
-                                                              runtime->registry_endpoint()));
+                // we must do this via lazy initialization as attempting to do this in
+                // the constructor causes a deadlock when accessing runtime methods
+                shared_reg_proxy = dynamic_pointer_cast<ZmqRegistry>(mw_base()->create_registry_proxy(
+                                                                         runtime->registry_identity(),
+                                                                         runtime->registry_endpoint()));
 
-            // this really shouldn't happen but if we do fail to retrieve the
-            // registry proxy, just rethrow the exception
-            if (!registry_)
-            {
-                throw;
+                // this really shouldn't happen but if we do fail to retrieve the
+                // registry proxy, just rethrow the exception
+                if (!shared_reg_proxy)
+                {
+                    throw;
+                }
             }
         }
 
-        // rebind and try invoke again
-        ObjectProxy new_proxy = registry_->locate(identity_);
-        endpoint_ = new_proxy->endpoint();
-        identity_ = new_proxy->identity();
-        category_ = new_proxy->category();
-        timeout_ = new_proxy->timeout();
+        // if this object is the registry itself, rethrow the exception
+        if (identity() == shared_reg_proxy->identity())
+        {
+            throw;
+        }
+
+        // rebind
+        ObjectProxy new_proxy = shared_reg_proxy->locate(identity());
+
+        // update our proxy with the newly received data
+        // (we need to first store values in local variables outside of the mutex,
+        // otherwise we will deadlock on the following ZmqObjectProxy methods)
+        std::string endpoint = new_proxy->endpoint();
+        std::string identity = new_proxy->identity();
+        std::string category = new_proxy->category();
+        int64_t timeout = new_proxy->timeout();
+        {
+            lock_guard<mutex> lock(shared_mutex);
+            endpoint_ = endpoint;
+            identity_ = identity;
+            category_ = category;
+            timeout_ = timeout;
+        }
+
+        // retry the invocation
         return invoke_twoway__(out_params, timeout);
     }
 }
@@ -241,8 +279,16 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
 
-    assert(mode_ == RequestMode::Twoway);
-    zmqpp::socket& s = pool.find(endpoint_, mode_);
+    RequestMode mode;
+    std::string endpoint;
+    {
+        lock_guard<mutex> lock(shared_mutex);
+        mode = mode_;
+        endpoint = endpoint_;
+    }
+
+    assert(mode == RequestMode::Twoway);
+    zmqpp::socket& s = pool.find(endpoint, mode);
     ZmqSender sender(s);
     auto segments = out_params.getSegmentsForOutput();
     sender.send(segments);
@@ -265,7 +311,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
         // zmq gets confused: the reply will never be read, so the socket ends up
         // in a bad state.
         // (removing a socket from the connection pool deletes it, hense closing the socket)
-        pool.remove(endpoint_);
+        pool.remove(endpoint);
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }
     return ZmqReceiver(s);

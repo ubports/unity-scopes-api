@@ -766,7 +766,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     }
     else if (category == registry_category)
     {
-        // The registry adapter is single- or multi-threaded and supports twoway operations only.
+        // The registry adapter is multi-threaded and supports twoway operations only.
         // TODO: get pool size from config
         // NB: On rebind, locate() is called on this adapter. A scope may then call registry methods during
         // its start() method, hence we must ensure this adapter has enough threads available to handle this.
