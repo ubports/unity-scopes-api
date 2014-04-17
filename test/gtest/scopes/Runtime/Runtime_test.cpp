@@ -364,7 +364,7 @@ TEST(Runtime, early_cancel)
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
 
     // Check that, if a cancel is sent before search() returns on the server side, the
-    // cancel is correcly forwarded to the scope once the real reply proxy arrives
+    // cancel is correctly forwarded to the scope once the real reply proxy arrives
     // over the wire.
     auto receiver = make_shared<CancelReceiver>();
     auto ctrl = scope->search("test", SearchMetadata("unused", "unused"), receiver);
