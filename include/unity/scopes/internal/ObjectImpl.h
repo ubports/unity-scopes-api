@@ -54,7 +54,7 @@ protected:
                                        // Each derived proxy implements a non-virtual fwd() method
                                        // that is called from within each operation to down-cast the MWProxy.
 
-    void set_proxy(MWProxy const& p);  // Allows a derived proxy to replace mw_proxy_ for aynchronous twoway calls.
+    void set_proxy(MWProxy const& p);  // Allows a derived proxy to replace mw_proxy_ for asynchronous twoway calls.
 
     MWProxy mw_proxy_;
     std::mutex proxy_mutex_;           // Protects mw_proxy_

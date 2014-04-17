@@ -433,7 +433,7 @@ void ObjectAdapter::run_workers()
         try
         {
             // Start the publisher for stop messages.
-            stopper_.reset(new StopPublisher(mw_.context(), name_ + "-stoppper"));
+            stopper_.reset(new StopPublisher(mw_.context(), name_ + "-stopper"));
         }
         catch (...)
         {
