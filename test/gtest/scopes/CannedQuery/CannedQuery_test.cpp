@@ -121,12 +121,27 @@ TEST(CannedQuery, to_uri)
 
 TEST(CannedQuery, from_uri)
 {
+    // invalid schema
+    try
     {
-        EXPECT_THROW(CannedQuery::from_uri("http://foo.com"), unity::InvalidArgumentException);
+        CannedQuery::from_uri("http://foo.com");
+        FAIL();
     }
+    catch (unity::InvalidArgumentException const& e)
     {
-        EXPECT_THROW(CannedQuery::from_uri("scope://"), unity::InvalidArgumentException);
+        EXPECT_STREQ("unity::InvalidArgumentException: CannedQuery::from_uri(): unsupported schema 'http://foo.com'", e.what());
     }
+
+    // missing scope id
+    try
+    {
+        CannedQuery::from_uri("scope://");
+    }
+    catch (unity::InvalidArgumentException const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: CannedQuery()::from_uri(): scope id is empty in 'scope://'", e.what());
+    }
+
     // missing argument for percent-encoded value
     {
         try
@@ -136,7 +151,9 @@ TEST(CannedQuery, from_uri)
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value", e.what());
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
+                    e.what());
         }
     }
     // missing character in percent-encoded value
@@ -148,19 +165,23 @@ TEST(CannedQuery, from_uri)
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value", e.what());
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%0:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
+                    e.what());
         }
     }
     // non-hex value in percent-encoded value
     {
         try
         {
-            CannedQuery::from_uri("scope://foo?q=%qy");
+            CannedQuery::from_uri("scope://foo?dep=%qy");
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion:\n    stoi", e.what());
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'dep' of uri 'scope://foo?dep=%qy:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion:\n        stoi",
+                    e.what());
         }
     }
     {

@@ -61,6 +61,7 @@ public:
     static const std::string scopes_schema;
 
 private:
+    static std::string decode_or_throw(std::string const& value, std::string const& key_name, std::string const& uri);
     std::string scope_id_;
     std::string query_string_;
     std::string department_id_;

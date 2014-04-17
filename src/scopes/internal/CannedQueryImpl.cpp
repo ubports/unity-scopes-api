@@ -156,12 +156,28 @@ CannedQuery CannedQueryImpl::create(VariantMap const& var)
     return CannedQuery(new CannedQueryImpl(var));
 }
 
+std::string CannedQueryImpl::decode_or_throw(std::string const& value, std::string const& key_name, std::string const& uri)
+{
+    try
+    {
+        return from_percent_encoding(value);
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        std::stringstream err;
+        err << "Failed to decode key '" << key_name << "' of uri '" << uri;
+        throw InvalidArgumentException(err.str());
+    }
+}
+
 CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
 {
     size_t pos = scopes_schema.length();
     if (uri.compare(0, pos, scopes_schema) != 0)
     {
-        throw InvalidArgumentException("CannedQuery::from_uri(): unsupported schema '" + uri + "'");
+        std::stringstream s;
+        s << "CannedQuery::from_uri(): unsupported schema '" + uri + "'";
+        throw InvalidArgumentException(s.str());
     }
 
     size_t next = uri.find("?", pos);
@@ -169,7 +185,9 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
     auto scope_id = uri.substr(pos, next - pos);
     if (scope_id.empty())
     {
-        throw InvalidArgumentException("CannedQuery()::from_uri(): scope id is empty");
+        std::stringstream s;
+        s << "CannedQuery()::from_uri(): scope id is empty in '" << uri << "'";
+        throw InvalidArgumentException(s.str());
     }
 
     CannedQuery q(from_percent_encoding(scope_id));
@@ -188,15 +206,15 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
 
                 if (key == "q")
                 {
-                    q.set_query_string(from_percent_encoding(val));
+                    q.set_query_string(decode_or_throw(val, key, uri));
                 }
                 else if (key == "dep")
                 {
-                    q.set_department_id(from_percent_encoding(val));
+                    q.set_department_id(decode_or_throw(val, key, uri));
                 }
                 else if (key == "filters")
                 {
-                    auto const fstate_json = from_percent_encoding(val);
+                    auto const fstate_json = decode_or_throw(val, key, uri);
                     internal::JsonCppNode const node(fstate_json);
                     auto const var = node.to_variant();
                     if (var.which() == Variant::Type::Dict)
@@ -205,7 +223,9 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
                     }
                     else
                     {
-                        throw InvalidArgumentException("CannedQuery::from_uri(): invalid filters data");
+                        std::stringstream s;
+                        s << "CannedQuery::from_uri(): invalid filters data for uri: '" << uri << "'";
+                        throw InvalidArgumentException(s.str());
                     }
                 } // else - unknown keys are ignored
             } // else - the string with no '=' is ignored
