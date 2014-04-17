@@ -83,7 +83,9 @@ std::string from_percent_encoding(std::string const& str)
                     }
                     catch (std::logic_error const& e) // covers both std::invalid_argument and std::out_of_range
                     {
-                        throw unity::InvalidArgumentException("from_percent_encoding(): unsupported conversion");
+                        std::stringstream err;
+                        err << "from_percent_encoding(): unsupported conversion of '" << hexnum << "'";
+                        throw unity::InvalidArgumentException(err.str());
                     }
                 }
             }

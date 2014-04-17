@@ -180,7 +180,7 @@ TEST(CannedQuery, from_uri)
         catch (unity::InvalidArgumentException const& e)
         {
             EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'dep' of uri 'scope://foo?dep=%qy:\n"
-                    "    unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion:\n        stoi",
+                    "    unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion of 'qy':\n        stoi",
                     e.what());
         }
     }
