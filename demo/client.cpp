@@ -59,7 +59,7 @@ std::string to_string(FilterBase const& filter)
 std::string to_string(Department const& dep, std::string const& indent = "")
 {
     std::ostringstream str;
-    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
+    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << ", has_children=" << dep.has_subdepartments() << endl;
     auto const subdeps = dep.subdepartments();
     if (!subdeps.empty())
     {
@@ -313,11 +313,13 @@ private:
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "usage: ./client <scope-id> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./client <canned-query> [activate n] | [preview n]" << endl;
     cerr << "   or: ./client list" << endl;
+    cerr << "   canned query format is: scope://<scope-id>?q=<query>&dep=<department-id>&filters=<filter-state-json>" << endl;
     cerr << "For example: ./client scope-B iron" << endl;
     cerr << "         or: ./client scope-B iron activate 1" << endl;
-    cerr << "         or: ./client scope-B iron preview 1" << endl;
+    cerr << "         or: ./client \"scope://scope-A?q=iron\" preview 1" << endl;
     exit(1);
 }
 
@@ -333,32 +335,51 @@ int main(int argc, char* argv[])
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
     bool do_list = false;
+    string scope_id;
+    string search_string;
+    string department_id;
+    FilterState filter_state;
 
     // poor man's getopt
-    if (argc == 5)
+    int index = 1;
+    if (argc == 2 && strcmp(argv[1], "list") == 0)
     {
-        if (strcmp(argv[3], "activate") == 0)
+        do_list = true;
+    }
+    else if (argc > 1 && strncmp(argv[index], "scope://", 8) == 0)
+    {
+        auto q = CannedQuery::from_uri(argv[index++]);
+        scope_id = q.scope_id();
+        search_string = q.query_string();
+        department_id = q.department_id();
+        filter_state = q.filter_state();
+    }
+    else if (argc > 2)
+    {
+        scope_id = argv[index++];
+        search_string = argv[index++];
+    }
+    else
+    {
+        print_usage();
+    }
+
+    if (argc == index + 2)
+    {
+        if (strcmp(argv[index], "activate") == 0)
         {
-            result_index = atoi(argv[4]);
+            result_index = atoi(argv[++index]);
             result_op = ResultOperation::Activation;
         }
-        else if (strcmp(argv[3], "preview") == 0)
+        else if (strcmp(argv[index], "preview") == 0)
         {
-            result_index = atoi(argv[4]);
+            result_index = atoi(argv[++index]);
             result_op = ResultOperation::Preview;
         }
         else
         {
             print_usage();
         }
-    }
-    else if (argc == 2 && strcmp(argv[1], "list") == 0)
-    {
-        do_list = true;
-    }
-    else if (argc != 3)
-    {
-        print_usage();
     }
 
     try
@@ -376,9 +397,6 @@ int main(int argc, char* argv[])
             }
             return 0;
         }
-
-        string scope_id = argv[1];
-        string search_string = argv[2];
 
         auto meta = r->get_metadata(scope_id);
         cout << "Scope metadata:   " << endl;
@@ -422,7 +440,7 @@ int main(int argc, char* argv[])
 
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
-        auto ctrl = meta.proxy()->search(search_string, metadata, reply); // May raise TimeoutException
+        auto ctrl = meta.proxy()->search(search_string, department_id, filter_state, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
         cout << "client: wait returned" << endl;
