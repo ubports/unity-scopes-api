@@ -1,3 +1,9 @@
+unity-scopes-api (0.4.3-0ubuntu1) UNRELEASED; urgency=low
+
+  * Implemented to_uri() and from_uri() conversions for CannedQuery.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 11 Apr 2014 14:06:55 +0200
+
 unity-scopes-api (0.4.2+14.04.20140404.2-0ubuntu1) trusty; urgency=low
 
   [ Pawel Stolowski ]

@@ -148,7 +148,7 @@ public:
         // query, the worker thread's next call to push() will return false,
         // causing the worker thread to stop working on this query.
         queue_.remove(this);
-        cerr << "scope-C: \"" + query_.to_string() + "\" cancelled" << endl;
+        cerr << "scope-C: \"" + query_.to_uri() + "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override

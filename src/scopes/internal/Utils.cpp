@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
+#include <iomanip>
 
 namespace unity
 {
@@ -39,6 +40,66 @@ VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap 
         throw unity::InvalidArgumentException(str.str());
     }
     return it;
+}
+
+std::string to_percent_encoding(std::string const& str)
+{
+    std::ostringstream result;
+    for (auto const& c: str)
+    {
+        if ((!isalnum(c)))
+        {
+            result << '%' << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(static_cast<unsigned char>(c)) << std::nouppercase;
+        }
+        else
+        {
+            result << c;
+        }
+    }
+    return result.str();
+}
+
+std::string from_percent_encoding(std::string const& str)
+{
+    std::ostringstream result;
+    for (auto it = str.begin(); it != str.end(); it++)
+    {
+        auto c = *it;
+        if (c == '%')
+        {
+            bool valid = false;
+            // take two characters and covert them from hex to actual char
+            if (++it != str.end())
+            {
+                c = *it;
+                if (++it != str.end())
+                {
+                    std::string const hexnum { c, *it };
+                    try
+                    {
+                        auto k = std::stoi(hexnum, nullptr, 16);
+                        result << static_cast<char>(k);
+                        valid = true;
+                    }
+                    catch (std::logic_error const& e) // covers both std::invalid_argument and std::out_of_range
+                    {
+                        std::stringstream err;
+                        err << "from_percent_encoding(): unsupported conversion of '" << hexnum << "'";
+                        throw unity::InvalidArgumentException(err.str());
+                    }
+                }
+            }
+            if (!valid)
+            {
+                throw unity::InvalidArgumentException("from_percent_encoding(): too few characters for percent-encoded value");
+            }
+        }
+        else
+        {
+            result << c;
+        }
+    }
+    return result.str();
 }
 
 } // namespace internal
