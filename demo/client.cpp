@@ -314,11 +314,11 @@ private:
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
-    cerr << "   or: ./client list" << endl;
-    cerr << "For example: ./client scope-B iron" << endl;
-    cerr << "         or: ./client scope-B iron activate 1" << endl;
-    cerr << "         or: ./client scope-B iron preview 1" << endl;
+    cerr << "usage: ./scopes-client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./scopes-client list" << endl;
+    cerr << "For example: ./scopes-client scope-B iron" << endl;
+    cerr << "         or: ./scopes-client scope-B iron activate 1" << endl;
+    cerr << "         or: ./scopes-client scope-B iron preview 1" << endl;
     exit(1);
 }
 
