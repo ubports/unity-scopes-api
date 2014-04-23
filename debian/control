@@ -58,9 +58,10 @@ Description: Header files for Unity scopes API
 Package: libunity-scopes-cli
 Section: devel
 Architecture: any
-Multi-Arch: same
+Multi-Arch: foreign
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes1 (= ${binary:Version}),
+         ${shlibs:Depends},
          ${misc:Depends},
 Description: Client utility for Unity scopes API
  Commandline client utility for querying Unity scopes, useful for testing.
