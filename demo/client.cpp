@@ -19,6 +19,7 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
+#include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
 #include <string.h>
@@ -363,7 +364,17 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
+        Runtime::UPtr rt;
+        // use Runtime.ini from the current directory if present, otherwise let the API pick the default one
+        const boost::filesystem::path path("Runtime.ini");
+        if (boost::filesystem::exists(path))
+        {
+            rt = Runtime::create(path.native());
+        }
+        else
+        {
+            rt = Runtime::create();
+        }
         RegistryProxy r = rt->registry();
 
         if (do_list)
