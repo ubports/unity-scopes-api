@@ -38,7 +38,7 @@ namespace internal
 namespace
 {
     const string overrideable_str = "Override";
-    const string scope_id_str = "DisplayName";
+    const string scope_name_str = "DisplayName";
     const string description_str = "Description";
     const string author_str = "Author";
     const string art_str = "Art";
@@ -61,8 +61,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         overrideable_ = false;
     }
 
-    display_name_ = parser()->get_string(SCOPE_CONFIG_GROUP, scope_id_str);
-    description_ = parser()->get_string(SCOPE_CONFIG_GROUP, description_str);
+    display_name_ = parser()->get_locale_string(SCOPE_CONFIG_GROUP, scope_name_str);
+    description_ = parser()->get_locale_string(SCOPE_CONFIG_GROUP, description_str);
     author_ = parser()->get_string(SCOPE_CONFIG_GROUP, author_str);
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
@@ -86,7 +86,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string hint = parser()->get_string(SCOPE_CONFIG_GROUP, search_hint_str);
+        string hint = parser()->get_locale_string(SCOPE_CONFIG_GROUP, search_hint_str);
         search_hint_.reset(new string(hint));
     }
     catch (LogicException const&)
