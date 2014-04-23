@@ -18,9 +18,12 @@
 
 #include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/Utils.h>
 #include <sstream>
+#include <set>
 
 namespace unity
 {
@@ -30,6 +33,8 @@ namespace scopes
 
 namespace internal
 {
+
+const std::string CannedQueryImpl::scopes_schema {"scope://"};
 
 CannedQueryImpl::CannedQueryImpl(std::string const& scope_id)
     : scope_id_(scope_id)
@@ -125,14 +130,23 @@ VariantMap CannedQueryImpl::serialize() const
     return vm;
 }
 
-std::string CannedQueryImpl::to_string() const
+std::string CannedQueryImpl::to_uri() const
 {
     std::ostringstream s;
-    s << "scope://" << scope_id_;
-    s << "?q=" << query_string_; // FIXME: escape
+    s << scopes_schema << to_percent_encoding(scope_id_);
+    s << "?q=" << to_percent_encoding(query_string_);
+
     if (!department_id_.empty())
     {
-        s << "&department=" << department_id_;
+        s << "&dep=" << to_percent_encoding(department_id_);
+    }
+
+    auto filters_var = filter_state_.serialize();
+    if (filters_var.size())
+    {
+        Variant const var(filters_var);
+        internal::JsonCppNode const jstr(var);
+        s << "&filters=" << to_percent_encoding(jstr.to_json_string());
     }
     return s.str();
 }
@@ -142,10 +156,82 @@ CannedQuery CannedQueryImpl::create(VariantMap const& var)
     return CannedQuery(new CannedQueryImpl(var));
 }
 
-CannedQuery CannedQueryImpl::from_string()
+std::string CannedQueryImpl::decode_or_throw(std::string const& value, std::string const& key_name, std::string const& uri)
 {
-    //TODO
-    CannedQuery q("");
+    try
+    {
+        return from_percent_encoding(value);
+    }
+    catch (InvalidArgumentException const& e)
+    {
+        std::stringstream err;
+        err << "Failed to decode key '" << key_name << "' of uri '" << uri;
+        throw InvalidArgumentException(err.str());
+    }
+}
+
+CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
+{
+    size_t pos = scopes_schema.length();
+    if (uri.compare(0, pos, scopes_schema) != 0)
+    {
+        std::stringstream s;
+        s << "CannedQuery::from_uri(): unsupported schema '" + uri + "'";
+        throw InvalidArgumentException(s.str());
+    }
+
+    size_t next = uri.find("?", pos);
+
+    auto scope_id = uri.substr(pos, next - pos);
+    if (scope_id.empty())
+    {
+        std::stringstream s;
+        s << "CannedQuery()::from_uri(): scope id is empty in '" << uri << "'";
+        throw InvalidArgumentException(s.str());
+    }
+
+    CannedQuery q(from_percent_encoding(scope_id));
+
+    if (next != std::string::npos) {
+        ++next;
+        std::string kv;
+        std::istringstream istr(uri.substr(next));
+        while (std::getline(istr, kv, '&'))
+        {
+            auto eqpos = kv.find("=");
+            if (eqpos != std::string::npos)
+            {
+                std::string const key = kv.substr(0, eqpos);
+                std::string const val = kv.substr(eqpos + 1);
+
+                if (key == "q")
+                {
+                    q.set_query_string(decode_or_throw(val, key, uri));
+                }
+                else if (key == "dep")
+                {
+                    q.set_department_id(decode_or_throw(val, key, uri));
+                }
+                else if (key == "filters")
+                {
+                    auto const fstate_json = decode_or_throw(val, key, uri);
+                    internal::JsonCppNode const node(fstate_json);
+                    auto const var = node.to_variant();
+                    if (var.which() == Variant::Type::Dict)
+                    {
+                        q.set_filter_state(internal::FilterStateImpl::deserialize(var.get_dict()));
+                    }
+                    else
+                    {
+                        std::stringstream s;
+                        s << "CannedQuery::from_uri(): invalid filters data for uri: '" << uri << "'";
+                        throw InvalidArgumentException(s.str());
+                    }
+                } // else - unknown keys are ignored
+            } // else - the string with no '=' is ignored
+        }
+    }
+
     return q;
 }
 

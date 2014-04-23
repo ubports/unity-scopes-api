@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/CannedQueryImpl.h>
+#include <unity/scopes/OptionSelectorFilter.h>
+#include <unity/scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -74,17 +76,162 @@ TEST(CannedQuery, copy)
 }
 
 // test of serialization into a canned query string
-TEST(CannedQuery, to_string)
+TEST(CannedQuery, to_uri)
 {
     {
         CannedQuery q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
-        EXPECT_EQ("scope://scope-A?q=foo&department=dep1", q.to_string());
+        EXPECT_EQ("scope://scope%2DA?q=foo&dep=dep1", q.to_uri());
     }
     {
         CannedQuery q("scope-A");
-        EXPECT_EQ("scope://scope-A?q=", q.to_string());
+        EXPECT_EQ("scope://scope%2DA?q=", q.to_uri());
+    }
+    {
+        CannedQuery q("scope-A");
+        q.set_query_string("foo bar Baz");
+        q.set_department_id("dep 1");
+        EXPECT_EQ("scope://scope%2DA?q=foo%20bar%20Baz&dep=dep%201", q.to_uri());
+    }
+    {
+        CannedQuery q("com.canonical.scope.foo");
+        q.set_query_string("ß"); // utf8 character
+        EXPECT_EQ("scope://com%2Ecanonical%2Escope%2Efoo?q=%C3%9F", q.to_uri());
+    }
+    {
+        {
+            CannedQuery q("scopeA");
+            q.set_query_string("foo");
+            q.set_department_id("dep1");
+
+            FilterState fstate;
+            {
+                auto filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+                auto option1 = filter->add_option("o1", "Option 1");
+                filter->add_option("o2", "Option 2");
+                filter->update_state(fstate, option1, true);
+            }
+            q.set_filter_state(fstate);
+            // filters is {"f1":["o1"]}
+            EXPECT_EQ("scope://scopeA?q=foo&dep=dep1&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A", q.to_uri());
+        }
+    }
+}
+
+TEST(CannedQuery, from_uri)
+{
+    // invalid schema
+    try
+    {
+        CannedQuery::from_uri("http://foo.com");
+        FAIL();
+    }
+    catch (unity::InvalidArgumentException const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: CannedQuery::from_uri(): unsupported schema 'http://foo.com'", e.what());
+    }
+
+    // missing scope id
+    try
+    {
+        CannedQuery::from_uri("scope://");
+    }
+    catch (unity::InvalidArgumentException const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: CannedQuery()::from_uri(): scope id is empty in 'scope://'", e.what());
+    }
+
+    // missing argument for percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?q=%");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
+                    e.what());
+        }
+    }
+    // missing character in percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?q=%0");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%0:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
+                    e.what());
+        }
+    }
+    // non-hex value in percent-encoded value
+    {
+        try
+        {
+            CannedQuery::from_uri("scope://foo?dep=%qy");
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'dep' of uri 'scope://foo?dep=%qy:\n"
+                    "    unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion of 'qy':\n        stoi",
+                    e.what());
+        }
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("", q.query_string());
+        EXPECT_EQ("", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?q=");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("", q.query_string());
+        EXPECT_EQ("", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?q=Foo");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("Foo", q.query_string());
+        EXPECT_EQ("", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?dep=a%20bc&q=Foo%20bar");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("Foo bar", q.query_string());
+        EXPECT_EQ("a bc", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://com%2Ecanonical%2Escope%2Efoo?q=Foo&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D");
+        EXPECT_EQ("com.canonical.scope.foo", q.scope_id());
+        EXPECT_EQ("Foo", q.query_string());
+        auto const fstate = q.filter_state();
+        auto filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        filter->add_option("o1", "Option 1");
+        filter->add_option("o2", "Option 2");
+        auto actopts = filter->active_options(fstate);
+        EXPECT_EQ(1, actopts.size());
+        EXPECT_EQ("o1", (*(actopts.begin()))->id());
+    }
+    // no "q=" argument
+    {
+        auto q = CannedQuery::from_uri("scope://foo?dep=a");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("", q.query_string());
+        EXPECT_EQ("a", q.department_id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://foo?dep=a%20bc&q=Foo%20bar");
+        EXPECT_EQ("foo", q.scope_id());
+        EXPECT_EQ("Foo bar", q.query_string());
+        EXPECT_EQ("a bc", q.department_id());
     }
 }
 
