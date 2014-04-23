@@ -68,6 +68,10 @@ public:
     (this example assumes "screenshot-url" value is either available in the result object that's being previewed, or it will be pushed with
     unity::scopes::PreviewReply::push() method)
 
+    \note It is recommended to create widgets via unity::scopes::PreviewWidget(std::string const&, std::string const&) constructor
+    and unity::scopes::PreviewWidget::add_attribute_value() / unity::scopes::PreviewWidget::add_attribute_mapping() methods,
+    rather than via JSON definition.
+
     \param definition The JSON definition.
     */
     PreviewWidget(std::string const& definition);
