@@ -121,8 +121,9 @@ class Receiver : public SearchListenerBase
 {
 public:
     Receiver(int index_to_save)
-        : index_to_save_(index_to_save),
-          push_result_count_(0)
+        : query_complete_(false),
+          push_result_count_(0),
+          index_to_save_(index_to_save)
     {
     }
 
@@ -211,23 +212,23 @@ public:
         return push_result_count_;
     }
 
-    Receiver() :
-        query_complete_(false)
-    {
-    }
-
 private:
     bool query_complete_;
+    int push_result_count_ = 0;
     int index_to_save_;
+    std::shared_ptr<Result> saved_result_;
     mutex mutex_;
     condition_variable condvar_;
-    int push_result_count_ = 0;
-    std::shared_ptr<Result> saved_result_;
 };
 
 class ActivationReceiver : public ActivationListenerBase
 {
 public:
+    ActivationReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void activated(ActivationResponse const& response) override
     {
         cout << "\tGot activation response: " << response.status() << endl;
@@ -236,16 +237,19 @@ public:
     void finished(Reason r, std::string const& error_message)
     {
         cout << "\tActivation finished, reason: " << r << ", error_message: " << error_message << endl;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
@@ -253,6 +257,11 @@ private:
 class PreviewReceiver : public PreviewListenerBase
 {
 public:
+    PreviewReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void push(ColumnLayoutList const& columns) override
     {
         cout << "\tGot column layouts:" << endl;
@@ -296,17 +305,20 @@ public:
 
     void finished(Reason r, std::string const& error_message) override
     {
+        lock_guard<decltype(mutex_)> lock(mutex_);
         cout << "\tPreview finished, reason: " << r << ", error_message: " << error_message << endl;
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
