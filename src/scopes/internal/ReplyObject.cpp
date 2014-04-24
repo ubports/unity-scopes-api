@@ -41,18 +41,20 @@ namespace scopes
 namespace internal
 {
 
+static atomic_int count;
+
 ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy) :
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
     num_push_(0)
 {
+cerr << "ReplyObject(): " << ++count << endl;
     assert(receiver_base);
     assert(runtime);
     reap_item_ = runtime->reply_reaper()->add([this] {
-        cerr << "No activity on ReplyObject for scope " << this->origin_proxy_
-             << ": ReplyObject destroyed" << endl;
-        this->disconnect();
+        string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
+        this->finished(ListenerBase::Error, msg);
     });
 }
 
@@ -60,11 +62,14 @@ ReplyObject::~ReplyObject()
 {
     try
     {
+cerr << "Reply object, calling finished" << endl;
         finished(ListenerBase::Finished, "");
     }
     catch (...)
     {
+cerr << "~ReplyObject: EXCEPTIOON" << endl;
     }
+    cerr << "~ReplyObject: " << --count << endl;
 }
 
 void ReplyObject::push(VariantMap const& result) noexcept
@@ -141,11 +146,14 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     // a race condition where the executing down-stream query invokes
     // finished() concurrently with the QueryCtrl forwarding a cancel()
     // call to this reply's finished() method.
+cerr << "ReplyObject: got finished" << endl;
     if (finished_.exchange(true))
     {
+cerr << "ReplyObject: already finished" << endl;
         return;
     }
 
+cerr << "ReplyObject: processing finished" << endl;
     // Only one thread can reach this point, any others were thrown out above.
 
     reap_item_->destroy();
@@ -158,7 +166,9 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
+cerr << "passing finished to application" << endl;
         listener_base_->finished(r, error_message);
+cerr << "done passing finished to application" << endl;
     }
     catch (std::exception const& e)
     {

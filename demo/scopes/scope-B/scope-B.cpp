@@ -47,12 +47,12 @@ class Receiver: public SearchListenerBase
 public:
     virtual void push(Category::SCPtr category) override
     {
-        cout << "received category: id=" << category->id() << endl;
+        cerr << scope_id_ << ": received category: id=" << category->id() << endl;
     }
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result from " << scope_id_ << ": " << result.uri() << ", " << result.title() << endl;
+        cerr << scope_id_ << ": received result: " << result.uri() << ", " << result.title() << endl;
         try
         {
             result.set_category(upstream_->lookup_category("catB"));
@@ -60,35 +60,29 @@ public:
         }
         catch (const unity::InvalidArgumentException &e)
         {
-            cerr << "error pushing result: " << e.what() << endl;
+            cerr << scope_id_ << ": error pushing result: " << e.what() << endl;
         }
     }
 
     virtual void finished(Reason reason, string const& error_message) override
     {
-        cout << "query to " << scope_id_ << " complete, status: " << to_string(reason);
+        cerr << scope_id_ << ": subquery complete, status: " << to_string(reason);
         if (reason == ListenerBase::Error)
         {
-            cout << ": " << error_message;
+            cerr << ": " << error_message;
         }
-        cout << endl;
-        if (--num_children_ == 0)
-        {
-            upstream_->finished();  // Send finished once last child finishes
-        }
+        cerr << endl;
     }
 
-    Receiver(string const& scope_id, SearchReplyProxy const& upstream, int num_children) :
+    Receiver(string const& scope_id, SearchReplyProxy const& upstream) :
         scope_id_(scope_id),
-        upstream_(upstream),
-        num_children_(num_children)
+        upstream_(upstream)
     {
     }
 
 private:
     string scope_id_;
     SearchReplyProxy upstream_;
-    int num_children_;
 };
 
 class MyQuery : public SearchQueryBase
@@ -107,7 +101,7 @@ public:
 
     virtual void cancelled()
     {
-        cout << "query to " << scope_id_ << " was cancelled" << endl;
+        cerr << scope_id_ << ": query " << query_.query_string() << " was cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& upstream_reply)
@@ -129,8 +123,10 @@ public:
             assert(0);
         }
 
-        SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply, 2));
+        SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply));
+cerr << "scope-B: sending subsearch C" << endl;
         subsearch(scope_c_, query_.query_string(), reply);
+cerr << "scope-B: sending subsearch D" << endl;
         subsearch(scope_d_, query_.query_string(), reply);
     }
 
@@ -168,13 +164,13 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, scope_c_, scope_d_));
-        cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
+        cerr << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
+        cerr << "scope-B: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 
