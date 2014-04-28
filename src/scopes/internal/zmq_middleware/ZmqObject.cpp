@@ -126,8 +126,7 @@ void ZmqObjectProxy::ping()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "ping");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { this->invoke_twoway_(request_builder); });
-    // TODO: dubious, waiter thread in runtimeImpl should do this?
+    auto future = mw_base()->twoway_pool()->submit([&] { this->invoke_twoway_(request_builder); });
     future.wait();
 }
 

@@ -111,11 +111,10 @@ void ZmqMiddleware::start()
         }
         case Stopped:
         {
-            // TODO: get directory from config
-            // TODO: get pool size from config
             {
                 lock_guard<mutex> lock(data_mutex_);
-                invokers_.reset(new ThreadPool(1));
+                oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
+                twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
             }
             state_ = Started;
             state_changed_.notify_all();
@@ -150,7 +149,8 @@ void ZmqMiddleware::stop()
             {
                 lock_guard<mutex> lock(data_mutex_);
                 // No more outgoing invocations
-                invokers_.reset();
+                twoway_invokers_.reset();
+                oneway_invoker_.reset();
             }
             auto adapter_map = move(am_);
             for (auto& pair : adapter_map)
@@ -642,7 +642,7 @@ zmqpp::context* ZmqMiddleware::context() const noexcept
     return const_cast<zmqpp::context*>(&context_);
 }
 
-ThreadPool* ZmqMiddleware::invoke_pool()
+ThreadPool* ZmqMiddleware::oneway_pool()
 {
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
@@ -655,7 +655,23 @@ ThreadPool* ZmqMiddleware::invoke_pool()
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
-    return invokers_.get();
+    return oneway_invoker_.get();
+}
+
+ThreadPool* ZmqMiddleware::twoway_pool()
+{
+    lock(state_mutex_, data_mutex_);
+    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
+    if (state_ == Starting)
+    {
+        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
+    }
+    if (state_ == Stopped)
+    {
+        throw MiddlewareException("Cannot invoke operations while middleware is stopped");
+    }
+    return twoway_invokers_.get();
 }
 
 int64_t ZmqMiddleware::locate_timeout() const noexcept

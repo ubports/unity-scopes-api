@@ -83,7 +83,7 @@ void ZmqStateReceiver::push_state(std::string const& sender_id, StateReceiverObj
     in_params.setState(s);
     in_params.setSenderId(sender_id);
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();
 }
 
