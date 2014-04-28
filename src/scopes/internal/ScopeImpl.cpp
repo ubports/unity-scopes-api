@@ -30,8 +30,6 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
-#include <unity/scopes/internal/MWReply.h> // TODO: remove this
-
 #include <cassert>
 
 using namespace std;
@@ -98,9 +96,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     }
 
     ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality()));
-cerr << "created reply object, use count = " << ro.use_count() << endl;
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
-cerr << "reply obj id: " << rp->identity() << endl;
 
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
@@ -113,7 +109,6 @@ cerr << "reply obj id: " << rp->identity() << endl;
 
     auto send_search = [impl, query, metadata, rp, ro, ctrl]() -> void
     {
-        cerr << "lambda: ro use count = " << ro.use_count() << endl;
         try
         {
             // Forward the (synchronous) search() method across the bus.
@@ -136,14 +131,12 @@ cerr << "reply obj id: " << rp->identity() << endl;
             {
             }
         }
-        cerr << "end lambda, ro use count = " << ro.use_count() - 1 << endl;
     };
 
     // Send the blocking twoway request asynchronously via the async invocation pool. The waiter thread
     // waits on the future, so it gets cleaned up.
     auto future = runtime_->async_pool()->submit(send_search);
     runtime_->future_queue()->push(move(future));
-    cerr << "end of search, ro use count = " << ro.use_count() - 1 << endl;
     return ctrl;
 }
 

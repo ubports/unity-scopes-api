@@ -124,9 +124,7 @@ public:
         }
 
         SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply));
-cerr << "scope-B: sending subsearch C" << endl;
         subsearch(scope_c_, query_.query_string(), reply);
-cerr << "scope-B: sending subsearch D" << endl;
         subsearch(scope_d_, query_.query_string(), reply);
     }
 

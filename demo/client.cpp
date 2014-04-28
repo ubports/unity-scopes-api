@@ -435,9 +435,7 @@ int main(int argc, char* argv[])
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
         auto ctrl = meta.proxy()->search(search_string, metadata, reply); // May raise TimeoutException
-        cout << "client: created query" << endl;
         reply->wait_until_finished();
-        cout << "client: wait returned" << endl;
 
         // handle activation
         if (result_index > 0)

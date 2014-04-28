@@ -54,14 +54,12 @@ ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver,
     cardinality_(cardinality),
     num_pushes_(0)
 {
-cerr << "ResultReplyObject()" << endl;
     assert(receiver_);
     assert(runtime);
 }
 
 ResultReplyObject::~ResultReplyObject()
 {
-cerr << "~ResultReplyObject" << endl;
 }
 
 bool ResultReplyObject::process_data(VariantMap const& data)

@@ -783,10 +783,7 @@ ZmqProxy ZmqMiddleware::safe_add(function<void()>& disconnect_func,
     {
         try
         {
-auto s = adapter->find(id);
             adapter->remove(id);
-cerr << "removed servant " << id << endl;
-cerr << "DISC: count = " << s.use_count() - 1 << endl;
         }
         catch (...)
         {

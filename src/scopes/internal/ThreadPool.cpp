@@ -87,9 +87,9 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::run()
 {
-    TaskQueue::value_type task;
     for (;;)
     {
+        TaskQueue::value_type task;  // Task must go out of scope in each iteration, in case it stores shared_ptrs.
         try
         {
             {

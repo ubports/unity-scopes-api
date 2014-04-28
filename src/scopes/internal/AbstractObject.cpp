@@ -19,7 +19,6 @@
 #include <unity/scopes/internal/AbstractObject.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 using namespace std;
 
@@ -59,18 +58,14 @@ void AbstractObject::disconnect() noexcept
             assert(disconnect_func_);
             disconnect_func = disconnect_func_;
         }
-cerr << "Disconneting" << endl;
         disconnect_func();
-cerr << "Done disconneting" << endl;
     }
     catch (...)
     {
-cerr << "Already disconnected" << endl;
         // Only happens if no servant with the corresponding identity is registered.
         // If we have concurrent calls into a servant, each of which tries to disconnect
         // the servant, only the first one succeeds; second and subsequent calls will be ignored.
     }
-//function<void()>().swap(disconnect_func_);
 }
 
 } // namespace internal

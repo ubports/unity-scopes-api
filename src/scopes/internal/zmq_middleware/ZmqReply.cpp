@@ -99,7 +99,6 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     }
     in_params.setReason(r);
 
-cerr << "submitting finished" << endl;
     auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();
 }
