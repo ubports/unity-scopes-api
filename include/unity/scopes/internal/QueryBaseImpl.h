@@ -25,7 +25,6 @@
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
-#include <atomic>
 #include <vector>
 
 namespace unity
@@ -69,7 +68,8 @@ public:
 private:
     SearchMetadata::UPtr search_metadata_;
     std::vector<QueryCtrlProxy> subqueries_;
-    std::atomic_bool valid_;
+    bool valid_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

@@ -251,8 +251,9 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
     {
         try
         {
-            auto future = queue->wait_and_pop();  // Throws runtime_error when queue is destroyed
-            future.get();
+            // Wait on the future from an async invocation.
+            // wait_and_pop() throws runtime_error when queue is destroyed
+            queue->wait_and_pop().get();
         }
         catch (std::runtime_error const&)
         {

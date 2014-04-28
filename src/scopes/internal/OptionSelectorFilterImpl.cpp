@@ -180,6 +180,9 @@ void OptionSelectorFilterImpl::update_state(FilterState& filter_state, std::stri
 {
     VariantMap& state = FilterBaseImpl::get(filter_state);
     auto it = state.find(filter_id);
+
+    VariantMap filter_info;
+
     // do we have this filter already?
     if (it == state.end())
     {
