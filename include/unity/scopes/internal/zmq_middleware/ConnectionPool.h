@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -24,7 +24,6 @@
 
 #include <zmqpp/socket.hpp>
 
-#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -33,6 +32,8 @@
 // different threads to crash.
 // So, we maintain a pool of invocation threads, with each thread keeping its own cache of sockets.
 // Sockets are indexed by adapter name and created lazily.
+//
+// WARNING: No locking anywhere here. The pool is intended for us as a thread_local static member only.
 
 namespace unity
 {
@@ -57,17 +58,18 @@ public:
     void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m);
 
 private:
-    struct Connection
+    struct SocketData
     {
         zmqpp::socket socket;
         RequestMode mode;
     };
 
-    typedef std::unordered_map<std::string, Connection> CPool;
+    typedef std::unordered_map<std::string, SocketData> CPool;
+
+    CPool::value_type create_connection(std::string const& endpoint, RequestMode m, int64_t timeout);
 
     zmqpp::context& context_;
     CPool pool_;
-    std::mutex mutex_;
 };
 
 } // namespace zmq_middleware

@@ -24,8 +24,6 @@
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
-#include <atomic>
-
 namespace unity
 {
 
@@ -71,9 +69,10 @@ protected:
     MWReplyProxy reply_;
     std::weak_ptr<unity::scopes::Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
-    std::atomic_bool pushable_;
+    bool pushable_;
     QueryObjectBase::SPtr self_;
-    std::atomic_int cardinality_;
+    int cardinality_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

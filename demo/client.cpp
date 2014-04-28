@@ -19,6 +19,7 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
+#include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
 #include <string.h>
@@ -121,8 +122,9 @@ class Receiver : public SearchListenerBase
 {
 public:
     Receiver(int index_to_save)
-        : index_to_save_(index_to_save),
-          push_result_count_(0)
+        : query_complete_(false),
+          push_result_count_(0),
+          index_to_save_(index_to_save)
     {
     }
 
@@ -167,7 +169,7 @@ public:
              << endl;
         for (auto link: links)
         {
-            cout << "  " << link->query().to_string() << endl;
+            cout << "  " << link->query().to_uri() << endl;
         }
     }
 
@@ -211,23 +213,23 @@ public:
         return push_result_count_;
     }
 
-    Receiver() :
-        query_complete_(false)
-    {
-    }
-
 private:
     bool query_complete_;
+    int push_result_count_ = 0;
     int index_to_save_;
+    std::shared_ptr<Result> saved_result_;
     mutex mutex_;
     condition_variable condvar_;
-    int push_result_count_ = 0;
-    std::shared_ptr<Result> saved_result_;
 };
 
 class ActivationReceiver : public ActivationListenerBase
 {
 public:
+    ActivationReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void activated(ActivationResponse const& response) override
     {
         cout << "\tGot activation response: " << response.status() << endl;
@@ -236,16 +238,19 @@ public:
     void finished(Reason r, std::string const& error_message)
     {
         cout << "\tActivation finished, reason: " << r << ", error_message: " << error_message << endl;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
@@ -253,6 +258,11 @@ private:
 class PreviewReceiver : public PreviewListenerBase
 {
 public:
+    PreviewReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void push(ColumnLayoutList const& columns) override
     {
         cout << "\tGot column layouts:" << endl;
@@ -296,28 +306,31 @@ public:
 
     void finished(Reason r, std::string const& error_message) override
     {
+        lock_guard<decltype(mutex_)> lock(mutex_);
         cout << "\tPreview finished, reason: " << r << ", error_message: " << error_message << endl;
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
-    cerr << "   or: ./client list" << endl;
-    cerr << "For example: ./client scope-B iron" << endl;
-    cerr << "         or: ./client scope-B iron activate 1" << endl;
-    cerr << "         or: ./client scope-B iron preview 1" << endl;
+    cerr << "usage: ./scopes-client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./scopes-client list" << endl;
+    cerr << "For example: ./scopes-client scope-B iron" << endl;
+    cerr << "         or: ./scopes-client scope-B iron activate 1" << endl;
+    cerr << "         or: ./scopes-client scope-B iron preview 1" << endl;
     exit(1);
 }
 
@@ -363,7 +376,17 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
+        Runtime::UPtr rt;
+        // use Runtime.ini from the current directory if present, otherwise let the API pick the default one
+        const boost::filesystem::path path("Runtime.ini");
+        if (boost::filesystem::exists(path))
+        {
+            rt = Runtime::create(path.native());
+        }
+        else
+        {
+            rt = Runtime::create();
+        }
         RegistryProxy r = rt->registry();
 
         if (do_list)
@@ -423,9 +446,7 @@ int main(int argc, char* argv[])
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
         auto ctrl = meta.proxy()->search(search_string, metadata, reply); // May raise TimeoutException
-        cout << "client: created query" << endl;
         reply->wait_until_finished();
-        cout << "client: wait returned" << endl;
 
         // handle activation
         if (result_index > 0)

@@ -27,6 +27,8 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
 
+#include <iostream> // TODO: remove this
+
 using namespace std;
 
 namespace unity
@@ -90,7 +92,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setCategory(reply_proxy->category().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -122,7 +124,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -157,7 +159,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
     future.wait();
 
     auto receiver = future.get();
@@ -190,7 +192,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();

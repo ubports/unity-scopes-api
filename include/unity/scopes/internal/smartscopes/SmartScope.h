@@ -62,8 +62,8 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, query_id, locale, country
-        search_handle_ = ss_client->search(base_url, query_.query_string(), query.department_id(), "session_id", 0, hints.form_factor(), "", "", hints.cardinality());
+        ///! TODO: session_id, query_id, country
+        search_handle_ = ss_client->search(base_url, query_.query_string(), query.department_id(), "session_id", 0, hints.form_factor(), hints.locale(), "", hints.cardinality());
     }
 
     ~SmartQuery() noexcept
@@ -144,8 +144,8 @@ public:
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
-        ///! TODO: session_id, widgets_api_version, locale, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, "", "");
+        ///! TODO: session_id, widgets_api_version, country
+        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
     }
 
     ~SmartPreview()

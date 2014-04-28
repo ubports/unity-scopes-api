@@ -32,6 +32,8 @@ namespace internal
 {
 
 VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap const& var, std::string const& key);
+std::string to_percent_encoding(std::string const& str);
+std::string from_percent_encoding(std::string const& str);
 
 } // namespace internal
 

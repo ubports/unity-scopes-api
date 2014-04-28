@@ -54,8 +54,8 @@ else()
 endif()
 
 include(FindPkgConfig)
-find_package(Boost COMPONENTS regex serialization REQUIRED)
-pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
+find_package(Boost COMPONENTS system filesystem regex serialization REQUIRED)
+pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp>=1.0.0 REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
@@ -100,7 +100,7 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS})
 set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
@@ -176,7 +176,7 @@ set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 4)
-set(UNITY_SCOPES_MICRO 2)
+set(UNITY_SCOPES_MICRO 3)
 
 # Scopes library
 set(UNITY_SCOPES_LIB unity-scopes)
@@ -218,6 +218,7 @@ set(OTHER_LIBS
     ${Boost_LIBRARIES}
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
+    ${APPARMOR_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}

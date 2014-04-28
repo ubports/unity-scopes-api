@@ -1,6 +1,7 @@
 add_subdirectory(ObjectAdapter)
 add_subdirectory(RegistryI)
 add_subdirectory(ServantBase)
+add_subdirectory(StopPublisher)
 add_subdirectory(Util)
 add_subdirectory(VariantConverter)
 add_subdirectory(ZmqMiddleware)

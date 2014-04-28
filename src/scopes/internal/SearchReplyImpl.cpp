@@ -38,11 +38,13 @@ namespace scopes
 namespace internal
 {
 
-SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
+SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
+                                 std::shared_ptr<QueryObjectBase> const& qo,
+                                 int cardinality) :
     ObjectImpl(mw_proxy),
     ReplyImpl(mw_proxy, qo),
     cat_registry_(new CategoryRegistry()),
-    cardinality_(qo->cardinality({ fwd()->identity(), fwd()->mw_base() })),
+    cardinality_(cardinality),
     num_pushes_(0)
 {
 }

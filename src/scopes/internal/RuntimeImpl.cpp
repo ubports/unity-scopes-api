@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/MWStateReceiver.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
@@ -50,11 +51,14 @@ namespace scopes
 namespace internal
 {
 
-RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
-    destroyed_(false),
-    scope_id_(scope_id)
+RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
-    if (scope_id.empty())
+    lock_guard<mutex> lock(mutex_);
+
+    destroyed_ = false;
+
+    scope_id_ = scope_id;
+    if (scope_id_.empty())
     {
         UniqueID id;
         scope_id_ = "c-" + id.gen();
@@ -75,6 +79,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile) :
 
         middleware_ = middleware_factory_->create(scope_id_, default_middleware, middleware_configfile);
         middleware_->start();
+
+        async_pool_ = make_shared<ThreadPool>(1); // TODO: configurable pool size
+        future_queue_ = make_shared<ThreadSafeQueue<future<void>>>();
+        waiter_thread_ = std::thread([this]{ waiter_thread(future_queue_); });
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
@@ -123,21 +131,51 @@ RuntimeImpl::UPtr RuntimeImpl::create(string const& scope_id, string const& conf
 
 void RuntimeImpl::destroy()
 {
-    if (!destroyed_.exchange(true))
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
-        // TODO: not good enough. Need to wait for the middleware to stop and for the reaper
-        // to terminate. Otherwise, it's possible that we exit while threads are still running
-        // with undefined behavior.
-        registry_ = nullptr;
-        middleware_->stop();
-        middleware_ = nullptr;
-        middleware_factory_.reset(nullptr);
+        return;
+    }
+    destroyed_ = true;
+
+    // Stop the reaper. Any ReplyObject instances that may still
+    // be hanging around will be cleaned up when the server side
+    // is shut down.
+    if (reply_reaper_)
+    {
+        reply_reaper_->destroy();
         reply_reaper_ = nullptr;
     }
+
+    // No more outgoing invocations.
+    async_pool_ = nullptr;
+
+    // Wait for any twoway operations that were invoked asynchronously to complete.
+    if (future_queue_)
+    {
+        future_queue_->wait_until_empty();
+        future_queue_->destroy();
+        future_queue_->wait_for_destroy();
+    }
+
+    if (waiter_thread_.joinable())
+    {
+        waiter_thread_.join();
+    }
+
+    // Shut down server-side.
+    middleware_->stop();
+    middleware_->wait_for_shutdown();
+    middleware_ = nullptr;
+    middleware_factory_.reset(nullptr);
+
+    registry_ = nullptr;
 }
 
 string RuntimeImpl::scope_id() const
 {
+    lock_guard<mutex> lock(mutex_);
     return scope_id_;
 }
 
@@ -148,7 +186,9 @@ string RuntimeImpl::configfile() const
 
 MiddlewareFactory const* RuntimeImpl::factory() const
 {
-    if (destroyed_.load())
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
         throw LogicException("factory(): Cannot obtain factory for already destroyed run time");
     }
@@ -157,7 +197,9 @@ MiddlewareFactory const* RuntimeImpl::factory() const
 
 RegistryProxy RuntimeImpl::registry() const
 {
-    if (destroyed_.load())
+    lock_guard<mutex> lock(mutex_);
+
+    if (destroyed_)
     {
         throw LogicException("registry(): Cannot obtain registry for already destroyed run time");
     }
@@ -170,21 +212,25 @@ RegistryProxy RuntimeImpl::registry() const
 
 string RuntimeImpl::registry_configfile() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_configfile_;
 }
 
 string RuntimeImpl::registry_identity() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_identity_;
 }
 
 string RuntimeImpl::registry_endpointdir() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_endpointdir_;
 }
 
 string RuntimeImpl::registry_endpoint() const
 {
+    lock_guard<mutex> lock(mutex_);
     return registry_endpoint_;
 }
 
@@ -199,9 +245,44 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     return reply_reaper_;
 }
 
+void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept
+{
+    for (;;)
+    {
+        try
+        {
+            // Wait on the future from an async invocation.
+            // wait_and_pop() throws runtime_error when queue is destroyed
+            queue->wait_and_pop().get();
+        }
+        catch (std::runtime_error const&)
+        {
+            break;
+        }
+    }
+}
+
+ThreadPool::SPtr RuntimeImpl::async_pool() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return async_pool_;
+}
+
+ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return future_queue_;
+}
+
 void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)
 {
-    auto mw = factory()->create(scope_id_, "Zmq", "Zmq.ini");
+    // Retrieve the registry middleware and create a proxy to its state receiver
+    RegistryConfig reg_conf(registry_identity_, registry_configfile_);
+    auto reg_runtime = create(registry_identity_, configfile_);
+    auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
+    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
+
+    auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
         // dirname modifies its argument, so we need a copy of scope lib path
@@ -223,7 +304,14 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scop
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
     auto proxy = mw->add_scope_object(scope_id_, move(scope));
 
+    // Inform the registry that this scope is now ready to process requests
+    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+
     mw->wait_for_shutdown();
+
+    // Inform the registry that this scope is shutting down
+    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
+
     run_future.get();
 }
 

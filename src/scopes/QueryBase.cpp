@@ -50,6 +50,11 @@ void QueryBase::set_metadata(SearchMetadata const& metadata)
     p->set_metadata(metadata);
 }
 
+bool QueryBase::valid() const
+{
+    return p->valid();
+}
+
 } // namespace scopes
 
 } // namespace unity

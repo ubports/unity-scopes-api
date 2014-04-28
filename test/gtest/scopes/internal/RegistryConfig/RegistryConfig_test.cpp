@@ -29,18 +29,19 @@ using namespace unity::scopes::internal;
 
 TEST(RegistryConfig, basic)
 {
-    RegistryConfig c("Registry", "Registry.ini");
+    RegistryConfig c("Registry", TEST_REGISTRY_PATH);
     EXPECT_EQ("Registry", c.identity());
     EXPECT_EQ("Zmq", c.mw_kind());
     EXPECT_EQ("ipc:///tmp/socket_for_registry", c.endpoint());
     EXPECT_EQ("Zmq.ini", c.mw_configfile());
+    EXPECT_EQ("/unused", c.click_installdir());
 }
 
 TEST(RegistryConfig, RegistryIDEmpty)
 {
     try
     {
-        RegistryConfig c("", "Registry.ini");
+        RegistryConfig c("", TEST_REGISTRY_PATH);
         FAIL();
     }
     catch (InvalidArgumentException const& e)

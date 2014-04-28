@@ -71,14 +71,28 @@ public:
     FilterState filter_state;
 };
 
-void scope_thread(Runtime::SPtr const& rt)
+template <typename ScopeType>
+struct RaiiScopeThread
 {
-    TestScope scope;
-    rt->run_scope(&scope, "/");
-}
+    ScopeType scope;
+    Runtime::SPtr runtime;
+    std::thread scope_thread;
+
+    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
+        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
+          scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
+
+    ~RaiiScopeThread()
+    {
+        runtime->destroy();
+        scope_thread.join();
+    }
+};
 
 TEST(Filters, scope)
 {
+    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
     // parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -118,15 +132,4 @@ TEST(Filters, scope)
         auto option1 = *(selector->active_options(filter_state2).begin());
         EXPECT_EQ("o1", option1->id());
     }
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
-    auto rc = RUN_ALL_TESTS();
-    rt->destroy();
-    scope_t.join();
-    return rc;
 }

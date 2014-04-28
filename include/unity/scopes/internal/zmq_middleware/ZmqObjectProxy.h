@@ -21,9 +21,11 @@
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistryProxyFwd.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 
 #include <capnp/message.h>
@@ -71,10 +73,15 @@ public:
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params, int64_t timeout);
+
+    void invoke_oneway_(capnp::MessageBuilder& out_params);
+
+    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params);
+    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout);
 
 private:
+    ZmqReceiver invoke_twoway__(capnp::MessageBuilder& out_params, int64_t timeout);
+
     std::string endpoint_;
     std::string identity_;
     std::string category_;

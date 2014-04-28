@@ -30,6 +30,9 @@
 using namespace std;
 using namespace unity::scopes;
 
+namespace
+{
+
 class TestQuery : public SearchQueryBase
 {
 public:
@@ -41,6 +44,7 @@ public:
     virtual void cancelled() override
     {
     }
+
     virtual void run(SearchReplyProxy const& reply) override
     {
         Department dep("news", query_, "News");
@@ -64,6 +68,8 @@ public:
 private:
     CannedQuery query_;
 };
+
+}  // namespace
 
 class TestPreview : public PreviewQueryBase
 {

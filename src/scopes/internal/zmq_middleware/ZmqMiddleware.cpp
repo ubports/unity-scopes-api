@@ -63,6 +63,13 @@ char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control 
 char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
 char const* state_suffix = "-s";  // Appended to server_name_ to create state adapter name
 
+char const* query_category = "Query";       // query adapter category name
+char const* ctrl_category = "QueryCtrl";    // control adapter category name
+char const* reply_category = "Reply";       // reply adapter category name
+char const* state_category = "State";       // state adapter category name
+char const* scope_category = "Scope";       // scope adapter category name
+char const* registry_category = "Registry"; // registry adapter category name
+
 } // namespace
 
 ZmqMiddleware::ZmqMiddleware(string const& server_name, string const& configfile, RuntimeImpl* runtime)
@@ -72,7 +79,7 @@ try :
     state_(Stopped),
     config_(configfile),
     twoway_timeout_(300),  // TODO: get timeout from config
-    locate_timeout_(1500)  // TODO: get timeout from config
+    locate_timeout_(2000)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
 }
@@ -111,11 +118,12 @@ void ZmqMiddleware::start()
         }
         case Stopped:
         {
-            // TODO: get directory from config
-            // TODO: get pool size from config
             {
                 lock_guard<mutex> lock(data_mutex_);
-                invokers_.reset(new ThreadPool(1));
+                oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
+                // N.B. We absolutely MUST have AT LEAST 2 two-way invoke threads
+                // as rebinding is invoked within two-way invocations.
+                twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
             }
             state_ = Started;
             state_changed_.notify_all();
@@ -150,7 +158,8 @@ void ZmqMiddleware::stop()
             {
                 lock_guard<mutex> lock(data_mutex_);
                 // No more outgoing invocations
-                invokers_.reset();
+                twoway_invokers_.reset();
+                oneway_invoker_.reset();
             }
             auto adapter_map = move(am_);
             for (auto& pair : adapter_map)
@@ -273,7 +282,7 @@ ObjectProxy ZmqMiddleware::string_to_proxy(string const& s)
     }
 
     // Now run over the map and check each value
-    string category = "Scope";
+    string category = scope_category;
     RequestMode mode = RequestMode::Twoway;
     int64_t timeout = -1;
     for (auto const& pair : fmap)
@@ -343,7 +352,7 @@ MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, str
     MWRegistryProxy proxy;
     try
     {
-        proxy.reset(new ZmqRegistry(this, endpoint, identity, "Registry", twoway_timeout_));
+        proxy.reset(new ZmqRegistry(this, endpoint, identity, registry_category, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -358,7 +367,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
     try
     {
         string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
-        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope", twoway_timeout_));
+        proxy.reset(new ZmqScope(this, endpoint, identity, scope_category, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -372,7 +381,7 @@ MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string co
     MWScopeProxy proxy;
     try
     {
-        proxy.reset(new ZmqScope(this, endpoint, identity, "Scope", twoway_timeout_));
+        proxy.reset(new ZmqScope(this, endpoint, identity, scope_category, twoway_timeout_));
     }
     catch (zmqpp::exception const& e)
     {
@@ -386,7 +395,7 @@ MWQueryProxy ZmqMiddleware::create_query_proxy(string const& identity, string co
     MWQueryProxy proxy;
     try
     {
-        proxy.reset(new ZmqQuery(this, endpoint, identity, "Query"));
+        proxy.reset(new ZmqQuery(this, endpoint, identity, query_category));
     }
     catch (zmqpp::exception const& e)
     {
@@ -400,7 +409,7 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
     MWQueryCtrlProxy proxy;
     try
     {
-        proxy.reset(new ZmqQueryCtrl(this, endpoint, identity, "QueryCtrl"));
+        proxy.reset(new ZmqQueryCtrl(this, endpoint, identity, ctrl_category));
     }
     catch (zmqpp::exception const& e)
     {
@@ -415,7 +424,7 @@ MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string cons
     try
     {
         proxy.reset(new ZmqStateReceiver(this, "ipc://" + config_.private_dir() + "/" +  server_name_ + state_suffix,
-                                         identity, "StateReceiver"));
+                                         identity, state_category));
     }
     catch (zmqpp::exception const& e)
     {
@@ -432,11 +441,11 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
     try
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
-        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir());
+        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir(), ctrl_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", qci);
+        auto p = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
-        return ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, proxy->endpoint(), proxy->identity(), "QueryCtrl"));
+        proxy = ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, p->endpoint(), p->identity(), ctrl_category));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -454,8 +463,8 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
     try
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
-        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir());
-        auto df = safe_dflt_add(adapter, "QueryCtrl", qci);
+        auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir(), ctrl_category);
+        auto df = safe_dflt_add(adapter, ctrl_category, qci);
         ctrl->set_disconnect_function(df);
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
@@ -474,11 +483,11 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     try
     {
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
-        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
+        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir(), query_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", qi);
+        auto p = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
-        return ZmqQueryProxy(new ZmqQuery(this, proxy->endpoint(), proxy->identity(), "Query"));
+        proxy = ZmqQueryProxy(new ZmqQuery(this, p->endpoint(), p->identity(), query_category));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -496,8 +505,8 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
     try
     {
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
-        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir());
-        auto df = safe_dflt_add(adapter, "Query", qi);
+        auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir(), query_category);
+        auto df = safe_dflt_add(adapter, query_category, qi);
         query->set_disconnect_function(df);
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
@@ -517,11 +526,11 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     try
     {
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
-        auto adapter = find_adapter(server_name_, runtime()->registry_endpointdir());
+        auto adapter = find_adapter(server_name_, runtime()->registry_endpointdir(), registry_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, identity, ri);
+        auto p = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
-        return ZmqRegistryProxy(new ZmqRegistry(this, proxy->endpoint(), proxy->identity(), "Registry", twoway_timeout_));
+        proxy = ZmqRegistryProxy(new ZmqRegistry(this, p->endpoint(), p->identity(), registry_category, twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -540,11 +549,11 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     try
     {
         shared_ptr<ReplyI> ri(make_shared<ReplyI>(reply));
-        auto adapter = find_adapter(server_name_ + reply_suffix, config_.public_dir());
+        auto adapter = find_adapter(server_name_ + reply_suffix, config_.public_dir(), reply_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, "", ri);
+        auto p = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
-        return ZmqReplyProxy(new ZmqReply(this, proxy->endpoint(), proxy->identity(), "Reply"));
+        proxy = ZmqReplyProxy(new ZmqReply(this, p->endpoint(), p->identity(), reply_category));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -564,11 +573,11 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_, config_.private_dir());
+        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, identity, si);
+        auto p = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
-        return ZmqScopeProxy(new ZmqScope(this, proxy->endpoint(), proxy->identity(), "Scope", twoway_timeout_));
+        proxy = ZmqScopeProxy(new ZmqScope(this, p->endpoint(), p->identity(), scope_category, twoway_timeout_));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -586,8 +595,8 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_, config_.private_dir());
-        auto df = safe_dflt_add(adapter, "Scope", si);
+        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
+        auto df = safe_dflt_add(adapter, scope_category, si);
         scope->set_disconnect_function(df);
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
@@ -607,11 +616,11 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     try
     {
         shared_ptr<StateReceiverI> sri(make_shared<StateReceiverI>(state_receiver));
-        auto adapter = find_adapter(server_name_ + state_suffix, config_.private_dir());
+        auto adapter = find_adapter(server_name_ + state_suffix, config_.private_dir(), state_category);
         function<void()> df;
-        auto proxy = safe_add(df, adapter, identity, sri);
+        auto p = safe_add(df, adapter, identity, sri);
         state_receiver->set_disconnect_function(df);
-        return ZmqStateReceiverProxy(new ZmqStateReceiver(this, proxy->endpoint(), proxy->identity(), "StateReceiver"));
+        proxy = ZmqStateReceiverProxy(new ZmqStateReceiver(this, p->endpoint(), p->identity(), state_category));
     }
     catch (std::exception const& e) // Should never happen unless our implementation is broken
     {
@@ -642,7 +651,7 @@ zmqpp::context* ZmqMiddleware::context() const noexcept
     return const_cast<zmqpp::context*>(&context_);
 }
 
-ThreadPool* ZmqMiddleware::invoke_pool()
+ThreadPool* ZmqMiddleware::oneway_pool()
 {
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
@@ -655,7 +664,23 @@ ThreadPool* ZmqMiddleware::invoke_pool()
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
-    return invokers_.get();
+    return oneway_invoker_.get();
+}
+
+ThreadPool* ZmqMiddleware::twoway_pool()
+{
+    lock(state_mutex_, data_mutex_);
+    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
+    if (state_ == Starting)
+    {
+        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
+    }
+    if (state_ == Stopped)
+    {
+        throw MiddlewareException("Cannot invoke operations while middleware is stopped");
+    }
+    return twoway_invokers_.get();
 }
 
 int64_t ZmqMiddleware::locate_timeout() const noexcept
@@ -675,12 +700,12 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     {
         throw MiddlewareException("make_typed_proxy(): cannot create oneway proxies");
     }
-    if (category == "Scope")
+    if (category == scope_category)
     {
         auto p = make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
         return ScopeImpl::create(p, runtime(), identity);
     }
-    else if (category == "Registry")
+    else if (category == registry_category)
     {
         auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
         return make_shared<RegistryImpl>(p, runtime());
@@ -691,23 +716,8 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     }
 }
 
-namespace
-{
-
-bool has_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
-    {
-        return s.compare(s_len - suffix_len, suffix_len, suffix) == 0;
-    }
-    return false;
-}
-
-} // namespace
-
-shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir)
+shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir,
+                                                      string const& category)
 {
     lock_guard<mutex> lock(data_mutex_);
 
@@ -720,32 +730,48 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     // We don't have the requested adapter yet, so we create it on the fly.
     int pool_size;
     RequestMode mode;
-    if (has_suffix(name, query_suffix))
+    if (category == query_category)
     {
         // The query adapter is single or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
         mode = RequestMode::Oneway;
     }
-    else if (has_suffix(name, ctrl_suffix))
+    else if (category == ctrl_category)
     {
         // The ctrl adapter is single-threaded and supports oneway operations only.
         pool_size = 1;
         mode = RequestMode::Oneway;
     }
-    else if (has_suffix(name, reply_suffix))
+    else if (category == reply_category)
     {
         // The reply adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
         mode = RequestMode::Oneway;
     }
-    else if (has_suffix(name, state_suffix))
+    else if (category == state_category)
     {
         // The state adapter is single- or multi-threaded and supports oneway operations only.
         // TODO: get pool size from config
         pool_size = 1;
         mode = RequestMode::Oneway;
+    }
+    else if (category == scope_category)
+    {
+        // The scope adapter is single- or multi-threaded and supports twoway operations only.
+        // TODO: get pool size from config
+        pool_size = 1;
+        mode = RequestMode::Twoway;
+    }
+    else if (category == registry_category)
+    {
+        // The registry adapter is multi-threaded and supports twoway operations only.
+        // TODO: get pool size from config
+        // NB: On rebind, locate() is called on this adapter. A scope may then call registry methods during
+        // its start() method, hence we must ensure this adapter has enough threads available to handle this.
+        pool_size = 6;
+        mode = RequestMode::Twoway;
     }
     else
     {
@@ -757,7 +783,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
 
     // The query adapter is always inproc.
     string endpoint;
-    if (has_suffix(name, query_suffix))
+    if (category == query_category)
     {
         endpoint = "inproc://" + name;
     }

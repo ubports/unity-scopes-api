@@ -47,12 +47,12 @@ class Receiver: public SearchListenerBase
 public:
     virtual void push(Category::SCPtr category) override
     {
-        cout << "received category: id=" << category->id() << endl;
+        cerr << scope_id_ << ": received category: id=" << category->id() << endl;
     }
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result from " << scope_id_ << ": " << result.uri() << ", " << result.title() << endl;
+        cerr << scope_id_ << ": received result: " << result.uri() << ", " << result.title() << endl;
         try
         {
             result.set_category(upstream_->lookup_category("catB"));
@@ -60,18 +60,18 @@ public:
         }
         catch (const unity::InvalidArgumentException &e)
         {
-            cerr << "error pushing result: " << e.what() << endl;
+            cerr << scope_id_ << ": error pushing result: " << e.what() << endl;
         }
     }
 
     virtual void finished(Reason reason, string const& error_message) override
     {
-        cout << "query to " << scope_id_ << " complete, status: " << to_string(reason);
+        cerr << scope_id_ << ": subquery complete, status: " << to_string(reason);
         if (reason == ListenerBase::Error)
         {
-            cout << ": " << error_message;
+            cerr << ": " << error_message;
         }
-        cout << endl;
+        cerr << endl;
     }
 
     Receiver(string const& scope_id, SearchReplyProxy const& upstream) :
@@ -101,11 +101,16 @@ public:
 
     virtual void cancelled()
     {
-        cout << "query to " << scope_id_ << " was cancelled" << endl;
+        cerr << scope_id_ << ": query " << query_.query_string() << " was cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& upstream_reply)
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         // note, category id must mach categories received from scope C and D, otherwise result pushing will fail.
         try
         {
@@ -157,13 +162,13 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, scope_c_, scope_d_));
-        cout << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
+        cerr << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << "scope-B: preview: \"" << result.uri() << "\"" << endl;
+        cerr << "scope-B: preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 

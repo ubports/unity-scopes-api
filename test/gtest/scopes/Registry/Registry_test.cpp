@@ -21,8 +21,15 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <functional>
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
+
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+
 #include <signal.h>
 #include <unistd.h>
 
@@ -31,13 +38,41 @@ using namespace unity::scopes;
 class Receiver : public SearchListenerBase
 {
 public:
+    Receiver()
+        : done_(false)
+        , finished_ok_(false)
+    {
+    }
+
     virtual void push(CategorisedResult /* result */) override
     {
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, std::string const& error_message ) override
     {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
+        finished_ok_ = reason == Finished;
+        done_ = true;
+        cond_.notify_all();
     }
+
+    bool wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        auto now = std::chrono::steady_clock::now();
+        auto expiry_time = now + std::chrono::seconds(5);
+        EXPECT_TRUE(cond_.wait_until(lock, expiry_time, [this]{ return done_; })) << "finished message not delivered";
+        return finished_ok_;
+    }
+
+private:
+    bool done_;
+    bool finished_ok_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
 };
 
 TEST(Registry, metadata)
@@ -72,18 +107,30 @@ TEST(Registry, metadata)
 
     auto sp = meta.proxy();
 
-    SearchListenerBase::SPtr reply(new Receiver);
+    auto receiver = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply(receiver);
     SearchMetadata metadata("C", "desktop");
 
     // search would fail if testscopeB can't be executed
-    try
+    auto ctrl = sp->search("foo", metadata, reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
+}
+
+bool wait_for_registry()
+{
+    const int num_retries = 10;
+    const boost::filesystem::path path("/tmp/RegistryTest");
+    for (int i = 0; i<num_retries; i++)
     {
-        auto ctrl = sp->search("foo", metadata, reply);
+        if (boost::filesystem::exists(path))
+        {
+            boost::system::error_code error;
+            auto st = boost::filesystem::status(path, error).type();
+            return st == boost::filesystem::file_type::socket_file;
+        }
+        sleep(1);
     }
-    catch (...)
-    {
-        FAIL();
-    }
+    return false;
 }
 
 int main(int argc, char **argv)
@@ -102,6 +149,8 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
+        EXPECT_TRUE(wait_for_registry());
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;

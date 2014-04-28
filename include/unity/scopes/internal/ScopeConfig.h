@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/ConfigBase.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/ScopeMetadata.h>
 
 namespace unity
 {

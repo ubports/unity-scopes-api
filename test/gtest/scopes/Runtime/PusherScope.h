@@ -16,6 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#ifndef TEST_PUSHERSCOPE_H
+#define TEST_PUSHERSCOPE_H
+
 #include <unity/scopes/ScopeBase.h>
 
 using namespace std;
@@ -33,3 +36,5 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
 };
+
+#endif

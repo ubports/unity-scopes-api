@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/internal/TaskWrapper.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/DefinesPtrs.h>
 
 #include <future>
 
@@ -42,6 +43,7 @@ class ThreadPool final
 {
 public:
     NONCOPYABLE(ThreadPool);
+    UNITY_DEFINES_PTRS(ThreadPool);
 
     ThreadPool(int size);
     ~ThreadPool();

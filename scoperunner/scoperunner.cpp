@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeLoader.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/ThreadSafeQueue.h>
@@ -38,9 +39,12 @@
 
 #include <libgen.h>
 
+#include <boost/filesystem/path.hpp>
+
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
+using namespace boost;
 
 namespace
 {
@@ -53,65 +57,41 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
-bool has_suffix(string const& s, string const& suffix)
+// Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
+// Return exit status for main to use.
+
+int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
 {
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
+    auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
-        return s.compare(s_len - suffix_len, suffix_len, suffix) == 0;
-    }
-    return false;
-}
+        core::posix::Signal::sig_hup,
+        core::posix::Signal::sig_term
+    });
 
-string strip_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
+    std::thread trap_worker([trap]() { trap->run(); });
+
+    // Retrieve the registry middleware and create a proxy to its state receiver
+    RuntimeConfig rt_config(runtime_config.native());
+    RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
+    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config.native());
+    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
+    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
+
+    string lib_dir = scope_config.parent_path().native();
+    string scope_id = scope_config.stem().native();
+    if (!lib_dir.empty())
     {
-        if (s.compare(s_len - suffix_len, suffix_len, suffix) == 0)
-        {
-            return string(s, 0, s_len - suffix_len);
-        }
+      lib_dir += '/';
     }
-    return s;
-}
 
-// One thread for each scope, plus a future that the thread sets when it finishes.
-
-struct ThreadFuture
-{
-    thread t;
-    std::future<void> f;
-};
-
-// Each thread provides its own ID on a queue when it finishes. That allows us to
-// then locate the thread in the map. The promise is set by the thread so we can
-// find out what happened to it and join with it. Unfortunately, we have to jump
-// through these hoops because there is no way to wait on multiple futures in C++ 11.
-
-unordered_map<thread::id, ThreadFuture> threads;
-
-ThreadSafeQueue<thread::id> finished_threads;
-
-// Scope thread start function.
-
-void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
-                  MWStateReceiverProxy reg_state_receiver,
-                  string const& mw_kind,
-                  string const& mw_config,
-                  string const& runtime_config,
-                  string const& scope_id,
-                  string const& lib_dir,
-                  promise<void> finished_promise)
-{
+    int exit_status = 1;
     try
     {
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_id, runtime_config);
-        auto mw = rt->factory()->create(scope_id, mw_kind, mw_config);
+        auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
+        auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
+
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
         loader->start();
 
@@ -141,82 +121,15 @@ void scope_thread(std::shared_ptr<core::posix::SignalTrap> trap,
         // destructor will still call stop() on the scope.
         run_future.get();
 
-        finished_promise.set_value();
+        exit_status = 0;
+    }
+    catch (std::exception const& e)
+    {
+        error(e.what());
     }
     catch (...)
     {
-        finished_promise.set_exception(current_exception());
-    }
-
-    finished_threads.push(this_thread::get_id());
-}
-
-// Run each of the scopes in config_files in a separate thread and wait for each thread to finish.
-// Return the number of threads that did not terminate normally.
-
-int run_scopes(string const& runtime_config, vector<string> config_files)
-{
-    auto trap = core::posix::trap_signals_for_all_subsequent_threads(
-    {
-        core::posix::Signal::sig_hup,
-        core::posix::Signal::sig_term
-    });
-
-    std::thread trap_worker([trap]() { trap->run(); });
-
-    // Retrieve the registry middleware and create a proxy to its state receiver
-    RuntimeConfig rt_config(runtime_config);
-    RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
-    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
-    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
-    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
-
-    for (auto file : config_files)
-    {
-        string file_name = basename(const_cast<char*>(string(file).c_str()));    // basename() modifies its argument
-        auto dir_len = file.size() - file_name.size();
-        string dir = file.substr(0, dir_len);
-        if (*dir.rbegin() != '/')
-        {
-            dir += "/";
-        }
-        string scope_id = strip_suffix(file_name, ".ini");
-
-        // For each scope, create a thread that loads the scope and initializes it.
-        // Each thread gets a promise to indicate when it is finished. When a thread
-        // completes, it fulfils the promise, and pushes its ID onto the finished queue.
-        // We collect exit status from the thread via the future from each promise.
-        promise<void> p;
-        auto f = p.get_future();
-        thread t(scope_thread, trap, reg_state_receiver, reg_conf.mw_kind(), reg_conf.mw_configfile(),
-                 runtime_config, scope_id, dir, move(p));
-
-        auto id = t.get_id();
-        threads[id] = ThreadFuture { move(t), move(f) };
-    }
-
-    // Now wait for the threads to finish (in any order).
-    int num_errors = 0;
-    for (int i = threads.size(); i > 0; --i)
-    {
-        try
-        {
-            auto id = finished_threads.wait_and_pop();
-            auto it = threads.find(id);
-            assert(it != threads.end());
-            it->second.t.join();
-            it->second.f.get();             // This will throw if the thread terminated due to an exception
-        }
-        catch (std::exception const& e)
-        {
-            error(e.what());
-            ++num_errors;
-        }
-        catch (...)
-        {
-            error("unknown exception");
-            ++num_errors;
-        }
+        error("unknown exception");
     }
 
     trap->stop();
@@ -224,7 +137,7 @@ int run_scopes(string const& runtime_config, vector<string> config_files)
     if (trap_worker.joinable())
         trap_worker.join();
 
-    return num_errors;
+    return exit_status;
 }
 
 } // namespace
@@ -240,27 +153,30 @@ main(int argc, char* argv[])
     ::pthread_sigmask(SIG_SETMASK, &set, nullptr);
 
     prog_name = basename(argv[0]);
-    if (argc < 3)
+    if (argc != 3)
     {
-        cerr << "usage: " << prog_name << " runtime.ini configfile.ini [configfile.ini ...]" << endl;
+        cerr << "usage: " << prog_name << " runtime.ini configfile.ini" << endl;
         return 2;
     }
     char const* const runtime_config = argv[1];
+    char const* const scope_config = argv[2];
 
     int exit_status = 1;
     try
     {
-        vector<string> config_files;
-        for (int i = 2; i < argc; ++i)
+        filesystem::path runtime_path(runtime_config);
+        if (runtime_path.extension() != ".ini")
         {
-            if (!has_suffix(argv[i], ".ini"))
-            {
-                throw ConfigException(string("invalid config file name: \"") + argv[i] + "\": missing .ini extension");
-            }
-            config_files.push_back(argv[i]);
+            throw ConfigException(string("invalid runtime config file name: \"") + runtime_config + "\": missing .ini extension");
         }
 
-        exit_status = run_scopes(runtime_config, config_files);
+        filesystem::path scope_path(scope_config);
+        if (scope_path.extension() != ".ini")
+        {
+            throw ConfigException(string("invalid scope config file name: \"") + scope_config + "\": missing .ini extension");
+        }
+
+        exit_status = run_scope(runtime_path, scope_path);
     }
     catch (std::exception const& e)
     {

@@ -6,3 +6,4 @@ Zmq.ConfigFile = Zmq.ini
 Scoperunner.Path = /SomePath
 Scope.ConfigDir = /tmp
 Scope.InstallDir = /tmp
+Click.InstallDir = /unused
