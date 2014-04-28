@@ -6,3 +6,4 @@ Author = Canonical
 Icon = an icon
 SearchHint = a search hint string
 HotKey = a key
+ResultsTTL = none

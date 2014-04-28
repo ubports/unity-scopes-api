@@ -49,6 +49,17 @@ Use unity::scopes::Registry to get the metadata for a specific scope or all scop
 class ScopeMetadata final
 {
 public:
+    /**
+     \brief Enum representing the expected valid lifetime of results from the scope.
+     */
+    enum class ResultsTtl
+    {
+        none,
+        small,
+        medium,
+        large
+    };
+
     /// @cond
     UNITY_DEFINES_PTRS(ScopeMetadata);
     ~ScopeMetadata();
@@ -148,6 +159,12 @@ public:
     \return Dictionary of all metadata attributes.
     */
     VariantMap serialize() const;
+
+    /**
+    \brief Return the TTL for the results this scope produces.
+    \return Enum of timeout type.
+    */
+    ResultsTtl results_ttl() const;
 
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl

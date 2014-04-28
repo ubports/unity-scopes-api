@@ -46,6 +46,7 @@ TEST(ScopeMetadataImpl, basic)
     mi->set_display_name("display_name");
     mi->set_description("description");
     mi->set_author("author");
+    mi->set_results_ttl(ScopeMetadata::ResultsTtl::medium);
 
     // Keep a copy for tests below
     unique_ptr<ScopeMetadataImpl> mi2(new ScopeMetadataImpl(*mi));
@@ -59,6 +60,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("description", m.description());
     EXPECT_EQ("author", m.author());
     EXPECT_EQ(0, m.appearance_attributes().size());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::medium, m.results_ttl());
 
     // Check that optional fields that are not set throw
     try
@@ -122,6 +124,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("description", mi2->description());
     EXPECT_EQ("author", mi2->author());
     EXPECT_EQ(0, mi2->appearance_attributes().size());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::medium, mi2->results_ttl());
 
     VariantMap attrs;
     attrs["foo"] = "bar";
@@ -134,6 +137,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_invisible(true);
     mi2->set_appearance_attributes(attrs);
     mi2->set_scope_directory("/foo");
+    mi2->set_results_ttl(ScopeMetadata::ResultsTtl::large);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -160,6 +164,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_invisible(true);
     ti->set_scope_directory("/foo");
     ti->set_appearance_attributes(attrs);
+    ti->set_results_ttl(ScopeMetadata::ResultsTtl::small);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -177,6 +182,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", ci.scope_directory());
     EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::small, ci.results_ttl());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -193,6 +199,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp hot_key", m.hot_key());
     EXPECT_EQ("/foo", m.scope_directory());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::small, m.results_ttl());
     EXPECT_TRUE(m.invisible());
 
     // Self-assignment
@@ -209,6 +216,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp hot_key", tmp.hot_key());
     EXPECT_EQ("bar", tmp.appearance_attributes()["foo"].get_string());
     EXPECT_EQ("/foo", tmp.scope_directory());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::small, tmp.results_ttl());
     EXPECT_TRUE(tmp.invisible());
 
     // Copy constructor
@@ -225,6 +233,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("tmp hot_key", tmp2.hot_key());
     EXPECT_EQ("/foo", tmp2.scope_directory());
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::small, tmp2.results_ttl());
     EXPECT_TRUE(tmp2.invisible());
 }
 
@@ -246,11 +255,12 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_hot_key("hot_key");
     mi->set_scope_directory("/foo");
     mi->set_invisible(false);
+    mi->set_results_ttl(ScopeMetadata::ResultsTtl::large);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(11u, var.size());
+    EXPECT_EQ(12u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -260,6 +270,8 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("search_hint", var["search_hint"].get_string());
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
     EXPECT_EQ("/foo", var["scope_dir"].get_string());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::large,
+            (ScopeMetadata::ResultsTtl ) var["results_ttl"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
@@ -274,6 +286,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("icon", c.icon());
     EXPECT_EQ("search_hint", c.search_hint());
     EXPECT_EQ("hot_key", c.hot_key());
+    EXPECT_EQ(ScopeMetadata::ResultsTtl::large, c.results_ttl());
     EXPECT_FALSE(c.invisible());
 }
 

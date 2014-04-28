@@ -52,6 +52,7 @@ namespace
     const string idle_timeout_key = "IdleTimeout";
 
     const string scope_appearance_group = "Appearance";
+    const string results_ttl_str = "ResultsTTL";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -140,6 +141,27 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         for (auto const& key: parser()->get_keys(scope_appearance_group))
         {
             appearance_attributes_[key] = parser()->get_string(scope_appearance_group, key);
+        }
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    results_ttl_ = ScopeMetadata::ResultsTtl::none;
+    try
+    {
+        string ttl = parser()->get_string(scope_config_group, results_ttl_str);
+        if (ttl == "small")
+        {
+            results_ttl_ = ScopeMetadata::ResultsTtl::small;
+        }
+        else if (ttl == "medium")
+        {
+            results_ttl_ = ScopeMetadata::ResultsTtl::medium;
+        }
+        else if (ttl == "large")
+        {
+            results_ttl_ = ScopeMetadata::ResultsTtl::large;
         }
     }
     catch (LogicException const&)
@@ -254,6 +276,11 @@ int ScopeConfig::idle_timeout() const
 VariantMap ScopeConfig::appearance_attributes() const
 {
     return appearance_attributes_;
+}
+
+ScopeMetadata::ResultsTtl ScopeConfig::results_ttl() const
+{
+    return results_ttl_;
 }
 
 } // namespace internal

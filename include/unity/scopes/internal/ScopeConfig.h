@@ -32,6 +32,7 @@ namespace scopes
 namespace internal
 {
 
+
 class ScopeConfig : public ConfigBase
 {
 public:
@@ -51,6 +52,7 @@ public:
     int idle_timeout() const;            // Optional, returns default value if not present
 
     VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
+    ScopeMetadata::ResultsTtl results_ttl() const;    // Optional, returns none if not present
 
 private:
     bool overrideable_;
@@ -65,6 +67,7 @@ private:
     std::unique_ptr<std::string> scope_runner_;
     int idle_timeout_;
     VariantMap appearance_attributes_;
+    ScopeMetadata::ResultsTtl results_ttl_;
 };
 
 } // namespace internal

@@ -132,6 +132,11 @@ VariantMap ScopeMetadata::serialize() const
     return p->serialize();
 }
 
+ScopeMetadata::ResultsTtl ScopeMetadata::results_ttl() const
+{
+    return p->results_ttl();
+}
+
 //! @endcond
 
 } // namespace scopes

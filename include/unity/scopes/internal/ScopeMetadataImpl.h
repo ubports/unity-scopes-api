@@ -55,6 +55,7 @@ public:
     bool invisible() const;             // optional (default = false)
     VariantMap appearance_attributes() const; // optional (default: empty map)
     std::string scope_directory() const;
+    ScopeMetadata::ResultsTtl results_ttl() const; // optional (default: none)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -68,6 +69,7 @@ public:
     void set_invisible(bool invisible);
     void set_appearance_attributes(VariantMap const& appearance_attributes);
     void set_scope_directory(std::string const& path);
+    void set_results_ttl(ScopeMetadata::ResultsTtl results_ttl);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -89,6 +91,7 @@ private:
     std::unique_ptr<bool> invisible_;           // Optional, hence a pointer
     std::unique_ptr<std::string> scope_directory_;
     VariantMap appearance_attributes_;
+    ScopeMetadata::ResultsTtl results_ttl_;
 };
 
 } // namespace internal
