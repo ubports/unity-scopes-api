@@ -24,8 +24,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <functional>
 #include <gtest/gtest.h>
+
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+
 #include <signal.h>
 #include <unistd.h>
 
@@ -34,13 +38,40 @@ using namespace unity::scopes;
 class Receiver : public SearchListenerBase
 {
 public:
+    Receiver()
+        : done_(false)
+        , finished_ok_(false)
+    {
+    }
+
     virtual void push(CategorisedResult /* result */) override
     {
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, std::string const& /* error_message */) override
     {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        EXPECT_EQ(Finished, reason);
+        finished_ok_ = reason == Finished;
+        done_ = true;
+        cond_.notify_all();
     }
+
+    bool wait_until_finished()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        auto now = std::chrono::steady_clock::now();
+        auto expiry_time = now + std::chrono::seconds(5);
+        EXPECT_TRUE(cond_.wait_until(lock, expiry_time, [this]{ return done_; })) << "finished message not delivered";
+        return finished_ok_;
+    }
+
+private:
+    bool done_;
+    bool finished_ok_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
 };
 
 TEST(Registry, metadata)
@@ -75,18 +106,13 @@ TEST(Registry, metadata)
 
     auto sp = meta.proxy();
 
-    SearchListenerBase::SPtr reply(new Receiver);
+    auto receiver = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply(receiver);
     SearchMetadata metadata("C", "desktop");
 
     // search would fail if testscopeB can't be executed
-    try
-    {
-        auto ctrl = sp->search("foo", metadata, reply);
-    }
-    catch (...)
-    {
-        FAIL();
-    }
+    auto ctrl = sp->search("foo", metadata, reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
 }
 
 bool wait_for_registry()

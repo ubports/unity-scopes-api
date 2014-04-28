@@ -64,7 +64,7 @@ void ZmqReply::push(VariantMap const& result)
     auto resultBuilder = in_params.getResult();
     to_value_dict(result, resultBuilder);
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();
 }
 
@@ -99,7 +99,7 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     }
     in_params.setReason(r);
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();
 }
 

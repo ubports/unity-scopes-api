@@ -77,11 +77,8 @@ public:
 
     ~smartscopesproxytest()
     {
-        scope_mw_->stop();
-        scope_mw_->wait_for_shutdown();
-
-        reg_mw_->stop();
-        reg_mw_->wait_for_shutdown();
+        scope_rt_->destroy();
+        reg_rt_->destroy();
     }
 
 protected:

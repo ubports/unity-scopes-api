@@ -76,7 +76,7 @@ public:
 
     \param reply The proxy on which to push results for the preview.
     */
-    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this query
+    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this preview
 
     // TODO: Add a method for subpreview request?
 

@@ -404,7 +404,7 @@ public:
         ///! TODO: HACK:
         /// we have to start scope-C and scope-D before starting scope-B here, as B aggregates C and D.
         /// (When re-binding logic is introduced, this will be unnecessary)
-        scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
+        scope_ids = { {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"} };
         for (auto& scope_id : scope_ids)
         {
             proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
@@ -509,7 +509,7 @@ TEST_F(RegistryTest, locate_one)
 // test locating all scopes
 TEST_F(RegistryTest, locate_all)
 {
-    // locate all scopes (hense starting all scope processes)
+    // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
     {
         EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));

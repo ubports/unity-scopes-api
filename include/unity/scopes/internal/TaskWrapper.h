@@ -31,7 +31,7 @@ namespace internal
 {
 
 // Simple wrapper for tasks. Allows us to use a std::packaged_task as the functor
-// for a task in a thread pool, without having to know the task's return type in advance.
+// for a task in a thread pool without having to know the task's return type in advance.
 
 class TaskWrapper final
 {
@@ -54,7 +54,6 @@ public:
 
     void operator()()
     {
-
         task_->call();
     }
 

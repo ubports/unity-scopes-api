@@ -104,3 +104,14 @@ TEST(ThreadPool, exception)
         EXPECT_STREQ("unity::InvalidArgumentException: ThreadPool(): invalid pool size: -1", e.what());
     }
 }
+
+TEST(ThreadPool, throwing_task)
+{
+    ThreadPool p(1);
+    auto thrower = [](){ throw std::logic_error("some error"); };
+    auto thrower2 = [](){ throw 99; };
+    auto f = p.submit(thrower);
+    auto f2 = p.submit(thrower2);
+    EXPECT_THROW(f.get(), std::logic_error);
+    EXPECT_THROW(f2.get(), int);
+}
