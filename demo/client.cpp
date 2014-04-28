@@ -19,6 +19,7 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
+#include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
 #include <string.h>
@@ -325,11 +326,11 @@ private:
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
-    cerr << "   or: ./client list" << endl;
-    cerr << "For example: ./client scope-B iron" << endl;
-    cerr << "         or: ./client scope-B iron activate 1" << endl;
-    cerr << "         or: ./client scope-B iron preview 1" << endl;
+    cerr << "usage: ./scopes-client <scope-name> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./scopes-client list" << endl;
+    cerr << "For example: ./scopes-client scope-B iron" << endl;
+    cerr << "         or: ./scopes-client scope-B iron activate 1" << endl;
+    cerr << "         or: ./scopes-client scope-B iron preview 1" << endl;
     exit(1);
 }
 
@@ -375,7 +376,17 @@ int main(int argc, char* argv[])
 
     try
     {
-        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
+        Runtime::UPtr rt;
+        // use Runtime.ini from the current directory if present, otherwise let the API pick the default one
+        const boost::filesystem::path path("Runtime.ini");
+        if (boost::filesystem::exists(path))
+        {
+            rt = Runtime::create(path.native());
+        }
+        else
+        {
+            rt = Runtime::create();
+        }
         RegistryProxy r = rt->registry();
 
         if (do_list)
