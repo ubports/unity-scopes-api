@@ -87,18 +87,19 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::run()
 {
+    {
+        lock_guard<mutex> lock(mutex_);
+        if (--num_threads_ == 0)
+        {
+            threads_ready_.set_value();
+        }
+    }
+
     for (;;)
     {
         TaskQueue::value_type task;  // Task must go out of scope in each iteration, in case it stores shared_ptrs.
         try
         {
-            {
-                lock_guard<mutex> lock(mutex_);
-                if (--num_threads_ == 0)
-                {
-                    threads_ready_.set_value();
-                }
-            }
             task = queue_->wait_and_pop();
         }
         catch (runtime_error const&)
