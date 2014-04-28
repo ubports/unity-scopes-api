@@ -254,6 +254,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
             mi->set_invisible(sc.invisible());
             mi->set_appearance_attributes(sc.appearance_attributes());
             mi->set_scope_directory(scope_dir.native());
+            mi->set_results_ttl(sc.results_ttl());
 
             try
             {
