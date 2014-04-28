@@ -288,7 +288,7 @@ TEST(Runtime, preview)
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
-    EXPECT_TRUE(result.get() != nullptr);
+    ASSERT_TRUE(result.get() != nullptr);
 
     auto target = result->target_scope_proxy();
     EXPECT_TRUE(target != nullptr);
