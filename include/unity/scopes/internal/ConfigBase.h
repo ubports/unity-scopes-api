@@ -21,6 +21,9 @@
 
 #include <unity/util/IniParser.h>
 
+#include <map>
+#include <set>
+
 namespace unity
 {
 
@@ -48,7 +51,11 @@ public:
     virtual std::string get_optional_string(std::string const& group, std::string const& key) const;
     virtual std::string get_middleware(std::string const& group, std::string const& key) const;
 
+protected:
     virtual void throw_ex(::std::string const& reason) const;
+
+    typedef std::map<std::string, std::set<std::string>> KnownEntries;
+    void check_unknown_entries(KnownEntries const& valid) const;
 
 private:
     unity::util::IniParser::SPtr parser_;

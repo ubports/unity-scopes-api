@@ -32,10 +32,9 @@ namespace scopes
 namespace internal
 {
 
-const char* RuntimeConfig::RUNTIME_CONFIG_GROUP = "Runtime";
-
 namespace
 {
+    const string runtime_config_group = "Runtime";
     const string registry_identity_str = "Registry.Identity";
     const string registry_configfile_str = "Registry.ConfigFile";
     const string default_middleware_str = "Default.Middleware";
@@ -47,25 +46,37 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
 {
     if (configfile.empty())  // Default config
     {
-        registry_identity_ = "Registry";
+        registry_identity_ = DFLT_REGISTRY_ID;
         registry_configfile_ = DFLT_REGISTRY_INI;
         default_middleware_ = "Zmq";
         default_middleware_configfile_ = "Zmq.ini";
     }
     else
     {
-        registry_identity_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_identity_str);
+        registry_identity_ = get_optional_string(runtime_config_group, registry_identity_str);
         auto pos = registry_identity_.find_first_of("@:/");
         if (pos != string::npos)
         {
             throw_ex("Illegal character in value for " + registry_identity_str + ": \"" + registry_identity_ +
                      "\": identity cannot contain '" + registry_identity_[pos] + "'");
         }
-        registry_configfile_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
-        default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
+        registry_configfile_ = get_optional_string(runtime_config_group, registry_configfile_str);
+        default_middleware_ = get_middleware(runtime_config_group, default_middleware_str);
         default_middleware_configfile_ =
-            get_optional_string(RUNTIME_CONFIG_GROUP, default_middleware_ + "." + default_middleware_configfile_str);
+            get_optional_string(runtime_config_group, default_middleware_ + "." + default_middleware_configfile_str);
     }
+
+    const KnownEntries known_entries = {
+                                          {  runtime_config_group,
+                                             {
+                                                registry_identity_str,
+                                                registry_configfile_str,
+                                                default_middleware_str,
+                                                default_middleware_configfile_str
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 RuntimeConfig::~RuntimeConfig()

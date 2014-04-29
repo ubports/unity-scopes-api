@@ -34,8 +34,6 @@ namespace internal
 class RuntimeConfig : public ConfigBase
 {
 public:
-    static const char* RUNTIME_CONFIG_GROUP;
-
     RuntimeConfig(std::string const& configfile);
     ~RuntimeConfig();
 

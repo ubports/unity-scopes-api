@@ -32,7 +32,20 @@ namespace scopes
 namespace internal
 {
 
-constexpr char const* RegistryConfig::REGISTRY_CONFIG_GROUP;
+namespace
+{
+    const string registry_config_group = "Registry";
+    const string mw_kind_str = "Middleware";
+    const string endpoint_dir_str = ".EndpointDir";
+    const string endpoint_str = ".Endpoint";
+    const string configfile_str = ".ConfigFile";
+    const string scope_installdir_str = "Scope.InstallDir";
+    const string oem_installdir_str = "OEM.InstallDir";
+    const string click_installdir_str = "Click.InstallDir";
+    const string scoperunner_path_str = "Scoperunner.Path";
+    const string ss_registry_identity_str = "SS.Registry.Identity";
+    const string ss_registry_endpoint_str = "SS.Registry.Endpoint";
+}
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
     ConfigBase(configfile)
@@ -42,24 +55,43 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw InvalidArgumentException("Registry identity cannot be an empty string");
     }
-    mw_kind_ = get_middleware(REGISTRY_CONFIG_GROUP, "Middleware");
-    endpointdir_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".EndpointDir");
-    endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
-    mw_configfile_ = get_optional_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
-    scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
-    oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
-    click_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "Click.InstallDir");
+    mw_kind_ = get_middleware(registry_config_group, mw_kind_str);
+    string mw_prefix = get_string(registry_config_group, mw_kind_str);
+    endpointdir_ = get_string(registry_config_group, mw_kind_ + endpoint_dir_str);
+    endpoint_ = get_string(registry_config_group, mw_kind_ + endpoint_str);
+    mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_str);
+    scope_installdir_ = get_string(registry_config_group, scope_installdir_str);
+    oem_installdir_ = get_optional_string(registry_config_group, oem_installdir_str);
+    click_installdir_ = get_optional_string(registry_config_group, click_installdir_str);
     if (click_installdir_.empty())
     {
         click_installdir_ = string(getenv("HOME")) + "/.local/share/unity-scopes/";
     }
-    scoperunner_path_ = get_string(REGISTRY_CONFIG_GROUP, "Scoperunner.Path");
+    scoperunner_path_ = get_string(registry_config_group, scoperunner_path_str);
     if (scoperunner_path_[0] != '/')
     {
-        throw ConfigException(configfile + ": Scoperunner.Path must be an absolute path");
+        throw ConfigException(configfile + ": " + scoperunner_path_str + " must be an absolute path");
     }
-    ss_registry_identity_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Identity");
-    ss_registry_endpoint_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Endpoint");
+    ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_str);
+    ss_registry_endpoint_ = get_optional_string(registry_config_group, ss_registry_endpoint_str);
+
+    const KnownEntries known_entries = {
+                                          {  registry_config_group,
+                                             {
+                                                mw_kind_str,
+                                                mw_prefix + endpoint_dir_str,
+                                                mw_prefix + endpoint_str,
+                                                mw_prefix + configfile_str,
+                                                scope_installdir_str,
+                                                oem_installdir_str,
+                                                click_installdir_str,
+                                                scoperunner_path_str,
+                                                ss_registry_identity_str,
+                                                ss_registry_endpoint_str
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 RegistryConfig::~RegistryConfig()

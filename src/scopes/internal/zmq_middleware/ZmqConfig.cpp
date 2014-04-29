@@ -33,10 +33,9 @@ namespace scopes
 namespace internal
 {
 
-const char* ZmqConfig::ZMQ_CONFIG_GROUP = "Zmq";
-
 namespace
 {
+    const string zmq_config_group = "Zmq";
     const string public_dir_str = "EndpointDir.Public";
     const string private_dir_str = "EndpointDir.Private";
 }
@@ -46,8 +45,8 @@ ZmqConfig::ZmqConfig(string const& configfile) :
 {
     if (!configfile.empty())
     {
-        public_dir_ = get_optional_string(ZMQ_CONFIG_GROUP, public_dir_str);
-        private_dir_ = get_optional_string(ZMQ_CONFIG_GROUP, private_dir_str);
+        public_dir_ = get_optional_string(zmq_config_group, public_dir_str);
+        private_dir_ = get_optional_string(zmq_config_group, private_dir_str);
     }
 
     // Set the endpoint directories if they were not set explicitly.
@@ -59,7 +58,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
         {
-            basedir = string(DFLT_ENDPOINT_DIR_BASE) + "/" + std::to_string(geteuid());
+            basedir = string(DFLT_ENDPOINT_DIR_BASE) + "/" + std::to_string(geteuid()) + "/zmq";
         }
         else
         {
@@ -74,6 +73,16 @@ ZmqConfig::ZmqConfig(string const& configfile) :
             private_dir_ = basedir + "/priv";
         }
     }
+
+    const KnownEntries known_entries = {
+                                          {  zmq_config_group,
+                                             {
+                                                public_dir_str,
+                                                private_dir_str
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 ZmqConfig::~ZmqConfig()

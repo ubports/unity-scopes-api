@@ -35,9 +35,6 @@ namespace internal
 class ScopeConfig : public ConfigBase
 {
 public:
-    static constexpr const char* SCOPE_CONFIG_GROUP = "ScopeConfig";
-    static constexpr const char* SCOPE_DISPLAY_GROUP = "Appearance";
-
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig();
 
@@ -51,6 +48,7 @@ public:
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
     std::string scope_runner() const;    // Optional, throws NotFoundException if not present
+
     VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
 
 private:

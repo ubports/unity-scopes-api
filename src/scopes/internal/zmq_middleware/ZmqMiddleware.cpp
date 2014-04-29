@@ -73,7 +73,7 @@ void create_dir(string const& dir)
 {
     if (mkdir(dir.c_str(), 0700 | S_ISVTX) == -1 && errno != EEXIST)
     {
-        throw FileException("cannot create public endpoint directory " + dir, errno);
+        throw FileException("cannot create endpoint directory " + dir, errno);
     }
 }
 
@@ -100,8 +100,6 @@ try :
     {
         throw MiddlewareException("cannot initialize zmq middleware for scope " + server_name);
     }
-    cerr << "dir: " << config_.public_dir() << endl;
-    cerr << "priv: " << config_.private_dir() << endl;
 }
 catch (zmqpp::exception const& e)
 {

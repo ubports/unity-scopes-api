@@ -31,6 +31,7 @@ namespace internal
 static constexpr const char* DFLT_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini";
 static constexpr const char* DFLT_SS_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/SSRuntime.ini";
 static constexpr const char* DFLT_REGISTRY_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Registry.ini";
+static constexpr char const* DFLT_REGISTRY_ID = "Registry";
 static constexpr char const* DFLT_ENDPOINT_DIR_BASE = "/run/user";
 static constexpr char const* DFLT_ZMQ_MIDDLEWARE_INI = "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini";
 

@@ -33,8 +33,6 @@ namespace internal
 class ZmqConfig : public ConfigBase
 {
 public:
-    static const char* ZMQ_CONFIG_GROUP;
-
     ZmqConfig(std::string const& configfile);
     ~ZmqConfig();
 

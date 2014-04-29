@@ -22,6 +22,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/IniParser.h>
 
+#include <iostream>
 #include <sys/stat.h>
 
 using namespace std;
@@ -119,6 +120,44 @@ void ConfigBase::throw_ex(string const& reason) const
 {
     string s = "\"" + configfile_ + "\": " + reason;
     throw ConfigException(s);
+}
+
+// Check whether a configuration file contains unknown groups
+// or unknown keys within a known group. This is useful to catch typos.
+// For example, if a config file contains "SS.Registry.Idenity" instead
+// of "SS.Registry.Identity" (did you spot it?), we print a warning,
+// so people don't endlessly scratch their heads as to why the config
+// isn't working for them.
+//
+// KnownEntries is a map of <group, set<key>> pairs that contains
+// the known keys for each group. Anything in the config file that
+// is not found in the map generates a warning.
+
+void ConfigBase::check_unknown_entries(KnownEntries const& known_entries) const
+{
+    if (!parser_)
+    {
+        return;
+    }
+    auto const groups = parser()->get_groups();
+    for (auto const& group : groups)
+    {
+        auto const it = known_entries.find(group);
+        if (it == known_entries.end())
+        {
+            cerr << "warning: ignoring unknown group " << group << " in file " << configfile_ << endl;
+            continue;
+        }
+        auto keys = parser()->get_keys(group);
+        for (auto const& key : keys)
+        {
+            if (it->second.find(key) == it->second.end())
+            {
+                cerr << "warning: ignoring unknown key " << key << " in group " << group
+                     << " in file " << configfile_ << endl;
+            }
+        }
+    }
 }
 
 } // namespace internal
