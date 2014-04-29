@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/RegistryI.h>
 
+#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/RegistryObject.h>
@@ -26,7 +28,7 @@
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
-#include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -401,10 +403,7 @@ public:
         mw->add_state_receiver_object("StateReceiver", reg->state_receiver());
 
         // configure scopes
-        ///! TODO: HACK:
-        /// we have to start scope-C and scope-D before starting scope-B here, as B aggregates C and D.
-        /// (When re-binding logic is introduced, this will be unnecessary)
-        scope_ids = {"scope-A", "scope-C", "scope-D", "scope-B", "scope-N", "scope-S"};
+        scope_ids = { {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"} };
         for (auto& scope_id : scope_ids)
         {
             proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
@@ -509,7 +508,7 @@ TEST_F(RegistryTest, locate_one)
 // test locating all scopes
 TEST_F(RegistryTest, locate_all)
 {
-    // locate all scopes (hense starting all scope processes)
+    // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
     {
         EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
@@ -525,8 +524,33 @@ TEST_F(RegistryTest, locate_all)
     EXPECT_EQ(6, process_count());
 }
 
-// test scope death and re-locate
-TEST_F(RegistryTest, locate_relocate)
+class Receiver : public SearchListenerBase
+{
+public:
+    void push(CategorisedResult) override {}
+
+    void finished(Reason, std::string const&) override
+    {
+        // Signal that the query is complete
+        unique_lock<std::mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_one();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
+// test scope death and rebinding
+TEST_F(RegistryTest, locate_rebinding)
 {
     // locate first scope
     EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
@@ -550,8 +574,10 @@ TEST_F(RegistryTest, locate_relocate)
     // check that we now have no running scopes
     EXPECT_EQ(0, process_count());
 
-    // locate first scope
-    EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
+    // locate first scope indirectly via rebinding on scope request
+    auto receiver = make_shared<Receiver>();
+    EXPECT_NO_THROW(proxies[scope_ids[0]]->search("test", SearchMetadata("en", "phone"), receiver));
+    receiver->wait_until_finished();
 
     // check that the first scope is running
     EXPECT_TRUE(reg->is_scope_running(scope_ids[0]));

@@ -85,7 +85,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
     in_params.setIdentity(scope_id.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -119,7 +119,7 @@ MetadataMap ZmqRegistry::list()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -148,8 +148,8 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
     in_params.setIdentity(identity.c_str());
 
     // locate uses a custom timeout because it needs to potentially fork/exec a scope.
-    int64_t timeout = 1000; // TODO: get timeout from config
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder, timeout); });
+    int64_t timeout = 2000; // TODO: get timeout from config
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);

@@ -36,8 +36,8 @@ namespace internal
 namespace zmq_middleware
 {
 
-ConnectionPool::ConnectionPool(zmqpp::context& context) :
-    context_(context)
+ConnectionPool::ConnectionPool(zmqpp::context& context)
+    : context_(context)
 {
 }
 
@@ -50,9 +50,7 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
 {
     assert(!endpoint.empty());
 
-    lock_guard<mutex> lock(mutex_);
-
-    // Look for existing connection. If there is one, but with the wrong type, we throw.
+    // Look for existing connection.
     auto const& it = pool_.find(endpoint);
     if (it != pool_.end())
     {
@@ -66,18 +64,29 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
     }
 
     // No existing connection yet, establish one.
+    auto entry = create_connection(endpoint, m, -1);
+    return pool_.emplace(move(entry)).first->second.socket;
+}
+
+ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string const& endpoint,
+                                                    RequestMode m,
+                                                    int64_t timeout)
+{
+    if (timeout == -1)
+    {
+        timeout = 0;    // Don't linger on close
+    }
     zmqpp::socket_type stype = m == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push;
     zmqpp::socket s(context_, stype);
-    s.set(zmqpp::socket_option::linger, 0);
+    auto zmqpp_timeout = m == RequestMode::Twoway ? int32_t(timeout) : 0;
+    s.set(zmqpp::socket_option::linger, zmqpp_timeout);
     s.connect(endpoint);
-    return pool_.emplace(endpoint, Connection { move(s), m }).first->second.socket;
+    return CPool::value_type{ endpoint, SocketData{ move(s), m } };
 }
 
 void ConnectionPool::remove(std::string const& endpoint)
 {
     assert(!endpoint.empty());
-
-    lock_guard<mutex> lock(mutex_);
 
     auto const& it = pool_.find(endpoint);
     if (it != pool_.end())
@@ -90,8 +99,7 @@ void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket 
 {
     assert(!endpoint.empty());
 
-    lock_guard<mutex> lock(mutex_);
-    pool_.emplace(endpoint, Connection { move(socket), m });
+    pool_.emplace(endpoint, SocketData{ move(socket), m });
 }
 
 } // namespace zmq_middleware

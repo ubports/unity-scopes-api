@@ -66,7 +66,7 @@ void ZmqQuery::run(MWReplyProxy const& reply)
     proxy.setIdentity(rp->identity().c_str());
     proxy.setCategory(rp->category().c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();
 }
 

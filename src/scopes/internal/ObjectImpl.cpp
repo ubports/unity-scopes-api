@@ -19,8 +19,12 @@
 #include <unity/scopes/internal/ObjectImpl.h>
 
 #include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/ScopeExceptions.h>
+
+#include <cassert>
 
 using namespace std;
+using namespace unity::scopes;
 
 namespace unity
 {
@@ -31,9 +35,10 @@ namespace scopes
 namespace internal
 {
 
-ObjectImpl::ObjectImpl(MWProxy const& mw_proxy) :
-    mw_proxy_(mw_proxy)
+ObjectImpl::ObjectImpl(MWProxy const& mw_proxy)
 {
+    lock_guard<mutex> lock(proxy_mutex_);
+    mw_proxy_ = mw_proxy;
 }
 
 ObjectImpl::~ObjectImpl()
@@ -42,6 +47,7 @@ ObjectImpl::~ObjectImpl()
 
 string ObjectImpl::identity()
 {
+    check_proxy();
     return mw_proxy_->identity();
 }
 
@@ -52,27 +58,49 @@ string ObjectImpl::category()
 
 string ObjectImpl::endpoint()
 {
+    check_proxy();
     return mw_proxy_->endpoint();
 }
 
 int64_t ObjectImpl::timeout()
 {
+    check_proxy();
     return mw_proxy_->timeout();
 }
 
 string ObjectImpl::to_string()
 {
+    check_proxy();
     return mw_proxy_->to_string();
 }
 
 void ObjectImpl::ping()
 {
+    check_proxy();
     mw_proxy_->ping();
 }
 
-MWProxy ObjectImpl::proxy() const
+MWProxy ObjectImpl::proxy()
 {
+    lock_guard<mutex> lock(proxy_mutex_);
     return mw_proxy_;
+}
+
+void ObjectImpl::set_proxy(MWProxy const& p)
+{
+    assert(p);
+    lock_guard<mutex> lock(proxy_mutex_);
+    assert(!mw_proxy_);
+    mw_proxy_ = p;
+}
+
+void ObjectImpl::check_proxy()
+{
+    lock_guard<mutex> lock(proxy_mutex_);
+    if (!mw_proxy_)
+    {
+        throw MiddlewareException("Cannot invoke on null proxy");
+    }
 }
 
 } // namespace internal

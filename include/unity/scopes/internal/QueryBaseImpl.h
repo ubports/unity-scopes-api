@@ -63,10 +63,13 @@ public:
 
     void cancel();
     void set_metadata(SearchMetadata const& metadata);
+    bool valid() const;
 
 private:
     SearchMetadata::UPtr search_metadata_;
     std::vector<QueryCtrlProxy> subqueries_;
+    bool valid_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

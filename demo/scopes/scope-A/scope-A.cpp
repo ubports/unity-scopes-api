@@ -31,13 +31,16 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(CannedQuery const& query) :
+    MyQuery(string const& scope_id, CannedQuery const& query) :
+        scope_id_(scope_id),
         query_(query)
     {
+        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     ~MyQuery()
     {
+        cerr << scope_id_ << ": query instance for \"" << query_.query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -46,6 +49,11 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         DepartmentList departments({{"news", query_, "News", {{"news-world", query_, "World"}, {"news-europe", query_, "Europe"}}},
                                     {"sport", query_, "Sport"}});
         reply->register_departments(departments);
@@ -56,7 +64,10 @@ public:
         filter->add_option("2", "Option 2");
         filters.push_back(filter);
         FilterState filter_state; // TODO: push real state from query obj
-        reply->push(filters, filter_state);
+        if (!reply->push(filters, filter_state))
+        {
+            return;  // Query was cancelled
+        }
 
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
@@ -65,30 +76,37 @@ public:
         res.set_title("scope-A: result 1 for query \"" + query_.query_string() + "\"");
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
-        reply->push(res);
+        if (!reply->push(res))
+        {
+            return;  // Query was cancelled
+        }
 
         CannedQuery q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
         reply->register_annotation(annotation);
 
-        cout << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
+        cerr << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
     }
 
 private:
+    string scope_id_;
     CannedQuery query_;
 };
 
 class MyPreview : public PreviewQueryBase
 {
 public:
-    MyPreview(string const& uri) :
+    MyPreview(string const& scope_id, string const& uri) :
+        scope_id_(scope_id),
         uri_(uri)
     {
+        cerr << scope_id_ << ": preview instance for \"" << uri << "\" created" << endl;
     }
 
     ~MyPreview()
     {
+        cerr << scope_id_ << ": preview instance for \"" << uri_ << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -119,21 +137,32 @@ public:
         layout3col.add_column({"rating"});
 
         reply->register_layout({layout1col, layout2col, layout3col});
-        reply->push(widgets);
-        reply->push("author", Variant("Foo"));
-        reply->push("rating", Variant("4 blah"));
-        cout << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
+        if (!reply->push(widgets))
+        {
+            return;  // Query was cancelled
+        }
+        if (!reply->push("author", Variant("Foo")))
+        {
+            return;  // Query was cancelled
+        }
+        if (!reply->push("rating", Variant("4 blah")))
+        {
+            return;  // Query was cancelled
+        }
+        cerr << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
     }
 
 private:
+    string scope_id_;
     string uri_;
 };
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
+    virtual int start(string const& scope_id, RegistryProxy const&) override
     {
+        scope_id_ = scope_id;
         return VERSION;
     }
 
@@ -141,17 +170,19 @@ public:
 
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(q));
-        cout << "scope-A: created query: \"" << q.query_string() << "\"" << endl;
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q));
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview(result.uri()));
-        cout << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
+        PreviewQueryBase::UPtr preview(new MyPreview(scope_id_, result.uri()));
+        cerr << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
         return preview;
     }
+
+private:
+    string scope_id_;
 };
 
 extern "C"

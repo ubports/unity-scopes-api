@@ -92,14 +92,31 @@ public:
                     PreviewListenerBase::SPtr const&));
 };
 
-static void pretend_started(StateReceiverObject::SPtr receiver)
-{
-    receiver->push_state("scope-id", StateReceiverObject::State::ScopeReady);
-}
 
 class TestRegistryObject: public Test
 {
+public:
+    core::posix::ChildProcess mock_exec(const string&, const vector<string>&,
+            const map<string, string>&, const core::posix::StandardStream&)
+    {
+        t_start.reset(new thread(pretend_started, registry->state_receiver()));
+        return dummy_process;
+    }
+
 protected:
+    void TearDown() override
+    {
+        ASSERT_TRUE(t_start.get());
+        t_start->join();
+
+        dummy_process.send_signal_or_throw(core::posix::Signal::sig_term);
+    }
+
+    static void pretend_started(StateReceiverObject::SPtr receiver)
+    {
+        receiver->push_state("scope-id", StateReceiverObject::State::ScopeReady);
+    }
+
     ScopeMetadata make_meta(const string& scope_id)
     {
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(nullptr));
@@ -144,14 +161,10 @@ protected:
         exec_data.scope_config = "/path/scope.ini";
         exec_data.confinement_profile = confinement_profile;
 
-        RegistryObject registry(*death_observer(), executor);
-        registry.add_local_scope("scope-id", meta, exec_data);
-        auto t_start = thread(pretend_started, registry.state_receiver());
-        registry.locate("scope-id");
-        t_start.join();
-        EXPECT_TRUE(registry.is_scope_running("scope-id"));
-
-        dummy_process.send_signal_or_throw(core::posix::Signal::sig_term);
+        registry.reset(new RegistryObject(*death_observer(), executor));
+        registry->add_local_scope("scope-id", meta, exec_data);
+        registry->locate("scope-id");
+        EXPECT_TRUE(registry->is_scope_running("scope-id"));
     }
 
     static std::shared_ptr<ChildProcess::DeathObserver> death_observer_;
@@ -160,6 +173,10 @@ protected:
 
     ChildProcess dummy_process = core::posix::exec("/bin/sleep", vector<string>
         { "30" }, map<string, string>(), StandardStream::empty);
+
+    unique_ptr<thread> t_start;
+
+    unique_ptr<RegistryObject> registry;
 };
 
 std::shared_ptr<ChildProcess::DeathObserver> TestRegistryObject::death_observer_;
@@ -170,7 +187,7 @@ TEST_F(TestRegistryObject, basic)
             exec("/path/scoperunner", vector<string>
                     {   "/path/runtime.ini", "/path/scope.ini"}, _,
                     StandardStream::stdin | StandardStream::stdout)).WillOnce(
-            Return(dummy_process));
+            Invoke(this, &TestRegistryObject::mock_exec));
 
     run_registry(string());
 }
@@ -181,7 +198,7 @@ TEST_F(TestRegistryObject, confined)
             exec("/usr/sbin/aa-exec", vector<string>
                     {   "-p", "confinement profile", "/path/scoperunner", "/path/runtime.ini",
                         "/path/scope.ini"}, _, StandardStream::stdin | StandardStream::stdout)).WillOnce(
-            Return(dummy_process));
+            Invoke(this, &TestRegistryObject::mock_exec));
 
     run_registry("confinement profile");
 }

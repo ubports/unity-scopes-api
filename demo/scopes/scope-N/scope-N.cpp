@@ -32,32 +32,44 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery()
+    MyQuery(string const& scope_id)
+        : scope_id_(scope_id)
     {
+        cerr << scope_id_ << ": query instance created" << endl;
     }
 
     ~MyQuery()
     {
+        cerr << scope_id_ << ": query instance destroyed" << endl;
     }
 
     virtual void cancelled() override
     {
-        cerr << "scope-no-op: received cancel request" << endl;
+        cerr << scope_id_ << ": received cancel request" << endl;
     }
 
     virtual void run(SearchReplyProxy const&) override
     {
-        cerr << "scope-no-op: received query" << endl;
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
+        cerr << scope_id_ << ": received query" << endl;
         this_thread::sleep_for(chrono::seconds(3));
-        cerr << "scope-no-op: query complete" << endl;
+        cerr << scope_id_ << ": query complete" << endl;
     }
+
+private:
+    string scope_id_;
 };
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
+    virtual int start(string const& scope_id, RegistryProxy const&) override
     {
+        scope_id_ = scope_id;
         return VERSION;
     }
 
@@ -65,13 +77,16 @@ public:
 
     virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
     {
-        return SearchQueryBase::UPtr(new MyQuery);
+        return SearchQueryBase::UPtr(new MyQuery(scope_id_));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
     }
+
+private:
+    string scope_id_;
 };
 
 extern "C"

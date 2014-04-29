@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
@@ -44,7 +45,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 // an occastional "address in use" exception because the new socket
 // tries to bind while the old one is still in the process of destroying itself.
 
-void wait(int millisec = 20)
+void wait(int millisec = 200)
 {
     this_thread::sleep_for(chrono::milliseconds(millisec));
 }
@@ -176,7 +177,7 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: activate(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -194,25 +195,22 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): stop thread "
                          "failure (adapter: testscope):\n"
-                         "    unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                         "(adapter: testscope):\n"
+                         "    unity::scopes::MiddlewareException: StopPublisher(): publisher thread "
+                         "failed (endpoint: inproc://testscope-stopper):\n"
                          "        Address already in use",
                          e.what());
         }
+
         try
         {
             b.shutdown();
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                         "    Exception history:\n"
-                         "        Exception #1:\n"
-                         "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                         "(adapter: testscope):\n"
-                         "                Address already in use",
+            EXPECT_STREQ("unity::scopes::MiddlewareException: shutdown() [state_ == Failed]: "
+                         "Object adapter in Failed state (adapter: testscope)",
                          e.what());
         }
         try
@@ -221,13 +219,9 @@ TEST(ObjectAdapter, state_change)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope)\n"
-                          "    Exception history:\n"
-                          "        Exception #1:\n"
-                          "            unity::scopes::MiddlewareException: ObjectAdapter: broker thread failure "
-                          "(adapter: testscope):\n"
-                          "                Address already in use",
-                          e.what());
+            EXPECT_STREQ("unity::scopes::MiddlewareException: wait_for_shutdown(): "
+                         "Object adapter in Failed state (adapter: testscope)",
+                         e.what());
         }
     }
 }
@@ -281,8 +275,8 @@ public:
 
 TEST(ObjectAdapter, add_remove_find)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
@@ -568,8 +562,8 @@ TEST(ObjectAdapter, corrupt_header)
 
 TEST(ObjectAdapter, invoke_ok)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -620,8 +614,8 @@ public:
 
 TEST(ObjectAdapter, invoke_object_not_exist)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -665,8 +659,8 @@ TEST(ObjectAdapter, invoke_object_not_exist)
 
 TEST(ObjectAdapter, invoke_operation_not_exist)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -785,8 +779,8 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 
 TEST(ObjectAdapter, twoway_threading)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -819,8 +813,8 @@ TEST(ObjectAdapter, twoway_threading)
 
 TEST(ObjectAdapter, oneway_threading)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -890,8 +884,8 @@ public:
 
 TEST(ObjectAdapter, servant_map_destructor)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini", rt.get());
 
     {
         wait();
@@ -907,7 +901,8 @@ TEST(ObjectAdapter, servant_map_destructor)
             }
             catch (MiddlewareException const& e)
             {
-                EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed state (adapter: testscope)",
+                EXPECT_STREQ("unity::scopes::MiddlewareException: remove(): "
+                             "Object adapter in Destroyed state (adapter: testscope)",
                              e.what());
             }
         };
@@ -1005,7 +1000,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: add(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -1016,7 +1011,7 @@ TEST(ObjectAdapter, servant_map_destructor)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Destroyed "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: find(): Object adapter in Destroyed "
                          "state (adapter: testscope)",
                          e.what());
         }
@@ -1212,7 +1207,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: add_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 
@@ -1224,7 +1220,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: remove_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 
@@ -1236,7 +1233,8 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: find_dflt_servant(): "
+                     "Object adapter in Failed state (adapter: testscope2)",
                      e.what());
     }
 }

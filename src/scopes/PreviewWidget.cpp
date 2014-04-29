@@ -45,6 +45,8 @@ similar fashion to the components mapping when specifying a CategoryRenderer
 attribute need not be present in the result; instead, its value can be pushed later
 using the PreviewReply::push() method, which accepts the name of the field and its value as a Variant.
 
+Preview widget can also be created entirely from a JSON string. See the documentation of unity::scopes::PreviewWidget::PreviewWidget(std::string const&) constructor for details.
+
 Here is an example that creates a preview and illustrates three ways to associate a preview widget attribute
 with its value:
 

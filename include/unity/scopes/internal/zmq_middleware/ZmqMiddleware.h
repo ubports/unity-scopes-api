@@ -85,7 +85,8 @@ public:
     virtual std::string get_query_ctrl_endpoint() override;
 
     zmqpp::context* context() const noexcept;
-    ThreadPool* invoke_pool();
+    ThreadPool* oneway_pool();
+    ThreadPool* twoway_pool();
     int64_t locate_timeout() const noexcept;
 
 private:
@@ -95,7 +96,8 @@ private:
                            RequestMode mode,
                            int64_t timeout);
 
-    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir);
+    std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir,
+                                                std::string const& category);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,
                       std::shared_ptr<ObjectAdapter> const& adapter,
@@ -111,9 +113,10 @@ private:
 
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;
-    std::unique_ptr<ThreadPool> invokers_;
+    std::unique_ptr<ThreadPool> oneway_invoker_;
+    std::unique_ptr<ThreadPool> twoway_invokers_;
 
-    mutable std::mutex data_mutex_;             // Protects am_ and invokers_
+    mutable std::mutex data_mutex_;             // Protects am_ and the invokers
 
     UniqueID unique_id_;
 

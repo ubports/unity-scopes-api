@@ -59,7 +59,7 @@ public:
     void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
 
 private:
-    ListenerBase::SPtr const listener_base_;
+    ListenerBase::SPtr listener_base_;
     ReapItem::SPtr reap_item_;
     std::atomic_bool finished_;
     std::mutex mutex_;

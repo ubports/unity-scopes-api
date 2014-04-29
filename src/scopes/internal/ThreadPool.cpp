@@ -54,7 +54,6 @@ ThreadPool::ThreadPool(int size)
             threads_.push_back(std::thread(&ThreadPool::run, this));
         }
         auto future = threads_ready_.get_future();
-        future.wait();
         future.get();
     }
     catch (std::exception const&)   // LCOV_EXCL_LINE
@@ -66,11 +65,18 @@ ThreadPool::ThreadPool(int size)
 ThreadPool::~ThreadPool()
 {
     queue_->destroy();
+
+    vector<thread> threads;
+    {
+        lock_guard<mutex> lock(mutex_);
+        threads.swap(threads_);
+    }
+
     try
     {
-        for (size_t i = 0; i < threads_.size(); ++i)
+        for (size_t i = 0; i < threads.size(); ++i)
         {
-            threads_[i].join();
+            threads[i].join();
         }
     }
     catch (...) // LCOV_EXCL_LINE
@@ -81,18 +87,19 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::run()
 {
-    TaskQueue::value_type task;
+    {
+        lock_guard<mutex> lock(mutex_);
+        if (--num_threads_ == 0)
+        {
+            threads_ready_.set_value();
+        }
+    }
+
     for (;;)
     {
+        TaskQueue::value_type task;  // Task must go out of scope in each iteration, in case it stores shared_ptrs.
         try
         {
-            {
-                lock_guard<mutex> lock(mutex_);
-                if (--num_threads_ == 0)
-                {
-                    threads_ready_.set_value();
-                }
-            }
             task = queue_->wait_and_pop();
         }
         catch (runtime_error const&)

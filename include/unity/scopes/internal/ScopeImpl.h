@@ -66,7 +66,7 @@ public:
 
     QueryCtrlProxy search(CannedQuery const& query,
                           SearchMetadata const& metadata,
-                          SearchListenerBase::SPtr const& reply); // Not remote operation, hence not override
+                          SearchListenerBase::SPtr const& reply); // Not remote, hence not override
 
     virtual QueryCtrlProxy activate(Result const& result,
                                     ActionMetadata const& metadata,
@@ -85,7 +85,7 @@ public:
     static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
 
 private:
-    MWScopeProxy fwd() const;
+    MWScopeProxy fwd();
 
     RuntimeImpl* const runtime_;
     std::string scope_id_;

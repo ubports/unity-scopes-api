@@ -16,6 +16,9 @@
  * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
+#ifndef TEST_TESTSCOPE_H
+#define TEST_TESTSCOPE_H
+
 #include <unity/scopes/ScopeBase.h>
 
 using namespace std;
@@ -33,3 +36,5 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override;
 };
+
+#endif
