@@ -104,6 +104,14 @@ public:
     }
 
 protected:
+    void TearDown() override
+    {
+        ASSERT_TRUE(t_start.get());
+        t_start->join();
+
+        dummy_process.send_signal_or_throw(core::posix::Signal::sig_term);
+    }
+
     static void pretend_started(StateReceiverObject::SPtr receiver)
     {
         receiver->push_state("scope-id", StateReceiverObject::State::ScopeReady);
@@ -156,11 +164,7 @@ protected:
         registry.reset(new RegistryObject(*death_observer(), executor));
         registry->add_local_scope("scope-id", meta, exec_data);
         registry->locate("scope-id");
-        ASSERT_TRUE(t_start.get());
-        t_start->join();
         EXPECT_TRUE(registry->is_scope_running("scope-id"));
-
-        dummy_process.send_signal_or_throw(core::posix::Signal::sig_term);
     }
 
     static std::shared_ptr<ChildProcess::DeathObserver> death_observer_;
