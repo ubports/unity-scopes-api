@@ -30,10 +30,11 @@ TEST(ScopeConfig, basic)
         ScopeConfig cfg("configtest1.ini");
 
         EXPECT_EQ("Scope name", cfg.display_name());
+        EXPECT_EQ("Scope description", cfg.description());
         EXPECT_EQ("scope art", cfg.art());
         EXPECT_EQ("Canonical", cfg.author());
         EXPECT_EQ("an icon", cfg.icon());
-        EXPECT_EQ("a search hint string", cfg.search_hint());
+        EXPECT_EQ("search string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
 
         auto attrs = cfg.appearance_attributes();
@@ -47,6 +48,7 @@ TEST(ScopeConfig, basic)
         ScopeConfig cfg("configtest2.ini");
 
         EXPECT_EQ("Scope name", cfg.display_name());
+        EXPECT_EQ("Scope description", cfg.description());
         EXPECT_EQ("scope art", cfg.art());
         EXPECT_EQ("Canonical", cfg.author());
         EXPECT_EQ("an icon", cfg.icon());
@@ -59,6 +61,7 @@ TEST(ScopeConfig, basic)
         ScopeConfig cfg("configtest3.ini");
 
         EXPECT_EQ("Scope name", cfg.display_name());
+        EXPECT_EQ("Scope description", cfg.description());
         EXPECT_EQ("scope art", cfg.art());
         EXPECT_EQ("Canonical", cfg.author());
         EXPECT_EQ("an icon", cfg.icon());
@@ -67,5 +70,41 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("/my/scope/runner", cfg.scope_runner());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
+    }
+}
+
+class ScopeConfigWithIntl: public ::testing::Test
+{
+public:
+    ScopeConfigWithIntl()
+    {
+        setenv("LANGUAGE", "test", 1);
+    }
+
+    ~ScopeConfigWithIntl()
+    {
+        unsetenv("LANGUAGE");
+    }
+};
+
+TEST_F(ScopeConfigWithIntl, localization)
+{
+    {
+        ScopeConfig cfg("configtest1.ini");
+
+        EXPECT_EQ("copesay amenay", cfg.display_name());
+        EXPECT_EQ("copesay criptiondesay", cfg.description());
+        EXPECT_EQ("scope art", cfg.art());
+        EXPECT_EQ("Canonical", cfg.author());
+        EXPECT_EQ("an icon", cfg.icon());
+        EXPECT_EQ("earchsay ringstay", cfg.search_hint());
+        EXPECT_EQ("a key", cfg.hot_key());
+
+        auto attrs = cfg.appearance_attributes();
+        EXPECT_EQ(2, attrs.size());
+        EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
+        EXPECT_EQ("bar", attrs["another_one"].get_string());
+
+        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
 }
