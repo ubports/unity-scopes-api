@@ -107,7 +107,7 @@ TEST(Invocation, timeout)
     receiver->wait_until_finished();
 
     EXPECT_EQ(ListenerBase::Error, receiver->reason());
-    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 300 milliseconds", receiver->error_message());
+    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 2000 milliseconds", receiver->error_message());
 
    // this_thread::sleep_for(chrono::milliseconds(500));
 

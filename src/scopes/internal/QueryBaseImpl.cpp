@@ -55,6 +55,8 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     // This allows cancel() to forward incoming cancellations to subqueries
     // without intervention from the scope application code.
     QueryCtrlProxy qcp = scope->search(query_string, *search_metadata_, reply);
+
+    lock_guard<mutex> lock(mutex_);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -67,6 +69,8 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     assert(search_metadata_);
 
     QueryCtrlProxy qcp = scope->search(query_string, filter_state, *search_metadata_, reply);
+
+    lock_guard<mutex> lock(mutex_);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -80,6 +84,8 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     assert(search_metadata_);
 
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, *search_metadata_, reply);
+
+    lock_guard<mutex> lock(mutex_);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -92,6 +98,8 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               SearchListenerBase::SPtr const& reply)
 {
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);
+
+    lock_guard<mutex> lock(mutex_);
     subqueries_.push_back(qcp);
     return qcp;
 }
@@ -103,10 +111,13 @@ void QueryBaseImpl::set_metadata(SearchMetadata const& metadata)
 
 void QueryBaseImpl::cancel()
 {
-    if (!valid_.exchange(false))
+    lock_guard<mutex> lock(mutex_);
+
+    if (!valid_)
     {
         return;
     }
+    valid_ = false;
     for (auto& ctrl : subqueries_)
     {
         ctrl->cancel(); // Forward the cancellation to any subqueries that might be active
@@ -119,6 +130,7 @@ void QueryBaseImpl::cancel()
 
 bool QueryBaseImpl::valid() const
 {
+    lock_guard<mutex> lock(mutex_);
     return valid_;
 }
 

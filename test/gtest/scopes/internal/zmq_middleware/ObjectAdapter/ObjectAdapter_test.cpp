@@ -18,7 +18,9 @@
 
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
+#include <scope-api-testconfig.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
@@ -43,7 +45,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 // an occastional "address in use" exception because the new socket
 // tries to bind while the old one is still in the process of destroying itself.
 
-void wait(int millisec = 40)
+void wait(int millisec = 200)
 {
     this_thread::sleep_for(chrono::milliseconds(millisec));
 }
@@ -194,7 +196,7 @@ TEST(ObjectAdapter, state_change)
             EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): stop thread "
                          "failure (adapter: testscope):\n"
                          "    unity::scopes::MiddlewareException: StopPublisher(): publisher thread "
-                         "failed (endpoint: inproc://testscope-stoppper):\n"
+                         "failed (endpoint: inproc://testscope-stopper):\n"
                          "        Address already in use",
                          e.what());
         }
@@ -270,7 +272,8 @@ public:
 
 TEST(ObjectAdapter, add_remove_find)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
@@ -551,7 +554,8 @@ TEST(ObjectAdapter, corrupt_header)
 
 TEST(ObjectAdapter, invoke_ok)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -602,7 +606,8 @@ public:
 
 TEST(ObjectAdapter, invoke_object_not_exist)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -646,7 +651,8 @@ TEST(ObjectAdapter, invoke_object_not_exist)
 
 TEST(ObjectAdapter, invoke_operation_not_exist)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -765,7 +771,8 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 
 TEST(ObjectAdapter, twoway_threading)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -798,7 +805,8 @@ TEST(ObjectAdapter, twoway_threading)
 
 TEST(ObjectAdapter, oneway_threading)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Single servant to which we send requests concurrently.
     shared_ptr<CountingServant> o(new CountingServant(100));
@@ -868,7 +876,8 @@ public:
 
 TEST(ObjectAdapter, servant_map_destructor)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     {
         wait();

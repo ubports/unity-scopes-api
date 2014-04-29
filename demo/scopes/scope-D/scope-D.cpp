@@ -132,12 +132,12 @@ public:
         query_(query),
         queue_(queue)
     {
-        cerr << "query instance for \"" << scope_id_ << ":" << query.query_string() << "\" created" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     virtual ~MyQuery()
     {
-        cerr << "query instance for \"" << scope_id_ << ":" << query_.query_string() << "\" destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query_.query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -151,7 +151,7 @@ public:
         // work may still be in progress on a query. Note that cancellations are frequent;
         // not responding to cancelled() correctly causes loss of performance.
 
-        cerr << "query for \"" << scope_id_ << ":" << query_.query_string() << "\" cancelled" << endl;
+        cerr << scope_id_ << ": query for \"" << query_.query_string() << "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -231,13 +231,12 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
     {
         SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, queue_));
-        cerr << scope_id_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << scope_id_ << ": preview: \"" << result.uri() << "\"" << endl;
+        cerr << scope_id_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 

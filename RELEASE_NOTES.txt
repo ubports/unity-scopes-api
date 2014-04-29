@@ -1,7 +1,7 @@
 Release Notes for unity-scopes-api
 ==================================
 
-Changes in version 0.4.3
+Changes in version 0.4.2
 ========================
 
   * Made the scope search, activate, perform_action, and preview methods non-blocking.
@@ -9,6 +9,9 @@ Changes in version 0.4.3
     the server has finished creating the query remembers the cancel and sends it to the
     server once the server has returned the real QueryCtrl. This change should be transparent
     to application code (the only difference being that these methods complete faster now).
+
+  * CannedQuery class can now be converted to and from a scopes:// uri with to_uri() and from_uri() methods.
+    These methods replace to_string() and from_string() methods that got removed.
 
 Changes in version 0.4.0
 ========================

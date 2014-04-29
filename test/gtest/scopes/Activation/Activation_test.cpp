@@ -504,15 +504,29 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+template <typename ScopeType>
+struct RaiiScopeThread
 {
-    TestScope scope;
-    rt->run_scope(&scope, "/");
-}
+    ScopeType scope;
+    Runtime::SPtr runtime;
+    std::thread scope_thread;
+
+    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
+        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
+          scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
+
+    ~RaiiScopeThread()
+    {
+        runtime->destroy();
+        scope_thread.join();
+    }
+};
 
 // does actual activation with a test scope
 TEST(Activation, scope)
 {
+    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
     // parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -526,7 +540,7 @@ TEST(Activation, scope)
     receiver->wait_until_finished();
 
     auto result = receiver->result;
-    EXPECT_TRUE(result != nullptr);
+    ASSERT_TRUE(result != nullptr);
     EXPECT_FALSE(result->direct_activation());
     EXPECT_EQ("uri", result->uri());
     EXPECT_EQ("dnd_uri", result->dnd_uri());
@@ -569,15 +583,4 @@ TEST(Activation, scope)
         EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->scope_data().get_dict()["activated_uri"].get_string());
     }
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
-    auto rc = RUN_ALL_TESTS();
-    rt->destroy();
-    scope_t.join();
-    return rc;
 }
