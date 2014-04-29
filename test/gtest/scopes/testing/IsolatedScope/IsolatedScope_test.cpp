@@ -99,10 +99,10 @@ TEST_F(TestScopeFixture,
                             id, title, icon, renderer
                         }
                     }));
-    EXPECT_CALL(reply, register_annotation(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::Annotation const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
-    EXPECT_CALL(reply, push(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
 
