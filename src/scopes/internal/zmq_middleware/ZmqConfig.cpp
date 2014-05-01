@@ -36,8 +36,8 @@ namespace internal
 namespace
 {
     const string zmq_config_group = "Zmq";
-    const string public_dir_str = "EndpointDir.Public";
-    const string private_dir_str = "EndpointDir.Private";
+    const string public_dir_key = "EndpointDir.Public";
+    const string private_dir_key = "EndpointDir.Private";
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
@@ -45,8 +45,8 @@ ZmqConfig::ZmqConfig(string const& configfile) :
 {
     if (!configfile.empty())
     {
-        public_dir_ = get_optional_string(zmq_config_group, public_dir_str);
-        private_dir_ = get_optional_string(zmq_config_group, private_dir_str);
+        public_dir_ = get_optional_string(zmq_config_group, public_dir_key);
+        private_dir_ = get_optional_string(zmq_config_group, private_dir_key);
     }
 
     // Set the endpoint directories if they were not set explicitly.
@@ -77,8 +77,8 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     const KnownEntries known_entries = {
                                           {  zmq_config_group,
                                              {
-                                                public_dir_str,
-                                                private_dir_str
+                                                public_dir_key,
+                                                private_dir_key
                                              }
                                           }
                                        };

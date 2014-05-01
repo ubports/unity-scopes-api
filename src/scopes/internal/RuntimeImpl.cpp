@@ -64,13 +64,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         scope_id_ = "c-" + id.gen();
     }
 
-    string config_file(configfile.empty() ? DFLT_RUNTIME_INI : configfile);
-    configfile_ = config_file;
-
     try
     {
         // Create the middleware factory and get the registry identity and config filename.
-        RuntimeConfig config(config_file);
+        RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));
@@ -91,17 +88,16 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
         else
         {
-            // Create the registry proxy.
+            // Create the registry proxy and set the SS registry identity.
             RegistryConfig reg_config(registry_identity_, registry_configfile_);
-            registry_endpoint_ = reg_config.endpoint();
-            registry_endpointdir_ = reg_config.endpointdir();
-            auto registry_mw_proxy = middleware_->create_registry_proxy(registry_identity_, registry_endpoint_);
+            auto registry_mw_proxy = middleware_->registry_proxy();
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
+            ss_registry_identity_ = reg_config.ss_registry_identity();
         }
     }
     catch (unity::Exception const& e)
     {
-        throw ConfigException("Cannot instantiate run time for " + scope_id + ", config file: " + config_file);
+        throw ConfigException("Cannot instantiate run time for " + scope_id_ + ", config file: " + configfile);
     }
 }
 
@@ -168,19 +164,12 @@ void RuntimeImpl::destroy()
     middleware_->wait_for_shutdown();
     middleware_ = nullptr;
     middleware_factory_.reset(nullptr);
-
-    registry_ = nullptr;
 }
 
 string RuntimeImpl::scope_id() const
 {
     lock_guard<mutex> lock(mutex_);
     return scope_id_;
-}
-
-string RuntimeImpl::configfile() const
-{
-    return configfile_;
 }
 
 MiddlewareFactory const* RuntimeImpl::factory() const
@@ -211,26 +200,17 @@ RegistryProxy RuntimeImpl::registry() const
 
 string RuntimeImpl::registry_configfile() const
 {
-    lock_guard<mutex> lock(mutex_);
-    return registry_configfile_;
+    return registry_configfile_;  // Immutable
 }
 
 string RuntimeImpl::registry_identity() const
 {
-    lock_guard<mutex> lock(mutex_);
-    return registry_identity_;
+    return registry_identity_;  // Immutable
 }
 
-string RuntimeImpl::registry_endpointdir() const
+string RuntimeImpl::ss_registry_identity() const
 {
-    lock_guard<mutex> lock(mutex_);
-    return registry_endpointdir_;
-}
-
-string RuntimeImpl::registry_endpoint() const
-{
-    lock_guard<mutex> lock(mutex_);
-    return registry_endpoint_;
+    return ss_registry_identity_;  // Immutable
 }
 
 Reaper::SPtr RuntimeImpl::reply_reaper() const
@@ -269,15 +249,14 @@ ThreadPool::SPtr RuntimeImpl::async_pool() const
 
 ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
 {
-    lock_guard<mutex> lock(mutex_);
-    return future_queue_;
+    return future_queue_;  // Immutable
 }
 
-void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_ini_file, string const& scope_ini_file)
 {
     // Retrieve the registry middleware and create a proxy to its state receiver
     RegistryConfig reg_conf(registry_identity_, registry_configfile_);
-    auto reg_runtime = create(registry_identity_, configfile_);
+    auto reg_runtime = create(registry_identity_, runtime_ini_file);
     auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
@@ -285,8 +264,8 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, std::string const& scop
 
     {
         // dirname modifies its argument, so we need a copy of scope lib path
-        std::vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
-        const std::string scope_dir(dirname(&scope_ini[0]));
+        vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
+        const string scope_dir(dirname(&scope_ini[0]));
         scope_base->p->set_scope_directory(scope_dir);
     }
 

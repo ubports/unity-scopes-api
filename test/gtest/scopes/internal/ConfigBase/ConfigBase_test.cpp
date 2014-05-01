@@ -120,11 +120,22 @@ TEST(ConfigBase, FileException)
 {
     try
     {
-        MyConfig c("no_such_file");
+        MyConfig c("wrong_extension.x");
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: invalid config file name: \"wrong_extension.x\": "
+                     "missing .ini extension",
+                     e.what());
+    }
+
+    try
+    {
+        MyConfig c("no_such_file.ini");
     }
     catch (FileException const& e)
     {
-        EXPECT_STREQ("unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
+        EXPECT_STREQ("unity::FileException: Could not load ini file no_such_file.ini: No such file or directory (errno = 4)",
                      e.what());
     }
 }

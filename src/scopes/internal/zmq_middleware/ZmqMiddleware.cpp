@@ -372,90 +372,63 @@ string ZmqMiddleware::proxy_to_string(MWProxy const& proxy)
     return proxy->to_string();
 }
 
-MWRegistryProxy ZmqMiddleware::create_registry_proxy(string const& identity, string const& endpoint)
+MWRegistryProxy ZmqMiddleware::registry_proxy()
 {
-    MWRegistryProxy proxy;
-    try
+    lock_guard<mutex> lock(data_mutex_);
+
+    if (!registry_proxy_)
     {
-        proxy.reset(new ZmqRegistry(this, endpoint, identity, registry_category, twoway_timeout_));
+        string r_id = runtime()->registry_identity();  // May be empty, if no registry is configured.
+        if (!r_id.empty())
+        {
+            string r_endp = "ipc://" + config_.public_dir() + "/" + r_id;
+            registry_proxy_.reset(new ZmqRegistry(this, r_endp, r_id, registry_category, twoway_timeout_));
+        }
     }
-    catch (zmqpp::exception const& e)
+    return registry_proxy_;
+}
+
+MWRegistryProxy ZmqMiddleware::ss_registry_proxy()
+{
+    lock_guard<mutex> lock(data_mutex_);
+
+    if (!ss_registry_proxy_)
     {
-        rethrow_zmq_ex(e);
+        string ssr_id = runtime()->ss_registry_identity();  // May be empty, if no registry is configured.
+        if (!ssr_id.empty())
+        {
+            string ssr_endp = "ipc://" + config_.public_dir() + "/" + ssr_id;
+            ss_registry_proxy_.reset(new ZmqRegistry(this, ssr_endp, ssr_id, registry_category, twoway_timeout_));
+        }
     }
-    return proxy;
+    return ss_registry_proxy_;
 }
 
 MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity)
 {
-    MWScopeProxy proxy;
-    try
-    {
-        string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
-        proxy.reset(new ZmqScope(this, endpoint, identity, scope_category, twoway_timeout_));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+    string endpoint = "ipc://" + config_.private_dir() + "/" + identity;
+    return make_shared<ZmqScope>(this, endpoint, identity, scope_category, twoway_timeout_);
 }
 
 MWScopeProxy ZmqMiddleware::create_scope_proxy(string const& identity, string const& endpoint)
 {
-    MWScopeProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqScope(this, endpoint, identity, scope_category, twoway_timeout_));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+    return make_shared<ZmqScope>(this, endpoint, identity, scope_category, twoway_timeout_);
 }
 
 MWQueryProxy ZmqMiddleware::create_query_proxy(string const& identity, string const& endpoint)
 {
-    MWQueryProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqQuery(this, endpoint, identity, query_category));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+    return make_shared<ZmqQuery>(this, endpoint, identity, query_category);
 }
 
 MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, string const& endpoint)
 {
-    MWQueryCtrlProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqQueryCtrl(this, endpoint, identity, ctrl_category));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+    return make_shared<ZmqQueryCtrl>(this, endpoint, identity, ctrl_category);
 }
 
 MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string const& identity)
 {
-    MWStateReceiverProxy proxy;
-    try
-    {
-        proxy.reset(new ZmqStateReceiver(this, "ipc://" + config_.private_dir() + "/" +  server_name_ + state_suffix,
-                                         identity, state_category));
-    }
-    catch (zmqpp::exception const& e)
-    {
-        rethrow_zmq_ex(e);
-    }
-    return proxy;
+    string endpoint = "ipc://" + config_.private_dir() + "/" + server_name_ + state_suffix;
+    return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
 }
 
 MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl)
@@ -551,7 +524,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     try
     {
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
-        auto adapter = find_adapter(server_name_, runtime()->registry_endpointdir(), registry_category);
+        auto adapter = find_adapter(server_name_, config_.public_dir(), registry_category);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);

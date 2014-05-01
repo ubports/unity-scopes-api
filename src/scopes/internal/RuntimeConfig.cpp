@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
+#include <iostream>  // TODO: remove this
 
 using namespace std;
 
@@ -35,10 +36,10 @@ namespace internal
 namespace
 {
     const string runtime_config_group = "Runtime";
-    const string registry_identity_str = "Registry.Identity";
-    const string registry_configfile_str = "Registry.ConfigFile";
-    const string default_middleware_str = "Default.Middleware";
-    const string default_middleware_configfile_str = "ConfigFile";
+    const string registry_identity_key = "Registry.Identity";
+    const string registry_configfile_key = "Registry.ConfigFile";
+    const string default_middleware_key = "Default.Middleware";
+    const string default_middleware_configfile_key = ".ConfigFile";
 }
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :
@@ -48,31 +49,32 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     {
         registry_identity_ = DFLT_REGISTRY_ID;
         registry_configfile_ = DFLT_REGISTRY_INI;
-        default_middleware_ = "Zmq";
-        default_middleware_configfile_ = "Zmq.ini";
+        default_middleware_ = DFLT_MIDDLEWARE;
+        default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
     }
     else
     {
-        registry_identity_ = get_optional_string(runtime_config_group, registry_identity_str);
+        registry_identity_ = get_optional_string(runtime_config_group, registry_identity_key);
         auto pos = registry_identity_.find_first_of("@:/");
         if (pos != string::npos)
         {
-            throw_ex("Illegal character in value for " + registry_identity_str + ": \"" + registry_identity_ +
+            throw_ex("Illegal character in value for " + registry_identity_key + ": \"" + registry_identity_ +
                      "\": identity cannot contain '" + registry_identity_[pos] + "'");
         }
-        registry_configfile_ = get_optional_string(runtime_config_group, registry_configfile_str);
-        default_middleware_ = get_middleware(runtime_config_group, default_middleware_str);
-        default_middleware_configfile_ =
-            get_optional_string(runtime_config_group, default_middleware_ + "." + default_middleware_configfile_str);
+        registry_configfile_ = get_optional_string(runtime_config_group, registry_configfile_key);
+        default_middleware_ = get_middleware(runtime_config_group, default_middleware_key);
+        default_middleware_configfile_ = get_optional_string(runtime_config_group,
+                                                             default_middleware_ + default_middleware_configfile_key,
+                                                             DFLT_MIDDLEWARE_INI);
     }
 
     const KnownEntries known_entries = {
                                           {  runtime_config_group,
                                              {
-                                                registry_identity_str,
-                                                registry_configfile_str,
-                                                default_middleware_str,
-                                                default_middleware_configfile_str
+                                                registry_identity_key,
+                                                registry_configfile_key,
+                                                default_middleware_key,
+                                                default_middleware_ + default_middleware_configfile_key
                                              }
                                           }
                                        };

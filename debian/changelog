@@ -1,3 +1,10 @@
+unity-scopes-api (0.4.4-0ubuntu1) UNRELEASED; urgency=low
+
+  * Simplified configuration files.
+  * Runtime::run_scope() now requires a path to Runtime.ini. If the empty string is passed,
+    the system-wide Runtime.ini is used.
+  * UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq.
+
 unity-scopes-api (0.4.3-0ubuntu1) UNRELEASED; urgency=low
 
   * Implemented to_uri() and from_uri() conversions for CannedQuery.

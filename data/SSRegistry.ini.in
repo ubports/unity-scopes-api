@@ -1,6 +1,4 @@
 [Registry]
-Middleware = Zmq
-Zmq.Endpoint = ipc:///tmp/SSRegistry
 Zmq.EndpointDir = /tmp
 Zmq.ConfigFile = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini
 Scope.InstallDir = @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/unity-scopes

@@ -165,17 +165,7 @@ main(int argc, char* argv[])
     try
     {
         filesystem::path runtime_path(runtime_config);
-        if (runtime_path.extension() != ".ini")
-        {
-            throw ConfigException(string("invalid runtime config file name: \"") + runtime_config + "\": missing .ini extension");
-        }
-
         filesystem::path scope_path(scope_config);
-        if (scope_path.extension() != ".ini")
-        {
-            throw ConfigException(string("invalid scope config file name: \"") + scope_config + "\": missing .ini extension");
-        }
-
         exit_status = run_scope(runtime_path, scope_path);
     }
     catch (std::exception const& e)

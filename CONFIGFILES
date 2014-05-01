@@ -1,0 +1,113 @@
+This document outlines how the scopes run time is configured.
+In general, if a recognized key is not set in a configuration
+file, a default value applies as detailed below.
+
+The following configuration files are used by the scopes run time:
+
+Runtime.ini
+-----------
+
+If no specific file is provided to the scopes run time, the default path is
+"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini".
+
+If that file does not exist, the default values apply.
+
+The only recognized group in this file is [Runtime].
+
+The following keys are recognized:
+
+- Registry.Identity (string)
+
+  The identity of the local registry. If not set, the default value is "Registry".
+  To run a scope without a registry, for example, using the scoperunner for testing, the identity
+  can be the empty string.
+
+- Registry.ConfigFile (string)
+
+  The path to the registry configuration file. The default value is
+  "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Registry.ini".
+
+- Default.Middleware (string)
+
+  The middleware to be used by default. The default value is "Zmq".
+
+- <middleware>.ConfigFile
+
+  The path to the configuration file for the middleware, with the value of
+  Default.Middleware substituted for <middleware>, For example,
+
+  Zmq.ConfigFile = <path>
+
+  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini".
+
+Zmq.ini
+-------
+
+If no specific file is provided to the scopes run time, the default path is
+"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini".
+
+If that file does not exist, the default values for keys apply.
+
+The only recognized group in this file is [Zmq].
+
+The following keys are recognized:
+
+- EndpointDir.Public (string)
+
+  The directory in which the public endpoint of a scope (or the registry) is created.
+  This endpoint must be accessible to any process.
+
+  The default value is "$XDG_RUNTIME_DIR/<effective UID>/zmq". If XDG_RUNTIME_DIR is not
+  set, "/run/user/<effective UID>/zmq" is used.
+
+- EndpointDir.Private (string)
+
+  The directory in which the private endpoint a scope is created. This endpoint must
+  be accessible only to the Dash and the registry. The default value is
+  "<EndpointDir.Public>/priv".
+
+Registry.ini
+------------
+
+If no specific file is provided to the scopes run time, the default path is
+"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Registry.ini".
+
+If that file does not exist, the default values for keys apply.
+
+The only recognized group in this file is [Registry].
+
+The following keys are recognized:
+
+- Middleware
+
+  The middleware used by the registry, such as "Zmq". The default value is "Zmq".
+
+- <Middleware>.ConfigFile
+
+  <Middleware> must match the value of the Middleware key, for example:
+
+      Zmq.Middleware = path/to/SomeFile.ini
+
+- Scoperunner.Path
+
+  The path to the scoperunner executable. The path must be an absolute path.
+  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/scoperunner".
+
+- Scope.InstallDir
+
+  The directory in which to look for subdirectories containing scope .so and .ini files.
+  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/scopes".
+
+- OEM.InstallDir
+
+  The directory in which to look for subdirectories containing scope .so and .ini files added
+  by OEMs. The default value is "@CMAKE_INSTALL_PREFIX@/custom/@LIB_INSTALL_PREFIX@/scopes".
+
+- Click.InstallDir
+
+  The directory in which to look for subdirectories containing scopes installed from click packages.
+  The defaul value is "$HOME/.local/sahre/unity-scopes".
+
+- SS.Registry.Identity
+
+  The identity of the smartscopes registry object. The default value is "SSRegistry".

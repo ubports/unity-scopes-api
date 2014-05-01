@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -35,59 +36,49 @@ namespace internal
 namespace
 {
     const string registry_config_group = "Registry";
-    const string mw_kind_str = "Middleware";
-    const string endpoint_dir_str = ".EndpointDir";
-    const string endpoint_str = ".Endpoint";
-    const string configfile_str = ".ConfigFile";
-    const string scope_installdir_str = "Scope.InstallDir";
-    const string oem_installdir_str = "OEM.InstallDir";
-    const string click_installdir_str = "Click.InstallDir";
-    const string scoperunner_path_str = "Scoperunner.Path";
-    const string ss_registry_identity_str = "SS.Registry.Identity";
-    const string ss_registry_endpoint_str = "SS.Registry.Endpoint";
+    const string mw_kind_key = "Middleware";
+    const string configfile_key = ".ConfigFile";
+    const string scope_installdir_key = "Scope.InstallDir";
+    const string oem_installdir_key = "OEM.InstallDir";
+    const string click_installdir_key = "Click.InstallDir";
+    const string scoperunner_path_key = "Scoperunner.Path";
+    const string ss_registry_identity_key = "SS.Registry.Identity";
 }
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
-    ConfigBase(configfile)
+    ConfigBase(configfile, DFLT_REGISTRY_INI)
 {
     identity_ = identity;
     if (identity.empty())
     {
         throw InvalidArgumentException("Registry identity cannot be an empty string");
     }
-    mw_kind_ = get_middleware(registry_config_group, mw_kind_str);
-    string mw_prefix = get_string(registry_config_group, mw_kind_str);
-    endpointdir_ = get_string(registry_config_group, mw_kind_ + endpoint_dir_str);
-    endpoint_ = get_string(registry_config_group, mw_kind_ + endpoint_str);
-    mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_str);
-    scope_installdir_ = get_string(registry_config_group, scope_installdir_str);
-    oem_installdir_ = get_optional_string(registry_config_group, oem_installdir_str);
-    click_installdir_ = get_optional_string(registry_config_group, click_installdir_str);
+    mw_kind_ = get_middleware(registry_config_group, mw_kind_key);
+    mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_key);
+    scope_installdir_ = get_optional_string(registry_config_group, scope_installdir_key, DFLT_SCOPE_INSTALL_DIR);
+    oem_installdir_ = get_optional_string(registry_config_group, oem_installdir_key, DFLT_OEM_INSTALL_DIR);
+    click_installdir_ = get_optional_string(registry_config_group, click_installdir_key);
     if (click_installdir_.empty())
     {
         click_installdir_ = string(getenv("HOME")) + "/.local/share/unity-scopes/";
     }
-    scoperunner_path_ = get_string(registry_config_group, scoperunner_path_str);
+    scoperunner_path_ = get_optional_string(registry_config_group, scoperunner_path_key, DFLT_SCOPERUNNER_PATH);
     if (scoperunner_path_[0] != '/')
     {
-        throw ConfigException(configfile + ": " + scoperunner_path_str + " must be an absolute path");
+        throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
-    ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_str);
-    ss_registry_endpoint_ = get_optional_string(registry_config_group, ss_registry_endpoint_str);
+    ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_key, DFLT_SS_REGISTRY_ID);
 
     const KnownEntries known_entries = {
                                           {  registry_config_group,
                                              {
-                                                mw_kind_str,
-                                                mw_prefix + endpoint_dir_str,
-                                                mw_prefix + endpoint_str,
-                                                mw_prefix + configfile_str,
-                                                scope_installdir_str,
-                                                oem_installdir_str,
-                                                click_installdir_str,
-                                                scoperunner_path_str,
-                                                ss_registry_identity_str,
-                                                ss_registry_endpoint_str
+                                                mw_kind_key,
+                                                mw_kind_ + configfile_key,
+                                                scope_installdir_key,
+                                                oem_installdir_key,
+                                                click_installdir_key,
+                                                scoperunner_path_key,
+                                                ss_registry_identity_key,
                                              }
                                           }
                                        };
@@ -106,16 +97,6 @@ string RegistryConfig::identity() const
 string RegistryConfig::mw_kind() const
 {
     return mw_kind_;
-}
-
-string RegistryConfig::endpointdir() const
-{
-    return endpointdir_;
-}
-
-string RegistryConfig::endpoint() const
-{
-    return endpoint_;
 }
 
 string RegistryConfig::mw_configfile() const
@@ -146,11 +127,6 @@ string RegistryConfig::scoperunner_path() const
 string RegistryConfig::ss_registry_identity() const
 {
     return ss_registry_identity_;
-}
-
-string RegistryConfig::ss_registry_endpoint() const
-{
-    return ss_registry_endpoint_;
 }
 
 } // namespace internal

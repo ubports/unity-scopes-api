@@ -119,7 +119,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
 
     // locate should throw (via mw)
-    MWRegistryProxy mw_reg = reg_mw_->create_registry_proxy(reg_id_, reg_mw_->get_scope_endpoint());
+    MWRegistryProxy mw_reg = reg_mw_->registry_proxy();
     EXPECT_THROW(mw_reg->locate("Dummy Demo Scope"), RegistryException);
 
     // list scopes (via mw)

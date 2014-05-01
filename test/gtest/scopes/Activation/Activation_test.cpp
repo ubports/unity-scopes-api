@@ -513,7 +513,7 @@ struct RaiiScopeThread
 
     RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
         : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
-          scope_thread([this]{ runtime->run_scope(&scope, "/foo"); }) {}
+          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, "/foo"); }) {}
 
     ~RaiiScopeThread()
     {
