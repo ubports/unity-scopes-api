@@ -126,7 +126,7 @@ TEST_F(TestScopeFixture, previewing_a_result_works)
     using namespace ::testing;
 
     NiceMock<unity::scopes::testing::MockPreviewReply> reply;
-    EXPECT_CALL(reply, push(_))
+    EXPECT_CALL(reply, push(A<unity::scopes::PreviewWidgetList const&>()))
         .WillOnce(Return(true));
     EXPECT_CALL(reply, push("author", unity::scopes::Variant("Foo")))
         .WillOnce(Return(true));
