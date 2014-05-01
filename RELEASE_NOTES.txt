@@ -1,6 +1,16 @@
 Release Notes for unity-scopes-api
 ==================================
 
+Changes in version 0.4.4
+========================
+
+  * Simplified configuration with sensible defaults for all values.
+  * scoperunner, scoperegistry, and smartscopesproxy are now install in /usr/lib/<arch>
+    (instead of in a subdirectory of <arch>).
+  * Runtime::run_scope() now requires a path to Runtime.ini. If the empty string is passed,
+    the system-wide Runtime.ini is used.
+  * UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq.
+
 Changes in version 0.4.2
 ========================
 
