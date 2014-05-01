@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/DfltConfig.h>
 
 #include <unistd.h>
+#include <iostream> // TODO: remove this, debug only
 
 using namespace std;
 
@@ -56,6 +57,9 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     {
         string basedir;
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
+cerr << "XDG_RUNTIME_DIR is: " << (xdg_runtime_dir ? (char*)"null" : xdg_runtime_dir) << endl;
+system("ls -l /run/user");
+system("echo UID: `id`");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
         {
             basedir = string(DFLT_ENDPOINT_DIR_BASE) + "/" + std::to_string(geteuid()) + "/zmq";
