@@ -38,15 +38,15 @@ namespace internal
 namespace
 {
     const string scope_config_group = "ScopeConfig";
-    const string overrideable_str = "Override";
-    const string scope_id_str = "DisplayName";
-    const string description_str = "Description";
-    const string author_str = "Author";
-    const string art_str = "Art";
-    const string icon_str = "Icon";
-    const string search_hint_str = "SearchHint";
-    const string hot_key_str = "HotKey";
-    const string invisible_str = "Invisible";
+    const string overrideable_key = "Override";
+    const string scope_name_key = "DisplayName";
+    const string description_key = "Description";
+    const string author_key = "Author";
+    const string art_key = "Art";
+    const string icon_key = "Icon";
+    const string search_hint_key = "SearchHint";
+    const string hot_key_key = "HotKey";
+    const string invisible_key = "Invisible";
     const string scope_runner_exec = "ScopeRunner";
 
     const string scope_appearance_group = "Appearance";
@@ -57,23 +57,23 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 {
     try
     {
-        overrideable_ = parser()->get_boolean(scope_config_group, overrideable_str);
+        overrideable_ = parser()->get_boolean(scope_config_group, overrideable_key);
     }
     catch (LogicException const&)
     {
         overrideable_ = false;
     }
 
-    display_name_ = parser()->get_string(scope_config_group, scope_id_str);
-    description_ = parser()->get_string(scope_config_group, description_str);
-    author_ = parser()->get_string(scope_config_group, author_str);
+    display_name_ = parser()->get_locale_string(scope_config_group, scope_name_key);
+    description_ = parser()->get_locale_string(scope_config_group, description_key);
+    author_ = parser()->get_string(scope_config_group, author_key);
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
     // from the "explicitly set to empty string" case. parser()->get_string throws LogicException if
     // the key is not present, so we ignore the exception for optional values.
     try
     {
-        string art = parser()->get_string(scope_config_group, art_str);
+        string art = parser()->get_string(scope_config_group, art_key);
         art_.reset(new string(art));
     }
     catch (LogicException const&)
@@ -81,7 +81,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string icon = parser()->get_string(scope_config_group, icon_str);
+        string icon = parser()->get_string(scope_config_group, icon_key);
         icon_.reset(new string(icon));
     }
     catch (LogicException const&)
@@ -89,7 +89,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string hint = parser()->get_string(scope_config_group, search_hint_str);
+        string hint = parser()->get_locale_string(scope_config_group, search_hint_key);
         search_hint_.reset(new string(hint));
     }
     catch (LogicException const&)
@@ -97,7 +97,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string key = parser()->get_string(scope_config_group, hot_key_str);
+        string key = parser()->get_string(scope_config_group, hot_key_key);
         hot_key_.reset(new string(key));
     }
     catch (LogicException const&)
@@ -105,7 +105,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string key = parser()->get_string(scope_config_group, invisible_str);
+        string key = parser()->get_string(scope_config_group, invisible_key);
         std::transform(begin(key), end(key), begin(key), ::toupper);
         invisible_.reset(new bool(key == "TRUE"));
     }
@@ -138,13 +138,13 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     const KnownEntries known_entries = {
                                           {  scope_config_group,
                                              {
-                                                overrideable_str,
-                                                scope_id_str,
-                                                description_str,
-                                                art_str,
-                                                icon_str,
-                                                search_hint_str,
-                                                hot_key_str
+                                                overrideable_key,
+                                                scope_name_key,
+                                                description_key,
+                                                art_key,
+                                                icon_key,
+                                                search_hint_key,
+                                                hot_key_key
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -185,7 +185,7 @@ string ScopeConfig::art() const
 {
     if (!art_)
     {
-        throw NotFoundException("Art not set", art_str);
+        throw NotFoundException("Art not set", art_key);
     }
     return *art_;
 }
@@ -194,7 +194,7 @@ string ScopeConfig::icon() const
 {
     if (!icon_)
     {
-        throw NotFoundException("Icon not set", icon_str);
+        throw NotFoundException("Icon not set", icon_key);
     }
     return *icon_;
 }
@@ -203,7 +203,7 @@ string ScopeConfig::search_hint() const
 {
     if (!search_hint_)
     {
-        throw NotFoundException("Hint not set", search_hint_str);
+        throw NotFoundException("Hint not set", search_hint_key);
     }
     return *search_hint_;
 }
@@ -212,7 +212,7 @@ string ScopeConfig::hot_key() const
 {
     if (!hot_key_)
     {
-        throw NotFoundException("Key not set", hot_key_str);
+        throw NotFoundException("Key not set", hot_key_key);
     }
     return *hot_key_;
 }
