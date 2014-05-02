@@ -35,7 +35,8 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ZmqMiddleware, basic)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
     mw.start();
     sleep(1);
     mw.stop();
@@ -82,7 +83,8 @@ TEST(ZmqMiddleware, string_to_proxy)
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
 
     try
     {

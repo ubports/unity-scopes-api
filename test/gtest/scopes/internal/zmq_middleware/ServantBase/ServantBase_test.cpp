@@ -93,7 +93,8 @@ private:
 
 TEST(ServantBase, success)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";
@@ -109,7 +110,8 @@ TEST(ServantBase, success)
 
 TEST(ServantBase, ping)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "ping";
@@ -125,7 +127,8 @@ TEST(ServantBase, ping)
 
 TEST(ServantBase, exceptions)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";
