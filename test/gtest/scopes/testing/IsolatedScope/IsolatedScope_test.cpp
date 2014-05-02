@@ -121,6 +121,27 @@ TEST_F(TestScopeFixture,
     search_query->run(search_reply_proxy);
 }
 
+TEST_F(TestScopeFixture, previewing_a_result_works)
+{
+    using namespace ::testing;
+
+    NiceMock<unity::scopes::testing::MockPreviewReply> reply;
+    EXPECT_CALL(reply, push(A<unity::scopes::PreviewWidgetList const&>()))
+        .WillOnce(Return(true));
+    EXPECT_CALL(reply, push("author", unity::scopes::Variant("Foo")))
+        .WillOnce(Return(true));
+    EXPECT_CALL(reply, push("rating", unity::scopes::Variant("Bar")))
+        .WillOnce(Return(true));
+
+    unity::scopes::ActionMetadata metadata(default_locale, default_form_factor);
+    unity::scopes::testing::Result result;
+    unity::scopes::PreviewReplyProxy proxy(&reply, [](unity::scopes::PreviewReply*) {});
+
+    auto previewer = scope->preview(result, metadata);
+    ASSERT_NE(nullptr, previewer);
+    previewer->run(proxy);
+}
+
 TEST_F(TestScopeFixture, activating_a_result_works)
 {
     using namespace ::testing;
