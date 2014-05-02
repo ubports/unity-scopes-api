@@ -59,7 +59,7 @@ public:
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 
-    virtual bool register_annotation(unity::scopes::Annotation const& annotation) override;
+    virtual bool push(unity::scopes::Annotation const& annotation) override;
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
