@@ -31,10 +31,13 @@ TEST(OptionSelectorFilter, basic)
     EXPECT_EQ("f1", filter1->id());
     EXPECT_EQ("Options", filter1->label());
     EXPECT_FALSE(filter1->multi_select());
+    EXPECT_EQ(FilterBase::DisplayHints::Default, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
 
+    filter1->set_display_hints(FilterBase::DisplayHints::TopArea);
     filter1->add_option("1", "Option 1");
     filter1->add_option("2", "Option 2");
 
+    EXPECT_EQ(FilterBase::DisplayHints::TopArea, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
     auto opts = filter1->options();
     EXPECT_EQ(2u, opts.size());
     EXPECT_EQ("1", opts.front()->id());
@@ -103,6 +106,7 @@ TEST(OptionSelectorFilter, multi_selection)
 TEST(OptionSelectorFilter, serialize)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+    filter1->set_display_hints(FilterBase::DisplayHints::TopArea);
     filter1->add_option("1", "Option 1");
     filter1->add_option("2", "Option 2");
 
@@ -110,6 +114,7 @@ TEST(OptionSelectorFilter, serialize)
     EXPECT_EQ("f1", var["id"].get_string());
     EXPECT_EQ("option_selector", var["filter_type"].get_string());
     EXPECT_EQ("Options", var["label"].get_string());
+    EXPECT_EQ(FilterBase::DisplayHints::TopArea, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
 
     auto optarr = var["options"].get_array();
     EXPECT_EQ(2u, optarr.size());
@@ -128,7 +133,7 @@ TEST(OptionSelectorFilter, deserialize)
             internal::OptionSelectorFilterImpl filter(var);
             FAIL();
         }
-        catch (unity::LogicException const&) {}
+        catch (unity::InvalidArgumentException const&) {}
     }
 
     {

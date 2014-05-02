@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/UnityExceptions.h>
 
@@ -32,31 +33,47 @@ namespace internal
 {
 
 FilterBaseImpl::FilterBaseImpl(std::string const& id)
-    : id_(id)
+    : id_(id),
+      display_hints_(FilterBase::DisplayHints::Default)
 {
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
 {
-    auto it = var.find("id");
-    if (it == var.end())
-    {
-        throw unity::LogicException("FilterBase: missing 'id'");
-    }
+    auto it = find_or_throw("FilterBase()", var, "id");
     id_ = it->second.get_string();
+    it = var.find("display_hints");
+    if (it != var.end())
+    {
+        display_hints_ = static_cast<FilterBase::DisplayHints>(it->second.get_int());
+    }
 }
 
 FilterBaseImpl::~FilterBaseImpl() = default;
+
+void FilterBaseImpl::set_display_hints(int hints)
+{
+    display_hints_ = hints;
+}
 
 std::string FilterBaseImpl::id() const
 {
     return id_;
 }
 
+int FilterBaseImpl::display_hints() const
+{
+    return display_hints_;
+}
+
 VariantMap FilterBaseImpl::serialize() const
 {
     VariantMap vm;
     vm["id"] = id_;
+    if (display_hints_ != FilterBase::DisplayHints::Default)
+    {
+        vm["display_hints"] = static_cast<int>(display_hints_);
+    }
     vm["filter_type"] = filter_type();
     serialize(vm);
     return vm;

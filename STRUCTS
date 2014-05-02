@@ -103,6 +103,12 @@ FilterOption
 OptionSelectorFilter
 ====================
  'id'           : string
+ 'filter_type'  : string
+ 'display_hints': int, optional
+
+OptionSelectorFilter (FilterBase)
+=================================
+ 'id'           : string
  'filter_type'  : "option_selector"
  'label'        : string
  'multi_select' : bool
