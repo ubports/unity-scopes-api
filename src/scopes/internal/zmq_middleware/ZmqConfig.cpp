@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <unistd.h>
 
@@ -58,12 +59,10 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
         {
-            basedir = string(DFLT_ENDPOINT_DIR_BASE) + "/" + std::to_string(geteuid()) + "/zmq";
+            throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
+                                  "environment variable not set");
         }
-        else
-        {
-            basedir = string(xdg_runtime_dir) + "/zmq";
-        }
+        basedir = string(xdg_runtime_dir) + "/zmq";
         if (public_dir_.empty())
         {
             public_dir_ = basedir;
