@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.4.4
+========================
+  - Added method to get and set display hints for filters (at this moment the only display hint
+    available is TopArea hint).
+
 Changes in version 0.4.2
 ========================
 
