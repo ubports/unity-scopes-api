@@ -1,24 +1,24 @@
-Release Notes for unity-scopes-api
-==================================
+Release notes
+=============
 
 Changes in version 0.4.2
 ========================
 
-  * Made the scope search, activate, perform_action, and preview methods non-blocking.
+  - Made the scope search, activate, perform_action, and preview methods non-blocking.
     A (fake) QueryCtrl is returned immediately from these methods now. Calling cancel() before
     the server has finished creating the query remembers the cancel and sends it to the
     server once the server has returned the real QueryCtrl. This change should be transparent
     to application code (the only difference being that these methods complete faster now).
 
-  * CannedQuery class can now be converted to and from a scopes:// uri with to_uri() and from_uri() methods.
+  - CannedQuery class can now be converted to and from a scopes:// uri with to_uri() and from_uri() methods.
     These methods replace to_string() and from_string() methods that got removed.
 
 Changes in version 0.4.0
 ========================
 
-  * Re-factored proxy class implementation. These changes are API compatible, but not ABI compatible.
+  - Re-factored proxy class implementation. These changes are API compatible, but not ABI compatible.
 
-  * Renaming of various API elements for consistency and clarity:
+  - Renaming of various API elements for consistency and clarity:
 
     PreviewWidget::add_attribute() -> PreviewWidget::add_attribute_value()
     PreviewWidget::attributes() -> PreviewWidget::attribute_values()

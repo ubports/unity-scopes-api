@@ -1,9 +1,20 @@
-unity-scopes-api (0.4.3-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.4.3+14.10.20140428-0ubuntu1) utopic; urgency=low
 
+  [ Pawel Stolowski ]
   * Implemented to_uri() and from_uri() conversions for CannedQuery.
   * Ship scopes-client in libunity-scopes-cli package.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 23 Apr 2014 14:32:03 +0200
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 28 Apr 2014 17:24:08 +0000
+
+unity-scopes-api (0.4.2+14.04.20140408-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Merge r298 from devel branch.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 08 Apr 2014 13:41:30 +0000
 
 unity-scopes-api (0.4.2+14.04.20140404.2-0ubuntu1) trusty; urgency=low
 

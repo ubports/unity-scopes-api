@@ -55,7 +55,7 @@ endif()
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS system filesystem regex serialization REQUIRED)
-pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
+pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp>=1.0.0 REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
