@@ -28,6 +28,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Department::~Department()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::operator=(unity::scopes::Department&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::operator=(unity::scopes::Department const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::FilterBase::set_display_hints(int)@Base" 0replaceme
  (c++)"unity::scopes::FilterBase::FilterBase(unity::scopes::internal::FilterBaseImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::~FilterBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
@@ -496,6 +497,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Department::query() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::filter_type() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::FilterBase::display_hints() const@Base" 0replaceme
  (c++)"unity::scopes::FilterBase::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0.4.0+14.04.20140312.1
