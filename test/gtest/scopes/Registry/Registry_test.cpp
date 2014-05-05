@@ -21,9 +21,6 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
 
 #include <condition_variable>
