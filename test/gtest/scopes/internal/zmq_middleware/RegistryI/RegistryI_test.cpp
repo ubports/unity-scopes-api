@@ -427,6 +427,20 @@ public:
         }
     }
 
+    ~RegistryTest()
+    {
+        // tear down the registry
+        reg.reset();
+        mw.reset();
+        rt.reset();
+
+        // wait until all processes created by this test are terminated
+        while (process_count() != 0)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        }
+    }
+
     int first_child_pid()
     {
         return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));

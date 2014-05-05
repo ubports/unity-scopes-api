@@ -21,9 +21,6 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
 
 #include <condition_variable>
@@ -80,6 +77,22 @@ TEST(Registry, metadata)
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
+    // wait for the registry to become available on middleware
+    // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
+    const int num_retries = 10;
+    for (int i = 0; i < num_retries; ++i)
+    {
+        try
+        {
+            r->list(); // this will throw if the registry is not yet available on middleware
+            break;
+        }
+        catch (std::exception const&)
+        {
+            sleep(1);
+        }
+    }
+
     auto meta = r->get_metadata("testscopeA");
     EXPECT_EQ("testscopeA", meta.scope_id());
     EXPECT_EQ("Canonical Ltd.", meta.author());
@@ -116,23 +129,6 @@ TEST(Registry, metadata)
     EXPECT_TRUE(receiver->wait_until_finished());
 }
 
-bool wait_for_registry()
-{
-    const int num_retries = 10;
-    const boost::filesystem::path path("/tmp/RegistryTest");
-    for (int i = 0; i<num_retries; i++)
-    {
-        if (boost::filesystem::exists(path))
-        {
-            boost::system::error_code error;
-            auto st = boost::filesystem::status(path, error).type();
-            return st == boost::filesystem::file_type::socket_file;
-        }
-        sleep(1);
-    }
-    return false;
-}
-
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -149,8 +145,6 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
-        // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
-        EXPECT_TRUE(wait_for_registry());
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;
