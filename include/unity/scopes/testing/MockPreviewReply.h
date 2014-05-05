@@ -21,6 +21,8 @@
 
 #include <unity/scopes/PreviewReply.h>
 
+#include <unity/scopes/testing/MockObject.h>
+
 #include <gmock/gmock.h>
 
 namespace unity
@@ -34,7 +36,7 @@ namespace testing
 
 /// @cond
 
-class MockPreviewReply : public unity::scopes::PreviewReply
+class MockPreviewReply : public unity::scopes::PreviewReply, public unity::scopes::testing::MockObject
 {
 public:
     MockPreviewReply() = default;

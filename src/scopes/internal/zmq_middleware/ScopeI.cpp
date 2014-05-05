@@ -95,9 +95,9 @@ void ScopeI::search_(Current const& current,
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->search(query,
-                                                                                metadata,
-                                                                                reply_proxy,
-                                                                                to_info(current)));
+                                                                          metadata,
+                                                                          reply_proxy,
+                                                                          to_info(current)));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto search_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();

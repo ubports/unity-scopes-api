@@ -62,7 +62,7 @@ public:
         CannedQuery query("scope-A", "foo", "dep1");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
-        reply->register_annotation(annotation);
+        reply->push(annotation);
     }
 
 private:

@@ -89,7 +89,7 @@ public:
         unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
         unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
         annotation.add_link("Link1", query);
-        reply->register_annotation(annotation);
+        reply->push(annotation);
     }
 
 private:

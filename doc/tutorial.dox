@@ -20,6 +20,7 @@ query it receives.
 
 This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
 
+\if RemoteScopes
 \subsection LvsR Local vs remote scopes
 
 Local scopes are scopes that are located and run on the user’s device, while remote scopes (or “Smart Scopes”) are scopes that
@@ -34,6 +35,7 @@ be written with the intention of running remotely on the Smart Scopes Server.</b
 
 (For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
 the SSS REST API see: <i>link_not_yet_available</i>)
+\endif
 
 \section develop Developing scopes
 
@@ -479,10 +481,10 @@ TEST_F(TestScopeFixutre, search_results)
                     unity::scopes::Category::SCPtr(new unity::scopes::testing::Category("id", "title", "icon", renderer))
                 )
             );
-    EXPECT_CALL(reply, register_annotation(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::Annotation const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
-    EXPECT_CALL(reply, push(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
 
