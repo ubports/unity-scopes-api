@@ -92,12 +92,12 @@ The following keys are recognized:
 - Scope.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files.
-  The default value is "/usr/lib/<arch>/unity-scopes/scopes".
+  The default value is "/usr/lib/<arch>/unity-scopes".
 
 - OEM.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files added
-  by OEMs. The default value is "/custom/usr/lib/<arch>/unity-scopes/scopes".
+  by OEMs. The default value is "/custom/usr/lib/<arch>/unity-scopes".
 
 - Click.InstallDir
 

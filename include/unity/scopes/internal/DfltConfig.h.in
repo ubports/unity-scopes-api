@@ -36,8 +36,8 @@ static constexpr char const* DFLT_SCOPERUNNER_PATH = "@CMAKE_INSTALL_PREFIX@/@LI
 static constexpr char const* DFLT_MIDDLEWARE = "Zmq";
 static constexpr char const* DFLT_ZMQ_MIDDLEWARE_INI = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/Zmq.ini";
 static constexpr char const* DFLT_MIDDLEWARE_INI = DFLT_ZMQ_MIDDLEWARE_INI;
-static constexpr char const* DFLT_SCOPE_INSTALL_DIR = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/scopes";
-static constexpr char const* DFLT_OEM_INSTALL_DIR = "/custom/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/scopes";
+static constexpr char const* DFLT_SCOPE_INSTALL_DIR = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@";
+static constexpr char const* DFLT_OEM_INSTALL_DIR = "/custom/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@";
 static constexpr char const* DFLT_SS_REGISTRY_ID = "SSRegistry";
 
 } // namespace internal
