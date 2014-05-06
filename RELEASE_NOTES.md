@@ -3,8 +3,8 @@ Release notes
 
 Changes in version 0.4.4
 ========================
-  * The register_annotation() method of SearchReply got renamed back to push(). The display order of annotations
-    with respect to results and categories got updated in the documentation of that method.
+  * The register_annotation() method of SearchReply is now deprecated - push(Annotation const&) should be used instead.
+    The display order of annotations with respect to results and categories got updated in the documentation of that method.
 
 Changes in version 0.4.2
 ========================

@@ -58,6 +58,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::FilterState::~FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchReply::register_annotation(unity::scopes::Annotation const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchReply::SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchReply::~SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ColumnLayout::add_column(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >)@Base" 0.4.0+14.04.20140312.1
