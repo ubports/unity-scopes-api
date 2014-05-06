@@ -163,12 +163,9 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     }
 
     ObjectProxy proxy;
-
-    lock(mutex_, ptable_mutex_);
-    lock_guard<decltype(ptable_mutex_)> ptable_lock(ptable_mutex_, adopt_lock);
-
+    ProcessMap::iterator proc_it;
     {
-        lock_guard<decltype(mutex_)> lock(mutex_, adopt_lock);
+        lock_guard<decltype(mutex_)> lock(mutex_);
 
         auto scope_it = scopes_.find(identity);
         if (scope_it == scopes_.end())
@@ -176,15 +173,15 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
             throw NotFoundException("RegistryObject::locate(): Tried to locate unknown local scope", identity);
         }
         proxy = scope_it->second.proxy();
-    }
-    // Unlock. Without this, calling the remote registry in, for example, list(), can result in a locate()
-    // attempt if the remote registry isn't running, causing deadlock.
 
-    auto proc_it = scope_processes_.find(identity);
-    if (proc_it == scope_processes_.end())
-    {
-        throw NotFoundException("RegistryObject::locate(): Tried to exec unknown local scope", identity);
+        proc_it = scope_processes_.find(identity);
+        if (proc_it == scope_processes_.end())
+        {
+            throw NotFoundException("RegistryObject::locate(): Tried to exec unknown local scope", identity);
+        }
     }
+
+    // Exec after unlocking, so we can start processing another locate()
     proc_it->second.exec(death_observer_, executor_);
 
     return proxy;
@@ -202,9 +199,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot create a scope with '/' in its id");
     }
 
-    lock(mutex_, ptable_mutex_);
-    lock_guard<decltype(ptable_mutex_)> ptable_lock(ptable_mutex_, adopt_lock);
-    lock_guard<decltype(mutex_)> lock(mutex_, adopt_lock);
+    lock_guard<decltype(mutex_)> lock(mutex_);
 
     bool return_value = true;
     if (scopes_.find(scope_id) != scopes_.end())
@@ -227,9 +222,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    lock(mutex_, ptable_mutex_);
-    lock_guard<decltype(ptable_mutex_)> ptable_lock(ptable_mutex_, adopt_lock);
-    lock_guard<decltype(mutex_)> lock(mutex_, adopt_lock);
+    lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
     return scopes_.erase(scope_id) == 1;
@@ -243,7 +236,7 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 
 bool RegistryObject::is_scope_running(std::string const& scope_id)
 {
-    lock_guard<decltype(ptable_mutex_)> ptable_lock(ptable_mutex_);
+    lock_guard<decltype(mutex_)> lock(mutex_);
 
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
