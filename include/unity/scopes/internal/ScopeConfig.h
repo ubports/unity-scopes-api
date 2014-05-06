@@ -60,7 +60,7 @@ private:
     std::unique_ptr<std::string> icon_;
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
-    std::unique_ptr<bool> invisible_;
+    bool invisible_;
     std::unique_ptr<std::string> scope_runner_;
     VariantMap appearance_attributes_;
 };

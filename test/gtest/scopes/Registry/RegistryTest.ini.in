@@ -5,3 +5,4 @@ Scope.InstallDir = @CMAKE_CURRENT_BINARY_DIR@/scopes
 OEM.InstallDir = /unused
 Click.InstallDir = /unused
 Scoperunner.Path = @PROJECT_BINARY_DIR@/scoperunner/scoperunner
+SS.Registry.Identity =

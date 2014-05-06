@@ -47,7 +47,7 @@ namespace
     const string search_hint_key = "SearchHint";
     const string hot_key_key = "HotKey";
     const string invisible_key = "Invisible";
-    const string scope_runner_exec = "ScopeRunner";
+    const string scoperunner_key = "ScopeRunner";
 
     const string scope_appearance_group = "Appearance";
 }
@@ -105,18 +105,17 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
     try
     {
-        string key = parser()->get_string(scope_config_group, invisible_key);
-        std::transform(begin(key), end(key), begin(key), ::toupper);
-        invisible_.reset(new bool(key == "TRUE"));
+        invisible_ = parser()->get_boolean(scope_config_group, invisible_key);
     }
     catch (LogicException const&)
     {
+        invisible_ = false;
     }
 
     // custom scope runner executable is optional
     try
     {
-        string key = parser()->get_string(scope_config_group, scope_runner_exec);
+        string key = parser()->get_string(scope_config_group, scoperunner_key);
         scope_runner_.reset(new string(key));
     }
     catch (LogicException const&)
@@ -141,10 +140,13 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 overrideable_key,
                                                 scope_name_key,
                                                 description_key,
+                                                author_key,
                                                 art_key,
                                                 icon_key,
                                                 search_hint_key,
-                                                hot_key_key
+                                                invisible_key,
+                                                hot_key_key,
+                                                scoperunner_key
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -219,18 +221,14 @@ string ScopeConfig::hot_key() const
 
 bool ScopeConfig::invisible() const
 {
-    if (!invisible_)
-    {
-        return false;
-    }
-    return *invisible_;
+    return invisible_;
 }
 
 string ScopeConfig::scope_runner() const
 {
     if (!scope_runner_)
     {
-        throw NotFoundException("Runner binary not set", scope_runner_exec);
+        throw NotFoundException("Runner binary not set", scoperunner_key);
     }
     return *scope_runner_;
 }

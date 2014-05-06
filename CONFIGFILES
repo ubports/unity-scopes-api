@@ -111,3 +111,61 @@ The following keys are recognized:
 - SS.Registry.Identity
 
   The identity of the smartscopes registry object. The default value is "SSRegistry".
+
+<scope_id>.ini
+--------------
+
+The recognized groups in this file are:
+
+- ScopeConfig
+- Appearance
+
+The following keys are recognized in the ScopeConfig group:
+
+- Override
+
+  Determines whether an OEM scope is allowed to override a Canonical scope. This key is used only by Canonical
+  scopes. If true, the Canonical scope can be replaced by an OEM scope with the same ID. The default value
+  is false.
+
+  For OEM scopes and click scopes, the setting of this key is ignored.
+
+- DisplayName
+
+  The display name of a scope (mandatory, localizable).
+
+- Description
+
+  The description of a scope (mandatory, localizable).
+
+- Author
+
+  The author of the scope (mandatory).
+
+- Art
+
+  Artwork to be shown for the scope. The default value is the empty string.
+
+- Icon
+
+  The icon to be shown for the scope. The default value is the empty string.
+
+- SearchHint
+
+  A search hint for on-screen display (localizable). The default value is the empty string.
+
+- HotKey
+
+  The hot key for the scope. The default value is the empty string.
+
+- Invisible
+
+  Whether the scope is hidden in the UI. The default value is false.
+
+- ScopeRunner
+
+  The path to a custom scoperunner binary. If not set, the default scoperunner is used.
+
+The following keys are recognized in the Appearance group:
+
+- TODO: document this

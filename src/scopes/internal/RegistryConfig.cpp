@@ -67,7 +67,18 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
-    ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_key, DFLT_SS_REGISTRY_ID);
+    try
+    {
+        ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_key);
+
+        // ss_registry_identity may be empty here, if explicitly set to the empty string in the .ini file.
+        // In that case, the remote registry was explicitly disabled.
+    }
+    catch (LogicException const&)
+    {
+        // No remote registry configured, so we run with the default.
+        ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
+    }
 
     const KnownEntries known_entries = {
                                           {  registry_config_group,
