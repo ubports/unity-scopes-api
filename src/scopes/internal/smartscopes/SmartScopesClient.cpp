@@ -28,12 +28,18 @@
 #include <sstream>
 #include <sys/stat.h>
 
+static std::string homedir()
+{
+    static const char* home = getenv("HOME");
+    return home ? std::string(home) : "";
+}
+
 static const std::string c_base_url = "https://dash.ubuntu.com/smartscopes/v2";
 static const std::string c_remote_scopes_resource = "/remote-scopes";
 static const std::string c_search_resource = "/search";
 static const std::string c_preview_resource = "/preview";
 
-static const std::string c_scopes_cache_dir = std::string(getenv("HOME")) + "/.cache/unity-scopes/";
+static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/";
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 
 using namespace unity::scopes;
