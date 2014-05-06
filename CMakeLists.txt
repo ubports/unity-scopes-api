@@ -389,8 +389,6 @@ else()
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}/index.html)
-message("ROOT ${CMAKE_INSTALL_DATAROOTDIR}")
-message("INSTALL_DOC ${CMAKE_INSTALL_DOCDIR}")
     install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc)
 endif()

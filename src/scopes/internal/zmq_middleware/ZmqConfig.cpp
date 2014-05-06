@@ -22,7 +22,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <unistd.h>
-#include <iostream>
 
 using namespace std;
 
@@ -54,7 +53,6 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     // set, we give up.
     if (public_dir_.empty())
     {
-cerr << "USING XDG" << endl;
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
         {
