@@ -6,7 +6,7 @@ if(CLICK_MODE)
     include(GNUInstallDirs)
     include(FindPkgConfig)
 
-    pkg_check_modules(UNITY_SCOPES REQUIRED libunity-scopes>=0.4.0)
+    pkg_check_modules(UNITY_SCOPES REQUIRED lib${UNITY_SCOPES_LIB}>=0.4.0)
     add_definitions(${UNITY_SCOPES_CFLAGS} ${UNITY_SCOPES_CFLAGS_OTHER})
 
     add_definitions(-std=c++11)

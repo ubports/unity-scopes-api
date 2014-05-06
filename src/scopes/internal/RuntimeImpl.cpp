@@ -252,6 +252,11 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
+void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& scope_ini_file)
+{
+    run_scope(scope_base, "", scope_ini_file);
+}
+
 void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_ini_file, string const& scope_ini_file)
 {
     // Retrieve the registry middleware and create a proxy to its state receiver

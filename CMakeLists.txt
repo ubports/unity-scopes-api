@@ -171,18 +171,18 @@ if(IPC_MONITORING)
     add_definitions(-DENABLE_IPC_MONITOR)
 endif()
 
-set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
+# Scopes library name. Also used as a prefix in various places, and as a subdirectory
+# name for installed files. Changing this will also require corresponding changes
+# to the debian files.
+set(UNITY_SCOPES_LIB unity-scopes)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 4)
 set(UNITY_SCOPES_MICRO 4)
 
-# Scopes library
-set(UNITY_SCOPES_LIB unity-scopes)
-
 # Version for testing, with all symbols visible
-set(UNITY_SCOPES_TEST_LIB unity-scopes-test)
+set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
 
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 
@@ -243,9 +243,10 @@ set(TESTLIBS ${UNITY_SCOPES_TEST_LIB})
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
-
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
-set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
+
+set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
+set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
 
 # Tests
 include(CTest)
@@ -344,7 +345,7 @@ set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "${ldflags}
 # out all symbols that (recursively) are in the unity::scopes::internal namespace,
 # except for a few exceptions that are needed by the scoperegistry, scoperunner,
 # smartscopesproxy, and any other binaries that reach into the internal namespace.
-set(symbol_map "${CMAKE_SOURCE_DIR}/unity-scopes.map")
+set(symbol_map "${CMAKE_SOURCE_DIR}/${UNITY_SCOPES_LIB}.map")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
@@ -368,8 +369,6 @@ endif()
 
 option(DEVEL_DOCS "Enable detailed Doxygen documentation")
 
-set(CMAKE_INSTALL_DOCDIR doc)
-
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
 if (NOT DOXYGEN_FOUND OR NOT DOT_EXECUTABLE)
@@ -382,14 +381,16 @@ else()
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     endif()
     configure_file(${PROJECT_SOURCE_DIR}/doc/index.html ${PROJECT_BINARY_DIR}/doc/index.html COPYONLY)
-    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
+    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${PROJECT_SOURCE_DIR}/doc/tutorial.dox
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL
-                       DEPENDS ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${PROJECT}
-            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_INSTALL_DOCDIR})
+                       DEPENDS ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}/index.html)
+message("ROOT ${CMAKE_INSTALL_DATAROOTDIR}")
+message("INSTALL_DOC ${CMAKE_INSTALL_DOCDIR}")
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc)
 endif()

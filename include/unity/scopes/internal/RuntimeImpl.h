@@ -52,6 +52,7 @@ public:
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
+    void run_scope(ScopeBase* const scope_base, std::string const& scope_ini_file);
     void run_scope(ScopeBase* const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
 
     ObjectProxy string_to_proxy(std::string const& s) const;

@@ -326,7 +326,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
 
 // Usage: scoperegistry [runtime.ini] [scope.ini]...
 //
-// If no runtime config file is specified, the default location (/usr/share/unity-scopes-api/Runtime.ini)
+// If no runtime config file is specified, the default location (/usr/lib/<arch>/unity-scopes/Runtime.ini)
 // is assumed.
 // If additional scope configuration files are specified, the corresponding scopes will be added
 // to the registry (overriding any scopes that are found via config files reached via Runtime.ini).

@@ -8,7 +8,7 @@ Runtime.ini
 -----------
 
 If no specific file is provided to the scopes run time, the default path is
-"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Runtime.ini".
+"/usr/lib/<arch>/unity-scopes/Runtime.ini".
 
 If that file does not exist, the default values apply.
 
@@ -25,7 +25,7 @@ The following keys are recognized:
 - Registry.ConfigFile (string)
 
   The path to the registry configuration file. The default value is
-  "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Registry.ini".
+  "/usr/lib/<arch>/unity-scopes/Registry.ini".
 
 - Default.Middleware (string)
 
@@ -38,13 +38,13 @@ The following keys are recognized:
 
   Zmq.ConfigFile = <path>
 
-  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini".
+  The default value is "/usr/lib/<arch>/unity-scopes/Zmq.ini".
 
 Zmq.ini
 -------
 
 If no specific file is provided to the scopes run time, the default path is
-"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini".
+"/usr/lib/<arch>/unity-scopes/Zmq.ini".
 
 If that file does not exist, the default values for keys apply.
 
@@ -52,25 +52,21 @@ The only recognized group in this file is [Zmq].
 
 The following keys are recognized:
 
-- EndpointDir.Public (string)
+- EndpointDir (string)
 
   The directory in which the public endpoint of a scope (or the registry) is created.
   This endpoint must be accessible to any process.
 
-  The default value is "$XDG_RUNTIME_DIR/<effective UID>/zmq". If XDG_RUNTIME_DIR is not
-  set, "/run/user/<effective UID>/zmq" is used.
+  The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
+  set, initialization fails.
 
-- EndpointDir.Private (string)
-
-  The directory in which the private endpoint a scope is created. This endpoint must
-  be accessible only to the Dash and the registry. The default value is
-  "<EndpointDir.Public>/priv".
+  Private endpoints are created in "<EndpointDir.Public>/priv".
 
 Registry.ini
 ------------
 
 If no specific file is provided to the scopes run time, the default path is
-"@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Registry.ini".
+"/usr/lib/<arch>/unity-scopes/Registry.ini".
 
 If that file does not exist, the default values for keys apply.
 
@@ -91,22 +87,22 @@ The following keys are recognized:
 - Scoperunner.Path
 
   The path to the scoperunner executable. The path must be an absolute path.
-  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/scoperunner".
+  The default value is "/usr/lib/<arch>/scoperunner".
 
 - Scope.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files.
-  The default value is "@CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/scopes".
+  The default value is "/usr/lib/<arch>/unity-scopes/scopes".
 
 - OEM.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files added
-  by OEMs. The default value is "@CMAKE_INSTALL_PREFIX@/custom/@LIB_INSTALL_PREFIX@/scopes".
+  by OEMs. The default value is "/custom/usr/lib/<arch>/unity-scopes/scopes".
 
 - Click.InstallDir
 
   The directory in which to look for subdirectories containing scopes installed from click packages.
-  The defaul value is "$HOME/.local/sahre/unity-scopes".
+  The default value is "$HOME/.local/share/unity-scopes".
 
 - SS.Registry.Identity
 

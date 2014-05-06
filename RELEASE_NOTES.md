@@ -3,18 +3,18 @@ Release notes
 
 Changes in version 0.4.4
 ========================
-  * The register_annotation() method of SearchReply got renamed back to push(). The display order of annotations
+  - The register_annotation() method of SearchReply got renamed back to push(). The display order of annotations
     with respect to results and categories got updated in the documentation of that method.
 
-Changes in version 0.4.4
-========================
+  - Simplified configuration with sensible defaults for all values.
 
-  * Simplified configuration with sensible defaults for all values.
-  * scoperunner, scoperegistry, and smartscopesproxy are now install in /usr/lib/<arch>
+  - scoperunner, scoperegistry, and smartscopesproxy are now install in /usr/lib/<arch>
     (instead of in a subdirectory of <arch>).
-  * Runtime::run_scope() now requires a path to Runtime.ini. If the empty string is passed,
+
+  - Runtime::run_scope() now has an overload to accept a path to Runtime.ini. If no file name is passed,
     the system-wide Runtime.ini is used.
-  * UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq.
+
+  - UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq by default.
 
 Changes in version 0.4.2
 ========================

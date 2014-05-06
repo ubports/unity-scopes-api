@@ -108,6 +108,13 @@ public:
     */
     void run_scope(ScopeBase *const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
 
+    /**
+    \brief Run a scope without going through the scope runner.
+
+    Equivalent to `run_scope(scope_base, "", scope_ini_file);`
+    */
+    void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file);
+
     // TODO: Flesh out documentation for this, especially syntax.
     /**
     \brief Convert a string to a proxy.

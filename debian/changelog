@@ -1,9 +1,11 @@
 unity-scopes-api (0.4.4+14.10.20140428-0ubuntu2) UNRELEASED; urgency=medium
 
   * Simplified configuration files.
-  * Runtime::run_scope() now requires a path to Runtime.ini. If the
-    empty string is passed, the system-wide Runtime.ini is used.
+  * Runtime::run_scope() now has an overload to accept a path to Runtime.ini.
+    If no file name is passed, the system-wide Runtime.ini is used.
   * UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq.
+  * Install location for things under /usr/share is now unity-scopes instead
+    of unity-scopes-api.
 
  -- Michi Henning <michi.henning@canonical.com>  Thu, 01 May 2014 13:55:48 +1000
 

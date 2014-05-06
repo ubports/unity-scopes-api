@@ -22,6 +22,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <unistd.h>
+#include <iostream>
 
 using namespace std;
 
@@ -37,8 +38,7 @@ namespace internal
 namespace
 {
     const string zmq_config_group = "Zmq";
-    const string public_dir_key = "EndpointDir.Public";
-    const string private_dir_key = "EndpointDir.Private";
+    const string public_dir_key = "EndpointDir";
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
@@ -47,37 +47,28 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     if (!configfile.empty())
     {
         public_dir_ = get_optional_string(zmq_config_group, public_dir_key);
-        private_dir_ = get_optional_string(zmq_config_group, private_dir_key);
     }
 
-    // Set the endpoint directories if they were not set explicitly.
+    // Set the endpoint directory if it was not set explicitly.
     // We look for the XDG_RUNTIME_DIR env variable. If that is not
-    // set, we default to DFLT_ENDPOINT_DIR_BASE/<effective UID>/zmq.
-    if (public_dir_.empty() || private_dir_.empty())
+    // set, we give up.
+    if (public_dir_.empty())
     {
-        string basedir;
+cerr << "USING XDG" << endl;
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
         {
             throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
                                   "environment variable not set");
         }
-        basedir = string(xdg_runtime_dir) + "/zmq";
-        if (public_dir_.empty())
-        {
-            public_dir_ = basedir;
-        }
-        if (private_dir_.empty())
-        {
-            private_dir_ = basedir + "/priv";
-        }
+        public_dir_ = string(xdg_runtime_dir) + "/zmq";
     }
+    private_dir_ = public_dir_ + "/priv";
 
     const KnownEntries known_entries = {
                                           {  zmq_config_group,
                                              {
-                                                public_dir_key,
-                                                private_dir_key
+                                                public_dir_key
                                              }
                                           }
                                        };
