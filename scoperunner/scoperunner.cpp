@@ -60,7 +60,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
+int run_scope(std::string const& runtime_config, std::string const& scope_config)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -71,14 +71,15 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     std::thread trap_worker([trap]() { trap->run(); });
 
     // Retrieve the registry middleware and create a proxy to its state receiver
-    RuntimeConfig rt_config(runtime_config.native());
+    RuntimeConfig rt_config(runtime_config);
     RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
-    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config.native());
+    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
-    string lib_dir = scope_config.parent_path().native();
-    string scope_id = scope_config.stem().native();
+    filesystem::path scope_config_path(scope_config);
+    string lib_dir = scope_config_path.parent_path().native();
+    string scope_id = scope_config_path.stem().native();
     if (!lib_dir.empty())
     {
       lib_dir += '/';
@@ -89,7 +90,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     {
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
+        auto rt = RuntimeImpl::create(scope_id, runtime_config);
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
@@ -164,9 +165,7 @@ main(int argc, char* argv[])
     int exit_status = 1;
     try
     {
-        filesystem::path runtime_path(runtime_config);
-        filesystem::path scope_path(scope_config);
-        exit_status = run_scope(runtime_path, scope_path);
+        exit_status = run_scope(runtime_config, scope_config);
     }
     catch (std::exception const& e)
     {
