@@ -48,8 +48,7 @@ ConfigBase::ConfigBase(string const& configfile, string const& dflt_file) :
 {
     if (!configfile.empty())
     {
-        boost::filesystem::path path(configfile);
-        if (path.extension() != ".ini")
+        if (configfile.find(".ini") == string::npos)
         {
             throw ConfigException(string("invalid config file name: \"") + configfile + "\": missing .ini extension");
         }
