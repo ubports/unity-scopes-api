@@ -75,6 +75,9 @@ The following keys are recognized:
 
   The default value is 1500 milliseconds.
 
+  Note that this value must be less than LocateTimeout in the [<Middleware>]
+  config group, otherwise the middleware can prematurely conclude that
+  a locate() request failed to start a scope.
 
 Zmq.ini
 -------
@@ -97,6 +100,27 @@ The following keys are recognized:
   set, initialization fails.
 
   Private endpoints are created in "<EndpointDir.Public>/priv".
+
+- Default.Twoway.Timeout
+
+  The default timeout value to be used for twoway invocations in milliseconds.
+  If a twoway invocation (such as list() or search()) does not complete
+  withing the specified time, the invocation throws a TimeoutException, possibly
+  after asking the registry to start the target process first (see LocateTimeout).
+
+  The default value is 300 ms.
+
+- Locate.Timeout
+
+  The timeout to be used when asking the registry to start a scope. If the registry
+  does not respond within the specified amount of time, the scope is assumed
+  to be unavailable, and twoway invocations fail with a TimeoutException.
+
+  Note that this value must be somewhat larger than the value of Process.Timeout
+  in Registry.ini, otherwise invocations on a scope that needs to be activated
+  first can fail, even though the activation succeeded.
+
+  The default value is 2000 ms.
 
 Registry.ini
 ------------
