@@ -19,7 +19,9 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/@HDR_INSTALL_DIR@
 libdir=${prefix}/@LIBDIR@
-scopesdir=${libdir}/unity-scopes
+scopesdir=${libdir}/@UNITY_SCOPES_LIB@
+scoperegistry_bin=${libdir}/@UNITY_SCOPES_LIB@/scoperegistry
+scoperunner_bin=${libdir}/@UNITY_SCOPES_LIB@/scoperunner
 
 Name: lib@UNITY_SCOPES_LIB@
 Description: Unity Scopes API library
