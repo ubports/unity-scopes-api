@@ -73,6 +73,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
+        reap_expiry_ = config.reap_expiry();
+        reap_interval_ = config.reap_interval();
 
         middleware_ = middleware_factory_->create(scope_id_, default_middleware, middleware_configfile);
         middleware_->start();
@@ -219,7 +221,7 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     lock_guard<mutex> lock(mutex_);
     if (!reply_reaper_)
     {
-        reply_reaper_ = Reaper::create(10, 45); // TODO: configurable timeouts
+        reply_reaper_ = Reaper::create(reap_interval_, reap_expiry_);
     }
     return reply_reaper_;
 }

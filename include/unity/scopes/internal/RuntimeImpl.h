@@ -72,6 +72,8 @@ private:
     mutable std::string registry_configfile_;
     mutable std::string registry_identity_;
     mutable std::string ss_registry_identity_;
+    int reap_expiry_;
+    int reap_interval_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;
