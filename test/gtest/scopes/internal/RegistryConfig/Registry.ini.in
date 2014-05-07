@@ -4,3 +4,4 @@ Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /SomeDir
 Click.InstallDir = /unused
 Scoperunner.Path = /SomeAbsolutePath
+Process.Timeout = 3000

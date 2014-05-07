@@ -43,6 +43,7 @@ namespace
     const string click_installdir_key = "Click.InstallDir";
     const string scoperunner_path_key = "Scoperunner.Path";
     const string ss_registry_identity_key = "SS.Registry.Identity";
+    const string process_timeout_key = "Process.Timeout";
 }
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
@@ -79,6 +80,11 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
         // No remote registry configured, so we run with the default.
         ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
     }
+    process_timeout_ = get_optional_int(registry_config_group, process_timeout_key, DFLT_PROCESS_TIMEOUT);
+    if (process_timeout_ < 10 || process_timeout_ > 5000)
+    {
+        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-5000 ms");
+    }
 
     const KnownEntries known_entries = {
                                           {  registry_config_group,
@@ -90,6 +96,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
                                                 click_installdir_key,
                                                 scoperunner_path_key,
                                                 ss_registry_identity_key,
+                                                process_timeout_key
                                              }
                                           }
                                        };
@@ -138,6 +145,11 @@ string RegistryConfig::scoperunner_path() const
 string RegistryConfig::ss_registry_identity() const
 {
     return ss_registry_identity_;
+}
+
+int RegistryConfig::process_timeout() const
+{
+    return process_timeout_;
 }
 
 } // namespace internal

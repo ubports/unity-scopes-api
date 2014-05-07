@@ -65,6 +65,17 @@ The following keys are recognized:
 
   The default value is 10 seconds.
 
+- Process.Timeout
+
+  This parameter determines how the registry will wait for a scope
+  to start and stop. The registry waits for at most Process.Timeout
+  milliseconds before it concludes that a scope failed to initialize
+  or terminate correctly. If a scope does not respond
+  within the allotted time, it is killed with SIGKILL.
+
+  The default value is 1500 milliseconds.
+
+
 Zmq.ini
 -------
 

@@ -233,7 +233,8 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       MiddlewareBase::SPtr const& mw,
                       string const& scoperunner_path,
                       string const& config_file,
-                      bool click)
+                      bool click,
+                      int timeout_ms)
 {
     for (auto&& pair : all_scopes)
     {
@@ -297,6 +298,8 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                 exec_data.confinement_profile =
                         scope_path.parent_path().filename().native();
             }
+
+            exec_data.timeout_ms = timeout_ms;
 
             try
             {
@@ -368,6 +371,7 @@ main(int argc, char* argv[])
         string click_installdir;
         string scoperunner_path;
         string ss_reg_id;
+        int process_timeout;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
@@ -376,6 +380,7 @@ main(int argc, char* argv[])
             click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
             ss_reg_id = c.ss_registry_identity();
+            process_timeout = c.process_timeout();
         } // Release memory for config parser
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
@@ -417,8 +422,8 @@ main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false);
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
         local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty())
         {
