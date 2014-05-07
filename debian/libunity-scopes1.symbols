@@ -635,6 +635,8 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_ssclient() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::list() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::has_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeConfig::reap_expiry() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::reap_interval() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::registry_identity() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0.4.2+14.04.20140404.2
@@ -642,14 +644,15 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::oem_installdir() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryConfig::process_timeout() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RegistryConfig::scope_installdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::scoperunner_path() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::ss_registry_identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_kind() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::list() const@Base" 0.4.2+14.04.20140404.2
