@@ -40,11 +40,11 @@ static constexpr char const* DFLT_SCOPE_INSTALL_DIR = "@CMAKE_INSTALL_PREFIX@/@L
 static constexpr char const* DFLT_OEM_INSTALL_DIR = "/custom/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@";
 static constexpr char const* DFLT_SS_REGISTRY_ID = "SSRegistry";
 
-static const int DFLT_REAP_EXPIRY = 45;          // seconds
-static const int DFLT_REAP_INTERVAL = 10;        // seconds
-static const int DFLT_PROCESS_TIMEOUT = 1500;    // milliseconds
-static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 300;  // milliseconds
-static const int DFLT_ZMQ_LOCATE_TIMEOUT = 300;  // milliseconds
+static const int DFLT_REAP_EXPIRY = 45;           // seconds
+static const int DFLT_REAP_INTERVAL = 10;         // seconds
+static const int DFLT_PROCESS_TIMEOUT = 1500;     // milliseconds
+static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 300;   // milliseconds
+static const int DFLT_ZMQ_LOCATE_TIMEOUT = 2000;  // milliseconds
 
 } // namespace internal
 
