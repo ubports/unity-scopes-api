@@ -31,7 +31,7 @@
 static std::string homedir()
 {
     static const char* home = getenv("HOME");
-    return home ? std::string(home) : "";
+    return home ? home : "";
 }
 
 static const std::string c_base_url = "https://dash.ubuntu.com/smartscopes/v2";
