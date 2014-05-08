@@ -99,7 +99,8 @@ public:
     /**
     \brief Run a scope without going through the scope runner.
 
-    This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
+    This method is intended to run a scope that can not be loaded via the scope runner, such as
+    those written in languages that can not be dynamically loaded.
 
     \param scope_base The scope implementation
     \param runtime_ini_file The full path of runtime configuration file. Passing an empty string uses
