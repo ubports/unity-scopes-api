@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/RangeInputFilterImpl.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/UnityExceptions.h>
 
@@ -81,6 +82,10 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         if (ftype == "option_selector")
         {
             return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(var));
+        }
+        if (ftype == "range_input")
+        {
+            return RangeInputFilterImpl::create(var);
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }
