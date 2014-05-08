@@ -291,9 +291,16 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
 
     // Create a servant for the scope and register the servant.
-    ScopeConfig scope_config(scope_ini_file);
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    auto proxy = mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout());
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout());
+    }
+    else
+    {
+        mw->add_scope_object(scope_id_, move(scope));
+    }
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
