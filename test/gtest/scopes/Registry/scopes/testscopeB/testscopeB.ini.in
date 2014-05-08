@@ -7,3 +7,4 @@ Icon = data/scope-B.Icon
 SearchHint = scope-B.SearchHint
 HotKey = scope-B.HotKey
 ScopeRunner = @CMAKE_CURRENT_BINARY_DIR@/testscopeB
+IdleTimeout = 2000
