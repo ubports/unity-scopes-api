@@ -593,7 +593,10 @@ void ObjectAdapter::broker_thread()
         for (;;)
         {
             zmqpp::message message;
-            poller.poll();
+            if (!poller.poll(5000))
+            {
+                cout << "TIMEOUT!\n";
+            }
             if (poller.has_input(stop))
             {
                 // When the stop socket becomes ready, we need to get out of here.
