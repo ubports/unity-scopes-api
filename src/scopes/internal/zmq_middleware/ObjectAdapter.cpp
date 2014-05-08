@@ -286,7 +286,10 @@ void ObjectAdapter::activate(int64_t idle_timeout)
             state_ = Activating;  // No notify_all() here because no-one waits for this
             try
             {
-                idle_timeout_ = idle_timeout;
+                if (idle_timeout == zmqpp::poller::wait_forever || idle_timeout > 0)
+                {
+                    idle_timeout_ = idle_timeout;
+                }
                 lock.unlock();
                 run_workers();
                 lock.lock();

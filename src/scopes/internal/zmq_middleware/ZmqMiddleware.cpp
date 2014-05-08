@@ -791,7 +791,8 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     }
 
     shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size));
-    a->activate(idle_timeout != 0 ? idle_timeout : zmqpp::poller::wait_forever);
+    a->activate(idle_timeout);
+
     am_[name] = a;
     return a;
 }
