@@ -73,6 +73,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
+        ss_configfile_ = config.ss_configfile();
+        ss_registry_identity_ = config.ss_registry_identity();
 
         middleware_ = middleware_factory_->create(scope_id_, default_middleware, middleware_configfile);
         middleware_->start();
@@ -88,11 +90,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
         else
         {
-            // Create the registry proxy and set the SS registry identity.
+            // Create the registry proxy
             RegistryConfig reg_config(registry_identity_, registry_configfile_);
             auto registry_mw_proxy = middleware_->registry_proxy();
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
-            ss_registry_identity_ = reg_config.ss_registry_identity();
         }
     }
     catch (unity::Exception const& e)
@@ -206,6 +207,11 @@ string RuntimeImpl::registry_configfile() const
 string RuntimeImpl::registry_identity() const
 {
     return registry_identity_;  // Immutable
+}
+
+string RuntimeImpl::ss_configfile() const
+{
+    return ss_configfile_;  // Immutable
 }
 
 string RuntimeImpl::ss_registry_identity() const

@@ -359,6 +359,7 @@ main(int argc, char* argv[])
         RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
+        string ss_reg_id = runtime->ss_registry_identity();
 
         // Collect the registry config data.
 
@@ -367,7 +368,6 @@ main(int argc, char* argv[])
         string oem_installdir;
         string click_installdir;
         string scoperunner_path;
-        string ss_reg_id;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
@@ -375,7 +375,6 @@ main(int argc, char* argv[])
             oem_installdir = c.oem_installdir();
             click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
-            ss_reg_id = c.ss_registry_identity();
         } // Release memory for config parser
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);

@@ -35,21 +35,6 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ("Zmq", c.default_middleware());
 }
 
-TEST(RuntimeConfig, BadRegistryID)
-{
-    try
-    {
-        RuntimeConfig c("BadRegID.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"BadRegID.ini\": Illegal character in value for "
-                     "Registry.Identity: \"Regi/stry\": identity cannot contain '/'",
-                     e.what());
-    }
-}
-
 TEST(RuntimeConfig, BadMiddleware)
 {
     try

@@ -397,8 +397,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_remote_scopes()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::add(unity::scopes::internal::smartscopes::RemoteScope const&, unity::scopes::ScopeMetadata const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::ScopeMetadata, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::ScopeMetadata> > >&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >&)@Base" 0.4.0+14.04.20140324
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::SSRegistryObject(std::shared_ptr<unity::scopes::internal::MiddlewareBase>, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int, unsigned int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::SSRegistryObject(std::shared_ptr<unity::scopes::internal::MiddlewareBase>, unity::scopes::internal::smartscopes::SSConfig const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::~SSRegistryObject()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::SSConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::~SSConfig()@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::RuntimeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::~RuntimeConfig()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::MiddlewareBase::MiddlewareBase(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1
@@ -607,6 +609,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::reply_reaper() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeImpl::ss_configfile() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::waiter_thread(std::shared_ptr<unity::scopes::internal::ThreadSafeQueue<std::future<void> > > const&) const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::string_to_proxy(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
@@ -635,9 +638,15 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_ssclient() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::list() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::has_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::scope_identity() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::reg_refresh_rate() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::http_reply_timeout() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::smartscopes::SSConfig::reg_refresh_fail_timeout() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::ss_configfile() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::registry_identity() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RuntimeConfig::ss_registry_identity() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware_configfile() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
@@ -645,7 +654,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RegistryConfig::scope_installdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::scoperunner_path() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryConfig::ss_registry_identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_kind() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState, int) const@Base" 0.4.2+14.04.20140404.2
