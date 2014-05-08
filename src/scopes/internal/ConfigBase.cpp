@@ -23,6 +23,8 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/IniParser.h>
 
+#include <boost/filesystem/path.hpp>
+
 #include <iostream>
 #include <sys/stat.h>
 
@@ -46,7 +48,8 @@ ConfigBase::ConfigBase(string const& configfile, string const& dflt_file) :
 {
     if (!configfile.empty())
     {
-        if (configfile.find(".ini") == string::npos)
+        boost::filesystem::path path(configfile);
+        if (path.extension() != ".ini")
         {
             throw ConfigException(string("invalid config file name: \"") + configfile + "\": missing .ini extension");
         }
