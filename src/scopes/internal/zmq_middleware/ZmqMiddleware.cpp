@@ -78,9 +78,9 @@ try :
     server_name_(server_name),
     state_(Stopped),
     config_(configfile),
-    twoway_timeout_(300),           // TODO: get timeout from config
-    locate_timeout_(2000),          // TODO: get timeout from config
-    scope_shutdown_timeout_(20000)  // TODO: get timeout from config
+    twoway_timeout_(300),       // TODO: get timeout from config
+    locate_timeout_(2000),      // TODO: get timeout from config
+    scope_idle_timeout_(20000)  // TODO: get timeout from config
 {
     assert(!server_name.empty());
 }
@@ -796,7 +796,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     shared_ptr<ObjectAdapter> a;
     if (category == scope_category)
     {
-        a.reset(new ObjectAdapter(*this, name, endpoint, mode, pool_size, scope_shutdown_timeout_));
+        a.reset(new ObjectAdapter(*this, name, endpoint, mode, pool_size, scope_idle_timeout_));
     }
     else
     {

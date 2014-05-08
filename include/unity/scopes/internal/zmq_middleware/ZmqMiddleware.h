@@ -128,7 +128,7 @@ private:
     ZmqConfig config_;
     const int64_t twoway_timeout_;              // Default timeout for twoway invocations
     int64_t locate_timeout_;                    // Timeout for registry locate()
-    const int64_t scope_shutdown_timeout_;      // Default timeout for idle scope shutdown
+    const int64_t scope_idle_timeout_;          // Default timeout for idle scope shutdown
 };
 
 } // namespace zmq_middleware
