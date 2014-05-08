@@ -23,7 +23,6 @@
 
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/NonCopyable.h>
-#include <zmqpp/poller.hpp>
 #include <zmqpp/socket.hpp>
 
 #include <future>
@@ -74,7 +73,7 @@ public:
     void remove_dflt_servant(std::string const& category);
     std::shared_ptr<ServantBase> find_dflt_servant(std::string const& id) const;
 
-    void activate(int64_t idle_timeout = zmqpp::poller::wait_forever);
+    void activate(int64_t idle_timeout = 0);
     void shutdown();
     void wait_for_shutdown();
 
