@@ -48,6 +48,7 @@ public:
     RegistryProxy registry() const;
     std::string registry_configfile() const;
     std::string registry_identity() const;
+    std::string ss_configfile() const;
     std::string ss_registry_identity() const;
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr async_pool() const;
@@ -71,6 +72,7 @@ private:
     mutable RegistryProxy registry_;
     mutable std::string registry_configfile_;
     mutable std::string registry_identity_;
+    mutable std::string ss_configfile_;
     mutable std::string ss_registry_identity_;
     int reap_expiry_;
     int reap_interval_;

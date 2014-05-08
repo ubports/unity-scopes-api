@@ -42,7 +42,6 @@ namespace
     const string oem_installdir_key = "OEM.InstallDir";
     const string click_installdir_key = "Click.InstallDir";
     const string scoperunner_path_key = "Scoperunner.Path";
-    const string ss_registry_identity_key = "SS.Registry.Identity";
     const string process_timeout_key = "Process.Timeout";
 }
 
@@ -68,18 +67,6 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
-    try
-    {
-        ss_registry_identity_ = get_optional_string(registry_config_group, ss_registry_identity_key);
-
-        // ss_registry_identity may be empty here, if explicitly set to the empty string in the .ini file.
-        // In that case, the remote registry was explicitly disabled.
-    }
-    catch (LogicException const&)
-    {
-        // No remote registry configured, so we run with the default.
-        ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
-    }
     process_timeout_ = get_optional_int(registry_config_group, process_timeout_key, DFLT_PROCESS_TIMEOUT);
     if (process_timeout_ < 10 || process_timeout_ > 5000)
     {
@@ -95,7 +82,6 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
                                                 oem_installdir_key,
                                                 click_installdir_key,
                                                 scoperunner_path_key,
-                                                ss_registry_identity_key,
                                                 process_timeout_key
                                              }
                                           }
@@ -140,11 +126,6 @@ string RegistryConfig::click_installdir() const
 string RegistryConfig::scoperunner_path() const
 {
     return scoperunner_path_;
-}
-
-string RegistryConfig::ss_registry_identity() const
-{
-    return ss_registry_identity_;
 }
 
 int RegistryConfig::process_timeout() const

@@ -28,7 +28,6 @@
 
 #include <iostream>
 
-static const uint c_failed_refresh_timeout = 10; ///! TODO get from config
 static const char* c_dbussend_cmd = "dbus-send /com/canonical/unity/scopes com.canonical.unity.scopes.InvalidateResults string:smart-scopes";
 
 namespace unity
@@ -44,19 +43,19 @@ namespace smartscopes
 {
 
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
+                                   SSConfig const& ss_config,
                                    std::string const& ss_scope_endpoint,
-                                   uint http_reply_timeout,
-                                   uint refresh_rate_in_sec,
                                    std::string const& sss_url,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientQt>(http_reply_timeout),
+                    std::make_shared<HttpClientQt>(ss_config.http_reply_timeout() * 1000),  // need millisecs
                     std::make_shared<JsonCppNode>(), sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
-    , regular_refresh_timeout_(refresh_rate_in_sec)
-    , next_refresh_timeout_(refresh_rate_in_sec)
+    , regular_refresh_timeout_(ss_config.reg_refresh_rate())
+    , next_refresh_timeout_(ss_config.reg_refresh_rate())
+    , failed_refresh_timeout_(ss_config.reg_refresh_fail_timeout())
     , caching_enabled_(caching_enabled)
 {
     // get remote scopes then start the auto-refresh background thread
@@ -183,14 +182,14 @@ void SSRegistryObject::get_remote_scopes()
         }
         else
         {
-            next_refresh_timeout_ = c_failed_refresh_timeout;
+            next_refresh_timeout_ = failed_refresh_timeout_;
         }
     }
     catch (std::exception const& e)
     {
         std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
-        next_refresh_timeout_ = c_failed_refresh_timeout;
+        next_refresh_timeout_ = failed_refresh_timeout_;
         return;
     }
 

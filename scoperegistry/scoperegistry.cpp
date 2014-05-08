@@ -362,6 +362,7 @@ main(int argc, char* argv[])
         RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
+        string ss_reg_id = runtime->ss_registry_identity();
 
         // Collect the registry config data.
 
@@ -370,7 +371,6 @@ main(int argc, char* argv[])
         string oem_installdir;
         string click_installdir;
         string scoperunner_path;
-        string ss_reg_id;
         int process_timeout;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
@@ -379,7 +379,6 @@ main(int argc, char* argv[])
             oem_installdir = c.oem_installdir();
             click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
-            ss_reg_id = c.ss_registry_identity();
             process_timeout = c.process_timeout();
         } // Release memory for config parser
 

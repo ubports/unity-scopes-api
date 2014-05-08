@@ -33,8 +33,6 @@ namespace internal
 class RegistryConfig : public ConfigBase
 {
 public:
-    static constexpr char const* REGISTRY_CONFIG_GROUP = "Registry";
-
     RegistryConfig(std::string const& identity, std::string const& configfile);
     ~RegistryConfig();
 
@@ -45,7 +43,6 @@ public:
     std::string oem_installdir() const;         // Directory for OEM scope config files
     std::string click_installdir() const;       // Directory for Click scope config files
     std::string scoperunner_path() const;       // Path to scoperunner binary
-    std::string ss_registry_identity() const;   // Identity of smart scopes registry
     int process_timeout() const;                // Milliseconds to wait before scope is considereed non-responsive.
 
 private:
@@ -56,7 +53,6 @@ private:
     std::string oem_installdir_;
     std::string click_installdir_;
     std::string scoperunner_path_;
-    std::string ss_registry_identity_;
     int process_timeout_;                       // Milliseconds
 };
 
