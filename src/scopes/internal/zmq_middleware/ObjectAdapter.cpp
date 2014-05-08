@@ -594,9 +594,12 @@ void ObjectAdapter::broker_thread()
         for (;;)
         {
             zmqpp::message message;
-            if (!poller.poll(idle_timeout_))
+            // Poll for incoming messages. If a timeout has been set, and no incoming messages are received for
+            // idle_timeout_ milliseconds, we shutdown the server.
+            // NOTE: We don't auto shutdown object adaptors that contain default servants as these fallbacks are
+            // expected to be available at all times.
+            if (!poller.poll(idle_timeout_) && dflt_servants_.empty())
             {
-                // No incoming messages have been received for idle_timeout_ milliseconds.
                 // Shutdown this server by stopping the middleware.
                 mw_.stop();
             }
