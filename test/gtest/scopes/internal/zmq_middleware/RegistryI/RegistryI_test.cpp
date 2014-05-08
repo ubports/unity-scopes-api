@@ -447,6 +447,31 @@ public:
         return current_process_count - start_process_count;
     }
 
+    ScopeProxy start_testscopeB()
+    {
+        std::string test_scope_id = "testscopeB";
+        ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
+
+        unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+        mi->set_scope_id(test_scope_id);
+        mi->set_display_name(test_scope_id);
+        mi->set_description(test_scope_id);
+        mi->set_author("Canonical Ltd.");
+        mi->set_proxy(test_proxy);
+        mi->set_scope_directory("/foo");
+        auto meta = ScopeMetadataImpl::create(move(mi));
+
+        RegistryObject::ScopeExecData exec_data;
+        exec_data.scope_id = test_scope_id;
+        exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
+        exec_data.runtime_config = rt_config;
+        exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+
+        reg->add_local_scope(test_scope_id, move(meta), exec_data);
+
+        return test_proxy;
+    }
+
 protected:
     std::string exec_cmd(std::string const& cmd)
     {
@@ -625,34 +650,16 @@ TEST_F(RegistryTest, locate_remove)
 // test custom scoperunner executable
 TEST_F(RegistryTest, locate_custom_exec)
 {
-    std::string test_scope_id = "testscopeB";
-    ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
-
-    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-    mi->set_scope_id(test_scope_id);
-    mi->set_display_name(test_scope_id);
-    mi->set_description(test_scope_id);
-    mi->set_author("Canonical Ltd.");
-    mi->set_proxy(test_proxy);
-    mi->set_scope_directory("/foo");
-    auto meta = ScopeMetadataImpl::create(move(mi));
-
-    RegistryObject::ScopeExecData exec_data;
-    exec_data.scope_id = test_scope_id;
-    exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
-    exec_data.runtime_config = rt_config;
-    exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
-
-    reg->add_local_scope(test_scope_id, move(meta), exec_data);
+    ScopeProxy test_proxy = start_testscopeB();
 
     // check that no new processes have been started yet
     EXPECT_EQ(0, process_count());
 
     // locate scope
-    EXPECT_EQ(test_proxy, reg->locate(test_scope_id));
+    EXPECT_EQ(test_proxy, reg->locate("testscopeB"));
 
     // check that the scope is running
-    EXPECT_TRUE(reg->is_scope_running(test_scope_id));
+    EXPECT_TRUE(reg->is_scope_running("testscopeB"));
 
     // check that 1 new process was started
     EXPECT_EQ(1, process_count());
@@ -662,7 +669,7 @@ TEST_F(RegistryTest, locate_custom_exec)
     kill(scope1_pid, SIGKILL);
 
     // wait for the SIGCHLD signal to reach the registry
-    while (reg->is_scope_running(test_scope_id))
+    while (reg->is_scope_running("testscopeB"))
     {
         std::this_thread::sleep_for(std::chrono::milliseconds{10});
     }
@@ -674,34 +681,16 @@ TEST_F(RegistryTest, locate_custom_exec)
 // test idle timeout of a scope
 TEST_F(RegistryTest, locate_idle_timeout)
 {
-    std::string test_scope_id = "testscopeB";
-    ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
-
-    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-    mi->set_scope_id(test_scope_id);
-    mi->set_display_name(test_scope_id);
-    mi->set_description(test_scope_id);
-    mi->set_author("Canonical Ltd.");
-    mi->set_proxy(test_proxy);
-    mi->set_scope_directory("/foo");
-    auto meta = ScopeMetadataImpl::create(move(mi));
-
-    RegistryObject::ScopeExecData exec_data;
-    exec_data.scope_id = test_scope_id;
-    exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
-    exec_data.runtime_config = rt_config;
-    exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
-
-    reg->add_local_scope(test_scope_id, move(meta), exec_data);
+    ScopeProxy test_proxy = start_testscopeB();
 
     // check that no new processes have been started yet
     EXPECT_EQ(0, process_count());
 
     // locate scope
-    EXPECT_EQ(test_proxy, reg->locate(test_scope_id));
+    EXPECT_EQ(test_proxy, reg->locate("testscopeB"));
 
     // check that the scope is running
-    EXPECT_TRUE(reg->is_scope_running(test_scope_id));
+    EXPECT_TRUE(reg->is_scope_running("testscopeB"));
 
     // check that 1 new process was started
     EXPECT_EQ(1, process_count());
@@ -709,7 +698,7 @@ TEST_F(RegistryTest, locate_idle_timeout)
     std::this_thread::sleep_for(std::chrono::seconds{1});
 
     // check that the scope is still running after 1s (should only time out after 2s)
-    EXPECT_TRUE(reg->is_scope_running(test_scope_id));
+    EXPECT_TRUE(reg->is_scope_running("testscopeB"));
 
     // check that we still have 1 child process
     EXPECT_EQ(1, process_count());
@@ -717,7 +706,7 @@ TEST_F(RegistryTest, locate_idle_timeout)
     std::this_thread::sleep_for(std::chrono::seconds{2});
 
     // check now that the scope has shutdown automatically (timed out after 2s)
-    EXPECT_FALSE(reg->is_scope_running(test_scope_id));
+    EXPECT_FALSE(reg->is_scope_running("testscopeB"));
 
     // check that 1 new process was started
     EXPECT_EQ(0, process_count());
