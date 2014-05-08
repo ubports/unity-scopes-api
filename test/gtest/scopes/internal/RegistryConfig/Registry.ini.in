@@ -2,5 +2,4 @@
 Middleware = Zmq
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /SomeDir
-Click.InstallDir = /unused
 Scoperunner.Path = /SomeAbsolutePath

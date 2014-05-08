@@ -21,6 +21,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
+
 #include <scope-api-testconfig.h>
 
 using namespace std;
