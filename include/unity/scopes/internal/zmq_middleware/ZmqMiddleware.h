@@ -30,6 +30,7 @@
 #include <unity/scopes/ObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
+#include <zmqpp/poller.hpp>
 
 namespace unity
 {
@@ -78,7 +79,7 @@ public:
     virtual void add_dflt_query_object(QueryObjectBase::SPtr const& query) override;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) override;
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) override;
-    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) override;
+    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout = 0) override;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) override;
 
@@ -132,7 +133,6 @@ private:
     ZmqConfig config_;
     const int64_t twoway_timeout_;              // Default timeout for twoway invocations
     int64_t locate_timeout_;                    // Timeout for registry locate()
-    const int64_t scope_idle_timeout_;          // Default timeout for idle scope shutdown
 };
 
 } // namespace zmq_middleware

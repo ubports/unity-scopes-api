@@ -59,8 +59,7 @@ public:
                   std::string const& name,
                   std::string const& endpoint,
                   RequestMode m,
-                  int pool_size,
-                  int64_t idle_timeout = zmqpp::poller::wait_forever);
+                  int pool_size);
     ~ObjectAdapter();
 
     ZmqMiddleware* mw() const;
@@ -75,7 +74,7 @@ public:
     void remove_dflt_servant(std::string const& category);
     std::shared_ptr<ServantBase> find_dflt_servant(std::string const& id) const;
 
-    void activate();
+    void activate(int64_t idle_timeout = zmqpp::poller::wait_forever);
     void shutdown();
     void wait_for_shutdown();
 

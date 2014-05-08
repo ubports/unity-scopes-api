@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/util/ResourcePtr.h>
 #include <zmqpp/message.hpp>
+#include <zmqpp/poller.hpp>
 
 #include <cassert>
 #include <sstream>
@@ -49,14 +50,13 @@ namespace internal
 namespace zmq_middleware
 {
 
-ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
-                             int pool_size, int64_t idle_timeout) :
+ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m, int pool_size) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
     mode_(m),
     pool_size_(pool_size),
-    idle_timeout_(idle_timeout),
+    idle_timeout_(zmqpp::poller::wait_forever),
     state_(Inactive)
 {
     assert(!name.empty());
@@ -276,7 +276,7 @@ shared_ptr<ServantBase> ObjectAdapter::find_dflt_servant(std::string const& cate
     return shared_ptr<ServantBase>();
 }
 
-void ObjectAdapter::activate()
+void ObjectAdapter::activate(int64_t idle_timeout)
 {
     unique_lock<mutex> lock(state_mutex_);
     switch (state_)
@@ -286,6 +286,7 @@ void ObjectAdapter::activate()
             state_ = Activating;  // No notify_all() here because no-one waits for this
             try
             {
+                idle_timeout_ = idle_timeout;
                 lock.unlock();
                 run_workers();
                 lock.lock();
@@ -596,9 +597,7 @@ void ObjectAdapter::broker_thread()
             zmqpp::message message;
             // Poll for incoming messages. If a timeout has been set, and no incoming messages are received for
             // idle_timeout_ milliseconds, we shutdown the server.
-            // NOTE: We don't auto shutdown object adaptors that contain default servants as these fallbacks are
-            // expected to be available at all times.
-            if (!poller.poll(idle_timeout_) && dflt_servants_.empty())
+            if (!poller.poll(idle_timeout_))
             {
                 // Shutdown this server by stopping the middleware.
                 mw_.stop();
