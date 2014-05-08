@@ -18,6 +18,11 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/ScopeExceptions.h>
+
+#include <unistd.h>
+
 using namespace std;
 
 namespace unity
@@ -29,27 +34,43 @@ namespace scopes
 namespace internal
 {
 
-const char* ZmqConfig::ZMQ_CONFIG_GROUP = "Zmq";
-
 namespace
 {
-    const string public_dir_str = "EndpointDir.Public";
-    const string private_dir_str = "EndpointDir.Private";
+    const string zmq_config_group = "Zmq";
+    const string public_dir_key = "EndpointDir";
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
-    ConfigBase(configfile)
+    ConfigBase(configfile, DFLT_ZMQ_MIDDLEWARE_INI)
 {
-    if (configfile.empty())
+    if (!configfile.empty())
     {
-        public_dir_ = "/tmp";
-        private_dir_ = "/tmp";
+        public_dir_ = get_optional_string(zmq_config_group, public_dir_key);
     }
-    else
+
+    // Set the endpoint directory if it was not set explicitly.
+    // We look for the XDG_RUNTIME_DIR env variable. If that is not
+    // set, we give up.
+    if (public_dir_.empty())
     {
-        public_dir_ = get_string(ZMQ_CONFIG_GROUP, public_dir_str);
-        private_dir_ = get_string(ZMQ_CONFIG_GROUP, private_dir_str);
+        char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
+        if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
+        {
+            throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
+                                  "environment variable not set");
+        }
+        public_dir_ = string(xdg_runtime_dir) + "/zmq";
     }
+    private_dir_ = public_dir_ + "/priv";
+
+    const KnownEntries known_entries = {
+                                          {  zmq_config_group,
+                                             {
+                                                public_dir_key
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 ZmqConfig::~ZmqConfig()

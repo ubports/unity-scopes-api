@@ -33,7 +33,6 @@ TEST(RegistryConfig, basic)
     RegistryConfig c("Registry", TEST_REGISTRY_PATH);
     EXPECT_EQ("Registry", c.identity());
     EXPECT_EQ("Zmq", c.mw_kind());
-    EXPECT_EQ("ipc:///tmp/socket_for_registry", c.endpoint());
     EXPECT_EQ("Zmq.ini", c.mw_configfile());
 }
 

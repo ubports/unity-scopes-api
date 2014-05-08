@@ -18,13 +18,13 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
+#include <scope-api-testconfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -35,9 +35,8 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(ZmqMiddleware, basic)
 {
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
     mw.start();
     sleep(1);
     mw.stop();
@@ -46,7 +45,7 @@ TEST(ZmqMiddleware, basic)
 TEST(ZmqMiddleware, string_to_proxy)
 {
     auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini", rt.get());
+    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
 
     ObjectProxy p;
     ScopeProxy sp;
@@ -84,9 +83,8 @@ TEST(ZmqMiddleware, string_to_proxy)
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
 {
-    ZmqMiddleware mw("testscope",
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
 
     try
     {

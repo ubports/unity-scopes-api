@@ -21,6 +21,9 @@
 
 #include <unity/util/IniParser.h>
 
+#include <map>
+#include <set>
+
 namespace unity
 {
 
@@ -39,16 +42,23 @@ class ConfigBase
 {
 public:
     ConfigBase();
-    ConfigBase(std::string const& configfile);
+    ConfigBase(std::string const& configfile, std::string const& dflt_file = "");
     virtual ~ConfigBase();
 
     unity::util::IniParser::SPtr parser() const;
 
     virtual std::string get_string(std::string const& group, std::string const& key) const;
-    virtual std::string get_optional_string(std::string const& group, std::string const& key) const;
+    virtual std::string get_optional_string(std::string const& group,
+                                            std::string const& key,
+                                            std::string const& dflt = "") const;
     virtual std::string get_middleware(std::string const& group, std::string const& key) const;
 
-    virtual void throw_ex(::std::string const& reason) const;
+protected:
+    void throw_ex(::std::string const& reason) const;
+    bool path_exists(::std::string const& path) const;
+
+    typedef std::map<std::string, std::set<std::string>> KnownEntries;
+    void check_unknown_entries(KnownEntries const& valid) const;
 
 private:
     unity::util::IniParser::SPtr parser_;
