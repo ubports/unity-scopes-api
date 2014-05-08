@@ -26,7 +26,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 #include <unity/util/ResourcePtr.h>
 #include <zmqpp/message.hpp>
-#include <zmqpp/poller.hpp>
 
 #include <cassert>
 #include <sstream>
@@ -50,12 +49,14 @@ namespace internal
 namespace zmq_middleware
 {
 
-ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m, int pool_size) :
+ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
+                             int pool_size, int shutdown_timeout) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
     mode_(m),
     pool_size_(pool_size),
+    shutdown_timeout_(shutdown_timeout),
     state_(Inactive)
 {
     assert(!name.empty());
@@ -593,7 +594,7 @@ void ObjectAdapter::broker_thread()
         for (;;)
         {
             zmqpp::message message;
-            if (!poller.poll(5000))
+            if (!poller.poll(shutdown_timeout_))
             {
                 cout << "TIMEOUT!\n";
             }
