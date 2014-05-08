@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -34,7 +35,6 @@ TEST(RegistryConfig, basic)
     EXPECT_EQ("Zmq", c.mw_kind());
     EXPECT_EQ("ipc:///tmp/socket_for_registry", c.endpoint());
     EXPECT_EQ("Zmq.ini", c.mw_configfile());
-    EXPECT_EQ("/unused", c.click_installdir());
 }
 
 TEST(RegistryConfig, RegistryIDEmpty)
@@ -51,10 +51,27 @@ TEST(RegistryConfig, RegistryIDEmpty)
     }
 }
 
+TEST(RegistryConfig, HomeNotSet)
+{
+    try
+    {
+        putenv(const_cast<char*>("HOME="));
+        RegistryConfig c("Registry", TEST_REGISTRY_PATH);
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        boost::regex r( "unity::scopes::ConfigException: .*: No Click.InstallDir "
+                        "configured and \\$HOME not set");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
+}
+
 TEST(RegistryConfig, ScoperunnerRelativePath)
 {
     try
     {
+        putenv(const_cast<char*>("HOME=/tmp"));
         RegistryConfig c("Registry", "ScoperunnerRelativePath.ini");
         FAIL();
     }

@@ -21,7 +21,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-//#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 
 using namespace std;
 using namespace unity;
