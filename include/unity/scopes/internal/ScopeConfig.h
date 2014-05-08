@@ -48,6 +48,7 @@ public:
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
     std::string scope_runner() const;    // Optional, throws NotFoundException if not present
+    int64_t idle_timeout() const;        // Optional, returns default value if not present
 
     VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
 
@@ -62,6 +63,7 @@ private:
     std::unique_ptr<std::string> hot_key_;
     bool invisible_;
     std::unique_ptr<std::string> scope_runner_;
+    int64_t idle_timeout_;
     VariantMap appearance_attributes_;
 };
 
