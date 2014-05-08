@@ -102,7 +102,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
 
         // Create a servant for the scope and register the servant.
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_id, move(scope), 10000);
+        auto proxy = mw->add_scope_object(scope_id, move(scope), 10000); ///!
 
         trap->signal_raised().connect([mw](core::posix::Signal)
         {

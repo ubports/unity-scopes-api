@@ -440,7 +440,6 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
         auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir(), ctrl_category);
-        adapter->activate();
         function<void()> df;
         auto p = safe_add(df, adapter, "", qci);
         ctrl->set_disconnect_function(df);
@@ -463,7 +462,6 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
     {
         shared_ptr<QueryCtrlI> qci(make_shared<QueryCtrlI>(ctrl));
         auto adapter = find_adapter(server_name_ + ctrl_suffix, config_.private_dir(), ctrl_category);
-        adapter->activate();
         auto df = safe_dflt_add(adapter, ctrl_category, qci);
         ctrl->set_disconnect_function(df);
     }
@@ -484,7 +482,6 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     {
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
         auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir(), query_category);
-        adapter->activate();
         function<void()> df;
         auto p = safe_add(df, adapter, "", qi);
         query->set_disconnect_function(df);
@@ -507,7 +504,6 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
     {
         shared_ptr<QueryI> qi(make_shared<QueryI>(query));
         auto adapter = find_adapter(server_name_ + query_suffix, config_.private_dir(), query_category);
-        adapter->activate();
         auto df = safe_dflt_add(adapter, query_category, qi);
         query->set_disconnect_function(df);
     }
@@ -529,7 +525,6 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     {
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
         auto adapter = find_adapter(server_name_, config_.public_dir(), registry_category);
-        adapter->activate();
         function<void()> df;
         auto p = safe_add(df, adapter, identity, ri);
         registry->set_disconnect_function(df);
@@ -553,7 +548,6 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     {
         shared_ptr<ReplyI> ri(make_shared<ReplyI>(reply));
         auto adapter = find_adapter(server_name_ + reply_suffix, config_.public_dir(), reply_category);
-        adapter->activate();
         function<void()> df;
         auto p = safe_add(df, adapter, "", ri);
         reply->set_disconnect_function(df);
@@ -577,8 +571,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
-        adapter->activate(idle_timeout != 0 ? idle_timeout : zmqpp::poller::wait_forever );
+        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category, idle_timeout);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
@@ -601,7 +594,6 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
         auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
-        adapter->activate();
         auto df = safe_dflt_add(adapter, scope_category, si);
         scope->set_disconnect_function(df);
     }
@@ -623,7 +615,6 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     {
         shared_ptr<StateReceiverI> sri(make_shared<StateReceiverI>(state_receiver));
         auto adapter = find_adapter(server_name_ + state_suffix, config_.private_dir(), state_category);
-        adapter->activate();
         function<void()> df;
         auto p = safe_add(df, adapter, identity, sri);
         state_receiver->set_disconnect_function(df);
@@ -724,7 +715,7 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
 }
 
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir,
-                                                      string const& category)
+                                                      string const& category, int64_t idle_timeout)
 {
     lock_guard<mutex> lock(data_mutex_);
 
@@ -800,6 +791,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     }
 
     shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size));
+    a->activate(idle_timeout != 0 ? idle_timeout : zmqpp::poller::wait_forever);
     am_[name] = a;
     return a;
 }

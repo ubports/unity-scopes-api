@@ -30,7 +30,6 @@
 #include <unity/scopes/ObjectProxyFwd.h>
 
 #include <zmqpp/context.hpp>
-#include <zmqpp/poller.hpp>
 
 namespace unity
 {
@@ -100,7 +99,7 @@ private:
                            int64_t timeout);
 
     std::shared_ptr<ObjectAdapter> find_adapter(std::string const& name, std::string const& endpoint_dir,
-                                                std::string const& category);
+                                                std::string const& category, int64_t idle_timeout = 0);
 
     ZmqProxy safe_add(std::function<void()>& disconnect_func,
                       std::shared_ptr<ObjectAdapter> const& adapter,
