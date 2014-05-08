@@ -106,10 +106,9 @@ public:
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
-    OptionSelectorFilter(std::string const& id, std::string const& label, bool multi_select = false);
-    OptionSelectorFilter(VariantMap const& var);
+    OptionSelectorFilter(internal::OptionSelectorFilterImpl*);
     internal::OptionSelectorFilterImpl* fwd() const;
-    friend class internal::FilterBaseImpl;
+    friend class internal::OptionSelectorFilterImpl;
 };
 
 } // namespace scopes

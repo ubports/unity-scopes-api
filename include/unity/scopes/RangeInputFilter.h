@@ -139,7 +139,6 @@ public:
 private:
     RangeInputFilter(internal::RangeInputFilterImpl*);
     internal::RangeInputFilterImpl* fwd() const;
-    friend class internal::FilterBaseImpl;
     friend class internal::RangeInputFilterImpl;
 };
 
