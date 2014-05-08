@@ -150,7 +150,7 @@ bool ConfigBase::path_exists(string const& path) const
 // Check whether a configuration file contains unknown groups
 // or unknown keys within a known group. This is useful to catch typos.
 // For example, if a config file contains "Smartscopes.Registry.Idenity" instead
-// of "SS.Registry.Identity" (did you spot it?), we print a warning,
+// of "Smartscopes.Registry.Identity" (did you spot it?), we print a warning,
 // so people don't endlessly scratch their heads as to why the config
 // isn't working for them.
 //

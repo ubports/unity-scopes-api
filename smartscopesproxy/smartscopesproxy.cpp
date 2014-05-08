@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
 
         // Add objects to the middlewares
-        reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
+        reg_mw->add_registry_object(reg_rt->ss_registry_identity(), reg);
         scope_mw->add_dflt_scope_object(std::move(scope));
 
         if (sig_upstart)
