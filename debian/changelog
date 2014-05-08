@@ -15,6 +15,9 @@ unity-scopes-api (0.4.4-0ubuntu1) UNRELEASED; urgency=low
   [ Pawel Stolowski ]
   * Renamed SearchReply::register_annotation() to push().
 
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
  -- Michi Henning <michi.henning@canonical.com>  Thu, 01 May 2014 13:55:48 +1000
 
 unity-scopes-api (0.4.3+14.10.20140502.1-0ubuntu1) utopic; urgency=low
