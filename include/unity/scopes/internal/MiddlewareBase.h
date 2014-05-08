@@ -65,7 +65,9 @@ public:
     virtual ObjectProxy string_to_proxy(std::string const& s) = 0;
     virtual std::string proxy_to_string(MWProxy const& proxy) = 0;
 
-    virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
+    virtual MWRegistryProxy registry_proxy() = 0;
+    virtual MWRegistryProxy ss_registry_proxy() = 0;
+
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) = 0;

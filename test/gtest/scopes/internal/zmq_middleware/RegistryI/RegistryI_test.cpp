@@ -96,7 +96,6 @@ TEST(RegistryI, get_metadata)
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
     string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
@@ -120,7 +119,6 @@ TEST(RegistryI, list)
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
     string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
@@ -170,7 +168,6 @@ TEST(RegistryI, add_remove)
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
     string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
@@ -223,7 +220,6 @@ TEST(RegistryI, exceptions)
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
     string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
     string mw_configfile = c.mw_configfile();
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
@@ -316,7 +312,6 @@ TEST(RegistryI, locate_mock)
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
     string mw_kind = c.mw_kind();
-    string mw_endpoint = c.endpoint();
     string mw_configfile = c.mw_configfile();
     RegistryObject::ScopeExecData dummy_exec_data;
 
@@ -500,7 +495,7 @@ TEST_F(RegistryTest, locate_init)
 // test locating the same scope multiple times
 TEST_F(RegistryTest, locate_one)
 {
-    // locate all scopes (hense starting all scope processes)
+    // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
     {
         EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
@@ -603,7 +598,7 @@ TEST_F(RegistryTest, locate_rebinding)
 // test removing a scope
 TEST_F(RegistryTest, locate_remove)
 {
-    // locate all scopes (hense starting all scope processes)
+    // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
     {
         EXPECT_EQ(proxies[scope_id], reg->locate(scope_id));
@@ -612,7 +607,7 @@ TEST_F(RegistryTest, locate_remove)
     // check that 6 new processes were started
     EXPECT_EQ(6, process_count());
 
-    // remove a scope (hense killing the process)
+    // remove a scope (hence killing the process)
     EXPECT_TRUE(reg->remove_local_scope(scope_ids[0]));
 
     // check that we now have 5 scopes running

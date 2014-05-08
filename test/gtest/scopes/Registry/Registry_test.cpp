@@ -80,11 +80,13 @@ TEST(Registry, metadata)
     // wait for the registry to become available on middleware
     // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
     const int num_retries = 10;
+    bool registry_started = false;
     for (int i = 0; i < num_retries; ++i)
     {
         try
         {
             r->list(); // this will throw if the registry is not yet available on middleware
+            registry_started = true;
             break;
         }
         catch (std::exception const&)
@@ -92,6 +94,7 @@ TEST(Registry, metadata)
             sleep(1);
         }
     }
+    ASSERT_TRUE(registry_started);
 
     auto meta = r->get_metadata("testscopeA");
     EXPECT_EQ("testscopeA", meta.scope_id());

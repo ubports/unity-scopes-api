@@ -44,17 +44,17 @@ public:
     void destroy();
 
     std::string scope_id() const;
-    std::string configfile() const;
     MiddlewareFactory const* factory() const;
     RegistryProxy registry() const;
     std::string registry_configfile() const;
     std::string registry_identity() const;
-    std::string registry_endpointdir() const;
-    std::string registry_endpoint() const;
+    std::string ss_configfile() const;
+    std::string ss_registry_identity() const;
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
-    void run_scope(ScopeBase *const scope_base, std::string const &scope_ini_file);
+    void run_scope(ScopeBase* const scope_base, std::string const& scope_ini_file);
+    void run_scope(ScopeBase* const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
 
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
@@ -67,14 +67,13 @@ private:
 
     bool destroyed_;
     std::string scope_id_;
-    std::string configfile_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
     mutable RegistryProxy registry_;
     mutable std::string registry_configfile_;
     mutable std::string registry_identity_;
-    mutable std::string registry_endpointdir_;
-    mutable std::string registry_endpoint_;
+    mutable std::string ss_configfile_;
+    mutable std::string ss_registry_identity_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;
