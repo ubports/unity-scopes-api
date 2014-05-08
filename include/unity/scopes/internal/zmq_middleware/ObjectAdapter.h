@@ -60,7 +60,7 @@ public:
                   std::string const& endpoint,
                   RequestMode m,
                   int pool_size,
-                  int idle_timeout = zmqpp::poller::wait_forever);
+                  int64_t idle_timeout = zmqpp::poller::wait_forever);
     ~ObjectAdapter();
 
     ZmqMiddleware* mw() const;
@@ -117,7 +117,7 @@ private:
     std::string endpoint_;
     RequestMode mode_;
     int pool_size_;
-    int idle_timeout_;
+    int64_t idle_timeout_;
     // std::unique_ptr<zmqpp::socket> ctrl_;       // PUB socket to signal when to deactivate
     // std::mutex ctrl_mutex_;                     // Synchronizes access to ctrl_ when sending
     std::unique_ptr<StopPublisher> stopper_;    // Used to signal threads when it's time to terminate

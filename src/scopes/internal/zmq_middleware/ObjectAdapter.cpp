@@ -50,7 +50,7 @@ namespace zmq_middleware
 {
 
 ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
-                             int pool_size, int idle_timeout) :
+                             int pool_size, int64_t idle_timeout) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
