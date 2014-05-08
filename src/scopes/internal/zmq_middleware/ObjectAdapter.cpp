@@ -596,7 +596,9 @@ void ObjectAdapter::broker_thread()
             zmqpp::message message;
             if (!poller.poll(shutdown_timeout_))
             {
-                cout << "TIMEOUT!\n";
+                // No incoming messages have been received for shutdown_timeout_ milliseconds.
+                // Shutdown this server by stopping the middleware.
+                mw_.stop();
             }
             if (poller.has_input(stop))
             {
