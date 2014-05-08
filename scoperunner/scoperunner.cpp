@@ -104,12 +104,8 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
         auto proxy = mw->add_scope_object(scope_id, move(scope));
 
-        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_id](core::posix::Signal)
+        trap->signal_raised().connect([mw](core::posix::Signal)
         {
-            // Inform the registry that this scope is shutting down
-            reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
-
-            loader->stop();
             mw->stop();
         });
 
@@ -117,6 +113,11 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
 
         mw->wait_for_shutdown();
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
+
+        loader->stop();
 
         // Collect exit status from the run thread. If this throws, the ScopeLoader
         // destructor will still call stop() on the scope.
