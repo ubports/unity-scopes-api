@@ -90,25 +90,36 @@ RegistryObject::~RegistryObject()
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
-    // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
+        // If the id is empty, it was sent as empty by the remote client.
         throw unity::InvalidArgumentException("RegistryObject::get_metadata(): Cannot search for scope with empty id");
     }
 
     // Look for the scope in both the local and the remote map.
-    // Local scopes take precedence over remote ones of the same
-    // id. (Ideally, this should never happen.)
-    auto const& scope_it = scopes_.find(scope_id);
-    if (scope_it != scopes_.end())
+    // Local scopes take precedence over remote ones of the same id.
+    // (Ideally, this should never happen.)
     {
-        return scope_it->second;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        auto const& scope_it = scopes_.find(scope_id);
+        if (scope_it != scopes_.end())
+        {
+            return scope_it->second;
+        }
     }
+    // Unlock, so we don't call the remote registry while holding a lock.
 
     if (remote_registry_)
     {
-        return remote_registry_->get_metadata(scope_id);
+        try
+        {
+            return remote_registry_->get_metadata(scope_id);
+        }
+        catch (std::exception const& e)
+        {
+            cerr << "cannot get metdata from remote registry: " << e.what() << endl;
+            // TODO: log error
+        }
     }
 
     throw NotFoundException("RegistryObject::get_metadata(): no such scope: ",  scope_id);
@@ -116,16 +127,28 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
 
 MetadataMap RegistryObject::list() const
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
-    MetadataMap all_scopes(scopes_);  // Local scopes
+    MetadataMap all_scopes;  // Local scopes
+    {
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        all_scopes = scopes_;  // Local scopes
+    }
+    // Unlock, so we don't call the remote registry while holding a lock.
 
     // If a remote scope has the same id as a local one,
     // this will not overwrite a local scope with a remote
     // one if they have the same id.
     if (remote_registry_)
     {
-        MetadataMap remote_scopes = remote_registry_->list();
-        all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
+        try
+        {
+            MetadataMap remote_scopes = remote_registry_->list();
+            all_scopes.insert(remote_scopes.begin(), remote_scopes.end());
+        }
+        catch (std::exception const& e)
+        {
+            cerr << "cannot get scopes list from remote registry: " << e.what() << endl;
+            // TODO: log error
+        }
     }
 
     return all_scopes;
@@ -133,22 +156,23 @@ MetadataMap RegistryObject::list() const
 
 ObjectProxy RegistryObject::locate(std::string const& identity)
 {
-    decltype(scopes_.cbegin()) scope_it;
-    decltype(scope_processes_.begin()) proc_it;
+    // If the id is empty, it was sent as empty by the remote client.
+    if (identity.empty())
+    {
+        throw unity::InvalidArgumentException("RegistryObject::locate(): Cannot locate scope with empty id");
+    }
 
+    ObjectProxy proxy;
+    ProcessMap::iterator proc_it;
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
-        // If the id is empty, it was sent as empty by the remote client.
-        if (identity.empty())
-        {
-            throw unity::InvalidArgumentException("RegistryObject::locate(): Cannot locate scope with empty id");
-        }
 
-        scope_it = scopes_.find(identity);
+        auto scope_it = scopes_.find(identity);
         if (scope_it == scopes_.end())
         {
             throw NotFoundException("RegistryObject::locate(): Tried to locate unknown local scope", identity);
         }
+        proxy = scope_it->second.proxy();
 
         proc_it = scope_processes_.find(identity);
         if (proc_it == scope_processes_.end())
@@ -157,15 +181,15 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
         }
     }
 
+    // Exec after unlocking, so we can start processing another locate()
     proc_it->second.exec(death_observer_, executor_);
-    return scope_it->second.proxy();
+
+    return proxy;
 }
 
 bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
-    bool return_value = true;
     if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot add scope with empty id");
@@ -175,6 +199,9 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         throw unity::InvalidArgumentException("RegistryObject::add_local_scope(): Cannot create a scope with '/' in its id");
     }
 
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    bool return_value = true;
     if (scopes_.find(scope_id) != scopes_.end())
     {
         scopes_.erase(scope_id);
@@ -188,13 +215,14 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
 
 bool RegistryObject::remove_local_scope(std::string const& scope_id)
 {
-    lock_guard<decltype(mutex_)> lock(mutex_);
     // If the id is empty, it was sent as empty by the remote client.
     if (scope_id.empty())
     {
         throw unity::InvalidArgumentException("RegistryObject::remove_local_scope(): Cannot remove scope "
                                               "with empty id");
     }
+
+    lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
     return scopes_.erase(scope_id) == 1;
@@ -208,6 +236,8 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 
 bool RegistryObject::is_scope_running(std::string const& scope_id)
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
@@ -224,14 +254,16 @@ StateReceiverObject::SPtr RegistryObject::state_receiver()
 
 void RegistryObject::on_process_death(core::posix::Process const& process)
 {
-    // the death observer has signaled that a child has died.
-    // broadcast this message to each scope process until we have found the process in question.
-    // (this is slightly more efficient than just connecting the signal to every scope process)
+    // The death observer has signaled that a child has died.
+    // Broadcast this message to each scope process until we have found the process in question.
+    // (This is slightly more efficient than just connecting the signal to every scope process.)
     pid_t pid = process.pid();
     for (auto& scope_process : scope_processes_)
     {
         if (scope_process.second.on_process_death(pid))
+        {
             break;
+        }
     }
 }
 

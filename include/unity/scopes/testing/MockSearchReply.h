@@ -58,6 +58,7 @@ public:
     MOCK_METHOD1(push, bool(CategorisedResult const&));
     MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
     MOCK_METHOD1(register_annotation, bool(Annotation const& annotation));
+    MOCK_METHOD1(push, bool(Annotation const& annotation));
 };
 
 /// @endcond

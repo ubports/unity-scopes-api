@@ -90,7 +90,7 @@ Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
     return cat_registry_->lookup_category(id);
 }
 
-bool SearchReplyImpl::register_annotation(unity::scopes::Annotation const& annotation)
+bool SearchReplyImpl::push(unity::scopes::Annotation const& annotation)
 {
     VariantMap var;
     var["annotation"] = annotation.serialize();

@@ -109,7 +109,8 @@ TEST(Invocation, timeout)
     EXPECT_EQ(ListenerBase::Error, receiver->reason());
     EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 2000 milliseconds", receiver->error_message());
 
-   // this_thread::sleep_for(chrono::milliseconds(500));
+    // Wait another second, so TestScope is finally able to receive another request.
+    this_thread::sleep_for(chrono::seconds(1));
 
     // Second call must succeed
     scope->search("test", SearchMetadata("unused", "unused"), receiver);
@@ -119,10 +120,10 @@ TEST(Invocation, timeout)
     EXPECT_EQ("", receiver->error_message());
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     TestScope scope;
-    rt->run_scope(&scope, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "/foo");
 }
 
 int main(int argc, char **argv)
@@ -130,7 +131,7 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, srt);
+    std::thread scope_t(scope_thread, srt, "Runtime.ini");
 
     // Give thread some time to bind to its endpoint, to avoid getting ObjectNotExistException
     // from a synchronous remote call.

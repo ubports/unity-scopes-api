@@ -84,7 +84,7 @@ public:
         CannedQuery q("scope-A", query_.query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
-        reply->register_annotation(annotation);
+        reply->push(annotation);
 
         cerr << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
     }

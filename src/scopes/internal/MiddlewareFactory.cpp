@@ -62,7 +62,7 @@ MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
     {
         case Kind_Zmq:
         {
-            mw = make_shared<zmq_middleware::ZmqMiddleware>(server_name, configfile, runtime_);
+            mw = make_shared<zmq_middleware::ZmqMiddleware>(server_name, runtime_, configfile);
             break;
         }
         case Kind_REST:

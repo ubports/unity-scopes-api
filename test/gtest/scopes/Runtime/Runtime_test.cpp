@@ -382,22 +382,22 @@ TEST(Runtime, early_cancel)
     this_thread::sleep_for(chrono::milliseconds(200));
 }
 
-void scope_thread(Runtime::SPtr const& rt)
+void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     TestScope scope;
-    rt->run_scope(&scope, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "/foo");
 }
 
-void pusher_thread(Runtime::SPtr const& rt)
+void pusher_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     PusherScope scope;
-    rt->run_scope(&scope, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "/foo");
 }
 
-void slow_create_thread(Runtime::SPtr const& rt)
+void slow_create_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     SlowCreateScope scope;
-    rt->run_scope(&scope, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "/foo");
 }
 
 int main(int argc, char **argv)
@@ -405,13 +405,13 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, srt);
+    std::thread scope_t(scope_thread, srt, "Runtime.ini");
 
     Runtime::SPtr prt = move(Runtime::create_scope_runtime("PusherScope", "Runtime.ini"));
-    std::thread pusher_t(pusher_thread, prt);
+    std::thread pusher_t(pusher_thread, prt, "Runtime.ini");
 
     Runtime::SPtr scrt = move(Runtime::create_scope_runtime("SlowCreateScope", "Runtime.ini"));
-    std::thread slow_create_t(slow_create_thread, scrt);
+    std::thread slow_create_t(slow_create_thread, scrt, "Runtime.ini");
 
     // Give threads some time to bind to their endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.

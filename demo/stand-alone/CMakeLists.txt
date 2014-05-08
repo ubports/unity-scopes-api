@@ -1,5 +1,4 @@
 configure_file(Runtime.ini.in Runtime.ini)
-configure_file(Zmq.ini.in Zmq.ini)
 
 add_executable(stand-alone-client stand-alone-client.cpp)
 

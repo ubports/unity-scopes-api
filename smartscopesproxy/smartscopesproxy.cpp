@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
@@ -107,14 +108,14 @@ int main(int argc, char* argv[])
     {
         SignalThreadWrapper signal_handler;
 
-        ///! TODO: get these from config
-        std::string ss_reg_id = "SSRegistry";
-        std::string ss_scope_id = "SmartScope";
-        uint const http_reply_timeout = 20000;
-        uint const ss_reg_refresh_rate = 60 * 60 * 24; // 24 hour refresh (in seconds)
+        RuntimeConfig rt_config(config_file);
+        std::string ss_reg_id = rt_config.ss_registry_identity();
+
+        SSConfig ss_config(rt_config.ss_configfile());
+        std::string ss_scope_id = ss_config.scope_identity();
 
         // Instantiate SS registry and scopes runtimes
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, DFLT_SS_RUNTIME_INI);
+        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, config_file);
         RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, config_file);
 
         // Get registry config
@@ -133,14 +134,13 @@ int main(int argc, char* argv[])
         });
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, scope_mw->get_scope_endpoint(),
-                                                        http_reply_timeout, ss_reg_refresh_rate));
+        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, ss_config, scope_mw->get_scope_endpoint()));
 
         // Instantiate a SS scope object
         SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
 
         // Add objects to the middlewares
-        reg_mw->add_registry_object(reg_rt->registry_identity(), reg);
+        reg_mw->add_registry_object(reg_rt->ss_registry_identity(), reg);
         scope_mw->add_dflt_scope_object(std::move(scope));
 
         if (sig_upstart)
