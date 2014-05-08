@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/internal/smartscopes/SSConfig.h>
 
 #include <mutex>
 
@@ -42,8 +43,10 @@ class SSRegistryObject final : public RegistryObjectBase
 public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
-                     uint http_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
+    SSRegistryObject(MiddlewareBase::SPtr middleware,
+                     SSConfig const& ss_config,
+                     std::string const& ss_scope_endpoint,
+                     std::string const& sss_url = "",
                      bool caching_enabled = true);
     virtual ~SSRegistryObject() noexcept;
 
@@ -78,6 +81,7 @@ private:
     std::string ss_scope_endpoint_;
     uint const regular_refresh_timeout_;
     uint next_refresh_timeout_;
+    uint const failed_refresh_timeout_;
 
     bool caching_enabled_;
 };

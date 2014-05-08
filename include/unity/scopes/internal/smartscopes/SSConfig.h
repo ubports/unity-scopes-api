@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,11 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
-#define UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
+#ifndef UNITY_SCOPES_INTERNAL_SSCONFIG_H
+#define UNITY_SCOPES_INTERNAL_SSCONFIG_H
 
 #include <unity/scopes/internal/ConfigBase.h>
-#include <unity/scopes/Runtime.h>
 
 namespace unity
 {
@@ -31,27 +30,28 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeConfig : public ConfigBase
+namespace smartscopes
+{
+
+class SSConfig : public ConfigBase
 {
 public:
-    RuntimeConfig(std::string const& configfile);
-    ~RuntimeConfig();
+    SSConfig(std::string const& configfile);
+    ~SSConfig();
 
-    std::string registry_identity() const;
-    std::string registry_configfile() const;
-    std::string ss_registry_identity() const;
-    std::string ss_configfile() const;
-    std::string default_middleware() const;
-    std::string default_middleware_configfile() const;
+    int http_reply_timeout() const;             // seconds
+    int reg_refresh_rate() const;               // seconds
+    int reg_refresh_fail_timeout() const;       // seconds
+    std::string scope_identity() const;
 
 private:
-    std::string registry_identity_;
-    std::string registry_configfile_;
-    std::string ss_registry_identity_;
-    std::string ss_configfile_;
-    std::string default_middleware_;
-    std::string default_middleware_configfile_;
+    int http_reply_timeout_;
+    int reg_refresh_rate_;
+    int reg_refresh_fail_timeout_;
+    std::string scope_identity_;
 };
+
+} // namespace smartscopes
 
 } // namespace internal
 

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
+#include <iostream>  // TODO: remove this
 
 using namespace std;
 
@@ -32,14 +33,15 @@ namespace scopes
 namespace internal
 {
 
-const char* RuntimeConfig::RUNTIME_CONFIG_GROUP = "Runtime";
-
 namespace
 {
-    const string registry_identity_str = "Registry.Identity";
-    const string registry_configfile_str = "Registry.ConfigFile";
-    const string default_middleware_str = "Default.Middleware";
-    const string default_middleware_configfile_str = "ConfigFile";
+    const string runtime_config_group = "Runtime";
+    const string registry_identity_key = "Registry.Identity";
+    const string registry_configfile_key = "Registry.ConfigFile";
+    const string ss_registry_identity_key = "Smartscopes.Registry.Identity";
+    const string ss_configfile_key = "Smartscopes.ConfigFile";
+    const string default_middleware_key = "Default.Middleware";
+    const string default_middleware_configfile_key = ".ConfigFile";
 }
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :
@@ -47,25 +49,38 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
 {
     if (configfile.empty())  // Default config
     {
-        registry_identity_ = "Registry";
+        registry_identity_ = DFLT_REGISTRY_ID;
         registry_configfile_ = DFLT_REGISTRY_INI;
-        default_middleware_ = "Zmq";
-        default_middleware_configfile_ = "Zmq.ini";
+        ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
+        ss_configfile_ = DFLT_SS_INI;
+        default_middleware_ = DFLT_MIDDLEWARE;
+        default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
     }
     else
     {
-        registry_identity_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_identity_str);
-        auto pos = registry_identity_.find_first_of("@:/");
-        if (pos != string::npos)
-        {
-            throw_ex("Illegal character in value for " + registry_identity_str + ": \"" + registry_identity_ +
-                     "\": identity cannot contain '" + registry_identity_[pos] + "'");
-        }
-        registry_configfile_ = get_optional_string(RUNTIME_CONFIG_GROUP, registry_configfile_str);
-        default_middleware_ = get_middleware(RUNTIME_CONFIG_GROUP, default_middleware_str);
-        default_middleware_configfile_ = get_string(RUNTIME_CONFIG_GROUP,
-                                                    default_middleware_ + "." + default_middleware_configfile_str);
+        registry_identity_ = get_optional_string(runtime_config_group, registry_identity_key);
+        registry_configfile_ = get_optional_string(runtime_config_group, registry_configfile_key);
+        ss_configfile_ = get_optional_string(runtime_config_group, ss_configfile_key);
+        ss_registry_identity_ = get_optional_string(runtime_config_group, ss_registry_identity_key);
+        default_middleware_ = get_middleware(runtime_config_group, default_middleware_key);
+        default_middleware_configfile_ = get_optional_string(runtime_config_group,
+                                                             default_middleware_ + default_middleware_configfile_key,
+                                                             DFLT_MIDDLEWARE_INI);
     }
+
+    const KnownEntries known_entries = {
+                                          {  runtime_config_group,
+                                             {
+                                                registry_identity_key,
+                                                registry_configfile_key,
+                                                ss_registry_identity_key,
+                                                ss_configfile_key,
+                                                default_middleware_key,
+                                                default_middleware_ + default_middleware_configfile_key
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 RuntimeConfig::~RuntimeConfig()
@@ -80,6 +95,16 @@ string RuntimeConfig::registry_identity() const
 string RuntimeConfig::registry_configfile() const
 {
     return registry_configfile_;
+}
+
+string RuntimeConfig::ss_registry_identity() const
+{
+    return ss_registry_identity_;
+}
+
+string RuntimeConfig::ss_configfile() const
+{
+    return ss_configfile_;
 }
 
 string RuntimeConfig::default_middleware() const

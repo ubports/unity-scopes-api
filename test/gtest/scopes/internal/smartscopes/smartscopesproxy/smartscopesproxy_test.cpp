@@ -61,12 +61,14 @@ public:
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
+        SSConfig ss_config(reg_rt_->ss_configfile());
+
         // Get middleware handles from runtimes
         reg_mw_ = reg_rt_->factory()->find(reg_id_, mw_kind);
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 20000, 60,
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, ss_config, scope_mw_->get_scope_endpoint(),
                                                            "http://127.0.0.1:" + std::to_string(server_.port_), false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
@@ -119,7 +121,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
 
     // locate should throw (via mw)
-    MWRegistryProxy mw_reg = reg_mw_->create_registry_proxy(reg_id_, reg_mw_->get_scope_endpoint());
+    MWRegistryProxy mw_reg = reg_mw_->registry_proxy();
     EXPECT_THROW(mw_reg->locate("Dummy Demo Scope"), RegistryException);
 
     // list scopes (via mw)

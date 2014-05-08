@@ -53,7 +53,7 @@ class ServantBase;
 class ZmqMiddleware final : public MiddlewareBase
 {
 public:
-    ZmqMiddleware(std::string const& server_name, std::string const& configfile, RuntimeImpl* runtime);
+    ZmqMiddleware(std::string const& server_name, RuntimeImpl* runtime, std::string const& configfile = "");
     virtual ~ZmqMiddleware();
 
     virtual void start() override;
@@ -63,7 +63,9 @@ public:
     virtual ObjectProxy string_to_proxy(std::string const& s) override;
     virtual std::string proxy_to_string(MWProxy const& proxy) override;
 
-    virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) override;
+    virtual MWRegistryProxy registry_proxy() override;
+    virtual MWRegistryProxy ss_registry_proxy() override;
+
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) override;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) override;
@@ -110,6 +112,8 @@ private:
 
     std::string server_name_;
     zmqpp::context context_;
+    MWRegistryProxy registry_proxy_;
+    MWRegistryProxy ss_registry_proxy_;
 
     typedef std::map<std::string, std::shared_ptr<ObjectAdapter>> AdapterMap;
     AdapterMap am_;

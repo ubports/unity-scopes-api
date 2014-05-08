@@ -89,14 +89,19 @@ public:
     virtual bool push(CategorisedResult const& result) = 0;
 
     /**
-    \brief Register an annotation.
+    \brief Push an annotation.
+    \deprecated Push an annotation. Please use push(Annotation const&) instead. This method will be removed with version 0.4.5 of the Scopes API.
+     */
+    virtual bool register_annotation(Annotation const& annotation);
 
-    The annotation will be rendered at a next available spot below any category registered earlier.
-    To render annotations in the top annotation area, call register_annotation() before
-    registering any categories.
+    /**
+    \brief Push an annotation.
+
+    The annotation will be rendered at a next available spot below the category of last pushed result.
+    To render an annotation in the top annotation area, push it before pushing search results.
     \note The Unity shell can ignore some or all annotations, depending on available screen real estate.
     */
-    virtual bool register_annotation(Annotation const& annotation) = 0;
+    virtual bool push(Annotation const& annotation) = 0;
 
     /**
     \brief Sends all filters and their state to the source of a query.

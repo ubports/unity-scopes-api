@@ -47,9 +47,6 @@ namespace
 {
     // this mutex protects all members of all ZmqObjectProxies
     std::mutex shared_mutex;
-
-    // There is only one registry proxy, so share it across all ZmqObjectProxies
-    ZmqRegistryProxy shared_reg_proxy = nullptr;
 }
 
 #define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
@@ -217,40 +214,16 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     }
     catch (TimeoutException const&)
     {
-        // retrieve the registry proxy if we haven't already done so
-        {
-            lock_guard<mutex> lock(shared_mutex);
-            if (!shared_reg_proxy)
-            {
-                auto runtime = mw_base() ? mw_base()->runtime() : nullptr;
-                if (!runtime)
-                {
-                    throw;
-                }
+        auto registry_proxy = mw_base()->registry_proxy();
 
-                // we must do this via lazy initialization as attempting to do this in
-                // the constructor causes a deadlock when accessing runtime methods
-                shared_reg_proxy = dynamic_pointer_cast<ZmqRegistry>(mw_base()->create_registry_proxy(
-                                                                         runtime->registry_identity(),
-                                                                         runtime->registry_endpoint()));
-
-                // this really shouldn't happen but if we do fail to retrieve the
-                // registry proxy, just rethrow the exception
-                if (!shared_reg_proxy)
-                {
-                    throw;
-                }
-            }
-        }
-
-        // if this object is the registry itself, rethrow the exception
-        if (identity() == shared_reg_proxy->identity())
+        // If no registry is configured or if this object is the registry itself, rethrow the exception
+        if (!registry_proxy || identity() == registry_proxy->identity())
         {
             throw;
         }
 
         // rebind
-        ObjectProxy new_proxy = shared_reg_proxy->locate(identity());
+        ObjectProxy new_proxy = registry_proxy->locate(identity());
 
         // update our proxy with the newly received data
         // (we need to first store values in local variables outside of the mutex,
@@ -312,7 +285,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
         // If a request times out, we must trash the corresponding socket, otherwise
         // zmq gets confused: the reply will never be read, so the socket ends up
         // in a bad state.
-        // (removing a socket from the connection pool deletes it, hense closing the socket)
+        // (Removing a socket from the connection pool deletes it, hence closing the socket.)
         pool.remove(endpoint);
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }

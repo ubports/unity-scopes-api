@@ -123,10 +123,11 @@ private:
 
     Executor::SPtr executor_;
 
-    mutable std::mutex mutex_;
     MetadataMap scopes_;
-    std::map<std::string, ScopeProcess> scope_processes_;
+    typedef std::map<std::string, ScopeProcess> ProcessMap;
+    ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal
