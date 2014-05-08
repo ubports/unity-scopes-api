@@ -17,6 +17,8 @@
  */
 
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
@@ -31,7 +33,11 @@
 static std::string homedir()
 {
     static const char* home = getenv("HOME");
-    return home ? home : "";
+    if (!home)
+    {
+        throw unity::scopes::ConfigException("smartscopesclient: HOME not set, cannot configure cache");
+    }
+    return home;
 }
 
 static const std::string c_base_url = "https://dash.ubuntu.com/smartscopes/v2";
