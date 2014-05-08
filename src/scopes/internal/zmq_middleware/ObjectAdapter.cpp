@@ -50,13 +50,14 @@ namespace internal
 namespace zmq_middleware
 {
 
-ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m, int pool_size) :
+ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
+                             int pool_size, int64_t idle_timeout) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
     mode_(m),
     pool_size_(pool_size),
-    idle_timeout_(zmqpp::poller::wait_forever),
+    idle_timeout_(idle_timeout > 0 ? idle_timeout : zmqpp::poller::wait_forever),
     state_(Inactive)
 {
     assert(!name.empty());
@@ -276,7 +277,7 @@ shared_ptr<ServantBase> ObjectAdapter::find_dflt_servant(std::string const& cate
     return shared_ptr<ServantBase>();
 }
 
-void ObjectAdapter::activate(int64_t idle_timeout)
+void ObjectAdapter::activate()
 {
     unique_lock<mutex> lock(state_mutex_);
     switch (state_)
@@ -286,10 +287,6 @@ void ObjectAdapter::activate(int64_t idle_timeout)
             state_ = Activating;  // No notify_all() here because no-one waits for this
             try
             {
-                if (idle_timeout > 0)
-                {
-                    idle_timeout_ = idle_timeout;
-                }
                 lock.unlock();
                 run_workers();
                 lock.lock();
