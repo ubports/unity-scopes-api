@@ -467,6 +467,7 @@ public:
         exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
         exec_data.runtime_config = rt_config;
         exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        exec_data.timeout_ms = 1500;
 
         reg->add_local_scope(test_scope_id, move(meta), exec_data);
 
