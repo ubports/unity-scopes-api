@@ -205,7 +205,7 @@ The following keys are recognized in the ScopeConfig group:
 
 - IdleTimeout
 
-  The amount of time (in seconds) a running scope can be inactive before it will automatically shutdown.
+  The amount of time (in seconds) a running scope can be inactive before it will automatically shut down.
   If not set, a default value of 40 is used.
 
 The following keys are recognized in the Appearance group:
