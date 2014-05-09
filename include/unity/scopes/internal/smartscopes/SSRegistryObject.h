@@ -84,6 +84,7 @@ private:
     uint const failed_refresh_timeout_;
 
     bool caching_enabled_;
+    std::string locale_;
 };
 
 }  // namespace smartscopes

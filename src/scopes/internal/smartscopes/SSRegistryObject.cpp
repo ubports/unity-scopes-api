@@ -58,6 +58,20 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     , failed_refresh_timeout_(ss_config.reg_refresh_fail_timeout())
     , caching_enabled_(caching_enabled)
 {
+    // get locale_ from LANGUAGE environment variable (if not available, the default is "").
+    char const* locale = getenv("LANGUAGE");
+    if (locale && *locale != '\0')
+    {
+        // LANGUAGE is a colon separated list of locales in order of priority.
+        // We are only concerned with the highest priority locale, so we split it out here.
+        locale_ = std::string(locale);
+        size_t colon_pos = locale_.find(':');
+        if (colon_pos != std::string::npos)
+        {
+            locale_.resize(colon_pos);
+        }
+    }
+
     // get remote scopes then start the auto-refresh background thread
     try
     {
@@ -175,8 +189,7 @@ void SSRegistryObject::get_remote_scopes()
     try
     {
         // request remote scopes from smart scopes client
-        ///! TODO: locale
-        if (ssclient_->get_remote_scopes(remote_scopes, "", caching_enabled_))
+        if (ssclient_->get_remote_scopes(remote_scopes, locale_, caching_enabled_))
         {
             next_refresh_timeout_ = regular_refresh_timeout_;
         }
