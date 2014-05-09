@@ -112,6 +112,16 @@ public:
     void set_subdepartments(DepartmentList const& departments);
 
     /**
+     \brief Set the alternate label (plural of the normal label) of this department.
+
+     The alternate label should express the plural "all" form of the normal label. For example,
+     if the normal label is "Books", then the alternate label should be "All Books". The alternate label
+     needs to be provided for the current department only.
+     \param label The alternate label to display when showing plural form of this department's name.
+    */
+    void set_alternate_label(std::string const& label);
+
+    /**
      \brief Sets has_subdepartments flag of this department to true.
 
      This flag is a display hint for the Shell that indicates if this department has sub-departments and as such should be displayed
@@ -131,6 +141,17 @@ public:
     \return The department label.
     */
     std::string label() const;
+
+    /**
+    \brief Get the alternate label of this department.
+
+    Return the alternate label of this department. The alternate label expresses the plural "all" form of the normal label.
+    For example, if the normal label is "Books", then the alternate label is "All Books". Note that alternate label
+    and can be empty - in that case the normal label should be displayed instead.
+
+    \return The alternate label.
+     */
+    std::string alternate_label() const;
 
     /**
     \brief Get the canned query associated with this department.

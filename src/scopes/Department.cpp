@@ -79,6 +79,11 @@ void Department::set_subdepartments(DepartmentList const& departments)
     p->set_subdepartments(departments);
 }
 
+void Department::set_alternate_label(std::string const& label)
+{
+    p->set_alternate_label(label);
+}
+
 std::string Department::id() const
 {
     return p->id();
@@ -87,6 +92,11 @@ std::string Department::id() const
 std::string Department::label() const
 {
     return p->label();
+}
+
+std::string Department::alternate_label() const
+{
+    return p->alternate_label();
 }
 
 CannedQuery Department::query() const

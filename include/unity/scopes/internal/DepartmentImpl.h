@@ -45,6 +45,8 @@ public:
 
     void set_has_subdepartments();
     void set_subdepartments(DepartmentList const& departments);
+    void set_alternate_label(std::string const& label);
+    std::string alternate_label() const;
 
     std::string id() const;
     std::string label() const;
@@ -62,6 +64,7 @@ private:
     static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);
     CannedQuery query_;
     std::string label_;
+    std::string alt_label_;
     DepartmentList departments_;
     bool has_subdepartments_;
 };

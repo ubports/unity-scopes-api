@@ -55,6 +55,7 @@ Department (returned by serialize()):
 =====================================
   'query'       : dictionary (serialized Query)
   'label'       : string
+  'alt_label'   : string, optional
   'departments' : array of dictionaries (serialized Departments), optional
   'has_subdepartments' : bool (optional)
 

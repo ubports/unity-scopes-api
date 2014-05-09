@@ -30,11 +30,13 @@ TEST(Department, basic)
     {
         CannedQuery query("fooscope", "foo", "dep1");
         Department dep(query, "News");
+        dep.set_alternate_label("All News");
 
         EXPECT_EQ("dep1", dep.id());
         EXPECT_EQ("dep1", dep.query().department_id());
         EXPECT_EQ("fooscope", dep.query().scope_id());
         EXPECT_EQ("News", dep.label());
+        EXPECT_EQ("All News", dep.alternate_label());
         EXPECT_FALSE(dep.has_subdepartments());
 
         dep.set_subdepartments({{"subdep1", query, "Europe"}});
@@ -60,6 +62,7 @@ TEST(Department, serialize_and_deserialize)
     {
         CannedQuery query("fooscope", "foo", "dep1");
         Department dep(query, "News");
+        dep.set_alternate_label("All News");
         dep.set_subdepartments({{"subdep1", query, "Europe"},{"subdep2", query, "US"}});
 
         var = dep.serialize();
@@ -71,6 +74,7 @@ TEST(Department, serialize_and_deserialize)
     EXPECT_EQ("dep1", dep2.query().department_id());
     EXPECT_EQ("fooscope", dep2.query().scope_id());
     EXPECT_EQ("News", dep2.label());
+    EXPECT_EQ("All News", dep2.alternate_label());
     EXPECT_EQ(2u, dep2.subdepartments().size());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().id());
     EXPECT_EQ("subdep1", dep2.subdepartments().front().query().department_id());

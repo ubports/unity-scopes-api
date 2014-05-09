@@ -68,6 +68,16 @@ std::string DepartmentImpl::id() const
     return query_.department_id();
 }
 
+void DepartmentImpl::set_alternate_label(std::string const& label)
+{
+    alt_label_ = label;
+}
+
+std::string DepartmentImpl::alternate_label() const
+{
+    return alt_label_;
+}
+
 std::string DepartmentImpl::label() const
 {
     return label_;
@@ -92,6 +102,10 @@ VariantMap DepartmentImpl::serialize() const
 {
     VariantMap vm;
     vm["label"] = label_;
+    if (alt_label_.size())
+    {
+        vm["alt_label"] = alt_label_;
+    }
     vm["query"] = query_.serialize();
 
     // sub-departments are optional
@@ -123,6 +137,12 @@ Department DepartmentImpl::create(VariantMap const& var)
         throw unity::InvalidArgumentException("DepartmentImpl::create(): missing 'label'");
     }
     auto label = it->second.get_string();
+    std::string alt_label;
+    it = var.find("alt_label");
+    if (it != var.end())
+    {
+        alt_label = it->second.get_string();
+    }
     it = var.find("query");
     if (it == var.end())
     {
@@ -131,6 +151,7 @@ Department DepartmentImpl::create(VariantMap const& var)
     auto query = CannedQueryImpl::create(it->second.get_dict());
 
     Department department(query, label);
+    department.set_alternate_label(alt_label);
 
     it = var.find("departments");
     if (it != var.end())
