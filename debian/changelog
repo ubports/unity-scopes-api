@@ -1,8 +1,5 @@
 unity-scopes-api (0.4.5-0ubuntu1) UNRELEASED; urgency=low
 
-  * Implemented to_uri() and from_uri() conversions for CannedQuery.
-  * Ship scopes-client in libunity-scopes-cli package.
-  * Renamed SearchReply::register_annotation() to push().
   * Implemented RangeInputFilter.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 09 May 2014 13:30:33 +0200
