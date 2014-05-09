@@ -34,6 +34,7 @@ TEST(RegistryConfig, basic)
     EXPECT_EQ("Registry", c.identity());
     EXPECT_EQ("Zmq", c.mw_kind());
     EXPECT_EQ("Zmq.ini", c.mw_configfile());
+    EXPECT_EQ(3000, c.process_timeout());
 }
 
 TEST(RegistryConfig, RegistryIDEmpty)

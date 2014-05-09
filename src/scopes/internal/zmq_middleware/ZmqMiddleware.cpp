@@ -92,14 +92,14 @@ try :
     server_name_(server_name),
     state_(Stopped),
     config_(configfile),
-    twoway_timeout_(300),  // TODO: get timeout from config
-    locate_timeout_(2000)  // TODO: get timeout from config
+    twoway_timeout_(config_.twoway_timeout()),
+    locate_timeout_(config_.locate_timeout())
 {
     assert(!server_name.empty());
 
-    // Create the endpoint dirs if they don't exist.
     try
     {
+        // Create the endpoint dirs if they don't exist.
         create_dir(config_.public_dir());
         create_dir(config_.private_dir());
     }
@@ -562,7 +562,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     return proxy;
 }
 
-MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObjectBase::SPtr const& scope)
+MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout)
 {
     assert(!identity.empty());
     assert(scope);
@@ -571,7 +571,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
+        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category, idle_timeout);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
@@ -715,7 +715,7 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
 }
 
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir,
-                                                      string const& category)
+                                                      string const& category, int64_t idle_timeout)
 {
     lock_guard<mutex> lock(data_mutex_);
 
@@ -790,7 +790,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         endpoint = "ipc://" + endpoint_dir + "/" + name;
     }
 
-    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size));
+    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size, idle_timeout));
     a->activate();
     am_[name] = a;
     return a;

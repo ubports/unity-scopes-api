@@ -1,4 +1,4 @@
-unity-scopes-api (0.4.4-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.4.4+14.10.20140508-0ubuntu1) utopic; urgency=low
 
   [ Michi Henning ]
   * Simplified configuration files.
@@ -15,8 +15,12 @@ unity-scopes-api (0.4.4-0ubuntu1) UNRELEASED; urgency=low
   [ Pawel Stolowski ]
   * Renamed SearchReply::register_annotation() to push().
   * Added method to get and set display hints for filters.
+  * Added has_subdepartments flag and alternate label to the Department class.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 02 May 2014 12:49:14 +0200
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 08 May 2014 17:23:03 +0000
 
 unity-scopes-api (0.4.3+14.10.20140502.1-0ubuntu1) utopic; urgency=low
 

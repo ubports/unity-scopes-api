@@ -60,7 +60,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(std::string const& runtime_config, std::string const& scope_config)
+int run_scope(std::string const& runtime_config, std::string const& scope_configfile)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -77,7 +77,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
-    filesystem::path scope_config_path(scope_config);
+    filesystem::path scope_config_path(scope_configfile);
     string lib_dir = scope_config_path.parent_path().native();
     string scope_id = scope_config_path.stem().native();
     if (!lib_dir.empty())
@@ -101,15 +101,12 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         auto run_future = std::async(launch::async, [loader] { loader->scope_base()->run(); });
 
         // Create a servant for the scope and register the servant.
+        ScopeConfig scope_config(scope_configfile);
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_id, move(scope));
+        auto proxy = mw->add_scope_object(scope_id, move(scope), scope_config.idle_timeout() * 1000);
 
-        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_id](core::posix::Signal)
+        trap->signal_raised().connect([mw](core::posix::Signal)
         {
-            // Inform the registry that this scope is shutting down
-            reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
-
-            loader->stop();
             mw->stop();
         });
 
@@ -117,6 +114,11 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
 
         mw->wait_for_shutdown();
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
+
+        loader->stop();
 
         // Collect exit status from the run thread. If this throws, the ScopeLoader
         // destructor will still call stop() on the scope.

@@ -3,3 +3,4 @@ Middleware = Zmq
 Zmq.ConfigFile = Zmq.ini
 Scope.InstallDir = /SomeDir
 Scoperunner.Path = /SomeAbsolutePath
+Process.Timeout = 3000
