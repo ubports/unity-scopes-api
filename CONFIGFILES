@@ -267,6 +267,11 @@ The following keys are recognized in the ScopeConfig group:
 
   The path to a custom scoperunner binary. If not set, the default scoperunner is used.
 
+- IdleTimeout
+
+  The amount of time (in seconds) a running scope can be inactive before it will automatically shut down.
+  If not set, a default value of 40 is used.
+
 The following keys are recognized in the Appearance group:
 
 - TODO: document this

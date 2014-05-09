@@ -385,19 +385,19 @@ TEST(Runtime, early_cancel)
 void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     TestScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "");
 }
 
 void pusher_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     PusherScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "");
 }
 
 void slow_create_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     SlowCreateScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "/foo");
+    rt->run_scope(&scope, runtime_ini_file, "");
 }
 
 int main(int argc, char **argv)

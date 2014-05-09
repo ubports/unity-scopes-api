@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
@@ -293,7 +294,15 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    auto proxy = mw->add_scope_object(scope_id_, move(scope));
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
+    }
+    else
+    {
+        mw->add_scope_object(scope_id_, move(scope));
+    }
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
