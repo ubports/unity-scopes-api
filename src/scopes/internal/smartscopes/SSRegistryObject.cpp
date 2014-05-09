@@ -62,7 +62,14 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     char const* locale = getenv("LANGUAGE");
     if (locale && *locale != '\0')
     {
+        // LANGUAGE is a colon separated list of locales in order of priority.
+        // We are only concerned with the highest priority locale, so we split it out here.
         locale_ = std::string(locale);
+        size_t colon_pos = locale_.find(':');
+        if (colon_pos != std::string::npos)
+        {
+            locale_.resize(colon_pos);
+        }
     }
 
     // get remote scopes then start the auto-refresh background thread
