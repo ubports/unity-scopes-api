@@ -295,7 +295,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     if (!scope_ini_file.empty())
     {
         ScopeConfig scope_config(scope_ini_file);
-        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout());
+        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
     }
     else
     {
