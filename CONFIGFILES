@@ -51,6 +51,45 @@ The following keys are recognized:
 
   The default value is "/usr/lib/<arch>/unity-scopes/Zmq.ini".
 
+- Reap.Expiry
+
+  A ReplyBase instance receives push() invocations from a scope in
+  response to a query.
+  If a scope becomes non-responsive and stops pushing, eventually,
+  the scopes run time calls the finished() method with an error indicating
+  that there was no activity for some time and then deallocates the
+  ReplyBase instance.
+
+  Reap.Expiry sets the inactivity time (in seconds) for a query to be
+  considered "dead". If no push() or finished() message arrives for
+  this amount of time, the scopes run time reaps the ReplyBase.
+
+  The default value is 45 seconds.
+
+- Reap.Interval
+
+  The run time maintains a reaper thread that checks for "dead"
+  queries (at most) every Reap.Interval seconds. For a Reap.Expiry
+  time of 45 seconds and a Reap.Interval of 10 seconds, the actual
+  time for a dead query to be reaped is at least 45 seconds and
+  at most 55 seconds.
+
+  The default value is 10 seconds.
+
+- Process.Timeout
+
+  This parameter determines how the registry will wait for a scope
+  to start and stop. The registry waits for at most Process.Timeout
+  milliseconds before it concludes that a scope failed to initialize
+  or terminate correctly. If a scope does not respond
+  within the allotted time, it is killed with SIGKILL.
+
+  The default value is 1500 milliseconds.
+
+  Note that this value must be less than Locate.Timeout in the [<Middleware>]
+  config group, otherwise the middleware can prematurely conclude that
+  a locate() request failed to start a scope.
+
 
 Zmq.ini
 -------
@@ -73,6 +112,31 @@ The following keys are recognized:
   set, initialization fails.
 
   Private endpoints are created in "<EndpointDir.Public>/priv".
+
+- Default.Twoway.Timeout
+
+  The default timeout value to be used for twoway invocations in milliseconds.
+  If a twoway invocation (such as list() or search()) does not complete
+  within the specified time, the invocation throws a TimeoutException, possibly
+  after asking the registry to start the target process first (see Locate.Timeout).
+
+  The default value is 300 milliseconds.
+
+- Locate.Timeout
+
+  The timeout to be used when asking the registry to start a scope. If the registry
+  does not respond within the specified amount of time, the scope is assumed
+  to be unavailable, and twoway invocations fail with a TimeoutException.
+
+  Note that this value must be somewhat larger than the value of Process.Timeout
+  in Registry.ini, otherwise invocations on a scope that needs to be activated
+  first can fail, even though the activation succeeded.
+
+  Only values in the range 10 to 5000 milliseconds are accepted. (Values outside
+  this range would either cause locate() to falsely conclude that a scope
+  could not be started, or cause an unacceptably long wait time.)
+
+  The default value is 2000 milliseconds.
 
 
 Registry.ini

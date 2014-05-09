@@ -39,12 +39,12 @@ public:
     ~ScopeConfig();
 
     bool overrideable() const;           // Optional, returns false if not present
-    std::string display_name() const;
-    std::string description() const;
-    std::string author() const;
+    std::string display_name() const;    // Mandatory, localizable
+    std::string description() const;     // Mandatory, localizable
+    std::string author() const;          // Mandatory
     std::string art() const;             // Optional, throws NotFoundException if not present
     std::string icon() const;            // Optional, throws NotFoundException if not present
-    std::string search_hint() const;     // Optional, throws NotFoundException if not present
+    std::string search_hint() const;     // Optional, localizable, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
     std::string scope_runner() const;    // Optional, throws NotFoundException if not present

@@ -60,27 +60,12 @@ SSConfig::SSConfig(string const& configfile) :
     }
     else
     {
-        // TODO: replace code below with commented-out lines as part of config-fixes-stage2 merge proposal:
-        // http_reply_timeout_ = get_optional_int(ss_config_group, http_reply_timeout_key, DFLT_SS_HTTP_TIMEOUT);
-        // reg_refresh_rate_ = get_optional_int(ss_config_group, reg_refresh_rate_key, DFLT_SS_REG_REFRESH);
-        // reg_refresh_fail_timeout_ = get_optional_int(ss_config_group,
-        //                                              reg_refresh_fail_timeout_key,
-        //                                              DFLT_SS_REG_REFRESH_FAIL_TIMEOUT);
-        // scope_identity_ = get_optional_int(ss_config_group, scope_identity_key, DFLT_SS_SCOPE_IDENTITY);
-        try
-        {
-            http_reply_timeout_ = parser()->get_int(ss_config_group, http_reply_timeout_key);
-            reg_refresh_rate_ = parser()->get_int(ss_config_group, reg_refresh_rate_key);
-            reg_refresh_fail_timeout_ = parser()->get_int(ss_config_group, reg_refresh_fail_timeout_key);
-            scope_identity_ = parser()->get_int(ss_config_group, scope_identity_key);
-        }
-        catch (unity::LogicException const&)
-        {
-            http_reply_timeout_ = DFLT_SS_HTTP_TIMEOUT;
-            reg_refresh_rate_ = DFLT_SS_REG_REFRESH_RATE;
-            reg_refresh_fail_timeout_ = DFLT_SS_REG_REFRESH_FAIL_TIMEOUT;
-            scope_identity_ = DFLT_SS_SCOPE_IDENTITY;
-        }
+        http_reply_timeout_ = get_optional_int(ss_config_group, http_reply_timeout_key, DFLT_SS_HTTP_TIMEOUT);
+        reg_refresh_rate_ = get_optional_int(ss_config_group, reg_refresh_rate_key, DFLT_SS_REG_REFRESH_RATE);
+        reg_refresh_fail_timeout_ = get_optional_int(ss_config_group,
+                                                     reg_refresh_fail_timeout_key,
+                                                     DFLT_SS_REG_REFRESH_FAIL_TIMEOUT);
+        scope_identity_ = get_optional_string(ss_config_group, scope_identity_key, DFLT_SS_SCOPE_IDENTITY);
     }
 
     const KnownEntries known_entries = {

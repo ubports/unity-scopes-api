@@ -92,14 +92,14 @@ try :
     server_name_(server_name),
     state_(Stopped),
     config_(configfile),
-    twoway_timeout_(300),  // TODO: get timeout from config
-    locate_timeout_(2000)  // TODO: get timeout from config
+    twoway_timeout_(config_.twoway_timeout()),
+    locate_timeout_(config_.locate_timeout())
 {
     assert(!server_name.empty());
 
-    // Create the endpoint dirs if they don't exist.
     try
     {
+        // Create the endpoint dirs if they don't exist.
         create_dir(config_.public_dir());
         create_dir(config_.private_dir());
     }

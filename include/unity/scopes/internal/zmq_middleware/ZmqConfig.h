@@ -38,10 +38,14 @@ public:
 
     std::string public_dir() const;
     std::string private_dir() const;
+    int twoway_timeout() const;
+    int locate_timeout() const;
 
 private:
     std::string public_dir_;
     std::string private_dir_;
+    int twoway_timeout_;
+    int locate_timeout_;
 };
 
 } // namespace internal

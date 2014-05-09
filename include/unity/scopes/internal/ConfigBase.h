@@ -51,6 +51,12 @@ public:
     virtual std::string get_optional_string(std::string const& group,
                                             std::string const& key,
                                             std::string const& dflt = "") const;
+
+    virtual int get_int(std::string const& group, std::string const& key) const;
+    virtual int get_optional_int(std::string const& group,
+                                 std::string const& key,
+                                 int dflt) const;
+
     virtual std::string get_middleware(std::string const& group, std::string const& key) const;
 
 protected:
