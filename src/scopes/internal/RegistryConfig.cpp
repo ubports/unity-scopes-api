@@ -60,7 +60,12 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     click_installdir_ = get_optional_string(registry_config_group, click_installdir_key);
     if (click_installdir_.empty())
     {
-        click_installdir_ = string(getenv("HOME")) + "/.local/share/unity-scopes/";
+        char const* home = getenv("HOME");
+        if (!home || *home == '\0')
+        {
+            throw ConfigException(configfile + ": No Click.InstallDir configured and $HOME not set");
+        }
+        click_installdir_ = string(home) + "/.local/share/unity-scopes/";
     }
     scoperunner_path_ = get_optional_string(registry_config_group, scoperunner_path_key, DFLT_SCOPERUNNER_PATH);
     if (scoperunner_path_[0] != '/')
