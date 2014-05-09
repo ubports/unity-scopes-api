@@ -29,7 +29,7 @@ def response(environ, start_response):
     response_headers = [('Content-Type', 'application/json')]
     start_response(status, response_headers)
 
-    if environ['PATH_INFO'] == '/remote-scopes':
+    if environ['PATH_INFO'] == '/remote-scopes' and (environ['QUERY_STRING'] == '' or environ['QUERY_STRING'] == 'locale=test_TEST'):
         return [remote_scopes_response]
 
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':

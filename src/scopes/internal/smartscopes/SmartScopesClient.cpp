@@ -158,7 +158,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
         if (!locale.empty())
         {
-            remote_scopes_uri << "&locale=" << locale;
+            remote_scopes_uri << "locale=" << locale;
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
@@ -208,6 +208,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         throw;
     }
 
+    remote_scopes.clear();
     for (int i = 0; i < root_node->size(); ++i)
     {
         RemoteScope scope;
