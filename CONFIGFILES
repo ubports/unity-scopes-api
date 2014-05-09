@@ -72,7 +72,7 @@ The following keys are recognized:
   queries (at most) every Reap.Interval seconds. For a Reap.Expiry
   time of 45 seconds and a Reap.Interval of 10 seconds, the actual
   time for a dead query to be reaped is at least 45 seconds and
-  at most 55 seconds. that is, Reap.Interval determines how
+  at most 55 seconds.
 
   The default value is 10 seconds.
 
@@ -86,7 +86,7 @@ The following keys are recognized:
 
   The default value is 1500 milliseconds.
 
-  Note that this value must be less than LocateTimeout in the [<Middleware>]
+  Note that this value must be less than Locate.Timeout in the [<Middleware>]
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
 
@@ -117,10 +117,10 @@ The following keys are recognized:
 
   The default timeout value to be used for twoway invocations in milliseconds.
   If a twoway invocation (such as list() or search()) does not complete
-  withing the specified time, the invocation throws a TimeoutException, possibly
-  after asking the registry to start the target process first (see LocateTimeout).
+  within the specified time, the invocation throws a TimeoutException, possibly
+  after asking the registry to start the target process first (see Locate.Timeout).
 
-  The default value is 300 ms.
+  The default value is 300 milliseconds.
 
 - Locate.Timeout
 
@@ -132,7 +132,11 @@ The following keys are recognized:
   in Registry.ini, otherwise invocations on a scope that needs to be activated
   first can fail, even though the activation succeeded.
 
-  The default value is 2000 ms.
+  Only values in the range 10 to 5000 milliseconds are accepted. (Values outside
+  this range would either cause locate() to falsely conclude that a scope
+  could not be started, or cause an unacceptably long wait time.)
+
+  The default value is 2000 milliseconds.
 
 
 Registry.ini
