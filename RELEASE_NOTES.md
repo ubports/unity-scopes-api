@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.4.5
+========================
+  * Implemented RangeInputFilter.
+
 Changes in version 0.4.4
 ========================
   * The register_annotation() method of SearchReply is now deprecated - push(Annotation const&) should be used instead.
