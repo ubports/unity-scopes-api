@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ScopeConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -48,6 +49,7 @@ namespace
     const string hot_key_key = "HotKey";
     const string invisible_key = "Invisible";
     const string scoperunner_key = "ScopeRunner";
+    const string idle_timeout_key = "IdleTimeout";
 
     const string scope_appearance_group = "Appearance";
 }
@@ -122,6 +124,24 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
+    ///! TODO: replace code below with commented-out line once config-fixes-stage2 lands
+    // idle_timeout_ = get_optional_int(scope_config_group, idle_timeout_key, DFLT_SCOPE_IDLE_TIMEOUT);
+    try
+    {
+        idle_timeout_ = parser()->get_int(scope_config_group, idle_timeout_key);
+    }
+    catch (unity::LogicException const&)
+    {
+        idle_timeout_ = DFLT_SCOPE_IDLE_TIMEOUT;
+    }
+    // Negative values and values greater than max int (once multiplied by 1000 (s to ms)) are illegal
+    const int max_idle_timeout = std::numeric_limits<int>::max() / 1000;
+    if (idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout)
+    {
+        throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
+                 ": value must be > 0 and <= " + std::to_string(max_idle_timeout));
+    }
+
     // read all display attributes from scope_appearance_group
     try
     {
@@ -146,7 +166,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 search_hint_key,
                                                 invisible_key,
                                                 hot_key_key,
-                                                scoperunner_key
+                                                scoperunner_key,
+                                                idle_timeout_key
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -231,6 +252,11 @@ string ScopeConfig::scope_runner() const
         throw NotFoundException("Runner binary not set", scoperunner_key);
     }
     return *scope_runner_;
+}
+
+int ScopeConfig::idle_timeout() const
+{
+    return idle_timeout_;
 }
 
 VariantMap ScopeConfig::appearance_attributes() const
