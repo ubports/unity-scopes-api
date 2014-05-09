@@ -46,7 +46,7 @@ public:
 /// @endcond
 
     /**
-     \bried Creates a RangeInputFilter.
+    \brief Creates a RangeInputFilter.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
     \param start_label A display label for the input box of start value (can be empty).
     \param end_label A display label for the input box of end value (can be empty).
