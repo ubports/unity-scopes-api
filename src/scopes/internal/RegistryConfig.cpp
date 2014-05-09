@@ -42,6 +42,7 @@ namespace
     const string oem_installdir_key = "OEM.InstallDir";
     const string click_installdir_key = "Click.InstallDir";
     const string scoperunner_path_key = "Scoperunner.Path";
+    const string process_timeout_key = "Process.Timeout";
 }
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
@@ -71,6 +72,11 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
+    process_timeout_ = get_optional_int(registry_config_group, process_timeout_key, DFLT_PROCESS_TIMEOUT);
+    if (process_timeout_ < 10 || process_timeout_ > 5000)
+    {
+        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-5000 ms");
+    }
 
     const KnownEntries known_entries = {
                                           {  registry_config_group,
@@ -81,6 +87,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
                                                 oem_installdir_key,
                                                 click_installdir_key,
                                                 scoperunner_path_key,
+                                                process_timeout_key
                                              }
                                           }
                                        };
@@ -124,6 +131,11 @@ string RegistryConfig::click_installdir() const
 string RegistryConfig::scoperunner_path() const
 {
     return scoperunner_path_;
+}
+
+int RegistryConfig::process_timeout() const
+{
+    return process_timeout_;
 }
 
 } // namespace internal

@@ -43,6 +43,8 @@ public:
     std::string ss_configfile() const;
     std::string default_middleware() const;
     std::string default_middleware_configfile() const;
+    int reap_expiry() const;
+    int reap_interval() const;
 
 private:
     std::string registry_identity_;
@@ -51,6 +53,8 @@ private:
     std::string ss_configfile_;
     std::string default_middleware_;
     std::string default_middleware_configfile_;
+    int reap_expiry_;
+    int reap_interval_;
 };
 
 } // namespace internal

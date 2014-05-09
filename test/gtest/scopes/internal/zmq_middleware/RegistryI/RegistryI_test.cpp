@@ -417,6 +417,7 @@ public:
             exec_data.scoperunner_path = scoperunner_path;
             exec_data.runtime_config = rt_config;
             exec_data.scope_config = TEST_BUILD_ROOT "/../demo/scopes/" + scope_id + "/" + scope_id + ".ini";
+            exec_data.timeout_ms = 1500;
 
             reg->add_local_scope(scope_id, move(meta), exec_data);
         }
