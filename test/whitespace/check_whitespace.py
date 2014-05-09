@@ -60,7 +60,7 @@ def scan_for_bad_whitespace(file_path):
         for lino, line in enumerate(ifile, start=1):
             if whitespace_pat.match(line) or tab_indent_pat.match(line):
                 errors.append(lino)
-            if line == "\n":
+            if line == "\n" and lino != 1:  # Don't complain about empty file with only a single line
                 newlines_at_end += 1
             else:
                 newlines_at_end = 0

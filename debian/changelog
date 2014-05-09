@@ -7,6 +7,38 @@ unity-scopes-api (0.4.5-0ubuntu1) UNRELEASED; urgency=low
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 09 May 2014 13:30:33 +0200
 
+unity-scopes-api (0.4.4+14.10.20140508-0ubuntu1) utopic; urgency=low
+
+  [ Michi Henning ]
+  * Simplified configuration files.
+  * Removed SS.Registry.Endpoint from Runtime.ini.
+  * Replaced SS.Registry.Identity with Smartscopes.Registry.Identity
+  * Added documentation for configuration parameters (see CONFIGFILES in
+    the root of the source tree)
+  * Runtime::run_scope() now has an overload to accept a path to Runtime.ini.
+    If no file name is passed, the system-wide Runtime.ini is used.
+  * UNIX domain sockets for Zmq are now placed under $XDG_RUNTIME_DIR/zmq.
+  * Install location for things under /usr/share is now unity-scopes instead
+    of unity-scopes-api.
+
+  [ Pawel Stolowski ]
+  * Renamed SearchReply::register_annotation() to push().
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 08 May 2014 17:23:03 +0000
+
+unity-scopes-api (0.4.3+14.10.20140502.1-0ubuntu1) utopic; urgency=low
+
+  [ Tarmac ]
+  * Sync with devel branch.
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 02 May 2014 14:44:05 +0000
+
 unity-scopes-api (0.4.3+14.10.20140428-0ubuntu1) utopic; urgency=low
 
   [ Pawel Stolowski ]

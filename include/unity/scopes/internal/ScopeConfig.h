@@ -35,22 +35,21 @@ namespace internal
 class ScopeConfig : public ConfigBase
 {
 public:
-    static constexpr const char* SCOPE_CONFIG_GROUP = "ScopeConfig";
-    static constexpr const char* SCOPE_DISPLAY_GROUP = "Appearance";
-
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig();
 
     bool overrideable() const;           // Optional, returns false if not present
-    std::string display_name() const;
-    std::string description() const;
-    std::string author() const;
+    std::string display_name() const;    // Mandatory, localizable
+    std::string description() const;     // Mandatory, localizable
+    std::string author() const;          // Mandatory
     std::string art() const;             // Optional, throws NotFoundException if not present
     std::string icon() const;            // Optional, throws NotFoundException if not present
-    std::string search_hint() const;     // Optional, throws NotFoundException if not present
+    std::string search_hint() const;     // Optional, localizable, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
     std::string scope_runner() const;    // Optional, throws NotFoundException if not present
+    int idle_timeout() const;            // Optional, returns default value if not present
+
     VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
 
 private:
@@ -62,8 +61,9 @@ private:
     std::unique_ptr<std::string> icon_;
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
-    std::unique_ptr<bool> invisible_;
+    bool invisible_;
     std::unique_ptr<std::string> scope_runner_;
+    int idle_timeout_;
     VariantMap appearance_attributes_;
 };
 

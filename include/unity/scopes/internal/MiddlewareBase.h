@@ -65,7 +65,9 @@ public:
     virtual ObjectProxy string_to_proxy(std::string const& s) = 0;
     virtual std::string proxy_to_string(MWProxy const& proxy) = 0;
 
-    virtual MWRegistryProxy create_registry_proxy(std::string const& identity, std::string const& endpoint) = 0;
+    virtual MWRegistryProxy registry_proxy() = 0;
+    virtual MWRegistryProxy ss_registry_proxy() = 0;
+
     virtual MWScopeProxy create_scope_proxy(std::string const& identity) = 0;
     virtual MWScopeProxy create_scope_proxy(std::string const& identity, std::string const& endpoint) = 0;
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) = 0;
@@ -78,7 +80,7 @@ public:
     virtual void add_dflt_query_object(QueryObjectBase::SPtr const& query) = 0;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) = 0;
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) = 0;
-    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope) = 0;
+    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout = 0) = 0;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) = 0;
 

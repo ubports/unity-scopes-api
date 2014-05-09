@@ -49,6 +49,7 @@ public:
         std::string runtime_config;
         std::string scope_config;
         std::string confinement_profile;
+        int timeout_ms;
     };
 
 public:
@@ -89,10 +90,10 @@ private:
 
         ProcessState state() const;
         void update_state(ProcessState state);
-        bool wait_for_state(ProcessState state, int timeout_ms) const;
+        bool wait_for_state(ProcessState state) const;
 
         void exec(core::posix::ChildProcess::DeathObserver& death_observer,
-                Executor::SPtr executor);
+                  Executor::SPtr executor);
         void kill();
 
         bool on_process_death(pid_t pid);
@@ -102,8 +103,7 @@ private:
         void clear_handle_unlocked();
         void update_state_unlocked(ProcessState state);
 
-        bool wait_for_state(std::unique_lock<std::mutex>& lock,
-                            ProcessState state, int timeout_ms) const;
+        bool wait_for_state(std::unique_lock<std::mutex>& lock, ProcessState state) const;
         void kill(std::unique_lock<std::mutex>& lock);
 
     private:
@@ -123,10 +123,11 @@ private:
 
     Executor::SPtr executor_;
 
-    mutable std::mutex mutex_;
     MetadataMap scopes_;
-    std::map<std::string, ScopeProcess> scope_processes_;
+    typedef std::map<std::string, ScopeProcess> ProcessMap;
+    ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

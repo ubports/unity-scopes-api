@@ -233,7 +233,8 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       MiddlewareBase::SPtr const& mw,
                       string const& scoperunner_path,
                       string const& config_file,
-                      bool click)
+                      bool click,
+                      int timeout_ms)
 {
     for (auto&& pair : all_scopes)
     {
@@ -298,6 +299,8 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                         scope_path.parent_path().filename().native();
             }
 
+            exec_data.timeout_ms = timeout_ms;
+
             try
             {
                 auto custom_exec = sc.scope_runner();
@@ -322,22 +325,11 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
     }
 }
 
-// Overwrite any remote scopes loaded previously with the current ones.
-
-void load_remote_scopes(RegistryObject::SPtr const& registry,
-                        MiddlewareBase::SPtr const& mw,
-                        string const& ss_reg_id,
-                        string const& ss_reg_endpoint)
-{
-    auto ss_reg = mw->create_registry_proxy(ss_reg_id, ss_reg_endpoint);
-    registry->set_remote_registry(ss_reg);
-}
-
 } // namespace
 
 // Usage: scoperegistry [runtime.ini] [scope.ini]...
 //
-// If no runtime config file is specified, the default location (/usr/share/unity-scopes-api/Runtime.ini)
+// If no runtime config file is specified, the default location (/usr/lib/<arch>/unity-scopes/Runtime.ini)
 // is assumed.
 // If additional scope configuration files are specified, the corresponding scopes will be added
 // to the registry (overriding any scopes that are found via config files reached via Runtime.ini).
@@ -370,29 +362,24 @@ main(int argc, char* argv[])
         RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
         string identity = runtime->registry_identity();
+        string ss_reg_id = runtime->ss_registry_identity();
 
         // Collect the registry config data.
 
         string mw_kind;
-        string mw_endpoint;
-        string mw_configfile;
         string scope_installdir;
         string oem_installdir;
         string click_installdir;
         string scoperunner_path;
-        string ss_reg_id;
-        string ss_reg_endpoint;
+        int process_timeout;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
-            mw_endpoint = c.endpoint();
-            mw_configfile = c.mw_configfile();
             scope_installdir = c.scope_installdir();
             oem_installdir = c.oem_installdir();
             click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
-            ss_reg_id = c.ss_registry_identity();
-            ss_reg_endpoint = c.ss_registry_endpoint();
+            process_timeout = c.process_timeout();
         } // Release memory for config parser
 
         MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
@@ -434,16 +421,16 @@ main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, runtime->configfile(), false);
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, runtime->configfile(), true);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
         local_scopes.insert(click_scopes.begin(), click_scopes.end());
-        if (ss_reg_id.empty() || ss_reg_endpoint.empty())
+        if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");
         }
         else
         {
-            load_remote_scopes(registry, middleware, ss_reg_id, ss_reg_endpoint);
+            registry->set_remote_registry(middleware->ss_registry_proxy());
         }
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform

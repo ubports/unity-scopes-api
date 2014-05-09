@@ -1,5 +1,0 @@
-[Runtime]
-Registry.Identity = SSRegistry
-Registry.ConfigFile = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/SSRegistry.ini
-Default.Middleware = Zmq
-Zmq.ConfigFile = @CMAKE_INSTALL_PREFIX@/@SCOPES_DEFAULT_CONFIGDIR@/Zmq.ini

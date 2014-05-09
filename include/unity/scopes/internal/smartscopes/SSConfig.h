@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,8 +16,8 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
-#define UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
+#ifndef UNITY_SCOPES_INTERNAL_SSCONFIG_H
+#define UNITY_SCOPES_INTERNAL_SSCONFIG_H
 
 #include <unity/scopes/internal/ConfigBase.h>
 
@@ -30,23 +30,28 @@ namespace scopes
 namespace internal
 {
 
-class ZmqConfig : public ConfigBase
+namespace smartscopes
+{
+
+class SSConfig : public ConfigBase
 {
 public:
-    ZmqConfig(std::string const& configfile);
-    ~ZmqConfig();
+    SSConfig(std::string const& configfile);
+    ~SSConfig();
 
-    std::string public_dir() const;
-    std::string private_dir() const;
-    int twoway_timeout() const;
-    int locate_timeout() const;
+    int http_reply_timeout() const;             // seconds
+    int reg_refresh_rate() const;               // seconds
+    int reg_refresh_fail_timeout() const;       // seconds
+    std::string scope_identity() const;
 
 private:
-    std::string public_dir_;
-    std::string private_dir_;
-    int twoway_timeout_;
-    int locate_timeout_;
+    int http_reply_timeout_;
+    int reg_refresh_rate_;
+    int reg_refresh_fail_timeout_;
+    std::string scope_identity_;
 };
+
+} // namespace smartscopes
 
 } // namespace internal
 

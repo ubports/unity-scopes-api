@@ -148,7 +148,7 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
     in_params.setIdentity(identity.c_str());
 
     // locate uses a custom timeout because it needs to potentially fork/exec a scope.
-    int64_t timeout = 2000; // TODO: get timeout from config
+    int64_t timeout = mw_base()->locate_timeout();
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();

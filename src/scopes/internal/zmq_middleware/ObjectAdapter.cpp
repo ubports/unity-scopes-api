@@ -50,12 +50,14 @@ namespace internal
 namespace zmq_middleware
 {
 
-ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m, int pool_size) :
+ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
+                             int pool_size, int64_t idle_timeout) :
     mw_(mw),
     name_(name),
     endpoint_(endpoint),
     mode_(m),
     pool_size_(pool_size),
+    idle_timeout_(idle_timeout > 0 ? idle_timeout : zmqpp::poller::wait_forever),
     state_(Inactive)
 {
     assert(!name.empty());
@@ -593,7 +595,13 @@ void ObjectAdapter::broker_thread()
         for (;;)
         {
             zmqpp::message message;
-            poller.poll();
+            // Poll for incoming messages. If a timeout has been set, and no incoming messages are received for
+            // idle_timeout_ milliseconds, we shutdown the server.
+            if (!poller.poll(idle_timeout_))
+            {
+                // Shutdown this server by stopping the middleware.
+                mw_.stop();
+            }
             if (poller.has_input(stop))
             {
                 // When the stop socket becomes ready, we need to get out of here.

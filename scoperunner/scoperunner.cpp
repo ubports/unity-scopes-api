@@ -60,7 +60,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(filesystem::path const& runtime_config, filesystem::path const& scope_config)
+int run_scope(std::string const& runtime_config, std::string const& scope_configfile)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -71,14 +71,15 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     std::thread trap_worker([trap]() { trap->run(); });
 
     // Retrieve the registry middleware and create a proxy to its state receiver
-    RuntimeConfig rt_config(runtime_config.native());
+    RuntimeConfig rt_config(runtime_config);
     RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
-    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config.native());
+    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
-    string lib_dir = scope_config.parent_path().native();
-    string scope_id = scope_config.stem().native();
+    filesystem::path scope_config_path(scope_configfile);
+    string lib_dir = scope_config_path.parent_path().native();
+    string scope_id = scope_config_path.stem().native();
     if (!lib_dir.empty())
     {
       lib_dir += '/';
@@ -89,7 +90,7 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
     {
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_id, runtime_config.native());
+        auto rt = RuntimeImpl::create(scope_id, runtime_config);
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
         ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
@@ -100,15 +101,12 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         auto run_future = std::async(launch::async, [loader] { loader->scope_base()->run(); });
 
         // Create a servant for the scope and register the servant.
+        ScopeConfig scope_config(scope_configfile);
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_id, move(scope));
+        auto proxy = mw->add_scope_object(scope_id, move(scope), scope_config.idle_timeout() * 1000);
 
-        trap->signal_raised().connect([loader, mw, reg_state_receiver, scope_id](core::posix::Signal)
+        trap->signal_raised().connect([mw](core::posix::Signal)
         {
-            // Inform the registry that this scope is shutting down
-            reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
-
-            loader->stop();
             mw->stop();
         });
 
@@ -116,6 +114,11 @@ int run_scope(filesystem::path const& runtime_config, filesystem::path const& sc
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
 
         mw->wait_for_shutdown();
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
+
+        loader->stop();
 
         // Collect exit status from the run thread. If this throws, the ScopeLoader
         // destructor will still call stop() on the scope.
@@ -164,19 +167,7 @@ main(int argc, char* argv[])
     int exit_status = 1;
     try
     {
-        filesystem::path runtime_path(runtime_config);
-        if (runtime_path.extension() != ".ini")
-        {
-            throw ConfigException(string("invalid runtime config file name: \"") + runtime_config + "\": missing .ini extension");
-        }
-
-        filesystem::path scope_path(scope_config);
-        if (scope_path.extension() != ".ini")
-        {
-            throw ConfigException(string("invalid scope config file name: \"") + scope_config + "\": missing .ini extension");
-        }
-
-        exit_status = run_scope(runtime_path, scope_path);
+        exit_status = run_scope(runtime_config, scope_config);
     }
     catch (std::exception const& e)
     {
