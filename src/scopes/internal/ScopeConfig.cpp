@@ -134,6 +134,13 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         idle_timeout_ = DFLT_SCOPE_IDLE_TIMEOUT;
     }
+    // Negative values and values greater than max int (once multiplied by 1000 (s to ms)) are illegal
+    const int max_idle_timeout = std::numeric_limits<int>::max() / 1000;
+    if (idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout)
+    {
+        throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
+                 ": value must be > 0 and <= " + std::to_string(max_idle_timeout));
+    }
 
     // read all display attributes from scope_appearance_group
     try
@@ -247,7 +254,7 @@ string ScopeConfig::scope_runner() const
     return *scope_runner_;
 }
 
-int64_t ScopeConfig::idle_timeout() const
+int ScopeConfig::idle_timeout() const
 {
     return idle_timeout_;
 }
