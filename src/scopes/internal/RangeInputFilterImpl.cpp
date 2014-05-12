@@ -20,6 +20,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -111,7 +112,9 @@ double RangeInputFilterImpl::get_value(FilterState const& filter_state, unsigned
         {
         }
     }
-    throw unity::LogicException("RangeInputFilterImpl::start_value(): value is not set");
+    std::stringstream err;
+    err << "RangeInputFilterImpl::get_value(): value is not set for filter '" << id() << "', index " << index;
+    throw unity::LogicException(err.str());
 }
 
 double RangeInputFilterImpl::start_value(FilterState const& filter_state) const
