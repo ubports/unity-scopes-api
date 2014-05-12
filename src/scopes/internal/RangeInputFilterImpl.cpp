@@ -146,9 +146,16 @@ void RangeInputFilterImpl::update_state(FilterState& filter_state, std::string c
     check_type(start_value, filter_id, "start_value");
     check_type(end_value, filter_id, "end_value");
 
-    VariantMap& state = FilterBaseImpl::get(filter_state);
-    const VariantArray arr({start_value, end_value});
-    state[filter_id] = arr;
+    if (start_value.is_null() && end_value.is_null())
+    {
+        filter_state.remove(filter_id);
+    }
+    else
+    {
+        VariantMap& state = FilterBaseImpl::get(filter_state);
+        const VariantArray arr({start_value, end_value});
+        state[filter_id] = arr;
+    }
 }
 
 std::string RangeInputFilterImpl::filter_type() const

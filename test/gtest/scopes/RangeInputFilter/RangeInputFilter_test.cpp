@@ -42,7 +42,7 @@ TEST(RangeInputFilter, state)
     EXPECT_FALSE(fstate.has_filter("f1"));
 
     filter1->update_state(fstate, Variant::null(), Variant::null());
-    EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_FALSE(fstate.has_filter("f1"));
     EXPECT_FALSE(filter1->has_start_value(fstate));
     EXPECT_FALSE(filter1->has_end_value(fstate));
 
@@ -50,6 +50,7 @@ TEST(RangeInputFilter, state)
     EXPECT_THROW(filter1->end_value(fstate), unity::LogicException);
 
     filter1->update_state(fstate, Variant(5), Variant::null());
+    EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_TRUE(filter1->has_start_value(fstate));
     EXPECT_EQ(5.0f, filter1->start_value(fstate));
     EXPECT_FALSE(filter1->has_end_value(fstate));
