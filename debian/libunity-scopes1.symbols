@@ -171,6 +171,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::CategoryRenderer::operator=(unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewQueryBase::PreviewQueryBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewQueryBase::~PreviewQueryBase()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&, unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::RangeInputFilter(unity::scopes::internal::RangeInputFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::~RangeInputFilter()@Base" 0replaceme
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
@@ -230,10 +234,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::OptionSelectorFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(unity::scopes::internal::OptionSelectorFilterImpl*)@Base" 0replaceme
  (c++)"unity::scopes::OptionSelectorFilter::~OptionSelectorFilter()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::finished(unity::scopes::ListenerBase::Reason, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::activated(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
@@ -545,6 +546,15 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ConfigException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategoryRenderer::data() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RangeInputFilter::unit_label() const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::start_label() const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::start_value(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, unity::scopes::Variant const&, unity::scopes::Variant const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::has_end_value(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::has_start_value(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::end_label() const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::end_value(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::TimeoutException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::category() const@Base" 0.4.0+14.04.20140312.1
@@ -696,6 +706,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::RangeInputFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
@@ -733,6 +744,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::RangeInputFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
@@ -781,6 +793,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::RangeInputFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
