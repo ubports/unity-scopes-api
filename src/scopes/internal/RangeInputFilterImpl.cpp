@@ -152,6 +152,18 @@ void RangeInputFilterImpl::update_state(FilterState& filter_state, std::string c
     }
     else
     {
+        if (!(start_value.is_null() || end_value.is_null()))
+        {
+            const double start = start_value.which() == Variant::Type::Double ? start_value.get_double() : start_value.get_int();
+            const double end = end_value.which() == Variant::Type::Double ? end_value.get_double() : end_value.get_int();
+            if (start >= end)
+            {
+                std::stringstream err;
+                err << "RangeInputFilterImpl::update_state(): start_value " << start << " is greater or equal to end_value " << end << " for filter " <<
+                    filter_id;
+                throw unity::LogicException(err.str());
+            }
+        }
         VariantMap& state = FilterBaseImpl::get(filter_state);
         const VariantArray arr({start_value, end_value});
         state[filter_id] = arr;

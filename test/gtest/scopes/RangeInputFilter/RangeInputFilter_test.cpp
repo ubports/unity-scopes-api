@@ -55,11 +55,13 @@ TEST(RangeInputFilter, state)
     EXPECT_EQ(5.0f, filter1->start_value(fstate));
     EXPECT_FALSE(filter1->has_end_value(fstate));
 
-    filter1->update_state(fstate, Variant(5), Variant(1.5f));
+    filter1->update_state(fstate, Variant(5), Variant(6.5f));
     EXPECT_TRUE(filter1->has_start_value(fstate));
     EXPECT_EQ(5.0f, filter1->start_value(fstate));
     EXPECT_TRUE(filter1->has_end_value(fstate));
-    EXPECT_EQ(1.5f, filter1->end_value(fstate));
+    EXPECT_EQ(6.5f, filter1->end_value(fstate));
+
+    EXPECT_THROW(filter1->update_state(fstate, Variant(5), Variant(0.5f)), unity::LogicException);
 }
 
 TEST(RangeInputFilter, serialize_deserialize)
