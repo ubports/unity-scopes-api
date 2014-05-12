@@ -99,8 +99,7 @@ try :
 
     try
     {
-        // Create the endpoint dirs if they don't exist.
-        create_dir(config_.public_dir());
+        // Create the private endpoint dir if it doesn't exist.
         create_dir(config_.private_dir());
     }
     catch (...)
