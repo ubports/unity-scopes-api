@@ -60,6 +60,7 @@ protected:
 private:
     bool has_value(FilterState const& filter_state, unsigned int index) const;
     double get_value(FilterState const& filter_state, unsigned int index) const;
+    static void check_type(Variant const& val, std::string const& filter_id, std::string const& varname);
 
     std::string start_label_;
     std::string end_label_;

@@ -127,6 +127,15 @@ double RangeInputFilterImpl::end_value(FilterState const& filter_state) const
     return get_value(filter_state, 1);
 }
 
+void RangeInputFilterImpl::check_type(Variant const& val, std::string const& filter_id, std::string const& varname)
+{
+    if (val.which() == Variant::Type::Int || val.which() == Variant::Type::Double || val.is_null())
+        return;
+    std::stringstream err;
+    err << "RangeInputFilterImpl::check_type(): Invalid variant type for " << varname << ", filter '" << filter_id << "'";
+    throw unity::InvalidArgumentException(err.str());
+}
+
 void RangeInputFilterImpl::update_state(FilterState& filter_state, Variant const& start_value, Variant const& end_value) const
 {
     update_state(filter_state, id(), start_value, end_value);
@@ -134,6 +143,9 @@ void RangeInputFilterImpl::update_state(FilterState& filter_state, Variant const
 
 void RangeInputFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, Variant const& start_value, Variant const& end_value)
 {
+    check_type(start_value, filter_id, "start_value");
+    check_type(end_value, filter_id, "end_value");
+
     VariantMap& state = FilterBaseImpl::get(filter_state);
     const VariantArray arr({start_value, end_value});
     state[filter_id] = arr;
