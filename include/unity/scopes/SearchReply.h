@@ -49,7 +49,7 @@ public:
 
       <ul>
       <li>create a Department node for current department and attach to it a list of its subdepartments (unless current department is a leaf department) using
-      unity::scopes::Department::set_subdepartments() method. For every subdepartment on the list set “has_subdepartments” flag if applicable.
+      unity::scopes::Department::set_subdepartments() method. For every subdepartment on the list set "has_subdepartments" flag if applicable.
       <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
       <li>create a Department node for parent of current department (if applicable - not when in root department), and attach current Department node to it with
       unity::scopes::Department::set_subdepartments() method.
