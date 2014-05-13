@@ -122,10 +122,12 @@ ZmqMiddleware::~ZmqMiddleware()
     }
     catch (std::exception const& e)
     {
+        cerr << "~ZmqMiddleware(): " << e.what() << endl;
         // TODO: log exception
     }
     catch (...)
     {
+        cerr << "~ZmqMiddleware(): unknown exception" << endl;
         // TODO: log exception
     }
 }
@@ -137,9 +139,13 @@ void ZmqMiddleware::start()
     switch (state_)
     {
         case Started:
-        case Starting:
         {
-            return; // Already started, or about to start, no-op
+            return; // Already started, no-op
+        }
+        case Stopping:
+        {
+            state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
+            // FALLTHROUGH
         }
         case Stopped:
         {
@@ -167,37 +173,26 @@ void ZmqMiddleware::stop()
     switch (state_)
     {
         case Stopped:
+        case Stopping:
         {
             break;  // Already stopped, or about to stop, no-op
         }
-        case Starting:
-        {
-            // Wait until start in progress has completed before stopping
-            // Coverage excluded here because the window for which we are in this state is too
-            // small to hit with a test.
-            state_changed_.wait(lock, [this] { return state_ == Started; }); // LCOV_EXCL_LINE
-            // FALLTHROUGH
-        }
         case Started:
         {
-            {
-                lock_guard<mutex> lock(data_mutex_);
-                // No more outgoing invocations
-                twoway_invokers_.reset();
-                oneway_invoker_.reset();
-            }
-            auto adapter_map = move(am_);
-            for (auto& pair : adapter_map)
+            lock_guard<mutex> lock(data_mutex_);
+
+            // No more outgoing invocations
+            twoway_invokers_.reset();
+            oneway_invoker_.reset();
+
+            // Initiate shutdown of all adapters
+            for (auto& pair : am_)
             {
                 pair.second->shutdown();
             }
-            state_ = Stopped;
+
+            state_ = Stopping;
             state_changed_.notify_all();
-            lock.unlock();
-            for (auto& pair : adapter_map)
-            {
-                pair.second->wait_for_shutdown();
-            }
             break;
         }
         default:
@@ -209,8 +204,29 @@ void ZmqMiddleware::stop()
 
 void ZmqMiddleware::wait_for_shutdown()
 {
-    unique_lock<mutex> lock(state_mutex_);
-    state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
+    {
+        unique_lock<mutex> state_lock(state_mutex_);
+        state_changed_.wait(state_lock, [this] { return state_ == Stopping || state_ == Stopped; });
+        if (state_ == Stopped)
+        {
+            return;
+        }
+    }
+
+    // Exactly one thread gets to this point.
+    AdapterMap adapter_map;
+    {
+        lock_guard<mutex> data_lock(data_mutex_, std::adopt_lock);
+        adapter_map = move(am_);
+    }
+    for (auto&& pair : adapter_map)
+    {
+        pair.second->wait_for_shutdown();
+    }
+
+    unique_lock<mutex> state_lock(state_mutex_);
+    state_ = Stopped;
+    state_changed_.notify_all();
 }
 
 namespace
@@ -654,11 +670,7 @@ ThreadPool* ZmqMiddleware::oneway_pool()
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Starting)
-    {
-        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
-    }
-    if (state_ == Stopped)
+    if (state_ == Stopped || state_ == Stopping)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
@@ -670,11 +682,7 @@ ThreadPool* ZmqMiddleware::twoway_pool()
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Starting)
-    {
-        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
-    }
-    if (state_ == Stopped)
+    if (state_ == Stopped || state_ == Stopping)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
