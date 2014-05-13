@@ -1,6 +1,10 @@
 unity-scopes-api (0.4.5-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Pawel Stolowski ]
   * Implemented RangeInputFilter.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 09 May 2014 13:30:33 +0200
 
