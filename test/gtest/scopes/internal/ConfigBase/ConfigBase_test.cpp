@@ -140,3 +140,38 @@ TEST(ConfigBase, FileException)
                      e.what());
     }
 }
+
+class TestConfigClass : public ConfigBase
+{
+public:
+    TestConfigClass(const string& filename)
+        : ConfigBase(filename)
+    {
+        const KnownEntries known_entries = {
+                                              {  "SomeGroup",
+                                                 {
+                                                    "Empty",
+                                                    "Zmq.Middleware",
+                                                    "REST.Middleware",
+                                                    "Zmq.BadMiddleware",
+                                                    "REST.BadMiddleware"
+                                                 }
+                                              },
+                                              {  "SomeOtherGroup",
+                                                 {
+                                                   "SomeString",
+                                                   "SomeLocalizedString"
+                                                 }
+                                              }
+                                           };
+        check_unknown_entries(known_entries);
+    }
+};
+
+TEST(ConfigBase, TestKnownEntries)
+{
+    {
+        TestConfigClass c(TEST_INI);
+        EXPECT_EQ("fred", c.parser()->get_locale_string("SomeOtherGroup", "SomeLocalizedString", "fr"));
+    }
+}

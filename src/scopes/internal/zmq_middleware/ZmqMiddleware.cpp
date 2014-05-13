@@ -427,7 +427,7 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
 
 MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string const& identity)
 {
-    string endpoint = "ipc://" + config_.private_dir() + "/" + server_name_ + state_suffix;
+    string endpoint = "ipc://" + config_.public_dir() + "/" + server_name_ + state_suffix;
     return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
 }
 
@@ -614,7 +614,7 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     try
     {
         shared_ptr<StateReceiverI> sri(make_shared<StateReceiverI>(state_receiver));
-        auto adapter = find_adapter(server_name_ + state_suffix, config_.private_dir(), state_category);
+        auto adapter = find_adapter(server_name_ + state_suffix, config_.public_dir(), state_category);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, sri);
         state_receiver->set_disconnect_function(df);

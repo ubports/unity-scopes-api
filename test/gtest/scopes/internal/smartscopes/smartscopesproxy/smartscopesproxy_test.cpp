@@ -51,7 +51,12 @@ public:
         : server_(FAKE_SSS_PATH)
         , reg_id_("SSRegistryTest")
         , scope_id_("SmartScopeTest")
+        , ss_config_("")
     {
+        // set the LANGUAGE env var
+        std::string locale_env = "LANGUAGE=test_TEST";
+        ::putenv(const_cast<char*>(locale_env.c_str()));
+
         // Instantiate SS registry and scopes runtimes
         reg_rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
         scope_rt_ = RuntimeImpl::create(scope_id_, SS_RUNTIME_PATH);
@@ -61,20 +66,26 @@ public:
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
-        SSConfig ss_config(reg_rt_->ss_configfile());
+        ss_config_ = SSConfig(reg_rt_->ss_configfile());
 
         // Get middleware handles from runtimes
         reg_mw_ = reg_rt_->factory()->find(reg_id_, mw_kind);
         scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, ss_config, scope_mw_->get_scope_endpoint(),
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, ss_config_, scope_mw_->get_scope_endpoint(),
                                                            "http://127.0.0.1:" + std::to_string(server_.port_), false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
 
         // Add objects to the middlewares
         reg_mw_->add_registry_object(reg_rt_->registry_identity(), reg_);
         scope_mw_->add_dflt_scope_object(std::move(scope_));
+    }
+
+    void reset_reg()
+    {
+        reg_.reset(new SSRegistryObject(reg_mw_, ss_config_, scope_mw_->get_scope_endpoint(),
+                                        "http://127.0.0.1:" + std::to_string(server_.port_), false));
     }
 
     ~smartscopesproxytest()
@@ -91,6 +102,8 @@ protected:
 
     RuntimeImpl::UPtr reg_rt_;
     RuntimeImpl::UPtr scope_rt_;
+
+    SSConfig ss_config_;
 
     MiddlewareBase::SPtr reg_mw_;
     MiddlewareBase::SPtr scope_mw_;
@@ -139,6 +152,45 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // non-existant scope (via mw)
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
+}
+
+TEST_F(smartscopesproxytest, ss_registry_locale)
+{
+    // set an invalid LANGUAGE env var (should return 0 scopes)
+    std::string locale_env = "LANGUAGE=test_FAIL";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(0, reg_->list().size());
+
+    // set an empty LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(2u, reg_->list().size());
+
+    // set a valid LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=test_TEST";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(2u, reg_->list().size());
+
+    // set a colon only LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=:";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(2u, reg_->list().size());
+
+    // set a colon seperated LANGUAGE env var (first valid - should return 2 scopes)
+    locale_env = "LANGUAGE=test_TEST:test_FAIL";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(2u, reg_->list().size());
+
+    // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
+    locale_env = "LANGUAGE=test_FAIL:test_TEST";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(0, reg_->list().size());
 }
 
 class Receiver : public SearchListenerBase

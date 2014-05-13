@@ -199,8 +199,18 @@ void ConfigBase::check_unknown_entries(KnownEntries const& known_entries) const
         {
             if (it->second.find(key) == it->second.end())
             {
-                cerr << "warning: ignoring unknown key " << key << " in group " << group
-                     << " in file " << configfile_ << endl;
+                // Key not found as presented.
+                // Check whether the key is present as a localized entry of
+                // the form key[locale_name] = value.
+                auto start_pos = key.find('[');
+                bool is_localized = start_pos != string::npos &&                    // key contains [
+                                    key[key.size() - 1] == ']';                     // key ends with ]
+                if (!is_localized ||
+                    it->second.find(key.substr(0, start_pos)) == it->second.end())  // match prefix up to [
+                {
+                    cerr << "warning: ignoring unknown key " << key << " in group " << group
+                         << " in file " << configfile_ << endl;
+                }
             }
         }
     }

@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/FilterOption.h>
 #include <string>
 #include <list>
@@ -47,6 +48,7 @@ public:
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
+    static OptionSelectorFilter::SPtr create(VariantMap const& var);
 
 protected:
     void serialize(VariantMap& var) const override;

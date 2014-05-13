@@ -1,0 +1,4 @@
+add_executable(RangeInputFilter_test RangeInputFilter_test.cpp)
+target_link_libraries(RangeInputFilter_test ${TESTLIBS})
+
+add_test(RangeInputFilter RangeInputFilter_test)

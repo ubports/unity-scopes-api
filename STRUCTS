@@ -115,6 +115,13 @@ OptionSelectorFilter (FilterBase)
  'multi_select' : bool
  'options'      : array of FilterOption
 
+RangeInputFilter
+================
+ 'id'           : string
+ 'start_label'  : string
+ 'end_label'    : string
+ 'unit_label'   : string
+
 Filters + FilterState
 =====================
  'filter'       : array of filters (implementations of FilterBase)

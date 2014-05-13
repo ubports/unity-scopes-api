@@ -39,6 +39,11 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
 {
 }
 
+OptionSelectorFilter::SPtr OptionSelectorFilterImpl::create(VariantMap const& var)
+{
+    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new OptionSelectorFilterImpl(var)));
+}
+
 OptionSelectorFilterImpl::OptionSelectorFilterImpl(VariantMap const& var)
     : FilterBaseImpl(var)
 {

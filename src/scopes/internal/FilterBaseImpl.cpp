@@ -20,7 +20,8 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/Utils.h>
-#include <unity/scopes/OptionSelectorFilter.h>
+#include <unity/scopes/internal/OptionSelectorFilterImpl.h>
+#include <unity/scopes/internal/RangeInputFilterImpl.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -97,7 +98,11 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         auto ftype = it->second.get_string();
         if (ftype == "option_selector")
         {
-            return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(var));
+            return OptionSelectorFilterImpl::create(var);
+        }
+        if (ftype == "range_input")
+        {
+            return RangeInputFilterImpl::create(var);
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }
