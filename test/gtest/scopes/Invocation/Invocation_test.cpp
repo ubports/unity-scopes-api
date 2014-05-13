@@ -125,7 +125,6 @@ class NullReceiver : public SearchListenerBase
 {
 public:
     NullReceiver()
-        : query_complete_(false)
     {
     }
 
@@ -135,22 +134,11 @@ public:
 
     virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
     {
-        lock_guard<mutex> lock(mutex_);
-        query_complete_ = true;
-        cond_.notify_one();
     }
 
     void wait_until_finished()
     {
-        unique_lock<mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
-        query_complete_ = false;
     }
-
-private:
-    bool query_complete_;
-    mutex mutex_;
-    condition_variable cond_;
 };
 
 TEST(Invocation, shutdown_with_outstanding_async)
