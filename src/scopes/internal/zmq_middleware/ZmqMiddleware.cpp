@@ -71,14 +71,11 @@ char const* state_category = "State";       // state adapter category name
 char const* scope_category = "Scope";       // scope adapter category name
 char const* registry_category = "Registry"; // registry adapter category name
 
-// Create a directory with mode rwx------t if it doesn't exist yet.
-// We set the sticky bit to prevent the directory from being deleted:
-// if it happens to be under $XDG_RUNTIME_DIR and is not accessed
-// for more than six hours, the system may delete it.
+// Create a directory with the given mode if it doesn't exist yet.
 
-void create_dir(string const& dir)
+void create_dir(string const& dir, mode_t mode)
 {
-    if (mkdir(dir.c_str(), 0700 | S_ISVTX) == -1 && errno != EEXIST)
+    if (mkdir(dir.c_str(), mode) == -1 && errno != EEXIST)
     {
         throw FileException("cannot create endpoint directory " + dir, errno);
     }
@@ -100,8 +97,10 @@ try :
     try
     {
         // Create the endpoint dirs if they don't exist.
-        create_dir(config_.public_dir());
-        create_dir(config_.private_dir());
+        // We set the sticky bit because, without this, things in
+        // $XDG_RUNTIME_DIR may be deleted if not accessed for more than six hours.
+        create_dir(config_.public_dir(), 0755 | S_ISVTX);
+        create_dir(config_.private_dir(), 0700 | S_ISVTX);
     }
     catch (...)
     {

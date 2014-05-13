@@ -111,7 +111,10 @@ The following keys are recognized:
   The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
   set, initialization fails.
 
-  Private endpoints are created in "<EndpointDir.Public>/priv".
+  The public directory is created if it does not exist, with mode rwxr-xr-xt.
+
+  Private endpoints are created in "<EndpointDir.Public>/priv". The priv
+  directory is created if it does not exist, with mode rwx------t.
 
 - Default.Twoway.Timeout
 
