@@ -135,10 +135,6 @@ public:
     virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
     {
     }
-
-    void wait_until_finished()
-    {
-    }
 };
 
 TEST(Invocation, shutdown_with_outstanding_async)
