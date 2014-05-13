@@ -160,6 +160,7 @@ protected:
         exec_data.runtime_config = "/path/runtime.ini";
         exec_data.scope_config = "/path/scope.ini";
         exec_data.confinement_profile = confinement_profile;
+        exec_data.timeout_ms = 1500;
 
         registry.reset(new RegistryObject(*death_observer(), executor));
         registry->add_local_scope("scope-id", meta, exec_data);

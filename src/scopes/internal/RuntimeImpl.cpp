@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
@@ -73,6 +74,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         middleware_factory_.reset(new MiddlewareFactory(this));
         registry_configfile_ = config.registry_configfile();
         registry_identity_ = config.registry_identity();
+        reap_expiry_ = config.reap_expiry();
+        reap_interval_ = config.reap_interval();
         ss_configfile_ = config.ss_configfile();
         ss_registry_identity_ = config.ss_registry_identity();
 
@@ -225,7 +228,7 @@ Reaper::SPtr RuntimeImpl::reply_reaper() const
     lock_guard<mutex> lock(mutex_);
     if (!reply_reaper_)
     {
-        reply_reaper_ = Reaper::create(10, 45); // TODO: configurable timeouts
+        reply_reaper_ = Reaper::create(reap_interval_, reap_expiry_);
     }
     return reply_reaper_;
 }
@@ -243,6 +246,12 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
         catch (std::runtime_error const&)
         {
             break;
+        }
+        catch (std::future_error const&)
+        {
+            // If the run time is shut down without waiting for outstanding
+            // async invocations to complete, we get a future error because
+            // the promise will be destroyed, so we ignore this.
         }
     }
 }
@@ -291,7 +300,15 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    auto proxy = mw->add_scope_object(scope_id_, move(scope));
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
+    }
+    else
+    {
+        mw->add_scope_object(scope_id_, move(scope));
+    }
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);

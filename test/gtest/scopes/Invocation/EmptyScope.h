@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,42 +16,25 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
-#define UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
+#ifndef TEST_EMPTYSCOPE_H
+#define TEST_EMPTYSCOPE_H
 
-#include <unity/scopes/internal/ConfigBase.h>
+#include <unity/scopes/ScopeBase.h>
 
-namespace unity
-{
+using namespace std;
+using namespace unity::scopes;
 
-namespace scopes
-{
-
-namespace internal
-{
-
-class ZmqConfig : public ConfigBase
+class EmptyScope : public ScopeBase
 {
 public:
-    ZmqConfig(std::string const& configfile);
-    ~ZmqConfig();
+    virtual int start(string const&, RegistryProxy const &) override;
 
-    std::string public_dir() const;
-    std::string private_dir() const;
-    int twoway_timeout() const;
-    int locate_timeout() const;
+    virtual void stop() override;
 
-private:
-    std::string public_dir_;
-    std::string private_dir_;
-    int twoway_timeout_;
-    int locate_timeout_;
+    virtual void run() override;
+
+    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override;
 };
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
 
 #endif

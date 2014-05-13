@@ -41,25 +41,68 @@ the SSS REST API see: <i>link_not_yet_available</i>)
 
 \subsection starting Getting started
 
-A simple C++ scope template with cmake build system is currently available
-on Launchpad, to use it install the packages required for scope development:
+A simple C++ scope template with cmake build system is currently available as part of the Ubuntu SDK IDE. To use it install the
+packages required for scope development:
 
 \verbatim
 sudo apt-get install libunity-scopes-dev
 \endverbatim
 
-Clone the bazaar branch with the scope template and build the scope:
-
-\verbatim
-bzr branch lp:~jpakkane/+junk/scopetemplate
-cd scopetemplate
-mkdir build
-cd build
-cmake ..
-make
-\endverbatim
+In the Ubuntu SDK you will have to decide whether your scope will either access the network, or access the local filesystem.
 
 Now you're ready to explore and modify the sample code in the src/ directory.
+
+\subsection click Click packaging
+
+To register your scope, you must use the "scope" click hook, and point it to a directory containing your .ini file and .so file.
+In the template, a manifest like the follow is used:
+
+\code
+{
+  "description": "Net scope description",
+  "framework": "ubuntu-sdk-14.04-clibs",
+  "hooks": {
+    "myscope": {
+      "scope": "myscope", <-- Point to directory in build tree with .ini and .so
+      "apparmor": "scope-security.json" <-- Point to AppArmor manifest in build tree
+    }
+  }
+  "maintainer": "Some Guy <some.guy@ubuntu.com>",
+  "name": "com.ubuntu.developer.username.net-scope",
+  "title": "Some scope",
+  "version": "0.1"
+}
+\endcode
+
+\subsubsection apparmor Apparmor manifest
+
+Scopes that are packaged using click are inherently untrusted and must be confined. At present, there are two different choices
+that can be made:
+<ul>
+<li>Network scope - can access the network / internet, but is not allowed to use APIs that could provide access to the user's data.
+<li>Local-content scope - can access local APIs that could provide access to user's data, but cannot access the network / internet.
+</ul>
+
+For a scope confined to access local content only:
+
+\code
+{
+    "template": "ubuntu-scope-local-content",
+    "policy_version": 1.1
+}
+\endcode
+
+For a scope confined to only be able to access the internet:
+
+\code
+{
+    "template": "ubuntu-scope-network",
+    "policy_groups": [
+        "networking"
+    ],
+    "policy_version": 1.1
+}
+\endcode
 
 \subsection impl Implementing scope
 

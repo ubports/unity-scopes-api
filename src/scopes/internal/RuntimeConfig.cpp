@@ -42,6 +42,8 @@ namespace
     const string ss_configfile_key = "Smartscopes.ConfigFile";
     const string default_middleware_key = "Default.Middleware";
     const string default_middleware_configfile_key = ".ConfigFile";
+    const string reap_expiry_key = "Reap.Expiry";
+    const string reap_interval_key = "Reap.Interval";
 }
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :
@@ -55,6 +57,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         ss_configfile_ = DFLT_SS_INI;
         default_middleware_ = DFLT_MIDDLEWARE;
         default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
+        reap_expiry_ = DFLT_REAP_EXPIRY;
+        reap_interval_ = DFLT_REAP_INTERVAL;
     }
     else
     {
@@ -66,6 +70,16 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_configfile_ = get_optional_string(runtime_config_group,
                                                              default_middleware_ + default_middleware_configfile_key,
                                                              DFLT_MIDDLEWARE_INI);
+        reap_expiry_ = get_optional_int(runtime_config_group, reap_expiry_key, DFLT_REAP_EXPIRY);
+        if (reap_expiry_ < 1)
+        {
+            throw_ex("Illegal value (" + to_string(reap_expiry_) + ") for " + reap_expiry_key + ": value must be > 0");
+        }
+        reap_interval_ = get_optional_int(runtime_config_group, reap_interval_key, DFLT_REAP_INTERVAL);
+        if (reap_interval_ < 1)
+        {
+            throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
+        }
     }
 
     const KnownEntries known_entries = {
@@ -76,7 +90,9 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 ss_registry_identity_key,
                                                 ss_configfile_key,
                                                 default_middleware_key,
-                                                default_middleware_ + default_middleware_configfile_key
+                                                default_middleware_ + default_middleware_configfile_key,
+                                                reap_expiry_key,
+                                                reap_interval_key
                                              }
                                           }
                                        };
@@ -115,6 +131,16 @@ string RuntimeConfig::default_middleware() const
 string RuntimeConfig::default_middleware_configfile() const
 {
     return default_middleware_configfile_;
+}
+
+int RuntimeConfig::reap_expiry() const
+{
+    return reap_expiry_;
+}
+
+int RuntimeConfig::reap_interval() const
+{
+    return reap_interval_;
 }
 
 } // namespace internal

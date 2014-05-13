@@ -71,14 +71,11 @@ char const* state_category = "State";       // state adapter category name
 char const* scope_category = "Scope";       // scope adapter category name
 char const* registry_category = "Registry"; // registry adapter category name
 
-// Create a directory with mode rwx------t if it doesn't exist yet.
-// We set the sticky bit to prevent the directory from being deleted:
-// if it happens to be under $XDG_RUNTIME_DIR and is not accessed
-// for more than six hours, the system may delete it.
+// Create a directory with the given mode if it doesn't exist yet.
 
-void create_dir(string const& dir)
+void create_dir(string const& dir, mode_t mode)
 {
-    if (mkdir(dir.c_str(), 0700 | S_ISVTX) == -1 && errno != EEXIST)
+    if (mkdir(dir.c_str(), mode) == -1 && errno != EEXIST)
     {
         throw FileException("cannot create endpoint directory " + dir, errno);
     }
@@ -92,16 +89,18 @@ try :
     server_name_(server_name),
     state_(Stopped),
     config_(configfile),
-    twoway_timeout_(300),  // TODO: get timeout from config
-    locate_timeout_(2000)  // TODO: get timeout from config
+    twoway_timeout_(config_.twoway_timeout()),
+    locate_timeout_(config_.locate_timeout())
 {
     assert(!server_name.empty());
 
-    // Create the endpoint dirs if they don't exist.
     try
     {
-        create_dir(config_.public_dir());
-        create_dir(config_.private_dir());
+        // Create the endpoint dirs if they don't exist.
+        // We set the sticky bit because, without this, things in
+        // $XDG_RUNTIME_DIR may be deleted if not accessed for more than six hours.
+        create_dir(config_.public_dir(), 0755 | S_ISVTX);
+        create_dir(config_.private_dir(), 0700 | S_ISVTX);
     }
     catch (...)
     {
@@ -427,7 +426,7 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
 
 MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string const& identity)
 {
-    string endpoint = "ipc://" + config_.private_dir() + "/" + server_name_ + state_suffix;
+    string endpoint = "ipc://" + config_.public_dir() + "/" + server_name_ + state_suffix;
     return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
 }
 
@@ -562,7 +561,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     return proxy;
 }
 
-MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObjectBase::SPtr const& scope)
+MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout)
 {
     assert(!identity.empty());
     assert(scope);
@@ -571,7 +570,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     try
     {
         shared_ptr<ScopeI> si(make_shared<ScopeI>(scope));
-        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category);
+        auto adapter = find_adapter(server_name_, config_.private_dir(), scope_category, idle_timeout);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, si);
         scope->set_disconnect_function(df);
@@ -614,7 +613,7 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     try
     {
         shared_ptr<StateReceiverI> sri(make_shared<StateReceiverI>(state_receiver));
-        auto adapter = find_adapter(server_name_ + state_suffix, config_.private_dir(), state_category);
+        auto adapter = find_adapter(server_name_ + state_suffix, config_.public_dir(), state_category);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, sri);
         state_receiver->set_disconnect_function(df);
@@ -715,7 +714,7 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
 }
 
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir,
-                                                      string const& category)
+                                                      string const& category, int64_t idle_timeout)
 {
     lock_guard<mutex> lock(data_mutex_);
 
@@ -790,7 +789,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         endpoint = "ipc://" + endpoint_dir + "/" + name;
     }
 
-    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size));
+    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size, idle_timeout));
     a->activate();
     am_[name] = a;
     return a;

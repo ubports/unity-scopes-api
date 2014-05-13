@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.4.5
+========================
+  * Implemented RangeInputFilter.
+
 Changes in version 0.4.4
 ========================
   - The register_annotation() method of SearchReply is now deprecated - push(Annotation const&) should
@@ -9,13 +13,13 @@ Changes in version 0.4.4
 
   - Simplified configuration with sensible defaults for all values.
 
-  - scoperunner, scoperegistry, and smartscopesproxy are now install in /usr/lib/<arch>
-    (instead of in a subdirectory of <arch>).
+  - scoperunner, scoperegistry, and smartscopesproxy are now install in /usr/lib/\<arch\>
+    (instead of in a subdirectory of \<arch\>).
 
   - Runtime::run_scope() now has an overload to accept a path to Runtime.ini. If no file name is passed,
     the system-wide Runtime.ini is used.
 
-  - UNIX domain sockets for Zmq are now placed under /user/run/<uid>/zmq by default.
+  - UNIX domain sockets for Zmq are now placed under /user/run/\<uid\>/zmq by default.
 
 Changes in version 0.4.2
 ========================

@@ -61,7 +61,16 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 {
     std::vector<RemoteScope> scopes;
 
+    // first try an invalid locale (should throw)
+    EXPECT_THROW(ssc_->get_remote_scopes(scopes, "test_FAIL", false), std::exception);
+    ASSERT_EQ(0, scopes.size());
+
+    // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
+    ASSERT_EQ(2u, scopes.size());
+
+    // now try a valid locale
+    EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "test_TEST", false));
     ASSERT_EQ(2u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);

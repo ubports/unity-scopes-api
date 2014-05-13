@@ -43,8 +43,15 @@ static constexpr char const* DFLT_OEM_INSTALL_DIR = "/custom/@LIB_INSTALL_PREFIX
 static constexpr int DFLT_SS_HTTP_TIMEOUT = 20;              // seconds
 static constexpr int DFLT_SS_REG_REFRESH_RATE = 86400;       // 24 hours as seconds
 static constexpr int DFLT_SS_REG_REFRESH_FAIL_TIMEOUT = 10;  // seconds
+static constexpr int DFLT_SCOPE_IDLE_TIMEOUT = 40;           // seconds
 
 static constexpr char const* DFLT_SS_SCOPE_IDENTITY = "SmartScope";
+
+static const int DFLT_REAP_EXPIRY = 45;           // seconds
+static const int DFLT_REAP_INTERVAL = 10;         // seconds
+static const int DFLT_PROCESS_TIMEOUT = 1500;     // milliseconds
+static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 300;   // milliseconds
+static const int DFLT_ZMQ_LOCATE_TIMEOUT = 2000;  // milliseconds
 
 } // namespace internal
 
