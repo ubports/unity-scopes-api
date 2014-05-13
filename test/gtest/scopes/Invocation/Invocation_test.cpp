@@ -35,6 +35,7 @@
 
 #include <gtest/gtest.h>
 
+#include "EmptyScope.h"
 #include "TestScope.h"
 
 using namespace std;
@@ -120,9 +121,54 @@ TEST(Invocation, timeout)
     EXPECT_EQ("", receiver->error_message());
 }
 
-void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+class NullReceiver : public SearchListenerBase
+{
+public:
+    NullReceiver()
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+    }
+
+    virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
+    {
+    }
+
+    void wait_until_finished()
+    {
+    }
+};
+
+TEST(Invocation, shutdown_with_outstanding_async)
+{
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("EmptyScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("EmptyScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "no_such_scope");
+
+    auto receiver = make_shared<NullReceiver>();
+
+    // Fire a bunch of searches and do *not* wait for them complete.
+    // This tests that we correctly shut down the run time if there
+    // are outstanding async invocations.
+    for (int i = 0; i < 100; ++i)
+    {
+        scope->search("test", SearchMetadata("unused", "unused"), receiver);
+    }
+}
+
+void testscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     TestScope scope;
+    rt->run_scope(&scope, runtime_ini_file, "");
+}
+
+void nullscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+{
+    EmptyScope scope;
     rt->run_scope(&scope, runtime_ini_file, "");
 }
 
@@ -130,17 +176,23 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, srt, "Runtime.ini");
+    Runtime::SPtr tsrt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
+    std::thread testscope_t(testscope_thread, tsrt, "Runtime.ini");
 
-    // Give thread some time to bind to its endpoint, to avoid getting ObjectNotExistException
+    Runtime::SPtr esrt = move(Runtime::create_scope_runtime("EmptyScope", "Runtime.ini"));
+    std::thread emptyscope_t(nullscope_thread, esrt, "Runtime.ini");
+
+    // Give threads some time to bind to endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
     this_thread::sleep_for(chrono::milliseconds(200));
 
     auto rc = RUN_ALL_TESTS();
 
-    srt->destroy();
-    scope_t.join();
+    tsrt->destroy();
+    testscope_t.join();
+
+    esrt->destroy();
+    emptyscope_t.join();
 
     return rc;
 }
