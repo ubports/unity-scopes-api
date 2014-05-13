@@ -247,6 +247,12 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
         {
             break;
         }
+        catch (std::future_error const&)
+        {
+            // If the run time is shut down without waiting for outstanding
+            // async invocations to complete, we get a future error because
+            // the promise will be destroyed, so we ignore this.
+        }
     }
 }
 
