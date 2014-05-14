@@ -271,7 +271,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
     EXPECT_EQ("/foo", var["scope_dir"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
-            (ScopeMetadata::ResultsTtlType ) var["results_ttl"].get_int());
+            (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
