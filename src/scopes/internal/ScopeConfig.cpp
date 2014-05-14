@@ -23,6 +23,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -147,7 +148,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
-    results_ttl_ = ScopeMetadata::ResultsTtl::None;
+    results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
     try
     {
         string ttl = parser()->get_string(scope_config_group, results_ttl_str);
@@ -156,15 +157,15 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         }
         else if (ttl == "small")
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::Small;
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Small;
         }
         else if (ttl == "medium")
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::Medium;
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Medium;
         }
         else if (ttl == "large")
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::Large;
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Large;
         }
         else
         {
@@ -286,9 +287,9 @@ VariantMap ScopeConfig::appearance_attributes() const
     return appearance_attributes_;
 }
 
-ScopeMetadata::ResultsTtl ScopeConfig::results_ttl() const
+ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
 {
-    return results_ttl_;
+    return results_ttl_type_;
 }
 
 } // namespace internal

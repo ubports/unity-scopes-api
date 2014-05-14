@@ -52,7 +52,7 @@ public:
     /**
      \brief Enum representing the expected valid lifetime of results from the scope.
      */
-    enum class ResultsTtl
+    enum class ResultsTtlType
     {
         None,
         Small,
@@ -164,7 +164,7 @@ public:
     \brief Return the TTL for the results this scope produces.
     \return Enum of timeout type.
     */
-    ResultsTtl results_ttl() const;
+    ResultsTtlType results_ttl_type() const;
 
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl

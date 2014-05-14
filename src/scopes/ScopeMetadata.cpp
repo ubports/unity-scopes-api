@@ -132,9 +132,9 @@ VariantMap ScopeMetadata::serialize() const
     return p->serialize();
 }
 
-ScopeMetadata::ResultsTtl ScopeMetadata::results_ttl() const
+ScopeMetadata::ResultsTtlType ScopeMetadata::results_ttl_type() const
 {
-    return p->results_ttl();
+    return p->results_ttl_type();
 }
 
 //! @endcond

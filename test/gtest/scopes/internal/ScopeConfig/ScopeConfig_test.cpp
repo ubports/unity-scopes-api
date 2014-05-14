@@ -36,7 +36,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("an icon", cfg.icon());
         EXPECT_EQ("search string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
-        EXPECT_EQ(ScopeMetadata::ResultsTtl::None, cfg.results_ttl());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(2, attrs.size());
@@ -55,7 +55,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("an icon", cfg.icon());
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
-        EXPECT_EQ(ScopeMetadata::ResultsTtl::None, cfg.results_ttl());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
     }
@@ -70,7 +70,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
         EXPECT_EQ("/my/scope/runner", cfg.scope_runner());
-        EXPECT_EQ(ScopeMetadata::ResultsTtl::Small, cfg.results_ttl());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, cfg.results_ttl_type());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
     }
