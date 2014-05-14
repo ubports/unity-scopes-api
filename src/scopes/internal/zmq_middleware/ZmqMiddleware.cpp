@@ -629,6 +629,16 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     return proxy;
 }
 
+MWPublisherProxy ZmqMiddleware::create_publisher(std::string const& /*publisher_identity*/, std::string const& /*topic*/)
+{
+    return MWPublisherProxy();
+}
+
+MWSubscriberProxy ZmqMiddleware::create_subscriber(std::string const& /*publisher_identity*/, std::string const& /*topic*/)
+{
+    return MWSubscriberProxy();
+}
+
 std::string ZmqMiddleware::get_scope_endpoint()
 {
     return "ipc://" + config_.private_dir() + "/" +  server_name_;

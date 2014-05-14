@@ -78,9 +78,12 @@ public:
     virtual void add_dflt_query_object(QueryObjectBase::SPtr const& query) override;
     virtual MWRegistryProxy add_registry_object(std::string const& identity, RegistryObjectBase::SPtr const& registry) override;
     virtual MWReplyProxy add_reply_object(ReplyObjectBase::SPtr const& reply) override;
-    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout = 0) override;
+    virtual MWScopeProxy add_scope_object(std::string const& identity, ScopeObjectBase::SPtr const& scope, int64_t idle_timeout) override;
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) override;
+
+    virtual MWPublisherProxy create_publisher(std::string const& publisher_identity, std::string const& topic) override;
+    virtual MWSubscriberProxy create_subscriber(std::string const& publisher_identity, std::string const& topic) override;
 
     virtual std::string get_scope_endpoint() override;
     virtual std::string get_query_endpoint() override;
