@@ -54,10 +54,10 @@ public:
      */
     enum class ResultsTtl
     {
-        none,
-        small,
-        medium,
-        large
+        None,
+        Small,
+        Medium,
+        Large
     };
 
     /// @cond

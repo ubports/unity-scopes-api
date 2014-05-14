@@ -52,7 +52,7 @@ namespace
     const string idle_timeout_key = "IdleTimeout";
 
     const string scope_appearance_group = "Appearance";
-    const string results_ttl_str = "ResultsTTL";
+    const string results_ttl_str = "ResultsTtlType";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -147,21 +147,28 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
-    results_ttl_ = ScopeMetadata::ResultsTtl::none;
+    results_ttl_ = ScopeMetadata::ResultsTtl::None;
     try
     {
         string ttl = parser()->get_string(scope_config_group, results_ttl_str);
-        if (ttl == "small")
+        if (ttl.empty())
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::small;
+        }
+        else if (ttl == "small")
+        {
+            results_ttl_ = ScopeMetadata::ResultsTtl::Small;
         }
         else if (ttl == "medium")
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::medium;
+            results_ttl_ = ScopeMetadata::ResultsTtl::Medium;
         }
         else if (ttl == "large")
         {
-            results_ttl_ = ScopeMetadata::ResultsTtl::large;
+            results_ttl_ = ScopeMetadata::ResultsTtl::Large;
+        }
+        else
+        {
+            cerr << "warning: invalid value for " << results_ttl_str << ": " << ttl << endl;
         }
     }
     catch (LogicException const&)

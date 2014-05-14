@@ -36,12 +36,12 @@ namespace internal
 {
 
 ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
-    mw_(mw), results_ttl_(ScopeMetadata::ResultsTtl::none)
+    mw_(mw), results_ttl_(ScopeMetadata::ResultsTtl::None)
 {
 }
 
 ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw) :
-    mw_(mw), results_ttl_(ScopeMetadata::ResultsTtl::none)
+    mw_(mw), results_ttl_(ScopeMetadata::ResultsTtl::None)
 {
     deserialize(variant_map);
 }
@@ -321,7 +321,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     {
         var["appearance_attributes"] = appearance_attributes_;
     }
-    if (results_ttl_ != ScopeMetadata::ResultsTtl::none)
+    if (results_ttl_ != ScopeMetadata::ResultsTtl::None)
     {
         var["results_ttl"] = (int) results_ttl_;
     }

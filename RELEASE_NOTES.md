@@ -8,6 +8,8 @@ Changes in version 0.4.6
 
   - Added has_subdepartments flag and alternate label to Department class.
 
+  - Added TTL option for scope's results.
+
 Changes in version 0.4.5
 ========================
   - Implemented RangeInputFilter.
