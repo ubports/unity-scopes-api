@@ -99,7 +99,7 @@ TEST(Invocation, timeout)
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "no_such_scope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
 
     auto receiver = make_shared<TestReceiver>();
 
@@ -159,7 +159,7 @@ TEST(Invocation, shutdown_with_outstanding_async)
     auto mw = rt->factory()->create("EmptyScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("EmptyScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "no_such_scope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "EmptyScope");
 
     auto receiver = make_shared<NullReceiver>();
 
