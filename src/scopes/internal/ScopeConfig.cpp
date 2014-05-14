@@ -181,7 +181,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 invisible_key,
                                                 hot_key_key,
                                                 scoperunner_key,
-                                                idle_timeout_key
+                                                idle_timeout_key,
+                                                results_ttl_str
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
