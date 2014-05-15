@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQPUBLISHER_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQPUBLISHER_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqPublisherProxyFwd.h>
 #include <unity/scopes/internal/MWPublisher.h>
 
 namespace unity

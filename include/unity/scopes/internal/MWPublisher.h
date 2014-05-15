@@ -19,6 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWPUBLISHER_H
 #define UNITY_SCOPES_INTERNAL_MWPUBLISHER_H
 
+#include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
+
 namespace unity
 {
 
@@ -31,6 +34,9 @@ namespace internal
 class MWPublisher
 {
 public:
+    NONCOPYABLE(MWPublisher);
+    UNITY_DEFINES_PTRS(MWPublisher);
+
     virtual ~MWPublisher();
 
 protected:

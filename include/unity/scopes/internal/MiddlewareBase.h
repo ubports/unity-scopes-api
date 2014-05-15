@@ -20,13 +20,13 @@
 #define UNITY_SCOPES_INTERNAL_MIDDLEWAREBASE_H
 
 #include <unity/scopes/internal/MWObjectProxyFwd.h>
-#include <unity/scopes/internal/MWPublisherProxyFwd.h>
+#include <unity/scopes/internal/MWPublisher.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWQueryProxyFwd.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/scopes/internal/MWStateReceiverProxyFwd.h>
-#include <unity/scopes/internal/MWSubscriberProxyFwd.h>
+#include <unity/scopes/internal/MWSubscriber.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/QueryCtrlObjectBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
@@ -86,8 +86,8 @@ public:
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) = 0;
 
-    virtual MWPublisherProxy create_publisher(std::string const& publisher_identity, std::string const& topic = "") = 0;
-    virtual MWSubscriberProxy create_subscriber(std::string const& publisher_identity, std::string const& topic = "") = 0;
+    virtual MWPublisher::UPtr create_publisher(std::string const& publisher_id, std::string const& topic = "") = 0;
+    virtual MWSubscriber::UPtr create_subscriber(std::string const& publisher_id, std::string const& topic = "") = 0;
 
     virtual std::string get_scope_endpoint() = 0;
     virtual std::string get_query_endpoint() = 0;

@@ -19,6 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
 #define UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
 
+#include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
+
 namespace unity
 {
 
@@ -31,6 +34,9 @@ namespace internal
 class MWSubscriber
 {
 public:
+    NONCOPYABLE(MWSubscriber);
+    UNITY_DEFINES_PTRS(MWSubscriber);
+
     virtual ~MWSubscriber();
 
 protected:

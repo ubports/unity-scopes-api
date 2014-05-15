@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSUBSCRIBER_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSUBSCRIBER_H
 
-#include <unity/scopes/internal/zmq_middleware/ZmqSubscriberProxyFwd.h>
 #include <unity/scopes/internal/MWSubscriber.h>
 
 namespace unity

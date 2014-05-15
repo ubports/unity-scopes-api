@@ -629,14 +629,14 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     return proxy;
 }
 
-MWPublisherProxy ZmqMiddleware::create_publisher(std::string const& /*publisher_identity*/, std::string const& /*topic*/)
+MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& /*publisher_id*/, std::string const& /*topic*/)
 {
-    return MWPublisherProxy();
+    return MWPublisher::UPtr();
 }
 
-MWSubscriberProxy ZmqMiddleware::create_subscriber(std::string const& /*publisher_identity*/, std::string const& /*topic*/)
+MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& /*publisher_id*/, std::string const& /*topic*/)
 {
-    return MWSubscriberProxy();
+    return MWSubscriber::UPtr();
 }
 
 std::string ZmqMiddleware::get_scope_endpoint()
