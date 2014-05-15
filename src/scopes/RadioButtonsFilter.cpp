@@ -32,10 +32,12 @@ RadioButtonsFilter::RadioButtonsFilter(internal::RadioButtonsFilterImpl *impl)
 
 FilterOption::SCPtr RadioButtonsFilter::add_option(std::string const& id, std::string const& label)
 {
+    return fwd()->add_option(id, label);
 }
 
 std::string RadioButtonsFilter::label() const
 {
+    return fwd()->label();
 }
 
 FilterOption::SCPtr RadioButtonsFilter::active_option(FilterState const& filter_state) const

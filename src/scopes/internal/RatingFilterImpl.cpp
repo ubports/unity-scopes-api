@@ -42,7 +42,7 @@ RatingFilterImpl::RatingFilterImpl(std::string const& id, std::string const& lab
     {
         std::stringstream err;
         err << "RatingFilterImpl(): top_rating " << top_rating << " outside of allowed range for filter '" << id << "'";
-        throw unity::InvalidArgumentException(err.str());
+        throw unity::LogicException(err.str());
     }
 
     // create rating options from 1..top_rating range, e.g. "1+", "2+", ..., "5".
@@ -68,7 +68,7 @@ FilterOption::SCPtr RatingFilterImpl::add_option(std::string const& id, std::str
     {
         std::stringstream err;
         err << "RatingFilterImpl::add_option(): maximum number of rating options reached for filter '" << id << "'";
-        throw unity::InvalidArgumentException(err.str());
+        throw unity::LogicException(err.str());
     }
 }
 
