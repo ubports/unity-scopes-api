@@ -1,4 +1,4 @@
 {
-    "template": "ubuntu-scope-filesystem",
+    "template": "ubuntu-scope-local-content",
     "policy_version": 1.1
 }
