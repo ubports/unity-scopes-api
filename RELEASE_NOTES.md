@@ -1,9 +1,13 @@
 Release notes
 =============
 
+Changes in version 0.4.6
+========================
+  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+
 Changes in version 0.4.5
 ========================
-  * Implemented RangeInputFilter.
+  - Implemented RangeInputFilter.
 
 Changes in version 0.4.4
 ========================

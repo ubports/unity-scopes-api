@@ -45,7 +45,7 @@ using namespace unity::scopes;
 class Receiver: public SearchListenerBase
 {
 public:
-    virtual void push(const Category::SCPtr& category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cerr << scope_id_ << ": received category: id=" << category->id() << endl;
     }

@@ -1,3 +1,9 @@
+unity-scopes-api (0.4.6-0ubuntu1) UNRELEASED; urgency=low
+
+  * Changed parameter type for pushing categories to Category::SCPtr const&
+
+ -- Michi Henning <michi.henning@ubuntu.com>  Thu May 15 11:28:18 EST 2014
+
 unity-scopes-api (0.4.5-0ubuntu1) UNRELEASED; urgency=low
 
   * Implemented RangeInputFilter.
