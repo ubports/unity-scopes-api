@@ -110,10 +110,6 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     {
         throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
     }
-    if (!department_id.empty())
-    {
-        throw InvalidArgumentException("QueryBase::subsearch(): Invalid empty department_id string");
-    }
 
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, *search_metadata_, reply);
 
@@ -136,10 +132,6 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
     if (!reply)
     {
         throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
-    }
-    if (!department_id.empty())
-    {
-        throw InvalidArgumentException("QueryBase::subsearch(): Invalid empty department_id string");
     }
 
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);

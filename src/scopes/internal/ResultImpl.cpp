@@ -125,28 +125,16 @@ void ResultImpl::set_uri(std::string const& uri)
 
 void ResultImpl::set_title(std::string const& title)
 {
-    if (title.empty())
-    {
-        throw InvalidArgumentException("Result::set_title(): Invalid empty title string");
-    }
     attrs_["title"] = title;
 }
 
 void ResultImpl::set_art(std::string const& art)
 {
-    if (art.empty())
-    {
-        throw InvalidArgumentException("Result::set_art(): Invalid empty art string");
-    }
     attrs_["art"] = art;
 }
 
 void ResultImpl::set_dnd_uri(std::string const& dnd_uri)
 {
-    if (dnd_uri.empty())
-    {
-        throw InvalidArgumentException("Result::set_dnd_uri(): Invalid empty dnd_uri string");
-    }
     attrs_["dnd_uri"] = dnd_uri;
 }
 
