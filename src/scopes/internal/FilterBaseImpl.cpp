@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
 #include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -46,7 +47,7 @@ FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
     it = var.find("display_hints");
     if (it != var.end())
     {
-        display_hints_ = static_cast<FilterBase::DisplayHints>(it->second.get_int());
+        set_display_hints(static_cast<FilterBase::DisplayHints>(it->second.get_int()));
     }
 }
 
@@ -54,6 +55,14 @@ FilterBaseImpl::~FilterBaseImpl() = default;
 
 void FilterBaseImpl::set_display_hints(int hints)
 {
+    // note: make sure all_flags is updated whenever new values are added to the DisplayHints enum
+    static const int all_flags = static_cast<int>(FilterBase::DisplayHints::Primary);
+    if (hints < 0 || hints > all_flags)
+    {
+        std::stringstream err;
+        err << "FilterBaseImpl::set_display_hints(): Invalid display hint for filter '" << id_ << "'";
+        throw unity::InvalidArgumentException(err.str());
+    }
     display_hints_ = hints;
 }
 
