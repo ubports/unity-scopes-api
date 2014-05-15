@@ -138,7 +138,7 @@ public:
         cout << "\tcurrent department=" << current_department_id << endl;
     }
 
-    virtual void push(Category::SCPtr category) override
+    virtual void push(const Category::SCPtr& category) override
     {
         cout << "received category: id=" << category->id()
              << " title=" << category->title()

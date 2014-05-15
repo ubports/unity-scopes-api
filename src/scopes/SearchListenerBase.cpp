@@ -44,7 +44,7 @@ void SearchListenerBase::push(Filters const& /* filters */, FilterState const& /
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void SearchListenerBase::push(Category::SCPtr /* category */)
+void SearchListenerBase::push(const Category::SCPtr& /* category */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
