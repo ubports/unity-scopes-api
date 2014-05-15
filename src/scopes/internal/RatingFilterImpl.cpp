@@ -49,7 +49,7 @@ RatingFilterImpl::RatingFilterImpl(std::string const& id, std::string const& lab
     for (int i = 1; i <= top_rating; i++)
     {
         auto const num = std::to_string(i);
-        add_option(num, i < top_rating ? num + "+" : num);
+        RadioButtonsFilterImpl::add_option(num, i < top_rating ? num + "+" : num);
     }
 }
 
@@ -62,7 +62,7 @@ FilterOption::SCPtr RatingFilterImpl::add_option(std::string const& id, std::str
 {
     if (num_of_options() < max_rating)
     {
-        add_option(id, label);
+        return RadioButtonsFilterImpl::add_option(id, label);
     }
     else
     {

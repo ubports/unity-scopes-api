@@ -18,7 +18,10 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterOption.h>
+#include <unity/scopes/RadioButtonsFilter.h>
+#include <unity/scopes/RatingFilter.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -131,5 +134,44 @@ TEST(Filters, scope)
         EXPECT_EQ(1u, selector->active_options(filter_state2).size());
         auto option1 = *(selector->active_options(filter_state2).begin());
         EXPECT_EQ("o1", option1->id());
+    }
+}
+
+TEST(Filters, deserialize)
+{
+    // check that FilterBaseImpl::deserialize() creates valid instances of all filter types
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        auto option1 = filter1->add_option("1", "Option 1");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<OptionSelectorFilter const>(f) != nullptr);
+        EXPECT_EQ("option_selector", f->filter_type());
+    }
+
+    {
+        auto filter1 = RadioButtonsFilter::create("f1", "Options");
+        auto option1 = filter1->add_option("1", "Option 1");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<RadioButtonsFilter const>(f) != nullptr);
+        EXPECT_EQ("radio_buttons", f->filter_type());
+    }
+
+    {
+        auto filter1 = RatingFilter::create("f1", "Options", 5);
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<RatingFilter const>(f) != nullptr);
+        EXPECT_EQ("rating", f->filter_type());
+    }
+
+    {
+        // invalid data (no filter_type)
+        VariantMap var;
+        EXPECT_THROW(internal::FilterBaseImpl::deserialize(var), unity::LogicException);
     }
 }

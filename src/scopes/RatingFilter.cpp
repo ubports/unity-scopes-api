@@ -70,12 +70,14 @@ FilterOption::SCPtr RatingFilter::active_rating(FilterState const& filter_state)
     return fwd()->active_option(filter_state);
 }
 
-void RatingFilter::update_state(FilterState& filter_state, int rating)
+void RatingFilter::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const
 {
+    fwd()->update_state(filter_state, option, active);
 }
 
-void RatingFilter::update_state(FilterState& filter_state, std::string const& filter_id, int rating)
+void RatingFilter::update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value)
 {
+    internal::RatingFilterImpl::update_state(filter_state, filter_id, option_id, value);
 }
 
 internal::RatingFilterImpl* RatingFilter::fwd() const

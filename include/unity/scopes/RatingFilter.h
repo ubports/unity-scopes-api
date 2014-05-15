@@ -89,8 +89,8 @@ public:
 
     FilterOption::SCPtr active_rating(FilterState const& filter_state) const;
 
-    void update_state(FilterState& filter_state, int rating);
-    static void update_state(FilterState& filter_state, std::string const& filter_id, int rating);
+    void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
+    static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
     RatingFilter(internal::RatingFilterImpl*);
