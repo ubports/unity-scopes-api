@@ -602,7 +602,7 @@ void ObjectAdapter::broker_thread()
                 // Shutdown this server by stopping the middleware.
                 mw_.stop();
             }
-            if (poller.has_input(stop))
+            if (!shutting_down && poller.has_input(stop))
             {
                 // When the stop socket becomes ready, we need to get out of here.
                 // We stop reading more requests from the router, but continue processing
@@ -705,7 +705,7 @@ void ObjectAdapter::worker_thread()
             }
 
             poller.poll();
-            if (poller.has_input(stop)) // Parent sent a stop message, so we are supposed to go away.
+            if (!finish && poller.has_input(stop)) // Parent sent a stop message, so we are supposed to go away.
             {
                 poller.remove(stop);
                 stop.close();
