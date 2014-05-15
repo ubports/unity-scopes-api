@@ -23,6 +23,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -52,6 +53,7 @@ namespace
     const string idle_timeout_key = "IdleTimeout";
 
     const string scope_appearance_group = "Appearance";
+    const string results_ttl_str = "ResultsTtlType";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -146,6 +148,36 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
+    results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
+    try
+    {
+        string orig = parser()->get_string(scope_config_group, results_ttl_str);
+        string ttl = orig;
+        to_lower(ttl);
+        if (ttl.empty() || ttl == "none")
+        {
+        }
+        else if (ttl == "small")
+        {
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Small;
+        }
+        else if (ttl == "medium")
+        {
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Medium;
+        }
+        else if (ttl == "large")
+        {
+            results_ttl_type_ = ScopeMetadata::ResultsTtlType::Large;
+        }
+        else
+        {
+            throw_ex("Illegal value (" + orig + ") for " + results_ttl_str);
+        }
+    }
+    catch (LogicException const&)
+    {
+    }
+
     const KnownEntries known_entries = {
                                           {  scope_config_group,
                                              {
@@ -159,7 +191,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 invisible_key,
                                                 hot_key_key,
                                                 scoperunner_key,
-                                                idle_timeout_key
+                                                idle_timeout_key,
+                                                results_ttl_str
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -254,6 +287,11 @@ int ScopeConfig::idle_timeout() const
 VariantMap ScopeConfig::appearance_attributes() const
 {
     return appearance_attributes_;
+}
+
+ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
+{
+    return results_ttl_type_;
 }
 
 } // namespace internal

@@ -8,13 +8,9 @@
             "apparmor": "scope-security.json"
         }
     },
-    "icon": "@CLICK_SCOPE_ICON@",
+    "icon": "scope-click-icon",
     "maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
     "name": "com.ubuntu.scope-click",
     "title": "Click Scope",
-    "version": "1.0.0.@BZR_REVNO@",
-    "x-source": {
-        "vcs-bzr": "@BZR_SOURCE@",
-        "vcs-bzr-revno": "@BZR_REVNO@"
-    }
+    "version": "1.0.0"
 }
