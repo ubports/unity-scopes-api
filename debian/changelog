@@ -1,4 +1,4 @@
-unity-scopes-api (0.4.6-0ubuntu1) UNRELEASED; urgency=low
+unity-scopes-api (0.4.6+14.10.20140508-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pawel Stolowski ]
   * Implemented RangeInputFilter.
@@ -6,7 +6,7 @@ unity-scopes-api (0.4.6-0ubuntu1) UNRELEASED; urgency=low
   [ Michi Henning ]
   * Changed parameter type for pushing categories to Category::SCPtr const&
 
- -- Michi Henning <michi.henning@canonical.com>  Thu, 15 May 2014 11:56:03 +1000
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 15 May 2014 13:54:38 +1000
 
 unity-scopes-api (0.4.4+14.10.20140508-0ubuntu1) utopic; urgency=low
 
