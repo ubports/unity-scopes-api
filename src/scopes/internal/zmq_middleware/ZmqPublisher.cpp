@@ -30,7 +30,9 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqPublisher::ZmqPublisher()
+ZmqPublisher::ZmqPublisher(std::string const& endpoint, std::string const& topic)
+    : endpoint_(endpoint)
+    , topic_(topic)
 {
 }
 

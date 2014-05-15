@@ -30,7 +30,9 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber()
+ZmqSubscriber::ZmqSubscriber(std::string const& endpoint, std::string const& topic)
+    : endpoint_(endpoint)
+    , topic_(topic)
 {
 }
 

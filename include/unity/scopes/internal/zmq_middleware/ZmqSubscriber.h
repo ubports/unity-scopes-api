@@ -36,8 +36,12 @@ namespace zmq_middleware
 class ZmqSubscriber : public virtual MWSubscriber
 {
 public:
-    ZmqSubscriber();
+    ZmqSubscriber(std::string const& endpoint, std::string const& topic);
     virtual ~ZmqSubscriber();
+
+private:
+    std::string const endpoint_;
+    std::string const topic_;
 };
 
 } // namespace zmq_middleware

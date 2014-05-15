@@ -36,8 +36,12 @@ namespace zmq_middleware
 class ZmqPublisher : public virtual MWPublisher
 {
 public:
-    ZmqPublisher();
+    ZmqPublisher(std::string const& endpoint, std::string const& topic);
     virtual ~ZmqPublisher();
+
+private:
+    std::string const endpoint_;
+    std::string const topic_;
 };
 
 } // namespace zmq_middleware
