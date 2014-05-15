@@ -112,6 +112,25 @@ public:
     void set_subdepartments(DepartmentList const& departments);
 
     /**
+     \brief Set the alternate label (plural of the normal label) of this department.
+
+     The alternate label should express the plural "all" form of the normal label. For example,
+     if the normal label is "Books", then the alternate label should be "All Books". The alternate label
+     needs to be provided for the current department only.
+     \param label The alternate label to display when showing plural form of this department's name.
+    */
+    void set_alternate_label(std::string const& label);
+
+    /**
+     \brief Sets has_subdepartments flag of this department to true.
+
+     This flag is a display hint for the Shell that indicates if this department has sub-departments and as such should be displayed
+     in a way that suggests further navigation to the user.
+     Setting this flag is not needed when sub-departments have been added with set_subdepartments() method.
+     */
+    void set_has_subdepartments();
+
+    /**
     \brief Get the identifier of this department.
     \return The department identifier.
     */
@@ -124,6 +143,17 @@ public:
     std::string label() const;
 
     /**
+    \brief Get the alternate label of this department.
+
+    Return the alternate label of this department. The alternate label expresses the plural "all" form of the normal label.
+    For example, if the normal label is "Books", then the alternate label is "All Books". Note that alternate label
+    and can be empty - in that case the normal label should be displayed instead.
+
+    \return The alternate label.
+     */
+    std::string alternate_label() const;
+
+    /**
     \brief Get the canned query associated with this department.
     \return The canned query for this department.
     */
@@ -134,6 +164,12 @@ public:
     \return The list of sub-departments.
     */
     DepartmentList subdepartments() const;
+
+    /**
+     \brief Check if this department has subdepartments or has_subdepartments flag is set
+     \return true if this deparment has subdepartments or has_subdepartments flag is set
+     */
+    bool has_subdepartments() const;
 
     /// @cond
     VariantMap serialize() const;

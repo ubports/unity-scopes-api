@@ -45,8 +45,31 @@ public:
     /**
      \brief Register departments for the current search reply and provide the current department.
 
-     current_department_id should in most cases be the department returned by Query::department_id().
+     Departments are optional. If scope supports departments, it is expected to register departments on every search as follows:
+
+      <ul>
+      <li>create a Department node for current department and attach to it a list of its subdepartments (unless current department is a leaf department) using
+      unity::scopes::Department::set_subdepartments() method. For every subdepartment on the list set "has_subdepartments" flag if applicable.
+      <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
+      <li>create a Department node for parent of current department (if applicable - not when in root department), and attach current Department node to it with
+      unity::scopes::Department::set_subdepartments() method.
+      <li>register a unity::scopes::DepartmentList that has just the parent department in it.
+      </ul>
+
+     For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
+     that registers departments for current search in "History" may look like this:
+     \code{.cpp}
+     unity::scopes::Department books("books", query, "Books"); // the parent of "History"
+     unity::scopes::Department history({"history", query, "History"});
+     unity::scopes::DepartmentList history_depts({"ww2", query, "World War Two"}, {"ancient", query, "Ancient"});
+     history.set_subdepartments(history_depts);
+     books.set_subdepartments({history});
+     reply->register_departments({books}, "history");
+     \endcode
+
+     current_department_id should in most cases be the department returned by unity::scopes::CannedQuery::department_id().
      Pass an empty string for current_department_id to indicate no active department.
+
      \param departments A list of departments.
      \param current_department_id A department id that should be considered current.
      */

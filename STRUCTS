@@ -55,7 +55,9 @@ Department (returned by serialize()):
 =====================================
   'query'       : dictionary (serialized Query)
   'label'       : string
+  'alt_label'   : string, optional
   'departments' : array of dictionaries (serialized Departments), optional
+  'has_subdepartments' : bool (optional)
 
 ScopeMetadata (returned by serialize()):
 =====================================
@@ -101,6 +103,12 @@ FilterOption
 
 OptionSelectorFilter
 ====================
+ 'id'           : string
+ 'filter_type'  : string
+ 'display_hints': int, optional
+
+OptionSelectorFilter (FilterBase)
+=================================
  'id'           : string
  'filter_type'  : "option_selector"
  'label'        : string
