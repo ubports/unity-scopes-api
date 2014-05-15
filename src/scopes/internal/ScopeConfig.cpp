@@ -152,24 +152,24 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         string ttl = parser()->get_string(scope_config_group, results_ttl_str);
-        if (ttl.empty())
+        if (ttl.empty() || ttl == "None")
         {
         }
-        else if (ttl == "small")
+        else if (ttl == "Small")
         {
             results_ttl_type_ = ScopeMetadata::ResultsTtlType::Small;
         }
-        else if (ttl == "medium")
+        else if (ttl == "Medium")
         {
             results_ttl_type_ = ScopeMetadata::ResultsTtlType::Medium;
         }
-        else if (ttl == "large")
+        else if (ttl == "Large")
         {
             results_ttl_type_ = ScopeMetadata::ResultsTtlType::Large;
         }
         else
         {
-            cerr << "warning: invalid value for " << results_ttl_str << ": " << ttl << endl;
+            throw_ex("Illegal value (" + ttl + ") for " + results_ttl_str);
         }
     }
     catch (LogicException const&)

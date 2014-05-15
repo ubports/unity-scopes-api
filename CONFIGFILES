@@ -281,11 +281,11 @@ The following keys are recognized in the ScopeConfig group:
 
   - none
 
-  - small - in the order of a minute
+  - Small - in the order of a minute
 
-  - medium - in the order of a few minutes
+  - Medium - in the order of a few minutes
 
-  - large - in the order of an hour
+  - Large - in the order of an hour
 
 The following keys are recognized in the Appearance group:
 

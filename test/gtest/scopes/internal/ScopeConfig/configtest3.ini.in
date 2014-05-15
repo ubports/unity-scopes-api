@@ -7,4 +7,4 @@ Icon = an icon
 SearchHint = a search hint string
 HotKey = a key
 ScopeRunner = /my/scope/runner
-ResultsTtlType = small
+ResultsTtlType = Small
