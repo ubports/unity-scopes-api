@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/MWSubscriber.h>
 
+#include <thread>
+
 namespace unity
 {
 
@@ -42,6 +44,9 @@ public:
 private:
     std::string const endpoint_;
     std::string const topic_;
+    std::thread thread_;
+
+    void subscriber_thread();
 };
 
 } // namespace zmq_middleware

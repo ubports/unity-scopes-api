@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/MWPublisher.h>
 
+#include <thread>
+
 namespace unity
 {
 
@@ -42,6 +44,9 @@ public:
 private:
     std::string const endpoint_;
     std::string const topic_;
+    std::thread thread_;
+
+    void publisher_thread();
 };
 
 } // namespace zmq_middleware

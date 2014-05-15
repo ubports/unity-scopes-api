@@ -33,11 +33,17 @@ namespace zmq_middleware
 ZmqSubscriber::ZmqSubscriber(std::string const& endpoint, std::string const& topic)
     : endpoint_(endpoint)
     , topic_(topic)
+    , thread_(std::thread(&ZmqSubscriber::subscriber_thread, this))
 {
 }
 
 ZmqSubscriber::~ZmqSubscriber()
 {
+}
+
+void ZmqSubscriber::subscriber_thread()
+{
+
 }
 
 } // namespace zmq_middleware

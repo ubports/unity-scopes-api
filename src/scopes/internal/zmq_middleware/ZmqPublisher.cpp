@@ -33,11 +33,17 @@ namespace zmq_middleware
 ZmqPublisher::ZmqPublisher(std::string const& endpoint, std::string const& topic)
     : endpoint_(endpoint)
     , topic_(topic)
+    , thread_(std::thread(&ZmqPublisher::publisher_thread, this))
 {
 }
 
 ZmqPublisher::~ZmqPublisher()
 {
+}
+
+void ZmqPublisher::publisher_thread()
+{
+
 }
 
 } // namespace zmq_middleware
