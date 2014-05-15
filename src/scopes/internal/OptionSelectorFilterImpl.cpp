@@ -120,6 +120,11 @@ FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, 
     return opt;
 }
 
+int OptionSelectorFilterImpl::num_of_options() const
+{
+    return options_.size();
+}
+
 std::list<FilterOption::SCPtr> OptionSelectorFilterImpl::options() const
 {
     return options_;

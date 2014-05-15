@@ -21,6 +21,8 @@
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
+#include <unity/scopes/internal/RadioButtonsFilterImpl.h>
+#include <unity/scopes/internal/RatingFilterImpl.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/UnityExceptions.h>
 
@@ -87,6 +89,14 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         if (ftype == "range_input")
         {
             return RangeInputFilterImpl::create(var);
+        }
+        if (ftype == "radio_buttons")
+        {
+            return RadioButtonsFilterImpl::create(var);
+        }
+        if (ftype == "rating")
+        {
+            return RatingFilterImpl::create(var);
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }
