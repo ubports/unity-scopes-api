@@ -635,13 +635,13 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
 MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id, std::string const& topic)
 {
     string endpoint = "ipc://" + config_.public_dir() + "/" + publisher_id + publisher_suffix;
-    return MWPublisher::UPtr(new ZmqPublisher(endpoint, topic));
+    return MWPublisher::UPtr(new ZmqPublisher(&context_, endpoint, topic));
 }
 
 MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& publisher_id, std::string const& topic)
 {
     string endpoint = "ipc://" + config_.public_dir() + "/" + publisher_id + publisher_suffix;
-    return MWSubscriber::UPtr(new ZmqSubscriber(endpoint, topic));
+    return MWSubscriber::UPtr(new ZmqSubscriber(&context_, endpoint, topic));
 }
 
 std::string ZmqMiddleware::get_scope_endpoint()

@@ -18,6 +18,9 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 
+#include <zmqpp/poller.hpp>
+#include <zmqpp/socket.hpp>
+
 namespace unity
 {
 
@@ -30,8 +33,9 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(std::string const& endpoint, std::string const& topic)
-    : endpoint_(endpoint)
+ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& endpoint, std::string const& topic)
+    : context_(context)
+    , endpoint_(endpoint)
     , topic_(topic)
     , thread_(std::thread(&ZmqSubscriber::subscriber_thread, this))
 {
@@ -48,7 +52,21 @@ void ZmqSubscriber::set_message_callback(SubscriberCallback /*callback*/)
 
 void ZmqSubscriber::subscriber_thread()
 {
+    // Subscribe to publisher socket
+    zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
+    sub_socket.connect(endpoint_);
+    sub_socket.subscribe(topic_);
 
+    // Poll for messages
+    std::string message;
+    zmqpp::poller poller;
+    poller.add(sub_socket);
+    poller.poll();
+    sub_socket.receive(message);
+
+    // Clean up
+    poller.remove(sub_socket);
+    sub_socket.close();
 }
 
 } // namespace zmq_middleware

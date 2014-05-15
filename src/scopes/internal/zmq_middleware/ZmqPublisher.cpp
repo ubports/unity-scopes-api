@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 
+#include <zmqpp/socket.hpp>
+
 namespace unity
 {
 
@@ -30,8 +32,9 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqPublisher::ZmqPublisher(std::string const& endpoint, std::string const& topic)
-    : endpoint_(endpoint)
+ZmqPublisher::ZmqPublisher(zmqpp::context* context, std::string const& endpoint, std::string const& topic)
+    : context_(context)
+    , endpoint_(endpoint)
     , topic_(topic)
     , thread_(std::thread(&ZmqPublisher::publisher_thread, this))
 {
@@ -48,7 +51,15 @@ void ZmqPublisher::send_message(std::string const& /*message*/)
 
 void ZmqPublisher::publisher_thread()
 {
+    // Create the publisher socket
+    zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
+    pub_socket.bind(endpoint_);
 
+    // Wait for send_message or stop
+    //pub_socket.send(topic_ + message);
+
+    // Clean up
+    pub_socket.close();
 }
 
 } // namespace zmq_middleware

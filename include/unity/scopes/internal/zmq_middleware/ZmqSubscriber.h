@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/MWSubscriber.h>
 
+#include <zmqpp/context.hpp>
+
 #include <thread>
 
 namespace unity
@@ -38,12 +40,13 @@ namespace zmq_middleware
 class ZmqSubscriber : public virtual MWSubscriber
 {
 public:
-    ZmqSubscriber(std::string const& endpoint, std::string const& topic);
+    ZmqSubscriber(zmqpp::context* context, std::string const& endpoint, std::string const& topic);
     virtual ~ZmqSubscriber();
 
     void set_message_callback(SubscriberCallback callback) override;
 
 private:
+    zmqpp::context* context_;
     std::string const endpoint_;
     std::string const topic_;
     std::thread thread_;

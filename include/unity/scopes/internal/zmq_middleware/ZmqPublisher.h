@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/MWPublisher.h>
 
+#include <zmqpp/context.hpp>
+
 #include <thread>
 
 namespace unity
@@ -38,12 +40,13 @@ namespace zmq_middleware
 class ZmqPublisher : public virtual MWPublisher
 {
 public:
-    ZmqPublisher(std::string const& endpoint, std::string const& topic);
+    ZmqPublisher(zmqpp::context* context, std::string const& endpoint, std::string const& topic);
     virtual ~ZmqPublisher();
 
     void send_message(std::string const& message) override;
 
 private:
+    zmqpp::context* context_;
     std::string const endpoint_;
     std::string const topic_;
     std::thread thread_;
