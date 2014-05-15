@@ -41,10 +41,13 @@ public:
     ZmqSubscriber(std::string const& endpoint, std::string const& topic);
     virtual ~ZmqSubscriber();
 
+    void set_message_callback(SubscriberCallback callback) override;
+
 private:
     std::string const endpoint_;
     std::string const topic_;
     std::thread thread_;
+    SubscriberCallback callback_;
 
     void subscriber_thread();
 };

@@ -41,6 +41,11 @@ ZmqPublisher::~ZmqPublisher()
 {
 }
 
+void ZmqPublisher::send_message(std::string const& /*message*/)
+{
+
+}
+
 void ZmqPublisher::publisher_thread()
 {
 

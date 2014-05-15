@@ -39,6 +39,8 @@ public:
 
     virtual ~MWPublisher();
 
+    virtual void send_message(std::string const& message) = 0;
+
 protected:
     MWPublisher();
 };

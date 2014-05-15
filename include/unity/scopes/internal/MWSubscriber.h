@@ -31,6 +31,8 @@ namespace scopes
 namespace internal
 {
 
+typedef std::function<void(std::string const& message)> SubscriberCallback;
+
 class MWSubscriber
 {
 public:
@@ -38,6 +40,8 @@ public:
     UNITY_DEFINES_PTRS(MWSubscriber);
 
     virtual ~MWSubscriber();
+
+    virtual void set_message_callback(SubscriberCallback callback) = 0;
 
 protected:
     MWSubscriber();

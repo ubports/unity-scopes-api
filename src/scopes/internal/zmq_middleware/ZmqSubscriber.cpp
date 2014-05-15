@@ -41,6 +41,11 @@ ZmqSubscriber::~ZmqSubscriber()
 {
 }
 
+void ZmqSubscriber::set_message_callback(SubscriberCallback /*callback*/)
+{
+
+}
+
 void ZmqSubscriber::subscriber_thread()
 {
 
