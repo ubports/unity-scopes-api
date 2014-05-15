@@ -217,9 +217,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const>)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::~SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationQueryBase::activate()@Base" 0.4.0+14.04.20140312.1
