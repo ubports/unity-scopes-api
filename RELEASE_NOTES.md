@@ -4,7 +4,7 @@ Release notes
 Changes in version 0.4.6
 ========================
   - Added method to get and set display hints for filters (at this moment the only display hint
-    available is TopArea hint).
+    available is Primary hint).
 
   - Added has_subdepartments flag and alternate label to Department class.
 
