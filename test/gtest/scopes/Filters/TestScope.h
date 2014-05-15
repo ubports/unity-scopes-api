@@ -45,7 +45,7 @@ public:
     virtual void run(SearchReplyProxy const& reply) override
     {
         Filters filters;
-        auto filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Choose an option", false);
         filter->add_option("o1", "Option 1");
         filter->add_option("o2", "Option 2");
         filters.push_back(filter);

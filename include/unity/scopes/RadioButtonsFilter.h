@@ -47,7 +47,7 @@ public:
     UNITY_DEFINES_PTRS(RadioButtonsFilter);
 /// @endcond
 
-    static RadioButtonsFilter::SPtr create(std::string const& id, std::string const& label);
+    static RadioButtonsFilter::UPtr create(std::string const& id, std::string const& label);
 
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
 

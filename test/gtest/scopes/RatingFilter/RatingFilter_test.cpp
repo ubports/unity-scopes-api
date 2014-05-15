@@ -36,8 +36,10 @@ TEST(RatingFilter, basic)
         EXPECT_EQ("bar", filter1->off_icon());
         EXPECT_EQ(0u, filter1->options().size());
 
-        filter1->add_option("a", "A");
-        filter1->add_option("b", "B");
+        auto o1 = filter1->add_option("a", "A");
+        auto o2 = filter1->add_option("b", "B");
+        EXPECT_EQ("a", o1->id());
+        EXPECT_EQ("b", o2->id());
 
         auto opts = filter1->options();
         EXPECT_EQ(2u, opts.size());

@@ -30,19 +30,19 @@ RatingFilter::RatingFilter(internal::RatingFilterImpl *impl)
 {
 }
 
-RatingFilter::SPtr RatingFilter::create(std::string const& id, std::string const& label, int top_rating)
+RatingFilter::UPtr RatingFilter::create(std::string const& id, std::string const& label, int top_rating)
 {
-    return std::shared_ptr<RatingFilter>(new RatingFilter(new internal::RatingFilterImpl(id, label, top_rating)));
+    return std::unique_ptr<RatingFilter>(new RatingFilter(new internal::RatingFilterImpl(id, label, top_rating)));
 }
 
-RatingFilter::SPtr RatingFilter::create(std::string const& id, std::string const& label)
+RatingFilter::UPtr RatingFilter::create(std::string const& id, std::string const& label)
 {
-    return std::shared_ptr<RatingFilter>(new RatingFilter(new internal::RatingFilterImpl(id, label)));
+    return std::unique_ptr<RatingFilter>(new RatingFilter(new internal::RatingFilterImpl(id, label)));
 }
 
 FilterOption::SCPtr RatingFilter::add_option(std::string const& id, std::string const& label)
 {
-    fwd()->add_option(id, label);
+    return fwd()->add_option(id, label);
 }
 
 void RatingFilter::set_on_icon(std::string const& on_icon)

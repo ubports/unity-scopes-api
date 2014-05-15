@@ -57,7 +57,7 @@ public:
     \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
     option can be selected.
     */
-    static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
     \brief Get the label of this filter.

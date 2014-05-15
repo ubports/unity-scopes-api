@@ -60,9 +60,9 @@ void RadioButtonsFilter::update_state(FilterState& filter_state, std::string con
     internal::RadioButtonsFilterImpl::update_state(filter_state, filter_id, option_id, value);
 }
 
-RadioButtonsFilter::SPtr RadioButtonsFilter::create(std::string const& id, std::string const& label)
+RadioButtonsFilter::UPtr RadioButtonsFilter::create(std::string const& id, std::string const& label)
 {
-    return std::shared_ptr<RadioButtonsFilter>(new RadioButtonsFilter(new internal::RadioButtonsFilterImpl(id, label)));
+    return std::unique_ptr<RadioButtonsFilter>(new RadioButtonsFilter(new internal::RadioButtonsFilterImpl(id, label)));
 }
 
 internal::RadioButtonsFilterImpl* RadioButtonsFilter::fwd() const

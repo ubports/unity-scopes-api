@@ -63,7 +63,7 @@ public:
     \return Instance of RatingFilter
     */
 
-    static RatingFilter::SPtr create(std::string const& id, std::string const& label);
+    static RatingFilter::UPtr create(std::string const& id, std::string const& label);
 
     /**
     \brief Creates RatingFilter widget.
@@ -79,7 +79,7 @@ public:
     \param top_rating The maximum rating allowed.
     \return Instance of RatingFilter
     */
-    static RatingFilter::SPtr create(std::string const& id, std::string const& label, int top_rating = 5);
+    static RatingFilter::UPtr create(std::string const& id, std::string const& label, int top_rating = 5);
 
     /**
      \brief Adds a new option to the filter.

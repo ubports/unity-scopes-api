@@ -30,9 +30,9 @@ OptionSelectorFilter::OptionSelectorFilter(internal::OptionSelectorFilterImpl *i
 {
 }
 
-OptionSelectorFilter::SPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, bool multi_select)
+OptionSelectorFilter::UPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, bool multi_select)
 {
-    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
+    return std::unique_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
 }
 
 std::string OptionSelectorFilter::label() const
