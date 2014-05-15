@@ -32,7 +32,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqPublisher::ZmqPublisher(zmqpp::context* context, std::string const& endpoint, std::string const& topic)
+ZmqPublisher::ZmqPublisher(zmqpp::context const* context, std::string const& endpoint, std::string const& topic)
     : context_(context)
     , endpoint_(endpoint)
     , topic_(topic)

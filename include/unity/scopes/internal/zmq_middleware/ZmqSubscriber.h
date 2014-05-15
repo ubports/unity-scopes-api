@@ -40,13 +40,13 @@ namespace zmq_middleware
 class ZmqSubscriber : public virtual MWSubscriber
 {
 public:
-    ZmqSubscriber(zmqpp::context* context, std::string const& endpoint, std::string const& topic);
+    ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint, std::string const& topic);
     virtual ~ZmqSubscriber();
 
     void set_message_callback(SubscriberCallback callback) override;
 
 private:
-    zmqpp::context* context_;
+    zmqpp::context const* const context_;
     std::string const endpoint_;
     std::string const topic_;
     std::thread thread_;

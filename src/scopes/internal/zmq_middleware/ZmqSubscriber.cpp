@@ -33,7 +33,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& endpoint, std::string const& topic)
+ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint, std::string const& topic)
     : context_(context)
     , endpoint_(endpoint)
     , topic_(topic)
@@ -58,10 +58,11 @@ void ZmqSubscriber::subscriber_thread()
     sub_socket.subscribe(topic_);
 
     // Poll for messages
-    std::string message;
     zmqpp::poller poller;
     poller.add(sub_socket);
     poller.poll();
+
+    std::string message;
     sub_socket.receive(message);
 
     // Clean up
