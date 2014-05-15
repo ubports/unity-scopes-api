@@ -1,17 +1,19 @@
 Release notes
 =============
 
-Changes in version 0.4.5
-========================
-  * Implemented RangeInputFilter.
-
-Changes in version 0.4.4
+Changes in version 0.4.6
 ========================
   - Added method to get and set display hints for filters (at this moment the only display hint
     available is TopArea hint).
 
   - Added has_subdepartments flag and alternate label to Department class.
 
+Changes in version 0.4.5
+========================
+  - Implemented RangeInputFilter.
+
+Changes in version 0.4.4
+========================
   - The register_annotation() method of SearchReply is now deprecated - push(Annotation const&) should
     be used instead. The display order of annotations with respect to results and categories
     got updated in the documentation of that method.
