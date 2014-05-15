@@ -38,7 +38,14 @@ class RatingFilterImpl;
 }
 
 /**
-\brief
+\brief A filter that allows for rating-based selection.
+
+Displays filter with a set of options, where every option has a label and icon.
+Only one option can be active at a time. The active option uses the icon in "on" state
+(see unity::scopes::RatingFilter::set_on_icon() ).  All other icons are "off" (see unity::scopes::RatingFilter::set_off_icon() ).
+By default, "on" and "off" icons are bright and dimmed star respectively.
+
+This filter is best suited for rating-based filtering.
 */
 class UNITY_API RatingFilter : public FilterBase
 {
@@ -50,36 +57,37 @@ public:
     /**
     \brief Creates RatingFilter widget.
 
-    Creates a RatingFilter widget that allows values from 1 up to specified max value.
-    Selected value is displayed using on_icon. Unselected values use off_icon.
-    Values have numbers displayed next to them.
-
+    Creates an empty RatingFilter widget. Use unity::scopes::RatingFilter::add_option() to add rating options to it.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param label A display label for this filter,
-    \param max The maximum rating allowed.
-    \param on_icon An icon to use for selected rating (star symbol by default).
-    \param off_icon An icon to use for unselected rating (dimmed star symbol by default).
-    \return Instance of RatingFilter
-    */
-    static RatingFilter::SPtr create(std::string const& id, std::string const& label, int top_rating = 5);
-
-    /**
-    \brief Creates RatingFilter widget.
-
-    Creates a RatingFilter widget that allows values from 1 up to the value inferred from the number of elements of value_labels.
-    Selected value is displayed using on_icon. Unselected values use off_icon.
-    Values have lables displayed next to them, as specified by value_labels.
-
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param label A display label for this filter,
-    \param value_labels Labels to be displayed along rating values.
-    \param on_icon An icon to use for selected rating (star symbol by default).
-    \param off_icon An icon to use for unselected rating (dimmed star symbol by default).
+    \param label A display label for this filter
     \return Instance of RatingFilter
     */
 
     static RatingFilter::SPtr create(std::string const& id, std::string const& label);
 
+    /**
+    \brief Creates RatingFilter widget.
+
+    Creates a RatingFilter widget and populates it with some standard rating options.
+    This is a convienience factory method, that fills RatingFilter in with options for ratings
+    from 1 up to top_rating. Options are created with identifiers "1", "2" and so on, and labels
+    "1+", "2+" etc., except for that last label, which is just the number (no plus sign). The maximum top_rating
+    allowed is 10.
+
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param label A display label for this filter
+    \param top_rating The maximum rating allowed.
+    \return Instance of RatingFilter
+    */
+    static RatingFilter::SPtr create(std::string const& id, std::string const& label, int top_rating = 5);
+
+    /**
+     \brief Adds a new option to the filter.
+
+     \param id A unique identifief of the option.
+     \param label A display label for the option
+     \return Instance of FilterOption
+     */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
     void set_on_icon(std::string const& on_icon);
     void set_off_icon(std::string const& off_icon);
