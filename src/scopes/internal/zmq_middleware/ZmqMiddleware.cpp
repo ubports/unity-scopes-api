@@ -91,6 +91,7 @@ try :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Stopped),
+    shutdown_flag(false),
     config_(configfile),
     twoway_timeout_(config_.twoway_timeout()),
     locate_timeout_(config_.locate_timeout())
@@ -156,6 +157,7 @@ void ZmqMiddleware::start()
                 // as rebinding is invoked within two-way invocations.
                 twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
             }
+            shutdown_flag = false;
             state_ = Started;
             state_changed_.notify_all();
             break;
@@ -209,6 +211,17 @@ void ZmqMiddleware::wait_for_shutdown()
         state_changed_.wait(state_lock, [this] { return state_ == Stopping || state_ == Stopped; });
         if (state_ == Stopped)
         {
+            return; // Return immediately if stopped already, or never started in the first place.
+        }
+
+        // Several threads may see state_ == Stopping here. Exactly one of them
+        // waits for the object adapters to shut down; the others wait until
+        // shut down is complete.
+        if (shutdown_flag.exchange(true))
+        {
+            // Another thread has been through here already, wait for it
+            // to finish shutting down the adapters.
+            state_changed_.wait(state_lock, [this] { return state_ == Stopped; });
             return;
         }
     }
