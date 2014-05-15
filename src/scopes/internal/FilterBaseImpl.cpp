@@ -36,6 +36,10 @@ namespace internal
 FilterBaseImpl::FilterBaseImpl(std::string const& id)
     : id_(id)
 {
+    if (id_.empty())
+    {
+        throw InvalidArgumentException("FilterBase(): invalid empty id string");
+    }
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
