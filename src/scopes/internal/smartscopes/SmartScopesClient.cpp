@@ -259,6 +259,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                 scope.art.reset(new std::string(child_node->get_node("art")->as_string()));
             }
 
+            if (child_node->has_node("appearance"))
+            {
+                scope.appearance.reset(new VariantMap(child_node->get_node("appearance")->to_variant().get_dict()));
+            }
+
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);

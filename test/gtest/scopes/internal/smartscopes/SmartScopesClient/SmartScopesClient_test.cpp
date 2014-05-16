@@ -90,6 +90,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
+    EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
 }
 
 TEST_F(SmartScopesClientTest, search)
