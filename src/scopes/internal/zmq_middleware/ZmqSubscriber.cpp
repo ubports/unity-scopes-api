@@ -82,6 +82,11 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
 ZmqSubscriber::~ZmqSubscriber()
 {
     thread_stopper_->stop();
+
+    if (thread_.joinable())
+    {
+        thread_.join();
+    }
 }
 
 void ZmqSubscriber::set_message_callback(SubscriberCallback callback)
