@@ -58,7 +58,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& e
         }
         catch (...)
         {
-            throw MiddlewareException("ZmqPublisher(): publisher_thread failed to start (endpoint: " + endpoint_ + ")");
+            throw MiddlewareException("ZmqSubscriber(): subscriber_thread failed to start (endpoint: " + endpoint_ + ")");
         }
     }
 }
@@ -81,7 +81,7 @@ void ZmqSubscriber::subscriber_thread()
         sub_socket.connect(endpoint_);
         sub_socket.subscribe(topic_);
 
-        // Poll for messages
+        // Configure message poller
         zmqpp::poller poller;
         poller.add(sub_socket);
 
@@ -90,6 +90,7 @@ void ZmqSubscriber::subscriber_thread()
         thread_state_ = Running;
         cond_.notify_all();
 
+        // Poll for messages
         poller.poll();
 
         std::string message;
