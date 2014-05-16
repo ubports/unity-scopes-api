@@ -1,4 +1,4 @@
-unity-scopes-api (0.4.6-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.4.7-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pete Woods ]
   * Add results TTL option to configuration files.
@@ -6,8 +6,9 @@ unity-scopes-api (0.4.6-0ubuntu1) UNRELEASED; urgency=medium
   [ Pawel Stolowski ]
   * Added method to get and set display hints for filters.
   * Added has_subdepartments flag and alternate label to the Department class.
+  * Fixed lp:1319712: Appearance attributes not supported for remote scopes.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Thu, 15 May 2014 10:16:39 +0200
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 16 May 2014 17:48:23 +0200
 
 unity-scopes-api (0.4.5+14.10.20140513-0ubuntu1) utopic; urgency=low
 
