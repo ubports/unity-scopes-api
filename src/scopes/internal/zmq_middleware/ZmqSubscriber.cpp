@@ -35,7 +35,8 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint, std::string const& topic)
+ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint,
+                             std::string const& topic)
     : context_(context)
     , endpoint_(endpoint)
     , topic_(topic)
@@ -58,7 +59,8 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& e
         }
         catch (...)
         {
-            throw MiddlewareException("ZmqSubscriber(): subscriber thread failed to start (endpoint: " + endpoint_ + ")");
+            throw MiddlewareException("ZmqSubscriber(): subscriber thread failed to start (endpoint: " +
+                                      endpoint_ + ")");
         }
     }
 }
