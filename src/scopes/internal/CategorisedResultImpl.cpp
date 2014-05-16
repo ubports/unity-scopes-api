@@ -43,13 +43,13 @@ CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category)
     set_category(category);
 }
 
-CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category, const VariantMap& variant_map)
+CategorisedResultImpl::CategorisedResultImpl(Category::SCPtr category, VariantMap const& variant_map)
     : ResultImpl(variant_map)
 {
     set_category(category);
 }
 
-CategorisedResultImpl::CategorisedResultImpl(internal::CategoryRegistry const& reg, const VariantMap &variant_map)
+CategorisedResultImpl::CategorisedResultImpl(internal::CategoryRegistry const& reg, VariantMap const& variant_map)
     : ResultImpl(variant_map)
 {
     auto it = variant_map.find("internal");

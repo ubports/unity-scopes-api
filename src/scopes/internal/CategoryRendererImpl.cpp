@@ -53,8 +53,15 @@ CategoryRendererImpl::CategoryRendererImpl(std::string const& json_text)
 
 CategoryRenderer CategoryRendererImpl::from_file(std::string const& path)
 {
-    const std::string contents = unity::util::read_text_file(path);
-    return CategoryRenderer(contents);
+    try
+    {
+        const std::string contents = unity::util::read_text_file(path);
+        return CategoryRenderer(contents);
+    }
+    catch (...)
+    {
+        throw ResourceException("Category::from_file(): cannot parse renderer");
+    }
 }
 
 std::string CategoryRendererImpl::data() const
