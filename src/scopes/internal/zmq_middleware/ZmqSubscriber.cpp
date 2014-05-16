@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 
+#include <unity/scopes/ScopeExceptions.h>
+
 #include <zmqpp/poller.hpp>
 #include <zmqpp/socket.hpp>
 
@@ -38,7 +40,27 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& e
     , endpoint_(endpoint)
     , topic_(topic)
     , thread_(std::thread(&ZmqSubscriber::subscriber_thread, this))
+    , thread_state_(NotRunning)
+    , thread_exception_(nullptr)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
+
+    if (thread_state_ == Failed)
+    {
+        if (thread_.joinable())
+        {
+            thread_.join();
+        }
+        try
+        {
+            std::rethrow_exception(thread_exception_);
+        }
+        catch (...)
+        {
+            throw MiddlewareException("ZmqPublisher(): publisher_thread failed to start (endpoint: " + endpoint_ + ")");
+        }
+    }
 }
 
 ZmqSubscriber::~ZmqSubscriber()
@@ -52,22 +74,38 @@ void ZmqSubscriber::set_message_callback(SubscriberCallback /*callback*/)
 
 void ZmqSubscriber::subscriber_thread()
 {
-    // Subscribe to publisher socket
-    zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
-    sub_socket.connect(endpoint_);
-    sub_socket.subscribe(topic_);
+    try
+    {
+        // Subscribe to publisher socket
+        zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
+        sub_socket.connect(endpoint_);
+        sub_socket.subscribe(topic_);
 
-    // Poll for messages
-    zmqpp::poller poller;
-    poller.add(sub_socket);
-    poller.poll();
+        // Poll for messages
+        zmqpp::poller poller;
+        poller.add(sub_socket);
 
-    std::string message;
-    sub_socket.receive(message);
+        // Notify constructor that the thread is now running
+        std::unique_lock<std::mutex> lock(mutex_);
+        thread_state_ = Running;
+        cond_.notify_all();
 
-    // Clean up
-    poller.remove(sub_socket);
-    sub_socket.close();
+        poller.poll();
+
+        std::string message;
+        sub_socket.receive(message);
+
+        // Clean up
+        poller.remove(sub_socket);
+        sub_socket.close();
+    }
+    catch (...)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = Failed;
+        thread_exception_ = std::current_exception();
+        cond_.notify_all();
+    }
 }
 
 } // namespace zmq_middleware

@@ -23,6 +23,7 @@
 
 #include <zmqpp/context.hpp>
 
+#include <condition_variable>
 #include <thread>
 
 namespace unity
@@ -46,10 +47,24 @@ public:
     void set_message_callback(SubscriberCallback callback) override;
 
 private:
+    enum ThreadState
+    {
+        NotRunning,
+        Running,
+        Stopping,
+        Failed
+    };
+
     zmqpp::context const* const context_;
     std::string const endpoint_;
     std::string const topic_;
+
     std::thread thread_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+    ThreadState thread_state_;
+    std::exception_ptr thread_exception_;
+
     SubscriberCallback callback_;
 
     void subscriber_thread();

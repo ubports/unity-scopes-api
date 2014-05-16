@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 
+#include <unity/scopes/ScopeExceptions.h>
+
 #include <zmqpp/socket.hpp>
 
 namespace unity
@@ -37,7 +39,27 @@ ZmqPublisher::ZmqPublisher(zmqpp::context const* context, std::string const& end
     , endpoint_(endpoint)
     , topic_(topic)
     , thread_(std::thread(&ZmqPublisher::publisher_thread, this))
+    , thread_state_(NotRunning)
+    , thread_exception_(nullptr)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
+
+    if (thread_state_ == Failed)
+    {
+        if (thread_.joinable())
+        {
+            thread_.join();
+        }
+        try
+        {
+            std::rethrow_exception(thread_exception_);
+        }
+        catch (...)
+        {
+            throw MiddlewareException("ZmqPublisher(): publisher_thread failed to start (endpoint: " + endpoint_ + ")");
+        }
+    }
 }
 
 ZmqPublisher::~ZmqPublisher()
@@ -51,15 +73,30 @@ void ZmqPublisher::send_message(std::string const& /*message*/)
 
 void ZmqPublisher::publisher_thread()
 {
-    // Create the publisher socket
-    zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
-    pub_socket.bind(endpoint_);
+    try
+    {
+        // Create the publisher socket
+        zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
+        pub_socket.bind(endpoint_);
 
-    // Wait for send_message or stop
-    //pub_socket.send(topic_ + message);
+        // Notify constructor that the thread is now running
+        std::unique_lock<std::mutex> lock(mutex_);
+        thread_state_ = Running;
+        cond_.notify_all();
 
-    // Clean up
-    pub_socket.close();
+        // Wait for send_message or stop
+        //pub_socket.send(topic_ + message);
+
+        // Clean up
+        pub_socket.close();
+    }
+    catch (...)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = Failed;
+        thread_exception_ = std::current_exception();
+        cond_.notify_all();
+    }
 }
 
 } // namespace zmq_middleware
