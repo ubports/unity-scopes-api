@@ -43,6 +43,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
     , topic_(topic)
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
+    , callback_(nullptr)
 {
     // Start thread_stopper_ publisher (used to send a stop message to the subscriber on destruction)
     try
@@ -85,6 +86,7 @@ ZmqSubscriber::~ZmqSubscriber()
 
 void ZmqSubscriber::set_message_callback(SubscriberCallback callback)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     callback_ = callback;
 }
 
@@ -106,9 +108,11 @@ void ZmqSubscriber::subscriber_thread()
         poller.add(stop_socket);
 
         // Notify constructor that the thread is now running
-        std::unique_lock<std::mutex> lock(mutex_);
-        thread_state_ = Running;
-        cond_.notify_all();
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            thread_state_ = Running;
+            cond_.notify_all();
+        }
 
         // Poll for messages
         std::string message;
@@ -120,7 +124,13 @@ void ZmqSubscriber::subscriber_thread()
             if (poller.has_input(sub_socket))
             {
                 sub_socket.receive(message);
-                callback_(message);
+
+                // Discard the message if no callback is set
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (callback_)
+                {
+                    callback_(message);
+                }
             }
             else if(poller.has_input(stop_socket))
             {
