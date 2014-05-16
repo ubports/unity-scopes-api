@@ -75,7 +75,7 @@ TEST(RatingFilter, basic)
     }
 }
 
-TEST(RadioButtonsFilter, selection)
+TEST(RatingFilter, selection)
 {
     auto filter1 = RatingFilter::create("f1", "Rating", 2);
 
