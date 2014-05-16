@@ -83,9 +83,9 @@ ZmqSubscriber::~ZmqSubscriber()
     thread_stopper_->stop();
 }
 
-void ZmqSubscriber::set_message_callback(SubscriberCallback /*callback*/)
+void ZmqSubscriber::set_message_callback(SubscriberCallback callback)
 {
-
+    callback_ = callback;
 }
 
 void ZmqSubscriber::subscriber_thread()
@@ -111,10 +111,22 @@ void ZmqSubscriber::subscriber_thread()
         cond_.notify_all();
 
         // Poll for messages
-        poller.poll();
-
         std::string message;
-        sub_socket.receive(message);
+        while (true)
+        {
+            poller.poll();
+
+            // Flush out the message queue before stopping the thread
+            if (poller.has_input(sub_socket))
+            {
+                sub_socket.receive(message);
+                callback_(message);
+            }
+            else if(poller.has_input(stop_socket))
+            {
+                break;
+            }
+        }
 
         // Clean up
         poller.remove(sub_socket);
