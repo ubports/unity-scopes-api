@@ -28,8 +28,8 @@ TEST(RatingFilter, basic)
 {
     {
         auto filter1 = RatingFilter::create("f1", "Rating");
-        f1->set_on_icon("foo");
-        f1->set_off_icon("bar");
+        filter1->set_on_icon("foo");
+        filter1->set_off_icon("bar");
         EXPECT_EQ("f1", filter1->id());
         EXPECT_EQ("Rating", filter1->label());
         EXPECT_EQ("foo", filter1->on_icon());
@@ -56,12 +56,13 @@ TEST(RatingFilter, basic)
 
         auto opts = filter1->options();
         EXPECT_EQ(3u, opts.size());
-        EXPECT_EQ("1", opts.front()->id());
-        EXPECT_EQ("1+", opts.front()->label());
-        EXPECT_EQ("2", opts.back()->id());
-        EXPECT_EQ("2+", opts.back()->label());
-        EXPECT_EQ("3", opts.back()->id());
-        EXPECT_EQ("3", opts.back()->label());
+        auto it = opts.begin();
+        EXPECT_EQ("1", (*it)->id());
+        EXPECT_EQ("1+", (*it)->label());
+        EXPECT_EQ("2", (*++it)->id());
+        EXPECT_EQ("2+", (*it)->label());
+        EXPECT_EQ("3", (*++it)->id());
+        EXPECT_EQ("3", (*it)->label());
     }
 
     {

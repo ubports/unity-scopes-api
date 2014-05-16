@@ -55,6 +55,16 @@ void RatingFilter::set_off_icon(std::string const& off_icon)
     fwd()->set_off_icon(off_icon);
 }
 
+std::string RatingFilter::label() const
+{
+    return fwd()->label();
+}
+
+std::list<FilterOption::SCPtr> RatingFilter::options() const
+{
+    return fwd()->options();
+}
+
 std::string RatingFilter::on_icon() const
 {
     return fwd()->on_icon();
