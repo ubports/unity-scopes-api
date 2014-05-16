@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 
+#include <unity/scopes/internal/zmq_middleware/StopPublisher.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <zmqpp/poller.hpp>
@@ -35,15 +36,27 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint,
-                             std::string const& topic)
+ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
+                             std::string const& endpoint_dir, std::string const& topic)
     : context_(context)
-    , endpoint_(endpoint)
+    , endpoint_("ipc://" + endpoint_dir + "/" + name)
     , topic_(topic)
-    , thread_(std::thread(&ZmqSubscriber::subscriber_thread, this))
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
 {
+    // Start thread_stopper_ publisher (used to send a stop message to the subscriber on destruction)
+    try
+    {
+        thread_stopper_.reset(new StopPublisher(context, name + "-stopper"));
+    }
+    catch (...)
+    {
+        throw MiddlewareException("ZmqSubscriber(): thread_stopper_ failed to initialize (adapter: " + name + ")");
+    }
+
+    // Start the subscriber thread
+    thread_ = std::thread(&ZmqSubscriber::subscriber_thread, this);
+
     std::unique_lock<std::mutex> lock(mutex_);
     cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
 
@@ -67,6 +80,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& e
 
 ZmqSubscriber::~ZmqSubscriber()
 {
+    thread_stopper_->stop();
 }
 
 void ZmqSubscriber::set_message_callback(SubscriberCallback /*callback*/)
@@ -78,15 +92,18 @@ void ZmqSubscriber::subscriber_thread()
 {
     try
     {
-        // Subscribe to publisher socket
+        // Subscribe to our associated publisher socket
         zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
-        sub_socket.set(zmqpp::socket_option::linger, 0);
         sub_socket.connect(endpoint_);
         sub_socket.subscribe(topic_);
 
-        // Configure message poller
+        // Subscribe to the thread_stopper_ socket
+        zmqpp::socket stop_socket = thread_stopper_->subscribe();
+
+        // Configure the message poller
         zmqpp::poller poller;
         poller.add(sub_socket);
+        poller.add(stop_socket);
 
         // Notify constructor that the thread is now running
         std::unique_lock<std::mutex> lock(mutex_);
@@ -101,6 +118,7 @@ void ZmqSubscriber::subscriber_thread()
 
         // Clean up
         poller.remove(sub_socket);
+        poller.remove(stop_socket);
         sub_socket.close();
     }
     catch (...)

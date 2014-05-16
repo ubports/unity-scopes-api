@@ -37,10 +37,10 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqPublisher::ZmqPublisher(zmqpp::context const* context, std::string const& endpoint,
-                           std::string const& topic)
+ZmqPublisher::ZmqPublisher(zmqpp::context* context, std::string const& name,
+                           std::string const& endpoint_dir, std::string const& topic)
     : context_(context)
-    , endpoint_(endpoint)
+    , endpoint_("ipc://" + endpoint_dir + "/" + name)
     , topic_(topic)
     , thread_(std::thread(&ZmqPublisher::publisher_thread, this))
     , thread_state_(NotRunning)
@@ -137,25 +137,24 @@ void ZmqPublisher::publisher_thread()
 void ZmqPublisher::safe_bind(zmqpp::socket& socket)
 {
     const std::string transport_prefix = "ipc://";
-    if (endpoint_.substr(0, transport_prefix.size()) == transport_prefix)
+    std::string path = endpoint_.substr(transport_prefix.size());
+
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
+
+    int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd == -1)
     {
-        std::string path = endpoint_.substr(transport_prefix.size());
-        struct sockaddr_un addr;
-        memset(&addr, 0, sizeof(addr));
-        addr.sun_family = AF_UNIX;
-        strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
-        int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
-        if (fd == -1)
-        {
-            throw MiddlewareException("ZmqPublisher::safe_bind(): cannot create socket: " +
-                                      std::string(strerror(errno)));
-        }
-        util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
-        if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
-        {
-            // Connect succeeded, so another server is using the socket already.
-            throw MiddlewareException("ZmqPublisher::safe_bind(): endpoint in use: " + endpoint_);
-        }
+        throw MiddlewareException("ZmqPublisher::safe_bind(): cannot create socket: " +
+                                  std::string(strerror(errno)));
+    }
+    util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
+    if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
+    {
+        // Connect succeeded, so another server is using the socket already.
+        throw MiddlewareException("ZmqPublisher::safe_bind(): endpoint in use: " + endpoint_);
     }
     socket.bind(endpoint_);
 }

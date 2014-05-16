@@ -38,10 +38,13 @@ namespace internal
 namespace zmq_middleware
 {
 
+class StopPublisher;
+
 class ZmqSubscriber : public virtual MWSubscriber
 {
 public:
-    ZmqSubscriber(zmqpp::context const* context, std::string const& endpoint, std::string const& topic);
+    ZmqSubscriber(zmqpp::context* context, std::string const& name,
+                  std::string const& endpoint_dir, std::string const& topic);
     virtual ~ZmqSubscriber();
 
     void set_message_callback(SubscriberCallback callback) override;
@@ -55,11 +58,12 @@ private:
         Failed
     };
 
-    zmqpp::context const* const context_;
+    zmqpp::context* const context_;
     std::string const endpoint_;
     std::string const topic_;
 
     std::thread thread_;
+    std::unique_ptr<StopPublisher> thread_stopper_;
     std::mutex mutex_;
     std::condition_variable cond_;
     ThreadState thread_state_;

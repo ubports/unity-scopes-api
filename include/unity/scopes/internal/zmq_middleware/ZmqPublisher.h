@@ -43,7 +43,8 @@ namespace zmq_middleware
 class ZmqPublisher : public virtual MWPublisher
 {
 public:
-    ZmqPublisher(zmqpp::context const* context, std::string const& endpoint, std::string const& topic);
+    ZmqPublisher(zmqpp::context* context, std::string const& name,
+                 std::string const& endpoint_dir, std::string const& topic);
     virtual ~ZmqPublisher();
 
     void send_message(std::string const& message) override;
@@ -57,7 +58,7 @@ private:
         Failed
     };
 
-    zmqpp::context const* const context_;
+    zmqpp::context* const context_;
     std::string const endpoint_;
     std::string const topic_;
     std::queue<std::string> message_queue_;
