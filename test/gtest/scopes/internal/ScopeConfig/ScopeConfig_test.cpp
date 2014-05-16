@@ -27,7 +27,7 @@ using namespace unity::scopes::internal;
 TEST(ScopeConfig, basic)
 {
     {
-        ScopeConfig cfg("configtest1.ini");
+        ScopeConfig cfg(TEST_CONFIG_1);
 
         EXPECT_EQ("Scope name", cfg.display_name());
         EXPECT_EQ("Scope description", cfg.description());
@@ -36,6 +36,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("an icon", cfg.icon());
         EXPECT_EQ("search string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(2, attrs.size());
@@ -45,7 +46,7 @@ TEST(ScopeConfig, basic)
         EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
     {
-        ScopeConfig cfg("configtest2.ini");
+        ScopeConfig cfg(TEST_CONFIG_2);
 
         EXPECT_EQ("Scope name", cfg.display_name());
         EXPECT_EQ("Scope description", cfg.description());
@@ -54,11 +55,12 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("an icon", cfg.icon());
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
     }
     {
-        ScopeConfig cfg("configtest3.ini");
+        ScopeConfig cfg(TEST_CONFIG_3);
 
         EXPECT_EQ("Scope name", cfg.display_name());
         EXPECT_EQ("Scope description", cfg.description());
@@ -68,6 +70,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("a search hint string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
         EXPECT_EQ("/my/scope/runner", cfg.scope_runner());
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, cfg.results_ttl_type());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
     }

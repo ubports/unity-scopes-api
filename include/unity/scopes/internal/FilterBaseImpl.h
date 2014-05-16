@@ -39,7 +39,9 @@ public:
     FilterBaseImpl(std::string const& id);
     FilterBaseImpl(VariantMap const& var);
     virtual ~FilterBaseImpl();
+    void set_display_hints(int hints);
     std::string id() const;
+    int display_hints() const;
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
@@ -53,6 +55,7 @@ protected:
 
 private:
     std::string id_;
+    int display_hints_;
 };
 
 } // namespace internal

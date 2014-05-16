@@ -111,7 +111,10 @@ The following keys are recognized:
   The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
   set, initialization fails.
 
-  Private endpoints are created in "<EndpointDir.Public>/priv".
+  The public directory is created if it does not exist, with mode rwxr-xr-xt.
+
+  Private endpoints are created in "<EndpointDir.Public>/priv". The priv
+  directory is created if it does not exist, with mode rwx------t.
 
 - Default.Twoway.Timeout
 
@@ -271,6 +274,18 @@ The following keys are recognized in the ScopeConfig group:
 
   The amount of time (in seconds) a running scope can be inactive before it will automatically shut down.
   If not set, a default value of 40 is used.
+
+- ResultsTtlType
+
+  If set, the results for this scope will be set to expire, and be refreshed. Valid values are:
+
+  - none
+
+  - Small - in the order of a minute
+
+  - Medium - in the order of a few minutes
+
+  - Large - in the order of an hour
 
 The following keys are recognized in the Appearance group:
 

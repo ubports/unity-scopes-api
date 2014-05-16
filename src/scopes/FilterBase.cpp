@@ -39,9 +39,19 @@ VariantMap FilterBase::serialize() const
 FilterBase::~FilterBase() = default;
 /// @endcond
 
+void FilterBase::set_display_hints(int hints)
+{
+    p->set_display_hints(hints);
+}
+
 std::string FilterBase::id() const
 {
     return p->id();
+}
+
+int FilterBase::display_hints() const
+{
+    return p->display_hints();
 }
 
 std::string FilterBase::filter_type() const
