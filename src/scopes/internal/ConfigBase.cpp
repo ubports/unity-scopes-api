@@ -26,6 +26,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include <iostream>
+#include <locale>
 #include <sys/stat.h>
 
 using namespace std;
@@ -214,6 +215,14 @@ void ConfigBase::check_unknown_entries(KnownEntries const& known_entries) const
             }
         }
     }
+}
+
+void ConfigBase::to_lower(string & str)
+{
+    locale locale("");
+    const ctype<char>& ct = use_facet<ctype<char> >(locale);
+    transform(str.begin(), str.end(), str.begin(),
+            bind1st(std::mem_fun(&ctype<char>::tolower), &ct));
 }
 
 } // namespace internal

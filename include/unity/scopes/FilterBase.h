@@ -53,6 +53,29 @@ public:
     /// @endcond
 
     /**
+     \brief Display hints for the Shell UI.
+     */
+    enum DisplayHints
+    {
+        Default = 0,    /**< Default value (no hint) */
+        Primary = 1     /**< Display this filter at the top of the screen, if possible */
+    };
+
+    /**
+     \brief Sets display hints for the Shell UI.
+
+     \param hints A combination of DisplayHints for this filter.
+    */
+    void set_display_hints(int hints);
+
+    /**
+     \brief Get display hints of this filter.
+
+     \return Display hints flags.
+    */
+    int display_hints() const;
+
+    /**
      \brief Get the identifier of this filter.
      \return The filter id.
     */

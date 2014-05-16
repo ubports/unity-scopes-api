@@ -127,10 +127,11 @@ private:
 
     UniqueID unique_id_;
 
-    enum State { Stopped, Starting, Started };
+    enum State { Stopped, Started, Stopping };
     State state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;            // Protects state_
+    std::atomic_bool shutdown_flag;
 
     ZmqConfig config_;
     const int64_t twoway_timeout_;              // Default timeout for twoway invocations
