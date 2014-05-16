@@ -19,8 +19,11 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 
 #include <unity/scopes/ScopeExceptions.h>
+#include <unity/util/ResourcePtr.h>
 
-#include <zmqpp/socket.hpp>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 namespace unity
 {
@@ -57,18 +60,30 @@ ZmqPublisher::ZmqPublisher(zmqpp::context const* context, std::string const& end
         }
         catch (...)
         {
-            throw MiddlewareException("ZmqPublisher(): publisher_thread failed to start (endpoint: " + endpoint_ + ")");
+            throw MiddlewareException("ZmqPublisher(): publisher thread failed to start (endpoint: " + endpoint_ + ")");
         }
     }
 }
 
 ZmqPublisher::~ZmqPublisher()
 {
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = Stopping;
+        cond_.notify_all();
+    }
+
+    if (thread_.joinable())
+    {
+        thread_.join();
+    }
 }
 
-void ZmqPublisher::send_message(std::string const& /*message*/)
+void ZmqPublisher::send_message(std::string const& message)
 {
-
+    std::lock_guard<std::mutex> lock(mutex_);
+    message_queue_.push(message);
+    cond_.notify_all();
 }
 
 void ZmqPublisher::publisher_thread()
@@ -77,7 +92,7 @@ void ZmqPublisher::publisher_thread()
     {
         // Create the publisher socket
         zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
-        pub_socket.bind(endpoint_);
+        safe_bind(pub_socket);
 
         // Notify constructor that the thread is now running
         std::unique_lock<std::mutex> lock(mutex_);
@@ -85,7 +100,23 @@ void ZmqPublisher::publisher_thread()
         cond_.notify_all();
 
         // Wait for send_message or stop
-        //pub_socket.send(topic_ + message);
+        while (true)
+        {
+            // mutex_ unlocked
+            cond_.wait(lock, [this] { return thread_state_ == Stopping || !message_queue_.empty(); });
+            // mutex_ locked
+
+            if (thread_state_ == Stopping)
+            {
+                break;
+            }
+            else if (!message_queue_.empty())
+            {
+                // Write a message in the format: "<topic><message>"
+                pub_socket.send(topic_ + message_queue_.front());
+                message_queue_.pop();
+            }
+        }
 
         // Clean up
         pub_socket.close();
@@ -93,10 +124,37 @@ void ZmqPublisher::publisher_thread()
     catch (...)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        thread_state_ = Failed;
         thread_exception_ = std::current_exception();
+        thread_state_ = Failed;
         cond_.notify_all();
     }
+}
+
+void ZmqPublisher::safe_bind(zmqpp::socket& socket)
+{
+    const std::string transport_prefix = "ipc://";
+    std::string path = endpoint_.substr(transport_prefix.size());
+
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
+
+    int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd == -1)
+    {
+        throw MiddlewareException("ZmqPublisher::safe_bind(): cannot create socket: " +
+                                  std::string(strerror(errno)));
+    }
+    util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
+    if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
+    {
+        // Connect succeeded, so another server is using the socket already.
+        throw MiddlewareException("ZmqPublisher::safe_bind(): address in use: " +
+                                  endpoint_);
+    }
+
+    socket.bind(endpoint_);
 }
 
 } // namespace zmq_middleware

@@ -22,8 +22,10 @@
 #include <unity/scopes/internal/MWPublisher.h>
 
 #include <zmqpp/context.hpp>
+#include <zmqpp/socket.hpp>
 
 #include <condition_variable>
+#include <queue>
 #include <thread>
 
 namespace unity
@@ -58,6 +60,7 @@ private:
     zmqpp::context const* const context_;
     std::string const endpoint_;
     std::string const topic_;
+    std::queue<std::string> message_queue_;
 
     std::thread thread_;
     std::mutex mutex_;
@@ -66,6 +69,7 @@ private:
     std::exception_ptr thread_exception_;
 
     void publisher_thread();
+    void safe_bind(zmqpp::socket& socket);
 };
 
 } // namespace zmq_middleware

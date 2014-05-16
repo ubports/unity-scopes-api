@@ -58,7 +58,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context const* context, std::string const& e
         }
         catch (...)
         {
-            throw MiddlewareException("ZmqSubscriber(): subscriber_thread failed to start (endpoint: " + endpoint_ + ")");
+            throw MiddlewareException("ZmqSubscriber(): subscriber thread failed to start (endpoint: " + endpoint_ + ")");
         }
     }
 }
@@ -103,8 +103,8 @@ void ZmqSubscriber::subscriber_thread()
     catch (...)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        thread_state_ = Failed;
         thread_exception_ = std::current_exception();
+        thread_state_ = Failed;
         cond_.notify_all();
     }
 }
