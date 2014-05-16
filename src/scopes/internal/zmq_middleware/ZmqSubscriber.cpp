@@ -78,6 +78,7 @@ void ZmqSubscriber::subscriber_thread()
     {
         // Subscribe to publisher socket
         zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
+        sub_socket.set(zmqpp::socket_option::linger, 0);
         sub_socket.connect(endpoint_);
         sub_socket.subscribe(topic_);
 

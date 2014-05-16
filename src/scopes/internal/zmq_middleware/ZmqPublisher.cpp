@@ -92,6 +92,7 @@ void ZmqPublisher::publisher_thread()
     {
         // Create the publisher socket
         zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
+        pub_socket.set(zmqpp::socket_option::linger, 5000);
         safe_bind(pub_socket);
 
         // Notify constructor that the thread is now running
@@ -106,15 +107,16 @@ void ZmqPublisher::publisher_thread()
             cond_.wait(lock, [this] { return thread_state_ == Stopping || !message_queue_.empty(); });
             // mutex_ locked
 
-            if (thread_state_ == Stopping)
-            {
-                break;
-            }
-            else if (!message_queue_.empty())
+            // flush out the message queue first before stopping the thread
+            if (!message_queue_.empty())
             {
                 // Write a message in the format: "<topic><message>"
                 pub_socket.send(topic_ + message_queue_.front());
                 message_queue_.pop();
+            }
+            else if (thread_state_ == Stopping)
+            {
+                break;
             }
         }
 
@@ -132,12 +134,12 @@ void ZmqPublisher::publisher_thread()
 
 void ZmqPublisher::safe_bind(zmqpp::socket& socket)
 {
-    const std::string transport_prefix = "ipc://";
-    std::string path = endpoint_.substr(transport_prefix.size());
-
     struct sockaddr_un addr;
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
+
+    const std::string transport_prefix = "ipc://";
+    std::string path = endpoint_.substr(transport_prefix.size());
     strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
 
     int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
@@ -147,6 +149,7 @@ void ZmqPublisher::safe_bind(zmqpp::socket& socket)
                                   std::string(strerror(errno)));
     }
     util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
+
     if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
     {
         // Connect succeeded, so another server is using the socket already.
