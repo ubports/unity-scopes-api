@@ -37,6 +37,10 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
     label_(label),
     multi_select_(multi_select)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter(): Invalid empty label string");
+    }
 }
 
 OptionSelectorFilter::SPtr OptionSelectorFilterImpl::create(VariantMap const& var)
@@ -115,9 +119,16 @@ std::string OptionSelectorFilterImpl::filter_type() const
 
 FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, std::string const& label)
 {
-    auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
-    options_.push_back(opt);
-    return opt;
+    try
+    {
+        auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
+        options_.push_back(opt);
+        return opt;
+    }
+    catch (...)
+    {
+        throw ResourceException("OptionSelectorFilter(): cannot create FilterOption");
+    }
 }
 
 std::list<FilterOption::SCPtr> OptionSelectorFilterImpl::options() const
@@ -183,6 +194,15 @@ void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOpt
 
 void OptionSelectorFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value)
 {
+    if (filter_id.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter::update_state(): Invalid empty filter_id string");
+    }
+    if (option_id.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter::update_state(): Invalid empty option_id string");
+    }
+
     VariantMap& state = FilterBaseImpl::get(filter_state);
     auto it = state.find(filter_id);
 

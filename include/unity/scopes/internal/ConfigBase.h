@@ -66,6 +66,8 @@ protected:
     typedef std::map<std::string, std::set<std::string>> KnownEntries;
     void check_unknown_entries(KnownEntries const& valid) const;
 
+    static void to_lower(std::string & str);
+
 private:
     unity::util::IniParser::SPtr parser_;
     std::string configfile_;

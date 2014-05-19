@@ -36,12 +36,12 @@ namespace internal
 {
 
 ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
-    mw_(mw)
+    mw_(mw), results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
 {
 }
 
 ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw) :
-    mw_(mw)
+    mw_(mw), results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
 {
     deserialize(variant_map);
 }
@@ -53,7 +53,8 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     display_name_(other.display_name_),
     description_(other.description_),
     author_(other.author_),
-    appearance_attributes_(other.appearance_attributes_)
+    appearance_attributes_(other.appearance_attributes_),
+    results_ttl_type_(other.results_ttl_type_)
 {
     if (other.art_)
     {
@@ -98,6 +99,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         invisible_.reset(rhs.invisible_ ? new bool(*rhs.invisible_) : nullptr);
         appearance_attributes_ = rhs.appearance_attributes_;
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
+        results_ttl_type_ = rhs.results_ttl_type_;
     }
     return *this;
 }
@@ -186,6 +188,11 @@ std::string ScopeMetadataImpl::scope_directory() const
    throw NotFoundException("attribute not set", "scope_directory");
 }
 
+ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
+{
+    return results_ttl_type_;
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -244,6 +251,11 @@ void ScopeMetadataImpl::set_appearance_attributes(VariantMap const& appearance_a
 void ScopeMetadataImpl::set_scope_directory(std::string const& path)
 {
     scope_directory_.reset(new string(path));
+}
+
+void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl)
+{
+    results_ttl_type_ = results_ttl;
 }
 
 namespace
@@ -308,6 +320,10 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (appearance_attributes_.size() > 0)
     {
         var["appearance_attributes"] = appearance_attributes_;
+    }
+    if (results_ttl_type_ != ScopeMetadata::ResultsTtlType::None)
+    {
+        var["results_ttl_type"] = (int) results_ttl_type_;
     }
 
     return var;
@@ -404,6 +420,19 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         appearance_attributes_ = it->second.get_dict();
+    }
+
+    it = var.find("results_ttl_type");
+    if (it != var.end())
+    {
+        int tmp = it->second.get_int();
+        if(tmp < 0)
+        {
+            throw InvalidArgumentException(
+                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value '"
+                            + tmp);
+        }
+        results_ttl_type_ = (ScopeMetadata::ResultsTtlType) tmp;
     }
 }
 

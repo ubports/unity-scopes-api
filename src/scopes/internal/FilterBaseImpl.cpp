@@ -19,10 +19,11 @@
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
-#include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/UnityExceptions.h>
+#include <sstream>
 
 namespace unity
 {
@@ -34,31 +35,59 @@ namespace internal
 {
 
 FilterBaseImpl::FilterBaseImpl(std::string const& id)
-    : id_(id)
+    : id_(id),
+      display_hints_(FilterBase::DisplayHints::Default)
 {
+    if (id_.empty())
+    {
+        throw InvalidArgumentException("FilterBase(): invalid empty id string");
+    }
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
 {
-    auto it = var.find("id");
-    if (it == var.end())
-    {
-        throw unity::LogicException("FilterBase: missing 'id'");
-    }
+    auto it = find_or_throw("FilterBase()", var, "id");
     id_ = it->second.get_string();
+    it = var.find("display_hints");
+    if (it != var.end())
+    {
+        set_display_hints(static_cast<FilterBase::DisplayHints>(it->second.get_int()));
+    }
 }
 
 FilterBaseImpl::~FilterBaseImpl() = default;
+
+void FilterBaseImpl::set_display_hints(int hints)
+{
+    // note: make sure all_flags is updated whenever new values are added to the DisplayHints enum
+    static const int all_flags = static_cast<int>(FilterBase::DisplayHints::Primary);
+    if (hints < 0 || hints > all_flags)
+    {
+        std::stringstream err;
+        err << "FilterBaseImpl::set_display_hints(): Invalid display hint for filter '" << id_ << "'";
+        throw unity::InvalidArgumentException(err.str());
+    }
+    display_hints_ = hints;
+}
 
 std::string FilterBaseImpl::id() const
 {
     return id_;
 }
 
+int FilterBaseImpl::display_hints() const
+{
+    return display_hints_;
+}
+
 VariantMap FilterBaseImpl::serialize() const
 {
     VariantMap vm;
     vm["id"] = id_;
+    if (display_hints_ != FilterBase::DisplayHints::Default)
+    {
+        vm["display_hints"] = static_cast<int>(display_hints_);
+    }
     vm["filter_type"] = filter_type();
     serialize(vm);
     return vm;
