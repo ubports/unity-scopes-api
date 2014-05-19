@@ -152,6 +152,56 @@ Filters FilterBaseImpl::deserialize_filters(VariantArray const& var)
     return filters;
 }
 
+void FilterBaseImpl::validate_filters(Filters const& filters)
+{
+    for (auto const& f: filters)
+    {
+        if (f == nullptr)
+        {
+            throw unity::LogicException("FilterBaseImpl::validate_filters(): invalid null filter pointer");
+        }
+        {
+            OptionSelectorFilter::SCPtr optsel = std::dynamic_pointer_cast<OptionSelectorFilter const>(f);
+            if (optsel)
+            {
+                if (optsel->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty OptionSelectorFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+        {
+            RatingFilter::SCPtr rating = std::dynamic_pointer_cast<RatingFilter const>(f);
+            if (rating)
+            {
+                if (rating->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty RatingFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+        {
+            RadioButtonsFilter::SCPtr radiobtn = std::dynamic_pointer_cast<RadioButtonsFilter const>(f);
+            if (radiobtn)
+            {
+                if (radiobtn->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty RadioButtonsFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+    }
+}
+
 } // namespace internal
 
 } // namespace scopes

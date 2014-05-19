@@ -141,37 +141,67 @@ TEST(Filters, deserialize)
 {
     // check that FilterBaseImpl::deserialize() creates valid instances of all filter types
     {
-        auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        OptionSelectorFilter::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", false);
         auto option1 = filter1->add_option("1", "Option 1");
         auto var = filter1->serialize();
 
         auto f = internal::FilterBaseImpl::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<OptionSelectorFilter const>(f) != nullptr);
         EXPECT_EQ("option_selector", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
     }
 
     {
-        auto filter1 = RadioButtonsFilter::create("f1", "Options");
+        RadioButtonsFilter::SPtr filter1 = RadioButtonsFilter::create("f1", "Options");
         auto option1 = filter1->add_option("1", "Option 1");
         auto var = filter1->serialize();
 
         auto f = internal::FilterBaseImpl::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<RadioButtonsFilter const>(f) != nullptr);
         EXPECT_EQ("radio_buttons", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
     }
 
     {
-        auto filter1 = RatingFilter::create("f1", "Options", 5);
+        RatingFilter::SPtr filter1 = RatingFilter::create("f1", "Options", 5);
         auto var = filter1->serialize();
 
         auto f = internal::FilterBaseImpl::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<RatingFilter const>(f) != nullptr);
         EXPECT_EQ("rating", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
     }
 
     {
         // invalid data (no filter_type)
         VariantMap var;
         EXPECT_THROW(internal::FilterBaseImpl::deserialize(var), unity::LogicException);
+    }
+}
+
+TEST(Filters, validate)
+{
+    {
+        FilterBase::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
+    }
+
+    {
+        FilterBase::SPtr filter1 = RadioButtonsFilter::create("f1", "Options");
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
+    }
+
+    {
+        FilterBase::SPtr filter1 = RatingFilter::create("f1", "Options");
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
     }
 }

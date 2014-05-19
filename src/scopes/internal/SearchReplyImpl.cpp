@@ -62,7 +62,7 @@ void SearchReplyImpl::register_departments(DepartmentList const& departments, st
     }
     catch (unity::LogicException const &e)
     {
-        throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
+        throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
     ReplyImpl::push(internal::DepartmentImpl::serialize_departments(departments, current_department_id)); // ignore return value?
@@ -129,6 +129,16 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 
 bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
 {
+    // basic consistency check
+    try
+    {
+        internal::FilterBaseImpl::validate_filters(filters);
+    }
+    catch (unity::LogicException const &e)
+    {
+        throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
+    }
+
     VariantMap var;
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
