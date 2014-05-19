@@ -47,6 +47,7 @@ public:
                  std::string const& endpoint_dir, std::string const& topic);
     virtual ~ZmqPublisher();
 
+    std::string endpoint() const override;
     void send_message(std::string const& message) override;
 
 private:

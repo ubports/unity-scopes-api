@@ -81,6 +81,11 @@ ZmqPublisher::~ZmqPublisher()
     }
 }
 
+std::string ZmqPublisher::endpoint() const
+{
+    return endpoint_;
+}
+
 void ZmqPublisher::send_message(std::string const& message)
 {
     std::lock_guard<std::mutex> lock(mutex_);

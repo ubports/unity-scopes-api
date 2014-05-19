@@ -47,6 +47,7 @@ public:
                   std::string const& endpoint_dir, std::string const& topic);
     virtual ~ZmqSubscriber();
 
+    std::string endpoint() const override;
     void set_message_callback(SubscriberCallback callback) override;
 
 private:

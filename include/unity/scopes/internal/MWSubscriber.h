@@ -41,6 +41,7 @@ public:
 
     virtual ~MWSubscriber();
 
+    virtual std::string endpoint() const = 0;
     virtual void set_message_callback(SubscriberCallback callback) = 0;
 
 protected:

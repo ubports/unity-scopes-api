@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 
+#include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/internal/zmq_middleware/StopPublisher.h>
 #include <unity/scopes/ScopeExceptions.h>
 
@@ -48,7 +49,8 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
     // Start thread_stopper_ publisher (used to send a stop message to the subscriber on destruction)
     try
     {
-        thread_stopper_.reset(new StopPublisher(context, name + "-stopper"));
+        UniqueID unique_id;
+        thread_stopper_.reset(new StopPublisher(context, unique_id.gen()));
     }
     catch (...)
     {
@@ -87,6 +89,11 @@ ZmqSubscriber::~ZmqSubscriber()
     {
         thread_.join();
     }
+}
+
+std::string ZmqSubscriber::endpoint() const
+{
+    return endpoint_;
 }
 
 void ZmqSubscriber::set_message_callback(SubscriberCallback callback)
