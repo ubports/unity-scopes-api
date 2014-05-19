@@ -81,6 +81,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
+    EXPECT_EQ(nullptr, scopes[0].appearance);
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
