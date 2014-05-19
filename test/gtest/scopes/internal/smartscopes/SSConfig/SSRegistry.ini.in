@@ -1,0 +1,5 @@
+[Smartscopes]
+Http.Reply.Timeout = 2
+Registry.Refresh.Rate = 77333
+Registry.Refresh.Fail.Timeout = 17
+Scope.Identity = Fred
