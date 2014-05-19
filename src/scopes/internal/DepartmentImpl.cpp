@@ -34,6 +34,10 @@ DepartmentImpl::DepartmentImpl(CannedQuery const& query, std::string const& labe
       label_(label),
       has_subdepartments_(false)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("Department(): Invalid empty label string");
+    }
 }
 
 DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label)
@@ -41,6 +45,10 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
       label_(label),
       has_subdepartments_(false)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("Department(): Invalid empty label string");
+    }
     query_.set_department_id(department_id);
 }
 
@@ -50,6 +58,10 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
       departments_(subdepartments),
       has_subdepartments_(false)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("Department(): Invalid empty label string");
+    }
     query_.set_department_id(department_id);
 }
 

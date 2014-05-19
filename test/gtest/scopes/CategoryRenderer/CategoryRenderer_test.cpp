@@ -36,7 +36,7 @@ TEST(CategoryRenderer, from_file)
 {
     const std::string input_file(TEST_BUILD_ROOT "/gtest/scopes/CategoryRenderer/renderer.json");
 
-    EXPECT_THROW(CategoryRenderer::from_file("/non-existing-file"), unity::FileException);
+    EXPECT_THROW(CategoryRenderer::from_file("/non-existing-file"), unity::ResourceException);
     EXPECT_NO_THROW(CategoryRenderer::from_file(input_file));
 
     auto rdr = CategoryRenderer::from_file(input_file);

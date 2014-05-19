@@ -40,6 +40,10 @@ FilterBaseImpl::FilterBaseImpl(std::string const& id)
     : id_(id),
       display_hints_(FilterBase::DisplayHints::Default)
 {
+    if (id_.empty())
+    {
+        throw InvalidArgumentException("FilterBase(): invalid empty id string");
+    }
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)

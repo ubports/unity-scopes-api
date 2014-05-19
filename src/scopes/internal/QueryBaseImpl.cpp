@@ -21,6 +21,7 @@
 #include <unity/scopes/QueryCtrl.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/SearchMetadata.h>
+#include <unity/UnityExceptions.h>
 
 #include <iostream>
 #include <cassert>
@@ -51,6 +52,15 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
 {
     assert(search_metadata_);
 
+    if (!scope)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
+    }
+    if (!reply)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
+    }
+
     // Forward the create request to the child scope and remember the control.
     // This allows cancel() to forward incoming cancellations to subqueries
     // without intervention from the scope application code.
@@ -68,6 +78,15 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
 {
     assert(search_metadata_);
 
+    if (!scope)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
+    }
+    if (!reply)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
+    }
+
     QueryCtrlProxy qcp = scope->search(query_string, filter_state, *search_metadata_, reply);
 
     lock_guard<mutex> lock(mutex_);
@@ -83,6 +102,15 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
 {
     assert(search_metadata_);
 
+    if (!scope)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
+    }
+    if (!reply)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
+    }
+
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, *search_metadata_, reply);
 
     lock_guard<mutex> lock(mutex_);
@@ -97,6 +125,15 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
+    if (!scope)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
+    }
+    if (!reply)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
+    }
+
     QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);
 
     lock_guard<mutex> lock(mutex_);
