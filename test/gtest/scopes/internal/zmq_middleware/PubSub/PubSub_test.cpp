@@ -161,8 +161,9 @@ TEST(PubSub, send_receive)
     ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
-    // Create a publisher
+    // Create 2 publishers
     auto publisher = mw.create_publisher("testpublisher");
+    auto publisher2 = mw.create_publisher("testpublisher2");
 
     // Create a few subscribers
     auto subscriber1 = mw.create_subscriber("testpublisher", "testtopic1");
@@ -174,7 +175,7 @@ TEST(PubSub, send_receive)
     auto subscriber3 = mw.create_subscriber("testpublisher", "");
     subscriber3->set_message_callback(std::bind(&SubMsgReceiver::receive3, &message_receiver, _1));
 
-    auto subscriber4 = mw.create_subscriber("wrongpublisher", "testtopic4");
+    auto subscriber4 = mw.create_subscriber("testpublisher2", "testtopic4");
     subscriber4->set_message_callback(std::bind(&SubMsgReceiver::receive4, &message_receiver, _1));
 
     // Give the subscribers some time to connect
@@ -203,8 +204,17 @@ TEST(PubSub, send_receive)
     publisher->send_message("test", "testtopic4");
     EXPECT_FALSE(message_receiver.wait_for_message());
 
+    // Now send a "testtopic4" topic message from the correct publisher (subscriber4)
+    publisher2->send_message("test", "testtopic4");
+    EXPECT_TRUE(message_receiver.wait_for_message());
+    EXPECT_EQ(4, message_receiver.last_sub_index_);
+    EXPECT_EQ("test", message_receiver.last_message_);
+
     // Send a "unknown" topic message
     // (no message should be received as none of the subscribers are listening for "unknown")
     publisher->send_message("hello?", "unknown");
+    EXPECT_FALSE(message_receiver.wait_for_message());
+
+    publisher2->send_message("hello??", "unknown");
     EXPECT_FALSE(message_receiver.wait_for_message());
 }
