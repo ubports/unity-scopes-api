@@ -660,9 +660,9 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     return proxy;
 }
 
-MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id, std::string const& topic)
+MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id)
 {
-    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, config_.public_dir(), topic));
+    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, config_.public_dir()));
 }
 
 MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& publisher_id, std::string const& topic)

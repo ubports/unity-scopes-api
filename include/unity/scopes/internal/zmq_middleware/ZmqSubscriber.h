@@ -43,7 +43,7 @@ class StopPublisher;
 class ZmqSubscriber : public virtual MWSubscriber
 {
 public:
-    ZmqSubscriber(zmqpp::context* context, std::string const& name,
+    ZmqSubscriber(zmqpp::context* context, std::string const& publisher_name,
                   std::string const& endpoint_dir, std::string const& topic);
     virtual ~ZmqSubscriber();
 

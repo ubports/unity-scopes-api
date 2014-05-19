@@ -37,15 +37,22 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqPublisher::ZmqPublisher(zmqpp::context* context, std::string const& name,
-                           std::string const& endpoint_dir, std::string const& topic)
+ZmqPublisher::ZmqPublisher(zmqpp::context* context, std::string const& publisher_name,
+                           std::string const& endpoint_dir)
     : context_(context)
-    , endpoint_("ipc://" + endpoint_dir + "/" + name)
-    , topic_(topic)
-    , thread_(std::thread(&ZmqPublisher::publisher_thread, this))
+    , endpoint_("ipc://" + endpoint_dir + "/" + publisher_name)
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
 {
+    // Validate publisher_name
+    if (publisher_name.find('/') != std::string::npos)
+    {
+        throw MiddlewareException("ZmqPublisher(): A publisher cannot contain a '/' in its id");
+    }
+
+    // Start the publisher thread
+    thread_ = std::thread(&ZmqPublisher::publisher_thread, this);
+
     std::unique_lock<std::mutex> lock(mutex_);
     cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
 
@@ -86,10 +93,12 @@ std::string ZmqPublisher::endpoint() const
     return endpoint_;
 }
 
-void ZmqPublisher::send_message(std::string const& message)
+void ZmqPublisher::send_message(std::string const& message, std::string const& topic)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    message_queue_.push(message);
+
+    // Write message in the format: "<topic>:<message>"
+    message_queue_.push(topic + ':' + message);
     cond_.notify_all();
 }
 
@@ -117,8 +126,7 @@ void ZmqPublisher::publisher_thread()
             // Flush out the message queue before stopping the thread
             if (!message_queue_.empty())
             {
-                // Write a message in the format: "<topic><message>"
-                pub_socket.send(topic_ + message_queue_.front());
+                pub_socket.send(message_queue_.front());
                 message_queue_.pop();
             }
             else if (thread_state_ == Stopping)

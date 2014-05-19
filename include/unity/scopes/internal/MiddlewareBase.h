@@ -86,7 +86,7 @@ public:
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) = 0;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) = 0;
 
-    virtual MWPublisher::UPtr create_publisher(std::string const& publisher_id, std::string const& topic = "") = 0;
+    virtual MWPublisher::UPtr create_publisher(std::string const& publisher_id) = 0;
     virtual MWSubscriber::UPtr create_subscriber(std::string const& publisher_id, std::string const& topic = "") = 0;
 
     virtual std::string get_scope_endpoint() = 0;

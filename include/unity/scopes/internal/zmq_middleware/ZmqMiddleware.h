@@ -82,7 +82,7 @@ public:
     virtual void add_dflt_scope_object(ScopeObjectBase::SPtr const& scope) override;
     virtual MWStateReceiverProxy add_state_receiver_object(std::string const& identity, StateReceiverObject::SPtr const& state_receiver) override;
 
-    virtual MWPublisher::UPtr create_publisher(std::string const& publisher_id, std::string const& topic) override;
+    virtual MWPublisher::UPtr create_publisher(std::string const& publisher_id) override;
     virtual MWSubscriber::UPtr create_subscriber(std::string const& publisher_id, std::string const& topic) override;
 
     virtual std::string get_scope_endpoint() override;

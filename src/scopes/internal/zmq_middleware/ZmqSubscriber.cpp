@@ -37,15 +37,21 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
+ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publisher_name,
                              std::string const& endpoint_dir, std::string const& topic)
     : context_(context)
-    , endpoint_("ipc://" + endpoint_dir + "/" + name)
+    , endpoint_("ipc://" + endpoint_dir + "/" + publisher_name)
     , topic_(topic)
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
     , callback_(nullptr)
 {
+    // Validate publisher_name
+    if (publisher_name.find('/') != std::string::npos)
+    {
+        throw MiddlewareException("ZmqSubscriber(): A publisher cannot contain a '/' in its id");
+    }
+
     // Start thread_stopper_ publisher (used to send a stop message to the subscriber on destruction)
     try
     {
@@ -54,7 +60,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& name,
     }
     catch (...)
     {
-        throw MiddlewareException("ZmqSubscriber(): thread_stopper_ failed to initialize (adapter: " + name + ")");
+        throw MiddlewareException("ZmqSubscriber(): thread_stopper_ failed to initialize (adapter: " + publisher_name + ")");
     }
 
     // Start the subscriber thread
@@ -108,6 +114,7 @@ void ZmqSubscriber::subscriber_thread()
     {
         // Subscribe to our associated publisher socket
         zmqpp::socket sub_socket(*context_, zmqpp::socket_type::subscribe);
+        sub_socket.set(zmqpp::socket_option::linger, 0);
         sub_socket.connect(endpoint_);
         sub_socket.subscribe(topic_);
 
@@ -141,7 +148,12 @@ void ZmqSubscriber::subscriber_thread()
                 std::lock_guard<std::mutex> lock(mutex_);
                 if (callback_)
                 {
-                    callback_(message);
+                    // Message should arrive in the format: "<topic>:<message>"
+                    if (message.length() > topic_.length() &&
+                        message[topic_.length()] == ':')
+                    {
+                        callback_(message.substr(topic_.length() + 1));
+                    }
                 }
             }
             else if(poller.has_input(stop_socket))
