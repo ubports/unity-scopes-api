@@ -37,17 +37,17 @@ namespace internal
 namespace zmq_middleware
 {
 
-ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publisher_name,
+ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publisher_id,
                              std::string const& endpoint_dir, std::string const& topic)
     : context_(context)
-    , endpoint_("ipc://" + endpoint_dir + "/" + publisher_name)
+    , endpoint_("ipc://" + endpoint_dir + "/" + publisher_id)
     , topic_(topic)
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
     , callback_(nullptr)
 {
-    // Validate publisher_name
-    if (publisher_name.find('/') != std::string::npos)
+    // Validate publisher_id
+    if (publisher_id.find('/') != std::string::npos)
     {
         throw MiddlewareException("ZmqSubscriber(): A publisher cannot contain a '/' in its id");
     }
@@ -60,7 +60,7 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
     }
     catch (...)
     {
-        throw MiddlewareException("ZmqSubscriber(): thread_stopper_ failed to initialize (adapter: " + publisher_name + ")");
+        throw MiddlewareException("ZmqSubscriber(): thread_stopper_ failed to initialize (adapter: " + publisher_id + ")");
     }
 
     // Start the subscriber thread

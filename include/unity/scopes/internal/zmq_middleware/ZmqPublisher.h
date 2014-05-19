@@ -43,7 +43,7 @@ namespace zmq_middleware
 class ZmqPublisher : public virtual MWPublisher
 {
 public:
-    ZmqPublisher(zmqpp::context* context, std::string const& publisher_name,
+    ZmqPublisher(zmqpp::context* context, std::string const& publisher_id,
                  std::string const& endpoint_dir);
     virtual ~ZmqPublisher();
 
