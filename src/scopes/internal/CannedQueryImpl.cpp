@@ -50,6 +50,10 @@ CannedQueryImpl::CannedQueryImpl(std::string const& scope_id, std::string const&
       query_string_(query_str),
       department_id_(department_id)
 {
+    if (scope_id_.empty())
+    {
+        throw InvalidArgumentException("CannedQuery(): scope ID cannot be empty");
+    }
 }
 
 CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)

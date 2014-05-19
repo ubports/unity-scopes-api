@@ -147,6 +147,15 @@ void PreviewWidgetImpl::add_attribute_value(std::string const& key, Variant cons
 
 void PreviewWidgetImpl::add_attribute_mapping(std::string const& key, std::string const& field_name)
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("PreviewWidget::add_attribute_mapping(): Invalid empty key string");
+    }
+    if (field_name.empty())
+    {
+        throw InvalidArgumentException("PreviewWidget::add_attribute_mapping(): Invalid field_name string");
+    }
+
     if (key == "id" || key == "type")
     {
         throw InvalidArgumentException("PreviewWidget::add_attribute_mapping(): Can't override component '" + key + "'");
