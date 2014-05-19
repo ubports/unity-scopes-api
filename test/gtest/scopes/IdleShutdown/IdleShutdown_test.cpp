@@ -122,11 +122,13 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
 
     // Check that the run time doesn't shut down until
     // the search in the scope has completed, which takes 4 seconds.
-    // We allow 4 - 5 seconds for things to shut down before failing
-    // (or hanging).
+    // We allow 4 - 6 seconds for things to shut down before failing
+    // (or hanging). (On Arm, can be slow to shut down, so we allow
+    // a full two seconds for the server to go away before failing
+    // the test.)
     auto duration = chrono::steady_clock::now() - start_time;
     EXPECT_TRUE(duration > chrono::seconds(4));
-    EXPECT_TRUE(duration < chrono::seconds(5));
+    EXPECT_TRUE(duration < chrono::seconds(6));
 }
 
 int main(int argc, char **argv)
