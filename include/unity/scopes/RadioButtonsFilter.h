@@ -81,6 +81,14 @@ public:
     FilterOption::SCPtr active_option(FilterState const& filter_state) const;
 
     /**
+    \brief Check if active options.
+    \param filter_state The state of filters
+    \return true if there is at least one option active
+    */
+    bool has_active_option(FilterState const& filter_state) const;
+
+
+    /**
     \brief Get all options of this filter, in the order they were added.
     \return The list of options.
      */

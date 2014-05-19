@@ -55,6 +55,11 @@ std::list<FilterOption::SCPtr> OptionSelectorFilter::options() const
     return fwd()->options();
 }
 
+bool OptionSelectorFilter::has_active_option(FilterState const& filter_state) const
+{
+    return fwd()->has_active_option(filter_state);
+}
+
 std::set<FilterOption::SCPtr> OptionSelectorFilter::active_options(FilterState const& filter_state) const
 {
     return fwd()->active_options(filter_state);

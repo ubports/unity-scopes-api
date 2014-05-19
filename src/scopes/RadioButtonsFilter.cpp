@@ -45,6 +45,11 @@ FilterOption::SCPtr RadioButtonsFilter::active_option(FilterState const& filter_
     return fwd()->active_option(filter_state);
 }
 
+bool RadioButtonsFilter::has_active_option(FilterState const& filter_state) const
+{
+    return fwd()->has_active_option();
+}
+
 std::list<FilterOption::SCPtr> RadioButtonsFilter::options() const
 {
     return fwd()->options();

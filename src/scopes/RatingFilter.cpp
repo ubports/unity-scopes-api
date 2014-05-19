@@ -80,6 +80,11 @@ FilterOption::SCPtr RatingFilter::active_rating(FilterState const& filter_state)
     return fwd()->active_option(filter_state);
 }
 
+bool RatingFilter::has_active_rating(FilterState const& filter_state) const
+{
+    return fwd()->has_active_option();
+}
+
 void RatingFilter::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const
 {
     fwd()->update_state(filter_state, option, active);

@@ -84,6 +84,13 @@ public:
     std::list<FilterOption::SCPtr> options() const;
 
     /**
+    \brief Check if an option is active for this filter.
+    \param filter_state The state of filters
+    \return true if an option is active
+    */
+    bool has_active_option(FilterState const& filter_state) const;
+
+    /**
     \brief Get active options from an instance of FilterState for this filter.
     \return The set of selected filter options.
     */

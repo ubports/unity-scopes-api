@@ -138,6 +138,13 @@ public:
     std::list<FilterOption::SCPtr> options() const;
 
     /**
+    \brief Check if a rating option is active.
+    \param filter_state The state of filters
+    \return true if a rating option is active.
+    */
+    bool has_active_rating(FilterState const& filter_state) const;
+
+    /**
     \brief Get active option from an instance of FilterState for this filter.
     \return The active option or nullptr if no option is active.
     */

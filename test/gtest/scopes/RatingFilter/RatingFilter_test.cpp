@@ -81,6 +81,7 @@ TEST(RatingFilter, selection)
 
     FilterState fstate;
     EXPECT_FALSE(fstate.has_filter("f1"));
+    EXPECT_FALSE(filter1->has_active_rating(fstate));
     EXPECT_EQ(nullptr, filter1->active_rating(fstate));
 
     auto opts = filter1->options();
@@ -93,6 +94,7 @@ TEST(RatingFilter, selection)
     // enable option1
     filter1->update_state(fstate, option1, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_TRUE(filter1->has_active_rating(fstate));
     auto active = filter1->active_rating(fstate);
     EXPECT_EQ("1", active->id());
 
@@ -104,5 +106,6 @@ TEST(RatingFilter, selection)
     // disable option1; filter state remains in the FilterState, just no options are selected
     filter1->update_state(fstate, option2, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_FALSE(filter1->has_active_rating(fstate));
     EXPECT_EQ(nullptr, filter1->active_rating(fstate));
 }

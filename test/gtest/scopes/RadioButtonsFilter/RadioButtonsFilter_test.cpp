@@ -51,6 +51,7 @@ TEST(RadioButtonsFilter, selection)
     FilterState fstate;
     EXPECT_FALSE(fstate.has_filter("f1"));
     EXPECT_EQ(nullptr, filter1->active_option(fstate));
+    EXPECT_FALSE(filter1->has_active_option(fstate));
 
     // enable option1
     filter1->update_state(fstate, option1, true);
