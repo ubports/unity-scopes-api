@@ -42,7 +42,9 @@ DirWatch::DirWatch(std::string const& dir, DirWatchCallback callback)
     {
         throw ResourceException("DirWatch(): inotify_init() failed");
     }
-    wd_ = inotify_add_watch(fd_, dir_.c_str(), IN_CREATE | IN_DELETE | IN_MOVE);
+    wd_ = inotify_add_watch(fd_, dir_.c_str(), IN_CREATE | IN_MOVED_TO |
+                                               IN_DELETE | IN_MOVED_FROM |
+                                               IN_MODIFY);
 
     // Start the watch thread
     thread_ = std::thread(&DirWatch::watch_thread, this);
@@ -89,48 +91,37 @@ void DirWatch::watch_thread()
                 struct inotify_event* event = (inotify_event*)&buffer[i];
                 if (event->len)
                 {
-                    if (event->mask & IN_CREATE)
+                    if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                     {
                         if (event->mask & IN_ISDIR)
                         {
-                            //printf("The directory %s was created.\n", event->name);
+                            callback_(Added, Directory, event->name);
                         }
                         else
                         {
-                            //printf("The file %s was created.\n", event->name);
+                            callback_(Added, File, event->name);
                         }
                     }
-                    else if (event->mask & IN_DELETE)
+                    else if (event->mask & IN_DELETE || event->mask & IN_MOVED_FROM)
                     {
                         if (event->mask & IN_ISDIR)
                         {
-                            //printf("The directory %s was deleted.\n", event->name);
+                            callback_(Removed, Directory, event->name);
                         }
                         else
                         {
-                            //printf("The file %s was deleted.\n", event->name);
-                        }
-                    }
-                    else if (event->mask & IN_MOVE)
-                    {
-                        if (event->mask & IN_ISDIR)
-                        {
-                            //printf("The directory %s was moved.\n", event->name);
-                        }
-                        else
-                        {
-                            //printf("The file %s was moved.\n", event->name);
+                            callback_(Removed, File, event->name);
                         }
                     }
                     else if (event->mask & IN_MODIFY)
                     {
                         if (event->mask & IN_ISDIR)
                         {
-                            //printf("The directory %s was modified.\n", event->name);
+                            callback_(Modified, Directory, event->name);
                         }
                         else
                         {
-                            //printf("The file %s was modified.\n", event->name);
+                            callback_(Modified, File, event->name);
                         }
                     }
                 }

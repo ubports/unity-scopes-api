@@ -25,11 +25,28 @@
 namespace scoperegistry
 {
 
-typedef std::function<void()> DirWatchCallback;
+// DirWatch watches the directory specified by the "dir" constructor parameter for changes in
+// the files and folders contained. If a file or folder is added, removed or modified, a user
+// callback is executed (also to be provided on construction).
 
 class DirWatch final
 {
 public:
+    enum EventType
+    {
+        Added,
+        Removed,
+        Modified
+    };
+
+    enum FileType
+    {
+        File,
+        Directory
+    };
+
+    typedef std::function<void(EventType, FileType, std::string const& file_name)> DirWatchCallback;
+
     DirWatch(std::string const& dir, DirWatchCallback callback);
     ~DirWatch();
 
