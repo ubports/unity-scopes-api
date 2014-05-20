@@ -45,6 +45,10 @@ TEST(Department, basic)
         EXPECT_EQ("subdep1", dep->subdepartments().front()->id());
         EXPECT_EQ("subdep1", dep->subdepartments().front()->query().department_id());
         EXPECT_EQ("Europe", dep->subdepartments().front()->label());
+
+        dep->add_subdepartment(std::move(Department::create("subdep2", query, "Australia")));
+        EXPECT_EQ(2u, dep->subdepartments().size());
+        EXPECT_EQ("subdep2", dep->subdepartments().back()->id());
     }
     {
         CannedQuery query("fooscope", "foo", "dep1");

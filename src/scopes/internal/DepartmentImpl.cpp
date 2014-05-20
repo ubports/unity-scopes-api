@@ -60,16 +60,22 @@ void DepartmentImpl::set_has_subdepartments()
 
 void DepartmentImpl::set_subdepartments(DepartmentList const& departments)
 {
+    departments_.clear();
     for (auto const& dep: departments)
     {
-        if (dep == nullptr)
-        {
-            std::stringstream str;
-            str << "DepartmentImpl::set_subdepartments(): invalid null department, parent department '", id();
-            throw InvalidArgumentException(str.str());
-        }
+        add_subdepartment(dep);
     }
-    departments_ = departments;
+}
+
+void DepartmentImpl::add_subdepartment(Department::SCPtr const& department)
+{
+    if (department == nullptr)
+    {
+        std::stringstream str;
+        str << "DepartmentImpl::add_subdepartment(): invalid null department, parent department '", id();
+        throw InvalidArgumentException(str.str());
+    }
+    departments_.push_back(department);
 }
 
 std::string DepartmentImpl::id() const

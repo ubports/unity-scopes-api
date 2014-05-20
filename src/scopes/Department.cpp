@@ -79,6 +79,11 @@ void Department::set_subdepartments(DepartmentList const& departments)
     p->set_subdepartments(departments);
 }
 
+void Department::add_subdepartment(Department::SCPtr const& department)
+{
+    p->add_subdepartment(department);
+}
+
 void Department::set_alternate_label(std::string const& label)
 {
     p->set_alternate_label(label);

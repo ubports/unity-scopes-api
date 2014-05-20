@@ -98,6 +98,12 @@ public:
     void set_subdepartments(DepartmentList const& departments);
 
     /**
+    \brief Add sub-department to this department.
+    \param department The subdepartment instance.
+    */
+    void add_subdepartment(Department::SCPtr const& department);
+
+    /**
      \brief Set the alternate label (plural of the normal label) of this department.
 
      The alternate label should express the plural "all" form of the normal label. For example,
