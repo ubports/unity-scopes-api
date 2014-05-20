@@ -216,15 +216,25 @@ void DepartmentImpl::validate_departments(Department::SCPtr const& parent, Depar
         throw unity::LogicException("DepartmentImpl::validate_departments(): invalid null current department");
     }
 
-    // don't allow duplicated department ids. ensure that current department matches one of the departments (if non-empty).
+    if (parent->subdepartments().size() == 0)
+    {
+        std::stringstream str;
+        str << "DepartmentImpl::validate_departments(): at least two levels of departments required, parent department id '"
+            << parent->id() << "'";
+        throw unity::LogicException(str.str());
+    }
+
+    // don't allow duplicated department ids.
     std::unordered_set<std::string> lookup;
     validate_departments(parent, lookup);
     if (parent != current)
     {
+        // ensure that current department matches one of the (sub)departments
         if (lookup.find(current->id()) == lookup.end())
         {
             std::stringstream str;
-            str << "DepartmentImpl::validate_departments(): current department '" << current->id() << "' doesn't match any of the departments";
+            str << "DepartmentImpl::validate_departments(): current department '" << current->id() <<
+                "' doesn't match any of the subdepartments of parent '" << parent->id() << "'";
             throw unity::LogicException(str.str());
         }
     }
@@ -256,16 +266,6 @@ VariantMap DepartmentImpl::serialize_departments(Department::SCPtr const& parent
     vm["departments"] = Variant(parent->serialize());
     vm["current_department"] = current->id();
     return vm;
-}
-
-DepartmentList DepartmentImpl::deserialize_departments(VariantArray const& var)
-{
-    DepartmentList departments;
-    for (auto const& dep: var)
-    {
-        departments.push_back(DepartmentImpl::create(dep.get_dict()));
-    }
-    return departments;
 }
 
 } // namespace internal

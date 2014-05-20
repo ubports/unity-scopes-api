@@ -58,7 +58,6 @@ public:
     static Department::UPtr create(VariantMap const& var);
     static void validate_departments(Department::SCPtr const& parent, Department::SCPtr const& current);
     static VariantMap serialize_departments(Department::SCPtr const& parent, Department::SCPtr const& current);
-    static DepartmentList deserialize_departments(VariantArray const& var);
     static Department::SCPtr find_subdepartment_by_id(Department::SCPtr const& department, std::string const& id);
 
 private:
