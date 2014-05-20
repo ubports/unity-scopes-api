@@ -31,18 +31,18 @@ namespace unity
 namespace scopes
 {
 
-class CannedQuery;
 class Department;
-
-/*! \typedef DepartmentList
-\brief List of departments (see unity::scopes::Department)
-*/
-typedef std::list<Department> DepartmentList;
+class CannedQuery;
 
 namespace internal
 {
 class DepartmentImpl;
 }
+
+/*! \typedef DepartmentList
+\brief List of departments (see unity::scopes::Department)
+*/
+typedef std::list<std::shared_ptr<Department>> DepartmentList;
 
 /**
 \brief A department with optional sub-departments.
@@ -90,6 +90,10 @@ public:
     \param subdepartments The sub-departments of this department.
      */
     Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
+
+    static Department::UPtr create(CannedQuery const& query, std::string const& label);
+    static Department::UPtr create(std::string const& department_id, CannedQuery const& query, std::string const& label);
+    static Department::UPtr create(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -176,7 +180,9 @@ public:
     /// @endcond
 
 private:
+    Department(internal::DepartmentImpl *impl);
     std::unique_ptr<internal::DepartmentImpl> p;
+    friend class internal::DepartmentImpl;
 };
 
 } // namespace scopes

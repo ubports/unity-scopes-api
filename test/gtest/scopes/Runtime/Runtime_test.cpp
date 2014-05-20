@@ -60,18 +60,18 @@ public:
     {
     }
 
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current) override
     {
-        EXPECT_EQ(current_department_id, "news");
-        EXPECT_EQ(1u, departments.size());
-        auto subdeps = departments.front().subdepartments();
+        EXPECT_EQ(parent->id(), "all");
+        EXPECT_EQ(current->id(), "news");
+        auto subdeps = current->subdepartments();
         EXPECT_EQ(2u, subdeps.size());
-        EXPECT_EQ("subdep1", subdeps.front().id());
-        EXPECT_EQ("Europe", subdeps.front().label());
-        EXPECT_EQ("test", subdeps.front().query().query_string());
-        EXPECT_EQ("subdep2", subdeps.back().id());
-        EXPECT_EQ("US", subdeps.back().label());
-        EXPECT_EQ("test", subdeps.back().query().query_string());
+        EXPECT_EQ("subdep1", subdeps.front()->id());
+        EXPECT_EQ("Europe", subdeps.front()->label());
+        EXPECT_EQ("test", subdeps.front()->query().query_string());
+        EXPECT_EQ("subdep2", subdeps.back()->id());
+        EXPECT_EQ("US", subdeps.back()->label());
+        EXPECT_EQ("test", subdeps.back()->query().query_string());
         dep_count_++;
     }
 

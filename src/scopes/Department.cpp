@@ -26,6 +26,11 @@ namespace unity
 namespace scopes
 {
 
+Department::Department(internal::DepartmentImpl *impl)
+    : p(impl)
+{
+}
+
 Department::Department(CannedQuery const& query, std::string const& label)
     : p(new internal::DepartmentImpl(query, label))
 {
@@ -61,6 +66,21 @@ Department& Department::operator=(Department const& other)
 }
 
 Department& Department::operator=(Department&&) = default;
+
+Department::UPtr Department::create(CannedQuery const& query, std::string const& label)
+{
+    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(query, label)));
+}
+
+Department::UPtr Department::create(std::string const& department_id, CannedQuery const& query, std::string const& label)
+{
+    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(department_id, query, label)));
+}
+
+Department::UPtr Department::create(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
+{
+    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(department_id, query, label, subdepartments)));
+}
 
 VariantMap Department::serialize() const
 {

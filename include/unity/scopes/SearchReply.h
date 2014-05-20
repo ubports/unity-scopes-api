@@ -73,7 +73,7 @@ public:
      \param departments A list of departments.
      \param current_department_id A department id that should be considered current.
      */
-    virtual void register_departments(DepartmentList const& departments, std::string current_department_id = "") = 0;
+    virtual void register_departments(Department::SCPtr const& parent, Department::SCPtr const& current) = 0;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.

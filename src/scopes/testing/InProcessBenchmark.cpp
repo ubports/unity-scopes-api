@@ -159,7 +159,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
-    void register_departments(unity::scopes::DepartmentList const&, std::string) override
+    void register_departments(unity::scopes::Department::SCPtr const&, unity::scopes::Department::SCPtr const&) override
     {
     }
 
