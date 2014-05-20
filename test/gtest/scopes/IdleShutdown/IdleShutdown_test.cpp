@@ -40,8 +40,12 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
+        EXPECT_EQ(ListenerBase::Reason::Error, reason);
+        EXPECT_EQ("unity::scopes::MiddlewareException: unity::scopes::MiddlewareException: "
+                  "Cannot invoke operations while middleware is stopped",
+                  error_message);
         lock_guard<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
