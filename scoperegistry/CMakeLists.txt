@@ -1,5 +1,5 @@
 set(SRC
-        FileWatcher.cpp
+        DirWatcher.cpp
         FindFiles.cpp
         scoperegistry.cpp
 )

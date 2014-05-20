@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include "FileWatcher.h"
+#include "DirWatcher.h"
 
 #include <unity/UnityExceptions.h>
 
@@ -31,7 +31,7 @@ using namespace unity;
 namespace scoperegistry
 {
 
-FileWatcher::FileWatcher(FileWatcherCallback callback)
+DirWatcher::DirWatcher(DirWatcherCallback callback)
     : callback_(callback)
     , thread_state_(Running)
 {
@@ -39,14 +39,14 @@ FileWatcher::FileWatcher(FileWatcherCallback callback)
     fd_ = inotify_init();
     if (fd_ < 0)
     {
-        throw ResourceException("FileWatcher(): inotify_init() failed");
+        throw ResourceException("DirWatcher(): inotify_init() failed");
     }
 
     // Start the watch thread
-    thread_ = std::thread(&FileWatcher::watch_thread, this);
+    thread_ = std::thread(&DirWatcher::watch_thread, this);
 }
 
-FileWatcher::~FileWatcher()
+DirWatcher::~DirWatcher()
 {
     // Set state to Stopping
     {
@@ -54,7 +54,7 @@ FileWatcher::~FileWatcher()
         thread_state_ = Stopping;
     }
 
-    // Remove file descriptors from watches (causing read to return)
+    // Remove file descriptors from watches (causes read to return)
     for (auto& wd : wds_)
     {
         inotify_rm_watch(fd_, wd.first);
@@ -70,10 +70,10 @@ FileWatcher::~FileWatcher()
     close(fd_);
 }
 
-bool FileWatcher::add_file_watch(std::string const& path)
+bool DirWatcher::add_watch(std::string const& path)
 {
-    int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVE_SELF | IN_MOVED_TO |
-                                                  IN_DELETE | IN_DELETE_SELF | IN_MOVED_FROM |
+    int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
+                                                  IN_DELETE | IN_MOVED_FROM |
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
@@ -84,7 +84,7 @@ bool FileWatcher::add_file_watch(std::string const& path)
     return true;
 }
 
-bool FileWatcher::remove_file_watch(std::string const& path)
+bool DirWatcher::remove_watch(std::string const& path)
 {
     bool found_path = false;
     for (auto& wd : wds_)
@@ -99,98 +99,58 @@ bool FileWatcher::remove_file_watch(std::string const& path)
     return found_path;
 }
 
-bool FileWatcher::add_dir_watch(std::string const& path)
-{
-    std::string dir_path = path;
-    if (dir_path.back() != '/')
-    {
-        dir_path += '/';
-    }
-
-    return add_file_watch(dir_path);
-}
-
-bool FileWatcher::remove_dir_watch(std::string const& path)
-{
-    std::string dir_path = path;
-    if (dir_path.back() != '/')
-    {
-        dir_path += '/';
-    }
-
-    return remove_file_watch(dir_path);
-}
-
-void FileWatcher::watch_thread()
+void DirWatcher::watch_thread()
 {
     try
     {
-        // Poll for notifications until stop
+        // Poll for notifications until stop is requested
         char buffer[c_buffer_len];
         while (true)
         {
-            // Wait for changes to directory
+            // Wait for changes to directories
             int length = read(fd_, buffer, c_buffer_len);
             if (length < 0)
             {
-                throw ResourceException("FileWatcher::watch_thread(): failed to read from inotify fd");
+                throw ResourceException("DirWatcher::watch_thread(): failed to read from inotify fd");
             }
 
             int i = 0;
             while (i < length)
             {
                 struct inotify_event* event = (inotify_event*)&buffer[i];
-                if (event->mask & IN_MOVE_SELF || event->mask & IN_DELETE_SELF)
-                {
-                    if (wds_.find(event->wd) != wds_.end())
-                    {
-                        if (wds_.at(event->wd).back() == '/')
-                        {
-                            std::string path = wds_.at(event->wd);
-                            remove_dir_watch(path);
-                            path.resize(path.length() - 1);
-                            callback_(Removed, Directory, path);
-                        }
-                        else
-                        {
-                            remove_file_watch(wds_.at(event->wd));
-                            callback_(Removed, File, wds_.at(event->wd));
-                        }
-                    }
-                }
-                else if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
+                if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        add_dir_watch(wds_.at(event->wd) + event->name);
-                        callback_(Added, Directory, wds_.at(event->wd) + event->name);
+                        callback_(Added, Directory, wds_.at(event->wd) + "/" + event->name);
+                        add_watch(wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
-                        callback_(Added, File, wds_.at(event->wd) + event->name);
+                        callback_(Added, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }
                 else if (event->mask & IN_DELETE || event->mask & IN_MOVED_FROM)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        remove_dir_watch(wds_.at(event->wd) + event->name);
-                        callback_(Removed, Directory, wds_.at(event->wd) + event->name);
+                        callback_(Removed, Directory, wds_.at(event->wd) + "/" + event->name);
+                        remove_watch(wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
-                        callback_(Removed, File, wds_.at(event->wd) + event->name);
+                        callback_(Removed, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }
                 else if (event->mask & IN_MODIFY || event->mask & IN_ATTRIB)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        callback_(Modified, Directory, wds_.at(event->wd) + event->name);
+                        callback_(Modified, Directory, wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
-                        callback_(Modified, File, wds_.at(event->wd) + event->name);
+                        callback_(Modified, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }
                 i += c_event_size + event->len;

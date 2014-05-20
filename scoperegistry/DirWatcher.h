@@ -16,8 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_FILEWATCHER_H
-#define SCOPEREGISTRY_FILEWATCHER_H
+#ifndef SCOPEREGISTRY_DIRWATCHER_H
+#define SCOPEREGISTRY_DIRWATCHER_H
 
 #include <condition_variable>
 #include <map>
@@ -26,11 +26,11 @@
 namespace scoperegistry
 {
 
-// FileWatcher watches the directory specified by the "dir" constructor parameter for changes in
+// DirWatcher watches directories specified by calls to add_watch()/remove_watch() for changes in
 // the files and folders contained. If a file or folder is added, removed or modified, a user
-// callback is executed (also to be provided on construction).
+// callback is executed (provided on construction).
 
-class FileWatcher final
+class DirWatcher final
 {
 public:
     enum EventType
@@ -46,16 +46,13 @@ public:
         Directory
     };
 
-    typedef std::function<void(EventType, FileType, std::string const& file_name)> FileWatcherCallback;
+    typedef std::function<void(EventType, FileType, std::string const& path)> DirWatcherCallback;
 
-    FileWatcher(FileWatcherCallback callback);
-    ~FileWatcher();
+    DirWatcher(DirWatcherCallback callback);
+    ~DirWatcher();
 
-    bool add_file_watch(std::string const& path);
-    bool remove_file_watch(std::string const& path);
-
-    bool add_dir_watch(std::string const& path);
-    bool remove_dir_watch(std::string const& path);
+    bool add_watch(std::string const& path);
+    bool remove_watch(std::string const& path);
 
 private:
     enum ThreadState
@@ -65,7 +62,7 @@ private:
         Failed
     };
 
-    FileWatcherCallback const callback_;
+    DirWatcherCallback const callback_;
 
     int fd_;
     std::map<int, std::string> wds_;
@@ -79,4 +76,4 @@ private:
 
 } // namespace scoperegistry
 
-#endif  // SCOPEREGISTRY_FILEWATCHER_H
+#endif  // SCOPEREGISTRY_DIRWATCHER_H

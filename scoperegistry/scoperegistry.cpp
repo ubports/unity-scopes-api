@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "FileWatcher.h"
+#include "DirWatcher.h"
 #include "FindFiles.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
@@ -346,10 +346,12 @@ usage(ostream& s = cerr)
 class ScopesWatch
 {
 public:
-    void callback(FileWatcher::EventType event_type,
-                  FileWatcher::FileType file_type,
+    void callback(DirWatcher::EventType event_type,
+                  DirWatcher::FileType file_type,
                   std::string const& file_name)
     {
+        int i = 0;
+        ++i;
     }
 };
 
@@ -446,11 +448,16 @@ main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        ScopesWatch scopes_watch;
-        FileWatcher local_scopes_watch(std::bind(&ScopesWatch::callback, &scopes_watch, _1, _2, _3));
-        local_scopes_watch.add_dir_watch(scope_installdir);
-        local_scopes_watch.add_dir_watch(oem_installdir);
-        local_scopes_watch.add_dir_watch(click_installdir);
+        ScopesWatch local_scopes_watch;
+        DirWatcher local_dir_watcher(std::bind(&ScopesWatch::callback, &local_scopes_watch, _1, _2, _3));
+        local_dir_watcher.add_watch(scope_installdir);
+        local_dir_watcher.add_watch(oem_installdir);
+        ///! add watches for each subdir
+
+        ScopesWatch click_scopes_watch;
+        ///! DirWatcher click_dir_watcher(std::bind(&ScopesWatch::callback, &click_scopes_watch, _1, _2, _3));
+        ///! click_dir_watcher.add_watch(click_installdir);
+        ///! add watches for each subdir
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform
         // the registry of state changes.
