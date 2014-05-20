@@ -54,6 +54,7 @@ struct RemoteScope
     std::string base_url;
     std::shared_ptr<std::string> icon;  // optional
     std::shared_ptr<std::string> art;  // optional
+    std::shared_ptr<VariantMap> appearance; // optional
     bool invisible = false;
 };
 
