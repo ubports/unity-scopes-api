@@ -1,5 +1,5 @@
 set(SRC
-        FileUtils.cpp
+        FindFiles.cpp
         scoperegistry.cpp
 )
 
