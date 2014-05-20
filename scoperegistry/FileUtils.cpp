@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "FindFiles.h"
+#include "FileUtils.h"
 
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>

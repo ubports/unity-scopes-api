@@ -36,10 +36,6 @@ namespace scoperegistry
 
 std::vector<std::string> find_scope_config_files(std::string const& install_dir, std::string const& suffix);
 
-// Return a vector of file names in dir with the given suffix.
-
-std::vector<std::string> find_files(std::string const& dir, std::string const& suffix);
-
 } // namespace scoperegistry
 
 #endif
