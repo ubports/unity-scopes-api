@@ -3,8 +3,10 @@ Release notes
 
 Changes in version 0.4.8
 ========================
-  - Changes to departments API: SearchReply::register_departments method now takes Department::SCPtr arguments for both
-    parent and current department. SearchListenerBase::push() method for departments got changed to match as well.
+  - Changes to departments API: SearchReply::register_departments() method now takes parent and current department argument,
+    and uses Department::SCPtr for both. SearchListenerBase::push() method for departments got changed to match as well. Removed
+    constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
+    pointers instead of values.
 
 Changes in version 0.4.6
 ========================
