@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.4.8
+========================
+  - Changes to departments API: SearchReply::register_departments method now takes Department::SCPtr arguments for both
+    parent and current department. SearchListenerBase::push() method for departments got changed to match as well.
+
 Changes in version 0.4.6
 ========================
   - Added method to get and set display hints for filters (at this moment the only display hint
