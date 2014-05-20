@@ -424,7 +424,6 @@ main(int argc, char* argv[])
 
         add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
         add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
-        local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");
