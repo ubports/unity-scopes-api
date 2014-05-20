@@ -59,19 +59,21 @@ public:
      For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
      that registers departments for current search in "History" may look like this:
      \code{.cpp}
-     unity::scopes::Department books("books", query, "Books"); // the parent of "History"
-     unity::scopes::Department history({"history", query, "History"});
-     unity::scopes::DepartmentList history_depts({"ww2", query, "World War Two"}, {"ancient", query, "Ancient"});
-     history.set_subdepartments(history_depts);
-     books.set_subdepartments({history});
-     reply->register_departments({books}, "history");
+     unity::scopes::Department::SPtr books = move(unity::scopes::Department::create("books", query, "Books")); // the parent of "History"
+     unity::scopes::Department::SPtr history = move(unity::scopes::Department::create("history", query, "History"));
+     unity::scopes::DepartmentList history_depts({
+                                                 move(unity::scopes::Department::create("ww2", query, "World War Two")),
+                                                 move(unity::scopes::Department::create("ancient", query, "Ancient"))});
+     history->set_subdepartments(history_depts);
+     books->set_subdepartments({history});
+     reply->register_departments(books, history);
      \endcode
 
-     current_department_id should in most cases be the department returned by unity::scopes::CannedQuery::department_id().
-     Pass an empty string for current_department_id to indicate no active department.
+     Current department should be the department returned by unity::scopes::CannedQuery::department_id(). Empty department id denotes
+     the root deparment.
 
-     \param departments A list of departments.
-     \param current_department_id A department id that should be considered current.
+     \param parent The parent department of current department, or current one if visiting root department.
+     \param current Currently visited department.
      */
     virtual void register_departments(Department::SCPtr const& parent, Department::SCPtr const& current) = 0;
 
