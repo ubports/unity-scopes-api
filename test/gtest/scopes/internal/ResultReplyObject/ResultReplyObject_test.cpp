@@ -68,9 +68,9 @@ TEST(ResultReplyObject, departments_push)
         CannedQuery const query1("scope-foo", "", "dep1");
         CannedQuery const query2("scope-foo", "", "dep2");
 
-        Department::SPtr parent = Department::create("dep1", query1, "Dep1");
-        Department::SPtr dep2 = Department::create("dep2", query2, "Dep2");
-        Department::SPtr dep3 = Department::create("dep3", query2, "Dep3");
+        Department::SPtr parent = std::move(Department::create("dep1", query1, "Dep1"));
+        Department::SPtr dep2 = std::move(Department::create("dep2", query2, "Dep2"));
+        Department::SPtr dep3 = std::move(Department::create("dep3", query2, "Dep3"));
         dep2->set_subdepartments({dep3});
         parent->set_subdepartments({dep2});
         reply.process_data(internal::DepartmentImpl::serialize_departments(parent, dep2));
@@ -89,9 +89,9 @@ TEST(ResultReplyObject, departments_push)
 
         CannedQuery const query1("scope-foo", "", "dep1");
 
-        Department::SPtr parent = Department::create("dep1", query1, "Dep1");
-        Department::SPtr dep2 = Department::create("dep2", query1, "Dep2");
-        Department::SPtr dep3 = Department::create("dep3", query1, "Dep3");
+        Department::SPtr parent = std::move(Department::create("dep1", query1, "Dep1"));
+        Department::SPtr dep2 = std::move(Department::create("dep2", query1, "Dep2"));
+        Department::SPtr dep3 = std::move(Department::create("dep3", query1, "Dep3"));
         dep2->set_subdepartments({dep3});
         parent->set_subdepartments({dep2});
 
