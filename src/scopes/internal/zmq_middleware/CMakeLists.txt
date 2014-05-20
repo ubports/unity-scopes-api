@@ -21,6 +21,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqMiddleware.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqException.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqPublisher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqQueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqReceiver.cpp
@@ -29,5 +30,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqSender.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ZmqStateReceiver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZmqSubscriber.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

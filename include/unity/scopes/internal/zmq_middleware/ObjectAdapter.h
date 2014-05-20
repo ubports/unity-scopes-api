@@ -98,8 +98,6 @@ private:
     // zmqpp::socket subscribe_to_ctrl_socket();
     // void stop_workers() noexcept;
 
-    void safe_bind(zmqpp::socket& s, std::string const& endpoint);
-
     std::shared_ptr<ServantBase> find_servant(std::string const& id, std::string const& category);
 
     // Thread start functions
