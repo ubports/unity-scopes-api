@@ -31,21 +31,6 @@ Department::Department(internal::DepartmentImpl *impl)
 {
 }
 
-Department::Department(CannedQuery const& query, std::string const& label)
-    : p(new internal::DepartmentImpl(query, label))
-{
-}
-
-Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label)
-    : p(new internal::DepartmentImpl(department_id, query, label))
-{
-}
-
-Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
-    : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
-{
-}
-
 /// @cond
 Department::Department(Department const& other)
     : p(new internal::DepartmentImpl(*(other.p)))
@@ -75,11 +60,6 @@ Department::UPtr Department::create(CannedQuery const& query, std::string const&
 Department::UPtr Department::create(std::string const& department_id, CannedQuery const& query, std::string const& label)
 {
     return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(department_id, query, label)));
-}
-
-Department::UPtr Department::create(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
-{
-    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(department_id, query, label, subdepartments)));
 }
 
 VariantMap Department::serialize() const

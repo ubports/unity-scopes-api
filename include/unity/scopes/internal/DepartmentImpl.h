@@ -37,7 +37,6 @@ class DepartmentImpl
 public:
     DepartmentImpl(CannedQuery const& query, std::string const& label);
     DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label);
-    DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
     DepartmentImpl(DepartmentImpl const&) = default;
     ~DepartmentImpl() = default;
 

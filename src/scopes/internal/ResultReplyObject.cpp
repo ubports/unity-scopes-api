@@ -90,7 +90,6 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        //DepartmentList const departments = DepartmentImpl::deserialize_departments(it->second.get_array());
         Department::SCPtr department = DepartmentImpl::create(it->second.get_dict());
         it = data.find("current_department");
         if (it != data.end())

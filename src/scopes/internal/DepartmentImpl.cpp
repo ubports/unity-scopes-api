@@ -53,19 +53,6 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
     query_.set_department_id(department_id);
 }
 
-DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
-    : query_(query),
-      label_(label),
-      departments_(subdepartments),
-      has_subdepartments_(false)
-{
-    if (label.empty())
-    {
-        throw InvalidArgumentException("Department(): Invalid empty label string");
-    }
-    query_.set_department_id(department_id);
-}
-
 void DepartmentImpl::set_has_subdepartments()
 {
     has_subdepartments_ = true;
