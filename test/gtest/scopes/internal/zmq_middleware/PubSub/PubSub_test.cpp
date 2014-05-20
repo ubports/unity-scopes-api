@@ -58,7 +58,7 @@ TEST(PubSub, exceptions)
     {
         EXPECT_STREQ("unity::scopes::MiddlewareException: ZmqPublisher(): publisher thread failed to start "
                      "(endpoint: ipc:///tmp/testpublisher-p):\n    unity::scopes::MiddlewareException: "
-                     "ZmqPublisher::safe_bind(): endpoint in use: ipc:///tmp/testpublisher-p",
+                     "safe_bind(): address in use: ipc:///tmp/testpublisher-p",
                      e.what());
     }
 

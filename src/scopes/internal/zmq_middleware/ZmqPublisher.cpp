@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 
+#include <unity/scopes/internal/zmq_middleware/Util.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
@@ -109,7 +110,7 @@ void ZmqPublisher::publisher_thread()
         // Create the publisher socket
         zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
         pub_socket.set(zmqpp::socket_option::linger, 5000);
-        safe_bind(pub_socket);
+        safe_bind(pub_socket, endpoint_);
 
         // Notify constructor that the thread is now running
         std::unique_lock<std::mutex> lock(mutex_);
@@ -145,31 +146,6 @@ void ZmqPublisher::publisher_thread()
         thread_state_ = Failed;
         cond_.notify_all();
     }
-}
-
-void ZmqPublisher::safe_bind(zmqpp::socket& socket)
-{
-    const std::string transport_prefix = "ipc://";
-    std::string path = endpoint_.substr(transport_prefix.size());
-
-    struct sockaddr_un addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
-
-    int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd == -1)
-    {
-        throw MiddlewareException("ZmqPublisher::safe_bind(): cannot create socket: " +
-                                  std::string(strerror(errno)));
-    }
-    util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
-    if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
-    {
-        // Connect succeeded, so another server is using the socket already.
-        throw MiddlewareException("ZmqPublisher::safe_bind(): endpoint in use: " + endpoint_);
-    }
-    socket.bind(endpoint_);
 }
 
 } // namespace zmq_middleware
