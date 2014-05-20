@@ -20,6 +20,7 @@
 #define SCOPEREGISTRY_DIRWATCH_H
 
 #include <condition_variable>
+#include <map>
 #include <thread>
 
 namespace scoperegistry
@@ -47,8 +48,14 @@ public:
 
     typedef std::function<void(EventType, FileType, std::string const& file_name)> DirWatchCallback;
 
-    DirWatch(std::string const& dir, DirWatchCallback callback);
+    DirWatch(DirWatchCallback callback);
     ~DirWatch();
+
+    bool add_file_watch(std::string const& path);
+    bool remove_file_watch(std::string const& path);
+
+    bool add_dir_watch(std::string const& path);
+    bool remove_dir_watch(std::string const& path);
 
 private:
     enum ThreadState
@@ -58,11 +65,10 @@ private:
         Failed
     };
 
-    std::string const dir_;
     DirWatchCallback const callback_;
 
     int fd_;
-    int wd_;
+    std::map<int, std::string> wds_;
 
     std::thread thread_;
     std::mutex mutex_;
