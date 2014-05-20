@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "DirWatch.h"
+#include "FileWatcher.h"
 #include "FindFiles.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
@@ -346,8 +346,8 @@ usage(ostream& s = cerr)
 class ScopesWatch
 {
 public:
-    void callback(DirWatch::EventType event_type,
-                  DirWatch::FileType file_type,
+    void callback(FileWatcher::EventType event_type,
+                  FileWatcher::FileType file_type,
                   std::string const& file_name)
     {
     }
@@ -447,7 +447,7 @@ main(int argc, char* argv[])
 
         // Configure watches for scope install directories
         ScopesWatch scopes_watch;
-        DirWatch local_scopes_watch(std::bind(&ScopesWatch::callback, &scopes_watch, _1, _2, _3));
+        FileWatcher local_scopes_watch(std::bind(&ScopesWatch::callback, &scopes_watch, _1, _2, _3));
         local_scopes_watch.add_dir_watch(scope_installdir);
         local_scopes_watch.add_dir_watch(oem_installdir);
         local_scopes_watch.add_dir_watch(click_installdir);

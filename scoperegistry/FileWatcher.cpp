@@ -16,7 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include "DirWatch.h"
+#include "FileWatcher.h"
 
 #include <unity/UnityExceptions.h>
 
@@ -31,7 +31,7 @@ using namespace unity;
 namespace scoperegistry
 {
 
-DirWatch::DirWatch(DirWatchCallback callback)
+FileWatcher::FileWatcher(FileWatcherCallback callback)
     : callback_(callback)
     , thread_state_(Running)
 {
@@ -39,14 +39,14 @@ DirWatch::DirWatch(DirWatchCallback callback)
     fd_ = inotify_init();
     if (fd_ < 0)
     {
-        throw ResourceException("DirWatch(): inotify_init() failed");
+        throw ResourceException("FileWatcher(): inotify_init() failed");
     }
 
     // Start the watch thread
-    thread_ = std::thread(&DirWatch::watch_thread, this);
+    thread_ = std::thread(&FileWatcher::watch_thread, this);
 }
 
-DirWatch::~DirWatch()
+FileWatcher::~FileWatcher()
 {
     // Set state to Stopping
     {
@@ -70,7 +70,7 @@ DirWatch::~DirWatch()
     close(fd_);
 }
 
-bool DirWatch::add_file_watch(std::string const& path)
+bool FileWatcher::add_file_watch(std::string const& path)
 {
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVE_SELF | IN_MOVED_TO |
                                                   IN_DELETE | IN_DELETE_SELF | IN_MOVED_FROM |
@@ -84,7 +84,7 @@ bool DirWatch::add_file_watch(std::string const& path)
     return true;
 }
 
-bool DirWatch::remove_file_watch(std::string const& path)
+bool FileWatcher::remove_file_watch(std::string const& path)
 {
     bool found_path = false;
     for (auto& wd : wds_)
@@ -99,7 +99,7 @@ bool DirWatch::remove_file_watch(std::string const& path)
     return found_path;
 }
 
-bool DirWatch::add_dir_watch(std::string const& path)
+bool FileWatcher::add_dir_watch(std::string const& path)
 {
     std::string dir_path = path;
     if (dir_path.back() != '/')
@@ -110,7 +110,7 @@ bool DirWatch::add_dir_watch(std::string const& path)
     return add_file_watch(dir_path);
 }
 
-bool DirWatch::remove_dir_watch(std::string const& path)
+bool FileWatcher::remove_dir_watch(std::string const& path)
 {
     std::string dir_path = path;
     if (dir_path.back() != '/')
@@ -121,7 +121,7 @@ bool DirWatch::remove_dir_watch(std::string const& path)
     return remove_file_watch(dir_path);
 }
 
-void DirWatch::watch_thread()
+void FileWatcher::watch_thread()
 {
     try
     {
@@ -133,7 +133,7 @@ void DirWatch::watch_thread()
             int length = read(fd_, buffer, c_buffer_len);
             if (length < 0)
             {
-                throw ResourceException("DirWatch::watch_thread(): failed to read from inotify fd");
+                throw ResourceException("FileWatcher::watch_thread(): failed to read from inotify fd");
             }
 
             int i = 0;
