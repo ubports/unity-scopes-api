@@ -376,13 +376,25 @@ private:
                   DirWatcher::FileType file_type,
                   std::string const& path)
     {
+        // A new sub directory has been added
         if (event_type == DirWatcher::Added && file_type == DirWatcher::Directory)
         {
             dir_watcher_.add_watch(path);
         }
+        // A sub directory has been removed
         else if (event_type == DirWatcher::Removed && file_type == DirWatcher::Directory)
         {
             dir_watcher_.remove_watch(path);
+        }
+        // A new config file has been added
+        else if (event_type == DirWatcher::Added && file_type == DirWatcher::File &&
+                 path.substr(path.length() - 4) == ".ini")
+        {
+        }
+        // A config file has been removed
+        else if (event_type == DirWatcher::Removed && file_type == DirWatcher::File &&
+                 path.substr(path.length() - 4) == ".ini")
+        {
         }
     }
 };
