@@ -46,7 +46,12 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
         auto subdirs = find_entries(dir, EntryType::Directory);
         for (auto const& subdir : subdirs)
         {
-            add_scope_dir(subdir);
+            auto configs = find_scope_dir_configs(subdir, ".ini");
+            if (!configs.empty())
+            {
+                dir_to_ini_map_[subdir] = configs[0];
+            }
+            add_watch(subdir);
         }
     }
     catch (...) {}
