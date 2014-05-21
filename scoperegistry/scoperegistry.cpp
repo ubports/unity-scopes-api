@@ -230,6 +230,94 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
+void add_local_scope(RegistryObject::SPtr const& registry,
+                     pair<string, string> const& scope,
+                     MiddlewareBase::SPtr const& mw,
+                     string const& scoperunner_path,
+                     string const& config_file,
+                     bool click,
+                     int timeout_ms)
+{
+    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+    string scope_config(scope.second);
+    ScopeConfig sc(scope_config);
+
+    filesystem::path scope_path(scope_config);
+    filesystem::path scope_dir(scope_path.parent_path());
+
+    mi->set_scope_id(scope.first);
+    mi->set_display_name(sc.display_name());
+    mi->set_description(sc.description());
+    mi->set_author(sc.author());
+    mi->set_invisible(sc.invisible());
+    mi->set_appearance_attributes(sc.appearance_attributes());
+    mi->set_scope_directory(scope_dir.native());
+    mi->set_results_ttl_type(sc.results_ttl_type());
+
+    try
+    {
+        mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_search_hint(sc.search_hint());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_hot_key(sc.hot_key());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+
+    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
+    mi->set_proxy(proxy);
+    auto meta = ScopeMetadataImpl::create(move(mi));
+
+    RegistryObject::ScopeExecData exec_data;
+    exec_data.scope_id = scope.first;
+    // get custom scope runner executable, if not set use default scoperunner
+    exec_data.scoperunner_path = scoperunner_path;
+
+    if (click)
+    {
+        exec_data.confinement_profile =
+                scope_path.parent_path().filename().native();
+    }
+
+    exec_data.timeout_ms = timeout_ms;
+
+    try
+    {
+        auto custom_exec = sc.scope_runner();
+        if (custom_exec.empty())
+        {
+            throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
+        }
+        exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    exec_data.runtime_config = config_file;
+    exec_data.scope_config = scope.second;
+
+    registry->add_local_scope(scope.first, move(meta), exec_data);
+}
+
 void add_local_scopes(RegistryObject::SPtr const& registry,
                       map<string, string> const& all_scopes,
                       MiddlewareBase::SPtr const& mw,
@@ -242,84 +330,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
     {
         try
         {
-            unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-            string scope_config(pair.second);
-            ScopeConfig sc(scope_config);
-
-            filesystem::path scope_path(scope_config);
-            filesystem::path scope_dir(scope_path.parent_path());
-
-            mi->set_scope_id(pair.first);
-            mi->set_display_name(sc.display_name());
-            mi->set_description(sc.description());
-            mi->set_author(sc.author());
-            mi->set_invisible(sc.invisible());
-            mi->set_appearance_attributes(sc.appearance_attributes());
-            mi->set_scope_directory(scope_dir.native());
-            mi->set_results_ttl_type(sc.results_ttl_type());
-
-            try
-            {
-                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_search_hint(sc.search_hint());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_hot_key(sc.hot_key());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-
-            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
-            mi->set_proxy(proxy);
-            auto meta = ScopeMetadataImpl::create(move(mi));
-
-            RegistryObject::ScopeExecData exec_data;
-            exec_data.scope_id = pair.first;
-            // get custom scope runner executable, if not set use default scoperunner
-            exec_data.scoperunner_path = scoperunner_path;
-
-            if (click)
-            {
-                exec_data.confinement_profile =
-                        scope_path.parent_path().filename().native();
-            }
-
-            exec_data.timeout_ms = timeout_ms;
-
-            try
-            {
-                auto custom_exec = sc.scope_runner();
-                if (custom_exec.empty())
-                {
-                    throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
-                }
-                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            exec_data.runtime_config = config_file;
-            exec_data.scope_config = pair.second;
-
-            registry->add_local_scope(pair.first, move(meta), exec_data);
+            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms);
         }
         catch (unity::Exception const& e)
         {
@@ -346,9 +357,11 @@ usage(ostream& s = cerr)
 class ScopesWatcher : public DirWatcher
 {
 public:
-    ScopesWatcher()
+    ScopesWatcher(RegistryObject::SPtr const& registry,
+                  std::function<void(pair<string, string> const&)> ini_added_callback)
+        : registry_(registry)
+        , ini_added_callback_(ini_added_callback)
     {
-
     }
 
     void add_install_dir(std::string const& dir)
@@ -369,29 +382,41 @@ public:
     }
 
 private:
+    RegistryObject::SPtr const& registry_;
+    std::function<void(pair<string, string> const&)> ini_added_callback_;
+
     void watch_event(DirWatcher::EventType event_type,
                      DirWatcher::FileType file_type,
-                     std::string const& path)
+                     std::string const& path) override
     {
-        // A new sub directory has been added
-        if (event_type == DirWatcher::Added && file_type == DirWatcher::Directory)
+        if (file_type == DirWatcher::Directory)
         {
-            add_watch(path);
+            // A new sub directory has been added
+            if (event_type == DirWatcher::Added)
+            {
+                add_watch(path);
+            }
+            // A sub directory has been removed
+            else if (event_type == DirWatcher::Removed)
+            {
+                remove_watch(path);
+            }
         }
-        // A sub directory has been removed
-        else if (event_type == DirWatcher::Removed && file_type == DirWatcher::Directory)
+        else if (file_type == DirWatcher::File && path.substr(path.length() - 4) == ".ini")
         {
-            remove_watch(path);
-        }
-        // A new config file has been added
-        else if (event_type == DirWatcher::Added && file_type == DirWatcher::File &&
-                 path.substr(path.length() - 4) == ".ini")
-        {
-        }
-        // A config file has been removed
-        else if (event_type == DirWatcher::Removed && file_type == DirWatcher::File &&
-                 path.substr(path.length() - 4) == ".ini")
-        {
+            filesystem::path p(path);
+            string scope_id = p.stem().native();
+
+            // A new config file has been added
+            if (event_type == DirWatcher::Added)
+            {
+                ini_added_callback_(make_pair(scope_id, path));
+            }
+            // A config file has been removed
+            else if (event_type == DirWatcher::Removed)
+            {
+                registry_->remove_local_scope(scope_id);
+            }
         }
     }
 };
@@ -489,11 +514,35 @@ main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        ScopesWatcher local_scopes_watcher;
+        ScopesWatcher local_scopes_watcher(registry,
+                                           [&registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           (pair<string, string> const& scope)
+        {
+            try
+            {
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, false, process_timeout);
+            }
+            catch (unity::Exception const& e)
+            {
+                error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
+            }
+        });
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
-        ScopesWatcher click_scopes_watcher;
+        ScopesWatcher click_scopes_watcher(registry,
+                                           [&registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           (pair<string, string> const& scope)
+        {
+            try
+            {
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, true, process_timeout);
+            }
+            catch (unity::Exception const& e)
+            {
+                error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
+            }
+        });
         click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform
@@ -504,14 +553,14 @@ main(int argc, char* argv[])
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
 
+        // Wait until we are done, which happens if we receive a termination signal.
+        middleware->wait_for_shutdown();
+
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware
         // shuts down, it clears out the active servant map, which destroys the registry
         // object. The registry object kills all its child processes as part of its clean-up.
         registry = nullptr;
-
-        // Wait until we are done, which happens if we receive a termination signal.
-        middleware->wait_for_shutdown();
 
         exit_status = 0;
     }
