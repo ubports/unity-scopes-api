@@ -21,11 +21,13 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/filesystem/path.hpp>
+
+#include <map>
+
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
-
-#include <boost/filesystem/path.hpp>
 
 using namespace std;
 using namespace unity;
@@ -86,10 +88,14 @@ vector<string> find_entries(string const& install_dir, EntryType type)
 // Return all files of the form dir/*/<scomescope>.ini that are regular files or
 // symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
+// Print error message for any scopes with an id that was seen previously.
 
-vector<string> find_scope_config_files(string const& install_dir, string const& suffix)
+vector<string> find_scope_config_files(string const& install_dir,
+                                       string const& suffix,
+                                       function<void(string const&)> error)
 {
     vector<string> files;
+    map<string, string> scopes_seen;
 
     auto subdirs = find_entries(install_dir, Directory);
     for (auto subdir : subdirs)
@@ -97,13 +103,18 @@ vector<string> find_scope_config_files(string const& install_dir, string const& 
         auto candidates = find_entries(subdir, File);
         for (auto c : candidates)
         {
-            // TODO Check for multiple ini files
-
             filesystem::path path(c);
             if (path.extension() != suffix) {
                 continue;
             }
-
+            auto stem = path.stem().native();
+            auto const it = scopes_seen.find(stem);
+            if (it != scopes_seen.end())
+            {
+                error("ignoring second instance of non-unique scope: " + path.native() + "\n"
+                      "previous instance: " + it->second);
+            }
+            scopes_seen[stem] = path.native();
             files.emplace_back(c);
         }
     }
