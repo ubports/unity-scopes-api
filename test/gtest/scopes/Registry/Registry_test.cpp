@@ -72,11 +72,8 @@ private:
     std::condition_variable cond_;
 };
 
-TEST(Registry, metadata)
+bool wait_for_registry(RegistryProxy r)
 {
-    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
-    RegistryProxy r = rt->registry();
-
     // wait for the registry to become available on middleware
     // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
     const int num_retries = 10;
@@ -94,7 +91,15 @@ TEST(Registry, metadata)
             sleep(1);
         }
     }
-    ASSERT_TRUE(registry_started);
+    return registry_started;
+}
+
+TEST(Registry, metadata)
+{
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    ASSERT_TRUE(wait_for_registry(r));
 
     auto meta = r->get_metadata("testscopeA");
     EXPECT_EQ("testscopeA", meta.scope_id());
@@ -130,6 +135,32 @@ TEST(Registry, metadata)
     // search would fail if testscopeB can't be executed
     auto ctrl = sp->search("foo", metadata, reply);
     EXPECT_TRUE(receiver->wait_until_finished());
+}
+
+TEST(Registry, update_notify)
+{
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    ASSERT_TRUE(wait_for_registry(r));
+
+    bool update_received_ = false;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+    r->set_update_callback([&update_received_, &mutex_, &cond_]
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        update_received_ = true;
+        cond_.notify_one();
+    });
+
+    MetadataMap list = r->list();
+    EXPECT_EQ(2, list.size());
+
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [&update_received_] { return update_received_; });
+    }
 }
 
 int main(int argc, char **argv)

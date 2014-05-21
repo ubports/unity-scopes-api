@@ -66,7 +66,7 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
         {
             publisher_ = middleware->create_publisher(middleware->runtime()->registry_identity());
         }
-        catch (MiddlewareException const& e)
+        catch (std::exception const& e)
         {
             std::cerr << "RegistryObject(): failed to create registry publisher: " << e.what() << endl;
         }
