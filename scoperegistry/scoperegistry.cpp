@@ -45,7 +45,6 @@
 
 using namespace scoperegistry;
 using namespace std;
-using namespace std::placeholders;
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

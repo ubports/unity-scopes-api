@@ -50,7 +50,7 @@ DirWatcher::~DirWatcher()
         // Set state to Stopping
         thread_state_ = Stopping;
 
-        // Remove file descriptors from watches (causes read to return)
+        // Remove watches (causes read to return)
         for (auto& wd : wds_)
         {
             inotify_rm_watch(fd_, wd.first);
@@ -101,7 +101,7 @@ void DirWatcher::remove_watch(std::string const& path)
                 thread_state_ = Stopping;
             }
 
-            // Remove file descriptor from watch
+            // Remove watch (causes read to return)
             inotify_rm_watch(fd_, wd.first);
             wds_.erase(wd.first);
         }

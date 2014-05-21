@@ -21,7 +21,6 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 
 using namespace std;
-using namespace std::placeholders;
 
 namespace unity
 {
