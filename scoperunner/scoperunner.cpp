@@ -93,7 +93,37 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         auto rt = RuntimeImpl::create(scope_id, runtime_config);
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
-        ScopeLoader::SPtr loader = ScopeLoader::load(scope_id, lib_dir + "lib" + scope_id + ".so", rt->registry());
+        // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
+        vector<string> libs;
+        libs.push_back(lib_dir + "lib" + scope_id + ".so");
+        libs.push_back(lib_dir + scope_id + ".so");
+        libs.push_back(lib_dir + "scope.so");
+        string failed_libs;
+        ScopeLoader::SPtr loader;
+        exception_ptr ep;
+        for (auto const& lib : libs)
+        {
+            try
+            {
+                loader = ScopeLoader::load(scope_id, lib, rt->registry());
+            }
+            catch (unity::ResourceException& e)
+            {
+                failed_libs += "\n    " + lib;
+                ep = e.remember(ep);
+            }
+            if (loader)
+            {
+                break;
+            }
+        }
+        if (!loader)
+        {
+            unity::ResourceException e("Cannot load scope " + scope_id + "; tried in the following locations:"
+                                       + failed_libs);
+            e.remember(ep);
+            throw e;
+        }
         loader->start();
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and

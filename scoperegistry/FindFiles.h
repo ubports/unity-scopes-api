@@ -19,8 +19,9 @@
 #ifndef SCOPEREGISTRY_FINDFILES_H
 #define SCOPEREGISTRY_FINDFILES_H
 
-#include <vector>
+#include <functional>
 #include <string>
+#include <vector>
 
 namespace scoperegistry
 {
@@ -46,7 +47,9 @@ std::vector<std::string> find_scope_dir_configs(std::string const& scope_dir, st
 // we get those two .ini files, but no .ini files in canonical or underneath
 // further-nested directories.
 
-std::vector<std::string> find_install_dir_configs(std::string const& install_dir, std::string const& suffix);
+std::vector<std::string> find_install_dir_configs(std::string const& install_dir,
+                                                  std::string const& suffix,
+                                                  std::function<void(std::string const&)> error);
 
 } // namespace scoperegistry
 

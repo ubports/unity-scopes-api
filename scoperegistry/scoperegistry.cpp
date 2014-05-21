@@ -138,7 +138,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
-    auto config_files = find_install_dir_configs(scope_installdir, ".ini");
+    auto config_files = find_install_dir_configs(scope_installdir, ".ini", error);
     for (auto&& path : config_files)
     {
         filesystem::path p(path);
@@ -165,7 +165,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     {
         try
         {
-            auto oem_paths = find_install_dir_configs(oem_installdir, ".ini");
+            auto oem_paths = find_install_dir_configs(oem_installdir, ".ini", error);
             for (auto&& path : oem_paths)
             {
                 filesystem::path p(path);
@@ -201,7 +201,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
     {
         try
         {
-            auto click_paths = find_install_dir_configs(click_installdir, ".ini");
+            auto click_paths = find_install_dir_configs(click_installdir, ".ini", error);
             for (auto&& path : click_paths)
             {
                 filesystem::path p(path);
