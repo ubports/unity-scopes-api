@@ -70,7 +70,6 @@ private:
     std::exception_ptr thread_exception_;
 
     void publisher_thread();
-    void safe_bind(zmqpp::socket& socket);
 };
 
 } // namespace zmq_middleware

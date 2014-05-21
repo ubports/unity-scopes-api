@@ -422,10 +422,11 @@ int main(int argc, char* argv[])
         }
 
         auto meta = r->get_metadata(scope_id);
-        cout << "Scope metadata:   " << endl;
-        cout << "\tscope_id:       " << meta.scope_id() << endl;
-        cout << "\tdisplay_name:   " << meta.display_name() << endl;
-        cout << "\tdescription:    " << meta.description() << endl;
+        cout << "Scope metadata:    " << endl;
+        cout << "\tscope_id:        " << meta.scope_id() << endl;
+        cout << "\tdisplay_name:    " << meta.display_name() << endl;
+        cout << "\tdescription:     " << meta.description() << endl;
+        cout << "\tappearance attr: " << to_string(Variant(meta.appearance_attributes())) << endl;
         string tmp;
         try
         {

@@ -64,7 +64,7 @@ void SlowSearchScope::run()
 
 SearchQueryBase::UPtr SlowSearchScope::search(CannedQuery const&, SearchMetadata const &)
 {
-        this_thread::sleep_for(chrono::seconds(4));
+    this_thread::sleep_for(chrono::seconds(4));
     return SearchQueryBase::UPtr(new TestQuery());
 }
 

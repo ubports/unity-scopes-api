@@ -58,7 +58,7 @@ TEST(PubSub, exceptions)
     {
         EXPECT_STREQ("unity::scopes::MiddlewareException: ZmqPublisher(): publisher thread failed to start "
                      "(endpoint: ipc:///tmp/testpublisher-p):\n    unity::scopes::MiddlewareException: "
-                     "ZmqPublisher::safe_bind(): endpoint in use: ipc:///tmp/testpublisher-p",
+                     "safe_bind(): address in use: ipc:///tmp/testpublisher-p",
                      e.what());
     }
 
@@ -217,4 +217,21 @@ TEST(PubSub, send_receive)
 
     publisher2->send_message("hello??", "unknown");
     EXPECT_FALSE(message_receiver.wait_for_message());
+}
+
+TEST(PubSub, threading)
+{
+    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
+
+    {
+        // Create a publisher and a subscriber in seperate thread
+        auto subscriber_future = std::async(std::launch::async, [&mw]{ return mw.create_subscriber("testpublisher", "testtopic"); });
+        auto publisher_future = std::async(std::launch::async, [&mw]{ return mw.create_publisher("testpublisher"); });
+
+        // Obtain the publisher and subscriber handles
+        MWSubscriber::UPtr subscriber = subscriber_future.get();
+        MWPublisher::UPtr publisher = publisher_future.get();
+    }
+    // The publisher and subscriber are now destroyed in this thread (should not hang / crash)
 }
