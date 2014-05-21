@@ -34,13 +34,8 @@ using namespace boost;
 namespace scoperegistry
 {
 
-namespace
-{
-
 // Return all paths underneath the given dir that are of the given type
 // or are a symbolic link.
-
-enum EntryType { File, Directory };
 
 vector<string> find_entries(string const& install_dir, EntryType type)
 {
@@ -80,8 +75,6 @@ vector<string> find_entries(string const& install_dir, EntryType type)
 
     return entries;
 }
-
-} // namespace
 
 // Return all files of the form dir/*/<scomescope>.ini that are regular files or
 // symbolic links and have the specified suffix.

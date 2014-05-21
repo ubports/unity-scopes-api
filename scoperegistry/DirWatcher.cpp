@@ -32,35 +32,34 @@ namespace scoperegistry
 {
 
 DirWatcher::DirWatcher(DirWatcherCallback callback)
-    : callback_(callback)
+    : fd_(inotify_init())
+    , callback_(callback)
     , thread_state_(Running)
 {
-    // Create the file descriptor
-    fd_ = inotify_init();
+    // Validate the file descriptor
     if (fd_ < 0)
     {
         throw ResourceException("DirWatcher(): inotify_init() failed");
     }
-
-    // Start the watch thread
-    thread_ = std::thread(&DirWatcher::watch_thread, this);
 }
 
 DirWatcher::~DirWatcher()
 {
-    // Set state to Stopping
     {
         std::lock_guard<std::mutex> lock(mutex_);
+
+        // Set state to Stopping
         thread_state_ = Stopping;
+
+        // Remove file descriptors from watches (causes read to return)
+        for (auto& wd : wds_)
+        {
+            inotify_rm_watch(fd_, wd.first);
+        }
+        wds_.clear();
     }
 
-    // Remove file descriptors from watches (causes read to return)
-    for (auto& wd : wds_)
-    {
-        inotify_rm_watch(fd_, wd.first);
-    }
-    wds_.clear();
-
+    // Wait for thread to terminate
     if (thread_.joinable())
     {
         thread_.join();
@@ -70,33 +69,44 @@ DirWatcher::~DirWatcher()
     close(fd_);
 }
 
-bool DirWatcher::add_watch(std::string const& path)
+void DirWatcher::add_watch(std::string const& path)
 {
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
                                                   IN_DELETE | IN_MOVED_FROM |
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
-        return false;
+        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" + path + "\"");
     }
 
+    std::lock_guard<std::mutex> lock(mutex_);
     wds_[wd] = path;
-    return true;
+
+    // If this is the first watch, start the thread
+    if (wds_.size() == 1)
+    {
+        thread_ = std::thread(&DirWatcher::watch_thread, this);
+    }
 }
 
-bool DirWatcher::remove_watch(std::string const& path)
+void DirWatcher::remove_watch(std::string const& path)
 {
-    bool found_path = false;
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto& wd : wds_)
     {
         if (wd.second == path)
         {
+            // If this is the last watch, stop the thread
+            if (wds_.size() == 1)
+            {
+                thread_state_ = Stopping;
+            }
+
+            // Remove file descriptor from watch
             inotify_rm_watch(fd_, wd.first);
             wds_.erase(wd.first);
-            found_path = true;
         }
     }
-    return found_path;
 }
 
 void DirWatcher::watch_thread()
@@ -122,11 +132,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Added, Directory, wds_.at(event->wd) + "/" + event->name);
-                        add_watch(wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Added, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }
@@ -134,11 +145,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Removed, Directory, wds_.at(event->wd) + "/" + event->name);
-                        remove_watch(wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Removed, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }
@@ -146,10 +158,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Modified, Directory, wds_.at(event->wd) + "/" + event->name);
                     }
                     else
                     {
+                        std::lock_guard<std::mutex> lock(mutex_);
                         callback_(Modified, File, wds_.at(event->wd) + "/" + event->name);
                     }
                 }

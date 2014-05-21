@@ -28,7 +28,7 @@ namespace scoperegistry
 
 // DirWatcher watches directories specified by calls to add_watch()/remove_watch() for changes in
 // the files and folders contained. If a file or folder is added, removed or modified, a user
-// callback is executed (provided on construction).
+// callback (provided on construction) is executed.
 
 class DirWatcher final
 {
@@ -51,8 +51,8 @@ public:
     DirWatcher(DirWatcherCallback callback);
     ~DirWatcher();
 
-    bool add_watch(std::string const& path);
-    bool remove_watch(std::string const& path);
+    void add_watch(std::string const& path);
+    void remove_watch(std::string const& path);
 
 private:
     enum ThreadState
@@ -62,9 +62,9 @@ private:
         Failed
     };
 
+    int const fd_;
     DirWatcherCallback const callback_;
 
-    int fd_;
     std::map<int, std::string> wds_;
 
     std::thread thread_;

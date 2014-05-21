@@ -25,6 +25,12 @@
 namespace scoperegistry
 {
 
+// Return a vector of all paths found underneath a given dir that are of the given type or are
+// a symbolic link.
+
+enum EntryType { File, Directory };
+std::vector<std::string> find_entries(std::string const& install_dir, EntryType type);
+
 // Return a vector of file names underneath a scope root install dir that have the given suffix.
 // Files are searched for exactly "one level down", that is, if we have a directory structure.
 //
