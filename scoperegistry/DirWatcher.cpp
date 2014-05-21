@@ -115,6 +115,7 @@ void DirWatcher::watch_thread()
     {
         // Poll for notifications until stop is requested
         char buffer[c_buffer_len];
+        std::string event_path;
         while (true)
         {
             // Wait for changes to directories
@@ -128,43 +129,42 @@ void DirWatcher::watch_thread()
             while (i < length)
             {
                 struct inotify_event* event = (inotify_event*)&buffer[i];
+                {
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    event_path = wds_.at(event->wd) + "/" + event->name;
+                }
+
                 if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Added, Directory, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Added, Directory, event_path);
                     }
                     else
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Added, File, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Added, File, event_path);
                     }
                 }
                 else if (event->mask & IN_DELETE || event->mask & IN_MOVED_FROM)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Removed, Directory, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Removed, Directory, event_path);
                     }
                     else
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Removed, File, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Removed, File, event_path);
                     }
                 }
                 else if (event->mask & IN_MODIFY || event->mask & IN_ATTRIB)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Modified, Directory, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Modified, Directory, event_path);
                     }
                     else
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        callback_(Modified, File, wds_.at(event->wd) + "/" + event->name);
+                        callback_(Modified, File, event_path);
                     }
                 }
                 i += c_event_size + event->len;

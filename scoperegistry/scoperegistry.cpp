@@ -343,16 +343,47 @@ usage(ostream& s = cerr)
     s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
 }
 
-class ScopesWatch
+class ScopesWatcher
 {
 public:
+    ScopesWatcher()
+        : dir_watcher_(std::bind(&ScopesWatcher::callback, this, _1, _2, _3))
+    {
+
+    }
+
+    void add_install_dir(std::string const& dir)
+    {
+        try
+        {
+            // Add watch for root directory
+            dir_watcher_.add_watch(dir);
+
+            // Add watches for each sub directory in root
+            auto subdirs = find_entries(dir, Directory);
+            for (auto const& subdir : subdirs)
+            {
+                dir_watcher_.add_watch(subdir);
+            }
+        }
+        catch (...) {}
+    }
+
+private:
+    DirWatcher dir_watcher_;
+
     void callback(DirWatcher::EventType event_type,
                   DirWatcher::FileType file_type,
-                  std::string const& file_name)
+                  std::string const& path)
     {
-        int i = 0;
-        ++i;
-        ///! if directory is added/remove -update watches
+        if (event_type == DirWatcher::Added && file_type == DirWatcher::Directory)
+        {
+            dir_watcher_.add_watch(path);
+        }
+        else if (event_type == DirWatcher::Removed && file_type == DirWatcher::Directory)
+        {
+            dir_watcher_.remove_watch(path);
+        }
     }
 };
 
@@ -449,41 +480,12 @@ main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        ScopesWatch local_scopes_watch;
-        DirWatcher local_dir_watcher(std::bind(&ScopesWatch::callback, &local_scopes_watch, _1, _2, _3));
-        try
-        {
-            local_dir_watcher.add_watch(scope_installdir);
-            auto subdirs = find_entries(scope_installdir, Directory);
-            for (auto const& subdir : subdirs)
-            {
-                local_dir_watcher.add_watch(subdir);
-            }
-        }
-        catch (...) {}
-        try
-        {
-            local_dir_watcher.add_watch(oem_installdir);
-            auto subdirs = find_entries(oem_installdir, Directory);
-            for (auto const& subdir : subdirs)
-            {
-                local_dir_watcher.add_watch(subdir);
-            }
-        }
-        catch (...) {}
+        ScopesWatcher local_scopes_watcher;
+        local_scopes_watcher.add_install_dir(scope_installdir);
+        local_scopes_watcher.add_install_dir(oem_installdir);
 
-        ScopesWatch click_scopes_watch;
-        DirWatcher click_dir_watcher(std::bind(&ScopesWatch::callback, &click_scopes_watch, _1, _2, _3));
-        try
-        {
-            click_dir_watcher.add_watch(click_installdir);
-            auto subdirs = find_entries(click_installdir, Directory);
-            for (auto const& subdir : subdirs)
-            {
-                click_dir_watcher.add_watch(subdir);
-            }
-        }
-        catch (...) {}
+        ScopesWatcher click_scopes_watcher;
+        click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform
         // the registry of state changes.
