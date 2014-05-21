@@ -102,20 +102,8 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                                 DirWatcher::FileType file_type,
                                 std::string const& path)
 {
-    if (file_type == DirWatcher::Directory)
-    {
-        // A new sub directory has been added
-        if (event_type == DirWatcher::Added)
-        {
-            add_scope_dir(path);
-        }
-        // A sub directory has been removed
-        else if (event_type == DirWatcher::Removed)
-        {
-            remove_scope_dir(path);
-        }
-    }
-    else if (file_type == DirWatcher::File && path.substr(path.length() - 4) == ".ini")
+    if (file_type == DirWatcher::File &&
+        path.substr(path.length() - 4) == ".ini")
     {
         filesystem::path p(path);
         std::string scope_id = p.stem().native();
@@ -129,6 +117,25 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         else if (event_type == DirWatcher::Removed)
         {
             registry_->remove_local_scope(scope_id);
+        }
+    }
+    else
+    {
+        // A new sub directory has been added
+        if (event_type == DirWatcher::Added)
+        {
+            // try add this path as a scope folder
+            // (we need to do this with both files and folders added, as the file added may be a symlink)
+            try
+            {
+                add_scope_dir(path);
+            }
+            catch (...) {}
+        }
+        // A sub directory has been removed
+        else if (event_type == DirWatcher::Removed)
+        {
+            remove_scope_dir(path);
         }
     }
 }
