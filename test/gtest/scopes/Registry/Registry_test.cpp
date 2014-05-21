@@ -72,34 +72,10 @@ private:
     std::condition_variable cond_;
 };
 
-bool wait_for_registry(RegistryProxy r)
-{
-    // wait for the registry to become available on middleware
-    // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
-    const int num_retries = 10;
-    bool registry_started = false;
-    for (int i = 0; i < num_retries; ++i)
-    {
-        try
-        {
-            r->list(); // this will throw if the registry is not yet available on middleware
-            registry_started = true;
-            break;
-        }
-        catch (std::exception const&)
-        {
-            sleep(1);
-        }
-    }
-    return registry_started;
-}
-
 TEST(Registry, metadata)
 {
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
-
-    ASSERT_TRUE(wait_for_registry(r));
 
     auto meta = r->get_metadata("testscopeA");
     EXPECT_EQ("testscopeA", meta.scope_id());
@@ -141,8 +117,6 @@ TEST(Registry, update_notify)
 {
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
-
-    ASSERT_TRUE(wait_for_registry(r));
 
     bool update_received_ = false;
     std::mutex mutex_;
