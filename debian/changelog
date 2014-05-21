@@ -8,6 +8,8 @@ unity-scopes-api (0.4.8-0ubuntu1) UNRELEASED; urgency=medium
   * Added has_subdepartments flag and alternate label to the Department class.
   * Fixed lp:1319712: Appearance attributes not supported for remote scopes.
   * Changes to departments API.
+  * Implemented RatingFilter and RadioButtonFilter.
+  * Changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique ptr.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Tue, 20 May 2014 16:40:56 +0200
 

@@ -47,6 +47,7 @@ public:
     static FilterBase::SCPtr deserialize(VariantMap const& var);
     static VariantArray serialize_filters(Filters const& filters);
     static Filters deserialize_filters(VariantArray const& var);
+    static void validate_filters(Filters const& filters);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;

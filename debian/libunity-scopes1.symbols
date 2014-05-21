@@ -81,6 +81,14 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::~PreviewReply()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RatingFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::set_on_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::set_off_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::RatingFilter(unity::scopes::internal::RatingFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::~RatingFilter()@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::add_attribute_value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::add_attribute_mapping(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
@@ -215,6 +223,11 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::~ActivationResponse()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RadioButtonsFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::RadioButtonsFilter(unity::scopes::internal::RadioButtonsFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::~RadioButtonsFilter()@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Department const> const&, std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
@@ -520,6 +533,14 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ColumnLayout::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::has_active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::label() const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::on_icon() const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::options() const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::off_icon() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::widget_type() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_values() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_mappings() const@Base" 0.4.0+14.04.20140312.1
@@ -571,10 +592,17 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::query() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::status() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::serialize() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RadioButtonsFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::label() const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::options() const@Base" 0replaceme
  (c++)"unity::scopes::MiddlewareException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::multi_select() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::active_options(unity::scopes::FilterState const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OptionSelectorFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::OptionSelectorFilter::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::label() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::options() const@Base" 0.4.0+14.04.20140312.1
@@ -709,6 +737,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::RatingFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
@@ -719,6 +748,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::RadioButtonsFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1
@@ -747,6 +777,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo name for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::RatingFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
@@ -757,6 +788,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::RadioButtonsFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1
@@ -796,6 +828,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"vtable for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::RatingFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
@@ -806,6 +839,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::RadioButtonsFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1

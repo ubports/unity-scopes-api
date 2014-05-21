@@ -7,6 +7,9 @@ Changes in version 0.4.8
     and uses Department::SCPtr for both. SearchListenerBase::push() method for departments got changed to match as well. Removed
     constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
     pointers instead of values.
+  - Implemented RatingFilter and RadioButtonsFilter.
+  - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
+    instead of shared pointers.
 
 Changes in version 0.4.6
 ========================

@@ -30,9 +30,9 @@ OptionSelectorFilter::OptionSelectorFilter(internal::OptionSelectorFilterImpl *i
 {
 }
 
-OptionSelectorFilter::SPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, bool multi_select)
+OptionSelectorFilter::UPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, bool multi_select)
 {
-    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
+    return std::unique_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
 }
 
 std::string OptionSelectorFilter::label() const
@@ -53,6 +53,11 @@ FilterOption::SCPtr OptionSelectorFilter::add_option(std::string const& id, std:
 std::list<FilterOption::SCPtr> OptionSelectorFilter::options() const
 {
     return fwd()->options();
+}
+
+bool OptionSelectorFilter::has_active_option(FilterState const& filter_state) const
+{
+    return fwd()->has_active_option(filter_state);
 }
 
 std::set<FilterOption::SCPtr> OptionSelectorFilter::active_options(FilterState const& filter_state) const
