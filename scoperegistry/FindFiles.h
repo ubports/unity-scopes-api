@@ -31,6 +31,12 @@ namespace scoperegistry
 enum EntryType { File, Directory };
 std::vector<std::string> find_entries(std::string const& install_dir, EntryType type);
 
+// Return a vector of file names underneath a scope dir that have the given suffix. Files are
+// searched for in the specified directory only, that is, no .ini files in further-nested
+// directories will be searched.
+
+std::vector<std::string> find_scope_dir_configs(std::string const& scope_dir, std::string const& suffix);
+
 // Return a vector of file names underneath a scope root install dir that have the given suffix.
 // Files are searched for exactly "one level down", that is, if we have a directory structure.
 //
@@ -40,7 +46,7 @@ std::vector<std::string> find_entries(std::string const& install_dir, EntryType 
 // we get those two .ini files, but no .ini files in canonical or underneath
 // further-nested directories.
 
-std::vector<std::string> find_scope_config_files(std::string const& install_dir, std::string const& suffix);
+std::vector<std::string> find_install_dir_configs(std::string const& install_dir, std::string const& suffix);
 
 } // namespace scoperegistry
 

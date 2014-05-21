@@ -18,6 +18,7 @@
 
 #include "DirWatcher.h"
 #include "FindFiles.h"
+#include "ScopesWatcher.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
@@ -138,7 +139,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
-    auto config_files = find_scope_config_files(scope_installdir, ".ini");
+    auto config_files = find_install_dir_configs(scope_installdir, ".ini");
     for (auto&& path : config_files)
     {
         filesystem::path p(path);
@@ -165,7 +166,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     {
         try
         {
-            auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
+            auto oem_paths = find_install_dir_configs(oem_installdir, ".ini");
             for (auto&& path : oem_paths)
             {
                 filesystem::path p(path);
@@ -201,7 +202,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
     {
         try
         {
-            auto click_paths = find_scope_config_files(click_installdir, ".ini");
+            auto click_paths = find_install_dir_configs(click_installdir, ".ini");
             for (auto&& path : click_paths)
             {
                 filesystem::path p(path);
@@ -353,73 +354,6 @@ usage(ostream& s = cerr)
 {
     s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
 }
-
-class ScopesWatcher : public DirWatcher
-{
-public:
-    ScopesWatcher(RegistryObject::SPtr const& registry,
-                  std::function<void(pair<string, string> const&)> ini_added_callback)
-        : registry_(registry)
-        , ini_added_callback_(ini_added_callback)
-    {
-    }
-
-    void add_install_dir(std::string const& dir)
-    {
-        try
-        {
-            // Add watch for root directory
-            add_watch(dir);
-
-            // Add watches for each sub directory in root
-            auto subdirs = find_entries(dir, EntryType::Directory);
-            for (auto const& subdir : subdirs)
-            {
-                add_watch(subdir);
-            }
-        }
-        catch (...) {}
-    }
-
-private:
-    RegistryObject::SPtr const& registry_;
-    std::function<void(pair<string, string> const&)> ini_added_callback_;
-
-    void watch_event(DirWatcher::EventType event_type,
-                     DirWatcher::FileType file_type,
-                     std::string const& path) override
-    {
-        if (file_type == DirWatcher::Directory)
-        {
-            // A new sub directory has been added
-            if (event_type == DirWatcher::Added)
-            {
-                add_watch(path);
-            }
-            // A sub directory has been removed
-            else if (event_type == DirWatcher::Removed)
-            {
-                remove_watch(path);
-            }
-        }
-        else if (file_type == DirWatcher::File && path.substr(path.length() - 4) == ".ini")
-        {
-            filesystem::path p(path);
-            string scope_id = p.stem().native();
-
-            // A new config file has been added
-            if (event_type == DirWatcher::Added)
-            {
-                ini_added_callback_(make_pair(scope_id, path));
-            }
-            // A config file has been removed
-            else if (event_type == DirWatcher::Removed)
-            {
-                registry_->remove_local_scope(scope_id);
-            }
-        }
-    }
-};
 
 int
 main(int argc, char* argv[])
