@@ -467,12 +467,6 @@ main(int argc, char* argv[])
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
 
-        // Drop our shared_ptr to the RegistryObject. This means that the registry object
-        // is kept alive only via the shared_ptr held by the middleware. If the middleware
-        // shuts down, it clears out the active servant map, which destroys the registry
-        // object. The registry object kills all its child processes as part of its clean-up.
-        registry = nullptr;
-
         exit_status = 0;
     }
     catch (std::exception const& e)
