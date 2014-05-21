@@ -38,7 +38,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                               MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -58,6 +59,10 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
       },
       executor_(executor)
 {
+    if (middleware)
+    {
+
+    }
 }
 
 RegistryObject::~RegistryObject()
