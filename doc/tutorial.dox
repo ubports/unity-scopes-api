@@ -188,7 +188,7 @@ methods of SearchReply object that every scope have to use are \link unity::scop
 and \link unity::scopes::SearchReply::push push\endlink.
 
 The \link unity::scopes::SearchReply::register_category register_category\endlink method is a factory method for creating new categories (see
-\link unity::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but it's recommended to create
+\link unity::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but we recommend to create
 them as soon as possible (ideally as soon as they are known to the scope).
 
 When creating a category, one of its parameters is a \link unity::scopes::CategoryRenderer \endlink instance,
@@ -552,29 +552,39 @@ is installed by running:
 restart scope-registry
 \endverbatim
 
-The scope will be installed under one of the "scopes directories"
+Scopes are installed under one of the "scopes directories"
 scanned by the scope registry.  Currently these default to:
 
 <ul>
 <li>/usr/lib/${arch}/unity-scopes</li>
 <li>/custom/lib/${arch}/unity-scopes</li>
-<!-- <li>??? Click packages?</li> -->
+<li>$HOME/.local/share/unity-scopes</li>
 </ul>
 
-Individual scopes are installed into a subdirectory matching the
-scope's name.  At a minimum, the directory structure should contain
-the following:
+The `/usr/lib` directory is for scopes that are pre-installed by Canonical.
+The `/custom/lib` directory is for scopes that pre-installed by OEMs.
+The `$HOME/.local` directory is for scopes that are installed from click packages.
+
+Individual scopes are installed into subdirectories of these
+installation directories. The name of the subdirectory containing
+a scope's `.ini` and `.so` files can be anything but, to avoid name clashes,
+we strongly suggest something that is unique, such as `com.canonical.scopes.scopename`.
+At a minimum, the directory structure must contain the following:
 
     -+- ${scopesdir}
-     `-+- scopename
+     `-+- subdirectory
        |--- scopename.ini
-       `--- libscopename.so
+       `--- <library>.so
 
-That is, a scope metadata file and a shared library containing the
-scope code.  The scope author is free to ship additional data in this
+That is, each subdirectory must contain a scope `.ini` file and a shared library containing the
+scope code. The scope author is free to ship additional data in this
 directory (e.g. icons and screenshots).
 
-The scope metadata file uses the standard ini file format, with the
+The name of the scope's `.ini` file _must_ be a unique ID for the scope. We _strongly_
+suggest to use a unique identifier, such as `com.canonical.scopes.scopename`, to avoid
+clashes with scopes created by other developers.
+
+The scope `.ini` file uses the standard `.ini` file format, with the
 following keys:
 
     [ScopeConfig]
@@ -585,8 +595,22 @@ following keys:
     Art = path to screenshot of the scope
     SearchHint = hint text displayed to user when viewing scope
     HotKey =
+    ResultsTtlType = None, Small, Medium, or Large
 
-In addition to allowing the registry to make the scope available, this information controls how the scope appears in the "Scopes" scope.
+    [Appearance]
+    TODO: document valid attributes
+
+The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and Author.
+`DisplayName` and `Description` can (and should) be localized. For example:
+
+`Description[de] = Fu&szlig;ballergebnisse`
+
+In addition to allowing the registry to make the scope available, this information controls how the scope appears
+in the "Scopes" scope.
+
+The name of of the scope's `.so` file can be `libscopename.so`, `scopename.so`, or simply `scope.so`. For example,
+for a scope named `Fred`, the names `libFred.so`, `Fred.so`, and `scope.so` are acceptable. (No other library
+names are valid.)
 
 \subsection scopetool Previewing scope
 
@@ -599,16 +623,17 @@ You can install it from the Ubuntu archive using:
 sudo apt-get install unity-scope-tool
 \endverbatim
 
-After installation, you can run the scope-tool with a parameter specifying
-path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`). If a binary for your scope can be found in the same
-directory (ie there's `~/dev/myscope/build/libmyscope.so`), the scope-tool will
+After installation, you can run the scope-tool with a parameter specifying the
+path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`).
+If a binary for your scope can be found in the same
+directory, the scope-tool will
 display surfacing and search results provided by your scope, and allow you to
 perform searches, invoke previews and actions within previews.
 
-Note that the scope-tool is using the same rendering mechanism as Unity
-itself, and therefore what you see in the scope-tool is what you get in Unity.
+Note that the scope-tool uses the same rendering mechanism as Unity
+itself and, therefore, what you see in the scope-tool is what you get in Unity.
 It can also be used to fine-tune the category definitions, as it allows you
-to manipulate the definitions on the fly, and once you're happy with the result
+to manipulate the definitions on the fly. Once you are happy with the result
 you can just copy the JSON definition back into your scope
 (see unity::scopes::CategoryRenderer::CategoryRenderer()).
 
