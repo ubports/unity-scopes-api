@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/SwitchFilter.h>
+#include <unity/scopes/internal/SwitchFilterImpl.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -43,4 +44,13 @@ TEST(SwitchFilter, basic)
     filter1->update_state(fstate, false);
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_FALSE(filter1->is_on(fstate));
+}
+
+TEST(SwitchFilter, serialize_deserialize)
+{
+    auto filter1 = SwitchFilter::create("f1", "Latest");
+    auto var = filter1->serialize();
+    auto filter2 = internal::SwitchFilterImpl::create(var);
+    EXPECT_EQ("f1", filter2->id());
+    EXPECT_EQ("Latest", filter2->label());
 }
