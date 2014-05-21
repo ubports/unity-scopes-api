@@ -67,9 +67,9 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
     thread_ = std::thread(&ZmqSubscriber::subscriber_thread, this);
 
     std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
+    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Stopped; });
 
-    if (thread_state_ == Failed)
+    if (thread_state_ == Stopped)
     {
         if (thread_.joinable())
         {
@@ -89,7 +89,13 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
 
 ZmqSubscriber::~ZmqSubscriber()
 {
-    thread_stopper_->stop();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (thread_stopper_)
+        {
+            thread_stopper_->stop();
+        }
+    }
 
     if (thread_.joinable())
     {
@@ -137,6 +143,7 @@ void ZmqSubscriber::subscriber_thread()
         std::string message;
         while (true)
         {
+            // poll() throws when the zmq context is destroyed (hense stopping the thread)
             poller.poll();
 
             // Flush out the message queue before stopping the thread
@@ -170,8 +177,11 @@ void ZmqSubscriber::subscriber_thread()
     catch (...)
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        thread_stopper_->stop();
+        thread_stopper_ = nullptr;
+
         thread_exception_ = std::current_exception();
-        thread_state_ = Failed;
+        thread_state_ = Stopped;
         cond_.notify_all();
     }
 }

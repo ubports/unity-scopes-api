@@ -28,7 +28,7 @@ using namespace boost;
 namespace scoperegistry
 {
 
-ScopesWatcher::ScopesWatcher(RegistryObject::SPtr const& registry,
+ScopesWatcher::ScopesWatcher(RegistryObject::SPtr registry,
                              std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback)
     : registry_(registry)
     , ini_added_callback_(ini_added_callback)

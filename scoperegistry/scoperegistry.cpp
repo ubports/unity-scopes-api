@@ -449,7 +449,7 @@ main(int argc, char* argv[])
 
         // Configure watches for scope install directories
         ScopesWatcher local_scopes_watcher(registry,
-                                           [&registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
                                            (pair<string, string> const& scope)
         {
             try
@@ -465,7 +465,7 @@ main(int argc, char* argv[])
         local_scopes_watcher.add_install_dir(oem_installdir);
 
         ScopesWatcher click_scopes_watcher(registry,
-                                           [&registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
                                            (pair<string, string> const& scope)
         {
             try
@@ -486,6 +486,12 @@ main(int argc, char* argv[])
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         middleware->add_registry_object(runtime->registry_identity(), registry);
+
+        // Drop our shared_ptr to the RegistryObject. This means that the registry object
+        // is kept alive only via the shared_ptr held by the middleware. If the middleware
+        // shuts down, it clears out the active servant map, which destroys the registry
+        // object. The registry object kills all its child processes as part of its clean-up.
+        registry = nullptr;
 
         // Wait until we are done, which happens if we receive a termination signal.
         middleware->wait_for_shutdown();
