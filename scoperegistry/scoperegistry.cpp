@@ -343,11 +343,10 @@ usage(ostream& s = cerr)
     s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
 }
 
-class ScopesWatcher
+class ScopesWatcher : public DirWatcher
 {
 public:
     ScopesWatcher()
-        : dir_watcher_(std::bind(&ScopesWatcher::callback, this, _1, _2, _3))
     {
 
     }
@@ -357,34 +356,32 @@ public:
         try
         {
             // Add watch for root directory
-            dir_watcher_.add_watch(dir);
+            add_watch(dir);
 
             // Add watches for each sub directory in root
-            auto subdirs = find_entries(dir, Directory);
+            auto subdirs = find_entries(dir, EntryType::Directory);
             for (auto const& subdir : subdirs)
             {
-                dir_watcher_.add_watch(subdir);
+                add_watch(subdir);
             }
         }
         catch (...) {}
     }
 
 private:
-    DirWatcher dir_watcher_;
-
-    void callback(DirWatcher::EventType event_type,
-                  DirWatcher::FileType file_type,
-                  std::string const& path)
+    void watch_event(DirWatcher::EventType event_type,
+                     DirWatcher::FileType file_type,
+                     std::string const& path)
     {
         // A new sub directory has been added
         if (event_type == DirWatcher::Added && file_type == DirWatcher::Directory)
         {
-            dir_watcher_.add_watch(path);
+            add_watch(path);
         }
         // A sub directory has been removed
         else if (event_type == DirWatcher::Removed && file_type == DirWatcher::Directory)
         {
-            dir_watcher_.remove_watch(path);
+            remove_watch(path);
         }
         // A new config file has been added
         else if (event_type == DirWatcher::Added && file_type == DirWatcher::File &&

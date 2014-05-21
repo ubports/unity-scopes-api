@@ -30,7 +30,7 @@ namespace scoperegistry
 // the files and folders contained. If a file or folder is added, removed or modified, a user
 // callback (provided on construction) is executed.
 
-class DirWatcher final
+class DirWatcher
 {
 public:
     enum EventType
@@ -46,9 +46,7 @@ public:
         Directory
     };
 
-    typedef std::function<void(EventType, FileType, std::string const& path)> DirWatcherCallback;
-
-    DirWatcher(DirWatcherCallback callback);
+    DirWatcher();
     ~DirWatcher();
 
     void add_watch(std::string const& path);
@@ -63,7 +61,6 @@ private:
     };
 
     int const fd_;
-    DirWatcherCallback const callback_;
 
     std::map<int, std::string> wds_;
 
@@ -72,6 +69,7 @@ private:
     ThreadState thread_state_;
 
     void watch_thread();
+    virtual void watch_event(EventType event_type, FileType file_type, std::string const& path) = 0;
 };
 
 } // namespace scoperegistry

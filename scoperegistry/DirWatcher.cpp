@@ -31,9 +31,8 @@ using namespace unity;
 namespace scoperegistry
 {
 
-DirWatcher::DirWatcher(DirWatcherCallback callback)
+DirWatcher::DirWatcher()
     : fd_(inotify_init())
-    , callback_(callback)
     , thread_state_(Running)
 {
     // Validate the file descriptor
@@ -130,41 +129,45 @@ void DirWatcher::watch_thread()
             {
                 struct inotify_event* event = (inotify_event*)&buffer[i];
                 {
+                    event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);
-                    event_path = wds_.at(event->wd) + "/" + event->name;
+                    if (wds_.find(event->wd) != wds_.end())
+                    {
+                        event_path = wds_.at(event->wd) + "/" + event->name;
+                    }
                 }
 
                 if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        callback_(Added, Directory, event_path);
+                        watch_event(Added, Directory, event_path);
                     }
                     else
                     {
-                        callback_(Added, File, event_path);
+                        watch_event(Added, File, event_path);
                     }
                 }
                 else if (event->mask & IN_DELETE || event->mask & IN_MOVED_FROM)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        callback_(Removed, Directory, event_path);
+                        watch_event(Removed, Directory, event_path);
                     }
                     else
                     {
-                        callback_(Removed, File, event_path);
+                        watch_event(Removed, File, event_path);
                     }
                 }
                 else if (event->mask & IN_MODIFY || event->mask & IN_ATTRIB)
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        callback_(Modified, Directory, event_path);
+                        watch_event(Modified, Directory, event_path);
                     }
                     else
                     {
-                        callback_(Modified, File, event_path);
+                        watch_event(Modified, File, event_path);
                     }
                 }
                 i += c_event_size + event->len;
