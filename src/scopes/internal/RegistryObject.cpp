@@ -449,7 +449,23 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     {
         return;
     }
-    else if (state == Stopped && state_ != Stopping )
+    else if (state == Running && state_ != Starting)
+    {
+        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
+             << "\" started manually" << endl;
+
+        // Don't update state, treat this scope as not running if a locate() is requested
+        return;
+    }
+    else if (state == Stopping && state_ != Running)
+    {
+        cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
+             << exec_data_.scope_id << "\" terminated" << endl;
+
+        // Don't update state, treat this scope as not running if a locate() is requested
+        return;
+    }
+    else if (state == Stopped && state_ != Stopping)
     {
         cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
              << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
