@@ -57,7 +57,7 @@ public:
     \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
     option can be selected.
     */
-    static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
     \brief Get the label of this filter.
@@ -82,6 +82,13 @@ public:
     \return The list of options.
      */
     std::list<FilterOption::SCPtr> options() const;
+
+    /**
+    \brief Check if an option is active for this filter.
+    \param filter_state The state of filters
+    \return true if an option is active
+    */
+    bool has_active_option(FilterState const& filter_state) const;
 
     /**
     \brief Get active options from an instance of FilterState for this filter.

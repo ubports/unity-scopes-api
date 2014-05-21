@@ -1,0 +1,4 @@
+add_executable(RadioButtonsFilter_test RadioButtonsFilter_test.cpp)
+target_link_libraries(RadioButtonsFilter_test ${TESTLIBS})
+
+add_test(RadioButtonsFilter RadioButtonsFilter_test)
