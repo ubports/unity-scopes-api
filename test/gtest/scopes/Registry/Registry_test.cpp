@@ -131,10 +131,27 @@ TEST(Registry, update_notify)
     MetadataMap list = r->list();
     EXPECT_EQ(2, list.size());
 
-//    {
-//        std::unique_lock<std::mutex> lock(mutex_);
-//        cond_.wait(lock, [&update_received_] { return update_received_; });
-//    }
+    system("mv '" TEST_RUNTIME_PATH "/other_scopes/testscopeC' '" TEST_RUNTIME_PATH "/scopes'");
+
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [&update_received_] { return update_received_; });
+        update_received_ = false;
+    }
+
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+
+    system("mv '" TEST_RUNTIME_PATH "/scopes/testscopeC' '" TEST_RUNTIME_PATH "/other_scopes'");
+
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait(lock, [&update_received_] { return update_received_; });
+        update_received_ = false;
+    }
+
+    list = r->list();
+    EXPECT_EQ(2, list.size());
 }
 
 int main(int argc, char **argv)
