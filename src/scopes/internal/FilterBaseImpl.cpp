@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
 #include <unity/scopes/internal/RadioButtonsFilterImpl.h>
 #include <unity/scopes/internal/RatingFilterImpl.h>
+#include <unity/scopes/internal/SwitchFilterImpl.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -126,6 +127,10 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         if (ftype == "rating")
         {
             return RatingFilterImpl::create(var);
+        }
+        if (ftype == "switch")
+        {
+            return SwitchFilterImpl::create(var);
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }
