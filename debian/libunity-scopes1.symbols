@@ -536,6 +536,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
  (c++)"unity::scopes::RatingFilter::active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RatingFilter::has_active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::RatingFilter::fwd() const@Base" 0replaceme
  (c++)"unity::scopes::RatingFilter::label() const@Base" 0replaceme
  (c++)"unity::scopes::RatingFilter::on_icon() const@Base" 0replaceme
@@ -594,6 +595,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::RadioButtonsFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
  (c++)"unity::scopes::RadioButtonsFilter::active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RadioButtonsFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::RadioButtonsFilter::fwd() const@Base" 0replaceme
  (c++)"unity::scopes::RadioButtonsFilter::label() const@Base" 0replaceme
  (c++)"unity::scopes::RadioButtonsFilter::options() const@Base" 0replaceme
@@ -601,6 +603,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::OptionSelectorFilter::multi_select() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::active_options(unity::scopes::FilterState const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OptionSelectorFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::OptionSelectorFilter::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::label() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::options() const@Base" 0.4.0+14.04.20140312.1
