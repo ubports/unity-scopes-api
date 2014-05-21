@@ -26,9 +26,10 @@
 namespace scoperegistry
 {
 
-// DirWatcher watches directories specified by calls to add_watch()/remove_watch() for changes in
-// the files and folders contained. If a file or folder is added, removed or modified, a user
-// callback (provided on construction) is executed.
+// DirWatcher watches directories specified by calls to add_watch() / remove_watch() for changes in
+// the files and folders contained. If a file or folder is added, removed or modified, the pure
+// virtual watch_event() method is executed (this is to be overridden by a child class deriving
+// from DirWatcher)
 
 class DirWatcher
 {

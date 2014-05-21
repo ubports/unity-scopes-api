@@ -319,27 +319,6 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     registry->add_local_scope(scope.first, move(meta), exec_data);
 }
 
-void add_local_scopes(RegistryObject::SPtr const& registry,
-                      map<string, string> const& all_scopes,
-                      MiddlewareBase::SPtr const& mw,
-                      string const& scoperunner_path,
-                      string const& config_file,
-                      bool click,
-                      int timeout_ms)
-{
-    for (auto&& pair : all_scopes)
-    {
-        try
-        {
-            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms);
-        }
-        catch (unity::Exception const& e)
-        {
-            error("ignoring scope \"" + pair.first + "\": cannot create metadata: " + e.what());
-        }
-    }
-}
-
 } // namespace
 
 // Usage: scoperegistry [runtime.ini] [scope.ini]...
@@ -436,8 +415,6 @@ main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
         if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");

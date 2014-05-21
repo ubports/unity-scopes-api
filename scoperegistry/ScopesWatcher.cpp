@@ -46,12 +46,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
         auto subdirs = find_entries(dir, EntryType::Directory);
         for (auto const& subdir : subdirs)
         {
-            auto configs = find_scope_dir_configs(subdir, ".ini");
-            if (!configs.empty())
-            {
-                dir_to_ini_map_[subdir] = configs[0];
-            }
-            add_watch(subdir);
+            add_scope_dir(subdir);
         }
     }
     catch (...) {}
@@ -62,19 +57,25 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
     auto configs = find_scope_dir_configs(dir, ".ini");
     if (!configs.empty())
     {
+        // Associate this directory with the contained config file
         dir_to_ini_map_[dir] = configs[0];
 
+        // New config found, execute callback
         filesystem::path p(configs[0]);
         std::string scope_id = p.stem().native();
         ini_added_callback_(std::make_pair(scope_id, configs[0]));
     }
+
+    // Add a watch for this directory
     add_watch(dir);
 }
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
 {
+    // Check if this directory is associate with the config file
     if (dir_to_ini_map_.find(dir) != dir_to_ini_map_.end())
     {
+        // Inform the registry that this scope has been removed
         std::string ini_path = dir_to_ini_map_.at(dir);
         dir_to_ini_map_.erase(dir);
 
@@ -82,6 +83,8 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
         std::string scope_id = p.stem().native();
         registry_->remove_local_scope(scope_id);
     }
+
+    // Remove the watch for this directory
     remove_watch(dir);
 }
 

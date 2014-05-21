@@ -26,6 +26,10 @@
 namespace scoperegistry
 {
 
+// ScopesWatcher watches the scope install directories specified by calls to add_install_dir() for
+// the installation / uninstallation of scopes. If a scope is removed, the registry is informed
+// accordingly. If a scope is added, a user callback (provided on construction) is executed.
+
 class ScopesWatcher : public DirWatcher
 {
 public:
