@@ -91,6 +91,7 @@ ZmqSubscriber::~ZmqSubscriber()
 {
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        callback_ = nullptr;
         thread_stopper_ = nullptr;
     }
 
@@ -174,6 +175,7 @@ void ZmqSubscriber::subscriber_thread()
     catch (...)
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        callback_ = nullptr;
         thread_stopper_ = nullptr;
         thread_exception_ = std::current_exception();
         thread_state_ = Stopped;

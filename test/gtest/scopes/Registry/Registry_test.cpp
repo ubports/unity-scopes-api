@@ -118,6 +118,7 @@ TEST(Registry, update_notify)
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
+    // Configure registry update callback
     bool update_received_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
@@ -127,31 +128,93 @@ TEST(Registry, update_notify)
         update_received_ = true;
         cond_.notify_one();
     });
+    auto wait_for_update = [&update_received_, &mutex_, &cond_]
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_.wait_for(lock, std::chrono::seconds(1), [&update_received_] { return update_received_; });
+        update_received_ = false;
+    };
 
+    // First check that we have 2 scopes registered
     MetadataMap list = r->list();
     EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
 
+    // Move testscopeC into the scopes folder
     system("mv '" TEST_RUNTIME_PATH "/other_scopes/testscopeC' '" TEST_RUNTIME_PATH "/scopes'");
+    wait_for_update();
 
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [&update_received_] { return update_received_; });
-        update_received_ = false;
-    }
-
+    // Now check that we have 3 scopes registered
     list = r->list();
     EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
 
+    // Make a symlink to testscopeD in the scopes folder
+    system("ln -s '" TEST_RUNTIME_PATH "/other_scopes/testscopeD' '" TEST_RUNTIME_PATH "/scopes/testscopeD'");
+    wait_for_update();
+
+    // Now check that we have 4 scopes registered
+    list = r->list();
+    EXPECT_EQ(4, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+    EXPECT_NE(list.end(), list.find("testscopeD"));
+
+    // Move testscopeC back into the other_scopes folder
     system("mv '" TEST_RUNTIME_PATH "/scopes/testscopeC' '" TEST_RUNTIME_PATH "/other_scopes'");
+    wait_for_update();
 
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [&update_received_] { return update_received_; });
-        update_received_ = false;
-    }
+    // Now check that we have 3 scopes registered again
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeD"));
 
+    // Remove symlink to testscopeD from the scopes folder
+    system("rm '" TEST_RUNTIME_PATH "/scopes/testscopeD'");
+    wait_for_update();
+
+    // Now check that we are back to having 2 scopes registered
     list = r->list();
     EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+
+    // Make a folder in scopes that does not represent a scope id
+    system("mkdir '" TEST_RUNTIME_PATH "/scopes/testfolder'");
+    wait_for_update();
+
+    // Check that no scopes were registered
+    list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+
+    // Make a symlink to testscopeC.ini in testfolder
+    system("ln -s '" TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini' '" TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini'");
+    wait_for_update();
+
+    // Now check that we have 3 scopes registered
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+
+    // Remove testfolder
+    system("rm -r '" TEST_RUNTIME_PATH "/scopes/testfolder'");
+    wait_for_update();
+
+    // Now check that we are back to having 2 scopes registered
+    list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
 }
 
 int main(int argc, char **argv)
