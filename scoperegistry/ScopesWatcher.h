@@ -40,8 +40,9 @@ public:
 
 private:
     unity::scopes::internal::RegistryObject::SPtr const& registry_;
-    std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback_;
+    std::function<void(std::pair<std::string, std::string> const&)> const ini_added_callback_;
     std::map<std::string, std::string> dir_to_ini_map_;
+    std::mutex mutex_;
 
     void add_scope_dir(std::string const& dir);
     void remove_scope_dir(std::string const& dir);

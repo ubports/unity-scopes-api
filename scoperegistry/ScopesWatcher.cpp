@@ -58,7 +58,10 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
     if (!configs.empty())
     {
         // Associate this directory with the contained config file
-        dir_to_ini_map_[dir] = configs[0];
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            dir_to_ini_map_[dir] = configs[0];
+        }
 
         // New config found, execute callback
         filesystem::path p(configs[0]);
@@ -72,6 +75,8 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
     // Check if this directory is associate with the config file
     if (dir_to_ini_map_.find(dir) != dir_to_ini_map_.end())
     {
