@@ -6,7 +6,9 @@ unity-scopes-api (0.4.7-0ubuntu1) UNRELEASED; urgency=medium
   [ Pawel Stolowski ]
   * Added method to get and set display hints for filters.
   * Added has_subdepartments flag and alternate label to the Department class.
+  * Implemented RatingFilter and RadioButtonFilter.
   * Fixed lp:1319712: Appearance attributes not supported for remote scopes.
+  * Changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique ptr.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 16 May 2014 17:48:23 +0200
 

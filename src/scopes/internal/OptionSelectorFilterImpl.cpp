@@ -131,6 +131,11 @@ FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, 
     }
 }
 
+int OptionSelectorFilterImpl::num_of_options() const
+{
+    return options_.size();
+}
+
 std::list<FilterOption::SCPtr> OptionSelectorFilterImpl::options() const
 {
     return options_;
@@ -168,6 +173,33 @@ std::set<FilterOption::SCPtr> OptionSelectorFilterImpl::active_options(FilterSta
         }
     }
     return opts;
+}
+
+bool OptionSelectorFilterImpl::has_active_option(FilterState const& filter_state) const
+{
+    if (filter_state.has_filter(id()))
+    {
+        try
+        {
+            auto const var = FilterBaseImpl::get(filter_state, id()).get_array(); // this can throw if of different type
+
+            for (auto const& idvar: var)
+            {
+                auto const opt_id = idvar.get_string();
+                for (auto const& opt: options_)
+                {
+                    if (opt_id == opt->id())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+    return false;
 }
 
 void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const

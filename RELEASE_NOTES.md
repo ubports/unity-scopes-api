@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Changes in version 0.4.7
+========================
+  - Implemented RatingFilter and RadioButtonsFilter.
+  - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
+    instead of shared pointers.
+
 Changes in version 0.4.6
 ========================
   - Added method to get and set display hints for filters (at this moment the only display hint
