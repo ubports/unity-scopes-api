@@ -85,10 +85,10 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
     }
 
     // Check that the scope has indeed timed out. The server shuts down after 2 seconds,
-    // so we allow between 2 and 3 seconds for it to time out.
+    // so we allow between 2 and 4 seconds for it to time out.
     auto duration = chrono::steady_clock::now() - start_time;
     EXPECT_TRUE(duration > chrono::seconds(2));
-    EXPECT_TRUE(duration < chrono::seconds(3));
+    EXPECT_TRUE(duration < chrono::seconds(4));
 }
 
 // Check that the idle timeout for a server waits for synchronous operations
