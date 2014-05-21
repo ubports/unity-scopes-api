@@ -35,7 +35,7 @@ class SwitchFilterImpl;
 }
 
 /**
-\brief
+\brief A simple on/off switch filter.
 */
 class UNITY_API SwitchFilter : public FilterBase
 {
@@ -44,6 +44,12 @@ public:
     UNITY_DEFINES_PTRS(SwitchFilter);
 /// @endcond
 
+    /**
+    \brief Creates an SwitchFilter
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param label A display label for the filter.
+    \return SwitchFilter instance
+    */
     static SwitchFilter::UPtr create(std::string const& id, std::string const& label);
 
     /**
@@ -52,8 +58,27 @@ public:
     */
     std::string label() const;
 
+    /**
+    \brief Check if the filter is "on".
+    \param filter_state The state of filters
+    \return true if the fiter is on.
+    */
     bool is_on(FilterState const& filter_state) const;
+
+    /**
+    \brief Sets on/off state of this filter instance in a FilterState object.
+
+    \param filter_state The state of filters
+    \param active the value of the filter (on/off)
+    */
     void update_state(FilterState& filter_state, bool active) const;
+
+    /**
+    \brief Sets on/off state of a SwitchFilter in a FilterState object,  without having an instance of SwitchFilter.
+
+    Updates an instance of FilterState, without the need for an SwitchFilter instance. This is meant
+    to be used when creating a canned Query that references another scope.
+    */
     static void update_state(FilterState& filter_state, std::string const& filter_id, bool active);
 
 private:
