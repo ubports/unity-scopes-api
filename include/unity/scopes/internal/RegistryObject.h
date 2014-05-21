@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/Executor.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWPublisher.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/StateReceiverObject.h>
@@ -130,6 +131,8 @@ private:
     ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
+
+    MWPublisher::UPtr publisher_;
 };
 
 } // namespace internal
