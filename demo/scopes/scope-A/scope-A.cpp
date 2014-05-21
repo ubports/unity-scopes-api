@@ -54,10 +54,9 @@ public:
             return;  // Query was cancelled
         }
 
-        Department::SPtr all_depts = std::move(Department::create("all", query_, "All departments"));
-        Department::SPtr news_dept = std::move(Department::create("news", query_, "News"));
-        news_dept->set_subdepartments({std::move(Department::create("news-world", query_, "World")),
-                std::move(Department::create("news-europe", query_, "Europe"))});
+        Department::SPtr all_depts = Department::create("all", query_, "All departments");
+        Department::SPtr news_dept = Department::create("news", query_, "News");
+        news_dept->set_subdepartments({Department::create("news-world", query_, "World"), Department::create("news-europe", query_, "Europe")});
         all_depts->set_subdepartments({news_dept, Department::create("sport", query_, "Sport")});
         reply->register_departments(all_depts, news_dept);
 

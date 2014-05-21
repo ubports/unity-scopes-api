@@ -76,10 +76,9 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        Department::SPtr parent = std::move(Department::create("all", query_, "All Departments"));
-        Department::SPtr news_dep = std::move(Department::create("news", query_, "News"));
-        news_dep->set_subdepartments({std::move(Department::create("subdep1", query_, "Europe")),
-                std::move(Department::create("subdep2", query_, "US"))});
+        Department::SPtr parent = Department::create("all", query_, "All Departments");
+        Department::SPtr news_dep = Department::create("news", query_, "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
         parent->set_subdepartments({news_dep});
         reply->register_departments(parent, news_dep);
 

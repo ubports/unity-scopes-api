@@ -29,7 +29,7 @@ TEST(Department, basic)
 {
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department::SPtr dep = std::move(Department::create(query, "News"));
+        Department::SPtr dep = Department::create(query, "News");
         dep->set_alternate_label("All News");
 
         EXPECT_EQ("dep1", dep->id());
@@ -39,7 +39,7 @@ TEST(Department, basic)
         EXPECT_EQ("All News", dep->alternate_label());
         EXPECT_FALSE(dep->has_subdepartments());
 
-        dep->set_subdepartments({std::move(Department::create("subdep1", query, "Europe"))});
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
         EXPECT_TRUE(dep->has_subdepartments());
         EXPECT_EQ(1u, dep->subdepartments().size());
         EXPECT_EQ("subdep1", dep->subdepartments().front()->id());
@@ -52,7 +52,7 @@ TEST(Department, basic)
     }
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department::SPtr dep = std::move(Department::create(query, "News"));
+        Department::SPtr dep = Department::create(query, "News");
         EXPECT_FALSE(dep->has_subdepartments());
 
         dep->set_has_subdepartments();
@@ -65,10 +65,9 @@ TEST(Department, serialize_and_deserialize)
     VariantMap var;
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department::SPtr dep = std::move(Department::create(query, "News"));
+        Department::SPtr dep = Department::create(query, "News");
         dep->set_alternate_label("All News");
-        dep->set_subdepartments({std::move(Department::create("subdep1", query, "Europe")),
-                std::move(Department::create("subdep2", query, "US"))});
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe"), Department::create("subdep2", query, "US")});
 
         var = dep->serialize();
     }
