@@ -26,18 +26,8 @@ namespace unity
 namespace scopes
 {
 
-Department::Department(CannedQuery const& query, std::string const& label)
-    : p(new internal::DepartmentImpl(query, label))
-{
-}
-
-Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label)
-    : p(new internal::DepartmentImpl(department_id, query, label))
-{
-}
-
-Department::Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments)
-    : p(new internal::DepartmentImpl(department_id, query, label, subdepartments))
+Department::Department(internal::DepartmentImpl *impl)
+    : p(impl)
 {
 }
 
@@ -62,6 +52,16 @@ Department& Department::operator=(Department const& other)
 
 Department& Department::operator=(Department&&) = default;
 
+Department::UPtr Department::create(CannedQuery const& query, std::string const& label)
+{
+    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(query, label)));
+}
+
+Department::UPtr Department::create(std::string const& department_id, CannedQuery const& query, std::string const& label)
+{
+    return std::unique_ptr<Department>(new Department(new internal::DepartmentImpl(department_id, query, label)));
+}
+
 VariantMap Department::serialize() const
 {
     return p->serialize();
@@ -77,6 +77,11 @@ void Department::set_has_subdepartments()
 void Department::set_subdepartments(DepartmentList const& departments)
 {
     p->set_subdepartments(departments);
+}
+
+void Department::add_subdepartment(Department::SCPtr const& department)
+{
+    p->add_subdepartment(department);
 }
 
 void Department::set_alternate_label(std::string const& label)
