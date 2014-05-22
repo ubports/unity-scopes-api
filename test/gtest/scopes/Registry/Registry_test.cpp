@@ -26,8 +26,8 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-
 #include <signal.h>
+#include <thread>
 #include <unistd.h>
 
 using namespace unity::scopes;
@@ -131,7 +131,7 @@ TEST(Registry, update_notify)
     auto wait_for_update = [&update_received_, &mutex_, &cond_]
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait_for(lock, std::chrono::seconds(1), [&update_received_] { return update_received_; });
+        cond_.wait(lock, [&update_received_] { return update_received_; });
         update_received_ = false;
     };
 
@@ -187,7 +187,7 @@ TEST(Registry, update_notify)
 
     // Make a folder in scopes that does not represent a scope id
     system("mkdir '" TEST_RUNTIME_PATH "/scopes/testfolder'");
-    wait_for_update();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // Check that no scopes were registered
     list = r->list();
