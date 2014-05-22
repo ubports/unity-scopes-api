@@ -40,8 +40,12 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
+        EXPECT_EQ(ListenerBase::Reason::Error, reason);
+        EXPECT_EQ("unity::scopes::MiddlewareException: unity::scopes::MiddlewareException: "
+                  "Cannot invoke operations while middleware is stopped",
+                  error_message);
         lock_guard<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
@@ -81,10 +85,10 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
     }
 
     // Check that the scope has indeed timed out. The server shuts down after 2 seconds,
-    // so we allow between 2 and 3 seconds for it to time out.
+    // so we allow between 2 and 4 seconds for it to time out.
     auto duration = chrono::steady_clock::now() - start_time;
     EXPECT_TRUE(duration > chrono::seconds(2));
-    EXPECT_TRUE(duration < chrono::seconds(3));
+    EXPECT_TRUE(duration < chrono::seconds(4));
 }
 
 // Check that the idle timeout for a server waits for synchronous operations
@@ -122,11 +126,13 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
 
     // Check that the run time doesn't shut down until
     // the search in the scope has completed, which takes 4 seconds.
-    // We allow 4 - 5 seconds for things to shut down before failing
-    // (or hanging).
+    // We allow 4 - 6 seconds for things to shut down before failing
+    // (or hanging). (On Arm, can be slow to shut down, so we allow
+    // a full two seconds for the server to go away before failing
+    // the test.)
     auto duration = chrono::steady_clock::now() - start_time;
     EXPECT_TRUE(duration > chrono::seconds(4));
-    EXPECT_TRUE(duration < chrono::seconds(5));
+    EXPECT_TRUE(duration < chrono::seconds(6));
 }
 
 int main(int argc, char **argv)

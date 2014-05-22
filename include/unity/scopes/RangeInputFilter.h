@@ -124,10 +124,10 @@ public:
      \brief Store start and end value in the filter state, without having an instance of RangeInputFilter.
 
      Updates filter_state with start and end values without an instance of RangeInputFilter. This is meant
+     for the explanation of this method.
      to be used when creating a CannedQuery that points to a foreign scope.
 
      See the documentation of unity::scopes::update_state(FilterState const& filter_state, Variant const& start_value, Variant const& end_value)
-     for the explanation of this method.
 
      \param filter_state FilterState instance to update
      \param filter_id Unique identifier of filter

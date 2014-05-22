@@ -30,12 +30,14 @@
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 #include <unity/scopes/internal/zmq_middleware/StateReceiverI.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQuery.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqStateReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 #include <unity/scopes/internal/zmq_middleware/RethrowException.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -65,6 +67,7 @@ char const* ctrl_suffix = "-c";     // Appended to server_name_ to create contro
 char const* reply_suffix = "-r";    // Appended to server_name_ to create reply adapter name
 char const* state_suffix = "-s";    // Appended to server_name_ to create state adapter name
 char const* registry_suffix = "-R"; // Appended to server_name_ to create registry (or SS registry) adapter name
+char const* publisher_suffix = "-p"; // Appended to publisher_id to create a publisher endpoint
 
 char const* query_category = "Query";       // query adapter category name
 char const* ctrl_category = "QueryCtrl";    // control adapter category name
@@ -673,6 +676,16 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
         throw;
     }
     return proxy;
+}
+
+MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id)
+{
+    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, public_endpoint_dir_));
+}
+
+MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& publisher_id, std::string const& topic)
+{
+    return MWSubscriber::UPtr(new ZmqSubscriber(&context_, publisher_id + publisher_suffix, public_endpoint_dir_, topic));
 }
 
 std::string ZmqMiddleware::get_scope_endpoint()

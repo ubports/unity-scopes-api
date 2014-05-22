@@ -136,7 +136,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
-    auto config_files = find_scope_config_files(scope_installdir, ".ini");
+    auto config_files = find_scope_config_files(scope_installdir, ".ini", error);
     for (auto&& path : config_files)
     {
         filesystem::path p(path);
@@ -163,7 +163,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     {
         try
         {
-            auto oem_paths = find_scope_config_files(oem_installdir, ".ini");
+            auto oem_paths = find_scope_config_files(oem_installdir, ".ini", error);
             for (auto&& path : oem_paths)
             {
                 filesystem::path p(path);
@@ -199,7 +199,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
     {
         try
         {
-            auto click_paths = find_scope_config_files(click_installdir, ".ini");
+            auto click_paths = find_scope_config_files(click_installdir, ".ini", error);
             for (auto&& path : click_paths)
             {
                 filesystem::path p(path);
@@ -424,7 +424,6 @@ main(int argc, char* argv[])
 
         add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
         add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
-        local_scopes.insert(click_scopes.begin(), click_scopes.end());
         if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");

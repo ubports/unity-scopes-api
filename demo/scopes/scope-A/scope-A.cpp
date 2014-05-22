@@ -59,7 +59,7 @@ public:
         reply->register_departments(departments);
 
         Filters filters;
-        auto filter = OptionSelectorFilter::create("f1", "Options");
+        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Options");
         filter->add_option("1", "Option 1");
         filter->add_option("2", "Option 2");
         filters.push_back(filter);

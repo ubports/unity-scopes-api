@@ -37,16 +37,28 @@ FilterStateImpl::FilterStateImpl(VariantMap const& var)
 
 bool FilterStateImpl::has_filter(std::string const& id) const
 {
+    if (id.empty())
+    {
+        throw InvalidArgumentException("FilterState::has_filter(): Invalid empty id string");
+    }
     return state_.find(id) != state_.end();
 }
 
 void FilterStateImpl::remove(std::string const& id)
 {
+    if (id.empty())
+    {
+        throw InvalidArgumentException("FilterState::remove(): Invalid empty id string");
+    }
     state_.erase(id);
 }
 
 Variant FilterStateImpl::get(std::string const& filter_id) const
 {
+    if (filter_id.empty())
+    {
+        throw InvalidArgumentException("FilterState::get(): Invalid empty filter_id string");
+    }
     auto it = state_.find(filter_id);
     if (it != state_.end())
     {

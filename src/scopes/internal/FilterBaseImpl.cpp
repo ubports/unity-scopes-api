@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
+#include <unity/scopes/internal/RadioButtonsFilterImpl.h>
+#include <unity/scopes/internal/RatingFilterImpl.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -38,6 +40,10 @@ FilterBaseImpl::FilterBaseImpl(std::string const& id)
     : id_(id),
       display_hints_(FilterBase::DisplayHints::Default)
 {
+    if (id_.empty())
+    {
+        throw InvalidArgumentException("FilterBase(): invalid empty id string");
+    }
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
@@ -113,6 +119,14 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         {
             return RangeInputFilterImpl::create(var);
         }
+        if (ftype == "radio_buttons")
+        {
+            return RadioButtonsFilterImpl::create(var);
+        }
+        if (ftype == "rating")
+        {
+            return RatingFilterImpl::create(var);
+        }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }
     throw unity::LogicException("FilterBase: Missing 'filter_type'");
@@ -136,6 +150,56 @@ Filters FilterBaseImpl::deserialize_filters(VariantArray const& var)
         filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
     }
     return filters;
+}
+
+void FilterBaseImpl::validate_filters(Filters const& filters)
+{
+    for (auto const& f: filters)
+    {
+        if (f == nullptr)
+        {
+            throw unity::LogicException("FilterBaseImpl::validate_filters(): invalid null filter pointer");
+        }
+        {
+            OptionSelectorFilter::SCPtr optsel = std::dynamic_pointer_cast<OptionSelectorFilter const>(f);
+            if (optsel)
+            {
+                if (optsel->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty OptionSelectorFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+        {
+            RatingFilter::SCPtr rating = std::dynamic_pointer_cast<RatingFilter const>(f);
+            if (rating)
+            {
+                if (rating->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty RatingFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+        {
+            RadioButtonsFilter::SCPtr radiobtn = std::dynamic_pointer_cast<RadioButtonsFilter const>(f);
+            if (radiobtn)
+            {
+                if (radiobtn->options().size() == 0)
+                {
+                    std::stringstream err;
+                    err << "FilterBaseImpl::validate_filters(): invalid empty RadioButtonsFilter '" << f->id() << "'";
+                    throw unity::LogicException(err.str());
+                }
+                continue;
+            }
+        }
+    }
 }
 
 } // namespace internal
