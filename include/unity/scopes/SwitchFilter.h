@@ -36,6 +36,8 @@ class SwitchFilterImpl;
 
 /**
 \brief A simple on/off switch filter.
+
+This is a simple on/off switcher. The filter is initially off.
 */
 class UNITY_API SwitchFilter : public FilterBase
 {
@@ -45,7 +47,7 @@ public:
 /// @endcond
 
     /**
-    \brief Creates an SwitchFilter
+    \brief Creates a SwitchFilter
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
     \param label A display label for the filter.
     \return SwitchFilter instance
@@ -60,6 +62,9 @@ public:
 
     /**
     \brief Check if the filter is "on".
+
+    The filter is "off" by default and also if not present in the filter_state.
+
     \param filter_state The state of filters
     \return true if the fiter is on.
     */
