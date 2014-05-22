@@ -16,7 +16,6 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "DirWatcher.h"
 #include "FindFiles.h"
 #include "ScopesWatcher.h"
 
