@@ -1,8 +1,13 @@
-unity-scopes-api (0.4.7+14.10.20140521-0ubuntu2) UNRELEASED; urgency=low
+unity-scopes-api (0.4.7+14.10.20140522-0ubuntu1) utopic; urgency=low
 
+  [ Ubuntu daily release ]
   * debian/*symbols: auto-update new symbols to released version
+  * New rebuild forced
 
- -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 22 May 2014 09:58:32 +0000
+  [ Pete Woods ]
+  * Switch to use libapparmor instead of aa-exec
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 22 May 2014 09:58:34 +0000
 
 unity-scopes-api (0.4.7+14.10.20140521-0ubuntu1) utopic; urgency=medium
 
