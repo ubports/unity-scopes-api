@@ -33,6 +33,7 @@ namespace scoperegistry
 DirWatcher::DirWatcher()
     : fd_(inotify_init())
     , thread_state_(Running)
+    , thread_exception_(nullptr)
 {
     // Validate the file descriptor
     if (fd_ < 0)
@@ -46,15 +47,34 @@ DirWatcher::~DirWatcher()
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        // Set state to Stopping
-        thread_state_ = Stopping;
-
-        // Remove watches (causes read to return)
-        for (auto& wd : wds_)
+        if (thread_state_ == Failed)
         {
-            inotify_rm_watch(fd_, wd.first);
+            try
+            {
+                std::rethrow_exception(thread_exception_);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "~DirWatcher(): " << e.what();
+            }
+            catch (...)
+            {
+                std::cerr << "~DirWatcher(): watch_thread was aborted due to an unknown exception"
+                          << std::endl;
+            }
         }
-        wds_.clear();
+        else
+        {
+            // Set state to Stopping
+            thread_state_ = Stopping;
+
+            // Remove watches (causes read to return)
+            for (auto& wd : wds_)
+            {
+                inotify_rm_watch(fd_, wd.first);
+            }
+            wds_.clear();
+        }
     }
 
     // Wait for thread to terminate
@@ -69,15 +89,22 @@ DirWatcher::~DirWatcher()
 
 void DirWatcher::add_watch(std::string const& path)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (thread_state_ == Failed)
+    {
+        std::rethrow_exception(thread_exception_);
+    }
+
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
                                                   IN_DELETE | IN_MOVED_FROM |
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
-        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" + path + "\"");
+        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
+                                path + "\"");
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
     wds_[wd] = path;
 
     // If this is the first watch, start the thread
@@ -90,6 +117,12 @@ void DirWatcher::add_watch(std::string const& path)
 void DirWatcher::remove_watch(std::string const& path)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+
+    if (thread_state_ == Failed)
+    {
+        std::rethrow_exception(thread_exception_);
+    }
+
     for (auto& wd : wds_)
     {
         if (wd.second == path)
@@ -126,7 +159,7 @@ void DirWatcher::watch_thread()
             int ret = select(fd_ + 1, &fds, nullptr, nullptr, nullptr);
             if (ret < 0)
             {
-                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                throw SyscallException("DirWatcher::watch_thread(): Thread aborted: "
                                        "select() failed on inotify fd (fd = " +
                                        std::to_string(fd_) + ")", errno);
             }
@@ -134,7 +167,7 @@ void DirWatcher::watch_thread()
             ret = ioctl(fd_, FIONREAD, &bytes_avail);
             if (ret < 0)
             {
-                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                throw SyscallException("DirWatcher::watch_thread(): Thread aborted: "
                                        "ioctl() failed on inotify fd (fd = " +
                                        std::to_string(fd_) + ")", errno);
             }
@@ -143,7 +176,7 @@ void DirWatcher::watch_thread()
             int bytes_read = read(fd_, &buffer[0], buffer.size());
             if (bytes_read < 0)
             {
-                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                throw SyscallException("DirWatcher::watch_thread(): Thread aborted: "
                                        "read() failed on inotify fd (fd = " +
                                        std::to_string(fd_) + ")", errno);
             }
@@ -210,9 +243,17 @@ void DirWatcher::watch_thread()
     }
     catch (std::exception const& e)
     {
-        std::cerr << e.what();
+        std::cerr << e.what() << std::endl;
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
+        thread_exception_ = std::current_exception();
+    }
+    catch (...)
+    {
+        std::cerr << "DirWatcher::watch_thread(): Thread aborted: unknown exception" << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = Failed;
+        thread_exception_ = std::current_exception();
     }
 }
 

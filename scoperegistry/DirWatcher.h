@@ -68,6 +68,7 @@ private:
     std::thread thread_;
     std::mutex mutex_;
     ThreadState thread_state_;
+    std::exception_ptr thread_exception_;
 
     void watch_thread();
     virtual void watch_event(EventType event_type, FileType file_type, std::string const& path) = 0;
