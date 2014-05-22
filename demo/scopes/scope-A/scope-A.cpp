@@ -54,9 +54,11 @@ public:
             return;  // Query was cancelled
         }
 
-        DepartmentList departments({{"news", query_, "News", {{"news-world", query_, "World"}, {"news-europe", query_, "Europe"}}},
-                                    {"sport", query_, "Sport"}});
-        reply->register_departments(departments);
+        Department::SPtr all_depts = Department::create("all", query_, "All departments");
+        Department::SPtr news_dept = Department::create("news", query_, "News");
+        news_dept->set_subdepartments({Department::create("news-world", query_, "World"), Department::create("news-europe", query_, "Europe")});
+        all_depts->set_subdepartments({news_dept, Department::create("sport", query_, "Sport")});
+        reply->register_departments(all_depts, news_dept);
 
         Filters filters;
         OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Options");

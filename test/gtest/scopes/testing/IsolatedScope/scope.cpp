@@ -33,6 +33,8 @@
 namespace testing
 {
 
+using namespace unity::scopes;
+
 class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
 public:
@@ -74,9 +76,11 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        unity::scopes::Department dep("news", query_, "News");
-        dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
-        reply->register_departments({dep}, "news");
+        Department::SPtr parent = Department::create("all", query_, "All Departments");
+        Department::SPtr news_dep = Department::create("news", query_, "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
+        parent->set_subdepartments({news_dep});
+        reply->register_departments(parent, news_dep);
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         unity::scopes::CategorisedResult res(cat);

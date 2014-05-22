@@ -440,7 +440,6 @@ main(int argc, char* argv[])
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
         auto p = middleware->add_registry_object(runtime->registry_identity(), registry);
-        cerr << p->to_string() << endl;
 
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware
