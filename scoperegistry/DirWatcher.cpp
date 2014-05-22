@@ -20,11 +20,10 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <iostream>
 #include <sys/inotify.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
-
-static const int c_event_size = sizeof(struct inotify_event);
-static const int c_buffer_len = 1024 * (c_event_size + 16);
 
 using namespace unity;
 
@@ -112,20 +111,46 @@ void DirWatcher::watch_thread()
 {
     try
     {
-        // Poll for notifications until stop is requested
-        char buffer[c_buffer_len];
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(fd_, &fds);
+
+        int bytes_avail = 0;
+        std::string buffer;
         std::string event_path;
+
+        // Poll for notifications until stop is requested
         while (true)
         {
-            // Wait for changes to directories
-            int length = read(fd_, buffer, c_buffer_len);
-            if (length < 0)
+            // Wait for a payload to arrive
+            int ret = select(fd_ + 1, &fds, nullptr, nullptr, nullptr);
+            if (ret < 0)
             {
-                throw ResourceException("DirWatcher::watch_thread(): failed to read from inotify fd");
+                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                                       "select() failed on inotify fd (fd = " +
+                                       std::to_string(fd_) + ")", errno);
+            }
+            // Get number of bytes available
+            ret = ioctl(fd_, FIONREAD, &bytes_avail);
+            if (ret < 0)
+            {
+                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                                       "ioctl() failed on inotify fd (fd = " +
+                                       std::to_string(fd_) + ")", errno);
+            }
+            // Read available bytes
+            buffer.resize(bytes_avail);
+            int bytes_read = read(fd_, &buffer[0], buffer.size());
+            if (bytes_read < 0)
+            {
+                throw SyscallException("DirWatcher::watch_thread(): Aborting thread: "
+                                       "read() failed on inotify fd (fd = " +
+                                       std::to_string(fd_) + ")", errno);
             }
 
+            // Process event(s) received
             int i = 0;
-            while (i < length)
+            while (i < bytes_read)
             {
                 struct inotify_event* event = (inotify_event*)&buffer[i];
                 {
@@ -170,7 +195,7 @@ void DirWatcher::watch_thread()
                         watch_event(Modified, File, event_path);
                     }
                 }
-                i += c_event_size + event->len;
+                i += sizeof(inotify_event) + event->len;
             }
 
             // Break from the loop if we are stopping
@@ -183,8 +208,9 @@ void DirWatcher::watch_thread()
             }
         }
     }
-    catch (...)
+    catch (std::exception const& e)
     {
+        std::cerr << e.what();
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
     }
