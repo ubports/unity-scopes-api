@@ -81,14 +81,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::~PreviewReply()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::RatingFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::set_on_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::set_off_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::RatingFilter(unity::scopes::internal::RatingFilterImpl*)@Base" 0replaceme
- (c++)"unity::scopes::RatingFilter::~RatingFilter()@Base" 0replaceme
  (c++)"unity::scopes::RatingFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::RatingFilter::set_on_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::RatingFilter::set_off_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
