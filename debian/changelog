@@ -1,8 +1,5 @@
 unity-scopes-api (0.4.8-0ubuntu1) UNRELEASED; urgency=medium
 
-  [ Pete Woods ]
-  * Add results TTL option to configuration files.
-
   [ Pawel Stolowski ]
   * Changes to departments API.
 
