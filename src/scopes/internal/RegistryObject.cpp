@@ -359,20 +359,8 @@ void RegistryObject::ScopeProcess::exec(
     // 2. exec the scope.
     update_state_unlocked(Starting);
 
-    std::string program;
-    std::vector<std::string> argv;
-
-    if (exec_data_.confinement_profile.empty())
-    {
-        program = exec_data_.scoperunner_path;
-        argv = {exec_data_.runtime_config, exec_data_.scope_config};
-    }
-    else
-    {
-        program = "/usr/sbin/aa-exec";
-        argv = {"-p", exec_data_.confinement_profile, exec_data_.scoperunner_path,
-                exec_data_.runtime_config, exec_data_.scope_config};
-    }
+    std::string program = exec_data_.scoperunner_path;
+    std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
@@ -382,7 +370,8 @@ void RegistryObject::ScopeProcess::exec(
 
     {
         process_ = executor->exec(program, argv, env,
-                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
+                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
+                                     exec_data_.confinement_profile);
         if (process_.pid() <= 0)
         {
             clear_handle_unlocked();
