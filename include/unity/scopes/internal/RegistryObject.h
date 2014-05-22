@@ -58,7 +58,7 @@ public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
     RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
-                   MiddlewareBase::SPtr middleware = nullptr);
+                   MiddlewareBase::SPtr middleware);
     virtual ~RegistryObject();
 
     // Remote operation implementations
