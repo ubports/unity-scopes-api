@@ -279,7 +279,7 @@ The following keys are recognized in the ScopeConfig group:
 
   If set, the results for this scope will be set to expire, and be refreshed. Valid values are:
 
-  - none
+  - None
 
   - Small - in the order of a minute
 
