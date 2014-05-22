@@ -102,21 +102,47 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                                 DirWatcher::FileType file_type,
                                 std::string const& path)
 {
-    if (file_type == DirWatcher::File &&
-        path.substr(path.length() - 4) == ".ini")
-    {
-        filesystem::path p(path);
-        std::string scope_id = p.stem().native();
+    filesystem::path fs_path(path);
 
-        // A new config file has been added
-        if (event_type == DirWatcher::Added)
+    if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
+    {
+        std::string parent_path = fs_path.parent_path().native();
+        std::string scope_id = fs_path.stem().native();
+
+        // A .ini has been added / modified
+        if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
         {
+            dir_to_ini_map_[parent_path] = path;
             ini_added_callback_(std::make_pair(scope_id, path));
         }
-        // A config file has been removed
+        // A .ini has been removed
         else if (event_type == DirWatcher::Removed)
         {
+            dir_to_ini_map_.erase(parent_path);
             registry_->remove_local_scope(scope_id);
+        }
+    }
+    else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
+    {
+        std::string parent_path = fs_path.parent_path().native();
+
+        // Check if this directory is associate with the config file
+        if (dir_to_ini_map_.find(parent_path) != dir_to_ini_map_.end())
+        {
+            std::string ini_path = dir_to_ini_map_.at(parent_path);
+            filesystem::path fs_ini_path(ini_path);
+            std::string scope_id = fs_ini_path.stem().native();
+
+            // A .so file has been added / modified
+            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
+            {
+                ini_added_callback_(std::make_pair(scope_id, ini_path));
+            }
+            // A .so file has been removed
+            else if (event_type == DirWatcher::Removed)
+            {
+                registry_->remove_local_scope(scope_id);
+            }
         }
     }
     else
