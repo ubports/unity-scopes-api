@@ -167,7 +167,7 @@ The following keys are recognized:
 - Scoperunner.Path
 
   The path to the scoperunner executable. The path must be an absolute path.
-  The default value is "/usr/lib/<arch>/scoperunner".
+  The default value is "/usr/lib/<arch>/unity-scopes/scoperunner".
 
 - Scope.InstallDir
 
