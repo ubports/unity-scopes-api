@@ -49,6 +49,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
             auto configs = find_scope_dir_configs(subdir, ".ini");
             if (!configs.empty())
             {
+                std::lock_guard<std::mutex> lock(mutex_);
                 dir_to_ini_map_[subdir] = configs[0];
             }
             add_watch(subdir);
@@ -106,6 +107,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
 
     if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         std::string parent_path = fs_path.parent_path().native();
         std::string scope_id = fs_path.stem().native();
 
@@ -124,6 +126,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
     }
     else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         std::string parent_path = fs_path.parent_path().native();
 
         // Check if this directory is associate with the config file
