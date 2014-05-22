@@ -73,6 +73,8 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
         filesystem::path p(configs[0]);
         std::string scope_id = p.stem().native();
         ini_added_callback_(std::make_pair(scope_id, configs[0]));
+        std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+                  << dir << "\"" << std::endl;
     }
 
     // Add a watch for this directory
@@ -93,6 +95,8 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
         filesystem::path p(ini_path);
         std::string scope_id = p.stem().native();
         registry_->remove_local_scope(scope_id);
+        std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                  << dir << "\"" << std::endl;
     }
 
     // Remove the watch for this directory
@@ -116,12 +120,16 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         {
             dir_to_ini_map_[parent_path] = path;
             ini_added_callback_(std::make_pair(scope_id, path));
+            std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+                      << parent_path << "\"" << std::endl;
         }
         // A .ini has been removed
         else if (event_type == DirWatcher::Removed)
         {
             dir_to_ini_map_.erase(parent_path);
             registry_->remove_local_scope(scope_id);
+            std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                      << parent_path << "\"" << std::endl;
         }
     }
     else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
@@ -140,11 +148,15 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
             {
                 ini_added_callback_(std::make_pair(scope_id, ini_path));
+                std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+                          << parent_path << "\"" << std::endl;
             }
             // A .so file has been removed
             else if (event_type == DirWatcher::Removed)
             {
                 registry_->remove_local_scope(scope_id);
+                std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                          << parent_path << "\"" << std::endl;
             }
         }
     }
