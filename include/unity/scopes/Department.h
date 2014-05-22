@@ -31,18 +31,18 @@ namespace unity
 namespace scopes
 {
 
-class CannedQuery;
 class Department;
-
-/*! \typedef DepartmentList
-\brief List of departments (see unity::scopes::Department)
-*/
-typedef std::list<Department> DepartmentList;
+class CannedQuery;
 
 namespace internal
 {
 class DepartmentImpl;
 }
+
+/*! \typedef DepartmentList
+\brief List of departments (see unity::scopes::Department)
+*/
+typedef std::list<std::shared_ptr<Department const>> DepartmentList;
 
 /**
 \brief A department with optional sub-departments.
@@ -62,7 +62,7 @@ public:
     selects this department.
     \param label The display name of this department.
     */
-    Department(CannedQuery const& query, std::string const& label);
+    static Department::UPtr create(CannedQuery const& query, std::string const& label);
 
     /**
     \brief Create a department with the given department identifier, canned query, and name.
@@ -75,21 +75,7 @@ public:
     selects this department.
     \param label The display name of this department.
     */
-    Department(std::string const& department_id, CannedQuery const& query, std::string const& label);
-
-    /**
-    \brief Create a department with the given department identifier, canned query, name, and sub-departments.
-
-    The canned query's target department identifier is updated with department_id.
-    This constructor is convenient for creating multiple departments that use the same query and only
-    need a different department identifier.
-    \param department_id The department identifier.
-    \param query The canned query (and associated parameters, such as filter state) to be executed when the user
-    selects this department.
-    \param label The display name of this department.
-    \param subdepartments The sub-departments of this department.
-     */
-    Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
+    static Department::UPtr create(std::string const& department_id, CannedQuery const& query, std::string const& label);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -110,6 +96,12 @@ public:
     \param departments The list of sub-departments.
     */
     void set_subdepartments(DepartmentList const& departments);
+
+    /**
+    \brief Add sub-department to this department.
+    \param department The subdepartment instance.
+    */
+    void add_subdepartment(Department::SCPtr const& department);
 
     /**
      \brief Set the alternate label (plural of the normal label) of this department.
@@ -176,7 +168,9 @@ public:
     /// @endcond
 
 private:
+    Department(internal::DepartmentImpl *impl);
     std::unique_ptr<internal::DepartmentImpl> p;
+    friend class internal::DepartmentImpl;
 };
 
 } // namespace scopes
