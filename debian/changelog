@@ -1,11 +1,17 @@
-unity-scopes-api (0.4.7-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.4.8+14.10.20140519-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pawel Stolowski ]
   * Implemented RatingFilter and RadioButtonFilter.
   * Fixed lp:1319712: Appearance attributes not supported for remote scopes.
   * Changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique ptr.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 16 May 2014 17:48:23 +0200
+  [ Marcus Tomlinson ]
+  * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
+  * Updated scoperegistry to inform the registry object when scopes are (un)installed.
+  * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
+  * Added set_update_callback() to Registry (callback executed when the scopes list changes).
+
+ -- Marcus Tomlinson <marcustomlinson@ubuntu>  Thu, 22 May 2014 06:47:28 +0200
 
 unity-scopes-api (0.4.6+14.10.20140519-0ubuntu1) utopic; urgency=medium
 
