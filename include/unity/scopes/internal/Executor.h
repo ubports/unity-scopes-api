@@ -43,7 +43,8 @@ public:
     virtual core::posix::ChildProcess exec (const std::string& fn,
             const std::vector<std::string>& argv,
             const std::map<std::string, std::string>& env,
-            const core::posix::StandardStream& flags);
+            const core::posix::StandardStream& flags,
+            const std::string& confinement_profile);
 
 };
 
