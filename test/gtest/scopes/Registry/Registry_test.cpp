@@ -26,6 +26,7 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <thread>
 
 #include <signal.h>
 #include <unistd.h>
@@ -131,7 +132,7 @@ int main(int argc, char **argv)
     {
         // Give the registry some time to fire up before running the tests,
         // otherwise we can get an ObjectNotExistException.
-        this_thread::sleep_for(chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;
