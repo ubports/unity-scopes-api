@@ -129,6 +129,9 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // Give the registry some time to fire up before running the tests,
+        // otherwise we can get an ObjectNotExistException.
+        this_thread::sleep_for(chrono::milliseconds(500));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;
