@@ -213,6 +213,12 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::NotFoundException::NotFoundException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::~NotFoundException()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::operator=(unity::scopes::NotFoundException const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ValueSliderFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, double)@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::set_slider_type(unity::scopes::ValueSliderFilter::SliderType)@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::set_default_value(double)@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, double, double)@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::ValueSliderFilter(unity::scopes::internal::ValueSliderFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::~ValueSliderFilter()@Base" 0replaceme
  (c++)"unity::scopes::ActivationResponse::set_scope_data(unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse::Status)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
@@ -596,6 +602,17 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::CategorisedResult::category() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::self() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ValueSliderFilter::slider_type() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::value_label(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::update_state(unity::scopes::FilterState&, double) const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::default_value() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::value_label_template() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::max() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::min() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::label() const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::value(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::ValueSliderFilter::has_value(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::ActivationResponse::scope_data() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::query() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::status() const@Base" 0.4.0+14.04.20140312.1
@@ -757,6 +774,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::ValueSliderFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"typeinfo for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
@@ -798,6 +816,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::ValueSliderFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"typeinfo name for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
@@ -850,6 +869,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::ValueSliderFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"vtable for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
