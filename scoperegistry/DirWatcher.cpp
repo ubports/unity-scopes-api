@@ -38,7 +38,8 @@ DirWatcher::DirWatcher()
     // Validate the file descriptor
     if (fd_ < 0)
     {
-        throw ResourceException("DirWatcher(): inotify_init() failed");
+        throw SyscallException("DirWatcher(): inotify_init() failed on inotify fd (fd = " +
+                               std::to_string(fd_) + ")", errno);
     }
 }
 
