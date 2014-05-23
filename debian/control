@@ -2,7 +2,6 @@ Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
-               apparmor:native,
                click-dev (>= 0.2.2),
                cmake,
                doxygen,
@@ -11,7 +10,8 @@ Build-Depends: debhelper (>= 9),
                pkg-config,
                python3:native,
                capnproto,
-               libprocess-cpp-dev (>= 1.0.0),
+               libapparmor-dev,
+               libprocess-cpp-dev (>= 1.0.1),
                libunity-api-dev (>= 7.80.7~),
                libboost-dev,
                libboost-filesystem-dev,
@@ -38,8 +38,7 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
-         ${shlibs:Depends},
-         apparmor
+         ${shlibs:Depends}
 Replaces: libunity-scopes0,
 Conflicts: libunity-scopes0,
 Description: API for Unity scopes integration
