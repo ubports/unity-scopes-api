@@ -55,6 +55,12 @@ TEST(ValueSliderFilter, state)
 
     {
         FilterState fstate;
+        auto filter1 = ValueSliderFilter::create("f1", "Less than", 1, 100);
+        EXPECT_THROW(filter1->label(fstate), unity::LogicException); // invalid label template
+    }
+
+    {
+        FilterState fstate;
         auto filter1 = ValueSliderFilter::create("f1", "Less than %d", 1, 100);
         filter1->update_state(fstate, 33);
         EXPECT_EQ("Less than 33", filter1->label(fstate));

@@ -96,7 +96,17 @@ std::string ValueSliderFilterImpl::label(FilterState const& filter_state) const
     {
         val = default_val_;
     }
-    return boost::str(boost::format(label_template_) % val);
+
+    try
+    {
+        return boost::str(boost::format(label_template_) % val);
+    }
+    catch (boost::io::format_error const& e)
+    {
+        std::stringstream err;
+        err << "ValueSliderFilterImpl::label(): Failed to format label of filter '" << id() << "' using template '" << label_template_ << "'";
+        throw unity::LogicException(err.str());
+    }
 }
 
 std::string ValueSliderFilterImpl::label_template() const
