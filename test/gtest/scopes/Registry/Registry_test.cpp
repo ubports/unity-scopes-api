@@ -153,7 +153,7 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
 
     // Make a symlink to testscopeD in the scopes folder
-    ASSERT_EQ(0, system("ln -sfv '" TEST_RUNTIME_PATH "/other_scopes/testscopeD' '" TEST_RUNTIME_PATH "/scopes/testscopeD'"));
+    ASSERT_EQ(0, system("ln -sfv '" TEST_RUNTIME_PATH "/other_scopes/testscopeD' '" TEST_RUNTIME_PATH "/scopes/testscopeD.lnk'"));
     wait_for_update();
 
     // Now check that we have 4 scopes registered
@@ -176,7 +176,7 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
     // Remove symlink to testscopeD from the scopes folder
-    ASSERT_EQ(0, system("rm -fv '" TEST_RUNTIME_PATH "/scopes/testscopeD'"));
+    ASSERT_EQ(0, system("mv -fv '" TEST_RUNTIME_PATH "/scopes/testscopeD.lnk' '" TEST_RUNTIME_PATH "/other_scopes'"));
     wait_for_update();
 
     // Now check that we are back to having 2 scopes registered
