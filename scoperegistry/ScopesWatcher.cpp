@@ -49,8 +49,9 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
             auto configs = find_scope_dir_configs(subdir, ".ini");
             if (!configs.empty())
             {
+                auto config = *configs.cbegin();
                 std::lock_guard<std::mutex> lock(mutex_);
-                dir_to_ini_map_[subdir] = configs[0];
+                dir_to_ini_map_[subdir] = config.second;
             }
             add_watch(subdir);
         }
@@ -63,17 +64,16 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
     auto configs = find_scope_dir_configs(dir, ".ini");
     if (!configs.empty())
     {
+        auto config = *configs.cbegin();
         // Associate this directory with the contained config file
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            dir_to_ini_map_[dir] = configs[0];
+            dir_to_ini_map_[dir] = config.second;
         }
 
         // New config found, execute callback
-        filesystem::path p(configs[0]);
-        std::string scope_id = p.stem().native();
-        ini_added_callback_(std::make_pair(scope_id, configs[0]));
-        std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+        ini_added_callback_(config);
+        std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
                   << dir << "\"" << std::endl;
     }
 

@@ -82,19 +82,20 @@ vector<string> find_entries(string const& install_dir, EntryType type)
 // symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 
-vector<string> find_scope_dir_configs(string const& scope_dir, string const& suffix)
+map<string, string> find_scope_dir_configs(string const& scope_dir, string const& suffix)
 {
-    vector<string> files;
+    map<string, string> files;
 
-    auto candidates = find_entries(scope_dir, File);
-    for (auto c : candidates)
+    auto paths = find_entries(scope_dir, File);
+    for (auto path : paths)
     {
-        filesystem::path path(c);
-        if (path.extension() != suffix) {
+        filesystem::path fs_path(path);
+        if (fs_path.extension() != suffix)
+        {
             continue;
         }
-
-        files.emplace_back(c);
+        auto scope_id = fs_path.stem().native();
+        files.insert(make_pair(scope_id, path));
     }
 
     return files;
@@ -105,32 +106,28 @@ vector<string> find_scope_dir_configs(string const& scope_dir, string const& suf
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 // Print error message for any scopes with an id that was seen previously.
 
-vector<string> find_install_dir_configs(string const& install_dir,
-                                        string const& suffix,
-                                        function<void(string const&)> error)
+map<string, string> find_install_dir_configs(string const& install_dir,
+                                             string const& suffix,
+                                             function<void(string const&)> error)
 {
-    vector<string> files;
+    map<string, string> files;
     map<string, string> scopes_seen;
 
-    auto subdirs = find_entries(install_dir, Directory);
-    for (auto subdir : subdirs)
+    auto scope_dirs = find_entries(install_dir, Directory);
+    for (auto scope_dir : scope_dirs)
     {
-        auto candidates = find_entries(subdir, File);
-        for (auto c : candidates)
+        auto configs = find_scope_dir_configs(scope_dir, suffix);
+        for (auto config : configs)
         {
-            filesystem::path path(c);
-            if (path.extension() != suffix) {
-                continue;
-            }
-            auto stem = path.stem().native();
-            auto const it = scopes_seen.find(stem);
+            auto const it = scopes_seen.find(config.first);
             if (it != scopes_seen.end())
             {
-                error("ignoring second instance of non-unique scope: " + path.native() + "\n"
+                error("ignoring second instance of non-unique scope: " + config.second + "\n"
                       "previous instance: " + it->second);
+                continue;
             }
-            scopes_seen[stem] = path.native();
-            files.emplace_back(c);
+            scopes_seen[config.first] = config.second;
+            files.insert(config);
         }
     }
 

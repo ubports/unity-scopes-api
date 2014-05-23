@@ -140,23 +140,21 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     auto config_files = find_install_dir_configs(scope_installdir, ".ini", error);
     for (auto&& path : config_files)
     {
-        filesystem::path p(path);
-        string scope_id = p.stem().native();
         try
         {
-            ScopeConfig config(path);
+            ScopeConfig config(path.second);
             if (config.overrideable())
             {
-                overrideable_scopes[scope_id] = path;
+                overrideable_scopes[path.first] = path.second;
             }
             else
             {
-                fixed_scopes[scope_id] = path;
+                fixed_scopes[path.first] = path.second;
             }
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + scope_id + "\": configuration error:\n" + e.what());
+            error("ignoring scope \"" + path.first + "\": configuration error:\n" + e.what());
         }
     }
 
@@ -167,16 +165,13 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
             auto oem_paths = find_install_dir_configs(oem_installdir, ".ini", error);
             for (auto&& path : oem_paths)
             {
-                filesystem::path p(path);
-                string file_name = p.filename().native();
-                string scope_id = p.stem().native();
-                if (fixed_scopes.find(scope_id) == fixed_scopes.end())
+                if (fixed_scopes.find(path.first) == fixed_scopes.end())
                 {
-                    overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
+                    overrideable_scopes[path.first] = path.second;  // Replaces scope if it was present already
                 }
                 else
                 {
-                    error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
+                    error("ignoring non-overrideable scope config \"" + path.second + "\" in OEM directory " + oem_installdir);
                 }
             }
         }
@@ -203,16 +198,13 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
             auto click_paths = find_install_dir_configs(click_installdir, ".ini", error);
             for (auto&& path : click_paths)
             {
-                filesystem::path p(path);
-                string file_name = p.filename().native();
-                string scope_id = p.stem().native();
-                if (local_scopes.find(scope_id) == local_scopes.end())
+                if (local_scopes.find(path.first) == local_scopes.end())
                 {
-                    click_scopes[scope_id] = path;
+                    click_scopes[path.first] = path.second;
                 }
                 else
                 {
-                    error("ignoring non-overrideable scope config \"" + file_name + "\" in click directory " + click_installdir);
+                    error("ignoring non-overrideable scope config \"" + path.second + "\" in click directory " + click_installdir);
                 }
             }
         }
