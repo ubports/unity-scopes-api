@@ -363,6 +363,9 @@ TEST(Runtime, early_cancel)
     auto proxy = mw->create_scope_proxy("SlowCreateScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
 
+    // Allow some time for the middleware to start up.
+    this_thread::sleep_for(chrono::milliseconds(200));
+
     // Check that, if a cancel is sent before search() returns on the server side, the
     // cancel is correctly forwarded to the scope once the real reply proxy arrives
     // over the wire.
@@ -379,7 +382,7 @@ TEST(Runtime, early_cancel)
     // of waiting for the cancel message from the scope. Allow some time for the
     // cancel to reach the scope before shutting down the run time, so the scope
     // can test that it received the cancel.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(300));
 }
 
 void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)

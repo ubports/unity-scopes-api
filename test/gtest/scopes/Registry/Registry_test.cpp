@@ -26,6 +26,7 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
+#include <thread>
 
 #include <signal.h>
 #include <unistd.h>
@@ -129,6 +130,9 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // Allow the registry process some time to start up,
+        // so we don't get an ObjectNotExistException.
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;
