@@ -23,6 +23,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -30,6 +31,7 @@
 #include <thread>
 #include <unistd.h>
 
+using namespace boost;
 using namespace unity::scopes;
 
 class Receiver : public SearchListenerBase
@@ -130,10 +132,15 @@ TEST(Registry, update_notify)
     });
     auto wait_for_update = [&update_received_, &mutex_, &cond_]
     {
+        // Flush out all update notifications
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [&update_received_] { return update_received_; });
-        update_received_ = false;
+        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
+        {
+            update_received_ = false;
+        }
     };
+
+    system::error_code ec;
 
     // First check that we have 2 scopes registered
     MetadataMap list = r->list();
@@ -142,7 +149,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
 
     // Move testscopeC into the scopes folder
-    ASSERT_EQ(0, system("mv -fv '" TEST_RUNTIME_PATH "/other_scopes/testscopeC' '" TEST_RUNTIME_PATH "/scopes'"));
+    std::cout << "Move testscopeC into the scopes folder" << std::endl;
+    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we have 3 scopes registered
@@ -153,7 +162,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
 
     // Make a symlink to testscopeD in the scopes folder
-    ASSERT_EQ(0, system("ln -sfv '" TEST_RUNTIME_PATH "/other_scopes/testscopeD' '" TEST_RUNTIME_PATH "/scopes/testscopeD.lnk'"));
+    std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD");
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we have 4 scopes registered
@@ -165,7 +176,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
     // Move testscopeC back into the other_scopes folder
-    ASSERT_EQ(0, system("mv -fv '" TEST_RUNTIME_PATH "/scopes/testscopeC' '" TEST_RUNTIME_PATH "/other_scopes'"));
+    std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we have 3 scopes registered again
@@ -176,7 +189,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
     // Remove symlink to testscopeD from the scopes folder
-    ASSERT_EQ(0, system("mv -fv '" TEST_RUNTIME_PATH "/scopes/testscopeD.lnk' '" TEST_RUNTIME_PATH "/other_scopes'"));
+    std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD");
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we are back to having 2 scopes registered
@@ -185,9 +200,10 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
 
-    // Make a folder in scopes that does not represent a scope id
-    ASSERT_EQ(0, system("mkdir -pv '" TEST_RUNTIME_PATH "/scopes/testfolder'"));
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Make a folder in scopes named "testfolder"
+    std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder");
+    ASSERT_EQ("Success", ec.message());
 
     // Check that no scopes were registered
     list = r->list();
@@ -196,7 +212,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
 
     // Make a symlink to testscopeC.ini in testfolder
-    ASSERT_EQ(0, system("ln -sfv '" TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini' '" TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini'"));
+    std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini");
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we have 3 scopes registered
@@ -207,7 +225,9 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
 
     // Remove testfolder
-    ASSERT_EQ(0, system("rm -rfv '" TEST_RUNTIME_PATH "/scopes/testfolder'"));
+    std::cout << "Remove testfolder" << std::endl;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder");
+    ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
     // Now check that we are back to having 2 scopes registered
