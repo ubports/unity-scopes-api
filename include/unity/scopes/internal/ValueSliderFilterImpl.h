@@ -36,15 +36,16 @@ namespace internal
 class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
-    ValueSliderFilterImpl(std::string const& id, std::string const& label_template, int min, int max);
+    ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, int min, int max);
     ValueSliderFilterImpl(VariantMap const& var);
     void set_slider_type(ValueSliderFilter::SliderType tp);
     ValueSliderFilter::SliderType slider_type() const;
     void set_default_value(int val);
+    std::string label() const;
     int min() const;
     int max() const;
-    std::string label(FilterState const& filter_state) const;
-    std::string label_template() const;
+    std::string value_label(FilterState const& filter_state) const;
+    std::string value_label_template() const;
     bool has_value(FilterState const& filter_state) const;
     int value(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, int value) const;
@@ -58,6 +59,7 @@ protected:
     void check_range(int val) const;
 
 private:
+    std::string label_;
     std::string label_template_;
     ValueSliderFilter::SliderType slider_type_;
     int default_val_;

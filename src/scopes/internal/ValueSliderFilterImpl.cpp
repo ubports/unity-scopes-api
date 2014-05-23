@@ -32,18 +32,24 @@ namespace scopes
 namespace internal
 {
 
-ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, std::string const& label_template, int min, int max)
+ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, int min, int max)
     : FilterBaseImpl(id),
+      label_(label),
       label_template_(label_template),
       slider_type_(ValueSliderFilter::SliderType::LessThan),
       min_(min),
       max_(max)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("ValueSliderFilterImpl(): Invalid empty label string");
+    }
+
     if (min < 0 || min >= max)
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
-        throw unity::LogicException(err.str());
+        throw LogicException(err.str());
     }
     default_val_ = max;
 }
@@ -85,14 +91,19 @@ int ValueSliderFilterImpl::max() const
     return max_;
 }
 
-std::string ValueSliderFilterImpl::label(FilterState const& filter_state) const
+std::string ValueSliderFilterImpl::label() const
+{
+    return label_;
+}
+
+std::string ValueSliderFilterImpl::value_label(FilterState const& filter_state) const
 {
     int val;
     try
     {
         val = value(filter_state);
     }
-    catch (unity::LogicException const&)
+    catch (LogicException const&)
     {
         val = default_val_;
     }
@@ -105,11 +116,11 @@ std::string ValueSliderFilterImpl::label(FilterState const& filter_state) const
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::label(): Failed to format label of filter '" << id() << "' using template '" << label_template_ << "'";
-        throw unity::LogicException(err.str());
+        throw LogicException(err.str());
     }
 }
 
-std::string ValueSliderFilterImpl::label_template() const
+std::string ValueSliderFilterImpl::value_label_template() const
 {
     return label_template_;
 }
@@ -141,7 +152,7 @@ int ValueSliderFilterImpl::value(FilterState const& filter_state) const
     }
     std::stringstream err;
     err << "ValueSliderFilterImpl::get_value(): value is not set for filter '" << id() << "'";
-    throw unity::LogicException(err.str());
+    throw LogicException(err.str());
 }
 
 void ValueSliderFilterImpl::update_state(FilterState& filter_state, int value) const
@@ -158,6 +169,7 @@ void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string 
 
 void ValueSliderFilterImpl::serialize(VariantMap& var) const
 {
+    var["label"] = label_;
     var["label_template"] = label_template_;
     var["min"] = Variant(min_);
     var["max"] = Variant(max_);
@@ -167,7 +179,9 @@ void ValueSliderFilterImpl::serialize(VariantMap& var) const
 
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
 {
-    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label_template");
+    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label");
+    label_ = it->second.get_string();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label_template");
     label_template_ = it->second.get_string();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
     min_ = it->second.get_int();
@@ -190,7 +204,7 @@ void ValueSliderFilterImpl::check_range(int val) const
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::check_range(): value " << val << " outside of allowed range (" << min_ << ", " << max_ << ")";
-        throw unity::LogicException(err.str());
+        throw LogicException(err.str());
     }
 }
 

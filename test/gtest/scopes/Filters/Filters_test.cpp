@@ -193,7 +193,7 @@ TEST(Filters, deserialize)
     }
 
     {
-        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Less than %d", 0, 100);
+        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %d", 0, 100);
         auto var = filter1->serialize();
 
         auto f = internal::FilterBaseImpl::deserialize(var);

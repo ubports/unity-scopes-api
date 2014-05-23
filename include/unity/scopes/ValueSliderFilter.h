@@ -35,7 +35,7 @@ class ValueSliderFilterImpl;
 }
 
 /**
-\brief
+\brief A value slider filter that allows for selecting values within given range.
 */
 class UNITY_API ValueSliderFilter : public FilterBase
 {
@@ -44,23 +44,115 @@ public:
     UNITY_DEFINES_PTRS(ValueSliderFilter);
     /// @endcond
 
+    /**
+     \brief The type of value slider.
+
+     The type should be set according to the behaviour of the filter:
+     ValueSliderFilter::SliderType::LessThan should be used if values lesser than selected value are to be returned, otherwise
+     ValueSliderFilter::SliderType::MoreThan should be used.
+     Note: the selected type is a display hint for the Shell only. It's up to the scope to set it properly and actually follow
+     it on search.
+     */
     enum SliderType
     {
-        LessThan,
-        MoreThan
+        LessThan, /**< Scope will search for values lesser than selected value */
+        MoreThan  /**< Scope will search for values greater than selected value */
     };
 
-    static ValueSliderFilter::UPtr create(std::string const& id, std::string const& label_template, int min, int max);
+    /**
+     \brief Create ValueSliderFilter.
 
+     Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
+
+     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param label_template Template for value label, e.g. "Less than %d"
+     \param min minimum allowed value
+     \param max maximum allowed value
+     \return Instance of ValueSliderFilter.
+     \throws unity::LogicException on invalid (min, max) range.
+    */
+    static ValueSliderFilter::UPtr create(std::string const& id, std::string const& label, std::string const& label_template, int min, int max);
+
+    /**
+     \brief Change the type of this filter.
+
+     \param The type of slider filter.
+     */
     void set_slider_type(SliderType tp);
+
+    /**
+     \brief Get the type of this filter.
+
+     \return The type of slider filter.
+     */
     SliderType slider_type() const;
+
+    /**
+     \brief Get the minimum allowed value.
+
+     \return mimimum value
+    */
     int min() const;
+
+    /**
+    \brief Get the maximum allowed value.
+
+    \return maximum value
+    */
     int max() const;
-    std::string label(FilterState const& filter_state) const;
-    std::string label_template() const;
+
+    /**
+    \brief Get the label of this filter.
+
+    \return The label
+    */
+    std::string label() const;
+
+    /**
+     \brief Get the value label template of this filter.
+
+     \return The value label template.
+     */
+    std::string value_label_template() const;
+
+    /**
+    \brief Check if filter state object holds a value of this filter.
+
+    \return true if filter_state has a value of this filter.
+     */
     bool has_value(FilterState const& filter_state) const;
+
+    /**
+     \brief Get value of this filter from filter state object.
+
+     \return value of this filter
+     \throws unity::LogicException if value is not present in state object.
+    */
     int value(FilterState const& filter_state) const;
+
+    /**
+     \brief Get label for current value of this filter, formatted with value label template.
+
+     \return formatted label for current value
+     \throws unity::LogicException if value cannot be formatted because of invalid template.
+     */
+    std::string value_label(FilterState const& filter_state) const;
+
+    /**
+    \brief Sets value of this filter instance in filter state object.
+
+    This is meant to be used to modify a FilterState received with a search request before sending it back to the client (UI shell).
+
+    \throws unity::LogicException if value is out of (min, max) range.
+    */
     void update_state(FilterState& filter_state, int value) const;
+
+    /**
+    \brief Sets value of this filter instance in filter state object, without having an instance of ValueSliderFilter.
+
+    Updates an instance of FilterState, without the need for an ValueSliderFilter instance. This is meant
+    to be used when creating a canned Query that references another scope.
+    */
     static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
 
 private:
