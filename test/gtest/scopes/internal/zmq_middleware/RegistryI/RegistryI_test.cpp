@@ -604,7 +604,7 @@ TEST_F(RegistryTest, locate_rebinding)
     // wait for the SIGCHLD signal to reach the registry
     while (reg->is_scope_running(scope_ids[0]))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
 
     // check that we now have no running scopes
@@ -673,7 +673,7 @@ TEST_F(RegistryTest, locate_custom_exec)
     // wait for the SIGCHLD signal to reach the registry
     while (reg->is_scope_running("testscopeB"))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
 
     // check that we now have no running scopes
