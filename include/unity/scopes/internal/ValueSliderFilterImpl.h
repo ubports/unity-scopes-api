@@ -36,35 +36,35 @@ namespace internal
 class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
-    ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, int min, int max);
+    ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, double min, double max);
     ValueSliderFilterImpl(VariantMap const& var);
     void set_slider_type(ValueSliderFilter::SliderType tp);
     ValueSliderFilter::SliderType slider_type() const;
-    void set_default_value(int val);
+    void set_default_value(double val);
     std::string label() const;
-    int min() const;
-    int max() const;
+    double min() const;
+    double max() const;
     std::string value_label(FilterState const& filter_state) const;
     std::string value_label_template() const;
     bool has_value(FilterState const& filter_state) const;
-    int value(FilterState const& filter_state) const;
-    void update_state(FilterState& filter_state, int value) const;
+    double value(FilterState const& filter_state) const;
+    void update_state(FilterState& filter_state, double value) const;
     static ValueSliderFilter::SPtr create(VariantMap const& var);
-    static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
+    static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
 
 protected:
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;
-    void check_range(int val) const;
+    void check_range(double val) const;
 
 private:
     std::string label_;
     std::string label_template_;
     ValueSliderFilter::SliderType slider_type_;
-    int default_val_;
-    int min_;
-    int max_;
+    double default_val_;
+    double min_;
+    double max_;
 };
 
 } // namespace internal

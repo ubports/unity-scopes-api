@@ -30,7 +30,7 @@ ValueSliderFilter::ValueSliderFilter(internal::ValueSliderFilterImpl *impl)
 {
 }
 
-ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, std::string const& label, std::string const& label_template, int min, int max)
+ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, std::string const& label, std::string const& label_template, double min, double max)
 {
     return std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, label, label_template, min, max)));
 }
@@ -45,12 +45,12 @@ ValueSliderFilter::SliderType ValueSliderFilter::slider_type() const
     return fwd()->slider_type();
 }
 
-int ValueSliderFilter::min() const
+double ValueSliderFilter::min() const
 {
     return fwd()->min();
 }
 
-int ValueSliderFilter::max() const
+double ValueSliderFilter::max() const
 {
     return fwd()->max();
 }
@@ -75,17 +75,17 @@ bool ValueSliderFilter::has_value(FilterState const& filter_state) const
     return fwd()->has_value(filter_state);
 }
 
-int ValueSliderFilter::value(FilterState const& filter_state) const
+double ValueSliderFilter::value(FilterState const& filter_state) const
 {
     return fwd()->value(filter_state);
 }
 
-void ValueSliderFilter::update_state(FilterState& filter_state, int value) const
+void ValueSliderFilter::update_state(FilterState& filter_state, double value) const
 {
     fwd()->update_state(filter_state, value);
 }
 
-void ValueSliderFilter::update_state(FilterState& filter_state, std::string const& filter_id, int value)
+void ValueSliderFilter::update_state(FilterState& filter_state, std::string const& filter_id, double value)
 {
     internal::ValueSliderFilterImpl::update_state(filter_state, filter_id, value);
 }

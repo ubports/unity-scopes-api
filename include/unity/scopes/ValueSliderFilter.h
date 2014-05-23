@@ -71,7 +71,7 @@ public:
      \return Instance of ValueSliderFilter.
      \throws unity::LogicException on invalid (min, max) range.
     */
-    static ValueSliderFilter::UPtr create(std::string const& id, std::string const& label, std::string const& label_template, int min, int max);
+    static ValueSliderFilter::UPtr create(std::string const& id, std::string const& label, std::string const& label_template, double min, double max);
 
     /**
      \brief Change the type of this filter.
@@ -92,14 +92,14 @@ public:
 
      \return mimimum value
     */
-    int min() const;
+    double min() const;
 
     /**
     \brief Get the maximum allowed value.
 
     \return maximum value
     */
-    int max() const;
+    double max() const;
 
     /**
     \brief Get the label of this filter.
@@ -128,7 +128,7 @@ public:
      \return value of this filter
      \throws unity::LogicException if value is not present in state object.
     */
-    int value(FilterState const& filter_state) const;
+    double value(FilterState const& filter_state) const;
 
     /**
      \brief Get label for current value of this filter, formatted with value label template.
@@ -145,7 +145,7 @@ public:
 
     \throws unity::LogicException if value is out of (min, max) range.
     */
-    void update_state(FilterState& filter_state, int value) const;
+    void update_state(FilterState& filter_state, double value) const;
 
     /**
     \brief Sets value of this filter instance in filter state object, without having an instance of ValueSliderFilter.
@@ -153,7 +153,7 @@ public:
     Updates an instance of FilterState, without the need for an ValueSliderFilter instance. This is meant
     to be used when creating a canned Query that references another scope.
     */
-    static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
+    static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
 
 private:
     ValueSliderFilter(internal::ValueSliderFilterImpl*);
