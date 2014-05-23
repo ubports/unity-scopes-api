@@ -40,9 +40,19 @@ void ValueSliderFilter::set_slider_type(SliderType tp)
     fwd()->set_slider_type(tp);
 }
 
+void ValueSliderFilter::set_default_value(double val)
+{
+    fwd()->set_default_value(val);
+}
+
 ValueSliderFilter::SliderType ValueSliderFilter::slider_type() const
 {
     return fwd()->slider_type();
+}
+
+double ValueSliderFilter::default_value() const
+{
+    return fwd()->default_value();
 }
 
 double ValueSliderFilter::min() const

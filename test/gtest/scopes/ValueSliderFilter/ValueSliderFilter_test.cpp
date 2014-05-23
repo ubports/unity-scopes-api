@@ -32,11 +32,14 @@ TEST(ValueSliderFilter, basic)
         EXPECT_EQ("f1", filter1->id());
         EXPECT_EQ("Max size", filter1->label());
         EXPECT_EQ("Less than %f", filter1->value_label_template());
+        EXPECT_EQ(100.0f, filter1->default_value());
         EXPECT_EQ(1.0f, filter1->min());
         EXPECT_EQ(100.0f, filter1->max());
         EXPECT_EQ(ValueSliderFilter::SliderType::LessThan, filter1->slider_type());
         filter1->set_slider_type(ValueSliderFilter::SliderType::MoreThan);
+        filter1->set_default_value(2.0f);
         EXPECT_EQ(ValueSliderFilter::SliderType::MoreThan, filter1->slider_type());
+        EXPECT_EQ(2.0f, filter1->default_value());
     }
 
     {

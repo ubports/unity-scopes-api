@@ -35,7 +35,12 @@ class ValueSliderFilterImpl;
 }
 
 /**
-\brief A value slider filter that allows for selecting values within given range.
+\brief A value slider filter that allows for selecting a value within given range.
+
+The ValueSliderFilter displays a static label, such as "Maximum size" and a slider that
+allows for selecting a value within range defined by minimum and maximum values. The currently
+selected value gets displayed using a label template provided by scope, e.g. "Less than %.1f MB",
+resulting in labels such as "Less than 40.5 MB".
 */
 class UNITY_API ValueSliderFilter : public FilterBase
 {
@@ -81,11 +86,28 @@ public:
     void set_slider_type(SliderType tp);
 
     /**
+     \brief Change the default value of this filter.
+
+     The default value of this filter is by default the maximum value allowed. This value is used when calling unity::scopes::ValueSliderFilter::value_label()
+     and there is no state for this filter in unity::scopes::FilterState.
+
+     \param val The new default value.
+    */
+    void set_default_value(double val);
+
+    /**
      \brief Get the type of this filter.
 
      \return The type of slider filter.
      */
     SliderType slider_type() const;
+
+    /**
+     \brief Get the default value of this filter.
+
+     \return The default value
+    */
+    double default_value() const;
 
     /**
      \brief Get the minimum allowed value.
@@ -132,6 +154,9 @@ public:
 
     /**
      \brief Get label for current value of this filter, formatted with value label template.
+
+     If there is no value stroed for this filter in filter_state, then the default value of this filter is used to create value label.
+     See unity::scopes::ValueSliderFilter::set_default_value().
 
      \return formatted label for current value
      \throws unity::LogicException if value cannot be formatted because of invalid template.

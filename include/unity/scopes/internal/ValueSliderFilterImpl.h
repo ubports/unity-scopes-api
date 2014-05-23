@@ -44,6 +44,7 @@ public:
     std::string label() const;
     double min() const;
     double max() const;
+    double default_value() const;
     std::string value_label(FilterState const& filter_state) const;
     std::string value_label_template() const;
     bool has_value(FilterState const& filter_state) const;

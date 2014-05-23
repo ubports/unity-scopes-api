@@ -81,6 +81,11 @@ ValueSliderFilter::SliderType ValueSliderFilterImpl::slider_type() const
     return slider_type_;
 }
 
+double ValueSliderFilterImpl::default_value() const
+{
+    return default_val_;
+}
+
 double ValueSliderFilterImpl::min() const
 {
     return min_;
