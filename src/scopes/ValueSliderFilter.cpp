@@ -45,6 +45,16 @@ ValueSliderFilter::SliderType ValueSliderFilter::slider_type() const
     return fwd()->slider_type();
 }
 
+int ValueSliderFilter::min() const
+{
+    return fwd()->min();
+}
+
+int ValueSliderFilter::max() const
+{
+    return fwd()->max();
+}
+
 std::string ValueSliderFilter::label(FilterState const& filter_state) const
 {
     return fwd()->label(filter_state);
@@ -60,9 +70,9 @@ bool ValueSliderFilter::has_value(FilterState const& filter_state) const
     return fwd()->has_value(filter_state);
 }
 
-int ValueSliderFilter::get_value(FilterState const& filter_state) const
+int ValueSliderFilter::value(FilterState const& filter_state) const
 {
-    return fwd()->get_value(filter_state);
+    return fwd()->value(filter_state);
 }
 
 void ValueSliderFilter::update_state(FilterState& filter_state, int value) const

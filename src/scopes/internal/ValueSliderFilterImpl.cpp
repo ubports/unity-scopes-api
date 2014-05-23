@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ValueSliderFilterImpl.h>
 #include <unity/scopes/FilterState.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
 #include <boost/format.hpp>
 #include <sstream>
@@ -33,6 +34,8 @@ namespace internal
 
 ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, std::string const& label_template, int min, int max)
     : FilterBaseImpl(id),
+      label_template_(label_template),
+      slider_type_(ValueSliderFilter::SliderType::LessThan),
       min_(min),
       max_(max)
 {
@@ -42,7 +45,18 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, std::string 
         err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
         throw unity::LogicException(err.str());
     }
-    default_val_ = (min + max) / 2;
+    default_val_ = max;
+}
+
+ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)
+    : FilterBaseImpl(var)
+{
+    deserialize(var);
+}
+
+ValueSliderFilter::SPtr ValueSliderFilterImpl::create(VariantMap const& var)
+{
+    return std::shared_ptr<ValueSliderFilter>(new ValueSliderFilter(new ValueSliderFilterImpl(var)));
 }
 
 void ValueSliderFilterImpl::set_default_value(int val)
@@ -61,12 +75,22 @@ ValueSliderFilter::SliderType ValueSliderFilterImpl::slider_type() const
     return slider_type_;
 }
 
+int ValueSliderFilterImpl::min() const
+{
+    return min_;
+}
+
+int ValueSliderFilterImpl::max() const
+{
+    return max_;
+}
+
 std::string ValueSliderFilterImpl::label(FilterState const& filter_state) const
 {
     int val;
     try
     {
-        val = get_value(filter_state);
+        val = value(filter_state);
     }
     catch (unity::LogicException const&)
     {
@@ -89,7 +113,7 @@ bool ValueSliderFilterImpl::has_value(FilterState const& filter_state) const
     return false;
 }
 
-int ValueSliderFilterImpl::get_value(FilterState const& filter_state) const
+int ValueSliderFilterImpl::value(FilterState const& filter_state) const
 {
     if (filter_state.has_filter(id()))
     {
@@ -112,18 +136,37 @@ int ValueSliderFilterImpl::get_value(FilterState const& filter_state) const
 
 void ValueSliderFilterImpl::update_state(FilterState& filter_state, int value) const
 {
+    check_range(value);
+    update_state(filter_state, id(), value);
 }
 
 void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, int value)
 {
+    VariantMap& state = FilterBaseImpl::get(filter_state);
+    state[filter_id] = Variant(value);
 }
 
 void ValueSliderFilterImpl::serialize(VariantMap& var) const
 {
+    var["label_template"] = label_template_;
+    var["min"] = Variant(min_);
+    var["max"] = Variant(max_);
+    var["default"] = Variant(default_val_);
+    var["slider_type"] = static_cast<int>(slider_type_);
 }
 
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
 {
+    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label_template");
+    label_template_ = it->second.get_string();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
+    min_ = it->second.get_int();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "max");
+    max_ = it->second.get_int();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "default");
+    default_val_ = it->second.get_int();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "slider_type");
+    slider_type_ = static_cast<ValueSliderFilter::SliderType>(it->second.get_int());
 }
 
 std::string ValueSliderFilterImpl::filter_type() const

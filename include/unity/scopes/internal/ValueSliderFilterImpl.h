@@ -37,14 +37,18 @@ class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
     ValueSliderFilterImpl(std::string const& id, std::string const& label_template, int min, int max);
+    ValueSliderFilterImpl(VariantMap const& var);
     void set_slider_type(ValueSliderFilter::SliderType tp);
     ValueSliderFilter::SliderType slider_type() const;
     void set_default_value(int val);
+    int min() const;
+    int max() const;
     std::string label(FilterState const& filter_state) const;
     std::string label_template() const;
     bool has_value(FilterState const& filter_state) const;
-    int get_value(FilterState const& filter_state) const;
+    int value(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, int value) const;
+    static ValueSliderFilter::SPtr create(VariantMap const& var);
     static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
 
 protected:
