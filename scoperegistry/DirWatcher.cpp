@@ -157,7 +157,7 @@ void DirWatcher::watch_thread()
         while (true)
         {
             // Wait for a payload to arrive
-            int ret = select(fd_ + 1, &fds, nullptr, nullptr, nullptr);
+            int ret = select(fd_ + 1, &fds, NULL, NULL, NULL);
             if (ret < 0)
             {
                 throw SyscallException("DirWatcher::watch_thread(): Thread aborted: "
