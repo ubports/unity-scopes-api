@@ -117,13 +117,14 @@ TEST(Registry, metadata)
 
 TEST(Registry, update_notify)
 {
+    bool update_received_ = false;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
     // Configure registry update callback
-    bool update_received_ = false;
-    std::mutex mutex_;
-    std::condition_variable cond_;
     r->set_update_callback([&update_received_, &mutex_, &cond_]
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -132,9 +133,9 @@ TEST(Registry, update_notify)
     });
     auto wait_for_update = [&update_received_, &mutex_, &cond_]
     {
-        // Flush out all update notifications
+        // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex_);
-        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
+        while (cond_.wait_for(lock, std::chrono::milliseconds(1000), [&update_received_] { return update_received_; }))
         {
             update_received_ = false;
         }
