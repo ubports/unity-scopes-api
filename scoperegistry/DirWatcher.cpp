@@ -56,7 +56,7 @@ DirWatcher::~DirWatcher()
             }
             catch (std::exception const& e)
             {
-                std::cerr << "~DirWatcher(): " << e.what();
+                std::cerr << "~DirWatcher(): " << e.what() << std::endl;
             }
             catch (...)
             {
@@ -157,7 +157,8 @@ void DirWatcher::watch_thread()
         while (true)
         {
             // Wait for a payload to arrive
-            int ret = select(fd_ + 1, &fds, NULL, NULL, NULL);
+            std::cout << "TEST: select(). fd = " << std::to_string(fd_) << "\n";
+            int ret = select(fd_ + 1, &fds, nullptr, nullptr, nullptr);
             if (ret < 0)
             {
                 throw SyscallException("DirWatcher::watch_thread(): Thread aborted: "
@@ -165,6 +166,7 @@ void DirWatcher::watch_thread()
                                        std::to_string(fd_) + ")", errno);
             }
             // Get number of bytes available
+            std::cout << "TEST: ioctl()\n";
             ret = ioctl(fd_, FIONREAD, &bytes_avail);
             if (ret < 0)
             {
@@ -174,6 +176,7 @@ void DirWatcher::watch_thread()
             }
             // Read available bytes
             buffer.resize(bytes_avail);
+            std::cout << "TEST: read(). buffer.size() = " << std::to_string(buffer.size()) << "\n";
             int bytes_read = read(fd_, &buffer[0], buffer.size());
             if (bytes_read < 0)
             {
@@ -196,6 +199,7 @@ void DirWatcher::watch_thread()
                     }
                 }
 
+                std::cout << "TEST: watch_event(). event_path = " << event_path << "\n";
                 if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                 {
                     if (event->mask & IN_ISDIR)
