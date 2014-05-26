@@ -39,7 +39,7 @@ class ValueSliderFilterImpl;
 
 The ValueSliderFilter displays a static label, such as "Maximum size" and a slider that
 allows for selecting a value within range defined by minimum and maximum values. The currently
-selected value gets displayed using a label template provided by scope, e.g. "Less than %.1f MB",
+selected value gets displayed using a label template provided by scope, e.g. "Less than %1 MB",
 resulting in labels such as "Less than 40.5 MB".
 */
 class UNITY_API ValueSliderFilter : public FilterBase
@@ -70,7 +70,7 @@ public:
      Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
 
      \param id A unique identifier for the filter that can be used to identify it later among several filters.
-     \param label_template Template for value label, e.g. "Less than %d"
+     \param label_template Template for value label, e.g. "Less than %1"
      \param min minimum allowed value
      \param max maximum allowed value
      \return Instance of ValueSliderFilter.
@@ -151,17 +151,6 @@ public:
      \throws unity::LogicException if value is not present in state object.
     */
     double value(FilterState const& filter_state) const;
-
-    /**
-     \brief Get label for current value of this filter, formatted with value label template.
-
-     If there is no value stroed for this filter in filter_state, then the default value of this filter is used to create value label.
-     See unity::scopes::ValueSliderFilter::set_default_value().
-
-     \return formatted label for current value
-     \throws unity::LogicException if value cannot be formatted because of invalid template.
-     */
-    std::string value_label(FilterState const& filter_state) const;
 
     /**
     \brief Sets value of this filter instance in filter state object.

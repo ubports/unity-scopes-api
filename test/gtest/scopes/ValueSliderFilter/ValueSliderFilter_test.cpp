@@ -28,10 +28,10 @@ using namespace unity::scopes::internal;
 TEST(ValueSliderFilter, basic)
 {
     {
-        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 1.0f, 100.0f);
+        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
         EXPECT_EQ("f1", filter1->id());
         EXPECT_EQ("Max size", filter1->label());
-        EXPECT_EQ("Less than %f", filter1->value_label_template());
+        EXPECT_EQ("Less than %1", filter1->value_label_template());
         EXPECT_EQ(100.0f, filter1->default_value());
         EXPECT_EQ(1.0f, filter1->min());
         EXPECT_EQ(100.0f, filter1->max());
@@ -43,8 +43,8 @@ TEST(ValueSliderFilter, basic)
     }
 
     {
-        EXPECT_THROW(ValueSliderFilter::create("f1", "Max size", "Less than %f", 10.0f, 1.0f), unity::LogicException);
-        EXPECT_THROW(ValueSliderFilter::create("f1", "Max size", "Less than %f", -1.0f, 10.0f), unity::LogicException);
+        EXPECT_THROW(ValueSliderFilter::create("f1", "Max size", "Less than %1", 10.0f, 1.0f), unity::LogicException);
+        EXPECT_THROW(ValueSliderFilter::create("f1", "Max size", "Less than %1", -1.0f, 10.0f), unity::LogicException);
     }
 }
 
@@ -52,23 +52,15 @@ TEST(ValueSliderFilter, state)
 {
     {
         FilterState fstate;
-        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %.0f", 1.0f, 100.0f);
-        EXPECT_EQ("Less than 100", filter1->value_label(fstate));
+        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
         EXPECT_FALSE(filter1->has_value(fstate));
         EXPECT_THROW(filter1->value(fstate), unity::LogicException);
     }
 
     {
         FilterState fstate;
-        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than", 1.0f, 100.0f);
-        EXPECT_THROW(filter1->value_label(fstate), unity::LogicException); // invalid label template
-    }
-
-    {
-        FilterState fstate;
-        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %.2f", 1.0f, 100.0f);
+        auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
         filter1->update_state(fstate, 33.0f);
-        EXPECT_EQ("Less than 33.00", filter1->value_label(fstate));
         EXPECT_TRUE(filter1->has_value(fstate));
         EXPECT_EQ(33.0f, filter1->value(fstate));
         EXPECT_THROW(filter1->update_state(fstate, 0.0f), unity::LogicException);
@@ -78,13 +70,13 @@ TEST(ValueSliderFilter, state)
 
 TEST(ValueSliderFilter, serialize)
 {
-    auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 1.0f, 100.0f);
+    auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
     auto var = filter1->serialize();
 
     auto filter2 = internal::ValueSliderFilterImpl::create(var);
     EXPECT_EQ("f1", filter1->id());
     EXPECT_EQ("Max size", filter1->label());
-    EXPECT_EQ("Less than %f", filter1->value_label_template());
+    EXPECT_EQ("Less than %1", filter1->value_label_template());
     EXPECT_EQ(1.0f, filter1->min());
     EXPECT_EQ(100.0f, filter1->max());
     EXPECT_EQ(ValueSliderFilter::SliderType::LessThan, filter1->slider_type());

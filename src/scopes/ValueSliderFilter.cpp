@@ -70,11 +70,6 @@ std::string ValueSliderFilter::label() const
     return fwd()->label();
 }
 
-std::string ValueSliderFilter::value_label(FilterState const& filter_state) const
-{
-    return fwd()->value_label(filter_state);
-}
-
 std::string ValueSliderFilter::value_label_template() const
 {
     return fwd()->value_label_template();

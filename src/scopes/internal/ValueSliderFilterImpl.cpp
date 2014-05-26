@@ -20,7 +20,6 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
-#include <boost/format.hpp>
 #include <sstream>
 
 namespace unity
@@ -99,30 +98,6 @@ double ValueSliderFilterImpl::max() const
 std::string ValueSliderFilterImpl::label() const
 {
     return label_;
-}
-
-std::string ValueSliderFilterImpl::value_label(FilterState const& filter_state) const
-{
-    double val;
-    try
-    {
-        val = value(filter_state);
-    }
-    catch (LogicException const&)
-    {
-        val = default_val_;
-    }
-
-    try
-    {
-        return boost::str(boost::format(label_template_) % val);
-    }
-    catch (boost::io::format_error const& e)
-    {
-        std::stringstream err;
-        err << "ValueSliderFilterImpl::label(): Failed to format label of filter '" << id() << "' using template '" << label_template_ << "'";
-        throw LogicException(err.str());
-    }
 }
 
 std::string ValueSliderFilterImpl::value_label_template() const
