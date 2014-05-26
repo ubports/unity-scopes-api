@@ -18,6 +18,9 @@
 
 #include <unity/scopes/internal/Executor.h>
 
+#include <cerrno>
+#include <sys/apparmor.h>
+
 using namespace unity::scopes::internal;
 
 Executor::Executor()
@@ -27,7 +30,31 @@ Executor::Executor()
 core::posix::ChildProcess Executor::exec(const std::string& fn,
         const std::vector<std::string>& argv,
         const std::map<std::string, std::string>& env,
-        const core::posix::StandardStream& flags)
+        const core::posix::StandardStream& flags,
+        const std::string& confinement_profile)
 {
-    return core::posix::exec(fn, argv, env, flags);
+    std::function<void()> child_setup = [confinement_profile]()
+    {
+        if (!confinement_profile.empty())
+        {
+            if (aa_change_profile(confinement_profile.c_str()) < 0)
+            {
+                switch (errno)
+                {
+                    case ENOENT:
+                    case EACCES:
+                        throw std::runtime_error("AppArmor profile does not exist");
+                        break;
+                    case EINVAL:
+                        throw std::runtime_error("AppArmor interface not available");
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown AppArmor error");
+                }
+            }
+        }
+
+
+    };
+    return core::posix::exec(fn, argv, env, flags, child_setup);
 }
