@@ -163,7 +163,7 @@ TEST(Registry, update_notify)
 
     // Make a symlink to testscopeD in the scopes folder
     std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
-    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD");
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
@@ -177,7 +177,7 @@ TEST(Registry, update_notify)
 
     // Move testscopeC back into the other_scopes folder
     std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
-    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
@@ -190,7 +190,7 @@ TEST(Registry, update_notify)
 
     // Remove symlink to testscopeD from the scopes folder
     std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
-    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD");
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
@@ -202,7 +202,7 @@ TEST(Registry, update_notify)
 
     // Make a folder in scopes named "testfolder"
     std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
-    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder");
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
 
     // Check that no scopes were registered
@@ -213,7 +213,7 @@ TEST(Registry, update_notify)
 
     // Make a symlink to testscopeC.ini in testfolder
     std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
-    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini");
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
@@ -226,7 +226,7 @@ TEST(Registry, update_notify)
 
     // Remove testfolder
     std::cout << "Remove testfolder" << std::endl;
-    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder");
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
     wait_for_update();
 
