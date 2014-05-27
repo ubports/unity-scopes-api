@@ -40,7 +40,7 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
     virtual ObjectProxy locate(std::string const& identity) = 0;
-    virtual bool is_scope_running(std::string const& /*scope_id*/) { return false; }
+    virtual bool is_scope_running(std::string const& scope_id) = 0;
 
     virtual ~MWRegistry();
 

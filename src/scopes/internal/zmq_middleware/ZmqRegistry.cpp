@@ -187,6 +187,40 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
         }
     }
 }
+
+bool ZmqRegistry::is_scope_running(std::string const& scope_id)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "is_scope_running");
+    auto in_params = request.initInParams().getAs<capnproto::Registry::IsScopeRunningRequest>();
+    in_params.setIdentity(scope_id.c_str());
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto receiver = future.get();
+    auto segments = receiver.receive();
+    capnp::SegmentArrayMessageReader reader(segments);
+    auto response = reader.getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto is_scope_running_response = response.getPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().getResponse();
+    switch (is_scope_running_response.which())
+    {
+        case capnproto::Registry::IsScopeRunningResponse::Response::RETURN_VALUE:
+        {
+            return is_scope_running_response.getReturnValue();
+        }
+        case capnproto::Registry::IsScopeRunningResponse::Response::NOT_FOUND_EXCEPTION:
+        {
+            auto ex = is_scope_running_response.getNotFoundException();
+            throw NotFoundException("Registry::is_scope_running(): no such scope", ex.getIdentity().cStr());
+        }
+        default:
+        {
+            throw MiddlewareException("Registry::is_scope_running(): unknown user exception");
+        }
+    }
+}
+
 } // namespace zmq_middleware
 
 } // namespace internal
