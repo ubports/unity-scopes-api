@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
 
 #include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/MWSubscriber.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeMetadata.h>
 
@@ -42,8 +43,15 @@ public:
 
     virtual ~MWRegistry();
 
+    // Local operations
+    void set_list_update_callback(std::function<void()> callback);
+
 protected:
     MWRegistry(MiddlewareBase* mw_base);
+
+private:
+    MiddlewareBase* mw_base_;
+    MWSubscriber::UPtr subscriber_;
 };
 
 } // namespace internal

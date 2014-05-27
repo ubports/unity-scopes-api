@@ -56,7 +56,7 @@ private:
         NotRunning,
         Running,
         Stopping,
-        Failed
+        Stopped
     };
 
     zmqpp::context* const context_;
