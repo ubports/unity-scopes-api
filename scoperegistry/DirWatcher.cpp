@@ -199,15 +199,16 @@ void DirWatcher::watch_thread()
                     }
                 }
 
-                std::cout << "TEST: watch_event(). event_path = " << event_path << "\n";
                 if (event->mask & IN_CREATE || event->mask & IN_MOVED_TO)
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cout << "TEST: watch_event(). ADD DIR. event_path = " << event_path << "\n";
                         watch_event(Added, Directory, event_path);
                     }
                     else
                     {
+                        std::cout << "TEST: watch_event(). ADD FILE. event_path = " << event_path << "\n";
                         watch_event(Added, File, event_path);
                     }
                 }
@@ -215,10 +216,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cout << "TEST: watch_event(). REM DIR. event_path = " << event_path << "\n";
                         watch_event(Removed, Directory, event_path);
                     }
                     else
                     {
+                        std::cout << "TEST: watch_event(). REM FILE. event_path = " << event_path << "\n";
                         watch_event(Removed, File, event_path);
                     }
                 }
@@ -226,10 +229,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cout << "TEST: watch_event(). MOD DIR. event_path = " << event_path << "\n";
                         watch_event(Modified, Directory, event_path);
                     }
                     else
                     {
+                        std::cout << "TEST: watch_event(). MOD FILE. event_path = " << event_path << "\n";
                         watch_event(Modified, File, event_path);
                     }
                 }
