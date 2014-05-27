@@ -603,7 +603,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::NotFoundException::name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ValueSliderFilter::slider_type() const@Base" 0replaceme
- (c++)"unity::scopes::ValueSliderFilter::value_label(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::ValueSliderFilter::update_state(unity::scopes::FilterState&, double) const@Base" 0replaceme
  (c++)"unity::scopes::ValueSliderFilter::default_value() const@Base" 0replaceme
  (c++)"unity::scopes::ValueSliderFilter::value_label_template() const@Base" 0replaceme
