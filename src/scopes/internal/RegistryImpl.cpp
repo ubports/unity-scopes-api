@@ -81,6 +81,11 @@ void RegistryImpl::set_scope_state_callback(std::function<void()> callback)
     return fwd()->set_scope_state_callback(callback);
 }
 
+void RegistryImpl::set_list_update_callback(std::function<void()> callback)
+{
+    fwd()->set_list_update_callback(callback);
+}
+
 MWRegistryProxy RegistryImpl::fwd()
 {
     return dynamic_pointer_cast<MWRegistry>(proxy());

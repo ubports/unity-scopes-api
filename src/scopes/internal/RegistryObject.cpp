@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RegistryObject.h>
 
 #include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -38,7 +39,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                               MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -58,6 +60,17 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
       },
       executor_(executor)
 {
+    if (middleware)
+    {
+        try
+        {
+            publisher_ = middleware->create_publisher(middleware->runtime()->registry_identity());
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "RegistryObject(): failed to create registry publisher: " << e.what() << endl;
+        }
+    }
 }
 
 RegistryObject::~RegistryObject()
@@ -222,6 +235,12 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     }
     scopes_.insert(make_pair(scope_id, metadata));
     scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
+
+    if (publisher_)
+    {
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
+    }
     return return_value;
 }
 
@@ -237,7 +256,18 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
     lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
-    return scopes_.erase(scope_id) == 1;
+
+    if (scopes_.erase(scope_id) == 1)
+    {
+        if (publisher_)
+        {
+            // Send a blank message to subscribers to inform them that the registry has been updated
+            publisher_->send_message("");
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)

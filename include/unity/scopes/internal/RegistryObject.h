@@ -20,6 +20,8 @@
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
 #include <unity/scopes/internal/Executor.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWPublisher.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/StateReceiverObject.h>
@@ -55,7 +57,8 @@ public:
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
-    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor);
+    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                   MiddlewareBase::SPtr middleware);
     virtual ~RegistryObject();
 
     // Remote operation implementations
@@ -128,6 +131,8 @@ private:
     ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
+
+    MWPublisher::UPtr publisher_;
 };
 
 } // namespace internal

@@ -45,6 +45,7 @@ public:
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) override;
     virtual bool is_scope_running(std::string const& scope_id) override;
     virtual void set_scope_state_callback(std::function<void()> callback) override;
+    virtual void set_list_update_callback(std::function<void()> callback) override;
 
     // Remote operation. Not part of public API, hence not override.
     ObjectProxy locate(std::string const& identity);

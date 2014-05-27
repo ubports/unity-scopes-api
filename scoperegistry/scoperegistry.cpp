@@ -17,6 +17,7 @@
  */
 
 #include "FindFiles.h"
+#include "ScopesWatcher.h"
 
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
@@ -136,26 +137,24 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> fixed_scopes;           // Scopes that the OEM cannot override
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
-    auto config_files = find_scope_config_files(scope_installdir, ".ini", error);
+    auto config_files = find_install_dir_configs(scope_installdir, ".ini", error);
     for (auto&& path : config_files)
     {
-        filesystem::path p(path);
-        string scope_id = p.stem().native();
         try
         {
-            ScopeConfig config(path);
+            ScopeConfig config(path.second);
             if (config.overrideable())
             {
-                overrideable_scopes[scope_id] = path;
+                overrideable_scopes[path.first] = path.second;
             }
             else
             {
-                fixed_scopes[scope_id] = path;
+                fixed_scopes[path.first] = path.second;
             }
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + scope_id + "\": configuration error:\n" + e.what());
+            error("ignoring scope \"" + path.first + "\": configuration error:\n" + e.what());
         }
     }
 
@@ -163,19 +162,16 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     {
         try
         {
-            auto oem_paths = find_scope_config_files(oem_installdir, ".ini", error);
+            auto oem_paths = find_install_dir_configs(oem_installdir, ".ini", error);
             for (auto&& path : oem_paths)
             {
-                filesystem::path p(path);
-                string file_name = p.filename().native();
-                string scope_id = p.stem().native();
-                if (fixed_scopes.find(scope_id) == fixed_scopes.end())
+                if (fixed_scopes.find(path.first) == fixed_scopes.end())
                 {
-                    overrideable_scopes[scope_id] = path;  // Replaces scope if it was present already
+                    overrideable_scopes[path.first] = path.second;  // Replaces scope if it was present already
                 }
                 else
                 {
-                    error("ignoring non-overrideable scope config \"" + file_name + "\" in OEM directory " + oem_installdir);
+                    error("ignoring non-overrideable scope config \"" + path.second + "\" in OEM directory " + oem_installdir);
                 }
             }
         }
@@ -199,19 +195,16 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
     {
         try
         {
-            auto click_paths = find_scope_config_files(click_installdir, ".ini", error);
+            auto click_paths = find_install_dir_configs(click_installdir, ".ini", error);
             for (auto&& path : click_paths)
             {
-                filesystem::path p(path);
-                string file_name = p.filename().native();
-                string scope_id = p.stem().native();
-                if (local_scopes.find(scope_id) == local_scopes.end())
+                if (local_scopes.find(path.first) == local_scopes.end())
                 {
-                    click_scopes[scope_id] = path;
+                    click_scopes[path.first] = path.second;
                 }
                 else
                 {
-                    error("ignoring non-overrideable scope config \"" + file_name + "\" in click directory " + click_installdir);
+                    error("ignoring non-overrideable scope config \"" + path.second + "\" in click directory " + click_installdir);
                 }
             }
         }
@@ -228,6 +221,94 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 
+void add_local_scope(RegistryObject::SPtr const& registry,
+                     pair<string, string> const& scope,
+                     MiddlewareBase::SPtr const& mw,
+                     string const& scoperunner_path,
+                     string const& config_file,
+                     bool click,
+                     int timeout_ms)
+{
+    unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
+    string scope_config(scope.second);
+    ScopeConfig sc(scope_config);
+
+    filesystem::path scope_path(scope_config);
+    filesystem::path scope_dir(scope_path.parent_path());
+
+    mi->set_scope_id(scope.first);
+    mi->set_display_name(sc.display_name());
+    mi->set_description(sc.description());
+    mi->set_author(sc.author());
+    mi->set_invisible(sc.invisible());
+    mi->set_appearance_attributes(sc.appearance_attributes());
+    mi->set_scope_directory(scope_dir.native());
+    mi->set_results_ttl_type(sc.results_ttl_type());
+
+    try
+    {
+        mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_search_hint(sc.search_hint());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    try
+    {
+        mi->set_hot_key(sc.hot_key());
+    }
+    catch (NotFoundException const&)
+    {
+    }
+
+    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
+    mi->set_proxy(proxy);
+    auto meta = ScopeMetadataImpl::create(move(mi));
+
+    RegistryObject::ScopeExecData exec_data;
+    exec_data.scope_id = scope.first;
+    // get custom scope runner executable, if not set use default scoperunner
+    exec_data.scoperunner_path = scoperunner_path;
+
+    if (click)
+    {
+        exec_data.confinement_profile =
+                scope_path.parent_path().filename().native();
+    }
+
+    exec_data.timeout_ms = timeout_ms;
+
+    try
+    {
+        auto custom_exec = sc.scope_runner();
+        if (custom_exec.empty())
+        {
+            throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
+        }
+        exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+    }
+    catch (NotFoundException const&)
+    {
+    }
+    exec_data.runtime_config = config_file;
+    exec_data.scope_config = scope.second;
+
+    registry->add_local_scope(scope.first, move(meta), exec_data);
+}
+
 void add_local_scopes(RegistryObject::SPtr const& registry,
                       map<string, string> const& all_scopes,
                       MiddlewareBase::SPtr const& mw,
@@ -240,84 +321,7 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
     {
         try
         {
-            unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
-            string scope_config(pair.second);
-            ScopeConfig sc(scope_config);
-
-            filesystem::path scope_path(scope_config);
-            filesystem::path scope_dir(scope_path.parent_path());
-
-            mi->set_scope_id(pair.first);
-            mi->set_display_name(sc.display_name());
-            mi->set_description(sc.description());
-            mi->set_author(sc.author());
-            mi->set_invisible(sc.invisible());
-            mi->set_appearance_attributes(sc.appearance_attributes());
-            mi->set_scope_directory(scope_dir.native());
-            mi->set_results_ttl_type(sc.results_ttl_type());
-
-            try
-            {
-                mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_search_hint(sc.search_hint());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            try
-            {
-                mi->set_hot_key(sc.hot_key());
-            }
-            catch (NotFoundException const&)
-            {
-            }
-
-            ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(pair.first), mw->runtime(), pair.first);
-            mi->set_proxy(proxy);
-            auto meta = ScopeMetadataImpl::create(move(mi));
-
-            RegistryObject::ScopeExecData exec_data;
-            exec_data.scope_id = pair.first;
-            // get custom scope runner executable, if not set use default scoperunner
-            exec_data.scoperunner_path = scoperunner_path;
-
-            if (click)
-            {
-                exec_data.confinement_profile =
-                        scope_path.parent_path().filename().native();
-            }
-
-            exec_data.timeout_ms = timeout_ms;
-
-            try
-            {
-                auto custom_exec = sc.scope_runner();
-                if (custom_exec.empty())
-                {
-                    throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + pair.first);
-                }
-                exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
-            }
-            catch (NotFoundException const&)
-            {
-            }
-            exec_data.runtime_config = config_file;
-            exec_data.scope_config = pair.second;
-
-            registry->add_local_scope(pair.first, move(meta), exec_data);
+            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms);
         }
         catch (unity::Exception const& e)
         {
@@ -403,7 +407,7 @@ main(int argc, char* argv[])
 
         // The registry object stores the local and remote scopes
         Executor::SPtr executor = make_shared<Executor>();
-        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor));
+        RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor, middleware));
 
         // Add the metadata for each scope to the lookup table.
         // We do this before starting any of the scopes, so aggregating scopes don't get a lookup failure if
@@ -432,6 +436,38 @@ main(int argc, char* argv[])
         {
             registry->set_remote_registry(middleware->ss_registry_proxy());
         }
+
+        // Configure watches for scope install directories
+        ScopesWatcher local_scopes_watcher(registry,
+                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           (pair<string, string> const& scope)
+        {
+            try
+            {
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, false, process_timeout);
+            }
+            catch (unity::Exception const& e)
+            {
+                error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
+            }
+        });
+        local_scopes_watcher.add_install_dir(scope_installdir);
+        local_scopes_watcher.add_install_dir(oem_installdir);
+
+        ScopesWatcher click_scopes_watcher(registry,
+                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                           (pair<string, string> const& scope)
+        {
+            try
+            {
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, true, process_timeout);
+            }
+            catch (unity::Exception const& e)
+            {
+                error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
+            }
+        });
+        click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform
         // the registry of state changes.

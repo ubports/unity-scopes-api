@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
 
 #include <unity/scopes/internal/MWObjectProxy.h>
+#include <unity/scopes/internal/MWSubscriber.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeMetadata.h>
 
@@ -39,13 +40,20 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
     virtual ObjectProxy locate(std::string const& identity) = 0;
-    virtual bool is_scope_running(std::string const& scope_id) {}
-    virtual void set_scope_state_callback(std::function<void()> callback) {}
+    virtual bool is_scope_running(std::string const& /*scope_id*/) { return true; }
+    virtual void set_scope_state_callback(std::function<void()> /*callback*/) {}
 
     virtual ~MWRegistry();
 
+    // Local operations
+    void set_list_update_callback(std::function<void()> callback);
+
 protected:
     MWRegistry(MiddlewareBase* mw_base);
+
+private:
+    MiddlewareBase* mw_base_;
+    MWSubscriber::UPtr subscriber_;
 };
 
 } // namespace internal
