@@ -41,6 +41,11 @@ MWRegistry::~MWRegistry()
 {
 }
 
+void MWRegistry::set_scope_state_callback(std::function<void()> /*callback*/)
+{
+
+}
+
 void MWRegistry::set_list_update_callback(std::function<void()> callback)
 {
     if (!subscriber_)

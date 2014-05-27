@@ -40,12 +40,12 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
     virtual ObjectProxy locate(std::string const& identity) = 0;
-    virtual bool is_scope_running(std::string const& /*scope_id*/) { return true; }
-    virtual void set_scope_state_callback(std::function<void()> /*callback*/) {}
+    virtual bool is_scope_running(std::string const& /*scope_id*/) { return false; }
 
     virtual ~MWRegistry();
 
     // Local operations
+    void set_scope_state_callback(std::function<void()> callback);
     void set_list_update_callback(std::function<void()> callback);
 
 protected:
