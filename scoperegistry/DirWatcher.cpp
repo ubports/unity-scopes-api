@@ -117,34 +117,25 @@ void DirWatcher::add_watch(std::string const& path)
 
 void DirWatcher::remove_watch(std::string const& path)
 {
-    std::cout << "TEST: remove_watch 1. path = " << path << "\n";
     std::lock_guard<std::mutex> lock(mutex_);
 
-    std::cout << "TEST: remove_watch 2.\n";
     if (thread_state_ == Failed)
     {
-        std::cout << "TEST: remove_watch 3.\n";
         std::rethrow_exception(thread_exception_);
     }
 
-    std::cout << "TEST: remove_watch 4.\n";
     for (auto& wd : wds_)
     {
-        std::cout << "TEST: remove_watch 5. wd.second = " << wd.second << "\n";
         if (wd.second == path)
         {
             // If this is the last watch, stop the thread
-            std::cout << "TEST: remove_watch 6. wds_.size() = " << std::to_string(wds_.size()) << ".\n";
             if (wds_.size() == 1)
             {
-                std::cout << "TEST: remove_watch 7.\n";
                 thread_state_ = Stopping;
             }
 
             // Remove watch (causes read to return)
-            std::cout << "TEST: remove_watch 8. fd_ = " << std::to_string(fd_) << ", wd.first = " << wd.first << "\n";
             inotify_rm_watch(fd_, wd.first);
-            std::cout << "TEST: remove_watch 9.\n";
             wds_.erase(wd.first);
         }
     }
@@ -166,7 +157,6 @@ void DirWatcher::watch_thread()
         while (true)
         {
             // Wait for a payload to arrive
-            std::cout << "TEST: select(). fd = " << std::to_string(fd_) << "\n";
             int ret = select(fd_ + 1, &fds, nullptr, nullptr, nullptr);
             if (ret < 0)
             {
@@ -175,7 +165,6 @@ void DirWatcher::watch_thread()
                                        std::to_string(fd_) + ")", errno);
             }
             // Get number of bytes available
-            std::cout << "TEST: ioctl()\n";
             ret = ioctl(fd_, FIONREAD, &bytes_avail);
             if (ret < 0)
             {
@@ -185,7 +174,6 @@ void DirWatcher::watch_thread()
             }
             // Read available bytes
             buffer.resize(bytes_avail);
-            std::cout << "TEST: read(). buffer.size() = " << std::to_string(buffer.size()) << "\n";
             int bytes_read = read(fd_, &buffer[0], buffer.size());
             if (bytes_read < 0)
             {
@@ -212,12 +200,10 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::cout << "TEST: watch_event(). ADD DIR. event_path = " << event_path << "\n";
                         watch_event(Added, Directory, event_path);
                     }
                     else
                     {
-                        std::cout << "TEST: watch_event(). ADD FILE. event_path = " << event_path << "\n";
                         watch_event(Added, File, event_path);
                     }
                 }
@@ -225,12 +211,10 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::cout << "TEST: watch_event(). REM DIR. event_path = " << event_path << "\n";
                         watch_event(Removed, Directory, event_path);
                     }
                     else
                     {
-                        std::cout << "TEST: watch_event(). REM FILE. event_path = " << event_path << "\n";
                         watch_event(Removed, File, event_path);
                     }
                 }
@@ -238,12 +222,10 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
-                        std::cout << "TEST: watch_event(). MOD DIR. event_path = " << event_path << "\n";
                         watch_event(Modified, Directory, event_path);
                     }
                     else
                     {
-                        std::cout << "TEST: watch_event(). MOD FILE. event_path = " << event_path << "\n";
                         watch_event(Modified, File, event_path);
                     }
                 }

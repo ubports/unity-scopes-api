@@ -85,21 +85,15 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    std::cout << "TEST: remove_scope_dir 1\n";
     // Check if this directory is associate with the config file
     if (dir_to_ini_map_.find(dir) != dir_to_ini_map_.end())
     {
         // Inform the registry that this scope has been removed
-        std::cout << "TEST: remove_scope_dir 2\n";
         std::string ini_path = dir_to_ini_map_.at(dir);
-        std::cout << "TEST: remove_scope_dir 3. ini_path = " << ini_path << "\n";
         dir_to_ini_map_.erase(dir);
 
-        std::cout << "TEST: remove_scope_dir 4\n";
         filesystem::path p(ini_path);
-        std::cout << "TEST: remove_scope_dir 5\n";
         std::string scope_id = p.stem().native();
-        std::cout << "TEST: remove_scope_dir 6. scope_id = " << scope_id << "\n";
         registry_->remove_local_scope(scope_id);
         std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
                   << dir << "\"" << std::endl;
@@ -113,24 +107,18 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                                 DirWatcher::FileType file_type,
                                 std::string const& path)
 {
-    std::cout << "TEST: watch_event 1\n";
     filesystem::path fs_path(path);
 
-    std::cout << "TEST: watch_event 2\n";
     if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::cout << "TEST: watch_event 3\n";
         std::string parent_path = fs_path.parent_path().native();
-        std::cout << "TEST: watch_event 4\n";
         std::string scope_id = fs_path.stem().native();
 
         // A .ini has been added / modified
         if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
         {
-            std::cout << "TEST: watch_event 5\n";
             dir_to_ini_map_[parent_path] = path;
-            std::cout << "TEST: watch_event 6\n";
             ini_added_callback_(std::make_pair(scope_id, path));
             std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
                       << parent_path << "\"" << std::endl;
@@ -138,9 +126,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         // A .ini has been removed
         else if (event_type == DirWatcher::Removed)
         {
-            std::cout << "TEST: watch_event 7\n";
             dir_to_ini_map_.erase(parent_path);
-            std::cout << "TEST: watch_event 8\n";
             registry_->remove_local_scope(scope_id);
             std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
                       << parent_path << "\"" << std::endl;
@@ -149,24 +135,18 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
     else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::cout << "TEST: watch_event 9\n";
         std::string parent_path = fs_path.parent_path().native();
 
         // Check if this directory is associate with the config file
-        std::cout << "TEST: watch_event 10\n";
         if (dir_to_ini_map_.find(parent_path) != dir_to_ini_map_.end())
         {
-            std::cout << "TEST: watch_event 11\n";
             std::string ini_path = dir_to_ini_map_.at(parent_path);
-            std::cout << "TEST: watch_event 12\n";
             filesystem::path fs_ini_path(ini_path);
-            std::cout << "TEST: watch_event 13\n";
             std::string scope_id = fs_ini_path.stem().native();
 
             // A .so file has been added / modified
             if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
             {
-                std::cout << "TEST: watch_event 14\n";
                 ini_added_callback_(std::make_pair(scope_id, ini_path));
                 std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
                           << parent_path << "\"" << std::endl;
@@ -174,7 +154,6 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             // A .so file has been removed
             else if (event_type == DirWatcher::Removed)
             {
-                std::cout << "TEST: watch_event 15\n";
                 registry_->remove_local_scope(scope_id);
                 std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
                           << parent_path << "\"" << std::endl;
@@ -190,7 +169,6 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             // (we need to do this with both files and folders added, as the file added may be a symlink)
             try
             {
-                std::cout << "TEST: watch_event 16\n";
                 add_scope_dir(path);
             }
             catch (...) {}
@@ -198,7 +176,6 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         // A sub directory has been removed
         else if (event_type == DirWatcher::Removed)
         {
-            std::cout << "TEST: watch_event 17\n";
             remove_scope_dir(path);
         }
     }

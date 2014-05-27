@@ -39,7 +39,7 @@ public:
     void add_install_dir(std::string const& dir);
 
 private:
-    unity::scopes::internal::RegistryObject::SPtr const& registry_;
+    unity::scopes::internal::RegistryObject::SPtr const registry_;
     std::function<void(std::pair<std::string, std::string> const&)> const ini_added_callback_;
     std::map<std::string, std::string> dir_to_ini_map_;
     std::mutex mutex_;
