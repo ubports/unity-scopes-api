@@ -117,25 +117,34 @@ void DirWatcher::add_watch(std::string const& path)
 
 void DirWatcher::remove_watch(std::string const& path)
 {
+    std::cout << "TEST: remove_watch 1. path = " << path << "\n";
     std::lock_guard<std::mutex> lock(mutex_);
 
+    std::cout << "TEST: remove_watch 2.\n";
     if (thread_state_ == Failed)
     {
+        std::cout << "TEST: remove_watch 3.\n";
         std::rethrow_exception(thread_exception_);
     }
 
+    std::cout << "TEST: remove_watch 4.\n";
     for (auto& wd : wds_)
     {
+        std::cout << "TEST: remove_watch 5. wd.second = " << wd.second << "\n";
         if (wd.second == path)
         {
             // If this is the last watch, stop the thread
+            std::cout << "TEST: remove_watch 6. wds_.size() = " << std::to_string(wds_.size()) << ".\n";
             if (wds_.size() == 1)
             {
+                std::cout << "TEST: remove_watch 7.\n";
                 thread_state_ = Stopping;
             }
 
             // Remove watch (causes read to return)
+            std::cout << "TEST: remove_watch 8. fd_ = " << std::to_string(fd_) << ", wd.first = " << wd.first << "\n";
             inotify_rm_watch(fd_, wd.first);
+            std::cout << "TEST: remove_watch 9.\n";
             wds_.erase(wd.first);
         }
     }
