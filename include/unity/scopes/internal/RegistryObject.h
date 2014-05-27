@@ -62,6 +62,7 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
     virtual ObjectProxy locate(std::string const& identity) override;
+    virtual bool is_scope_running(std::string const& scope_id) override;
 
     // Local methods
     bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
@@ -69,7 +70,6 @@ public:
     bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
-    bool is_scope_running(std::string const& scope_id);
     StateReceiverObject::SPtr state_receiver();
 
 private:

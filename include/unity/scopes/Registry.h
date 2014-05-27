@@ -56,6 +56,7 @@ public:
 
     /**
     \brief Returns the metadata for the scope with the given ID.
+    \param scope_id The ID of the scope we wish to retrieve metadata from.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
@@ -73,6 +74,20 @@ public:
     \return The metadata items for which the predicate returned true.
     */
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) = 0;
+
+    /**
+    \brief Returns whether a scope is currently running or not.
+    \param scope_id The ID of the scope we wish to retrieve state from.
+    \return True if the scope is running, and False if it is not running.
+    \throws NotFoundException if no scope with the given name exists.
+    */
+    virtual bool is_scope_running(std::string const& scope_id) = 0;
+
+    /**
+    \brief Assigns a callback method to be executed when a scope's running state (started / stopped) changes.
+    \param callback The function object that is invoked when a scope changes state.
+    */
+    virtual void set_scope_state_callback(std::function<void()> callback) = 0;
 
 protected:
     /// @cond

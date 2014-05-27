@@ -186,6 +186,19 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     return proxy;
 }
 
+bool RegistryObject::is_scope_running(std::string const& scope_id)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+    }
+
+    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
 bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
@@ -231,19 +244,6 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     remote_registry_ = remote_registry;
-}
-
-bool RegistryObject::is_scope_running(std::string const& scope_id)
-{
-    lock_guard<decltype(mutex_)> lock(mutex_);
-
-    auto it = scope_processes_.find(scope_id);
-    if (it != scope_processes_.end())
-    {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
-    }
-
-    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
 }
 
 StateReceiverObject::SPtr RegistryObject::state_receiver()

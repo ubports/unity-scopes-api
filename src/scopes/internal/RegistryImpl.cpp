@@ -71,6 +71,16 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
     return matching_entries;
 }
 
+bool RegistryImpl::is_scope_running(std::string const& scope_id)
+{
+    return fwd()->is_scope_running(scope_id);
+}
+
+void RegistryImpl::set_scope_state_callback(std::function<void()> callback)
+{
+    return fwd()->set_scope_state_callback(callback);
+}
+
 MWRegistryProxy RegistryImpl::fwd()
 {
     return dynamic_pointer_cast<MWRegistry>(proxy());
