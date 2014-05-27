@@ -74,6 +74,47 @@ private:
     std::condition_variable cond_;
 };
 
+TEST(Registry, metadata)
+{
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    auto meta = r->get_metadata("testscopeA");
+    EXPECT_EQ("testscopeA", meta.scope_id());
+    EXPECT_EQ("Canonical Ltd.", meta.author());
+    EXPECT_EQ("scope-A.DisplayName", meta.display_name());
+    EXPECT_EQ("scope-A.Description", meta.description());
+    EXPECT_EQ("/foo/scope-A.Art", meta.art());
+    EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
+    EXPECT_EQ("scope-A.HotKey", meta.hot_key());
+    EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
+    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
+
+    const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
+    const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
+
+    meta = r->get_metadata("testscopeB");
+    EXPECT_EQ("testscopeB", meta.scope_id());
+    EXPECT_EQ("Canonical Ltd.", meta.author());
+    EXPECT_EQ("scope-B.DisplayName", meta.display_name());
+    EXPECT_EQ("scope-B.Description", meta.description());
+    EXPECT_EQ(bart, meta.art());
+    EXPECT_EQ(bicon, meta.icon());
+    EXPECT_EQ("scope-B.HotKey", meta.hot_key());
+    EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
+    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
+
+    auto sp = meta.proxy();
+
+    auto receiver = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply(receiver);
+    SearchMetadata metadata("C", "desktop");
+
+    // search would fail if testscopeB can't be executed
+    auto ctrl = sp->search("foo", metadata, reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
+}
+
 TEST(Registry, update_notify)
 {
     bool update_received_ = false;
@@ -94,7 +135,7 @@ TEST(Registry, update_notify)
     {
         // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex_);
-        while (cond_.wait_for(lock, std::chrono::milliseconds(1000), [&update_received_] { return update_received_; }))
+        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
         {
             update_received_ = false;
         }
@@ -207,47 +248,6 @@ TEST(Registry, update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
-}
-
-TEST(Registry, metadata)
-{
-    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
-    RegistryProxy r = rt->registry();
-
-    auto meta = r->get_metadata("testscopeA");
-    EXPECT_EQ("testscopeA", meta.scope_id());
-    EXPECT_EQ("Canonical Ltd.", meta.author());
-    EXPECT_EQ("scope-A.DisplayName", meta.display_name());
-    EXPECT_EQ("scope-A.Description", meta.description());
-    EXPECT_EQ("/foo/scope-A.Art", meta.art());
-    EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
-    EXPECT_EQ("scope-A.HotKey", meta.hot_key());
-    EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
-    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
-
-    const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
-    const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
-
-    meta = r->get_metadata("testscopeB");
-    EXPECT_EQ("testscopeB", meta.scope_id());
-    EXPECT_EQ("Canonical Ltd.", meta.author());
-    EXPECT_EQ("scope-B.DisplayName", meta.display_name());
-    EXPECT_EQ("scope-B.Description", meta.description());
-    EXPECT_EQ(bart, meta.art());
-    EXPECT_EQ(bicon, meta.icon());
-    EXPECT_EQ("scope-B.HotKey", meta.hot_key());
-    EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
-    EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
-
-    auto sp = meta.proxy();
-
-    auto receiver = std::make_shared<Receiver>();
-    SearchListenerBase::SPtr reply(receiver);
-    SearchMetadata metadata("C", "desktop");
-
-    // search would fail if testscopeB can't be executed
-    auto ctrl = sp->search("foo", metadata, reply);
-    EXPECT_TRUE(receiver->wait_until_finished());
 }
 
 int main(int argc, char **argv)

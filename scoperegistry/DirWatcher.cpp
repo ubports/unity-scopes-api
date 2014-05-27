@@ -97,13 +97,23 @@ void DirWatcher::add_watch(std::string const& path)
         std::rethrow_exception(thread_exception_);
     }
 
+    for (auto const& wd : wds_)
+    {
+        if (wd.second == path)
+        {
+            throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
+                                    path + "\". Watch already exists.");
+        }
+    }
+
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
                                                   IN_DELETE | IN_MOVED_FROM |
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
         throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                path + "\"");
+                                path + "\". inotify_add_watch() failed. (fd = " +
+                                std::to_string(fd_) + ", path = " + path + ")");
     }
 
     wds_[wd] = path;
@@ -124,7 +134,7 @@ void DirWatcher::remove_watch(std::string const& path)
         std::rethrow_exception(thread_exception_);
     }
 
-    for (auto& wd : wds_)
+    for (auto const& wd : wds_)
     {
         if (wd.second == path)
         {
@@ -137,6 +147,7 @@ void DirWatcher::remove_watch(std::string const& path)
             // Remove watch (causes read to return)
             inotify_rm_watch(fd_, wd.first);
             wds_.erase(wd.first);
+            break;
         }
     }
 }
