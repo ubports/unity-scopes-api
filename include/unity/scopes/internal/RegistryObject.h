@@ -133,6 +133,7 @@ private:
     mutable std::mutex mutex_;
 
     MWPublisher::UPtr publisher_;
+    int gen_count_ = 0;
 };
 
 } // namespace internal

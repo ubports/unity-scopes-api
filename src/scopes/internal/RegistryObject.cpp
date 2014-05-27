@@ -142,6 +142,7 @@ MetadataMap RegistryObject::list() const
     MetadataMap all_scopes;  // Local scopes
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
+        std::cout << "TEST: list(). gen_count = " << gen_count_ << "\n";
         all_scopes = scopes_;  // Local scopes
     }
     // Unlock, so we don't call the remote registry while holding a lock.
@@ -214,6 +215,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     lock_guard<decltype(mutex_)> lock(mutex_);
 
     bool return_value = true;
+    std::cout << "TEST: add_local_scope(). adding scope. gen_count = " << gen_count_ << "\n";
     if (scopes_.find(scope_id) != scopes_.end())
     {
         scopes_.erase(scope_id);
@@ -222,6 +224,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     }
     scopes_.insert(make_pair(scope_id, metadata));
     scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
+    std::cout << "TEST: add_local_scope(). scope added. gen_count = " << ++gen_count_ << "\n";
 
     if (publisher_)
     {
@@ -242,10 +245,12 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
 
     lock_guard<decltype(mutex_)> lock(mutex_);
 
+    std::cout << "TEST: remove_local_scope(). removing scope. gen_count = " << gen_count_ << "\n";
     scope_processes_.erase(scope_id);
 
     if (scopes_.erase(scope_id) == 1)
     {
+        std::cout << "TEST: remove_local_scope(). scope removed. gen_count = " << ++gen_count_ << "\n";
         if (publisher_)
         {
             // Send a blank message to subscribers to inform them that the registry has been updated
