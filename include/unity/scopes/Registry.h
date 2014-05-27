@@ -85,9 +85,10 @@ public:
 
     /**
     \brief Assigns a callback method to be executed when a scope's running state (started / stopped) changes.
-    \param callback The function object that is invoked when a scope changes state.
+    \param scope_id The ID of the scope we wish to retrieve state changes from.
+    \param callback The function object that is invoked when a scope changes running state.
     */
-    virtual void set_scope_state_callback(std::function<void()> callback) = 0;
+    virtual void set_scope_state_callback(std::string const& scope_id, std::function<void(bool is_running)> callback) = 0;
 
     /**
     \brief Assigns a callback method to be executed when the registry's scope list changes.

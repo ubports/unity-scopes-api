@@ -45,7 +45,7 @@ public:
     virtual ~MWRegistry();
 
     // Local operations
-    void set_scope_state_callback(std::function<void()> callback);
+    void set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback);
     void set_list_update_callback(std::function<void()> callback);
 
 protected:
@@ -53,7 +53,8 @@ protected:
 
 private:
     MiddlewareBase* mw_base_;
-    MWSubscriber::UPtr subscriber_;
+    MWSubscriber::UPtr list_update_subscriber_;
+    MWSubscriber::UPtr scope_state_subscriber_;
 };
 
 } // namespace internal

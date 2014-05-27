@@ -44,7 +44,7 @@ public:
     MOCK_METHOD0(list, MetadataMap());
     MOCK_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
     MOCK_METHOD1(is_scope_running, bool(std::string const&));
-    MOCK_METHOD1(set_scope_state_callback, void(std::function<void()>));
+    MOCK_METHOD2(set_scope_state_callback, void(std::string const&, std::function<void(bool)>));
     MOCK_METHOD1(set_list_update_callback, void(std::function<void()>));
 };
 

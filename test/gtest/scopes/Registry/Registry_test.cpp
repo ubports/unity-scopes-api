@@ -135,11 +135,14 @@ TEST(Registry, update_notify)
     {
         // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex_);
+        bool success = false;
         while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
         {
+            success = true;
             update_received_ = false;
         }
         update_received_ = false;
+        return success;
     };
 
     system::error_code ec;
@@ -156,7 +159,7 @@ TEST(Registry, update_notify)
     std::cout << "Move testscopeC into the scopes folder" << std::endl;
     filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered
     list = r->list();
@@ -170,7 +173,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 4 scopes registered
     list = r->list();
@@ -184,7 +187,7 @@ TEST(Registry, update_notify)
     std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
     filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered again
     list = r->list();
@@ -198,7 +201,7 @@ TEST(Registry, update_notify)
     std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();
@@ -212,6 +215,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
+    EXPECT_FALSE(wait_for_update());
 
     // Check that no scopes were registered
     list = r->list();
@@ -225,7 +229,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered
     list = r->list();
@@ -239,7 +243,7 @@ TEST(Registry, update_notify)
     std::cout << "Remove testfolder" << std::endl;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();

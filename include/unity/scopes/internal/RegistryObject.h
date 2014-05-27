@@ -87,7 +87,7 @@ private:
             Stopped, Starting, Running, Stopping
         };
 
-        ScopeProcess(ScopeExecData exec_data);
+        ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher);
         ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
@@ -115,6 +115,7 @@ private:
         mutable std::mutex process_mutex_;
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
+        MWPublisher::SPtr reg_publisher_;
     };
 
 private:
@@ -132,7 +133,7 @@ private:
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
 
-    MWPublisher::UPtr publisher_;
+    MWPublisher::SPtr publisher_;
 };
 
 } // namespace internal
