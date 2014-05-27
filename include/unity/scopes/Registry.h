@@ -79,9 +79,9 @@ public:
 
     Note: Upon receiving this callback, you should retrieve the updated scopes list via the list() method if
     you wish to retain synchronisation between client and server.
-    \param callback The function object that is executed when an update occurs.
+    \param callback The function object that is invoked when an update occurs.
     */
-    virtual void set_update_callback(std::function<void()> callback) = 0;
+    virtual void set_list_update_callback(std::function<void()> callback) = 0;
 
 protected:
     /// @cond

@@ -125,7 +125,7 @@ TEST(Registry, update_notify)
     RegistryProxy r = rt->registry();
 
     // Configure registry update callback
-    r->set_update_callback([&update_received_, &mutex_, &cond_]
+    r->set_list_update_callback([&update_received_, &mutex_, &cond_]
     {
         std::lock_guard<std::mutex> lock(mutex_);
         update_received_ = true;

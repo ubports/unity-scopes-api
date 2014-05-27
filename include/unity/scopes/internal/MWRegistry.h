@@ -44,7 +44,7 @@ public:
     virtual ~MWRegistry();
 
     // Local operations
-    void set_update_callback(std::function<void()> callback);
+    void set_list_update_callback(std::function<void()> callback);
 
 protected:
     MWRegistry(MiddlewareBase* mw_base);

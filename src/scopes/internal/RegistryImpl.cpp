@@ -71,9 +71,9 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
     return matching_entries;
 }
 
-void RegistryImpl::set_update_callback(std::function<void()> callback)
+void RegistryImpl::set_list_update_callback(std::function<void()> callback)
 {
-    fwd()->set_update_callback(callback);
+    fwd()->set_list_update_callback(callback);
 }
 
 MWRegistryProxy RegistryImpl::fwd()

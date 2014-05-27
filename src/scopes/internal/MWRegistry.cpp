@@ -41,7 +41,7 @@ MWRegistry::~MWRegistry()
 {
 }
 
-void MWRegistry::set_update_callback(std::function<void()> callback)
+void MWRegistry::set_list_update_callback(std::function<void()> callback)
 {
     if (!subscriber_)
     {
@@ -52,7 +52,7 @@ void MWRegistry::set_update_callback(std::function<void()> callback)
         }
         catch (std::exception const& e)
         {
-            cerr << "MWRegistry::set_update_callback(): failed to create registry subscriber: " << e.what() << endl;
+            cerr << "MWRegistry::set_list_update_callback(): failed to create registry subscriber: " << e.what() << endl;
         }
     }
     if (subscriber_)
