@@ -44,7 +44,6 @@ public:
     MOCK_METHOD0(list, MetadataMap());
     MOCK_METHOD1(list_if, MetadataMap(std::function<bool(ScopeMetadata const&)>));
     MOCK_METHOD1(is_scope_running, bool(std::string const&));
-
     core::ScopedConnection set_scope_state_callback(std::string const&, std::function<void(bool is_running)>) override
     {
         return core::Signal<>().connect([]{});
