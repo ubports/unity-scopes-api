@@ -43,8 +43,11 @@ MWRegistry::~MWRegistry()
 
 core::ScopedConnection MWRegistry::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
 {
-    scope_state_subscribers_.push_back(mw_base_->create_subscriber(mw_base_->runtime()->registry_identity(), scope_id));
-    return scope_state_subscribers_.back()->message_received().connect([callback](string const& state){ callback(state == "started"); });
+    if (scope_state_subscribers_.find(scope_id) == scope_state_subscribers_.end())
+    {
+        scope_state_subscribers_[scope_id] = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity(), scope_id);
+    }
+    return scope_state_subscribers_.at(scope_id)->message_received().connect([callback](string const& state){ callback(state == "started"); });
 }
 
 core::ScopedConnection MWRegistry::set_list_update_callback(std::function<void()> callback)
