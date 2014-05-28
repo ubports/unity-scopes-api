@@ -103,19 +103,57 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
+}
 
+TEST(Registry, scope_state_notify)
+{
+    bool update_received_ = false;
+    bool state_received_ = false;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure registry update callback
+    r->set_scope_state_callback("testscopeB", [&update_received_, &state_received_, &mutex_, &cond_](bool is_running)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        update_received_ = true;
+        state_received_ = is_running;
+        cond_.notify_one();
+    });
+    auto wait_for_state_update = [&update_received_, &mutex_, &cond_]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex_);
+        bool success = cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; });
+        update_received_ = false;
+        return success;
+    };
+
+    auto meta = r->get_metadata("testscopeB");
     auto sp = meta.proxy();
 
     auto receiver = std::make_shared<Receiver>();
     SearchListenerBase::SPtr reply(receiver);
     SearchMetadata metadata("C", "desktop");
 
+    // testscopeB should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeB"));
+    EXPECT_FALSE(wait_for_state_update());
+
     // search would fail if testscopeB can't be executed
     auto ctrl = sp->search("foo", metadata, reply);
     EXPECT_TRUE(receiver->wait_until_finished());
+
+    // testscopeB should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(state_received_);
+    EXPECT_TRUE(r->is_scope_running("testscopeB"));
 }
 
-TEST(Registry, update_notify)
+TEST(Registry, list_update_notify)
 {
     bool update_received_ = false;
     std::mutex mutex_;
