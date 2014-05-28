@@ -64,6 +64,7 @@ public:
         auto now = std::chrono::steady_clock::now();
         auto expiry_time = now + std::chrono::seconds(5);
         EXPECT_TRUE(cond_.wait_until(lock, expiry_time, [this]{ return done_; })) << "finished message not delivered";
+        done_ = false;
         return finished_ok_;
     }
 
@@ -107,79 +108,104 @@ TEST(Registry, metadata)
 
 TEST(Registry, scope_state_notify)
 {
-    bool update_received_ = false;
-    bool state_received_ = false;
-    std::mutex mutex_;
-    std::condition_variable cond_;
+    bool update_received = false;
+    bool testscopeA_state = false;
+    bool testscopeB_state = false;
+    std::mutex mutex;
+    std::condition_variable cond;
 
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
-    // Configure registry update callback
-    r->set_scope_state_callback("testscopeB", [&update_received_, &state_received_, &mutex_, &cond_](bool is_running)
+    // Configure testscopeB scope_state_callback
+    r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        update_received_ = true;
-        state_received_ = is_running;
-        cond_.notify_one();
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        testscopeA_state = is_running;
+        cond.notify_one();
     });
-    auto wait_for_state_update = [&update_received_, &mutex_, &cond_]
+    // Configure testscopeB scope_state_callback
+    r->set_scope_state_callback("testscopeB", [&update_received, &testscopeB_state, &mutex, &cond](bool is_running)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        testscopeB_state = is_running;
+        cond.notify_one();
+    });
+    auto wait_for_state_update = [&update_received, &mutex, &cond]
     {
         // Wait for an update notification
-        std::unique_lock<std::mutex> lock(mutex_);
-        bool success = cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; });
-        update_received_ = false;
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; });
+        update_received = false;
         return success;
     };
-
-    auto meta = r->get_metadata("testscopeB");
-    auto sp = meta.proxy();
 
     auto receiver = std::make_shared<Receiver>();
     SearchListenerBase::SPtr reply(receiver);
     SearchMetadata metadata("C", "desktop");
+
+    auto meta = r->get_metadata("testscopeA");
+    auto sp = meta.proxy();
+
+    // testscopeA should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeA"));
+    EXPECT_FALSE(wait_for_state_update());
+
+    // search would fail if testscopeA can't be executed
+    auto ctrl = sp->search("foo", metadata, reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
+
+    // testscopeA should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(testscopeA_state);
+    EXPECT_TRUE(r->is_scope_running("testscopeA"));
+
+    meta = r->get_metadata("testscopeB");
+    sp = meta.proxy();
 
     // testscopeB should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
     EXPECT_FALSE(wait_for_state_update());
 
     // search would fail if testscopeB can't be executed
-    auto ctrl = sp->search("foo", metadata, reply);
+    ctrl = sp->search("foo", metadata, reply);
     EXPECT_TRUE(receiver->wait_until_finished());
 
     // testscopeB should now be running
     EXPECT_TRUE(wait_for_state_update());
-    EXPECT_TRUE(state_received_);
+    EXPECT_TRUE(testscopeB_state);
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 }
 
 TEST(Registry, list_update_notify)
 {
-    bool update_received_ = false;
-    std::mutex mutex_;
-    std::condition_variable cond_;
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
 
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
     // Configure registry update callback
-    r->set_list_update_callback([&update_received_, &mutex_, &cond_]
+    r->set_list_update_callback([&update_received, &mutex, &cond]
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        update_received_ = true;
-        cond_.notify_one();
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
     });
-    auto wait_for_update = [&update_received_, &mutex_, &cond_]
+    auto wait_for_update = [&update_received, &mutex, &cond]
     {
         // Flush out update notifications
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::unique_lock<std::mutex> lock(mutex);
         bool success = false;
-        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
+        while (cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; }))
         {
             success = true;
-            update_received_ = false;
+            update_received = false;
         }
-        update_received_ = false;
+        update_received = false;
         return success;
     };
 

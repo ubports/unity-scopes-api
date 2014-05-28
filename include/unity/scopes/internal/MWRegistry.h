@@ -54,7 +54,7 @@ protected:
 private:
     MiddlewareBase* mw_base_;
     MWSubscriber::UPtr list_update_subscriber_;
-    MWSubscriber::UPtr scope_state_subscriber_;
+    std::vector<MWSubscriber::UPtr> scope_state_subscribers_;
 };
 
 } // namespace internal
