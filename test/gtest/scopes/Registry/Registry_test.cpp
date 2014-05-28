@@ -117,7 +117,7 @@ TEST(Registry, scope_state_notify)
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
-    // Configure testscopeB scope_state_callback
+    // Configure testscopeA scope_state_callback
     r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
         std::lock_guard<std::mutex> lock(mutex);

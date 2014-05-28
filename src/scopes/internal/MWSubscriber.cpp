@@ -35,6 +35,11 @@ MWSubscriber::~MWSubscriber()
 {
 }
 
+core::Signal<std::string const&> const& MWSubscriber::message_received() const
+{
+    return message_received_;
+}
+
 } // namespace internal
 
 } // namespace scopes

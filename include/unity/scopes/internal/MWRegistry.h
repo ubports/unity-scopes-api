@@ -45,8 +45,8 @@ public:
     virtual ~MWRegistry();
 
     // Local operations
-    void set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback);
-    void set_list_update_callback(std::function<void()> callback);
+    core::ScopedConnection set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback);
+    core::ScopedConnection set_list_update_callback(std::function<void()> callback);
 
 protected:
     MWRegistry(MiddlewareBase* mw_base);

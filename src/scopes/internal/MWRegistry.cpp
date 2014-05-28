@@ -41,23 +41,20 @@ MWRegistry::~MWRegistry()
 {
 }
 
-void MWRegistry::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
+core::ScopedConnection MWRegistry::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
 {
     scope_state_subscribers_.push_back(mw_base_->create_subscriber(mw_base_->runtime()->registry_identity(), scope_id));
-    scope_state_subscribers_.back()->set_message_callback([callback](string const& state){ callback(state == "started"); });
+    return scope_state_subscribers_.back()->message_received().connect([callback](string const& state){ callback(state == "started"); });
 }
 
-void MWRegistry::set_list_update_callback(std::function<void()> callback)
+core::ScopedConnection MWRegistry::set_list_update_callback(std::function<void()> callback)
 {
     if (!list_update_subscriber_)
     {
         // Use lazy initialization here to only subscribe to the publisher if a callback is set
         list_update_subscriber_ = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity());
     }
-    if (list_update_subscriber_)
-    {
-        list_update_subscriber_->set_message_callback([callback](string const&){ callback(); });
-    }
+    return list_update_subscriber_->message_received().connect([callback](string const&){ callback(); });
 }
 
 } // namespace internal

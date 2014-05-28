@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_REGISTRY_H
 #define UNITY_SCOPES_REGISTRY_H
 
+#include <core/signal.h>
 #include <unity/scopes/Object.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ScopeMetadata.h>
@@ -89,7 +90,7 @@ public:
     \param callback The function object that is invoked when a scope changes running state.
     \throws MiddlewareException if the registry subscriber failed to initialize.
     */
-    virtual void set_scope_state_callback(std::string const& scope_id, std::function<void(bool is_running)> callback) = 0;
+    virtual core::ScopedConnection set_scope_state_callback(std::string const& scope_id, std::function<void(bool is_running)> callback) = 0;
 
     /**
     \brief Assigns a callback method to be executed when the registry's scope list changes.
@@ -99,7 +100,7 @@ public:
     \param callback The function object that is invoked when an update occurs.
     \throws MiddlewareException if the registry subscriber failed to initialize.
     */
-    virtual void set_list_update_callback(std::function<void()> callback) = 0;
+    virtual core::ScopedConnection set_list_update_callback(std::function<void()> callback) = 0;
 
 protected:
     /// @cond

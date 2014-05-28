@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
 #define UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
 
+#include <core/signal.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -31,8 +32,6 @@ namespace scopes
 namespace internal
 {
 
-typedef std::function<void(std::string const& message)> SubscriberCallback;
-
 class MWSubscriber
 {
 public:
@@ -42,10 +41,12 @@ public:
     virtual ~MWSubscriber();
 
     virtual std::string endpoint() const = 0;
-    virtual void set_message_callback(SubscriberCallback callback) = 0;
+    core::Signal<std::string const&> const& message_received() const;
 
 protected:
     MWSubscriber();
+
+    core::Signal<std::string const&> message_received_;
 };
 
 } // namespace internal

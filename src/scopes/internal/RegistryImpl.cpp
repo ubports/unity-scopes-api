@@ -76,14 +76,14 @@ bool RegistryImpl::is_scope_running(std::string const& scope_id)
     return fwd()->is_scope_running(scope_id);
 }
 
-void RegistryImpl::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
+core::ScopedConnection RegistryImpl::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
 {
     return fwd()->set_scope_state_callback(scope_id, callback);
 }
 
-void RegistryImpl::set_list_update_callback(std::function<void()> callback)
+core::ScopedConnection RegistryImpl::set_list_update_callback(std::function<void()> callback)
 {
-    fwd()->set_list_update_callback(callback);
+    return fwd()->set_list_update_callback(callback);
 }
 
 MWRegistryProxy RegistryImpl::fwd()
