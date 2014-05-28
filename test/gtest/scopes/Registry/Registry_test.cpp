@@ -118,7 +118,7 @@ TEST(Registry, scope_state_notify)
     RegistryProxy r = rt->registry();
 
     // Configure testscopeA scope_state_callback
-    r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
+    auto connA = r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = true;
@@ -126,7 +126,7 @@ TEST(Registry, scope_state_notify)
         cond.notify_one();
     });
     // Configure testscopeB scope_state_callback
-    r->set_scope_state_callback("testscopeB", [&update_received, &testscopeB_state, &mutex, &cond](bool is_running)
+    auto connB = r->set_scope_state_callback("testscopeB", [&update_received, &testscopeB_state, &mutex, &cond](bool is_running)
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = true;
@@ -189,7 +189,7 @@ TEST(Registry, list_update_notify)
     RegistryProxy r = rt->registry();
 
     // Configure registry update callback
-    r->set_list_update_callback([&update_received, &mutex, &cond]
+    auto conn = r->set_list_update_callback([&update_received, &mutex, &cond]
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = true;
