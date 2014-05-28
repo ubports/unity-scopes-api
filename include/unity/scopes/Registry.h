@@ -56,7 +56,7 @@ public:
 
     /**
     \brief Returns the metadata for the scope with the given ID.
-    \param scope_id The ID of the scope we wish to retrieve metadata from.
+    \param scope_id The ID of the scope from which we wish to retrieve metadata.
     \return The metadata for the scope.
     \throws NotFoundException if no scope with the given name exists.
     */
@@ -77,7 +77,7 @@ public:
 
     /**
     \brief Returns whether a scope is currently running or not.
-    \param scope_id The ID of the scope we wish to retrieve state from.
+    \param scope_id The ID of the scope from which we wish to retrieve state.
     \return True if the scope is running, and False if it is not running.
     \throws NotFoundException if no scope with the given name exists.
     */
@@ -85,7 +85,7 @@ public:
 
     /**
     \brief Assigns a callback method to be executed when a scope's running state (started / stopped) changes.
-    \param scope_id The ID of the scope we wish to retrieve state changes from.
+    \param scope_id The ID of the scope from which we wish to retrieve state changes.
     \param callback The function object that is invoked when a scope changes running state.
     */
     virtual void set_scope_state_callback(std::string const& scope_id, std::function<void(bool is_running)> callback) = 0;
