@@ -65,6 +65,14 @@ TEST(Department, basic)
         dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
         EXPECT_THROW(dep->set_has_subdepartments(false), unity::LogicException);
     }
+
+    {
+        CannedQuery query("fooscope", "foo", "dep1");
+        Department::SPtr dep = Department::create(query, "News");
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
+        dep->set_subdepartments({});
+        EXPECT_NO_THROW(dep->set_has_subdepartments(false));
+    }
 }
 
 TEST(Department, serialize_and_deserialize)
