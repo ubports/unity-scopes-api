@@ -42,7 +42,7 @@ public:
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
-    void set_has_subdepartments();
+    void set_has_subdepartments(bool subdepartments);
     void set_subdepartments(DepartmentList const& departments);
     void add_subdepartment(Department::SCPtr const& department);
     void set_alternate_label(std::string const& label);
