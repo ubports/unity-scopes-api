@@ -47,7 +47,8 @@ class QueryObjectBase;
 class SearchReplyImpl : public virtual unity::scopes::SearchReply, public virtual ReplyImpl
 {
 public:
-    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality);
+    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality,
+            std::string const& current_department_id);
     virtual ~SearchReplyImpl();
 
     virtual void register_departments(Department::SCPtr const& parent) override;
@@ -71,6 +72,7 @@ private:
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
+    std::string current_department_;
 };
 
 } // namespace internal

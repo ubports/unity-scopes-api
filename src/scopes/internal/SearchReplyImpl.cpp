@@ -40,12 +40,14 @@ namespace internal
 
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
                                  std::shared_ptr<QueryObjectBase> const& qo,
-                                 int cardinality) :
+                                 int cardinality,
+                                 std::string const& current_department_id) :
     ObjectImpl(mw_proxy),
     ReplyImpl(mw_proxy, qo),
     cat_registry_(new CategoryRegistry()),
     cardinality_(cardinality),
-    num_pushes_(0)
+    num_pushes_(0),
+    current_department_(current_department_id)
 {
 }
 
@@ -58,7 +60,7 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
     // basic consistency check
     try
     {
-        DepartmentImpl::validate_departments(parent); //TODO: perform validation with current department id
+        DepartmentImpl::validate_departments(parent, current_department_);
     }
     catch (unity::LogicException const &e)
     {
