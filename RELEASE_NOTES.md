@@ -8,9 +8,12 @@ Changes in version 0.4.8
     constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
     pointers instead of values. Changed Department::set_has_subdepartments() method to take bool value (true by default).
 
+  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+
 Changes in version 0.4.7
 ========================
   - Implemented RatingFilter and RadioButtonsFilter.
+
   - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
     instead of shared pointers.
 
