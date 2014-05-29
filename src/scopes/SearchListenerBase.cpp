@@ -34,7 +34,7 @@ SearchListenerBase::~SearchListenerBase()
 {
 }
 
-void SearchListenerBase::push(Department::SCPtr const& /* parent department */, Department::SCPtr const& /* current_department */)
+void SearchListenerBase::push(Department::SCPtr const& /* parent department */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

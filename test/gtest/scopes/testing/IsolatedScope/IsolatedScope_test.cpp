@@ -87,7 +87,7 @@ TEST_F(TestScopeFixture,
     const unity::scopes::CategoryRenderer renderer{};
 
     NiceMock<unity::scopes::testing::MockSearchReply> reply;
-    EXPECT_CALL(reply, register_departments(_, _)).Times(1);
+    EXPECT_CALL(reply, register_departments(_)).Times(1);
     EXPECT_CALL(reply, register_category(_, _, _, _))
             .Times(1)
             .WillOnce(
