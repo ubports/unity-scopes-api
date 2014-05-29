@@ -58,7 +58,7 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
     // basic consistency check
     try
     {
-        DepartmentImpl::validate_departments(parent, ""); //FIXME
+        DepartmentImpl::validate_departments(parent); //TODO: perform validation with current department id
     }
     catch (unity::LogicException const &e)
     {
