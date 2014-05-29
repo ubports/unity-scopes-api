@@ -13,23 +13,22 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Annotation::~Annotation()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::set_subdepartments(std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Department::add_subdepartment(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::set_subdepartments(std::list<std::shared_ptr<unity::scopes::Department const>, std::allocator<std::shared_ptr<unity::scopes::Department const> > > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::set_alternate_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Department::set_has_subdepartments()@Base" 0replaceme
+ (c++)"unity::scopes::Department::set_has_subdepartments(bool)@Base" 0replaceme
+ (c++)"unity::scopes::Department::create(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::Department::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::Department(unity::scopes::Department&&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Department::Department(unity::scopes::internal::DepartmentImpl*)@Base" 0replaceme
  (c++)"unity::scopes::Department::Department(unity::scopes::Department const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::Department(unity::scopes::Department&&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Department::Department(unity::scopes::internal::DepartmentImpl*)@Base" 0replaceme
  (c++)"unity::scopes::Department::Department(unity::scopes::Department const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::Department(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::~Department()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::operator=(unity::scopes::Department&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::operator=(unity::scopes::Department const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::FilterBase::set_display_hints(int)@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::set_display_hints(int)@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::FilterBase::FilterBase(unity::scopes::internal::FilterBaseImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::~FilterBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
@@ -82,6 +81,18 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::~PreviewReply()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RatingFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::set_on_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::set_off_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::RatingFilter(unity::scopes::internal::RatingFilterImpl*)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::~RatingFilter()@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::SwitchFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::SwitchFilter(unity::scopes::internal::SwitchFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::~SwitchFilter()@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::add_attribute_value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::add_attribute_mapping(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
@@ -174,10 +185,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::CategoryRenderer::operator=(unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewQueryBase::PreviewQueryBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewQueryBase::~PreviewQueryBase()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&, unity::scopes::Variant const&)@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::RangeInputFilter(unity::scopes::internal::RangeInputFilterImpl*)@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::~RangeInputFilter()@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&, unity::scopes::Variant const&)@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::RangeInputFilter(unity::scopes::internal::RangeInputFilterImpl*)@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::~RangeInputFilter()@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
@@ -216,9 +227,14 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::~ActivationResponse()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RadioButtonsFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::RadioButtonsFilter(unity::scopes::internal::RadioButtonsFilterImpl*)@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::~RadioButtonsFilter()@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const> const&)@Base" 0replaceme
- (c++)"unity::scopes::SearchListenerBase::push(std::list<unity::scopes::Department, std::allocator<unity::scopes::Department> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Department const> const&, std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::~SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
@@ -237,7 +253,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::OptionSelectorFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(unity::scopes::internal::OptionSelectorFilterImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(unity::scopes::internal::OptionSelectorFilterImpl*)@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::OptionSelectorFilter::~OptionSelectorFilter()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::finished(unity::scopes::ListenerBase::Reason, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::activated(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
@@ -432,7 +448,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&)@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareData::~MiddlewareData()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -447,6 +463,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_search_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_display_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_scope_directory(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_results_ttl_type(unity::scopes::ScopeMetadata::ResultsTtlType)@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_appearance_attributes(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::create(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_art(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -462,7 +479,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::StateReceiverObject::push_state(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::internal::StateReceiverObject::State const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::StateReceiverObject::StateReceiverObject()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::StateReceiverObject::~StateReceiverObject()@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::Executor::exec(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, core::posix::StandardStream const&)@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::Executor::exec(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, core::posix::StandardStream const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.7+14.10.20140522
  (c++)"unity::scopes::internal::Executor::Executor()@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::Executor::~Executor()@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::ScopeImpl::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
@@ -496,14 +513,14 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Annotation::links() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Annotation::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::subdepartments() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Department::alternate_label() const@Base" 0replaceme
- (c++)"unity::scopes::Department::has_subdepartments() const@Base" 0replaceme
+ (c++)"unity::scopes::Department::alternate_label() const@Base" 0.4.6+14.10.20140519
+ (c++)"unity::scopes::Department::has_subdepartments() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::Department::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::label() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::query() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::filter_type() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::FilterBase::display_hints() const@Base" 0replaceme
+ (c++)"unity::scopes::FilterBase::display_hints() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::FilterBase::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0.4.0+14.04.20140312.1
@@ -520,6 +537,18 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ColumnLayout::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RatingFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::active_rating(unity::scopes::FilterState const&) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::has_active_rating(unity::scopes::FilterState const&) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::fwd() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::label() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::on_icon() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::options() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RatingFilter::off_icon() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::SwitchFilter::update_state(unity::scopes::FilterState&, bool) const@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::is_on(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::SwitchFilter::label() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::widget_type() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_values() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_mappings() const@Base" 0.4.0+14.04.20140312.1
@@ -530,6 +559,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::scope_directory() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::ScopeMetadata::results_ttl_type() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::ScopeMetadata::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::ScopeMetadata::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::icon() const@Base" 0.4.0+14.04.20140312.1
@@ -552,15 +582,15 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ConfigException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategoryRenderer::data() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::RangeInputFilter::unit_label() const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::start_label() const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::start_value(unity::scopes::FilterState const&) const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, unity::scopes::Variant const&, unity::scopes::Variant const&) const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::has_end_value(unity::scopes::FilterState const&) const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::has_start_value(unity::scopes::FilterState const&) const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::fwd() const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::end_label() const@Base" 0replaceme
- (c++)"unity::scopes::RangeInputFilter::end_value(unity::scopes::FilterState const&) const@Base" 0replaceme
+ (c++)"unity::scopes::RangeInputFilter::unit_label() const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::start_label() const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::start_value(unity::scopes::FilterState const&) const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::update_state(unity::scopes::FilterState&, unity::scopes::Variant const&, unity::scopes::Variant const&) const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::has_end_value(unity::scopes::FilterState const&) const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::has_start_value(unity::scopes::FilterState const&) const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::fwd() const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::end_label() const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::RangeInputFilter::end_value(unity::scopes::FilterState const&) const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::TimeoutException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::category() const@Base" 0.4.0+14.04.20140312.1
@@ -570,10 +600,17 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::query() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::status() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::serialize() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::RadioButtonsFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::active_option(unity::scopes::FilterState const&) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::fwd() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::label() const@Base" 0.4.7+14.10.20140521
+ (c++)"unity::scopes::RadioButtonsFilter::options() const@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::MiddlewareException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::multi_select() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::active_options(unity::scopes::FilterState const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OptionSelectorFilter::has_active_option(unity::scopes::FilterState const&) const@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::OptionSelectorFilter::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::label() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::options() const@Base" 0.4.0+14.04.20140312.1
@@ -638,9 +675,10 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::display_name() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeConfig::idle_timeout() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::idle_timeout() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::scope_runner() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::ScopeConfig::results_ttl_type() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::internal::ScopeConfig::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeConfig::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::icon() const@Base" 0.4.0+14.04.20140312.1
@@ -659,8 +697,8 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSConfig::reg_refresh_rate() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::smartscopes::SSConfig::http_reply_timeout() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::smartscopes::SSConfig::reg_refresh_fail_timeout() const@Base" 0.4.4+14.10.20140508
- (c++)"unity::scopes::internal::RuntimeConfig::reap_expiry() const@Base" 0replaceme
- (c++)"unity::scopes::internal::RuntimeConfig::reap_interval() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::reap_expiry() const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::internal::RuntimeConfig::reap_interval() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RuntimeConfig::ss_configfile() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeConfig::registry_identity() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0.4.2+14.04.20140404.2
@@ -670,14 +708,14 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::MiddlewareBase::runtime() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::oem_installdir() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryConfig::process_timeout() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryConfig::process_timeout() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RegistryConfig::scope_installdir() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::scoperunner_path() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_kind() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0.4.5+14.10.20140513
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::get_metadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::list() const@Base" 0.4.2+14.04.20140404.2
@@ -689,6 +727,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::display_name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::scope_directory() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::results_ttl_type() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::internal::ScopeMetadataImpl::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::icon() const@Base" 0.4.0+14.04.20140312.1
@@ -706,16 +745,19 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::RatingFilter@Base" 0.4.7+14.10.20140521
+ (c++)"typeinfo for unity::scopes::SwitchFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
- (c++)"typeinfo for unity::scopes::RangeInputFilter@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::RangeInputFilter@Base" 0.4.5+14.10.20140513
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"typeinfo for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1
@@ -744,16 +786,19 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo name for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::RatingFilter@Base" 0.4.7+14.10.20140521
+ (c++)"typeinfo name for unity::scopes::SwitchFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
- (c++)"typeinfo name for unity::scopes::RangeInputFilter@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::RangeInputFilter@Base" 0.4.5+14.10.20140513
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"typeinfo name for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1
@@ -793,16 +838,19 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"vtable for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::RatingFilter@Base" 0.4.7+14.10.20140521
+ (c++)"vtable for unity::scopes::SwitchFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::PreviewQueryBase@Base" 0.4.0+14.04.20140312.1
- (c++)"vtable for unity::scopes::RangeInputFilter@Base" 0replaceme
+ (c++)"vtable for unity::scopes::RangeInputFilter@Base" 0.4.5+14.10.20140513
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::CategorisedResult@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::NotFoundException@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::RadioButtonsFilter@Base" 0.4.7+14.10.20140521
  (c++)"vtable for unity::scopes::SearchListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ActivationQueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1

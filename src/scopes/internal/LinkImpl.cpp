@@ -32,6 +32,10 @@ LinkImpl::LinkImpl(std::string const& label, CannedQuery const& query)
     : label_(label),
       query_(std::make_shared<CannedQuery>(query))
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("Link(): Invalid empty label string");
+    }
 }
 
 LinkImpl::LinkImpl(VariantMap const& variant_map)

@@ -74,6 +74,15 @@ public:
     */
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) = 0;
 
+    /**
+    \brief Assigns a callback method to be executed when the registry's scope list changes.
+
+    Note: Upon receiving this callback, you should retrieve the updated scopes list via the list() method if
+    you wish to retain synchronisation between client and server.
+    \param callback The function object that is invoked when an update occurs.
+    */
+    virtual void set_list_update_callback(std::function<void()> callback) = 0;
+
 protected:
     /// @cond
     Registry();

@@ -66,11 +66,20 @@ int SearchMetadataImpl::cardinality() const
 
 Variant& SearchMetadataImpl::hint(std::string const& key)
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("SearchMetadata::hint(): Invalid empty key string");
+    }
     return hints_[key];
 }
 
 Variant const& SearchMetadataImpl::hint(std::string const& key) const
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("SearchMetadata::hint(): Invalid empty key string");
+    }
+
     auto const& it = hints_.find(key);
     if (it != hints_.end())
     {
@@ -83,6 +92,10 @@ Variant const& SearchMetadataImpl::hint(std::string const& key) const
 
 void SearchMetadataImpl::set_hint(std::string const& key, Variant const& value)
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("SearchMetadata::set_hint(): Invalid empty key string");
+    }
     hints_[key] = value;
 }
 
@@ -93,6 +106,10 @@ VariantMap SearchMetadataImpl::hints() const
 
 bool SearchMetadataImpl::contains_hint(std::string const& key) const
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("SearchMetadata::contains_hint(): Invalid empty key string");
+    }
     return hints_.find(key) != hints_.end();
 }
 

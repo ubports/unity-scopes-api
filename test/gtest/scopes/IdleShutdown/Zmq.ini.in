@@ -1,0 +1,7 @@
+[Zmq]
+EndpointDir = /tmp
+# We set the idle timeout to something much larger than the expected
+# time for the test to finish, so we don't see a bogus completion
+# of the slow call due to the timeout on the client side triggering,
+# rather than the server shutting down.
+Default.Twoway.Timeout = 10000

@@ -56,7 +56,8 @@ endif()
 include(FindPkgConfig)
 find_package(Boost COMPONENTS system filesystem regex serialization REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
-pkg_check_modules(PROCESS_CPP process-cpp>=1.0.0 REQUIRED)
+pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
+pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 find_program(LTTNG_EXECUTABLE lttng)
@@ -101,7 +102,7 @@ endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS})
-set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
+set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${OTHER_LIBS})
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -179,7 +180,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 4)
-set(UNITY_SCOPES_MICRO 6)
+set(UNITY_SCOPES_MICRO 8)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
@@ -218,7 +219,6 @@ set(OTHER_LIBS
     ${Boost_LIBRARIES}
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
-    ${APPARMOR_LDFLAGS}
     ${ZMQPPLIB}
     ${ZMQLIB}
     ${CAPNPLIB}

@@ -247,6 +247,12 @@ void RuntimeImpl::waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& 
         {
             break;
         }
+        catch (std::future_error const&)
+        {
+            // If the run time is shut down without waiting for outstanding
+            // async invocations to complete, we get a future error because
+            // the promise will be destroyed, so we ignore this.
+        }
     }
 }
 
@@ -268,6 +274,11 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& scope_ini
 
 void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_ini_file, string const& scope_ini_file)
 {
+    if (!scope_base)
+    {
+        throw InvalidArgumentException("Runtime::run_scope(): scope_base cannot be nullptr");
+    }
+
     // Retrieve the registry middleware and create a proxy to its state receiver
     RegistryConfig reg_conf(registry_identity_, registry_configfile_);
     auto reg_runtime = create(registry_identity_, runtime_ini_file);
@@ -317,18 +328,32 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
 ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const
 {
-    auto mw = middleware_factory_->find(s);
-    assert(mw);
-    return mw->string_to_proxy(s);
+    try
+    {
+        auto mw = middleware_factory_->find(s);
+        assert(mw);
+        return mw->string_to_proxy(s);
+    }
+    catch (...)
+    {
+        throw ResourceException("Runtime::string_to_proxy(): Cannot create proxy from string");
+    }
 }
 
 string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 {
-    if (proxy == nullptr)
+    try
     {
-        return "nullproxy:";
+        if (proxy == nullptr)
+        {
+            return "nullproxy:";
+        }
+        return proxy->to_string();
     }
-    return proxy->to_string();
+    catch (...)
+    {
+        throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
+    }
 }
 
 } // namespace internal

@@ -57,11 +57,11 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
-std::string to_string(Department const& dep, std::string const& indent = "")
+std::string to_string(Department::SCPtr const& dep, std::string const& indent = "")
 {
     std::ostringstream str;
-    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << ", has_children=" << dep.has_subdepartments() << endl;
-    auto const subdeps = dep.subdepartments();
+    str << indent << "department id=" << dep->id() << ", name=" << dep->label() << ", has_children=" << dep->has_subdepartments() << endl;
+    auto const subdeps = dep->subdepartments();
     if (!subdeps.empty())
     {
         str << indent << "\tsubdepartments:" << endl;
@@ -128,14 +128,11 @@ public:
     {
     }
 
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current) override
     {
         cout << "\treceived departments:" << endl;
-        for (auto const& dep: departments)
-        {
-            cout << to_string(dep);
-        }
-        cout << "\tcurrent department=" << current_department_id << endl;
+        cout << to_string(parent);
+        cout << "\tcurrent department=" << current->id() << endl;
     }
 
     virtual void push(Category::SCPtr const& category) override
@@ -422,10 +419,11 @@ int main(int argc, char* argv[])
         }
 
         auto meta = r->get_metadata(scope_id);
-        cout << "Scope metadata:   " << endl;
-        cout << "\tscope_id:       " << meta.scope_id() << endl;
-        cout << "\tdisplay_name:   " << meta.display_name() << endl;
-        cout << "\tdescription:    " << meta.description() << endl;
+        cout << "Scope metadata:    " << endl;
+        cout << "\tscope_id:        " << meta.scope_id() << endl;
+        cout << "\tdisplay_name:    " << meta.display_name() << endl;
+        cout << "\tdescription:     " << meta.description() << endl;
+        cout << "\tappearance attr: " << to_string(Variant(meta.appearance_attributes())) << endl;
         string tmp;
         try
         {

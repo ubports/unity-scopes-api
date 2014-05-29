@@ -33,17 +33,25 @@ TEST(OptionSelectorFilter, basic)
     EXPECT_FALSE(filter1->multi_select());
     EXPECT_EQ(FilterBase::DisplayHints::Default, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
 
-    filter1->set_display_hints(FilterBase::DisplayHints::TopArea);
+    filter1->set_display_hints(FilterBase::DisplayHints::Primary);
     filter1->add_option("1", "Option 1");
     filter1->add_option("2", "Option 2");
 
-    EXPECT_EQ(FilterBase::DisplayHints::TopArea, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
+    EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
     auto opts = filter1->options();
     EXPECT_EQ(2u, opts.size());
     EXPECT_EQ("1", opts.front()->id());
     EXPECT_EQ("Option 1", opts.front()->label());
     EXPECT_EQ("2", opts.back()->id());
     EXPECT_EQ("Option 2", opts.back()->label());
+}
+
+TEST(OptionSelectorFilter, display_hints_range_check)
+{
+    auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+    EXPECT_THROW(filter1->set_display_hints(-1), unity::InvalidArgumentException);
+    // this check ensures we throw if this value exceeds the combination of FilterBase::DisplayHints flags.
+    EXPECT_THROW(filter1->set_display_hints(2), unity::InvalidArgumentException);
 }
 
 TEST(OptionSelectorFilter, single_selection)
@@ -54,10 +62,12 @@ TEST(OptionSelectorFilter, single_selection)
 
     FilterState fstate;
     EXPECT_FALSE(fstate.has_filter("f1"));
+    EXPECT_FALSE(filter1->has_active_option(fstate));
 
     // enable option1
     filter1->update_state(fstate, option1, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_TRUE(filter1->has_active_option(fstate));
     auto active = filter1->active_options(fstate);
     EXPECT_EQ(1u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
@@ -87,6 +97,7 @@ TEST(OptionSelectorFilter, multi_selection)
     filter1->update_state(fstate, option1, true);
     filter1->update_state(fstate, option2, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_TRUE(filter1->has_active_option(fstate));
     auto active = filter1->active_options(fstate);
     EXPECT_EQ(2u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
@@ -106,7 +117,7 @@ TEST(OptionSelectorFilter, multi_selection)
 TEST(OptionSelectorFilter, serialize)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
-    filter1->set_display_hints(FilterBase::DisplayHints::TopArea);
+    filter1->set_display_hints(FilterBase::DisplayHints::Primary);
     filter1->add_option("1", "Option 1");
     filter1->add_option("2", "Option 2");
 
@@ -114,7 +125,7 @@ TEST(OptionSelectorFilter, serialize)
     EXPECT_EQ("f1", var["id"].get_string());
     EXPECT_EQ("option_selector", var["filter_type"].get_string());
     EXPECT_EQ("Options", var["label"].get_string());
-    EXPECT_EQ(FilterBase::DisplayHints::TopArea, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
+    EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
 
     auto optarr = var["options"].get_array();
     EXPECT_EQ(2u, optarr.size());

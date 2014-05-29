@@ -58,7 +58,7 @@ public:
     enum DisplayHints
     {
         Default = 0,    /**< Default value (no hint) */
-        TopArea = 1     /**< Display this filter at the top, if possible */
+        Primary = 1     /**< Display this filter at the top of the screen, if possible */
     };
 
     /**

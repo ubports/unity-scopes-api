@@ -65,7 +65,7 @@ public:
 
     The default implementation does nothing.
     */
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id);
+    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current);
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().

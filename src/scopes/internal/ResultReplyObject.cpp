@@ -90,15 +90,21 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        DepartmentList const departments = DepartmentImpl::deserialize_departments(it->second.get_array());
+        Department::SCPtr department = DepartmentImpl::create(it->second.get_dict());
         it = data.find("current_department");
         if (it != data.end())
         {
-            receiver_->push(departments, it->second.get_string());
+            auto const current_dep_id = it->second.get_string();
+            Department::SCPtr current = (current_dep_id == department->id()) ? department : internal::DepartmentImpl::find_subdepartment_by_id(department, current_dep_id);
+            if (current == nullptr)
+            {
+                throw InvalidArgumentException("ResultReplyObject::process_data(): cannot determine current department");
+            }
+            receiver_->push(department, current);
         }
         else
         {
-            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
+            throw InvalidArgumentException("ResultReplyObject::process_data(): departments present but missing current_department");
         }
     }
 

@@ -29,12 +29,14 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWPublisher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWStateReceiver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWSubscriber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
@@ -46,6 +48,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RadioButtonsFilterImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RatingFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RangeInputFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryConfig.cpp
@@ -67,6 +71,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp

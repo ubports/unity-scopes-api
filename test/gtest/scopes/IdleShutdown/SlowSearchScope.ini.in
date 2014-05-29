@@ -1,0 +1,5 @@
+[ScopeConfig]
+IdleTimeout = 2
+DisplayName = SlowRunScope
+Description = Takes 4 seconds to return from search()
+Author = Michi

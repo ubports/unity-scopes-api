@@ -29,30 +29,49 @@ TEST(Department, basic)
 {
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department dep(query, "News");
-        dep.set_alternate_label("All News");
+        Department::SPtr dep = Department::create(query, "News");
+        dep->set_alternate_label("All News");
 
-        EXPECT_EQ("dep1", dep.id());
-        EXPECT_EQ("dep1", dep.query().department_id());
-        EXPECT_EQ("fooscope", dep.query().scope_id());
-        EXPECT_EQ("News", dep.label());
-        EXPECT_EQ("All News", dep.alternate_label());
-        EXPECT_FALSE(dep.has_subdepartments());
+        EXPECT_EQ("dep1", dep->id());
+        EXPECT_EQ("dep1", dep->query().department_id());
+        EXPECT_EQ("fooscope", dep->query().scope_id());
+        EXPECT_EQ("News", dep->label());
+        EXPECT_EQ("All News", dep->alternate_label());
+        EXPECT_FALSE(dep->has_subdepartments());
 
-        dep.set_subdepartments({{"subdep1", query, "Europe"}});
-        EXPECT_TRUE(dep.has_subdepartments());
-        EXPECT_EQ(1u, dep.subdepartments().size());
-        EXPECT_EQ("subdep1", dep.subdepartments().front().id());
-        EXPECT_EQ("subdep1", dep.subdepartments().front().query().department_id());
-        EXPECT_EQ("Europe", dep.subdepartments().front().label());
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
+        EXPECT_TRUE(dep->has_subdepartments());
+        EXPECT_EQ(1u, dep->subdepartments().size());
+        EXPECT_EQ("subdep1", dep->subdepartments().front()->id());
+        EXPECT_EQ("subdep1", dep->subdepartments().front()->query().department_id());
+        EXPECT_EQ("Europe", dep->subdepartments().front()->label());
+
+        dep->add_subdepartment(std::move(Department::create("subdep2", query, "Australia")));
+        EXPECT_EQ(2u, dep->subdepartments().size());
+        EXPECT_EQ("subdep2", dep->subdepartments().back()->id());
     }
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department dep(query, "News");
-        EXPECT_FALSE(dep.has_subdepartments());
+        Department::SPtr dep = Department::create(query, "News");
+        EXPECT_FALSE(dep->has_subdepartments());
 
-        dep.set_has_subdepartments();
-        EXPECT_TRUE(dep.has_subdepartments());
+        dep->set_has_subdepartments();
+        EXPECT_TRUE(dep->has_subdepartments());
+    }
+
+    {
+        CannedQuery query("fooscope", "foo", "dep1");
+        Department::SPtr dep = Department::create(query, "News");
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
+        EXPECT_THROW(dep->set_has_subdepartments(false), unity::LogicException);
+    }
+
+    {
+        CannedQuery query("fooscope", "foo", "dep1");
+        Department::SPtr dep = Department::create(query, "News");
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe")});
+        dep->set_subdepartments({});
+        EXPECT_NO_THROW(dep->set_has_subdepartments(false));
     }
 }
 
@@ -61,22 +80,22 @@ TEST(Department, serialize_and_deserialize)
     VariantMap var;
     {
         CannedQuery query("fooscope", "foo", "dep1");
-        Department dep(query, "News");
-        dep.set_alternate_label("All News");
-        dep.set_subdepartments({{"subdep1", query, "Europe"},{"subdep2", query, "US"}});
+        Department::SPtr dep = Department::create(query, "News");
+        dep->set_alternate_label("All News");
+        dep->set_subdepartments({Department::create("subdep1", query, "Europe"), Department::create("subdep2", query, "US")});
 
-        var = dep.serialize();
+        var = dep->serialize();
     }
 
     // deserialize back
     auto dep2 = internal::DepartmentImpl::create(var);
-    EXPECT_EQ("dep1", dep2.id());
-    EXPECT_EQ("dep1", dep2.query().department_id());
-    EXPECT_EQ("fooscope", dep2.query().scope_id());
-    EXPECT_EQ("News", dep2.label());
-    EXPECT_EQ("All News", dep2.alternate_label());
-    EXPECT_EQ(2u, dep2.subdepartments().size());
-    EXPECT_EQ("subdep1", dep2.subdepartments().front().id());
-    EXPECT_EQ("subdep1", dep2.subdepartments().front().query().department_id());
-    EXPECT_EQ("Europe", dep2.subdepartments().front().label());
+    EXPECT_EQ("dep1", dep2->id());
+    EXPECT_EQ("dep1", dep2->query().department_id());
+    EXPECT_EQ("fooscope", dep2->query().scope_id());
+    EXPECT_EQ("News", dep2->label());
+    EXPECT_EQ("All News", dep2->alternate_label());
+    EXPECT_EQ(2u, dep2->subdepartments().size());
+    EXPECT_EQ("subdep1", dep2->subdepartments().front()->id());
+    EXPECT_EQ("subdep1", dep2->subdepartments().front()->query().department_id());
+    EXPECT_EQ("Europe", dep2->subdepartments().front()->label());
 }

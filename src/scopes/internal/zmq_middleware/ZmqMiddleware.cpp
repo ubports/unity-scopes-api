@@ -29,12 +29,14 @@
 #include <unity/scopes/internal/zmq_middleware/ReplyI.h>
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 #include <unity/scopes/internal/zmq_middleware/StateReceiverI.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqPublisher.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQuery.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqStateReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqSubscriber.h>
 #include <unity/scopes/internal/zmq_middleware/RethrowException.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -59,10 +61,11 @@ namespace zmq_middleware
 namespace
 {
 
-char const* query_suffix = "-q";  // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-c";   // Appended to server_name_ to create control adapter name
-char const* reply_suffix = "-r";  // Appended to server_name_ to create reply adapter name
-char const* state_suffix = "-s";  // Appended to server_name_ to create state adapter name
+char const* query_suffix = "-q";     // Appended to server_name_ to create query adapter name
+char const* ctrl_suffix = "-c";      // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-r";     // Appended to server_name_ to create reply adapter name
+char const* state_suffix = "-s";     // Appended to server_name_ to create state adapter name
+char const* publisher_suffix = "-p"; // Appended to publisher_id to create a publisher endpoint
 
 char const* query_category = "Query";       // query adapter category name
 char const* ctrl_category = "QueryCtrl";    // control adapter category name
@@ -71,14 +74,11 @@ char const* state_category = "State";       // state adapter category name
 char const* scope_category = "Scope";       // scope adapter category name
 char const* registry_category = "Registry"; // registry adapter category name
 
-// Create a directory with mode rwx------t if it doesn't exist yet.
-// We set the sticky bit to prevent the directory from being deleted:
-// if it happens to be under $XDG_RUNTIME_DIR and is not accessed
-// for more than six hours, the system may delete it.
+// Create a directory with the given mode if it doesn't exist yet.
 
-void create_dir(string const& dir)
+void create_dir(string const& dir, mode_t mode)
 {
-    if (mkdir(dir.c_str(), 0700 | S_ISVTX) == -1 && errno != EEXIST)
+    if (mkdir(dir.c_str(), mode) == -1 && errno != EEXIST)
     {
         throw FileException("cannot create endpoint directory " + dir, errno);
     }
@@ -91,6 +91,7 @@ try :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Stopped),
+    shutdown_flag(false),
     config_(configfile),
     twoway_timeout_(config_.twoway_timeout()),
     locate_timeout_(config_.locate_timeout())
@@ -100,8 +101,10 @@ try :
     try
     {
         // Create the endpoint dirs if they don't exist.
-        create_dir(config_.public_dir());
-        create_dir(config_.private_dir());
+        // We set the sticky bit because, without this, things in
+        // $XDG_RUNTIME_DIR may be deleted if not accessed for more than six hours.
+        create_dir(config_.public_dir(), 0755 | S_ISVTX);
+        create_dir(config_.private_dir(), 0700 | S_ISVTX);
     }
     catch (...)
     {
@@ -122,10 +125,12 @@ ZmqMiddleware::~ZmqMiddleware()
     }
     catch (std::exception const& e)
     {
+        cerr << "~ZmqMiddleware(): " << e.what() << endl;
         // TODO: log exception
     }
     catch (...)
     {
+        cerr << "~ZmqMiddleware(): unknown exception" << endl;
         // TODO: log exception
     }
 }
@@ -137,9 +142,13 @@ void ZmqMiddleware::start()
     switch (state_)
     {
         case Started:
-        case Starting:
         {
-            return; // Already started, or about to start, no-op
+            return; // Already started, no-op
+        }
+        case Stopping:
+        {
+            state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
+            // FALLTHROUGH
         }
         case Stopped:
         {
@@ -150,6 +159,7 @@ void ZmqMiddleware::start()
                 // as rebinding is invoked within two-way invocations.
                 twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
             }
+            shutdown_flag = false;
             state_ = Started;
             state_changed_.notify_all();
             break;
@@ -167,37 +177,26 @@ void ZmqMiddleware::stop()
     switch (state_)
     {
         case Stopped:
+        case Stopping:
         {
             break;  // Already stopped, or about to stop, no-op
         }
-        case Starting:
-        {
-            // Wait until start in progress has completed before stopping
-            // Coverage excluded here because the window for which we are in this state is too
-            // small to hit with a test.
-            state_changed_.wait(lock, [this] { return state_ == Started; }); // LCOV_EXCL_LINE
-            // FALLTHROUGH
-        }
         case Started:
         {
-            {
-                lock_guard<mutex> lock(data_mutex_);
-                // No more outgoing invocations
-                twoway_invokers_.reset();
-                oneway_invoker_.reset();
-            }
-            auto adapter_map = move(am_);
-            for (auto& pair : adapter_map)
+            lock_guard<mutex> lock(data_mutex_);
+
+            // No more outgoing invocations
+            twoway_invokers_.reset();
+            oneway_invoker_.reset();
+
+            // Initiate shutdown of all adapters
+            for (auto& pair : am_)
             {
                 pair.second->shutdown();
             }
-            state_ = Stopped;
+
+            state_ = Stopping;
             state_changed_.notify_all();
-            lock.unlock();
-            for (auto& pair : adapter_map)
-            {
-                pair.second->wait_for_shutdown();
-            }
             break;
         }
         default:
@@ -209,8 +208,40 @@ void ZmqMiddleware::stop()
 
 void ZmqMiddleware::wait_for_shutdown()
 {
-    unique_lock<mutex> lock(state_mutex_);
-    state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
+    {
+        unique_lock<mutex> state_lock(state_mutex_);
+        state_changed_.wait(state_lock, [this] { return state_ == Stopping || state_ == Stopped; });
+        if (state_ == Stopped)
+        {
+            return; // Return immediately if stopped already, or never started in the first place.
+        }
+
+        // Several threads may see state_ == Stopping here. Exactly one of them
+        // waits for the object adapters to shut down; the others wait until
+        // shut down is complete.
+        if (shutdown_flag.exchange(true))
+        {
+            // Another thread has been through here already, wait for it
+            // to finish shutting down the adapters.
+            state_changed_.wait(state_lock, [this] { return state_ == Stopped; });
+            return;
+        }
+    }
+
+    // Exactly one thread gets to this point.
+    AdapterMap adapter_map;
+    {
+        lock_guard<mutex> data_lock(data_mutex_, std::adopt_lock);
+        adapter_map = move(am_);
+    }
+    for (auto&& pair : adapter_map)
+    {
+        pair.second->wait_for_shutdown();
+    }
+
+    unique_lock<mutex> state_lock(state_mutex_);
+    state_ = Stopped;
+    state_changed_.notify_all();
 }
 
 namespace
@@ -629,6 +660,16 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     return proxy;
 }
 
+MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id)
+{
+    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, config_.public_dir()));
+}
+
+MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& publisher_id, std::string const& topic)
+{
+    return MWSubscriber::UPtr(new ZmqSubscriber(&context_, publisher_id + publisher_suffix, config_.public_dir(), topic));
+}
+
 std::string ZmqMiddleware::get_scope_endpoint()
 {
     return "ipc://" + config_.private_dir() + "/" +  server_name_;
@@ -654,11 +695,7 @@ ThreadPool* ZmqMiddleware::oneway_pool()
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Starting)
-    {
-        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
-    }
-    if (state_ == Stopped)
+    if (state_ == Stopped || state_ == Stopping)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
@@ -670,11 +707,7 @@ ThreadPool* ZmqMiddleware::twoway_pool()
     lock(state_mutex_, data_mutex_);
     unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Starting)
-    {
-        state_changed_.wait(state_lock, [this] { return state_ != Starting; }); // LCOV_EXCL_LINE
-    }
-    if (state_ == Stopped)
+    if (state_ == Stopped || state_ == Stopping)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }

@@ -19,6 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
 
+#include <zmqpp/socket.hpp>
+
 #include <string>
 
 namespace unity
@@ -34,6 +36,8 @@ namespace zmq_middleware
 {
 
 void throw_if_bad_endpoint(std::string const& endpoint);
+
+void safe_bind(zmqpp::socket& s, std::string const& endpoint);
 
 } // namespace zmq_middleware
 

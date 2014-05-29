@@ -23,13 +23,15 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-
 #include <signal.h>
+#include <thread>
 #include <unistd.h>
 
+using namespace boost;
 using namespace unity::scopes;
 
 class Receiver : public SearchListenerBase
@@ -77,25 +79,6 @@ TEST(Registry, metadata)
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
-    // wait for the registry to become available on middleware
-    // FIXME: remove this once we have async queries and can set arbitrary timeout when calling registry
-    const int num_retries = 10;
-    bool registry_started = false;
-    for (int i = 0; i < num_retries; ++i)
-    {
-        try
-        {
-            r->list(); // this will throw if the registry is not yet available on middleware
-            registry_started = true;
-            break;
-        }
-        catch (std::exception const&)
-        {
-            sleep(1);
-        }
-    }
-    ASSERT_TRUE(registry_started);
-
     auto meta = r->get_metadata("testscopeA");
     EXPECT_EQ("testscopeA", meta.scope_id());
     EXPECT_EQ("Canonical Ltd.", meta.author());
@@ -132,6 +115,141 @@ TEST(Registry, metadata)
     EXPECT_TRUE(receiver->wait_until_finished());
 }
 
+TEST(Registry, update_notify)
+{
+    bool update_received_ = false;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure registry update callback
+    r->set_list_update_callback([&update_received_, &mutex_, &cond_]
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        update_received_ = true;
+        cond_.notify_one();
+    });
+    auto wait_for_update = [&update_received_, &mutex_, &cond_]
+    {
+        // Flush out update notifications
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
+        {
+            update_received_ = false;
+        }
+        update_received_ = false;
+    };
+
+    system::error_code ec;
+
+    // First check that we have 2 scopes registered
+    MetadataMap list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Move testscopeC into the scopes folder
+    std::cout << "Move testscopeC into the scopes folder" << std::endl;
+    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we have 3 scopes registered
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Make a symlink to testscopeD in the scopes folder
+    std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we have 4 scopes registered
+    list = r->list();
+    EXPECT_EQ(4, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+    EXPECT_NE(list.end(), list.find("testscopeD"));
+
+    // Move testscopeC back into the other_scopes folder
+    std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we have 3 scopes registered again
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_NE(list.end(), list.find("testscopeD"));
+
+    // Remove symlink to testscopeD from the scopes folder
+    std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we are back to having 2 scopes registered
+    list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Make a folder in scopes named "testfolder"
+    std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
+    ASSERT_EQ("Success", ec.message());
+
+    // Check that no scopes were registered
+    list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Make a symlink to testscopeC.ini in testfolder
+    std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we have 3 scopes registered
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Remove testfolder
+    std::cout << "Remove testfolder" << std::endl;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
+    ASSERT_EQ("Success", ec.message());
+    wait_for_update();
+
+    // Now check that we are back to having 2 scopes registered
+    list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -148,6 +266,9 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // Allow the registry process some time to start up,
+        // so we don't get an ObjectNotExistException.
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;

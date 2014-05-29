@@ -26,8 +26,6 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-BZR_SOURCE=${1:-lp:scope-click}
-
 CLICK_ARCH="$1"
 rm -rf "$CLICK_ARCH-build"
 rm -rf "package"
@@ -37,9 +35,7 @@ mkdir "$CLICK_ARCH-build"
     cmake .. \
         -DCMAKE_INSTALL_PREFIX:PATH=../package \
         -DCLICK_MODE=on \
-        -DCLICK_ARCH="$CLICK_ARCH" \
-        -DBZR_REVNO=$(cd ..; bzr revno) \
-        -DBZR_SOURCE="$BZR_SOURCE"
+        -DCLICK_ARCH="$CLICK_ARCH"
     make install
 )
 click build package

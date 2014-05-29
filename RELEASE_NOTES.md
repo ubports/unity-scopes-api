@@ -1,9 +1,30 @@
 Release notes
 =============
 
+Changes in version 0.4.8
+========================
+  - Changes to departments API: SearchReply::register_departments() method now takes parent and current department argument,
+    and uses Department::SCPtr for both. SearchListenerBase::push() method for departments got changed to match as well. Removed
+    constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
+    pointers instead of values. Changed Department::set_has_subdepartments() method to take bool value (true by default).
+
+  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+
+Changes in version 0.4.7
+========================
+  - Implemented RatingFilter and RadioButtonsFilter.
+
+  - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
+    instead of shared pointers.
+
 Changes in version 0.4.6
 ========================
-  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+  - Added method to get and set display hints for filters (at this moment the only display hint
+    available is Primary hint).
+
+  - Added has_subdepartments flag and alternate label to Department class.
+
+  - Added TTL option for scope's results.
 
 Changes in version 0.4.5
 ========================
@@ -11,11 +32,6 @@ Changes in version 0.4.5
 
 Changes in version 0.4.4
 ========================
-  - Added method to get and set display hints for filters (at this moment the only display hint
-    available is TopArea hint).
-
-  - Added has_subdepartments flag and alternate label to Department class.
-
   - The register_annotation() method of SearchReply is now deprecated - push(Annotation const&) should
     be used instead. The display order of annotations with respect to results and categories
     got updated in the documentation of that method.
