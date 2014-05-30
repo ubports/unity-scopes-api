@@ -86,10 +86,10 @@ public:
             return;
         }
 
-        std::vector<SearchResult> results = search_handle_->get_search_results();
+        SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
-        for (auto& result : results)
+        for (auto& result : results.second)
         {
             if (!result.category)
             {

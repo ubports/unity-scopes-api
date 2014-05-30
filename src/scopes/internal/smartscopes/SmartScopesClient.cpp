@@ -25,6 +25,7 @@
 #include <cstring>
 #include <fstream>
 #include <future>
+#include <utility>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -64,7 +65,7 @@ SearchHandle::~SearchHandle()
     cancel_search();
 }
 
-std::vector<SearchResult> SearchHandle::get_search_results()
+SearchRequestResults SearchHandle::get_search_results()
 {
     return ssc_->get_search_results(search_id_);
 }
@@ -393,7 +394,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
+SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
@@ -489,13 +490,17 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                         result.other_params[member] = child_node->get_node(member);
                     }
                 }
-
                 results.push_back(result);
+            }
+            else if (root_node->has_node("departments"))
+            {
             }
         }
 
         std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
-        return results;
+
+        DepartmentInfo dep;
+        return std::make_pair(dep, results);
     }
     catch (std::exception const& e)
     {
@@ -517,7 +522,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
             auto it = query_results_.find(preview_id);
             if (it == query_results_.end())
             {
-                throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
+                throw unity::LogicException("No preview for query " + std::to_string(preview_id) + " is active");
             }
 
             query_result = it->second;

@@ -74,6 +74,16 @@ struct SearchResult
     std::shared_ptr<SearchCategory> category;
 };
 
+struct DepartmentInfo
+{
+    std::string label;
+    std::string alternate_label;
+    std::string canned_query;
+    bool has_subdepartments;
+};
+
+using SearchRequestResults = std::pair<DepartmentInfo, std::vector<SearchResult>>;
+
 class SearchHandle
 {
 public:
@@ -82,7 +92,7 @@ public:
 
     ~SearchHandle();
 
-    std::vector<SearchResult> get_search_results();
+    SearchRequestResults get_search_results();
     void cancel_search();
 
 private:
@@ -156,7 +166,7 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    std::vector<SearchResult> get_search_results(uint search_id);
+    SearchRequestResults get_search_results(uint search_id);
     std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
