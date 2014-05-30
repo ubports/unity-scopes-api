@@ -70,9 +70,10 @@ public:
      Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
 
      \param id A unique identifier for the filter that can be used to identify it later among several filters.
-     \param label_template Template for value label, e.g. "Less than %1"
-     \param min minimum allowed value
-     \param max maximum allowed value
+     \param label The label for the filter
+     \param label_template The template for value label, e.g. "Less than %1"
+     \param min The minimum allowed value
+     \param max The maximum allowed value
      \return Instance of ValueSliderFilter.
      \throws unity::LogicException on invalid (min, max) range.
     */
@@ -81,7 +82,7 @@ public:
     /**
      \brief Change the type of this filter.
 
-     \param The type of slider filter.
+     \param tp The type of slider filter.
      */
     void set_slider_type(SliderType tp);
 
