@@ -512,7 +512,7 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
 
 std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInterface::SPtr node)
 {
-    static std::array<std::string, 4> const mandatory = { { "label", "canned_query" } };
+    static std::array<std::string, 2> const mandatory = { { "label", "canned_query" } };
     for (auto const& field : mandatory)
     {
         if (!node->has_node(field))
@@ -538,9 +538,10 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
 
     if (node->has_node("subdepartments"))
     {
-        for (int i = 0; i < node->size(); ++i)
+        auto const subdeps = node->get_node("subdepartments");
+        for (int i = 0; i < subdeps->size(); ++i)
         {
-            auto child = node->get_node(i);
+            auto child = subdeps->get_node(i);
             try
             {
                 dep->subdepartments.push_back(parse_departments(child));
@@ -551,7 +552,7 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
                 std::cerr << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '" << dep->label << "': " << e.what() << std::endl;
             }
         }
-        if(node->size() > 0 && dep->subdepartments.size() == 0)
+        if(subdeps->size() > 0 && dep->subdepartments.size() == 0)
         {
             std::stringstream err;
             err << "SmartScopesClient::parse_departments(): Failed to parse subdepartments of department '" << dep->label;
