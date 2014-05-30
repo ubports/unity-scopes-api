@@ -6,6 +6,16 @@ unity-scopes-api (0.4.9-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 23 May 2014 17:49:42 +0200
 
+unity-scopes-api (0.4.8+14.10.20140519-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
+  * Updated scoperegistry to inform the registry object when scopes are (un)installed.
+  * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
+  * Added set_update_callback() to Registry (callback executed when the scopes list changes).
+
+ -- Marcus Tomlinson <marcustomlinson@ubuntu>  Thu, 22 May 2014 06:47:28 +0200
+
 unity-scopes-api (0.4.7+14.10.20140522-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]
@@ -42,6 +52,16 @@ unity-scopes-api (0.4.6+14.10.20140519-0ubuntu1) utopic; urgency=medium
   * debian/*symbols: auto-update new symbols to released version
 
  -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 19 May 2014 10:10:28 +0000
+
+unity-scopes-api (0.4.6+14.10.20140508-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented RangeInputFilter.
+
+  [ Michi Henning ]
+  * Changed parameter type for pushing categories to Category::SCPtr const&
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 15 May 2014 13:54:38 +1000
 
 unity-scopes-api (0.4.5+14.10.20140513-0ubuntu1) utopic; urgency=low
 

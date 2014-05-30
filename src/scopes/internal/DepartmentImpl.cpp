@@ -53,9 +53,16 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
     query_.set_department_id(department_id);
 }
 
-void DepartmentImpl::set_has_subdepartments()
+void DepartmentImpl::set_has_subdepartments(bool subdepartments)
 {
-    has_subdepartments_ = true;
+    if (departments_.size() > 0 && !subdepartments)
+    {
+        std::stringstream err;
+        err << "DepartmentImpl::set_has_subdepartments(): cannot set has_subdepartments flag to false when subdepartments list is not empty department '" <<
+                query_.department_id() << "'";
+        throw LogicException(err.str());
+    }
+    has_subdepartments_ = subdepartments;
 }
 
 void DepartmentImpl::set_subdepartments(DepartmentList const& departments)

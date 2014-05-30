@@ -69,9 +69,9 @@ VariantMap Department::serialize() const
 
 /// @endcond
 
-void Department::set_has_subdepartments()
+void Department::set_has_subdepartments(bool subdepartments)
 {
-    p->set_has_subdepartments();
+    p->set_has_subdepartments(subdepartments);
 }
 
 void Department::set_subdepartments(DepartmentList const& departments)

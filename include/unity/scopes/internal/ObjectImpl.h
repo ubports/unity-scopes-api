@@ -40,7 +40,7 @@ public:
     virtual ~ObjectImpl();
 
     virtual std::string identity() override;
-    virtual std::string category() override;
+    virtual std::string target_category() override;
     virtual std::string endpoint() override;
     virtual int64_t timeout() override;
 

@@ -86,7 +86,7 @@ public:
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
     */
-    virtual void push(Category::SCPtr category);
+    virtual void push(Category::SCPtr const& category);
 
     /**
     \brief Called once by the scopes to send all the filters and their state.
