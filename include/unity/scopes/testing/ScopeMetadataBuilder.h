@@ -85,6 +85,7 @@ public:
     ScopeMetadataBuilder& proxy(ScopeProxy const& value);
     ScopeMetadataBuilder& display_name(std::string const& value);
     ScopeMetadataBuilder& description(std::string const& value);
+    ScopeMetadataBuilder& author(std::string const& value);
     ScopeMetadataBuilder& art(Optional<std::string> const& value);
     ScopeMetadataBuilder& icon(Optional<std::string> const& value);
     ScopeMetadataBuilder& search_hint(Optional<std::string> const& value);

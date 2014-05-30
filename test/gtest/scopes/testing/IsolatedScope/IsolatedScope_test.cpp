@@ -27,6 +27,7 @@
 #include <unity/scopes/testing/MockRegistry.h>
 #include <unity/scopes/testing/MockPreviewReply.h>
 #include <unity/scopes/testing/MockSearchReply.h>
+#include <unity/scopes/testing/MockScope.h>
 
 #include <unity/scopes/CategoryRenderer.h>
 
@@ -64,6 +65,46 @@ TEST(Category, construction_passes_on_arguments)
     EXPECT_EQ(title, category.title());
     EXPECT_EQ(icon, category.icon());
     EXPECT_EQ(renderer, category.renderer_template());
+}
+
+TEST(ScopeMetadataBuilder, construct_minimal)
+{
+    unity::scopes::testing::ScopeMetadataBuilder builder;
+    builder.scope_id(scope_id)
+        .proxy(std::make_shared<unity::scopes::testing::MockScope>())
+        .display_name("display_name")
+        .description("description")
+        .author("author");
+    unity::scopes::ScopeMetadata metadata = builder();
+    EXPECT_EQ(scope_id, metadata.scope_id());
+    EXPECT_EQ("display_name", metadata.display_name());
+    EXPECT_EQ("description", metadata.description());
+    EXPECT_EQ("author", metadata.author());
+}
+
+TEST(ScopeMetadataBuilder, construct_full)
+{
+   unity::scopes::testing::ScopeMetadataBuilder builder;
+    builder.scope_id(scope_id)
+        .proxy(std::make_shared<unity::scopes::testing::MockScope>())
+        .display_name("display_name")
+        .description("description")
+        .author("author")
+        .art(std::string("art"))
+        .icon(std::string("icon"))
+        .search_hint(std::string("search_hint"))
+        .hot_key(std::string("hot_key"));
+    //.invisible(true);
+    unity::scopes::ScopeMetadata metadata = builder();
+    EXPECT_EQ(scope_id, metadata.scope_id());
+    EXPECT_EQ("display_name", metadata.display_name());
+    EXPECT_EQ("description", metadata.description());
+    EXPECT_EQ("author", metadata.author());
+    EXPECT_EQ("art", metadata.art());
+    EXPECT_EQ("icon", metadata.icon());
+    EXPECT_EQ("search_hint", metadata.search_hint());
+    EXPECT_EQ("hot_key", metadata.hot_key());
+    //EXPECT_EQ(true, metadata.invisible());
 }
 
 TEST(ScopeMetadataBuilder, construction_in_case_of_missing_mandatory_arguments_aborts)

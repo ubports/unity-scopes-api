@@ -34,6 +34,7 @@ struct testing::ScopeMetadataBuilder::Private
     ScopeProxy proxy;
     std::string display_name;
     std::string description;
+    std::string author;
 
     Optional<std::string> art;
     Optional<std::string> icon;
@@ -74,6 +75,12 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::description(std::s
     return *this;
 }
 
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::author(std::string const& value)
+{
+    p->author = value;
+    return *this;
+}
+
 testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::art(Optional<std::string> const& value)
 {
     p->art = value;
@@ -111,6 +118,7 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
     impl->set_proxy(p->proxy);
     impl->set_display_name(p->display_name);
     impl->set_description(p->description);
+    impl->set_author(p->author);
 
     if (p->art)
         impl->set_art(*p->art);
