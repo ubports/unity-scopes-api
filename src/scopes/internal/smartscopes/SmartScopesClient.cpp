@@ -425,6 +425,7 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
 
         std::vector<SearchResult> results;
         std::map<std::string, std::shared_ptr<SearchCategory>> categories;
+        std::shared_ptr<DepartmentInfo> departments;
 
         std::vector<std::string> jsons = extract_json_stream(response_str);
 
@@ -494,19 +495,70 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
             }
             else if (root_node->has_node("departments"))
             {
+                departments = parse_departments(root_node->get_node("departments"));
             }
         }
 
         std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
 
-        DepartmentInfo dep;
-        return std::make_pair(dep, results);
+        return std::make_pair(departments, results);
     }
     catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << std::endl;
+        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << ": " << e.what() << std::endl;
         throw;
     }
+}
+
+std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInterface::SPtr node)
+{
+    static std::array<std::string, 4> const mandatory = { { "label", "canned_query" } };
+    for (auto const& field : mandatory)
+    {
+        if (!node->has_node(field))
+        {
+            std::stringstream err;
+            err << "SmartScopesClient::parse_departments(): missing mandatory department attribute '" << field << "'";
+            throw LogicException(err.str());
+        }
+    }
+
+    auto dep = std::make_shared<DepartmentInfo>();
+    dep->label = node->get_node("label")->as_string();
+    dep->canned_query = node->get_node("canned_query")->as_string();
+
+    if (node->has_node("alternate_label"))
+    {
+        dep->alternate_label = node->get_node("alternate_label")->as_string();
+    }
+    if (node->has_node("has_subdepartments"))
+    {
+        dep->has_subdepartments = node->get_node("has_subdepartments")->as_bool();
+    }
+
+    if (node->has_node("subdepartments"))
+    {
+        for (int i = 0; i < node->size(); ++i)
+        {
+            auto child = node->get_node(i);
+            try
+            {
+                dep->subdepartments.push_back(parse_departments(child));
+            }
+            catch (std::exception const& e)
+            {
+                // error in one subdepartment is not critical - just ignore it
+                std::cerr << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '" << dep->label << "': " << e.what() << std::endl;
+            }
+        }
+        if(node->size() > 0 && dep->subdepartments.size() == 0)
+        {
+            std::stringstream err;
+            err << "SmartScopesClient::parse_departments(): Failed to parse subdepartments of department '" << dep->label;
+            throw LogicException(err.str());
+        }
+    }
+    return dep;
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)

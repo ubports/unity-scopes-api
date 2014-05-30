@@ -80,9 +80,12 @@ struct DepartmentInfo
     std::string alternate_label;
     std::string canned_query;
     bool has_subdepartments;
+    std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
+
+    DepartmentInfo(): has_subdepartments(false) {}
 };
 
-using SearchRequestResults = std::pair<DepartmentInfo, std::vector<SearchResult>>;
+using SearchRequestResults = std::pair<std::shared_ptr<DepartmentInfo>, std::vector<SearchResult>>;
 
 class SearchHandle
 {
@@ -168,6 +171,7 @@ private:
 
     SearchRequestResults get_search_results(uint search_id);
     std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
+    std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
