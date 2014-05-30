@@ -64,7 +64,7 @@ remote_scopes_response = '\
 {"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" }]'
 
 search_response = '\
-{"departments": {"label": "All", "canned_query": "scope://foo?q=&dep=", "alternate_label": "Foo", "subdepartments": [{"label":"A", "canned_query":"scope://foo?q=&dep=a", "subdepartments":[{"label":"C", "canned_query":"scope://foo?q=&dep=c", "has_subdepartments":false}]},{"label":"B", "canned_query":"scope://foo?q=&dep=b", "has_subdepartments":false}]}}\r\n\
+{"departments": {"label": "All", "canned_query": "scope://foo?q=&dep=", "alternate_label": "Foo", "subdepartments": [{"label":"A", "canned_query":"scope://foo?q=&dep=a", "subdepartments":[{"label":"Broken department"},{"label":"C", "canned_query":"scope://foo?q=&dep=c", "has_subdepartments":false}]},{"label":"B", "canned_query":"scope://foo?q=&dep=b", "has_subdepartments":false}]}}\r\n\
 {"category": {"render_template": "{}", "id": "cat1", "title": "Category 1"}}\r\n\
 {"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
 {"result": {"cat_id": "cat1", "icon": "https://dash.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}\r\n\
