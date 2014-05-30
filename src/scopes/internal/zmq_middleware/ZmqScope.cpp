@@ -89,7 +89,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         auto p = in_params.initReplyProxy();
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());
-        p.setCategory(reply_proxy->category().c_str());
+        p.setCategory(reply_proxy->target_category().c_str());
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });

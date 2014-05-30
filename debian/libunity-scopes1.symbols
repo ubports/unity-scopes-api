@@ -16,7 +16,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::Department::add_subdepartment(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::set_subdepartments(std::list<std::shared_ptr<unity::scopes::Department const>, std::allocator<std::shared_ptr<unity::scopes::Department const> > > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::set_alternate_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Department::set_has_subdepartments()@Base" 0replaceme
+ (c++)"unity::scopes::Department::set_has_subdepartments(bool)@Base" 0replaceme
  (c++)"unity::scopes::Department::create(unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::Department(unity::scopes::Department&&)@Base" 0.4.0+14.04.20140312.1
@@ -234,8 +234,8 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::RadioButtonsFilter::~RadioButtonsFilter()@Base" 0.4.7+14.10.20140521
  (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const>)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchListenerBase::~SearchListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationQueryBase::activate()@Base" 0.4.0+14.04.20140312.1

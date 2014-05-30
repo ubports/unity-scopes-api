@@ -114,13 +114,16 @@ public:
     void set_alternate_label(std::string const& label);
 
     /**
-     \brief Sets has_subdepartments flag of this department to true.
+     \brief Sets has_subdepartments flag of this department.
 
      This flag is a display hint for the Shell that indicates if this department has sub-departments and as such should be displayed
      in a way that suggests further navigation to the user.
      Setting this flag is not needed when sub-departments have been added with set_subdepartments() method.
+     Setting this flag to false after adding sub-departments with set_subdepartments() throws unity::LogicException.
+
+     \throws unity::LogicException if called with false after adding sub-departments with unity::scopes::Department::set_subdepartments()
      */
-    void set_has_subdepartments();
+    void set_has_subdepartments(bool subdepartments = true);
 
     /**
     \brief Get the identifier of this department.

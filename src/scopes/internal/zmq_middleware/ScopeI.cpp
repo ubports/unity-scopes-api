@@ -104,7 +104,7 @@ void ScopeI::search_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::activate_(Current const& current,
@@ -131,7 +131,7 @@ void ScopeI::activate_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::perform_action_(Current const& current,
@@ -162,7 +162,7 @@ void ScopeI::perform_action_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::preview_(Current const& current,
@@ -189,7 +189,7 @@ void ScopeI::preview_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 } // namespace zmq_middleware

@@ -134,7 +134,7 @@ public:
         cout << to_string(parent);
     }
 
-    virtual void push(Category::SCPtr category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cout << "received category: id=" << category->id()
              << " title=" << category->title()
