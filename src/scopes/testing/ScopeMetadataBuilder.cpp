@@ -41,6 +41,9 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<std::string> search_hint;
     Optional<std::string> hot_key;
     Optional<bool> invisible;
+    Optional<VariantMap> appearance_attributes;
+    Optional<std::string> scope_directory;
+    Optional<ScopeMetadata::ResultsTtlType> results_ttl_type;
 };
 
 testing::ScopeMetadataBuilder::ScopeMetadataBuilder() : p(new Private())
@@ -105,9 +108,27 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::hot_key(Optional<s
     return *this;
 }
 
-testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::invisible(Optional<bool> value)
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::invisible(Optional<bool> const& value)
 {
     p->invisible = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::appearance_attributes(Optional<VariantMap> const& value)
+{
+    p->appearance_attributes = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::scope_directory(Optional<std::string> const& value)
+{
+    p->scope_directory = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::results_ttl_type(Optional<ScopeMetadata::ResultsTtlType> const& value)
+{
+    p->results_ttl_type = value;
     return *this;
 }
 
@@ -130,6 +151,12 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
         impl->set_hot_key(*p->hot_key);
     if (p->invisible)
         impl->set_invisible(*p->invisible);
+    if (p->appearance_attributes)
+        impl->set_appearance_attributes(*p->appearance_attributes);
+    if (p->scope_directory)
+        impl->set_scope_directory(*p->scope_directory);
+    if (p->results_ttl_type)
+        impl->set_results_ttl_type(*p->results_ttl_type);
 
     return unity::scopes::internal::ScopeMetadataImpl::create(
                 std::move(

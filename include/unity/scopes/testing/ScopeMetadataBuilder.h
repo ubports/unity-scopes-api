@@ -90,7 +90,10 @@ public:
     ScopeMetadataBuilder& icon(Optional<std::string> const& value);
     ScopeMetadataBuilder& search_hint(Optional<std::string> const& value);
     ScopeMetadataBuilder& hot_key(Optional<std::string> const& value);
-    ScopeMetadataBuilder& invisible(Optional<bool> value);
+    ScopeMetadataBuilder& invisible(Optional<bool> const& value);
+    ScopeMetadataBuilder& appearance_attributes(Optional<VariantMap> const& value);
+    ScopeMetadataBuilder& scope_directory(Optional<std::string> const& value);
+    ScopeMetadataBuilder& results_ttl_type(Optional<ScopeMetadata::ResultsTtlType> const& value);
 
     ScopeMetadata operator()() const;
 
