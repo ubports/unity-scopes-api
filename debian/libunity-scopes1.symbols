@@ -445,7 +445,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&)@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareData::~MiddlewareData()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
