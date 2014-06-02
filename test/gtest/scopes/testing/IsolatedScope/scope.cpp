@@ -80,7 +80,7 @@ public:
         Department::SPtr news_dep = Department::create("news", query_, "News");
         news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
         parent->set_subdepartments({news_dep});
-        reply->register_departments(parent, news_dep);
+        reply->register_departments(parent);
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         unity::scopes::CategorisedResult res(cat);

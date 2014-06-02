@@ -31,21 +31,21 @@ using namespace unity::scopes::internal;
 class DummyReceiver : public SearchListenerBase
 {
 public:
-    DummyReceiver(std::function<void(Department::SCPtr const&, Department::SCPtr const&)> departments_push_func)
+    DummyReceiver(std::function<void(Department::SCPtr const&)> departments_push_func)
     {
         departments_push_func_ = departments_push_func;
     };
 
     void push(CategorisedResult) override {}
 
-    void push(Department::SCPtr const& parent, Department::SCPtr const& current_department)
+    void push(Department::SCPtr const& parent) override
     {
-        departments_push_func_(parent, current_department);
+        departments_push_func_(parent);
     }
 
     void finished(Reason /* r */, std::string const& /* error_message */) override {}
 
-    std::function<void(Department::SCPtr const&, Department::SCPtr const&)> departments_push_func_;
+    std::function<void(Department::SCPtr const&)> departments_push_func_;
 };
 
 TEST(ResultReplyObject, departments_push)
@@ -53,14 +53,12 @@ TEST(ResultReplyObject, departments_push)
     // valid department data
     {
         Department::SCPtr received_parent;
-        Department::SCPtr received_current;
 
         auto df = []() -> void {};
         auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
-        auto receiver = std::make_shared<DummyReceiver>([&received_parent, &received_current](Department::SCPtr const& parent, Department::SCPtr const& current_dep)
+        auto receiver = std::make_shared<DummyReceiver>([&received_parent](Department::SCPtr const& parent)
                 {
                     received_parent = parent;
-                    received_current = current_dep;
                 });
         internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
@@ -73,35 +71,27 @@ TEST(ResultReplyObject, departments_push)
         Department::SPtr dep3 = Department::create("dep3", query2, "Dep3");
         dep2->set_subdepartments({dep3});
         parent->set_subdepartments({dep2});
-        reply.process_data(internal::DepartmentImpl::serialize_departments(parent, dep2));
+        reply.process_data(internal::DepartmentImpl::serialize_departments(parent));
 
         EXPECT_EQ("dep1", received_parent->id());
-        EXPECT_EQ("dep2", received_current->id());
     }
 
     // invalid department data
     {
         auto df = []() -> void {};
         auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
-        auto receiver = std::make_shared<DummyReceiver>([](Department::SCPtr const&, Department::SCPtr const&) {});
+        auto receiver = std::make_shared<DummyReceiver>([](Department::SCPtr const&) {});
         internal::ResultReplyObject reply(receiver, runtime.get(), "ipc:///tmp/scope-foo#scope-foo!c=Scope", 0);
         reply.set_disconnect_function(df);
 
         CannedQuery const query1("scope-foo", "", "dep1");
 
         Department::SPtr parent = Department::create("dep1", query1, "Dep1");
-        Department::SPtr dep2 = Department::create("dep2", query1, "Dep2");
-        Department::SPtr dep3 = Department::create("dep3", query1, "Dep3");
-        dep2->set_subdepartments({dep3});
-        parent->set_subdepartments({dep2});
 
-        Department::SPtr current = Department::create("dep9", query1, "Dep9");
-
-        // current department not in the parent's tree
+        // hierarchy too shallow
         {
-            auto var = internal::DepartmentImpl::serialize_departments(parent, current);
-            var.erase("current_department");
-            EXPECT_THROW(reply.process_data(var), unity::InvalidArgumentException);
+            auto var = internal::DepartmentImpl::serialize_departments(parent);
+            EXPECT_THROW(reply.process_data(var), unity::LogicException);
         }
     }
 }

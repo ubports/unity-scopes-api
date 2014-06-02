@@ -66,7 +66,7 @@ public:
                                                  move(unity::scopes::Department::create("ancient", query, "Ancient"))});
      history->set_subdepartments(history_depts);
      books->set_subdepartments({history});
-     reply->register_departments(books, history);
+     reply->register_departments(books);
      \endcode
 
      Current department should be the department returned by unity::scopes::CannedQuery::department_id(). Empty department id denotes
@@ -75,7 +75,7 @@ public:
      \param parent The parent department of current department, or current one if visiting root department.
      \param current Currently visited department.
      */
-    virtual void register_departments(Department::SCPtr const& parent, Department::SCPtr const& current) = 0;
+    virtual void register_departments(Department::SCPtr const& parent) = 0;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.
