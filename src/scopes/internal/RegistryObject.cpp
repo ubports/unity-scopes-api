@@ -400,11 +400,12 @@ void RegistryObject::ScopeProcess::exec(
     if (!exec_data_.custom_exec.empty())
     {
         wordexp_t exp;
-        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
 
         // Split command into program and args
         if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
         {
+            util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+
             program = exp.we_wordv[0];
             for (uint i = 1; i < exp.we_wordc; ++i)
             {

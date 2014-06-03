@@ -268,7 +268,15 @@ The following keys are recognized in the ScopeConfig group:
 
 - ScopeRunner
 
-  The path to a custom scoperunner binary. If not set, the default scoperunner is used.
+  A custom scoperunner command-line to be executed when the scope is invoked.
+  The following placeholders can be used to substitute config paths where required:
+
+  - %R - absolute path to the runtime .ini config file
+  - %S - absolute path to the scope's .ini config file
+
+  E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"
+  
+  If not set, the default scoperunner is used.
 
 - IdleTimeout
 

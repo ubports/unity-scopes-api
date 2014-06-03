@@ -97,11 +97,20 @@ public:
 
 int main(int argc, char** argv)
 {
-    char const* const rt_config = argc > 1 ? argv[1] : TEST_RUNTIME_FILE;
-    char const* const scope_config = argc > 2 ? argv[2] : TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB.ini";
+    // Set parameter as "FAIL" if not provided as to intentionally break the scope, hence causing
+    // dependant tests to fail (E.g. Registry_test and RegistryI_test).
+    std::string unused_arg_1 = argc > 1 ? argv[1] : "FAIL";
+    std::string rt_config = argc > 2 ? argv[2] : "FAIL";
+    std::string scope_config = argc > 3 ? argv[3] : "FAIL";
+    std::string unused_arg_2 = argc > 4 ? argv[4] : "FAIL";
 
-    MyScope scope;
-    auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
-    runtime->run_scope(&scope, rt_config, scope_config);
-    return 0;
+    // In order to test that custom exec splitting works, we check here that our arbitrary arguments
+    // have been delivered to us as expected.
+    if (unused_arg_1 == "unused arg 1" && unused_arg_2 == "unused arg 2")
+    {
+        MyScope scope;
+        auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
+        runtime->run_scope(&scope, rt_config, scope_config);
+        return 0;
+    }
 }
