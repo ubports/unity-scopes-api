@@ -71,7 +71,7 @@ private:
     std::exception_ptr thread_exception_;
 
     void watch_thread();
-    virtual void watch_event(EventType event_type, FileType file_type, std::string const& path) = 0;
+    virtual void watch_event(EventType, FileType, std::string const&) {}
 };
 
 } // namespace scoperegistry
