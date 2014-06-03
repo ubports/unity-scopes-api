@@ -80,3 +80,17 @@ struct LocateResponse
         registryException   @2 : RegistryException;
     }
 }
+
+struct IsScopeRunningRequest
+{
+    identity @0 : Text;
+}
+
+struct IsScopeRunningResponse
+{
+    response : union
+    {
+        returnValue         @0 : Bool;
+        notFoundException   @1 : NotFoundException;
+    }
+}

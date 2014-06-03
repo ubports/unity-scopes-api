@@ -41,24 +41,23 @@ MWRegistry::~MWRegistry()
 {
 }
 
-void MWRegistry::set_list_update_callback(std::function<void()> callback)
+core::ScopedConnection MWRegistry::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
 {
-    if (!subscriber_)
+    if (scope_state_subscribers_.find(scope_id) == scope_state_subscribers_.end())
+    {
+        scope_state_subscribers_[scope_id] = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity(), scope_id);
+    }
+    return scope_state_subscribers_.at(scope_id)->message_received().connect([callback](string const& state){ callback(state == "started"); });
+}
+
+core::ScopedConnection MWRegistry::set_list_update_callback(std::function<void()> callback)
+{
+    if (!list_update_subscriber_)
     {
         // Use lazy initialization here to only subscribe to the publisher if a callback is set
-        try
-        {
-            subscriber_ = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity());
-        }
-        catch (std::exception const& e)
-        {
-            cerr << "MWRegistry::set_list_update_callback(): failed to create registry subscriber: " << e.what() << endl;
-        }
+        list_update_subscriber_ = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity());
     }
-    if (subscriber_)
-    {
-        subscriber_->set_message_callback([callback](string const&){ callback(); });
-    }
+    return list_update_subscriber_->message_received().connect([callback](string const&){ callback(); });
 }
 
 } // namespace internal

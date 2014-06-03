@@ -53,7 +53,7 @@ public:
 
     MOCK_METHOD0(identity, std::string());
 
-    MOCK_METHOD0(category, std::string());
+    MOCK_METHOD0(target_category, std::string());
 
     MOCK_METHOD0(timeout, int64_t());
 

@@ -67,7 +67,7 @@ struct ObjectImpl : public virtual unity::scopes::Object
         return "";
     }
 
-    std::string category() override
+    std::string target_category() override
     {
         return "";
     }
