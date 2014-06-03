@@ -3,8 +3,6 @@ unity-scopes-api (0.4.8-0ubuntu1) UNRELEASED; urgency=medium
   [ Pawel Stolowski ]
   * Changes to departments API.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Tue, 20 May 2014 16:40:56 +0200
-
   [ Marcus Tomlinson ]
   * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
   * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
