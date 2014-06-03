@@ -394,21 +394,48 @@ void RegistryObject::ScopeProcess::exec(
     std::string program;
     std::vector<std::string> argv;
 
-    wordexp_t exp;
-    util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
-    if (wordexp(exec_data_.scoperunner_path.c_str(), &exp, WRDE_NOCMD) == 0)
+    // Check if this scope has specified a custom executable
+    if (!exec_data_.custom_exec.empty())
     {
-        program = exp.we_wordv[0];
-        for (uint i = 1; i < exp.we_wordc; i++)
+        wordexp_t exp;
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+
+        // Split command into program and args list
+        if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
         {
-            argv.push_back(exp.we_wordv[i]);
+            program = exp.we_wordv[0];
+            for (uint i = 1; i < exp.we_wordc; ++i)
+            {
+                std::string arg = exp.we_wordv[i];
+                // Replace "%R" placeholders with the runtime config
+                if (arg == "%R")
+                {
+                    argv.push_back(exec_data_.runtime_config);
+                }
+                // Replace "%S" placeholders with the scope config
+                else if (arg == "%S")
+                {
+                    argv.push_back(exec_data_.scope_config);
+                }
+                // Else simple append next word as an argument
+                else
+                {
+                    argv.push_back(arg);
+                }
+            }
         }
-        argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
+        else
+        {
+            // Something went wrong in parsing the command line, throw excpetion
+            throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Invalid custom scoperunner command: \""
+                                           + exec_data_.custom_exec + "\"");
+        }
     }
     else
     {
+        // No custom_exec was provided, use the default scoperunner
         program = exec_data_.scoperunner_path;
-        argv = {exec_data_.runtime_config, exec_data_.scope_config};
+        argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
     }
 
     std::map<std::string, std::string> env;
