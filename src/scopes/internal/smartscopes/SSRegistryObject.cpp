@@ -127,6 +127,11 @@ ObjectProxy SSRegistryObject::locate(std::string const& /*identity*/)
     throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
 }
 
+bool SSRegistryObject::is_scope_running(std::string const&)
+{
+    throw internal::RegistryException("SSRegistryObject::is_scope_running(): operation not available");
+}
+
 bool SSRegistryObject::has_scope(std::string const& scope_id) const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);

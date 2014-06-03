@@ -418,6 +418,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSScopeObject::SSScopeObject(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>, std::shared_ptr<unity::scopes::internal::smartscopes::SSRegistryObject>)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSScopeObject::~SSScopeObject()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::refresh_thread()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::is_scope_running(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::get_remote_scopes()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::add(unity::scopes::internal::smartscopes::RemoteScope const&, unity::scopes::ScopeMetadata const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::ScopeMetadata, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::ScopeMetadata> > >&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >&)@Base" 0.4.0+14.04.20140324
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -438,9 +439,9 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor>)@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::kill()@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::shared_ptr<unity::scopes::internal::MWPublisher>)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::shared_ptr<unity::scopes::internal::MWPublisher>)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::~ScopeProcess()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::~ScopeExecData()@Base" 0.4.2+14.04.20140404.2
