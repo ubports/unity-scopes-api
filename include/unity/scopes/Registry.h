@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_REGISTRY_H
 #define UNITY_SCOPES_REGISTRY_H
 
+#include <core/signal.h>
 #include <unity/scopes/Object.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/ScopeMetadata.h>
@@ -56,8 +57,9 @@ public:
 
     /**
     \brief Returns the metadata for the scope with the given ID.
+    \param scope_id The ID of the scope from which we wish to retrieve metadata.
     \return The metadata for the scope.
-    \throws NotFoundException if no scope with the given name exists.
+    \throws NotFoundException if no scope with the given ID exists.
     */
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
 
@@ -75,13 +77,30 @@ public:
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) = 0;
 
     /**
+    \brief Returns whether a scope is currently running or not.
+    \param scope_id The ID of the scope from which we wish to retrieve state.
+    \return True if the scope is running, and False if it is not running.
+    \throws NotFoundException if no scope with the given ID exists.
+    */
+    virtual bool is_scope_running(std::string const& scope_id) = 0;
+
+    /**
+    \brief Assigns a callback method to be executed when a scope's running state (started / stopped) changes.
+    \param scope_id The ID of the scope from which we wish to retrieve state changes.
+    \param callback The function object that is invoked when a scope changes running state.
+    \throws MiddlewareException if the registry subscriber failed to initialize.
+    */
+    virtual core::ScopedConnection set_scope_state_callback(std::string const& scope_id, std::function<void(bool is_running)> callback) = 0;
+
+    /**
     \brief Assigns a callback method to be executed when the registry's scope list changes.
 
     Note: Upon receiving this callback, you should retrieve the updated scopes list via the list() method if
     you wish to retain synchronisation between client and server.
     \param callback The function object that is invoked when an update occurs.
+    \throws MiddlewareException if the registry subscriber failed to initialize.
     */
-    virtual void set_list_update_callback(std::function<void()> callback) = 0;
+    virtual core::ScopedConnection set_list_update_callback(std::function<void()> callback) = 0;
 
 protected:
     /// @cond
