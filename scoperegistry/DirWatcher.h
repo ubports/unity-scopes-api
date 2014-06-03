@@ -48,10 +48,13 @@ public:
     };
 
     DirWatcher();
-    ~DirWatcher();
+    virtual ~DirWatcher();
 
     void add_watch(std::string const& path);
     void remove_watch(std::string const& path);
+
+protected:
+    void cleanup();
 
 private:
     enum ThreadState

@@ -35,6 +35,11 @@ ScopesWatcher::ScopesWatcher(RegistryObject::SPtr registry,
 {
 }
 
+ScopesWatcher::~ScopesWatcher()
+{
+    cleanup();
+}
+
 void ScopesWatcher::add_install_dir(std::string const& dir)
 {
     try
