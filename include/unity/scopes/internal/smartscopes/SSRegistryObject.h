@@ -54,6 +54,7 @@ public:
     MetadataMap list() const override;
 
     ObjectProxy locate(std::string const& identity) override;
+    bool is_scope_running(std::string const& scope_id) override;
 
     bool has_scope(std::string const& scope_id) const;
     std::string get_base_url(std::string const& scope_id) const;

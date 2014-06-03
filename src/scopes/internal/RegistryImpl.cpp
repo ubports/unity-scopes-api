@@ -71,9 +71,19 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
     return matching_entries;
 }
 
-void RegistryImpl::set_list_update_callback(std::function<void()> callback)
+bool RegistryImpl::is_scope_running(std::string const& scope_id)
 {
-    fwd()->set_list_update_callback(callback);
+    return fwd()->is_scope_running(scope_id);
+}
+
+core::ScopedConnection RegistryImpl::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
+{
+    return fwd()->set_scope_state_callback(scope_id, callback);
+}
+
+core::ScopedConnection RegistryImpl::set_list_update_callback(std::function<void()> callback)
+{
+    return fwd()->set_list_update_callback(callback);
 }
 
 MWRegistryProxy RegistryImpl::fwd()

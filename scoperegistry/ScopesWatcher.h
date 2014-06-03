@@ -36,6 +36,8 @@ public:
     ScopesWatcher(unity::scopes::internal::RegistryObject::SPtr registry,
                   std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback);
 
+    ~ScopesWatcher();
+
     void add_install_dir(std::string const& dir);
 
 private:

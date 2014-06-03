@@ -48,10 +48,13 @@ public:
     };
 
     DirWatcher();
-    ~DirWatcher();
+    virtual ~DirWatcher();
 
     void add_watch(std::string const& path);
     void remove_watch(std::string const& path);
+
+protected:
+    void cleanup();
 
 private:
     enum ThreadState
@@ -71,7 +74,7 @@ private:
     std::exception_ptr thread_exception_;
 
     void watch_thread();
-    virtual void watch_event(EventType event_type, FileType file_type, std::string const& path) = 0;
+    virtual void watch_event(EventType, FileType, std::string const&) {}
 };
 
 } // namespace scoperegistry

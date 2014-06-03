@@ -201,6 +201,19 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     return proxy;
 }
 
+bool RegistryObject::is_scope_running(std::string const& scope_id)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+    }
+
+    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
 bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
@@ -223,7 +236,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));
-    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
+    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data, publisher_)));
 
     if (publisher_)
     {
@@ -263,19 +276,6 @@ void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     remote_registry_ = remote_registry;
-}
-
-bool RegistryObject::is_scope_running(std::string const& scope_id)
-{
-    lock_guard<decltype(mutex_)> lock(mutex_);
-
-    auto it = scope_processes_.find(scope_id);
-    if (it != scope_processes_.end())
-    {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
-    }
-
-    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
 }
 
 StateReceiverObject::SPtr RegistryObject::state_receiver()
@@ -318,13 +318,15 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
-RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
     : exec_data_(exec_data)
+    , reg_publisher_(publisher)
 {
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
     : exec_data_(other.exec_data_)
+    , reg_publisher_(other.reg_publisher_)
 {
 }
 
@@ -514,26 +516,50 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     {
         return;
     }
-    else if (state == Running && state_ != Starting)
+    else if (state == Running)
     {
-        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
-             << "\" started manually" << endl;
+        if (reg_publisher_)
+        {
+            // Send a "started" message to subscribers to inform them that this scope (topic) has started
+            reg_publisher_->send_message("started", exec_data_.scope_id);
+        }
 
-        // Don't update state, treat this scope as not running if a locate() is requested
-        return;
+        if (state_ != Starting)
+        {
+            cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
+                 << "\" started manually" << endl;
+
+            // Don't update state, treat this scope as not running if a locate() is requested
+            return;
+        }
+    }
+    else if (state == Stopped)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
+        if (state_ != Stopping)
+        {
+            cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+                 << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
+        }
     }
     else if (state == Stopping && state_ != Running)
     {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" terminated" << endl;
 
         // Don't update state, treat this scope as not running if a locate() is requested
         return;
-    }
-    else if (state == Stopped && state_ != Stopping)
-    {
-        cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
-             << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
     }
     state_ = state;
     state_change_cond_.notify_all();
