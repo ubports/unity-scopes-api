@@ -402,7 +402,7 @@ void RegistryObject::ScopeProcess::exec(
         wordexp_t exp;
         util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
 
-        // Split command into program and args list
+        // Split command into program and args
         if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
         {
             program = exp.we_wordv[0];
@@ -419,7 +419,7 @@ void RegistryObject::ScopeProcess::exec(
                 {
                     argv.push_back(exec_data_.scope_config);
                 }
-                // Else simple append next word as an argument
+                // Else simply append next word as an argument
                 else
                 {
                     argv.push_back(arg);
@@ -428,7 +428,7 @@ void RegistryObject::ScopeProcess::exec(
         }
         else
         {
-            // Something went wrong in parsing the command line, throw excpetion
+            // Something went wrong in parsing the command line, throw exception
             throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Invalid custom scoperunner command: \""
                                            + exec_data_.custom_exec + "\"");
         }

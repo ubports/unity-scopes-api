@@ -47,8 +47,8 @@ public:
         ScopeExecData() = default;
         ScopeExecData(std::initializer_list<std::string>) = delete;
         std::string scope_id;
-        std::string scoperunner_path;
         std::string custom_exec;
+        std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
         std::string confinement_profile;
