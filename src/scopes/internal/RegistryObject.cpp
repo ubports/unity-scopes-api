@@ -22,11 +22,13 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/ResourcePtr.h>
 
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
 #include <cassert>
+#include <wordexp.h>
 
 using namespace std;
 
@@ -389,8 +391,25 @@ void RegistryObject::ScopeProcess::exec(
     // 2. exec the scope.
     update_state_unlocked(Starting);
 
-    std::string program = exec_data_.scoperunner_path;
-    std::vector<std::string> argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    std::string program;
+    std::vector<std::string> argv;
+
+    wordexp_t exp;
+    util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+    if (wordexp(exec_data_.scoperunner_path.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        program = exp.we_wordv[0];
+        for (uint i = 1; i < exp.we_wordc; i++)
+        {
+            argv.push_back(exp.we_wordv[i]);
+        }
+        argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
+    }
+    else
+    {
+        program = exec_data_.scoperunner_path;
+        argv = {exec_data_.runtime_config, exec_data_.scope_config};
+    }
 
     std::map<std::string, std::string> env;
     core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
