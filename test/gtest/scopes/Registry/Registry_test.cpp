@@ -64,6 +64,7 @@ public:
         auto now = std::chrono::steady_clock::now();
         auto expiry_time = now + std::chrono::seconds(5);
         EXPECT_TRUE(cond_.wait_until(lock, expiry_time, [this]{ return done_; })) << "finished message not delivered";
+        done_ = false;
         return finished_ok_;
     }
 
@@ -103,43 +104,115 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
+}
 
-    auto sp = meta.proxy();
+TEST(Registry, scope_state_notify)
+{
+    bool update_received = false;
+    bool testscopeA_state = false;
+    bool testscopeB_state = false;
+    std::mutex mutex;
+    std::condition_variable cond;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure testscopeA scope_state_callback
+    auto connA = r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        testscopeA_state = is_running;
+        cond.notify_one();
+    });
+    // Configure testscopeB scope_state_callback
+    auto connB = r->set_scope_state_callback("testscopeB", [&update_received, &testscopeB_state, &mutex, &cond](bool is_running)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        testscopeB_state = is_running;
+        cond.notify_one();
+    });
+    auto wait_for_state_update = [&update_received, &mutex, &cond]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; });
+        update_received = false;
+        return success;
+    };
 
     auto receiver = std::make_shared<Receiver>();
     SearchListenerBase::SPtr reply(receiver);
     SearchMetadata metadata("C", "desktop");
 
-    // search would fail if testscopeB can't be executed
+    auto meta = r->get_metadata("testscopeA");
+    auto sp = meta.proxy();
+
+    // testscopeA should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeA"));
+    EXPECT_FALSE(wait_for_state_update());
+
+    // search would fail if testscopeA can't be executed
     auto ctrl = sp->search("foo", metadata, reply);
     EXPECT_TRUE(receiver->wait_until_finished());
+
+    // testscopeA should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(testscopeA_state);
+    EXPECT_TRUE(r->is_scope_running("testscopeA"));
+
+    meta = r->get_metadata("testscopeB");
+    sp = meta.proxy();
+
+    // testscopeB should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeB"));
+    EXPECT_FALSE(wait_for_state_update());
+
+    // search would fail if testscopeB can't be executed
+    ctrl = sp->search("foo", metadata, reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
+
+    // testscopeB should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(testscopeB_state);
+    EXPECT_TRUE(r->is_scope_running("testscopeB"));
+
+    // check now that we get a callback when testscopeB terminates (timed out after 2s)
+    std::this_thread::sleep_for(std::chrono::seconds{3});
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_FALSE(testscopeB_state);
+    EXPECT_FALSE(r->is_scope_running("testscopeB"));
 }
 
-TEST(Registry, update_notify)
+TEST(Registry, list_update_notify)
 {
-    bool update_received_ = false;
-    std::mutex mutex_;
-    std::condition_variable cond_;
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
 
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
 
     // Configure registry update callback
-    r->set_list_update_callback([&update_received_, &mutex_, &cond_]
+    auto conn = r->set_list_update_callback([&update_received, &mutex, &cond]
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        update_received_ = true;
-        cond_.notify_one();
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
     });
-    auto wait_for_update = [&update_received_, &mutex_, &cond_]
+    auto wait_for_update = [&update_received, &mutex, &cond]
     {
         // Flush out update notifications
-        std::unique_lock<std::mutex> lock(mutex_);
-        while (cond_.wait_for(lock, std::chrono::milliseconds(500), [&update_received_] { return update_received_; }))
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = false;
+        while (cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; }))
         {
-            update_received_ = false;
+            success = true;
+            update_received = false;
         }
-        update_received_ = false;
+        update_received = false;
+        return success;
     };
 
     system::error_code ec;
@@ -156,7 +229,7 @@ TEST(Registry, update_notify)
     std::cout << "Move testscopeC into the scopes folder" << std::endl;
     filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered
     list = r->list();
@@ -170,7 +243,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 4 scopes registered
     list = r->list();
@@ -184,7 +257,7 @@ TEST(Registry, update_notify)
     std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
     filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered again
     list = r->list();
@@ -198,7 +271,7 @@ TEST(Registry, update_notify)
     std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();
@@ -212,6 +285,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
+    EXPECT_FALSE(wait_for_update());
 
     // Check that no scopes were registered
     list = r->list();
@@ -225,7 +299,7 @@ TEST(Registry, update_notify)
     std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we have 3 scopes registered
     list = r->list();
@@ -239,7 +313,7 @@ TEST(Registry, update_notify)
     std::cout << "Remove testfolder" << std::endl;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
-    wait_for_update();
+    EXPECT_TRUE(wait_for_update());
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();

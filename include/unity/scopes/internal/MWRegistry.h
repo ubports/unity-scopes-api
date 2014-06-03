@@ -40,18 +40,21 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
     virtual ObjectProxy locate(std::string const& identity) = 0;
+    virtual bool is_scope_running(std::string const& scope_id) = 0;
 
     virtual ~MWRegistry();
 
     // Local operations
-    void set_list_update_callback(std::function<void()> callback);
+    core::ScopedConnection set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback);
+    core::ScopedConnection set_list_update_callback(std::function<void()> callback);
 
 protected:
     MWRegistry(MiddlewareBase* mw_base);
 
 private:
     MiddlewareBase* mw_base_;
-    MWSubscriber::UPtr subscriber_;
+    MWSubscriber::UPtr list_update_subscriber_;
+    std::map<std::string, MWSubscriber::UPtr> scope_state_subscribers_;
 };
 
 } // namespace internal

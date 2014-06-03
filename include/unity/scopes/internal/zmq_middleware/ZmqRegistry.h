@@ -52,6 +52,7 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
     virtual MetadataMap list() override;
     virtual ObjectProxy locate(std::string const& identity) override;
+    virtual bool is_scope_running(std::string const& scope_id) override;
 };
 
 } // namespace zmq_middleware
