@@ -50,7 +50,7 @@ public:
     SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality);
     virtual ~SearchReplyImpl();
 
-    virtual void register_departments(Department::SCPtr const& parent, Department::SCPtr const& current) override;
+    virtual void register_departments(Department::SCPtr const& parent) override;
 
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,

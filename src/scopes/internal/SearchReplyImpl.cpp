@@ -53,19 +53,19 @@ SearchReplyImpl::~SearchReplyImpl()
 {
 }
 
-void SearchReplyImpl::register_departments(Department::SCPtr const& parent, Department::SCPtr const& current)
+void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
 {
     // basic consistency check
     try
     {
-        DepartmentImpl::validate_departments(parent, current);
+        DepartmentImpl::validate_departments(parent); //TODO: perform validation with current department id
     }
     catch (unity::LogicException const &e)
     {
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
-    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent, current)); // ignore return value?
+    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent)); // ignore return value?
 }
 
 void SearchReplyImpl::register_category(Category::SCPtr category)

@@ -48,7 +48,7 @@ public:
     MOCK_METHOD1(error, void(std::exception_ptr));
 
     // From SearchReply
-    MOCK_METHOD2(register_departments, void(Department::SCPtr const&, Department::SCPtr const&));
+    MOCK_METHOD1(register_departments, void(Department::SCPtr const&));
     MOCK_METHOD4(register_category,
                  Category::SCPtr(std::string const&,
                                  std::string const&,
