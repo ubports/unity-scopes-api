@@ -46,6 +46,9 @@ DirWatcher::DirWatcher()
 DirWatcher::~DirWatcher()
 {
     cleanup();
+
+    // Close the file descriptor
+    close(fd_);
 }
 
 void DirWatcher::add_watch(std::string const& path)
@@ -152,9 +155,6 @@ void DirWatcher::cleanup()
     {
         thread_.join();
     }
-
-    // Close the file descriptor
-    close(fd_);
 }
 
 void DirWatcher::watch_thread()
