@@ -74,9 +74,9 @@ void DirWatcher::add_watch(std::string const& path)
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
-        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                path + "\". inotify_add_watch() failed. (fd = " +
-                                std::to_string(fd_) + ", path = " + path + ")");
+        throw SyscallException("DirWatcher::add_watch(): failed to add watch for path: \"" +
+                               path + "\". inotify_add_watch() failed. (fd = " +
+                               std::to_string(fd_) + ")", errno);
     }
 
     wds_[wd] = path;
