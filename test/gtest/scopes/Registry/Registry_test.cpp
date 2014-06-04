@@ -185,6 +185,67 @@ TEST(Registry, scope_state_notify)
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
 }
 
+TEST(Registry, list_update_notify_before_click_folder_exists)
+{
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure registry update callback
+    auto conn = r->set_list_update_callback([&update_received, &mutex, &cond]
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
+    });
+    auto wait_for_update = [&update_received, &mutex, &cond]
+    {
+        // Flush out update notifications
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = false;
+        while (cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; }))
+        {
+            success = true;
+            update_received = false;
+        }
+        update_received = false;
+        return success;
+    };
+
+    system::error_code ec;
+
+    // First check that we have 2 scopes registered
+    MetadataMap list = r->list();
+    EXPECT_EQ(2, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_EQ(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    std::cout << "Create click folder: " TEST_RUNTIME_PATH "/click" << std::endl;
+    filesystem::create_directory(TEST_RUNTIME_PATH "/click");
+    ASSERT_EQ("Success", ec.message());
+
+    std::cout << "Make a symlink to testscopeC in the scopes folder" << std::endl;
+    filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/click/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    EXPECT_TRUE(wait_for_update());
+
+    // Now check that we have 3 scopes registered
+    list = r->list();
+    EXPECT_EQ(3, list.size());
+    EXPECT_NE(list.end(), list.find("testscopeA"));
+    EXPECT_NE(list.end(), list.find("testscopeB"));
+    EXPECT_NE(list.end(), list.find("testscopeC"));
+    EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    std::cout << "Remove click folder" << std::endl;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/click");
+}
+
 TEST(Registry, list_update_notify)
 {
     bool update_received = false;
