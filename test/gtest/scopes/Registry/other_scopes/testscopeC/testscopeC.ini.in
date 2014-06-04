@@ -1,0 +1,8 @@
+[ScopeConfig]
+DisplayName = scope-C.DisplayName
+Description = scope-C.Description
+Art = /foo/scope-C.Art
+Author = Canonical Ltd.
+Icon = /foo/scope-C.Icon
+SearchHint = scope-C.SearchHint
+HotKey = scope-C.HotKey

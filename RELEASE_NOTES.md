@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.4.8
+========================
+  - Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories, and added API to subscribe to changes in registry.
+
 Changes in version 0.4.7
 ========================
   - Implemented RatingFilter and RadioButtonsFilter.

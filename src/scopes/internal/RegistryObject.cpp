@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RegistryObject.h>
 
 #include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
@@ -38,7 +39,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                               MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -58,6 +60,17 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
       },
       executor_(executor)
 {
+    if (middleware)
+    {
+        try
+        {
+            publisher_ = middleware->create_publisher(middleware->runtime()->registry_identity());
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "RegistryObject(): failed to create registry publisher: " << e.what() << endl;
+        }
+    }
 }
 
 RegistryObject::~RegistryObject()
@@ -186,6 +199,19 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     return proxy;
 }
 
+bool RegistryObject::is_scope_running(std::string const& scope_id)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+    }
+
+    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
 bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
@@ -208,7 +234,13 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));
-    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
+    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data, publisher_)));
+
+    if (publisher_)
+    {
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
+    }
     return return_value;
 }
 
@@ -224,26 +256,24 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
     lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
-    return scopes_.erase(scope_id) == 1;
+
+    if (scopes_.erase(scope_id) == 1)
+    {
+        if (publisher_)
+        {
+            // Send a blank message to subscribers to inform them that the registry has been updated
+            publisher_->send_message("");
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     remote_registry_ = remote_registry;
-}
-
-bool RegistryObject::is_scope_running(std::string const& scope_id)
-{
-    lock_guard<decltype(mutex_)> lock(mutex_);
-
-    auto it = scope_processes_.find(scope_id);
-    if (it != scope_processes_.end())
-    {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
-    }
-
-    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
 }
 
 StateReceiverObject::SPtr RegistryObject::state_receiver()
@@ -286,13 +316,15 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
-RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
     : exec_data_(exec_data)
+    , reg_publisher_(publisher)
 {
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
     : exec_data_(other.exec_data_)
+    , reg_publisher_(other.reg_publisher_)
 {
 }
 
@@ -438,10 +470,50 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     {
         return;
     }
-    else if (state == Stopped && state_ != Stopping )
+    else if (state == Running)
     {
-        cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
-             << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
+        if (reg_publisher_)
+        {
+            // Send a "started" message to subscribers to inform them that this scope (topic) has started
+            reg_publisher_->send_message("started", exec_data_.scope_id);
+        }
+
+        if (state_ != Starting)
+        {
+            cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
+                 << "\" started manually" << endl;
+
+            // Don't update state, treat this scope as not running if a locate() is requested
+            return;
+        }
+    }
+    else if (state == Stopped)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
+        if (state_ != Stopping)
+        {
+            cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+                 << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
+        }
+    }
+    else if (state == Stopping && state_ != Running)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
+        cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
+             << exec_data_.scope_id << "\" terminated" << endl;
+
+        // Don't update state, treat this scope as not running if a locate() is requested
+        return;
     }
     state_ = state;
     state_change_cond_.notify_all();

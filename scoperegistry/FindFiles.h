@@ -21,12 +21,25 @@
 
 #include <functional>
 #include <string>
+#include <map>
 #include <vector>
 
 namespace scoperegistry
 {
 
-// Return a vector of file names underneath a scope root install dir that have the given suffix.
+// Return a vector of all paths found underneath a given dir that are of the given type or are
+// a symbolic link.
+
+enum EntryType { File, Directory };
+std::vector<std::string> find_entries(std::string const& install_dir, EntryType type);
+
+// Return a map of file names:paths underneath a scope dir that have the given suffix. Files are
+// searched for in the specified directory only, that is, no .ini files in further-nested
+// directories will be searched.
+
+std::map<std::string, std::string> find_scope_dir_configs(std::string const& scope_dir, std::string const& suffix);
+
+// Return a map of file names:paths underneath a scope root install dir that have the given suffix.
 // Files are searched for exactly "one level down", that is, if we have a directory structure.
 //
 // canonical/scopeA/myconfig.ini
@@ -35,14 +48,9 @@ namespace scoperegistry
 // we get those two .ini files, but no .ini files in canonical or underneath
 // further-nested directories.
 
-std::vector<std::string> find_scope_config_files(std::string const& install_dir,
-                                                 std::string const& suffix,
-                                                 std::function<void(std::string const&)> error);
-
-// Return a vector of file names in dir with the given suffix.
-
-std::vector<std::string> find_files(std::string const& dir,
-                                    std::string const& suffix);
+std::map<std::string, std::string> find_install_dir_configs(std::string const& install_dir,
+                                                            std::string const& suffix,
+                                                            std::function<void(std::string const&)> error);
 
 } // namespace scoperegistry
 

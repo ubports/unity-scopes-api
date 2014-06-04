@@ -59,6 +59,10 @@ private:
     virtual void locate_(Current const& current,
                          capnp::AnyPointer::Reader& in_params,
                          capnproto::Response::Builder& r);
+
+    virtual void is_scope_running_(Current const& current,
+                                   capnp::AnyPointer::Reader& in_params,
+                                   capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware

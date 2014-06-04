@@ -44,7 +44,6 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
     , topic_(topic)
     , thread_state_(NotRunning)
     , thread_exception_(nullptr)
-    , callback_(nullptr)
 {
     // Validate publisher_id
     if (publisher_id.find('/') != std::string::npos)
@@ -67,9 +66,9 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
     thread_ = std::thread(&ZmqSubscriber::subscriber_thread, this);
 
     std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Failed; });
+    cond_.wait(lock, [this] { return thread_state_ == Running || thread_state_ == Stopped; });
 
-    if (thread_state_ == Failed)
+    if (thread_state_ == Stopped)
     {
         if (thread_.joinable())
         {
@@ -89,7 +88,10 @@ ZmqSubscriber::ZmqSubscriber(zmqpp::context* context, std::string const& publish
 
 ZmqSubscriber::~ZmqSubscriber()
 {
-    thread_stopper_->stop();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_stopper_ = nullptr;
+    }
 
     if (thread_.joinable())
     {
@@ -100,12 +102,6 @@ ZmqSubscriber::~ZmqSubscriber()
 std::string ZmqSubscriber::endpoint() const
 {
     return endpoint_;
-}
-
-void ZmqSubscriber::set_message_callback(SubscriberCallback callback)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    callback_ = callback;
 }
 
 void ZmqSubscriber::subscriber_thread()
@@ -137,6 +133,7 @@ void ZmqSubscriber::subscriber_thread()
         std::string message;
         while (true)
         {
+            // poll() throws when the zmq context is destroyed (hense stopping the thread)
             poller.poll();
 
             // Flush out the message queue before stopping the thread
@@ -146,14 +143,11 @@ void ZmqSubscriber::subscriber_thread()
 
                 // Discard the message if no callback is set
                 std::lock_guard<std::mutex> lock(mutex_);
-                if (callback_)
+                // Message should arrive in the format: "<topic>:<message>"
+                if (message.length() > topic_.length() &&
+                    message[topic_.length()] == ':')
                 {
-                    // Message should arrive in the format: "<topic>:<message>"
-                    if (message.length() > topic_.length() &&
-                        message[topic_.length()] == ':')
-                    {
-                        callback_(message.substr(topic_.length() + 1));
-                    }
+                    message_received_(message.substr(topic_.length() + 1));
                 }
             }
             else if(poller.has_input(stop_socket))
@@ -170,8 +164,9 @@ void ZmqSubscriber::subscriber_thread()
     catch (...)
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        thread_stopper_ = nullptr;
         thread_exception_ = std::current_exception();
-        thread_state_ = Failed;
+        thread_state_ = Stopped;
         cond_.notify_all();
     }
 }

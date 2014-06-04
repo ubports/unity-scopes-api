@@ -20,6 +20,8 @@
 #define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
 
 #include <unity/scopes/internal/Executor.h>
+#include <unity/scopes/internal/MiddlewareBase.h>
+#include <unity/scopes/internal/MWPublisher.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/StateReceiverObject.h>
@@ -55,13 +57,15 @@ public:
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
-    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor);
+    RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                   MiddlewareBase::SPtr middleware);
     virtual ~RegistryObject();
 
     // Remote operation implementations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
     virtual ObjectProxy locate(std::string const& identity) override;
+    virtual bool is_scope_running(std::string const& scope_id) override;
 
     // Local methods
     bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
@@ -69,7 +73,6 @@ public:
     bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
-    bool is_scope_running(std::string const& scope_id);
     StateReceiverObject::SPtr state_receiver();
 
 private:
@@ -84,7 +87,7 @@ private:
             Stopped, Starting, Running, Stopping
         };
 
-        ScopeProcess(ScopeExecData exec_data);
+        ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher);
         ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
@@ -112,6 +115,7 @@ private:
         mutable std::mutex process_mutex_;
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
+        MWPublisher::SPtr reg_publisher_;
     };
 
 private:
@@ -128,6 +132,8 @@ private:
     ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
+
+    MWPublisher::SPtr publisher_;
 };
 
 } // namespace internal

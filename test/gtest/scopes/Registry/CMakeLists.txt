@@ -13,3 +13,4 @@ target_link_libraries(Registry_test ${TESTLIBS})
 
 add_test(Registry Registry_test)
 add_subdirectory(scopes)
+add_subdirectory(other_scopes)

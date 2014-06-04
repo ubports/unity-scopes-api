@@ -524,12 +524,12 @@ void ObjectAdapter::broker_thread()
         {
             poller.add(stop);
 
-            frontend.set(zmqpp::socket_option::linger, 0);
+            frontend.set(zmqpp::socket_option::linger, 200);
             // "Safe" bind: prevents two servers from binding to the same endpoint.
             safe_bind(frontend, endpoint_);
             poller.add(frontend);
 
-            backend.set(zmqpp::socket_option::linger, 0);
+            backend.set(zmqpp::socket_option::linger, 200);
             backend.bind("inproc://" + name_ + "-worker");
             poller.add(backend);
 
@@ -638,7 +638,7 @@ void ObjectAdapter::worker_thread()
 
         auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
         zmqpp::socket s(*mw_.context(), socket_type);
-        s.set(zmqpp::socket_option::linger, 0);
+        s.set(zmqpp::socket_option::linger, 200);
         s.connect("inproc://" + name_ + "-worker");
         poller.add(s);
 

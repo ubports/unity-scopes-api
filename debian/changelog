@@ -1,3 +1,12 @@
+unity-scopes-api (0.4.8-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
+  * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
+  * Added is_scope_running(), set_scope_state_callback() and set_update_callback() to Registry.
+
+ -- Marcus Tomlinson <marcustomlinson@ubuntu>  Wed, 28 May 2014 17:08:45 +0200
+
 unity-scopes-api (0.4.7+14.10.20140522-0ubuntu1) utopic; urgency=low
 
   [ Ubuntu daily release ]
