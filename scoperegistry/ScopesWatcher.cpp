@@ -276,6 +276,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             {
                 add_scope_dir(path, true);
             }
+            catch (unity::ResourceException const&) {}
             catch (unity::SyscallException const&) {}
         }
         // A sub directory has been removed
