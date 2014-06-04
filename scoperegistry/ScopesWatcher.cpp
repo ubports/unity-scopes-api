@@ -43,12 +43,16 @@ ScopesWatcher::~ScopesWatcher()
 
 void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
 {
-    // Add watch for parent directory (ignore exception if already exists)
+    // Add watch for parent directory
     try
     {
         add_watch(parent_dir(dir));
     }
-    catch (unity::ResourceException const&) {}
+    catch (unity::ResourceException const&) {} // Ignore already exists exception
+    catch (unity::SyscallException const& e )
+    {
+        std::cerr << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what() << std::endl;
+    }
 
     try
     {
@@ -76,7 +80,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
     }
     catch (std::exception const& e)
     {
-        std::cerr << "ScopesWatcher::add_install_dir: " << e.what() << std::endl;
+        std::cerr << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what() << std::endl;
     }
 }
 
