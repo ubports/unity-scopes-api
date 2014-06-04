@@ -78,7 +78,11 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
             add_scope_dir(subdir, notify);
         }
     }
-    catch (std::exception const& e)
+    catch (unity::ResourceException const& e)
+    {
+        std::cerr << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what() << std::endl;
+    }
+    catch (unity::SyscallException const& e)
     {
         std::cerr << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what() << std::endl;
     }
