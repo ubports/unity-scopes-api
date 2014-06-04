@@ -100,8 +100,8 @@ int main(int argc, char** argv)
     // Set parameter as "FAIL" if not provided as to intentionally break the scope, hence causing
     // dependant tests to fail (E.g. Registry_test and RegistryI_test).
     std::string unused_arg_1 = argc > 1 ? argv[1] : "FAIL";
-    std::string rt_config = argc > 2 ? argv[2] : "FAIL";
-    std::string scope_config = argc > 3 ? argv[3] : "FAIL";
+    std::string scope_config = argc > 2 ? argv[2] : "FAIL";
+    std::string rt_config = argc > 3 ? argv[3] : "FAIL";
     std::string unused_arg_2 = argc > 4 ? argv[4] : "FAIL";
 
     // In order to test that custom exec splitting works, we check here that our arbitrary arguments
