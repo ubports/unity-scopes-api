@@ -1,2 +1,2 @@
 Tests: scopebuild
-Depends: g++ pkg-config libunity-scopes-dev
+Depends: g++, pkg-config, libunity-scopes-dev
