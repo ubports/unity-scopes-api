@@ -254,7 +254,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             }
         }
 
-        // If the path an install dir:
+        // If this is path an install dir:
         if (is_install_dir)
         {
             // An install directory has been added
