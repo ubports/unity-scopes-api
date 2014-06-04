@@ -40,10 +40,29 @@ ScopesWatcher::~ScopesWatcher()
     cleanup();
 }
 
-void ScopesWatcher::add_install_dir(std::string const& dir)
+void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
 {
+    // Add watch for parent directory (ignore exception if already exists)
     try
     {
+        add_watch(parent_dir(dir));
+    }
+    catch (...) {}
+
+    try
+    {
+        // Create a new entry for this install dir into idir_to_sdirs_map_
+        if (dir.back() == '/')
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            idir_to_sdirs_map_[dir.substr(0, dir.length() - 1)] = std::set<std::string>();
+        }
+        else
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            idir_to_sdirs_map_[dir] = std::set<std::string>();
+        }
+
         // Add watch for root directory
         add_watch(dir);
 
@@ -51,52 +70,102 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
         auto subdirs = find_entries(dir, EntryType::Directory);
         for (auto const& subdir : subdirs)
         {
-            auto configs = find_scope_dir_configs(subdir, ".ini");
-            if (!configs.empty())
-            {
-                auto config = *configs.cbegin();
-                std::lock_guard<std::mutex> lock(mutex_);
-                dir_to_ini_map_[subdir] = config.second;
-            }
-            add_watch(subdir);
+            add_scope_dir(subdir, notify);
         }
     }
-    catch (...) {}
+    catch (std::exception const& e)
+    {
+        std::cerr << "ScopesWatcher::add_install_dir: " << e.what() << std::endl;
+    }
 }
 
-void ScopesWatcher::add_scope_dir(std::string const& dir)
+std::string ScopesWatcher::parent_dir(std::string const& child_dir)
+{
+    std::string parent;
+    if (child_dir.back() == '/')
+    {
+        parent = filesystem::path(child_dir.substr(0, child_dir.length() - 1)).parent_path().native();
+    }
+    else
+    {
+        parent = filesystem::path(child_dir).parent_path().native();
+    }
+    return parent;
+}
+
+void ScopesWatcher::remove_install_dir(std::string const& dir)
+{
+    std::set<std::string> scope_dirs;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (idir_to_sdirs_map_.find(dir) != idir_to_sdirs_map_.end())
+        {
+            scope_dirs = idir_to_sdirs_map_.at(dir);
+        }
+    }
+
+    for (auto const& scope_dir : scope_dirs)
+    {
+        remove_scope_dir(scope_dir);
+    }
+
+    remove_watch(dir);
+}
+
+void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
 {
     auto configs = find_scope_dir_configs(dir, ".ini");
     if (!configs.empty())
     {
         auto config = *configs.cbegin();
-        // Associate this directory with the contained config file
         {
             std::lock_guard<std::mutex> lock(mutex_);
+
+            // Associate this scope with its install directory
+            if (idir_to_sdirs_map_.find(parent_dir(dir)) != idir_to_sdirs_map_.end())
+            {
+                idir_to_sdirs_map_.at(parent_dir(dir)).insert(dir);
+            }
+
+            // Associate this directory with the contained config file
             dir_to_ini_map_[dir] = config.second;
         }
 
         // New config found, execute callback
-        ini_added_callback_(config);
-        std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
-                  << dir << "\"" << std::endl;
+        if (notify)
+        {
+            ini_added_callback_(config);
+            std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
+                      << dir << "\"" << std::endl;
+        }
     }
 
-    // Add a watch for this directory
-    add_watch(dir);
+    // Add a watch for this directory (ignore exception if already exists)
+    try
+    {
+        add_watch(dir);
+    }
+    catch (...) {}
 }
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // Check if this directory is associate with the config file
+    // Check if this directory is associate with a config file
     if (dir_to_ini_map_.find(dir) != dir_to_ini_map_.end())
     {
-        // Inform the registry that this scope has been removed
+        // Unassociate this scope with its install directory
+        if (idir_to_sdirs_map_.find(parent_dir(dir)) != idir_to_sdirs_map_.end())
+        {
+            idir_to_sdirs_map_.at(parent_dir(dir)).erase(dir);
+        }
+
+        // Unassociate this config file with its scope directory
         std::string ini_path = dir_to_ini_map_.at(dir);
         dir_to_ini_map_.erase(dir);
 
+        // Inform the registry that this scope has been removed
         filesystem::path p(ini_path);
         std::string scope_id = p.stem().native();
         registry_->remove_local_scope(scope_id);
@@ -167,14 +236,36 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
     }
     else
     {
-        // A new sub directory has been added
-        if (event_type == DirWatcher::Added)
+        bool is_install_dir = false;
         {
-            // try add this path as a scope folder
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (idir_to_sdirs_map_.find(path) != idir_to_sdirs_map_.end())
+            {
+                is_install_dir = true;
+            }
+        }
+
+        if (is_install_dir)
+        {
+            // An install directory has been added
+            if (event_type == DirWatcher::Added)
+            {
+                add_install_dir(path, true);
+            }
+            // An install directory has been removed
+            else if (event_type == DirWatcher::Removed)
+            {
+                remove_install_dir(path);
+            }
+        }
+        // A new sub directory has been added
+        else if (event_type == DirWatcher::Added)
+        {
+            // try add this path as a scope folder (ignore failures to add this path as scope dir)
             // (we need to do this with both files and folders added, as the file added may be a symlink)
             try
             {
-                add_scope_dir(path);
+                add_scope_dir(path, true);
             }
             catch (...) {}
         }
