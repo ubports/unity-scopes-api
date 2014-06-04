@@ -21,6 +21,7 @@
 #include "FindFiles.h"
 
 #include <boost/filesystem/path.hpp>
+#include <unity/UnityExceptions.h>
 
 using namespace unity::scopes::internal;
 using namespace boost;
@@ -47,7 +48,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
     {
         add_watch(parent_dir(dir));
     }
-    catch (...) {}
+    catch (unity::ResourceException const&) {}
 
     try
     {
@@ -145,7 +146,7 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
     {
         add_watch(dir);
     }
-    catch (...) {}
+    catch (unity::ResourceException const&) {}
 }
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
@@ -267,7 +268,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             {
                 add_scope_dir(path, true);
             }
-            catch (...) {}
+            catch (unity::SyscallException const&) {}
         }
         // A sub directory has been removed
         else if (event_type == DirWatcher::Removed)
