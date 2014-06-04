@@ -53,7 +53,7 @@ public:
       <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
       <li>create a Department node for parent of current department (if applicable - not when in root department), and attach current Department node to it with
       unity::scopes::Department::set_subdepartments() method.
-      <li>register a unity::scopes::DepartmentList that has just the parent department in it.
+      <li>register the parent department with unity::scopes::SearchReply::register_departments().
       </ul>
 
      For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
@@ -74,6 +74,7 @@ public:
 
      \param parent The parent department of current department, or current one if visiting root department.
      \param current Currently visited department.
+     \throws unity::LogicException if departments are invalid (nullptr passed, current department not present in the parent's tree, duplicated department ids present in the tree).
      */
     virtual void register_departments(Department::SCPtr const& parent) = 0;
 
