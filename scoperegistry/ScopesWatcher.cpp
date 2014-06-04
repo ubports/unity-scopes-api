@@ -137,7 +137,7 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
             }
 
             // Associate this directory with the contained config file
-            dir_to_ini_map_[dir] = config.second;
+            sdir_to_ini_map_[dir] = config.second;
         }
 
         // New config found, execute callback
@@ -162,7 +162,7 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
     std::lock_guard<std::mutex> lock(mutex_);
 
     // Check if this directory is associate with a config file
-    if (dir_to_ini_map_.find(dir) != dir_to_ini_map_.end())
+    if (sdir_to_ini_map_.find(dir) != sdir_to_ini_map_.end())
     {
         // Unassociate this scope with its install directory
         if (idir_to_sdirs_map_.find(parent_dir(dir)) != idir_to_sdirs_map_.end())
@@ -171,8 +171,8 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
         }
 
         // Unassociate this config file with its scope directory
-        std::string ini_path = dir_to_ini_map_.at(dir);
-        dir_to_ini_map_.erase(dir);
+        std::string ini_path = sdir_to_ini_map_.at(dir);
+        sdir_to_ini_map_.erase(dir);
 
         // Inform the registry that this scope has been removed
         filesystem::path p(ini_path);
@@ -201,7 +201,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         // A .ini has been added / modified
         if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
         {
-            dir_to_ini_map_[parent_path] = path;
+            sdir_to_ini_map_[parent_path] = path;
             ini_added_callback_(std::make_pair(scope_id, path));
             std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
                       << parent_path << "\"" << std::endl;
@@ -209,7 +209,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         // A .ini has been removed
         else if (event_type == DirWatcher::Removed)
         {
-            dir_to_ini_map_.erase(parent_path);
+            sdir_to_ini_map_.erase(parent_path);
             registry_->remove_local_scope(scope_id);
             std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
                       << parent_path << "\"" << std::endl;
@@ -221,9 +221,9 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         std::string parent_path = fs_path.parent_path().native();
 
         // Check if this directory is associate with the config file
-        if (dir_to_ini_map_.find(parent_path) != dir_to_ini_map_.end())
+        if (sdir_to_ini_map_.find(parent_path) != sdir_to_ini_map_.end())
         {
-            std::string ini_path = dir_to_ini_map_.at(parent_path);
+            std::string ini_path = sdir_to_ini_map_.at(parent_path);
             filesystem::path fs_ini_path(ini_path);
             std::string scope_id = fs_ini_path.stem().native();
 

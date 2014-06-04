@@ -43,7 +43,7 @@ public:
 private:
     unity::scopes::internal::RegistryObject::SPtr const registry_;
     std::function<void(std::pair<std::string, std::string> const&)> const ini_added_callback_;
-    std::map<std::string, std::string> dir_to_ini_map_;
+    std::map<std::string, std::string> sdir_to_ini_map_;
     std::map<std::string, std::set<std::string>> idir_to_sdirs_map_;
     std::mutex mutex_;
 
