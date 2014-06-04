@@ -254,6 +254,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             }
         }
 
+        // If the path an install dir:
         if (is_install_dir)
         {
             // An install directory has been added
@@ -267,22 +268,26 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 remove_install_dir(path);
             }
         }
-        // A new sub directory has been added
-        else if (event_type == DirWatcher::Added)
+        // Else if this path is within an install dir:
+        else if (idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end())
         {
-            // try add this path as a scope folder (ignore failures to add this path as scope dir)
-            // (we need to do this with both files and folders added, as the file added may be a symlink)
-            try
+            // A new sub directory has been added
+            if (event_type == DirWatcher::Added)
             {
-                add_scope_dir(path, true);
+                // try add this path as a scope folder (ignore failures to add this path as scope dir)
+                // (we need to do this with both files and folders added, as the file added may be a symlink)
+                try
+                {
+                    add_scope_dir(path, true);
+                }
+                catch (unity::ResourceException const&) {}
+                catch (unity::SyscallException const&) {}
             }
-            catch (unity::ResourceException const&) {}
-            catch (unity::SyscallException const&) {}
-        }
-        // A sub directory has been removed
-        else if (event_type == DirWatcher::Removed)
-        {
-            remove_scope_dir(path);
+            // A sub directory has been removed
+            else if (event_type == DirWatcher::Removed)
+            {
+                remove_scope_dir(path);
+            }
         }
     }
 }
