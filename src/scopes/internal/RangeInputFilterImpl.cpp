@@ -177,7 +177,6 @@ std::string RangeInputFilterImpl::filter_type() const
 
 void RangeInputFilterImpl::serialize(VariantMap& var) const
 {
-    VariantArray ops = VariantArray();
     var["start_label"] = start_label_;
     var["end_label"] = end_label_;
     var["unit_label"] = unit_label_;

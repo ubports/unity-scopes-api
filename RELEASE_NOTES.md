@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.4.9
+========================
+  - Implemented ValueSliderFilter.
+
 Changes in version 0.4.8
 ========================
   - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,

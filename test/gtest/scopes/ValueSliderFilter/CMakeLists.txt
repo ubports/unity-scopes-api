@@ -1,0 +1,4 @@
+add_executable(ValueSliderFilter_test ValueSliderFilter_test.cpp)
+target_link_libraries(ValueSliderFilter_test ${TESTLIBS})
+
+add_test(ValueSliderFilter ValueSliderFilter_test)
