@@ -41,11 +41,6 @@ namespace scopes
 namespace internal
 {
 
-static bool expand_command(std::string const& command, wordexp_t& exp)
-{
-    return wordexp(command.c_str(), &exp, WRDE_NOCMD) == 0;
-}
-
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
                                MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
@@ -402,41 +397,13 @@ void RegistryObject::ScopeProcess::exec(
     std::vector<std::string> argv;
 
     // Check if this scope has specified a custom executable
-    if (!exec_data_.custom_exec.empty())
+    auto custom_exec_args = expand_custom_exec();
+    if (!custom_exec_args.empty())
     {
-        wordexp_t exp;
-
-        // Split command into program and args
-        if (expand_command(exec_data_.custom_exec, exp))
+        program = custom_exec_args[0];
+        for (size_t i = 1; i < custom_exec_args.size(); ++i)
         {
-            util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
-
-            program = exp.we_wordv[0];
-            for (uint i = 1; i < exp.we_wordc; ++i)
-            {
-                std::string arg = exp.we_wordv[i];
-                // Replace "%R" placeholders with the runtime config
-                if (arg == "%R")
-                {
-                    argv.push_back(exec_data_.runtime_config);
-                }
-                // Replace "%S" placeholders with the scope config
-                else if (arg == "%S")
-                {
-                    argv.push_back(exec_data_.scope_config);
-                }
-                // Else simply append next word as an argument
-                else
-                {
-                    argv.push_back(arg);
-                }
-            }
-        }
-        else
-        {
-            // Something went wrong in parsing the command line, throw exception
-            throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Invalid custom scoperunner command: \""
-                                           + exec_data_.custom_exec + "\"");
+            argv.push_back(custom_exec_args[i]);
         }
     }
     else
@@ -615,6 +582,54 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
         clear_handle_unlocked();
         throw;
     }
+}
+
+std::vector<std::string> RegistryObject::ScopeProcess::expand_custom_exec()
+{
+    // Check first that custom_exec has been set
+    if (exec_data_.custom_exec.empty())
+    {
+        // custom_exec is empty, so simply return an empty vector
+        return std::vector<std::string>();
+    }
+
+    wordexp_t exp;
+    std::vector<std::string> command_args;
+
+    // Split command into program and args
+    if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+
+        command_args.push_back(exp.we_wordv[0]);
+        for (uint i = 1; i < exp.we_wordc; ++i)
+        {
+            std::string arg = exp.we_wordv[i];
+            // Replace "%R" placeholders with the runtime config
+            if (arg == "%R")
+            {
+                command_args.push_back(exec_data_.runtime_config);
+            }
+            // Replace "%S" placeholders with the scope config
+            else if (arg == "%S")
+            {
+                command_args.push_back(exec_data_.scope_config);
+            }
+            // Else simply append next word as an argument
+            else
+            {
+                command_args.push_back(arg);
+            }
+        }
+    }
+    else
+    {
+        // Something went wrong in parsing the command line, throw exception
+        throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Invalid custom scoperunner command: \""
+                                       + exec_data_.custom_exec + "\"");
+    }
+
+    return command_args;
 }
 
 } // namespace internal
