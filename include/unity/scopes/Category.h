@@ -52,6 +52,13 @@ public:
     NONCOPYABLE(Category);
     UNITY_DEFINES_PTRS(Category);
 
+    enum TapBehavior
+    {
+        ActivateResult,
+        ShowPreview,
+        Ignore
+    };
+
     virtual ~Category();
     /// @endcond
 
@@ -79,6 +86,29 @@ public:
      */
     CategoryRenderer const& renderer_template() const;
 
+    /**
+     \brief Change the default behavior for single tap on the result from this category.
+
+     The default behavior of single tap is to preview the result.
+     Note: changing the default behavior is not recommended, in particular
+     setting single tap behavior to TapBehavior::Ignore should be avoided.
+
+     \param behavior The behavior of single tap.
+     */
+
+    /**
+     \brief Change the default behavior for long tap on the result from this category.
+
+     The default behavior of long press is to preview the result.
+     Note: changing the default behavior is not recommended.
+
+     \param behavior The behavior of long press.
+     */
+
+    TapBehavior single_tap_behavior() const;
+
+    TapBehavior long_tap_behavior() const;
+
     // @cond
     VariantMap serialize() const;
     // @endcond
@@ -86,6 +116,7 @@ public:
 protected:
     /// @cond
     Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
+    Category(internal::CategoryImpl *impl);
     Category(VariantMap const& variant_map);
     /// @endcond
 

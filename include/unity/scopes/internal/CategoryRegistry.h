@@ -56,7 +56,9 @@ public:
     \brief Creates category from supplied parameters. Throws if category with same id exists.
     \return category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template,
+            Category::TapBehavior single_tap_behavior = Category::TapBehavior::ShowPreview,
+            Category::TapBehavior long_tap_behavior = Category::TapBehavior::ShowPreview);
 
     /**
     \brief Finds category instance with give id.

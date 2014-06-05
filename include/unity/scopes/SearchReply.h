@@ -88,6 +88,13 @@ public:
                                               std::string const &icon,
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CategoryRenderer const& renderer_template,
+                                              Category::TapBehavior single_tap_behavior,
+                                              Category::TapBehavior long_tap_behavior) = 0;
+
     /**
     \brief Returns a previously registered category.
     \return The category instance or `nullptr` if the category does not exist registered.

@@ -77,13 +77,29 @@ void SearchReplyImpl::register_category(Category::SCPtr category)
 Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
                                              std::string const& title,
                                              std::string const &icon,
-                                             CategoryRenderer const& renderer_template)
+                                             CategoryRenderer const& renderer_template
+                                            )
 {
     // will throw if adding same category again
     auto cat = cat_registry_->register_category(id, title, icon, renderer_template);
     push(cat);
     return cat;
 }
+
+Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
+                                             std::string const& title,
+                                             std::string const &icon,
+                                             CategoryRenderer const& renderer_template,
+                                             Category::TapBehavior single_tap_behavior,
+                                             Category::TapBehavior long_tap_behavior
+                                            )
+{
+    // will throw if adding same category again
+    auto cat = cat_registry_->register_category(id, title, icon, renderer_template); //TODO
+    push(cat);
+    return cat;
+}
+
 
 Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
 {
