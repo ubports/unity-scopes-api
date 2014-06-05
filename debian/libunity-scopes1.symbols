@@ -434,6 +434,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::RegistryConfig::~RegistryConfig()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::expand_custom_exec()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor>)@Base" 0.4.3+14.10.20140428
