@@ -41,6 +41,11 @@ namespace scopes
 namespace internal
 {
 
+static bool expand_command(std::string const& command, wordexp_t& exp)
+{
+    return wordexp(command.c_str(), &exp, WRDE_NOCMD) == 0;
+}
+
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
                                MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
@@ -402,7 +407,7 @@ void RegistryObject::ScopeProcess::exec(
         wordexp_t exp;
 
         // Split command into program and args
-        if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+        if (expand_command(exec_data_.custom_exec, exp))
         {
             util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
 
