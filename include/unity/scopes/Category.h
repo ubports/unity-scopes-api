@@ -87,26 +87,21 @@ public:
     CategoryRenderer const& renderer_template() const;
 
     /**
-     \brief Change the default behavior for single tap on the result from this category.
+     \brief Get the behavior for single tap on the result from this category.
 
-     The default behavior of single tap is to preview the result.
-     Note: changing the default behavior is not recommended, in particular
-     setting single tap behavior to TapBehavior::Ignore should be avoided.
-
-     \param behavior The behavior of single tap.
+     The default behavior of single tap is to preview the result, but it can be changed by
+     scopes when registering categories with unity::scopes::SearchReply::register_category().
+     \return The behavior of single tap.
      */
-
-    /**
-     \brief Change the default behavior for long tap on the result from this category.
-
-     The default behavior of long press is to preview the result.
-     Note: changing the default behavior is not recommended.
-
-     \param behavior The behavior of long press.
-     */
-
     TapBehavior single_tap_behavior() const;
 
+    /**
+     \brief Get the behavior for long tap on the result from this category.
+
+     The default behavior of long tap is to preview the result, but it can be changed by
+     scopes when registering categories with unity::scopes::SearchReply::register_category().
+     \return The behavior of long tap.
+     */
     TapBehavior long_tap_behavior() const;
 
     // @cond

@@ -78,16 +78,36 @@ public:
     virtual void register_departments(Department::SCPtr const& parent) = 0;
 
     /**
-    \brief Register an existing category instance and send it to the source of the query.
+    \brief Register new category and send it to the source of the query.
 
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
-    results and categories from other scope(s).
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param renderer_template The renderer template to be used for results in this category
+
+    \return The category instance
+    \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
+    /**
+    \brief Register new category and send it to the source of the query.
+
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param renderer_template The renderer template to be used for results in this category
+    \param single_tap_behavior The default behavior for single tap on the result from this category.
+    \param long_tap_behavior The default behavior of long tap on to preview the result.
+
+     The default behaviour of both single and long tap is to show a preview.
+     Changing the default behaviour is not recommended.
+
+     \return The category instance
+     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
@@ -96,9 +116,12 @@ public:
                                               Category::TapBehavior long_tap_behavior) = 0;
 
     /**
-    \brief Returns a previously registered category.
-    \return The category instance or `nullptr` if the category does not exist registered.
+    \brief Register an existing category instance and send it to the source of the query.
+
+    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
+    results and categories from other scope(s).
     */
+
     virtual void register_category(Category::SCPtr category) = 0;
 
     /**
