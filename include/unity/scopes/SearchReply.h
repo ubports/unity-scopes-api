@@ -73,7 +73,6 @@ public:
      the root deparment.
 
      \param parent The parent department of current department, or current one if visiting root department.
-     \param current Currently visited department.
      \throws unity::LogicException if departments are invalid (nullptr passed, current department not present in the parent's tree, duplicated department ids present in the tree).
      */
     virtual void register_departments(Department::SCPtr const& parent) = 0;
