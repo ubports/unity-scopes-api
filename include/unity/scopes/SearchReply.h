@@ -100,10 +100,10 @@ public:
     \param title The title of the category
     \param icon The icon of the category
     \param renderer_template The renderer template to be used for results in this category
-    \param single_tap_behavior The default behavior for single tap on the result from this category.
-    \param long_tap_behavior The default behavior of long tap on to preview the result.
+    \param tap_behavior The default behavior for tap on the result from this category.
+    \param long_press_behavior The default behavior of long press on to preview the result.
 
-     The default behaviour of both single and long tap is to show a preview.
+     The default behaviour of both tap and long press is to show a preview.
      Changing the default behaviour is not recommended.
 
      \return The category instance
@@ -112,8 +112,8 @@ public:
                                               std::string const& title,
                                               std::string const &icon,
                                               CategoryRenderer const& renderer_template,
-                                              Category::TapBehavior single_tap_behavior,
-                                              Category::TapBehavior long_tap_behavior) = 0;
+                                              Category::TapBehavior tap_behavior,
+                                              Category::TapBehavior long_press_behavior) = 0;
 
     /**
     \brief Register an existing category instance and send it to the source of the query.

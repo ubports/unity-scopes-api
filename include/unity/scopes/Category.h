@@ -54,9 +54,9 @@ public:
 
     enum TapBehavior
     {
-        ActivateResult,
-        ShowPreview,
-        Ignore
+        TapActivate,
+        TapPreview,
+        TapIgnore
     };
 
     virtual ~Category();
@@ -93,16 +93,16 @@ public:
      scopes when registering categories with unity::scopes::SearchReply::register_category().
      \return The behavior of single tap.
      */
-    TapBehavior single_tap_behavior() const;
+    TapBehavior tap_behavior() const;
 
     /**
-     \brief Get the behavior for long tap on the result from this category.
+     \brief Get the behavior for long press on the result from this category.
 
-     The default behavior of long tap is to preview the result, but it can be changed by
+     The default behavior of long press is to preview the result, but it can be changed by
      scopes when registering categories with unity::scopes::SearchReply::register_category().
-     \return The behavior of long tap.
+     \return The behavior of long press.
      */
-    TapBehavior long_tap_behavior() const;
+    TapBehavior long_press_behavior() const;
 
     // @cond
     VariantMap serialize() const;

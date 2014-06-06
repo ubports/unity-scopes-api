@@ -42,13 +42,13 @@ public:
 
     CategoryImpl(VariantMap const& variant_map);
     CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
-    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template, Category::TapBehavior
-            single_tap_behavior, Category::TapBehavior long_tap_behavior);
+    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template,
+            Category::TapBehavior tap_behavior, Category::TapBehavior long_press_behavior);
     std::string const& id() const;
     std::string const& title() const;
     std::string const& icon() const;
-    Category::TapBehavior single_tap_behavior() const;
-    Category::TapBehavior long_tap_behavior() const;
+    Category::TapBehavior tap_behavior() const;
+    Category::TapBehavior long_press_behavior() const;
     CategoryRenderer const& renderer_template() const;
     VariantMap serialize() const;
 
@@ -58,8 +58,8 @@ private:
     std::string id_;
     std::string title_;
     std::string icon_;
-    Category::TapBehavior single_tap_behavior_;
-    Category::TapBehavior long_tap_behavior_;
+    Category::TapBehavior tap_behavior_;
+    Category::TapBehavior long_press_behavior_;
     CategoryRenderer renderer_template_;
 };
 

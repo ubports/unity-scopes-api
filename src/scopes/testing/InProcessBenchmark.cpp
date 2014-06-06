@@ -177,10 +177,10 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
                                       std::string const& title,
                                       std::string const &icon,
                                       unity::scopes::CategoryRenderer const& renderer,
-                                      unity::scopes::Category::TapBehavior single_tap_behavior,
-                                      unity::scopes::Category::TapBehavior long_tap_behavior) override
+                                      unity::scopes::Category::TapBehavior tap_behavior,
+                                      unity::scopes::Category::TapBehavior long_press_behavior) override
     {
-        return category_registry.register_category(id, title, icon, renderer); // TODO
+        return category_registry.register_category(id, title, icon, renderer, tap_behavior, long_press_behavior);
     }
 
     void register_category(unity::scopes::Category::SCPtr category) override

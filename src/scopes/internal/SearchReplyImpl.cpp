@@ -92,12 +92,12 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
                                              std::string const& title,
                                              std::string const &icon,
                                              CategoryRenderer const& renderer_template,
-                                             Category::TapBehavior single_tap_behavior,
-                                             Category::TapBehavior long_tap_behavior
+                                             Category::TapBehavior tap_behavior,
+                                             Category::TapBehavior long_press_behavior
                                             )
 {
     // will throw if adding same category again
-    auto cat = cat_registry_->register_category(id, title, icon, renderer_template, single_tap_behavior, long_tap_behavior);
+    auto cat = cat_registry_->register_category(id, title, icon, renderer_template, tap_behavior, long_press_behavior);
     push(cat);
     return cat;
 }

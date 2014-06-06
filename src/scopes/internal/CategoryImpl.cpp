@@ -35,13 +35,13 @@ CategoryImpl::CategoryImpl(VariantMap const& variant_map)
 }
 
 CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template, Category::TapBehavior
-            single_tap_behavior, Category::TapBehavior long_tap_behavior)
+            tap_behavior, Category::TapBehavior long_press_behavior)
     : id_(id),
       title_(title),
       icon_(icon),
-      renderer_template_(renderer_template),
-      single_tap_behavior_(single_tap_behavior),
-      long_tap_behavior_(long_tap_behavior)
+      tap_behavior_(tap_behavior),
+      long_press_behavior_(long_press_behavior),
+      renderer_template_(renderer_template)
 {
     if (id.empty())
     {
@@ -51,7 +51,7 @@ CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std:
 }
 
 CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
-    : CategoryImpl(id, title, icon, renderer_template, Category::TapBehavior::ShowPreview, Category::TapBehavior::ShowPreview)
+    : CategoryImpl(id, title, icon, renderer_template, Category::TapBehavior::TapPreview, Category::TapBehavior::TapPreview)
 {
 }
 
@@ -75,14 +75,14 @@ CategoryRenderer const& CategoryImpl::renderer_template() const
     return renderer_template_;
 }
 
-Category::TapBehavior CategoryImpl::single_tap_behavior() const
+Category::TapBehavior CategoryImpl::tap_behavior() const
 {
-    return single_tap_behavior_;
+    return tap_behavior_;
 }
 
-Category::TapBehavior CategoryImpl::long_tap_behavior() const
+Category::TapBehavior CategoryImpl::long_press_behavior() const
 {
-    return long_tap_behavior_;
+    return long_press_behavior_;
 }
 
 VariantMap CategoryImpl::serialize() const
@@ -92,8 +92,8 @@ VariantMap CategoryImpl::serialize() const
     var["title"] = title_;
     var["icon"] = icon_;
     var["renderer_template"] = renderer_template_.data();
-    var["single_tap_behavior"] = static_cast<int>(single_tap_behavior_);
-    var["long_tap_behavior"] = static_cast<int>(long_tap_behavior_);
+    var["tap_behavior"] = static_cast<int>(tap_behavior_);
+    var["long_press_behavior"] = static_cast<int>(long_press_behavior_);
     return var;
 }
 
@@ -120,10 +120,10 @@ void CategoryImpl::deserialize(VariantMap const& variant_map)
         renderer_template_ = CategoryRenderer(it->second.get_string()); // can throw if json is invalid
     }
 
-    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "single_tap_behavior");
-    single_tap_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
-    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "long_tap_behavior");
-    long_tap_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
+    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "tap_behavior");
+    tap_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
+    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "long_press_behavior");
+    long_press_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
 }
 
 } // namespace internal

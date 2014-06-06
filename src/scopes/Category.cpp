@@ -66,14 +66,14 @@ std::string Category::title() const
     return p->title();
 }
 
-Category::TapBehavior Category::single_tap_behavior() const
+Category::TapBehavior Category::tap_behavior() const
 {
-    return p->single_tap_behavior();
+    return p->tap_behavior();
 }
 
-Category::TapBehavior Category::long_tap_behavior() const
+Category::TapBehavior Category::long_press_behavior() const
 {
-    return p->long_tap_behavior();
+    return p->long_press_behavior();
 }
 
 VariantMap Category::serialize() const

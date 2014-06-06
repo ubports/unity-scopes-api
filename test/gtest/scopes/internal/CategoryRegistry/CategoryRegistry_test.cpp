@@ -47,10 +47,10 @@ TEST(CategoryRegistry, basic)
         CategoryRegistry reg;
         CategoryRenderer rdr("{}");
 
-        auto cat = reg.register_category("a", "title", "icon", rdr, Category::TapBehavior::ActivateResult, Category::TapBehavior::Ignore);
+        auto cat = reg.register_category("a", "title", "icon", rdr, Category::TapBehavior::TapActivate, Category::TapBehavior::TapIgnore);
         EXPECT_TRUE(cat != nullptr);
-        EXPECT_EQ(Category::TapBehavior::ActivateResult, cat->single_tap_behavior());
-        EXPECT_EQ(Category::TapBehavior::Ignore, cat->long_tap_behavior());
+        EXPECT_EQ(Category::TapBehavior::TapActivate, cat->tap_behavior());
+        EXPECT_EQ(Category::TapBehavior::TapIgnore, cat->long_press_behavior());
     }
 
  }
