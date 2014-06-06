@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/UniqueID.h>
@@ -451,6 +452,8 @@ public:
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
+        std::string test_scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        ScopeConfig sc(test_scope_config);
         ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
 
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
@@ -464,9 +467,9 @@ public:
 
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
-        exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
+        exec_data.custom_exec = sc.scope_runner();
         exec_data.runtime_config = rt_config;
-        exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        exec_data.scope_config = test_scope_config;
         exec_data.timeout_ms = 1500;
 
         reg->add_local_scope(test_scope_id, move(meta), exec_data);

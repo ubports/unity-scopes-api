@@ -47,6 +47,7 @@ public:
         ScopeExecData() = default;
         ScopeExecData(std::initializer_list<std::string>) = delete;
         std::string scope_id;
+        std::string custom_exec;
         std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
@@ -65,6 +66,7 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) const override;
     virtual MetadataMap list() const override;
     virtual ObjectProxy locate(std::string const& identity) override;
+    virtual bool is_scope_running(std::string const& scope_id) override;
 
     // Local methods
     bool add_local_scope(std::string const& scope_id, ScopeMetadata const& scope,
@@ -72,7 +74,6 @@ public:
     bool remove_local_scope(std::string const& scope_id);
     void set_remote_registry(MWRegistryProxy const& remote_registry);
 
-    bool is_scope_running(std::string const& scope_id);
     StateReceiverObject::SPtr state_receiver();
 
 private:
@@ -87,7 +88,7 @@ private:
             Stopped, Starting, Running, Stopping
         };
 
-        ScopeProcess(ScopeExecData exec_data);
+        ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher);
         ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
@@ -109,12 +110,15 @@ private:
         bool wait_for_state(std::unique_lock<std::mutex>& lock, ProcessState state) const;
         void kill(std::unique_lock<std::mutex>& lock);
 
+        std::vector<std::string> expand_custom_exec();
+
     private:
         const ScopeExecData exec_data_;
         ProcessState state_ = Stopped;
         mutable std::mutex process_mutex_;
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
+        MWPublisher::SPtr reg_publisher_;
     };
 
 private:
@@ -132,7 +136,7 @@ private:
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
 
-    MWPublisher::UPtr publisher_;
+    MWPublisher::SPtr publisher_;
 };
 
 } // namespace internal

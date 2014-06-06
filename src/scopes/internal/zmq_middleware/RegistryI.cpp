@@ -68,7 +68,8 @@ using namespace std::placeholders;
 RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
                       { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
-                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) } })
+                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) },
+                      { "is_scope_running", bind(&RegistryI::is_scope_running_, this, _1, _2, _3) } })
 
 {
 }
@@ -148,6 +149,28 @@ void RegistryI::locate_(Current const&,
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
         locate_response.initRegistryException().setReason(e.reason().c_str());
+    }
+}
+
+void RegistryI::is_scope_running_(Current const&,
+                                  capnp::AnyPointer::Reader& in_params,
+                                  capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Registry::IsScopeRunningRequest>();
+    string scope_id = req.getIdentity().cStr();
+    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
+    try
+    {
+        auto is_running = delegate->is_scope_running(scope_id);
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+        auto is_scope_running_response = r.initPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().initResponse();
+        is_scope_running_response.setReturnValue(is_running);
+    }
+    catch (NotFoundException const& e)
+    {
+        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().initResponse();
+        get_metadata_response.initNotFoundException().setIdentity(e.name().c_str());
     }
 }
 

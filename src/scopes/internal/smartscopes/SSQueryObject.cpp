@@ -206,7 +206,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this(), query->q_cardinality);
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this(), query->q_cardinality, q_base->department_id());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 

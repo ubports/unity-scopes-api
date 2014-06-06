@@ -36,15 +36,22 @@ public:
     ScopesWatcher(unity::scopes::internal::RegistryObject::SPtr registry,
                   std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback);
 
-    void add_install_dir(std::string const& dir);
+    ~ScopesWatcher();
+
+    void add_install_dir(std::string const& dir, bool notify = false);
 
 private:
     unity::scopes::internal::RegistryObject::SPtr const registry_;
     std::function<void(std::pair<std::string, std::string> const&)> const ini_added_callback_;
-    std::map<std::string, std::string> dir_to_ini_map_;
+    std::map<std::string, std::string> sdir_to_ini_map_;
+    std::map<std::string, std::set<std::string>> idir_to_sdirs_map_;
     std::mutex mutex_;
 
-    void add_scope_dir(std::string const& dir);
+    std::string parent_dir(std::string const& child_dir);
+
+    void remove_install_dir(std::string const& dir);
+
+    void add_scope_dir(std::string const& dir, bool notify);
     void remove_scope_dir(std::string const& dir);
 
     void watch_event(DirWatcher::EventType event_type,

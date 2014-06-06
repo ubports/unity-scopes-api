@@ -45,44 +45,7 @@ DirWatcher::DirWatcher()
 
 DirWatcher::~DirWatcher()
 {
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-
-        if (thread_state_ == Failed)
-        {
-            try
-            {
-                std::rethrow_exception(thread_exception_);
-            }
-            catch (std::exception const& e)
-            {
-                std::cerr << "~DirWatcher(): " << e.what() << std::endl;
-            }
-            catch (...)
-            {
-                std::cerr << "~DirWatcher(): watch_thread was aborted due to an unknown exception"
-                          << std::endl;
-            }
-        }
-        else
-        {
-            // Set state to Stopping
-            thread_state_ = Stopping;
-
-            // Remove watches (causes read to return)
-            for (auto& wd : wds_)
-            {
-                inotify_rm_watch(fd_, wd.first);
-            }
-            wds_.clear();
-        }
-    }
-
-    // Wait for thread to terminate
-    if (thread_.joinable())
-    {
-        thread_.join();
-    }
+    cleanup();
 
     // Close the file descriptor
     close(fd_);
@@ -149,6 +112,48 @@ void DirWatcher::remove_watch(std::string const& path)
             wds_.erase(wd.first);
             break;
         }
+    }
+}
+
+void DirWatcher::cleanup()
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        if (thread_state_ == Failed)
+        {
+            try
+            {
+                std::rethrow_exception(thread_exception_);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "~DirWatcher(): " << e.what() << std::endl;
+            }
+            catch (...)
+            {
+                std::cerr << "~DirWatcher(): watch_thread was aborted due to an unknown exception"
+                          << std::endl;
+            }
+        }
+        else
+        {
+            // Set state to Stopping
+            thread_state_ = Stopping;
+
+            // Remove watches (causes read to return)
+            for (auto& wd : wds_)
+            {
+                inotify_rm_watch(fd_, wd.first);
+            }
+            wds_.clear();
+        }
+    }
+
+    // Wait for thread to terminate
+    if (thread_.joinable())
+    {
+        thread_.join();
     }
 }
 

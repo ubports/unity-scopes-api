@@ -298,7 +298,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         {
             throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
         }
-        exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+        exec_data.custom_exec = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
     }
     catch (NotFoundException const&)
     {
