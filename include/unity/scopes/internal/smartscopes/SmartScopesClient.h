@@ -79,10 +79,8 @@ struct DepartmentInfo
     std::string label;
     std::string alternate_label;
     std::string canned_query;
-    bool has_subdepartments;
+    bool has_subdepartments = false;
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
-
-    DepartmentInfo(): has_subdepartments(false) {}
 };
 
 using SearchRequestResults = std::pair<std::shared_ptr<DepartmentInfo>, std::vector<SearchResult>>;
