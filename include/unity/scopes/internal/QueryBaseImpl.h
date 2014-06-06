@@ -63,10 +63,13 @@ public:
 
     void cancel();
     void set_metadata(SearchMetadata const& metadata);
+    void set_department_id(std::string const& department_id);
+    std::string department_id() const;
     bool valid() const;
 
 private:
     SearchMetadata::UPtr search_metadata_;
+    std::string department_id_;
     std::vector<QueryCtrlProxy> subqueries_;
     bool valid_;
     mutable std::mutex mutex_;

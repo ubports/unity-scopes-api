@@ -60,11 +60,14 @@ public:
     {
     }
 
-    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current) override
+    virtual void push(Department::SCPtr const& parent) override
     {
-        EXPECT_EQ(parent->id(), "all");
+        EXPECT_EQ(parent->id(), "");
+        auto subdeps = parent->subdepartments();
+        EXPECT_EQ(1u, subdeps.size());
+        auto current = *subdeps.begin();
         EXPECT_EQ(current->id(), "news");
-        auto subdeps = current->subdepartments();
+        subdeps = current->subdepartments();
         EXPECT_EQ(2u, subdeps.size());
         EXPECT_EQ("subdep1", subdeps.front()->id());
         EXPECT_EQ("Europe", subdeps.front()->label());
