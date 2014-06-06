@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/SearchReplyImpl.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
@@ -97,7 +98,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_);
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, query_base_->department_id());
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
