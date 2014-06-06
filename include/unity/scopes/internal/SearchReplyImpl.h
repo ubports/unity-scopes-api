@@ -56,7 +56,15 @@ public:
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
-                                              CategoryRenderer const& renderer_template) override;
+                                              CategoryRenderer const& renderer_template
+                                              ) override;
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CategoryRenderer const& renderer_template,
+                                              Category::TapBehavior tap_behavior,
+                                              Category::TapBehavior long_press_behavior
+                                              ) override;
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 

@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/internal/CategoryImpl.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -48,9 +49,10 @@ Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_ma
     return cat;
 }
 
-Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template)
+Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const&
+        renderer_template, Category::TapBehavior single_tap_behavior, Category::TapBehavior long_tap_behavior)
 {
-    auto cat = std::shared_ptr<Category>(new Category(id, title, icon, renderer_template));
+    auto cat = std::shared_ptr<Category>(new Category(new internal::CategoryImpl(id, title, icon, renderer_template, single_tap_behavior, long_tap_behavior)));
     register_category(cat);
     return cat;
 }
