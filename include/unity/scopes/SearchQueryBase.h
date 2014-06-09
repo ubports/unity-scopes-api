@@ -113,13 +113,34 @@ public:
                                    SearchListenerBase::SPtr const& reply);
     //@}
 
+    /**
+     \brief Get canned query of this search request.
+
+     \return canned query
+     \throws unity::LogicException if canned query was not initialized (the default ctor was used).
+     */
+    CannedQuery query() const;
+
+    /**
+     \brief Get metadata for this search request.
+     \return search metadata
+     \throws unity::LogicException if search metadata was not initialized (the default ctor was used).
+    */
+    SearchMetadata search_metadata() const;
+
     /// @cond
     virtual ~SearchQueryBase();
     /// @endcond
 
 protected:
-    /// @cond
+    /**
+     \brief Default constructor of SearchQueryBase.
+     \deprecated This ctor is deprecated and will be removed with version 0.6.0. Please use non-default ctor.
+     */
     SearchQueryBase();
+
+    /// @cond
+    SearchQueryBase(CannedQuery const& query, SearchMetadata const& metadata);
     /// @endcond
 };
 

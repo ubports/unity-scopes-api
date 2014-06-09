@@ -78,6 +78,20 @@ public:
     */
     virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this preview
 
+    /**
+     \brief Get result for this preview request.
+     \throws unity::LogicException if result was not initialized (the default ctor was used).
+     \return result
+     */
+    Result result() const;
+
+    /**
+     \brief Get metadata for this preview request.
+     \return search metadata
+     \throws unity::LogicException if preview metadata was not initialized (the default ctor was used).
+    */
+    ActionMetadata action_metadata() const;
+
     // TODO: Add a method for subpreview request?
 
     /// @cond
@@ -85,8 +99,14 @@ public:
     /// @endcond
 
 protected:
-    /// @cond
+    /**
+     \brief Default constructor of SearchQueryBase.
+     \deprecated This ctor is deprecated and will be removed with version 0.6.0. Please use non-default ctor.
+     */
     PreviewQueryBase();
+
+    /// @cond
+    PreviewQueryBase(Result const& result, ActionMetadata const& hints);
     /// @endcond
 };
 
