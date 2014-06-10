@@ -25,6 +25,7 @@
 #include <cstring>
 #include <fstream>
 #include <future>
+#include <utility>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -64,7 +65,7 @@ SearchHandle::~SearchHandle()
     cancel_search();
 }
 
-std::vector<SearchResult> SearchHandle::get_search_results()
+SearchRequestResults SearchHandle::get_search_results()
 {
     return ssc_->get_search_results(search_id_);
 }
@@ -393,7 +394,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
+SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
@@ -424,6 +425,7 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
 
         std::vector<SearchResult> results;
         std::map<std::string, std::shared_ptr<SearchCategory>> categories;
+        std::shared_ptr<DepartmentInfo> departments;
 
         std::vector<std::string> jsons = extract_json_stream(response_str);
 
@@ -489,19 +491,75 @@ std::vector<SearchResult> SmartScopesClient::get_search_results(uint search_id)
                         result.other_params[member] = child_node->get_node(member);
                     }
                 }
-
                 results.push_back(result);
+            }
+            else if (root_node->has_node("departments"))
+            {
+                departments = parse_departments(root_node->get_node("departments"));
             }
         }
 
         std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
-        return results;
+
+        return std::make_pair(departments, results);
     }
     catch (std::exception const& e)
     {
-        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << std::endl;
+        std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << ": " << e.what() << std::endl;
         throw;
     }
+}
+
+std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInterface::SPtr node)
+{
+    static std::array<std::string, 2> const mandatory = { { "label", "canned_query" } };
+    for (auto const& field : mandatory)
+    {
+        if (!node->has_node(field))
+        {
+            std::stringstream err;
+            err << "SmartScopesClient::parse_departments(): missing mandatory department attribute '" << field << "'";
+            throw LogicException(err.str());
+        }
+    }
+
+    auto dep = std::make_shared<DepartmentInfo>();
+    dep->label = node->get_node("label")->as_string();
+    dep->canned_query = node->get_node("canned_query")->as_string();
+
+    if (node->has_node("alternate_label"))
+    {
+        dep->alternate_label = node->get_node("alternate_label")->as_string();
+    }
+    if (node->has_node("has_subdepartments"))
+    {
+        dep->has_subdepartments = node->get_node("has_subdepartments")->as_bool();
+    }
+
+    if (node->has_node("subdepartments"))
+    {
+        auto const subdeps = node->get_node("subdepartments");
+        for (int i = 0; i < subdeps->size(); ++i)
+        {
+            auto child = subdeps->get_node(i);
+            try
+            {
+                dep->subdepartments.push_back(parse_departments(child));
+            }
+            catch (std::exception const& e)
+            {
+                // error in one subdepartment is not critical - just ignore it
+                std::cerr << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '" << dep->label << "': " << e.what() << std::endl;
+            }
+        }
+        if(subdeps->size() > 0 && dep->subdepartments.size() == 0)
+        {
+            std::stringstream err;
+            err << "SmartScopesClient::parse_departments(): Failed to parse subdepartments of department '" << dep->label;
+            throw LogicException(err.str());
+        }
+    }
+    return dep;
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)
@@ -517,7 +575,7 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
             auto it = query_results_.find(preview_id);
             if (it == query_results_.end())
             {
-                throw unity::LogicException("No preivew for query " + std::to_string(preview_id) + " is active");
+                throw unity::LogicException("No preview for query " + std::to_string(preview_id) + " is active");
             }
 
             query_result = it->second;
