@@ -46,6 +46,7 @@ namespace smartscopes
 {
 
 class SSQueryObject;
+class SSScopeObject;
 
 } // namespace smartscopes
 
@@ -113,6 +114,7 @@ private:
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
     friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata()
+    friend class internal::smartscopes::SSScopeObject;
 };
 
 } // namespace scopes
