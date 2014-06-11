@@ -107,11 +107,10 @@ public:
 
 private:
     void standard_query(unity::scopes::SearchReplyProxy const& reply) {
-        unity::scopes::Department::SPtr parent = unity::scopes::Department::create("all", query_, "All Departments");
-        unity::scopes::Department::SPtr news_dep = unity::scopes::Department::create("news", query_, "News");
-        news_dep->set_subdepartments({
-            unity::scopes::Department::create("subdep1", query_, "Europe"),
-            unity::scopes::Department::create("subdep2", query_, "US")});
+        using namespace unity::scopes;
+        Department::SPtr parent = Department::create("all", query_, "All Departments");
+        Department::SPtr news_dep = Department::create("news", query_, "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
         parent->set_subdepartments({news_dep});
         reply->register_departments(parent);
 
