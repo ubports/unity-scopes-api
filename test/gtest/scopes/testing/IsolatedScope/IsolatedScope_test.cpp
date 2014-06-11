@@ -28,6 +28,7 @@
 #include <unity/scopes/testing/MockPreviewReply.h>
 #include <unity/scopes/testing/MockSearchReply.h>
 #include <unity/scopes/testing/MockScope.h>
+#include <unity/scopes/testing/MockQueryCtrl.h>
 
 #include <unity/scopes/CategoryRenderer.h>
 

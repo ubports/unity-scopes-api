@@ -22,8 +22,11 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ScopeMetadata.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchReply.h>
 
 #include "scope.h"
@@ -32,8 +35,6 @@
 
 namespace testing
 {
-
-using namespace unity::scopes;
 
 class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
@@ -62,11 +63,32 @@ public:
     }
 };
 
+class SearchListener : public unity::scopes::SearchListenerBase
+{
+public:
+    SearchListener(unity::scopes::SearchReplyProxy const& reply, unity::scopes::Category::SCPtr const& category)
+        : reply_(reply), category_(category)
+    {
+    }
+
+    void finished(unity::scopes::ListenerBase::Reason, std::string const&) override {
+    }
+
+    void push(unity::scopes::CategorisedResult result) override {
+        result.set_category(category_);
+        reply_->push(result);
+    }
+
+private:
+    unity::scopes::SearchReplyProxy reply_;
+    unity::scopes::Category::SCPtr category_;
+};
+
 class Query : public unity::scopes::SearchQueryBase
 {
 public:
-    Query(unity::scopes::CannedQuery const& query)
-        : query_(query)
+    Query(unity::scopes::CannedQuery const& query, unity::scopes::RegistryProxy const& registry)
+        : query_(query), registry_(registry)
     {
     }
 
@@ -76,9 +98,20 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        Department::SPtr parent = Department::create("all", query_, "All Departments");
-        Department::SPtr news_dep = Department::create("news", query_, "News");
-        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
+        if (query_.query_string() == "aggregator test") {
+            aggregator_query(reply);
+        } else {
+            standard_query(reply);
+        }
+    }
+
+private:
+    void standard_query(unity::scopes::SearchReplyProxy const& reply) {
+        unity::scopes::Department::SPtr parent = unity::scopes::Department::create("all", query_, "All Departments");
+        unity::scopes::Department::SPtr news_dep = unity::scopes::Department::create("news", query_, "News");
+        news_dep->set_subdepartments({
+            unity::scopes::Department::create("subdep1", query_, "Europe"),
+            unity::scopes::Department::create("subdep2", query_, "US")});
         parent->set_subdepartments({news_dep});
         reply->register_departments(parent);
 
@@ -96,8 +129,16 @@ public:
         reply->push(annotation);
     }
 
-private:
+    void aggregator_query(unity::scopes::SearchReplyProxy const& reply) {
+        const auto childscope = registry_->get_metadata("child").proxy();
+        auto cat = reply->register_category("cat1", "Category 1", "");
+        unity::scopes::SearchListenerBase::SPtr listener(
+            new SearchListener(reply, cat));
+        subsearch(childscope, query_.query_string(), listener);
+    }
+
     unity::scopes::CannedQuery query_;
+    unity::scopes::RegistryProxy registry_;
 };
 
 class Preview : public unity::scopes::PreviewQueryBase
@@ -120,8 +161,9 @@ public:
 
 } // namespace testing
 
-int testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &)
+int testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &registry)
 {
+    registry_ = registry;
     return VERSION;
 }
 
@@ -137,7 +179,8 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
+
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, registry_));
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
