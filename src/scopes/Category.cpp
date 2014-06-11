@@ -37,11 +37,6 @@ Category::Category(VariantMap const& variant_map)
 {
 }
 
-Category::Category(internal::CategoryImpl *impl)
-    : p(impl)
-{
-}
-
 Category::~Category()
 {
 }
@@ -64,16 +59,6 @@ CategoryRenderer const& Category::renderer_template() const
 std::string Category::title() const
 {
     return p->title();
-}
-
-Category::TapBehavior Category::tap_behavior() const
-{
-    return p->tap_behavior();
-}
-
-Category::TapBehavior Category::long_press_behavior() const
-{
-    return p->long_press_behavior();
 }
 
 VariantMap Category::serialize() const

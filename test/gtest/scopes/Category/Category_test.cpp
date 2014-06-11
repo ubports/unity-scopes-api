@@ -40,8 +40,6 @@ TEST(Category, basic)
     EXPECT_EQ("title", cat->title());
     EXPECT_EQ("icon", cat->icon());
     EXPECT_EQ("{\"a\":1}", cat->renderer_template().data());
-    EXPECT_EQ(Category::TapBehavior::TapPreview, cat->tap_behavior());
-    EXPECT_EQ(Category::TapBehavior::TapPreview, cat->long_press_behavior());
 }
 
 TEST(Category, serialize)
@@ -55,8 +53,6 @@ TEST(Category, serialize)
         EXPECT_EQ("title", vm["title"].get_string());
         EXPECT_EQ("icon", vm["icon"].get_string());
         EXPECT_EQ("{\"a\":1}", vm["renderer_template"].get_string());
-        EXPECT_EQ(Category::TapBehavior::TapPreview, static_cast<Category::TapBehavior>(vm["tap_behavior"].get_int()));
-        EXPECT_EQ(Category::TapBehavior::TapPreview, static_cast<Category::TapBehavior>(vm["long_press_behavior"].get_int()));
     }
 }
 
@@ -67,8 +63,6 @@ TEST(Category, deserialize)
     vm["title"] = "title";
     vm["icon"] = "icon";
     vm["renderer_template"] = "{\"a\":1}";
-    vm["tap_behavior"] = static_cast<int>(Category::TapBehavior::TapActivate);
-    vm["long_press_behavior"] = static_cast<int>(Category::TapBehavior::TapIgnore);
 
     CategoryRegistry reg;
     auto cat = reg.register_category(vm);
@@ -77,6 +71,4 @@ TEST(Category, deserialize)
     EXPECT_EQ("title", cat->title());
     EXPECT_EQ("icon", cat->icon());
     EXPECT_EQ("{\"a\":1}", cat->renderer_template().data());
-    EXPECT_EQ(Category::TapBehavior::TapIgnore, static_cast<Category::TapBehavior>(cat->long_press_behavior()));
-    EXPECT_EQ(Category::TapBehavior::TapActivate, static_cast<Category::TapBehavior>(cat->tap_behavior()));
 }
