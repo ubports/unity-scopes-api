@@ -2,6 +2,7 @@ unity-scopes-api (0.5.0-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pawel Stolowski ]
   * Implemented ValueSliderFilter.
+  * Changes to departments API.
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 23 May 2014 17:49:42 +0200
 
@@ -24,18 +25,6 @@ unity-scopes-api (0.4.8+14.10.20140604.1-0ubuntu1) utopic; urgency=medium
     #1326068)
 
  -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 04 Jun 2014 13:03:56 +0000
-
-unity-scopes-api (0.4.8-0ubuntu1) UNRELEASED; urgency=medium
-
-  [ Pawel Stolowski ]
-  * Changes to departments API.
-
-  [ Marcus Tomlinson ]
-  * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
-  * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
-  * Added is_scope_running(), set_scope_state_callback() and set_update_callback() to Registry.
-
- -- Marcus Tomlinson <marcustomlinson@ubuntu>  Wed, 28 May 2014 17:08:45 +0200
 
 unity-scopes-api (0.4.7+14.10.20140522-0ubuntu1) utopic; urgency=low
 
