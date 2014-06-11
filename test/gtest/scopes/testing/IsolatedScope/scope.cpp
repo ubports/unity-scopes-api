@@ -178,7 +178,6 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &)
 {
-
     return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, registry_));
 }
 
