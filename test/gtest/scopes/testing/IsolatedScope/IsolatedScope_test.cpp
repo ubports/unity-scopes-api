@@ -192,6 +192,18 @@ TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
 
     auto push_childscope_results =
         [queryctrl_proxy](Unused, Unused, unity::scopes::SearchListenerBase::SPtr const& listener) -> unity::scopes::QueryCtrlProxy {
+        unity::scopes::Category::SCPtr cat(
+            new unity::scopes::testing::Category(
+                "id", "title", "icon", unity::scopes::CategoryRenderer()));
+        listener->push(cat);
+
+        unity::scopes::CategorisedResult result(cat);
+        result.set_uri("uri");
+        result.set_title("title");
+        result.set_art("art");
+        result.set_dnd_uri("dnd_uri");
+        listener->push(result);
+
         listener->finished(unity::scopes::ListenerBase::Finished, "");
         return queryctrl_proxy;
     };
