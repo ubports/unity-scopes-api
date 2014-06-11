@@ -172,6 +172,75 @@ TEST_F(TestScopeFixture,
     search_query->run(search_reply_proxy);
 }
 
+TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
+{
+    using namespace ::testing;
+
+    const std::string aggregator_query{"aggregator test"};
+
+    const std::string id{"does.not.exist.id"};
+    const std::string title{"does.not.exist.title"};
+    const std::string icon{"does.not.exist.icon"};
+    const std::string display_name{"does.not.exist.display_name"};
+    const std::string description{"does.not.exist.description"};
+    const std::string author{"does.not.exist.author"};
+    const unity::scopes::CategoryRenderer renderer{};
+
+    NiceMock<unity::scopes::testing::MockQueryCtrl> queryctrl;
+    unity::scopes::QueryCtrlProxy queryctrl_proxy(
+        &queryctrl, [](unity::scopes::QueryCtrl*) {});
+
+    auto push_childscope_results =
+        [queryctrl_proxy](Unused, Unused, unity::scopes::SearchListenerBase::SPtr const& listener) -> unity::scopes::QueryCtrlProxy {
+        listener->finished(unity::scopes::ListenerBase::Finished, "");
+        return queryctrl_proxy;
+    };
+
+    NiceMock<unity::scopes::testing::MockScope> childscope;
+    EXPECT_CALL(childscope, search(aggregator_query, _, _))
+        .WillOnce(Invoke(push_childscope_results));
+    unity::scopes::ScopeProxy childscope_proxy(
+        &childscope, [](unity::scopes::Scope*) {});
+
+    EXPECT_CALL(registry, get_metadata("child"))
+        .WillOnce(Return(
+                      unity::scopes::testing::ScopeMetadataBuilder()
+                      .scope_id("child")
+                      .proxy(childscope_proxy)
+                      .display_name(display_name)
+                      .description(description)
+                      .author(author)
+                      ()));
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    EXPECT_CALL(reply, register_category(_, _, _, _))
+            .Times(1)
+            .WillOnce(
+                Return(
+                    unity::scopes::Category::SCPtr
+                    {
+                        new unity::scopes::testing::Category
+                        {
+                            id, title, icon, renderer
+                        }
+                    }));
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(_)))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    unity::scopes::SearchReplyProxy search_reply_proxy(
+        &reply, [](unity::scopes::SearchReply*) {});
+
+    unity::scopes::CannedQuery query(scope_id);
+    query.set_query_string(aggregator_query);
+    unity::scopes::SearchMetadata meta_data{default_locale, default_form_factor};
+
+    auto search_query = scope->search(query, meta_data);
+    ASSERT_NE(nullptr, search_query);
+    //search_query->set_metadata(meta_data);
+    search_query->run(search_reply_proxy);
+}
+
 TEST_F(TestScopeFixture, previewing_a_result_works)
 {
     using namespace ::testing;
