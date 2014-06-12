@@ -80,6 +80,10 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         scope_directory_.reset(new string(*other.scope_directory_));
     }
+    if (other.settings_json_)
+    {
+        settings_json_.reset(new string(*other.settings_json_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -100,6 +104,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         appearance_attributes_ = rhs.appearance_attributes_;
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
         results_ttl_type_ = rhs.results_ttl_type_;
+        settings_json_.reset(rhs.settings_json_ ? new string(*rhs.settings_json_) : nullptr);
     }
     return *this;
 }
@@ -193,6 +198,16 @@ ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
     return results_ttl_type_;
 }
 
+std::string ScopeMetadataImpl::settings_json() const
+{
+    if (settings_json_)
+    {
+        cerr << "ScopeMetadataImpl::settings_json" << endl;
+        return *settings_json_;
+    }
+    throw NotFoundException("attribute not set", "settings_json");
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -256,6 +271,12 @@ void ScopeMetadataImpl::set_scope_directory(std::string const& path)
 void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl)
 {
     results_ttl_type_ = results_ttl;
+}
+
+void ScopeMetadataImpl::set_settings_json(std::string const& settings_json)
+{
+    cerr << "ScopeMetadataImpl::set_settings_json" << endl;
+    settings_json_.reset(new string(settings_json));
 }
 
 namespace
@@ -324,6 +345,10 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (results_ttl_type_ != ScopeMetadata::ResultsTtlType::None)
     {
         var["results_ttl_type"] = (int) results_ttl_type_;
+    }
+    if (settings_json_)
+    {
+        var["settings_json"] = *settings_json_;
     }
 
     return var;
@@ -433,6 +458,12 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
                             + std::to_string(tmp));
         }
         results_ttl_type_ = (ScopeMetadata::ResultsTtlType) tmp;
+    }
+
+    it = var.find("settings_json");
+    if (it != var.end())
+    {
+        settings_json_.reset(new string(it->second.get_string()));
     }
 }
 

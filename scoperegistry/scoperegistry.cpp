@@ -35,12 +35,15 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <map>
 #include <set>
 #include <libgen.h>
 #include <unistd.h>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 using namespace scoperegistry;
 using namespace std;
@@ -235,6 +238,20 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
+    filesystem::path settings_json_path(scope_dir / (scope.first + ".json"));
+
+    if (filesystem::exists(settings_json_path))
+    {
+        ifstream in(settings_json_path.native(), ios::in | ios::binary);
+        if (in)
+        {
+            ostringstream contents;
+            contents << in.rdbuf();
+            in.close();
+            mi->set_settings_json(contents.str());
+            cerr << contents.str() << endl;
+        }
+    }
 
     mi->set_scope_id(scope.first);
     mi->set_display_name(sc.display_name());
@@ -286,7 +303,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     if (click)
     {
         exec_data.confinement_profile =
-                scope_path.parent_path().filename().native();
+                scope_dir.filename().native();
     }
 
     exec_data.timeout_ms = timeout_ms;
