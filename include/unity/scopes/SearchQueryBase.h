@@ -42,6 +42,7 @@ namespace internal
 
 class QueryBaseImpl;
 class QueryObject;
+class SearchQueryBaseImpl;
 
 } // namespace internal
 
@@ -142,6 +143,9 @@ protected:
     /// @cond
     SearchQueryBase(CannedQuery const& query, SearchMetadata const& metadata);
     /// @endcond
+
+private:
+    internal::SearchQueryBaseImpl* fwd() const;
 };
 
 } // namespace scopes

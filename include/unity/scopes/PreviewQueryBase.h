@@ -83,14 +83,14 @@ public:
      \throws unity::LogicException if result was not initialized (the default ctor was used).
      \return result
      */
-    Result result() const;
+    //Result result() const;
 
     /**
      \brief Get metadata for this preview request.
      \return search metadata
      \throws unity::LogicException if preview metadata was not initialized (the default ctor was used).
     */
-    ActionMetadata action_metadata() const;
+    //ActionMetadata action_metadata() const;
 
     // TODO: Add a method for subpreview request?
 
@@ -106,7 +106,7 @@ protected:
     PreviewQueryBase();
 
     /// @cond
-    PreviewQueryBase(Result const& result, ActionMetadata const& hints);
+    //PreviewQueryBase(Result const& result, ActionMetadata const& hints);
     /// @endcond
 };
 
