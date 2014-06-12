@@ -202,7 +202,6 @@ std::string ScopeMetadataImpl::settings_json() const
 {
     if (settings_json_)
     {
-        cerr << "ScopeMetadataImpl::settings_json" << endl;
         return *settings_json_;
     }
     throw NotFoundException("attribute not set", "settings_json");
@@ -275,7 +274,6 @@ void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType resul
 
 void ScopeMetadataImpl::set_settings_json(std::string const& settings_json)
 {
-    cerr << "ScopeMetadataImpl::set_settings_json" << endl;
     settings_json_.reset(new string(settings_json));
 }
 
