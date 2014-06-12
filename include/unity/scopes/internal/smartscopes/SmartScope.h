@@ -20,6 +20,7 @@
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/SearchReply.h>
@@ -78,6 +79,22 @@ public:
         }
     }
 
+    Department::SCPtr create_department(std::shared_ptr<DepartmentInfo const> const& deptinfo)
+    {
+        CannedQuery const query = CannedQuery::from_uri(deptinfo->canned_query);
+        Department::SPtr dep = Department::create(query, deptinfo->label);
+        if (!deptinfo->alternate_label.empty())
+        {
+            dep->set_alternate_label(deptinfo->alternate_label);
+        }
+        dep->set_has_subdepartments(deptinfo->has_subdepartments);
+        for (auto const& d: deptinfo->subdepartments)
+        {
+            dep->add_subdepartment(create_department(d));
+        }
+        return dep;
+    }
+
     virtual void run(SearchReplyProxy const& reply) override
     {
         if (search_handle_ == nullptr)
@@ -86,10 +103,25 @@ public:
             return;
         }
 
-        std::vector<SearchResult> results = search_handle_->get_search_results();
+        SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
-        for (auto& result : results)
+        if (results.first) // are there any departments?
+        {
+            try
+            {
+                auto const& deptinfo = results.first;
+                Department::SCPtr root = create_department(deptinfo);
+                reply->register_departments(root);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': "
+                    << e.what() << std::endl;
+            }
+        }
+
+        for (auto& result : results.second)
         {
             if (!result.category)
             {
