@@ -166,6 +166,14 @@ public:
     */
     ResultsTtlType results_ttl_type() const;
 
+    /**
+    \brief Get JSON represeting the scope configuration.
+
+    \throws unity::scopes::NotFoundException if directory is not set
+    \return JSON string
+    */
+    std::string settings_json() const;
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

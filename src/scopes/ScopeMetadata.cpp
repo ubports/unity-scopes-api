@@ -137,6 +137,11 @@ ScopeMetadata::ResultsTtlType ScopeMetadata::results_ttl_type() const
     return p->results_ttl_type();
 }
 
+std::string ScopeMetadata::settings_json() const
+{
+    return p->settings_json();
+}
+
 //! @endcond
 
 } // namespace scopes
