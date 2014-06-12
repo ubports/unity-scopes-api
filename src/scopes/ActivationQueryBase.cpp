@@ -27,8 +27,7 @@ namespace scopes
 
 /// @cond
 ActivationQueryBase::ActivationQueryBase() :
-    QueryBase(),
-    p(new internal::ActivationQueryBaseImpl())
+    QueryBase(new internal::ActivationQueryBaseImpl())
 {
 }
 

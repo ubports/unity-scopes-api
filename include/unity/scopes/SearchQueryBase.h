@@ -40,9 +40,15 @@ class SearchMetadata;
 namespace internal
 {
 
-class QueryBaseImpl;
-class QueryObject;
 class SearchQueryBaseImpl;
+
+namespace smartscopes
+{
+
+class SSScopeObject;
+class SSQueryObject;
+
+}
 
 } // namespace internal
 
@@ -140,6 +146,14 @@ protected:
 
 private:
     internal::SearchQueryBaseImpl* fwd() const;
+
+    void set_department_id(std::string const& department_id);
+    std::string department_id() const;
+
+    friend class internal::QueryObject;                    // So QueryObject can call cancel() and set_department_id()
+    friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata() and set_department_id()
+    friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
+    friend class internal::smartscopes::SSScopeObject;     // So SSQueryObject can call set_department_id()
 };
 
 } // namespace scopes

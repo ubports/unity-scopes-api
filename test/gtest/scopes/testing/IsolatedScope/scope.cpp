@@ -100,6 +100,11 @@ public:
 class Preview : public unity::scopes::PreviewQueryBase
 {
 public:
+    Preview(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata)
+        : unity::scopes::PreviewQueryBase(result, metadata)
+    {
+    }
+
     void cancelled() override
     {
     }
@@ -154,8 +159,8 @@ unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const &)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview());
+    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview(result, metadata));
 }

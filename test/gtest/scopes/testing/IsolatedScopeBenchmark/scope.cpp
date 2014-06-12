@@ -113,9 +113,12 @@ struct Preview : public unity::scopes::PreviewQueryBase
     std::mt19937& gen;
     std::normal_distribution<>& normal;
 
-    Preview(std::mt19937& gen,
+    Preview(unity::scopes::Result const& result,
+            unity::scopes::ActionMetadata const& metadata,
+            std::mt19937& gen,
             std::normal_distribution<>& normal)
-        : gen(gen),
+        : unity::scopes::PreviewQueryBase(result, metadata),
+          gen(gen),
           normal(normal)
     {
     }
@@ -181,8 +184,8 @@ unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const &)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::PreviewQueryBase::UPtr{new testing::Preview(gen, normal)};
+    return unity::scopes::PreviewQueryBase::UPtr{new testing::Preview(result, metadata, gen, normal)};
 }

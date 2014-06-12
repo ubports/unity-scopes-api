@@ -27,9 +27,28 @@ namespace scopes
 namespace internal
 {
 
+using namespace std;
+
+ActivationQueryBaseImpl::ActivationQueryBaseImpl():
+    QueryBaseImpl(),
+    valid_(true)
+{}
+
 ActivationResponse ActivationQueryBaseImpl::activate()
 {
     return ActivationResponse(ActivationResponse::Status::NotHandled);
+}
+
+void ActivationQueryBaseImpl::cancel()
+{
+    lock_guard<mutex> lock(mutex_);
+    valid_ = false;
+}
+
+bool ActivationQueryBaseImpl::valid() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return valid_;
 }
 
 } // namespace internal

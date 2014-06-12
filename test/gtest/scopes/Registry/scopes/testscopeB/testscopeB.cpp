@@ -53,8 +53,8 @@ public:
 class MyPreview : public PreviewQueryBase
 {
 public:
-    MyPreview(string const& uri) :
-        uri_(uri)
+    MyPreview(Result const& result, ActionMetadata const& metadata) :
+        PreviewQueryBase(result, metadata)
     {
     }
 
@@ -72,9 +72,6 @@ public:
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
         reply->push(widgets);
     }
-
-private:
-    string uri_;
 };
 
 class MyScope : public ScopeBase
@@ -93,9 +90,9 @@ public:
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview(result.uri()));
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata));
         return preview;
     }
 };

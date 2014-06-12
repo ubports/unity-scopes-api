@@ -171,14 +171,14 @@ class SmartPreview : public PreviewQueryBase
 {
 public:
     SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
-        : scope_id_(scope_id)
-        , result_(result)
+        : PreviewQueryBase(result, hints)
+        , scope_id_(scope_id)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, widgets_api_version, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
+        preview_handle_ = ss_client->preview(base_url, result["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
     }
 
     ~SmartPreview()
@@ -225,12 +225,11 @@ public:
 
         reply->push(widget_list);
 
-        std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result_.uri() << "\" complete" << std::endl;
+        std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
     }
 
 private:
     std::string scope_id_;
-    Result result_;
     PreviewHandle::UPtr preview_handle_;
 };
 
@@ -259,9 +258,9 @@ public:
     {
     }
 
-    QueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
+    SearchQueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
     {
-        QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
+        SearchQueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
     }

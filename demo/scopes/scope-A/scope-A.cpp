@@ -98,16 +98,16 @@ private:
 class MyPreview : public PreviewQueryBase
 {
 public:
-    MyPreview(string const& scope_id, string const& uri) :
-        scope_id_(scope_id),
-        uri_(uri)
+    MyPreview(Result const& result, ActionMetadata const& metadata, string const& scope_id) :
+        PreviewQueryBase(result, metadata),
+        scope_id_(scope_id)
     {
-        cerr << scope_id_ << ": preview instance for \"" << uri << "\" created" << endl;
+        cerr << scope_id_ << ": preview instance for \"" << result.uri() << "\" created" << endl;
     }
 
     ~MyPreview()
     {
-        cerr << scope_id_ << ": preview instance for \"" << uri_ << "\" destroyed" << endl;
+        cerr << scope_id_ << ": preview instance for \"" << result().uri() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -150,12 +150,11 @@ public:
         {
             return;  // Query was cancelled
         }
-        cerr << "scope-A: preview for \"" << uri_ << "\" complete" << endl;
+        cerr << "scope-A: preview for \"" << result().uri() << "\" complete" << endl;
     }
 
 private:
     string scope_id_;
-    string uri_;
 };
 
 class MyScope : public ScopeBase
@@ -175,9 +174,9 @@ public:
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview(scope_id_, result.uri()));
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata, scope_id_));
         cerr << "scope-A: created previewer: \"" << result.uri() << "\"" << endl;
         return preview;
     }

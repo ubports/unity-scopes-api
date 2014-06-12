@@ -29,11 +29,6 @@ namespace scopes
 {
 
 /// @cond
-QueryBase::QueryBase() :
-    p(new internal::QueryBaseImpl)
-{
-}
-
 QueryBase::QueryBase(internal::QueryBaseImpl* impl)
     : p(impl)
 {
@@ -49,21 +44,6 @@ void QueryBase::cancel()
     cancelled();    // Inform this query that it was cancelled
 }
 /// @endcond
-
-void QueryBase::set_metadata(SearchMetadata const& metadata)
-{
-    p->set_metadata(metadata);
-}
-
-void QueryBase::set_department_id(std::string const& department_id)
-{
-    p->set_department_id(department_id);
-}
-
-std::string QueryBase::department_id() const
-{
-    return p->department_id();
-}
 
 bool QueryBase::valid() const
 {

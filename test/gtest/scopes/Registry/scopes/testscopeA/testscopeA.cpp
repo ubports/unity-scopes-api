@@ -47,6 +47,11 @@ public:
 class MyPreview : public PreviewQueryBase
 {
 public:
+    MyPreview(Result const& result, ActionMetadata const& metadata)
+        : PreviewQueryBase(result, metadata)
+    {
+    }
+
     virtual void cancelled() override
     {
     }
@@ -72,9 +77,9 @@ public:
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview());
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata));
         return preview;
     }
 };

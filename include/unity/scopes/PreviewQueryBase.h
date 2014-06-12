@@ -34,9 +34,13 @@ namespace unity
 namespace scopes
 {
 
+class Result;
+class ActionMetadata;
+
 namespace internal
 {
 
+class PreviewQueryBaseImpl;
 class QueryBaseImpl;
 class QueryObject;
 
@@ -83,14 +87,14 @@ public:
      \throws unity::LogicException if result was not initialized (the default ctor was used).
      \return result
      */
-    //Result result() const;
+    Result result() const;
 
     /**
      \brief Get metadata for this preview request.
      \return search metadata
      \throws unity::LogicException if preview metadata was not initialized (the default ctor was used).
     */
-    //ActionMetadata action_metadata() const;
+    ActionMetadata action_metadata() const;
 
     // TODO: Add a method for subpreview request?
 
@@ -99,15 +103,10 @@ public:
     /// @endcond
 
 protected:
-    /**
-     \brief Default constructor of SearchQueryBase.
-     \deprecated This ctor is deprecated and will be removed with version 0.6.0. Please use non-default ctor.
-     */
-    PreviewQueryBase();
+    PreviewQueryBase(Result const& result, ActionMetadata const& metadata);
 
-    /// @cond
-    //PreviewQueryBase(Result const& result, ActionMetadata const& hints);
-    /// @endcond
+private:
+    internal::PreviewQueryBaseImpl* fwd() const;
 };
 
 } // namespace scopes

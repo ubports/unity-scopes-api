@@ -40,6 +40,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
