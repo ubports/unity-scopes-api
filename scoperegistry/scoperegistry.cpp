@@ -249,7 +249,6 @@ void add_local_scope(RegistryObject::SPtr const& registry,
             contents << in.rdbuf();
             in.close();
             mi->set_settings_json(contents.str());
-            cerr << contents.str() << endl;
         }
     }
 
