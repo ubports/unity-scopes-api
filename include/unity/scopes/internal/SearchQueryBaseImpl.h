@@ -36,6 +36,8 @@ class SearchQueryBaseImpl : public QueryBaseImpl
 {
 public:
     SearchQueryBaseImpl(CannedQuery const& query, SearchMetadata const& metadata);
+    CannedQuery query() const;
+    SearchMetadata search_metadata() const;
 
 private:
     const CannedQuery canned_query_;

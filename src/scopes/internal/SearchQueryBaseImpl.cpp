@@ -34,6 +34,16 @@ SearchQueryBaseImpl::SearchQueryBaseImpl(CannedQuery const& query, SearchMetadat
 {
 }
 
+CannedQuery SearchQueryBaseImpl::query() const
+{
+    return canned_query_;
+}
+
+SearchMetadata SearchQueryBaseImpl::search_metadata() const
+{
+    return search_metadata_;
+}
+
 } // namespace internal
 
 } // namespace scopes

@@ -102,6 +102,7 @@ public:
 protected:
     /// @cond
     QueryBase();
+    QueryBase(internal::QueryBaseImpl* impl);
     void cancel();
     std::unique_ptr<internal::QueryBaseImpl> p;
     /// @endcond

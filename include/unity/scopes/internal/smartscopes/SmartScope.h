@@ -46,7 +46,8 @@ class SmartQuery : public SearchQueryBase
 {
 public:
     SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)
-        : scope_id_(scope_id)
+        : SearchQueryBase(query, hints),
+          scope_id_(scope_id)
         , query_(query)
     {
         static const std::string no_net_hint("no-internet");

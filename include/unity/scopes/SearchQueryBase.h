@@ -134,12 +134,6 @@ public:
     /// @endcond
 
 protected:
-    /**
-     \brief Default constructor of SearchQueryBase.
-     \deprecated This ctor is deprecated and will be removed with version 0.6.0. Please use non-default ctor.
-     */
-    SearchQueryBase();
-
     /// @cond
     SearchQueryBase(CannedQuery const& query, SearchMetadata const& metadata);
     /// @endcond

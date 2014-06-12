@@ -34,6 +34,11 @@ QueryBase::QueryBase() :
 {
 }
 
+QueryBase::QueryBase(internal::QueryBaseImpl* impl)
+    : p(impl)
+{
+}
+
 QueryBase::~QueryBase()
 {
 }

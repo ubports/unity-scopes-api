@@ -36,6 +36,11 @@ namespace scopes
 class TestQuery : public SearchQueryBase
 {
 public:
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
+    {
+    }
+
     virtual void cancelled() override {}
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -90,9 +95,9 @@ public:
 
     virtual void run() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override
     {
-        return SearchQueryBase::UPtr(new TestQuery());
+        return SearchQueryBase::UPtr(new TestQuery(query, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override

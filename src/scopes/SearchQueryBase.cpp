@@ -31,10 +31,6 @@ namespace scopes
 {
 
 /// @cond
-SearchQueryBase::SearchQueryBase() : QueryBase()
-{
-}
-
 SearchQueryBase::~SearchQueryBase()
 {
 }

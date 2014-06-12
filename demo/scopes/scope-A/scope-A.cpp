@@ -31,16 +31,16 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(string const& scope_id, CannedQuery const& query) :
-        scope_id_(scope_id),
-        query_(query)
+    MyQuery(string const& scope_id, CannedQuery const& query, SearchMetadata const& metadata) :
+        SearchQueryBase(query, metadata),
+        scope_id_(scope_id)
     {
         cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     ~MyQuery()
     {
-        cerr << scope_id_ << ": query instance for \"" << query_.query_string() << "\" destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -54,10 +54,10 @@ public:
             return;  // Query was cancelled
         }
 
-        Department::SPtr all_depts = Department::create("all", query_, "All departments");
-        Department::SPtr news_dept = Department::create("news", query_, "News");
-        news_dept->set_subdepartments({Department::create("news-world", query_, "World"), Department::create("news-europe", query_, "Europe")});
-        all_depts->set_subdepartments({news_dept, Department::create("sport", query_, "Sport")});
+        Department::SPtr all_depts = Department::create("all", query(), "All departments");
+        Department::SPtr news_dept = Department::create("news", query(), "News");
+        news_dept->set_subdepartments({Department::create("news-world", query(), "World"), Department::create("news-europe", query(), "Europe")});
+        all_depts->set_subdepartments({news_dept, Department::create("sport", query(), "Sport")});
         reply->register_departments(all_depts);
 
         Filters filters;
@@ -75,7 +75,7 @@ public:
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
         CategorisedResult res(cat);
         res.set_uri("uri");
-        res.set_title("scope-A: result 1 for query \"" + query_.query_string() + "\"");
+        res.set_title("scope-A: result 1 for query \"" + query().query_string() + "\"");
         res.set_art("icon");
         res.set_dnd_uri("dnd_uri");
         if (!reply->push(res))
@@ -83,17 +83,16 @@ public:
             return;  // Query was cancelled
         }
 
-        CannedQuery q("scope-A", query_.query_string(), "");
+        CannedQuery q("scope-A", query().query_string(), "");
         Annotation annotation(Annotation::Type::Link);
         annotation.add_link("More...", q);
         reply->push(annotation);
 
-        cerr << "scope-A: query \"" << query_.query_string() << "\" complete" << endl;
+        cerr << "scope-A: query \"" << query().query_string() << "\" complete" << endl;
     }
 
 private:
     string scope_id_;
-    CannedQuery query_;
 };
 
 class MyPreview : public PreviewQueryBase
@@ -170,9 +169,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q));
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata));
         return query;
     }
 

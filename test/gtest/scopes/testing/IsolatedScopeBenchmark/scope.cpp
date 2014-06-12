@@ -85,9 +85,11 @@ struct Query : public unity::scopes::SearchQueryBase
     std::mt19937& gen;
     std::normal_distribution<>& normal;
 
-    Query(std::mt19937& gen,
-          std::normal_distribution<>& normal)
-        : gen(gen),
+    Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata,
+            std::mt19937& gen,
+            std::normal_distribution<>& normal)
+        : unity::scopes::SearchQueryBase(query, metadata),
+          gen(gen),
           normal(normal)
     {
     }
@@ -156,10 +158,10 @@ void testing::Scope::run()
 }
 
 unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
-        unity::scopes::CannedQuery const&,
-        unity::scopes::SearchMetadata const &)
+        unity::scopes::CannedQuery const& query,
+        unity::scopes::SearchMetadata const& metadata)
 {
-    return unity::scopes::SearchQueryBase::UPtr{new testing::Query(gen, normal)};
+    return unity::scopes::SearchQueryBase::UPtr{new testing::Query(query, metadata, gen, normal)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(

@@ -65,8 +65,8 @@ public:
 class Query : public unity::scopes::SearchQueryBase
 {
 public:
-    Query(unity::scopes::CannedQuery const& query)
-        : query_(query)
+    Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata)
+        : unity::scopes::SearchQueryBase(query, metadata)
     {
     }
 
@@ -76,9 +76,9 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        Department::SPtr parent = Department::create("all", query_, "All Departments");
-        Department::SPtr news_dep = Department::create("news", query_, "News");
-        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
+        Department::SPtr parent = Department::create("all", query(), "All Departments");
+        Department::SPtr news_dep = Department::create("news", query(), "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query(), "Europe"), Department::create("subdep2", query(), "US")});
         parent->set_subdepartments({news_dep});
         reply->register_departments(parent);
 
@@ -90,14 +90,11 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
+        unity::scopes::CannedQuery q("scope-A", "foo", "dep1");
         unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
-        annotation.add_link("Link1", query);
+        annotation.add_link("Link1", q);
         reply->push(annotation);
     }
-
-private:
-    unity::scopes::CannedQuery query_;
 };
 
 class Preview : public unity::scopes::PreviewQueryBase
@@ -135,9 +132,9 @@ void testing::Scope::run()
 
 unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
-        unity::scopes::SearchMetadata const &)
+        unity::scopes::SearchMetadata const &metadata)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata));
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(

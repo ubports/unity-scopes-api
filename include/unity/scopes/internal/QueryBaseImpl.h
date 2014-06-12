@@ -36,11 +36,11 @@ namespace scopes
 namespace internal
 {
 
-class QueryBaseImpl final
+class QueryBaseImpl
 {
 public:
     QueryBaseImpl();
-    ~QueryBaseImpl();
+    virtual ~QueryBaseImpl();
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
