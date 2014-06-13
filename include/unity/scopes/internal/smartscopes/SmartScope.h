@@ -235,6 +235,12 @@ private:
 
 class NullActivation : public ActivationQueryBase
 {
+public:
+    NullActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+
     ActivationResponse activate() override
     {
         return ActivationResponse(ActivationResponse::Status::NotHandled);
@@ -243,6 +249,12 @@ class NullActivation : public ActivationQueryBase
 
 class SmartActivation : public ActivationQueryBase
 {
+public:
+    SmartActivation(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
+        : ActivationQueryBase(result, metadata, widget_id, action_id)
+    {
+    }
+
     ActivationResponse activate() override
     {
         ///! TODO: need SSS endpoint for this
@@ -272,15 +284,15 @@ public:
         return preview;
     }
 
-    ActivationQueryBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
+    ActivationQueryBase::UPtr activate(std::string const&, Result const& result, ActionMetadata const& metadata)
     {
-        ActivationQueryBase::UPtr activation(new NullActivation());
+        ActivationQueryBase::UPtr activation(new NullActivation(result, metadata));
         return activation;
     }
 
-    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
+    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
     {
-        ActivationQueryBase::UPtr activation(new SmartActivation());
+        ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, widget_id, action_id));
         std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return activation;
     }

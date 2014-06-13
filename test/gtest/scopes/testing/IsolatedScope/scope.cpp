@@ -38,7 +38,8 @@ using namespace unity::scopes;
 class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
 public:
-    ActivationShowingDash()
+    ActivationShowingDash(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) :
+        unity::scopes::ActivationQueryBase(result, metadata)
     {
     }
 
@@ -52,7 +53,9 @@ public:
 class LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
 public:
-    LongRunningActivation()
+    LongRunningActivation(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata, std::string const& widget_id,
+            std::string const& action_id) :
+        unity::scopes::ActivationQueryBase(result, metadata, widget_id, action_id)
     {
     }
 
@@ -143,19 +146,19 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(result, metadata)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&,
-        std::string const&,
-        std::string const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata,
+        std::string const& widget_id,
+        std::string const& action_id)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(result, metadata, widget_id, action_id)};
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(

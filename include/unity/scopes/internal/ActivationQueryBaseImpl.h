@@ -21,6 +21,8 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/ActivationResponse.h>
+#include <unity/scopes/Result.h>
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/util/NonCopyable.h>
 
 namespace unity
@@ -37,14 +39,23 @@ class ActivationQueryBaseImpl : public QueryBaseImpl
 public:
     NONCOPYABLE(ActivationQueryBaseImpl);
 
-    ActivationQueryBaseImpl();
+    ActivationQueryBaseImpl(Result const& result, ActionMetadata const& metadata, std::string const& widget_id = "", std::string const& action_id = "");
     ~ActivationQueryBaseImpl() = default;
     ActivationResponse activate();
+
+    Result result() const;
+    ActionMetadata action_metadata() const;
+    std::string widget_id() const;
+    std::string action_id() const;
 
     void cancel() override;
     bool valid() const override;
 
 private:
+    Result result_;
+    const ActionMetadata metadata_;
+    const std::string widget_id_;
+    const std::string action_id_;
     bool valid_;
     mutable std::mutex mutex_;
 };

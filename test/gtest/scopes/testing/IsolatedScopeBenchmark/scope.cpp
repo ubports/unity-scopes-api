@@ -38,9 +38,12 @@ struct ActivationShowingDash : public unity::scopes::ActivationQueryBase
     std::mt19937& gen;
     std::normal_distribution<>& normal;
 
-    ActivationShowingDash(std::mt19937& gen,
+    ActivationShowingDash(unity::scopes::Result const& result,
+                          unity::scopes::ActionMetadata const& metadata,
+                          std::mt19937& gen,
                           std::normal_distribution<>& normal)
-        : gen(gen),
+        : ActivationQueryBase(result, metadata),
+          gen(gen),
           normal(normal)
     {
     }
@@ -61,9 +64,14 @@ struct LongRunningActivation : public unity::scopes::ActivationQueryBase
     std::mt19937& gen;
     std::normal_distribution<>& normal;
 
-    LongRunningActivation(std::mt19937& gen,
+    LongRunningActivation(unity::scopes::Result const& result,
+                          unity::scopes::ActionMetadata const& metadata,
+                          std::string const& widget_id,
+                          std::string const& action_id,
+                          std::mt19937& gen,
                           std::normal_distribution<>& normal)
-        : gen(gen),
+        : ActivationQueryBase(result, metadata, widget_id, action_id),
+          gen(gen),
           normal(normal)
     {
     }
@@ -168,19 +176,19 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(gen, normal)};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(result, metadata, gen, normal)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&,
-        std::string const&,
-        std::string const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata,
+        std::string const& widget_id,
+        std::string const& action_id)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(gen, normal)};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(result, metadata, widget_id, action_id, gen, normal)};
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(

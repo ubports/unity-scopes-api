@@ -13,7 +13,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Michi Henning <michi.henning@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #ifndef UNITY_INTERNAL_SEARCHQUERYBASEIMPL_H

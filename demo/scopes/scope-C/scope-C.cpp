@@ -169,6 +169,12 @@ private:
 
 class MyActivation : public ActivationQueryBase
 {
+public:
+    MyActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+
     ActivationResponse activate() override
     {
         return ActivationResponse(ActivationResponse::Status::ShowDash);
@@ -229,10 +235,10 @@ public:
         return SearchQueryBase::UPtr(new MyQuery(scope_id_, q, metadata, queue));
     }
 
-    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override
     {
         cerr << scope_id_ << ": activate: \"" << result.uri() << "\"" << endl;
-        return ActivationQueryBase::UPtr(new MyActivation());
+        return ActivationQueryBase::UPtr(new MyActivation(result, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
