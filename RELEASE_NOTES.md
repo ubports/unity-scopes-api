@@ -12,6 +12,10 @@ Changes in version 0.5.0
 
   - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
 
+  - Changed constructor of SearchQueryBase to take CannedQuery and SearchMetadata arguments.
+    Changed constructor of PreviewQueryBase to take Result and ActionMetadata arguments. Changed ActivationQueryBase constructor to take Result, widget id and
+    action id argument. All the constructor arguments and then available via respective getters of the base classes.
+
 Changes in version 0.4.8
 ========================
   - Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories, and added API to subscribe to changes in registry.
