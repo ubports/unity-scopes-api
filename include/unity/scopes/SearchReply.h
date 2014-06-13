@@ -53,7 +53,7 @@ public:
       <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
       <li>create a Department node for parent of current department (if applicable - not when in root department), and attach current Department node to it with
       unity::scopes::Department::set_subdepartments() method.
-      <li>register a unity::scopes::DepartmentList that has just the parent department in it.
+      <li>register the parent department with unity::scopes::SearchReply::register_departments().
       </ul>
 
      For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
@@ -73,15 +73,20 @@ public:
      the root deparment.
 
      \param parent The parent department of current department, or current one if visiting root department.
-     \param current Currently visited department.
+     \throws unity::LogicException if departments are invalid (nullptr passed, current department not present in the parent's tree, duplicated department ids present in the tree).
      */
     virtual void register_departments(Department::SCPtr const& parent) = 0;
 
     /**
-    \brief Register an existing category instance and send it to the source of the query.
+    \brief Register new category and send it to the source of the query.
 
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
-    results and categories from other scope(s).
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param renderer_template The renderer template to be used for results in this category
+
+    \return The category instance
+    \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
@@ -89,9 +94,34 @@ public:
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
-    \brief Returns a previously registered category.
-    \return The category instance or `nullptr` if the category does not exist registered.
+    \brief Register new category and send it to the source of the query.
+
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param renderer_template The renderer template to be used for results in this category
+    \param tap_behavior The default behavior for tap on the result from this category.
+    \param long_press_behavior The default behavior of long press on to preview the result.
+
+     The default behaviour of both tap and long press is to show a preview.
+     Changing the default behaviour is not recommended.
+
+     \return The category instance
+     */
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CategoryRenderer const& renderer_template,
+                                              Category::TapBehavior tap_behavior,
+                                              Category::TapBehavior long_press_behavior) = 0;
+
+    /**
+    \brief Register an existing category instance and send it to the source of the query.
+
+    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
+    results and categories from other scope(s).
     */
+
     virtual void register_category(Category::SCPtr category) = 0;
 
     /**

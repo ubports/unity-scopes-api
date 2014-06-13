@@ -165,6 +165,16 @@ void QueryBaseImpl::cancel()
     vector<QueryCtrlProxy>().swap(subqueries_);
 }
 
+void QueryBaseImpl::set_department_id(std::string const& department_id)
+{
+    department_id_ = department_id;
+}
+
+std::string QueryBaseImpl::department_id() const
+{
+    return department_id_;
+}
+
 bool QueryBaseImpl::valid() const
 {
     lock_guard<mutex> lock(mutex_);
