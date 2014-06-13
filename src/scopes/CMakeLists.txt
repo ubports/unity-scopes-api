@@ -43,6 +43,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ValueSliderFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Version.cpp

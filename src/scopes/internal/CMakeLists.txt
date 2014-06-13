@@ -71,9 +71,11 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ValueSliderFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

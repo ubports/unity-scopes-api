@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/internal/CategoryImpl.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
 
 namespace unity
@@ -33,10 +34,13 @@ CategoryImpl::CategoryImpl(VariantMap const& variant_map)
     deserialize(variant_map);
 }
 
-CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template, Category::TapBehavior
+            tap_behavior, Category::TapBehavior long_press_behavior)
     : id_(id),
       title_(title),
       icon_(icon),
+      tap_behavior_(tap_behavior),
+      long_press_behavior_(long_press_behavior),
       renderer_template_(renderer_template)
 {
     if (id.empty())
@@ -44,6 +48,11 @@ CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std:
         throw InvalidArgumentException("Category id must not be empty");
     }
     // it's ok if title and icon are empty.
+}
+
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+    : CategoryImpl(id, title, icon, renderer_template, Category::TapBehavior::TapPreview, Category::TapBehavior::TapPreview)
+{
 }
 
 std::string const& CategoryImpl::id() const
@@ -66,6 +75,16 @@ CategoryRenderer const& CategoryImpl::renderer_template() const
     return renderer_template_;
 }
 
+Category::TapBehavior CategoryImpl::tap_behavior() const
+{
+    return tap_behavior_;
+}
+
+Category::TapBehavior CategoryImpl::long_press_behavior() const
+{
+    return long_press_behavior_;
+}
+
 VariantMap CategoryImpl::serialize() const
 {
     VariantMap var;
@@ -73,16 +92,14 @@ VariantMap CategoryImpl::serialize() const
     var["title"] = title_;
     var["icon"] = icon_;
     var["renderer_template"] = renderer_template_.data();
+    var["tap_behavior"] = static_cast<int>(tap_behavior_);
+    var["long_press_behavior"] = static_cast<int>(long_press_behavior_);
     return var;
 }
 
 void CategoryImpl::deserialize(VariantMap const& variant_map)
 {
-    auto it = variant_map.find("id");
-    if (it == variant_map.end())
-    {
-        throw InvalidArgumentException("Missing 'id'");
-    }
+    auto it = find_or_throw("CategoryImpl::deserialize()", variant_map, "id");
     id_ = it->second.get_string();
 
     it = variant_map.find("title");
@@ -102,6 +119,11 @@ void CategoryImpl::deserialize(VariantMap const& variant_map)
     {
         renderer_template_ = CategoryRenderer(it->second.get_string()); // can throw if json is invalid
     }
+
+    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "tap_behavior");
+    tap_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
+    it = find_or_throw("CategoryImpl::deserialize()", variant_map, "long_press_behavior");
+    long_press_behavior_ = static_cast<Category::TapBehavior>(it->second.get_int());
 }
 
 } // namespace internal

@@ -46,6 +46,7 @@ namespace smartscopes
 {
 
 class SSQueryObject;
+class SSScopeObject;
 
 } // namespace smartscopes
 
@@ -107,10 +108,13 @@ protected:
 
 private:
     void set_metadata(SearchMetadata const& metadata);
+    void set_department_id(std::string const& department_id);
+    std::string department_id() const;
 
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
-    friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata()
+    friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata() and set_department_id()
+    friend class internal::smartscopes::SSScopeObject;     // So SSQueryObject can call set_department_id()
 };
 
 } // namespace scopes

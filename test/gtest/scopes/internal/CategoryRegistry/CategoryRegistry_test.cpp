@@ -30,17 +30,29 @@ using namespace unity::scopes::internal;
 
 TEST(CategoryRegistry, basic)
 {
-    CategoryRegistry reg;
     {
+        CategoryRegistry reg;
         CategoryRenderer rdr;
         EXPECT_EQ(nullptr, reg.lookup_category("a"));
         auto cat = reg.register_category("a", "title", "icon", rdr);
         EXPECT_TRUE(cat != nullptr);
+        EXPECT_EQ("a", cat->id());
 
         auto cat1 = reg.lookup_category("a");
         EXPECT_TRUE(cat1 != nullptr);
         EXPECT_TRUE(cat == cat1);
     }
+
+    {
+        CategoryRegistry reg;
+        CategoryRenderer rdr("{}");
+
+        auto cat = reg.register_category("a", "title", "icon", rdr, Category::TapBehavior::TapActivate, Category::TapBehavior::TapIgnore);
+        EXPECT_TRUE(cat != nullptr);
+        EXPECT_EQ(Category::TapBehavior::TapActivate, cat->tap_behavior());
+        EXPECT_EQ(Category::TapBehavior::TapIgnore, cat->long_press_behavior());
+    }
+
  }
 
 TEST(CategoryRegistry, exceptions)

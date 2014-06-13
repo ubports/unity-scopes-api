@@ -53,9 +53,16 @@ DepartmentImpl::DepartmentImpl(std::string const& department_id, CannedQuery con
     query_.set_department_id(department_id);
 }
 
-void DepartmentImpl::set_has_subdepartments()
+void DepartmentImpl::set_has_subdepartments(bool subdepartments)
 {
-    has_subdepartments_ = true;
+    if (departments_.size() > 0 && !subdepartments)
+    {
+        std::stringstream err;
+        err << "DepartmentImpl::set_has_subdepartments(): cannot set has_subdepartments flag to false when subdepartments list is not empty department '" <<
+                query_.department_id() << "'";
+        throw LogicException(err.str());
+    }
+    has_subdepartments_ = subdepartments;
 }
 
 void DepartmentImpl::set_subdepartments(DepartmentList const& departments)
@@ -206,16 +213,11 @@ void DepartmentImpl::validate_departments(Department::SCPtr const& department, s
     }
 }
 
-void DepartmentImpl::validate_departments(Department::SCPtr const& parent, Department::SCPtr const& current)
+void DepartmentImpl::validate_departments(Department::SCPtr const& parent)
 {
     if (parent == nullptr)
     {
         throw unity::LogicException("DepartmentImpl::validate_departments(): invalid null parent department");
-    }
-
-    if (current == nullptr)
-    {
-        throw unity::LogicException("DepartmentImpl::validate_departments(): invalid null current department");
     }
 
     if (parent->subdepartments().size() == 0)
@@ -225,17 +227,22 @@ void DepartmentImpl::validate_departments(Department::SCPtr const& parent, Depar
             << parent->id() << "'";
         throw unity::LogicException(str.str());
     }
+}
+
+void DepartmentImpl::validate_departments(Department::SCPtr const& parent, std::string const& current_id)
+{
+    validate_departments(parent);
 
     // don't allow duplicated department ids.
     std::unordered_set<std::string> lookup;
     validate_departments(parent, lookup);
-    if (parent != current)
+    if (parent->id() != current_id)
     {
         // ensure that current department matches one of the (sub)departments
-        if (lookup.find(current->id()) == lookup.end())
+        if (lookup.find(current_id) == lookup.end())
         {
             std::stringstream str;
-            str << "DepartmentImpl::validate_departments(): current department '" << current->id() <<
+            str << "DepartmentImpl::validate_departments(): current department '" << current_id <<
                 "' doesn't match any of the subdepartments of parent '" << parent->id() << "'";
             throw unity::LogicException(str.str());
         }
@@ -262,11 +269,10 @@ Department::SCPtr DepartmentImpl::find_subdepartment_by_id(Department::SCPtr con
     return nullptr;
 }
 
-VariantMap DepartmentImpl::serialize_departments(Department::SCPtr const& parent, Department::SCPtr const& current)
+VariantMap DepartmentImpl::serialize_departments(Department::SCPtr const& parent)
 {
     VariantMap vm;
     vm["departments"] = Variant(parent->serialize());
-    vm["current_department"] = current->id();
     return vm;
 }
 

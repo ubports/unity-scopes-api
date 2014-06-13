@@ -19,12 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSUBSCRIBER_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSUBSCRIBER_H
 
-#include <unity/scopes/internal/MWSubscriber.h>
-
-#include <zmqpp/context.hpp>
-
 #include <condition_variable>
 #include <thread>
+#include <unity/scopes/internal/MWSubscriber.h>
+#include <zmqpp/context.hpp>
 
 namespace unity
 {
@@ -48,7 +46,6 @@ public:
     virtual ~ZmqSubscriber();
 
     std::string endpoint() const override;
-    void set_message_callback(SubscriberCallback callback) override;
 
 private:
     enum ThreadState
@@ -56,7 +53,7 @@ private:
         NotRunning,
         Running,
         Stopping,
-        Failed
+        Stopped
     };
 
     zmqpp::context* const context_;
@@ -69,8 +66,6 @@ private:
     std::condition_variable cond_;
     ThreadState thread_state_;
     std::exception_ptr thread_exception_;
-
-    SubscriberCallback callback_;
 
     void subscriber_thread();
 };

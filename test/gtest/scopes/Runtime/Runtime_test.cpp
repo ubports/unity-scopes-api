@@ -60,11 +60,14 @@ public:
     {
     }
 
-    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current) override
+    virtual void push(Department::SCPtr const& parent) override
     {
-        EXPECT_EQ(parent->id(), "all");
+        EXPECT_EQ(parent->id(), "");
+        auto subdeps = parent->subdepartments();
+        EXPECT_EQ(1u, subdeps.size());
+        auto current = *subdeps.begin();
         EXPECT_EQ(current->id(), "news");
-        auto subdeps = current->subdepartments();
+        subdeps = current->subdepartments();
         EXPECT_EQ(2u, subdeps.size());
         EXPECT_EQ("subdep1", subdeps.front()->id());
         EXPECT_EQ("Europe", subdeps.front()->label());
@@ -363,6 +366,9 @@ TEST(Runtime, early_cancel)
     auto proxy = mw->create_scope_proxy("SlowCreateScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
 
+    // Allow some time for the middleware to start up.
+    this_thread::sleep_for(chrono::milliseconds(200));
+
     // Check that, if a cancel is sent before search() returns on the server side, the
     // cancel is correctly forwarded to the scope once the real reply proxy arrives
     // over the wire.
@@ -379,7 +385,7 @@ TEST(Runtime, early_cancel)
     // of waiting for the cancel message from the scope. Allow some time for the
     // cancel to reach the scope before shutting down the run time, so the scope
     // can test that it received the cancel.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(300));
 }
 
 void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)

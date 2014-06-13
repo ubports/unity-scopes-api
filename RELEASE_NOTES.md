@@ -1,16 +1,25 @@
 Release notes
 =============
 
+Changes in version 0.5.0
+========================
+  - Implemented ValueSliderFilter.
+
+  - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,
+    and uses Department::SCPtr for it. SearchListenerBase::push() method for departments got changed to match as well. Removed
+    constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
+    pointers instead of values. Changed Department::set_has_subdepartments() method to take bool value (true by default).
+
+  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+
 Changes in version 0.4.8
 ========================
-  - Changes to departments API: SearchReply::register_departments() method now takes parent and current department argument,
-    and uses Department::SCPtr for both. SearchListenerBase::push() method for departments got changed to match as well. Removed
-    constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
-    pointers instead of values.
+  - Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories, and added API to subscribe to changes in registry.
 
 Changes in version 0.4.7
 ========================
   - Implemented RatingFilter and RadioButtonsFilter.
+
   - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
     instead of shared pointers.
 

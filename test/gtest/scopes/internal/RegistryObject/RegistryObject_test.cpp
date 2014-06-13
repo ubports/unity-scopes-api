@@ -39,10 +39,11 @@ namespace
 class MockExecutor: public virtual Executor
 {
 public:
-    MOCK_METHOD4(exec, core::posix::ChildProcess(const std::string&,
+    MOCK_METHOD5(exec, core::posix::ChildProcess(const std::string&,
                     const std::vector<std::string>&,
                     const std::map<std::string, std::string>&,
-                    const core::posix::StandardStream&));
+                    const core::posix::StandardStream&,
+                    const std::string&));
 };
 
 class MockObject: public virtual Object
@@ -52,7 +53,7 @@ public:
 
     MOCK_METHOD0(identity, std::string());
 
-    MOCK_METHOD0(category, std::string());
+    MOCK_METHOD0(target_category, std::string());
 
     MOCK_METHOD0(timeout, int64_t());
 
@@ -97,7 +98,8 @@ class TestRegistryObject: public Test
 {
 public:
     core::posix::ChildProcess mock_exec(const string&, const vector<string>&,
-            const map<string, string>&, const core::posix::StandardStream&)
+            const map<string, string>&, const core::posix::StandardStream&,
+            const string&)
     {
         t_start.reset(new thread(pretend_started, registry->state_receiver()));
         return dummy_process;
@@ -162,7 +164,7 @@ protected:
         exec_data.confinement_profile = confinement_profile;
         exec_data.timeout_ms = 1500;
 
-        registry.reset(new RegistryObject(*death_observer(), executor));
+        registry.reset(new RegistryObject(*death_observer(), executor, nullptr));
         registry->add_local_scope("scope-id", meta, exec_data);
         registry->locate("scope-id");
         EXPECT_TRUE(registry->is_scope_running("scope-id"));
@@ -187,7 +189,8 @@ TEST_F(TestRegistryObject, basic)
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
                     {   "/path/runtime.ini", "/path/scope.ini"}, _,
-                    StandardStream::stdin | StandardStream::stdout)).WillOnce(
+                    StandardStream::stdin | StandardStream::stdout,
+                    string())).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));
 
     run_registry(string());
@@ -196,9 +199,10 @@ TEST_F(TestRegistryObject, basic)
 TEST_F(TestRegistryObject, confined)
 {
     EXPECT_CALL(*executor,
-            exec("/usr/sbin/aa-exec", vector<string>
-                    {   "-p", "confinement profile", "/path/scoperunner", "/path/runtime.ini",
-                        "/path/scope.ini"}, _, StandardStream::stdin | StandardStream::stdout)).WillOnce(
+            exec("/path/scoperunner", vector<string>
+                    {   "/path/runtime.ini", "/path/scope.ini"}, _,
+                    StandardStream::stdin | StandardStream::stdout,
+                    "confinement profile")).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));
 
     run_registry("confinement profile");

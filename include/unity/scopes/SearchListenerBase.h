@@ -61,11 +61,11 @@ public:
     /// @endcond
 
     /**
-    \brief Called at most once by the scopes run time for a list of departments returned by a query.
+    \brief Called at most once by the scopes run time for a tree of departments returned by a query.
 
     The default implementation does nothing.
     */
-    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current);
+    virtual void push(Department::SCPtr const& parent);
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
@@ -86,7 +86,7 @@ public:
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
     */
-    virtual void push(Category::SCPtr category);
+    virtual void push(Category::SCPtr const& category);
 
     /**
     \brief Called once by the scopes to send all the filters and their state.

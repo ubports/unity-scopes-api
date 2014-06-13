@@ -128,14 +128,13 @@ public:
     {
     }
 
-    virtual void push(Department::SCPtr const& parent, Department::SCPtr const& current) override
+    virtual void push(Department::SCPtr const& parent) override
     {
         cout << "\treceived departments:" << endl;
         cout << to_string(parent);
-        cout << "\tcurrent department=" << current->id() << endl;
     }
 
-    virtual void push(Category::SCPtr category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cout << "received category: id=" << category->id()
              << " title=" << category->title()

@@ -22,6 +22,8 @@
 #include <unity/scopes/FilterOption.h>
 #include <unity/scopes/RadioButtonsFilter.h>
 #include <unity/scopes/RatingFilter.h>
+#include <unity/scopes/SwitchFilter.h>
+#include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -173,6 +175,30 @@ TEST(Filters, deserialize)
         auto f = internal::FilterBaseImpl::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<RatingFilter const>(f) != nullptr);
         EXPECT_EQ("rating", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        SwitchFilter::SPtr filter1 = SwitchFilter::create("f1", "Latest");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<SwitchFilter const>(f) != nullptr);
+        EXPECT_EQ("switch", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 0.0f, 100.0f);
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<ValueSliderFilter const>(f) != nullptr);
+        EXPECT_EQ("value_slider", f->filter_type());
 
         const Filters filters {filter1};
         EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));

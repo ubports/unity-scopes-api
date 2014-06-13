@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/UniqueID.h>
@@ -100,7 +101,7 @@ TEST(RegistryI, get_metadata)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     Executor::SPtr executor = make_shared<Executor>();
-    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor));
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor, middleware));
     auto registry = middleware->add_registry_object(identity, ro);
     auto p = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
     EXPECT_TRUE(ro->add_local_scope("scope1", move(make_meta("scope1", p, middleware)),
@@ -123,7 +124,7 @@ TEST(RegistryI, list)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     Executor::SPtr executor = make_shared<Executor>();
-    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor));
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor, middleware));
     auto registry = middleware->add_registry_object(identity, ro);
 
     auto r = runtime->registry();
@@ -172,7 +173,7 @@ TEST(RegistryI, add_remove)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     Executor::SPtr executor = make_shared<Executor>();
-    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor));
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor, middleware));
     auto registry = middleware->add_registry_object(identity, ro);
 
     auto r = runtime->registry();
@@ -224,7 +225,7 @@ TEST(RegistryI, exceptions)
 
     MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
     Executor::SPtr executor = make_shared<Executor>();
-    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor));
+    RegistryObject::SPtr ro(make_shared<RegistryObject>(*scope.death_observer, executor, middleware));
     RegistryObject::ScopeExecData dummy_exec_data;
     auto registry = middleware->add_registry_object(identity, ro);
     auto proxy = middleware->create_scope_proxy("scope1", "ipc:///tmp/scope1");
@@ -286,7 +287,7 @@ class MockRegistryObject : public RegistryObject
 {
 public:
     MockRegistryObject(core::posix::ChildProcess::DeathObserver& death_observer)
-        : RegistryObject(death_observer, make_shared<Executor>())
+        : RegistryObject(death_observer, make_shared<Executor>(), nullptr)
     {
     }
 
@@ -393,7 +394,7 @@ public:
         mw = rt->factory()->find(reg_id, mw_kind);
 
         Executor::SPtr executor = make_shared<Executor>();
-        reg = RegistryObject::SPtr(new RegistryObject(*scope.death_observer, executor));
+        reg = RegistryObject::SPtr(new RegistryObject(*scope.death_observer, executor, mw));
         mw->add_registry_object(reg_id, reg);
         mw->add_state_receiver_object("StateReceiver", reg->state_receiver());
 
@@ -451,6 +452,8 @@ public:
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
+        std::string test_scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        ScopeConfig sc(test_scope_config);
         ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
 
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
@@ -464,9 +467,9 @@ public:
 
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
-        exec_data.scoperunner_path = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB";
+        exec_data.custom_exec = sc.scope_runner();
         exec_data.runtime_config = rt_config;
-        exec_data.scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        exec_data.scope_config = test_scope_config;
         exec_data.timeout_ms = 1500;
 
         reg->add_local_scope(test_scope_id, move(meta), exec_data);
@@ -604,7 +607,7 @@ TEST_F(RegistryTest, locate_rebinding)
     // wait for the SIGCHLD signal to reach the registry
     while (reg->is_scope_running(scope_ids[0]))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
 
     // check that we now have no running scopes
@@ -673,7 +676,7 @@ TEST_F(RegistryTest, locate_custom_exec)
     // wait for the SIGCHLD signal to reach the registry
     while (reg->is_scope_running("testscopeB"))
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
     }
 
     // check that we now have no running scopes

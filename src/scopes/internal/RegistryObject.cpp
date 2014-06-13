@@ -19,13 +19,16 @@
 #include <unity/scopes/internal/RegistryObject.h>
 
 #include <unity/scopes/internal/MWRegistry.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/ResourcePtr.h>
 
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
 #include <cassert>
+#include <wordexp.h>
 
 using namespace std;
 
@@ -38,7 +41,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor)
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+                               MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -58,6 +62,17 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
       },
       executor_(executor)
 {
+    if (middleware)
+    {
+        try
+        {
+            publisher_ = middleware->create_publisher(middleware->runtime()->registry_identity());
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "RegistryObject(): failed to create registry publisher: " << e.what() << endl;
+        }
+    }
 }
 
 RegistryObject::~RegistryObject()
@@ -186,6 +201,19 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     return proxy;
 }
 
+bool RegistryObject::is_scope_running(std::string const& scope_id)
+{
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    auto it = scope_processes_.find(scope_id);
+    if (it != scope_processes_.end())
+    {
+        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+    }
+
+    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
+}
+
 bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata const& metadata,
                                      ScopeExecData const& exec_data)
 {
@@ -208,7 +236,13 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));
-    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data)));
+    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data, publisher_)));
+
+    if (publisher_)
+    {
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
+    }
     return return_value;
 }
 
@@ -224,26 +258,24 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
     lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
-    return scopes_.erase(scope_id) == 1;
+
+    if (scopes_.erase(scope_id) == 1)
+    {
+        if (publisher_)
+        {
+            // Send a blank message to subscribers to inform them that the registry has been updated
+            publisher_->send_message("");
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
     remote_registry_ = remote_registry;
-}
-
-bool RegistryObject::is_scope_running(std::string const& scope_id)
-{
-    lock_guard<decltype(mutex_)> lock(mutex_);
-
-    auto it = scope_processes_.find(scope_id);
-    if (it != scope_processes_.end())
-    {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
-    }
-
-    throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
 }
 
 StateReceiverObject::SPtr RegistryObject::state_receiver()
@@ -286,13 +318,15 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
-RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data)
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
     : exec_data_(exec_data)
+    , reg_publisher_(publisher)
 {
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
     : exec_data_(other.exec_data_)
+    , reg_publisher_(other.reg_publisher_)
 {
 }
 
@@ -362,16 +396,21 @@ void RegistryObject::ScopeProcess::exec(
     std::string program;
     std::vector<std::string> argv;
 
-    if (exec_data_.confinement_profile.empty())
+    // Check if this scope has specified a custom executable
+    auto custom_exec_args = expand_custom_exec();
+    if (!custom_exec_args.empty())
     {
-        program = exec_data_.scoperunner_path;
-        argv = {exec_data_.runtime_config, exec_data_.scope_config};
+        program = custom_exec_args[0];
+        for (size_t i = 1; i < custom_exec_args.size(); ++i)
+        {
+            argv.push_back(custom_exec_args[i]);
+        }
     }
     else
     {
-        program = "/usr/sbin/aa-exec";
-        argv = {"-p", exec_data_.confinement_profile, exec_data_.scoperunner_path,
-                exec_data_.runtime_config, exec_data_.scope_config};
+        // No custom_exec was provided, use the default scoperunner
+        program = exec_data_.scoperunner_path;
+        argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
     }
 
     std::map<std::string, std::string> env;
@@ -382,7 +421,8 @@ void RegistryObject::ScopeProcess::exec(
 
     {
         process_ = executor->exec(program, argv, env,
-                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout);
+                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
+                                     exec_data_.confinement_profile);
         if (process_.pid() <= 0)
         {
             clear_handle_unlocked();
@@ -449,26 +489,50 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
     {
         return;
     }
-    else if (state == Running && state_ != Starting)
+    else if (state == Running)
     {
-        cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
-             << "\" started manually" << endl;
+        if (reg_publisher_)
+        {
+            // Send a "started" message to subscribers to inform them that this scope (topic) has started
+            reg_publisher_->send_message("started", exec_data_.scope_id);
+        }
 
-        // Don't update state, treat this scope as not running if a locate() is requested
-        return;
+        if (state_ != Starting)
+        {
+            cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
+                 << "\" started manually" << endl;
+
+            // Don't update state, treat this scope as not running if a locate() is requested
+            return;
+        }
+    }
+    else if (state == Stopped)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
+        if (state_ != Stopping)
+        {
+            cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+                 << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
+        }
     }
     else if (state == Stopping && state_ != Running)
     {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" terminated" << endl;
 
         // Don't update state, treat this scope as not running if a locate() is requested
         return;
-    }
-    else if (state == Stopped && state_ != Stopping)
-    {
-        cerr << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
-             << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
     }
     state_ = state;
     state_change_cond_.notify_all();
@@ -518,6 +582,54 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
         clear_handle_unlocked();
         throw;
     }
+}
+
+std::vector<std::string> RegistryObject::ScopeProcess::expand_custom_exec()
+{
+    // Check first that custom_exec has been set
+    if (exec_data_.custom_exec.empty())
+    {
+        // custom_exec is empty, so simply return an empty vector
+        return std::vector<std::string>();
+    }
+
+    wordexp_t exp;
+    std::vector<std::string> command_args;
+
+    // Split command into program and args
+    if (wordexp(exec_data_.custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+
+        command_args.push_back(exp.we_wordv[0]);
+        for (uint i = 1; i < exp.we_wordc; ++i)
+        {
+            std::string arg = exp.we_wordv[i];
+            // Replace "%R" placeholders with the runtime config
+            if (arg == "%R")
+            {
+                command_args.push_back(exec_data_.runtime_config);
+            }
+            // Replace "%S" placeholders with the scope config
+            else if (arg == "%S")
+            {
+                command_args.push_back(exec_data_.scope_config);
+            }
+            // Else simply append next word as an argument
+            else
+            {
+                command_args.push_back(arg);
+            }
+        }
+    }
+    else
+    {
+        // Something went wrong in parsing the command line, throw exception
+        throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): Invalid custom scoperunner command: \""
+                                       + exec_data_.custom_exec + "\"");
+    }
+
+    return command_args;
 }
 
 } // namespace internal

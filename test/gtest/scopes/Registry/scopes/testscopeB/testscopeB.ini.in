@@ -6,5 +6,5 @@ Author = Canonical Ltd.
 Icon = data/scope-B.Icon
 SearchHint = scope-B.SearchHint
 HotKey = scope-B.HotKey
-ScopeRunner = @CMAKE_CURRENT_BINARY_DIR@/testscopeB
+ScopeRunner = @CMAKE_CURRENT_BINARY_DIR@/testscopeB "unused arg 1" %S %R unused' 'arg' '2
 IdleTimeout = 2

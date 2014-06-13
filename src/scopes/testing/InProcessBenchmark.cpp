@@ -67,7 +67,7 @@ struct ObjectImpl : public virtual unity::scopes::Object
         return "";
     }
 
-    std::string category() override
+    std::string target_category() override
     {
         return "";
     }
@@ -159,7 +159,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
-    void register_departments(unity::scopes::Department::SCPtr const&, unity::scopes::Department::SCPtr const&) override
+    void register_departments(unity::scopes::Department::SCPtr const&) override
     {
     }
 
@@ -167,9 +167,20 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
             std::string const& id,
             std::string const& title,
             std::string const& icon,
-            unity::scopes::CategoryRenderer const& renderer) override
+            unity::scopes::CategoryRenderer const& renderer
+            ) override
     {
         return category_registry.register_category(id, title, icon, renderer);
+    }
+
+    unity::scopes::Category::SCPtr register_category(std::string const& id,
+                                      std::string const& title,
+                                      std::string const &icon,
+                                      unity::scopes::CategoryRenderer const& renderer,
+                                      unity::scopes::Category::TapBehavior tap_behavior,
+                                      unity::scopes::Category::TapBehavior long_press_behavior) override
+    {
+        return category_registry.register_category(id, title, icon, renderer, tap_behavior, long_press_behavior);
     }
 
     void register_category(unity::scopes::Category::SCPtr category) override

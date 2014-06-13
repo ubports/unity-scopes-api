@@ -42,7 +42,7 @@ public:
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
-    void set_has_subdepartments();
+    void set_has_subdepartments(bool subdepartments);
     void set_subdepartments(DepartmentList const& departments);
     void add_subdepartment(Department::SCPtr const& department);
     void set_alternate_label(std::string const& label);
@@ -56,8 +56,9 @@ public:
     VariantMap serialize() const;
 
     static Department::UPtr create(VariantMap const& var);
-    static void validate_departments(Department::SCPtr const& parent, Department::SCPtr const& current);
-    static VariantMap serialize_departments(Department::SCPtr const& parent, Department::SCPtr const& current);
+    static void validate_departments(Department::SCPtr const& parent);
+    static void validate_departments(Department::SCPtr const& parent, std::string const& current_id);
+    static VariantMap serialize_departments(Department::SCPtr const& parent);
     static Department::SCPtr find_subdepartment_by_id(Department::SCPtr const& department, std::string const& id);
 
 private:
