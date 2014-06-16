@@ -383,17 +383,17 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::~OutOfProcessBenchmark()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Result::Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Result::~Result()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::testing::Sample::~Sample()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::save_to_xml(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::load_from_xml(std::basic_istream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::Timing::~Timing()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::save_to(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::load_from(std::basic_istream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::testing::Benchmark::~Benchmark()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::operator==(unity::scopes::testing::Benchmark::Result const&, unity::scopes::testing::Benchmark::Result const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::operator<<(std::basic_ostream<char, std::char_traits<char> >&, unity::scopes::testing::Benchmark::Result const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Category::Category(unity::scopes::internal::CategoryImpl*)@Base" 0replaceme
  (c++)"unity::scopes::Category::Category(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::Category(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Category::Category(unity::scopes::internal::CategoryImpl*)@Base" 0replaceme
  (c++)"unity::scopes::Category::Category(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::Category(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::~Category()@Base" 0.4.0+14.04.20140312.1
@@ -690,9 +690,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::testing::Benchmark::Result::Timing::get_mean() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::Timing::get_size() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::Timing::enumerate(std::function<void (double)> const&) const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Category::tap_behavior() const@Base" 0replaceme
  (c++)"unity::scopes::Category::renderer_template() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Category::long_press_behavior() const@Base" 0replaceme
  (c++)"unity::scopes::Category::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::title() const@Base" 0.4.0+14.04.20140312.1
