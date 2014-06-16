@@ -455,7 +455,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
                     "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value '"
                             + tmp);
         }
-        results_ttl_type_ = (ScopeMetadata::ResultsTtlType) tmp;
+        results_ttl_type_ = static_cast<ScopeMetadata::ResultsTtlType>(tmp);
     }
 
     it = var.find("settings_json");

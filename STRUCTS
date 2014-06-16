@@ -63,17 +63,21 @@ Department (returned by serialize()):
 
 ScopeMetadata (returned by serialize()):
 =====================================
- 'scope_id'     : string
- 'proxy'        : dictionary
-    'identity'  : string
-    'endpoint'  : string
- 'display_name' : string
- 'description'  : string
- 'scope_dir'    : string, optional
- 'art'          : string, optional
- 'icon'         : string, optional
- 'search_hint'  : string, optional
- 'hot_key'      : string, optional
+ 'scope_id'              : string
+ 'proxy'                 : dictionary
+    'identity'           : string
+    'endpoint'           : string
+ 'display_name'          : string
+ 'description'           : string
+ 'scope_dir'             : string, optional
+ 'art'                   : string, optional
+ 'icon'                  : string, optional
+ 'search_hint'           : string, optional
+ 'hot_key'               : string, optional
+ 'invisible'             : bool, optional
+ 'appearance_attributes' : dictionary, optional
+ 'results_ttl_type'      : int, optional
+ 'settings_json'         : string, optional
 
 Query (returned by serialize())
 ===============================
