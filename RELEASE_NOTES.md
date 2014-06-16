@@ -14,7 +14,7 @@ Changes in version 0.5.0
 
   - Changed constructor of SearchQueryBase to take CannedQuery and SearchMetadata arguments.
     Changed constructor of PreviewQueryBase to take Result and ActionMetadata arguments. Changed ActivationQueryBase constructor to take Result, widget id and
-    action id argument. All the constructor arguments and then available via respective getters of the base classes.
+    action id argument. All the constructor arguments are then available via respective getters of the base classes.
 
 Changes in version 0.4.8
 ========================
