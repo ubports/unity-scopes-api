@@ -41,6 +41,7 @@ namespace
     const string twoway_timeout_key = "Default.Twoway.Timeout";
     const string locate_timeout_key = "Locate.Timeout";
     const string registry_endpoint_dir_key = "Registry.EndpointDir";
+    const string ss_registry_endpoint_dir_key = "Smartscopes.Registry.EndpointDir";
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
@@ -78,6 +79,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     }
 
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
+    ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
 
     const KnownEntries known_entries = {
                                           {  zmq_config_group,
@@ -85,7 +87,8 @@ ZmqConfig::ZmqConfig(string const& configfile) :
                                                 endpoint_dir_key,
                                                 twoway_timeout_key,
                                                 locate_timeout_key,
-                                                registry_endpoint_dir_key
+                                                registry_endpoint_dir_key,
+                                                ss_registry_endpoint_dir_key
                                              }
                                           }
                                        };
@@ -114,6 +117,11 @@ int ZmqConfig::locate_timeout() const
 string ZmqConfig::registry_endpoint_dir() const
 {
     return registry_endpoint_dir_;
+}
+
+string ZmqConfig::ss_registry_endpoint_dir() const
+{
+    return ss_registry_endpoint_dir_;
 }
 
 } // namespace internal

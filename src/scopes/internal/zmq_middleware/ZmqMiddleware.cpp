@@ -62,11 +62,11 @@ namespace zmq_middleware
 namespace
 {
 
-char const* query_suffix = "-q";    // Appended to server_name_ to create query adapter name
-char const* ctrl_suffix = "-c";     // Appended to server_name_ to create control adapter name
-char const* reply_suffix = "-r";    // Appended to server_name_ to create reply adapter name
-char const* state_suffix = "-s";    // Appended to server_name_ to create state adapter name
-char const* registry_suffix = "-R"; // Appended to server_name_ to create registry (or SS registry) adapter name
+char const* query_suffix = "-q";     // Appended to server_name_ to create query adapter name
+char const* ctrl_suffix = "-c";      // Appended to server_name_ to create control adapter name
+char const* reply_suffix = "-r";     // Appended to server_name_ to create reply adapter name
+char const* state_suffix = "-s";     // Appended to server_name_ to create state adapter name
+char const* registry_suffix = "-R";  // Appended to server_name_ to create registry (or SS registry) adapter name
 char const* publisher_suffix = "-p"; // Appended to publisher_id to create a publisher endpoint
 
 char const* query_category = "Query";       // query adapter category name
@@ -105,8 +105,9 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
         public_endpoint_dir_ = config.endpoint_dir();
         private_endpoint_dir_ = public_endpoint_dir_ + "/priv";
         registry_endpoint_dir_ = public_endpoint_dir_;
+        ss_registry_endpoint_dir_ = public_endpoint_dir_;
 
-        // The registry can override the normal endpoint dir. That's needed
+        // The registry and smartscopesproxy can override the normal endpoint dir. That's needed
         // for testing, so the shell can run a test registry somewhere other than the normal
         // registry, but still use the normal smartscopesproxy.
         if (runtime) // runtime can be nullptr for some of the tests. It is never null otherwise.
@@ -114,6 +115,10 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
             if (!config.registry_endpoint_dir().empty())
             {
                 registry_endpoint_dir_ = config.registry_endpoint_dir();
+            }
+            if (!config.ss_registry_endpoint_dir().empty())
+            {
+                ss_registry_endpoint_dir_ = config.ss_registry_endpoint_dir();
             }
         }
 
@@ -123,6 +128,7 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
         create_dir(public_endpoint_dir_, 0755 | S_ISVTX);
         create_dir(private_endpoint_dir_, 0700 | S_ISVTX);
         create_dir(registry_endpoint_dir_, 0755 | S_ISVTX);
+        create_dir(ss_registry_endpoint_dir_, 0755 | S_ISVTX);
     }
     catch (...)
     {
@@ -442,7 +448,7 @@ MWRegistryProxy ZmqMiddleware::ss_registry_proxy()
         string ssr_id = runtime()->ss_registry_identity();  // May be empty, if no ss registry is configured.
         if (!ssr_id.empty())
         {
-            string ssr_endp = "ipc://" + public_endpoint_dir_ + "/" + ssr_id + registry_suffix;
+            string ssr_endp = "ipc://" + ss_registry_endpoint_dir_ + "/" + ssr_id + registry_suffix;
             ss_registry_proxy_.reset(new ZmqRegistry(this, ssr_endp, ssr_id, registry_category, twoway_timeout_));
         }
     }
@@ -472,7 +478,9 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
 
 MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string const& identity)
 {
-    string endpoint = "ipc://" + registry_endpoint_dir_ + "/" + server_name_ + state_suffix;
+    // Only override endpoint dir for the registry, not the smartscopes registry.
+    auto endp_dir = (server_name_ == runtime()->registry_identity() ? registry_endpoint_dir_ : public_endpoint_dir_);
+    string endpoint = "ipc://" + endp_dir + "/" + server_name_ + state_suffix;
     return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
 }
 
@@ -569,8 +577,8 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     try
     {
         shared_ptr<RegistryI> ri(make_shared<RegistryI>(registry));
-        // Only override endpoint dir for the registry, not the smartscopes registry.
-        auto endp_dir = (server_name_ == runtime()->registry_identity() ? registry_endpoint_dir_ : public_endpoint_dir_);
+        auto endp_dir = (server_name_ == runtime()->registry_identity()
+                            ? registry_endpoint_dir_ : ss_registry_endpoint_dir_);
         auto adapter = find_adapter(server_name_ + registry_suffix, endp_dir, registry_category);
         function<void()> df;
         auto p = safe_add(df, adapter, identity, ri);
@@ -680,12 +688,16 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
 
 MWPublisher::UPtr ZmqMiddleware::create_publisher(std::string const& publisher_id)
 {
-    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, public_endpoint_dir_));
+    // Only override endpoint dir for the registry, not the smartscopes registry.
+    auto endp_dir = (server_name_ == runtime()->registry_identity() ? registry_endpoint_dir_ : public_endpoint_dir_);
+    return MWPublisher::UPtr(new ZmqPublisher(&context_, publisher_id + publisher_suffix, endp_dir));
 }
 
 MWSubscriber::UPtr ZmqMiddleware::create_subscriber(std::string const& publisher_id, std::string const& topic)
 {
-    return MWSubscriber::UPtr(new ZmqSubscriber(&context_, publisher_id + publisher_suffix, public_endpoint_dir_, topic));
+    // Only override endpoint dir for the registry, not the smartscopes registry.
+    auto endp_dir = (server_name_ == runtime()->registry_identity() ? registry_endpoint_dir_ : public_endpoint_dir_);
+    return MWSubscriber::UPtr(new ZmqSubscriber(&context_, publisher_id + publisher_suffix, endp_dir, topic));
 }
 
 std::string ZmqMiddleware::get_scope_endpoint()

@@ -118,10 +118,10 @@ The following keys are recognized:
 
 - Registry.EndpointDir
 
-  The directory in which the public endpoint of the registry is created.
+  The directory in which the public endpoints of the registry are created.
   If set to a non-empty string, this directory overrides the setting
   of EndpointDir for the registry only. (This is provided for testing,
-  so a separate registry can use the normal deployed smartscopes registry.)
+  so a separate registry can run beside the system-wide registry.)
 
   The directory is created if it does not exist, with mode rwxr-xr-xt.
 
@@ -133,6 +133,14 @@ The following keys are recognized:
   after asking the registry to start the target process first (see Locate.Timeout).
 
   The default value is 300 milliseconds.
+
+- Smartscopes.Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry,
+  while still using the system-wide smartscopes registry.)
 
 - Locate.Timeout
 
