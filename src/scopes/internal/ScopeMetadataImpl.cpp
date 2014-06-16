@@ -429,8 +429,8 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         if(tmp < 0)
         {
             throw InvalidArgumentException(
-                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value '"
-                            + tmp);
+                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value "
+                            + std::to_string(tmp));
         }
         results_ttl_type_ = (ScopeMetadata::ResultsTtlType) tmp;
     }
