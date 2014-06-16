@@ -139,6 +139,8 @@ private:
     std::string private_endpoint_dir_;
     std::string registry_endpoint_dir_;
     std::string ss_registry_endpoint_dir_;
+    std::string registry_identity_;
+    std::string ss_registry_identity_;
 };
 
 } // namespace zmq_middleware
