@@ -1,18 +1,4 @@
 libunity-scopes.so.1 libunity-scopes1 #MINVER#
- (c++)"unity::scopes::Annotation::add_link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation::Type)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation&&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation::Type)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation&&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::Annotation(unity::scopes::Annotation const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::~Annotation()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation&&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::operator=(unity::scopes::Annotation const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::add_subdepartment(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::set_subdepartments(std::list<std::shared_ptr<unity::scopes::Department const>, std::allocator<std::shared_ptr<unity::scopes::Department const> > > const&)@Base" 0replaceme
  (c++)"unity::scopes::Department::set_alternate_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
@@ -60,7 +46,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::FilterState::~FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::operator=(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchReply::register_annotation(unity::scopes::Annotation const&)@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::SearchReply::SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchReply::~SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ColumnLayout::add_column(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >)@Base" 0.4.0+14.04.20140312.1
@@ -81,6 +66,20 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::~PreviewReply()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::experimental::Annotation::add_link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation::Type)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation const&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation::Type)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::internal::AnnotationImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::Annotation(unity::scopes::experimental::Annotation const&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::~Annotation()@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::operator=(unity::scopes::experimental::Annotation&&)@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::operator=(unity::scopes::experimental::Annotation const&)@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::set_on_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::set_off_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
@@ -239,7 +238,7 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ActivationResponse::~ActivationResponse()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::operator=(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::Annotation)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchListenerBase::push(unity::scopes::experimental::Annotation)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::shared_ptr<unity::scopes::Category const> const&)@Base" 0replaceme
  (c++)"unity::scopes::SearchListenerBase::push(std::list<std::shared_ptr<unity::scopes::FilterBase const>, std::allocator<std::shared_ptr<unity::scopes::FilterBase const> > > const&, unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
@@ -522,11 +521,6 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ScopeBase::~ScopeBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::to_string(unity::scopes::ListenerBase::Reason)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::operator==(unity::scopes::CategoryRenderer const&, unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::annotation_type() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::icon() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::label() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::links() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Annotation::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::subdepartments() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::alternate_label() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::Department::has_subdepartments() const@Base" 0.4.6+14.10.20140519
@@ -552,6 +546,11 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::ColumnLayout::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::experimental::Annotation::annotation_type() const@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::label() const@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::links() const@Base" 0replaceme
+ (c++)"unity::scopes::experimental::Annotation::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::update_state(unity::scopes::FilterState&, std::shared_ptr<unity::scopes::FilterOption const>, bool) const@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
  (c++)"unity::scopes::experimental::RatingFilter::has_active_rating(unity::scopes::FilterState const&) const@Base" 0replaceme
@@ -776,11 +775,11 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"unity::scopes::internal::StateReceiverObject::state_received() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::QueryBase::valid() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::ScopeBase::scope_directory() const@Base" 0.4.2+14.04.20140404.2
- (c++)"typeinfo for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::experimental::Annotation@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::experimental::RatingFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::experimental::SwitchFilter@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::experimental::RangeInputFilter@Base" 0replaceme
@@ -818,11 +817,11 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"typeinfo for unity::scopes::QueryBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::QueryCtrl@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ScopeBase@Base" 0.4.0+14.04.20140312.1
- (c++)"typeinfo name for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::experimental::Annotation@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::experimental::RatingFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::experimental::SwitchFilter@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::experimental::RangeInputFilter@Base" 0replaceme
@@ -871,11 +870,11 @@ libunity-scopes.so.1 libunity-scopes1 #MINVER#
  (c++)"VTT for unity::scopes::Scope@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::Registry@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::QueryCtrl@Base" 0.4.0+14.04.20140312.1
- (c++)"vtable for unity::scopes::Annotation@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::FilterBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::SearchReply@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ListenerBase@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::PreviewReply@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::experimental::Annotation@Base" 0replaceme
  (c++)"vtable for unity::scopes::experimental::RatingFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::experimental::SwitchFilter@Base" 0replaceme
  (c++)"vtable for unity::scopes::experimental::RangeInputFilter@Base" 0replaceme
