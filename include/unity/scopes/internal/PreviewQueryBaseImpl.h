@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,14 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYBASEIMPL_H
+#ifndef UNITY_INTERNAL_PREVIEWQUERYBASEIMPL_H
+#define UNITY_INTERNAL_PREVIEWQUERYBASEIMPL_H
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
-#include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/ActionMetadata.h>
-#include <unity/util/NonCopyable.h>
 
 namespace unity
 {
@@ -34,30 +32,21 @@ namespace scopes
 namespace internal
 {
 
-class ActivationQueryBaseImpl : public QueryBaseImpl
+class PreviewQueryBaseImpl : public QueryBaseImpl
 {
 public:
-    NONCOPYABLE(ActivationQueryBaseImpl);
-
-    ActivationQueryBaseImpl(Result const& result, ActionMetadata const& metadata, std::string const& widget_id = "", std::string const& action_id = "");
-    ~ActivationQueryBaseImpl() = default;
-    ActivationResponse activate();
+    PreviewQueryBaseImpl(Result const& result, ActionMetadata const& metadata);
 
     Result result() const;
     ActionMetadata action_metadata() const;
-    std::string widget_id() const;
-    std::string action_id() const;
-
     void cancel() override;
     bool valid() const override;
 
 private:
-    Result result_;
-    const ActionMetadata metadata_;
-    const std::string widget_id_;
-    const std::string action_id_;
     bool valid_;
     mutable std::mutex mutex_;
+    const Result result_;
+    const ActionMetadata action_metadata_;
 };
 
 } // namespace internal

@@ -94,34 +94,13 @@ public:
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
-    \brief Register new category and send it to the source of the query.
-
-    \param id The identifier of the category
-    \param title The title of the category
-    \param icon The icon of the category
-    \param renderer_template The renderer template to be used for results in this category
-    \param tap_behavior The default behavior for tap on the result from this category.
-    \param long_press_behavior The default behavior of long press on to preview the result.
-
-     The default behaviour of both tap and long press is to show a preview.
-     Changing the default behaviour is not recommended.
-
-     \return The category instance
-     */
-    virtual Category::SCPtr register_category(std::string const& id,
-                                              std::string const& title,
-                                              std::string const &icon,
-                                              CategoryRenderer const& renderer_template,
-                                              Category::TapBehavior tap_behavior,
-                                              Category::TapBehavior long_press_behavior) = 0;
-
-    /**
     \brief Register an existing category instance and send it to the source of the query.
 
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
+    The purpose of this call is to register a category obtained via SearchListenerBase::push(Category::SCPtr const&) when aggregating
     results and categories from other scope(s).
-    */
 
+    \throws unity::InvalidArgumentException if category is already registered.
+    */
     virtual void register_category(Category::SCPtr category) = 0;
 
     /**

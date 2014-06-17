@@ -90,10 +90,11 @@ class MyQuery : public SearchQueryBase
 public:
     MyQuery(string const& scope_id,
             CannedQuery const& query,
+            SearchMetadata const& metadata,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
+        SearchQueryBase(query, metadata),
         scope_id_(scope_id),
-        query_(query),
         scope_c_(scope_c),
         scope_d_(scope_d)
     {
@@ -101,7 +102,7 @@ public:
 
     virtual void cancelled()
     {
-        cerr << scope_id_ << ": query " << query_.query_string() << " was cancelled" << endl;
+        cerr << scope_id_ << ": query " << query().query_string() << " was cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& upstream_reply)
@@ -124,13 +125,12 @@ public:
         }
 
         SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply));
-        subsearch(scope_c_, query_.query_string(), reply);
-        subsearch(scope_d_, query_.query_string(), reply);
+        subsearch(scope_c_, query().query_string(), reply);
+        subsearch(scope_d_, query().query_string(), reply);
     }
 
 private:
     string scope_id_;
-    CannedQuery query_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };
@@ -159,9 +159,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, scope_c_, scope_d_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata, scope_c_, scope_d_));
         cerr << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }

@@ -39,7 +39,8 @@ namespace testing
 class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
 public:
-    ActivationShowingDash()
+    ActivationShowingDash(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) :
+        unity::scopes::ActivationQueryBase(result, metadata)
     {
     }
 
@@ -53,7 +54,9 @@ public:
 class LongRunningActivation : public unity::scopes::ActivationQueryBase
 {
 public:
-    LongRunningActivation()
+    LongRunningActivation(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata, std::string const& widget_id,
+            std::string const& action_id) :
+        unity::scopes::ActivationQueryBase(result, metadata, widget_id, action_id)
     {
     }
 
@@ -87,8 +90,8 @@ private:
 class Query : public unity::scopes::SearchQueryBase
 {
 public:
-    Query(unity::scopes::CannedQuery const& query, unity::scopes::RegistryProxy const& registry)
-        : query_(query), registry_(registry)
+    Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata, unity::scopes::RegistryProxy const& registry)
+        : unity::scopes::SearchQueryBase(query, metadata), registry_(registry)
     {
     }
 
@@ -98,7 +101,7 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
-        if (query_.query_string() == "aggregator test") {
+        if (query().query_string() == "aggregator test") {
             aggregator_query(reply);
         } else {
             standard_query(reply);
@@ -108,9 +111,9 @@ public:
 private:
     void standard_query(unity::scopes::SearchReplyProxy const& reply) {
         using namespace unity::scopes;
-        Department::SPtr parent = Department::create("all", query_, "All Departments");
-        Department::SPtr news_dep = Department::create("news", query_, "News");
-        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
+        Department::SPtr parent = Department::create("all", query(), "All Departments");
+        Department::SPtr news_dep = Department::create("news", query(), "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query(), "Europe"), Department::create("subdep2", query(), "US")});
         parent->set_subdepartments({news_dep});
         reply->register_departments(parent);
 
@@ -122,9 +125,9 @@ private:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        unity::scopes::CannedQuery query("scope-A", "foo", "dep1");
+        unity::scopes::CannedQuery q("scope-A", "foo", "dep1");
         unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
-        annotation.add_link("Link1", query);
+        annotation.add_link("Link1", q);
         reply->push(annotation);
     }
 
@@ -133,16 +136,20 @@ private:
         auto cat = reply->register_category("cat1", "Category 1", "");
         unity::scopes::SearchListenerBase::SPtr listener(
             new SearchListener(reply, cat));
-        subsearch(childscope, query_.query_string(), listener);
+        subsearch(childscope, query().query_string(), listener);
     }
 
-    unity::scopes::CannedQuery query_;
     unity::scopes::RegistryProxy registry_;
 };
 
 class Preview : public unity::scopes::PreviewQueryBase
 {
 public:
+    Preview(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata)
+        : unity::scopes::PreviewQueryBase(result, metadata)
+    {
+    }
+
     void cancelled() override
     {
     }
@@ -176,30 +183,30 @@ void testing::Scope::run()
 
 unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
-        unity::scopes::SearchMetadata const &)
+        unity::scopes::SearchMetadata const &metadata)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, registry_));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata, registry_));
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::ActivationShowingDash(result, metadata)};
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::perform_action(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const&,
-        std::string const&,
-        std::string const&)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata,
+        std::string const& widget_id,
+        std::string const& action_id)
 {
-    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation()};
+    return unity::scopes::ActivationQueryBase::UPtr{new testing::LongRunningActivation(result, metadata, widget_id, action_id)};
 }
 
 unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
-        unity::scopes::Result const&,
-        unity::scopes::ActionMetadata const &)
+        unity::scopes::Result const& result,
+        unity::scopes::ActionMetadata const& metadata)
 {
-    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview());
+    return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview(result, metadata));
 }

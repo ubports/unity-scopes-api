@@ -129,9 +129,9 @@ private:
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(string const& scope_id, CannedQuery const& query, Queue& queue) :
+    MyQuery(string const& scope_id, CannedQuery const& query, SearchMetadata const& metadata, Queue& queue) :
+        SearchQueryBase(query, metadata),
         scope_id_(scope_id),
-        query_(query),
         queue_(queue)
     {
         cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
@@ -139,7 +139,7 @@ public:
 
     ~MyQuery()
     {
-        cerr << scope_id_ << ": query instance for \"" << query_.query_string() << "\" destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -149,7 +149,7 @@ public:
         // query, the worker thread's next call to push() will return false,
         // causing the worker thread to stop working on this query.
         queue_.remove(this);
-        cerr << scope_id_ << ": \"" + query_.to_uri() + "\" cancelled" << endl;
+        cerr << scope_id_ << ": \"" + query().to_uri() + "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -159,17 +159,22 @@ public:
             return;  // Query was cancelled
         }
 
-        queue_.put(this, query_.query_string(), reply);
+        queue_.put(this, query().query_string(), reply);
     }
 
 private:
     string scope_id_;
-    CannedQuery query_;
     Queue& queue_;
 };
 
 class MyActivation : public ActivationQueryBase
 {
+public:
+    MyActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+
     ActivationResponse activate() override
     {
         return ActivationResponse(ActivationResponse::Status::ShowDash);
@@ -225,15 +230,15 @@ public:
         }
     }
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        return SearchQueryBase::UPtr(new MyQuery(scope_id_, q, queue));
+        return SearchQueryBase::UPtr(new MyQuery(scope_id_, q, metadata, queue));
     }
 
-    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override
     {
         cerr << scope_id_ << ": activate: \"" << result.uri() << "\"" << endl;
-        return ActivationQueryBase::UPtr(new MyActivation());
+        return ActivationQueryBase::UPtr(new MyActivation(result, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override

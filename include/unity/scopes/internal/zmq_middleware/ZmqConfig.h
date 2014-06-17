@@ -36,16 +36,18 @@ public:
     ZmqConfig(std::string const& configfile);
     ~ZmqConfig();
 
-    std::string public_dir() const;
-    std::string private_dir() const;
+    std::string endpoint_dir() const;
     int twoway_timeout() const;
     int locate_timeout() const;
+    std::string registry_endpoint_dir() const;
+    std::string ss_registry_endpoint_dir() const;
 
 private:
-    std::string public_dir_;
-    std::string private_dir_;
+    std::string endpoint_dir_;
     int twoway_timeout_;
     int locate_timeout_;
+    std::string registry_endpoint_dir_;
+    std::string ss_registry_endpoint_dir_;
 };
 
 } // namespace internal

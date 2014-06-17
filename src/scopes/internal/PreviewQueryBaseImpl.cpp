@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,14 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
-
-#include <unity/scopes/PreviewQueryBase.h>
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+*/
 
 #include <unity/scopes/internal/PreviewQueryBaseImpl.h>
-
-using namespace std;
 
 namespace unity
 {
@@ -28,31 +24,42 @@ namespace unity
 namespace scopes
 {
 
-/// @cond
-PreviewQueryBase::PreviewQueryBase(Result const& result, ActionMetadata const& metadata) :
-    QueryBase(new internal::PreviewQueryBaseImpl(result, metadata))
+namespace internal
+{
+
+using namespace std;
+
+PreviewQueryBaseImpl::PreviewQueryBaseImpl(Result const& result, ActionMetadata const& metadata)
+    : QueryBaseImpl(),
+      valid_(true),
+      result_(result),
+      action_metadata_(metadata)
 {
 }
 
-PreviewQueryBase::~PreviewQueryBase()
+Result PreviewQueryBaseImpl::result() const
 {
-}
-/// @endcond
-
-Result PreviewQueryBase::result() const
-{
-    return fwd()->result();
+    return result_;
 }
 
-ActionMetadata PreviewQueryBase::action_metadata() const
+ActionMetadata PreviewQueryBaseImpl::action_metadata() const
 {
-    return fwd()->action_metadata();
+    return action_metadata_;
 }
 
-internal::PreviewQueryBaseImpl* PreviewQueryBase::fwd() const
+void PreviewQueryBaseImpl::cancel()
 {
-    return dynamic_cast<internal::PreviewQueryBaseImpl*>(p.get());
+    lock_guard<mutex> lock(mutex_);
+    valid_ = false;
 }
+
+bool PreviewQueryBaseImpl::valid() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return valid_;
+}
+
+} // namespace internal
 
 } // namespace scopes
 

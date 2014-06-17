@@ -63,7 +63,7 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 {
     auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
     assert(qo);
-    if (!qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
+    if (!qo->pushable(InvokeInfo{ fwd()->identity(), fwd()->mw_base() }))
     {
         return false; // Query was cancelled or had an error.
     }
