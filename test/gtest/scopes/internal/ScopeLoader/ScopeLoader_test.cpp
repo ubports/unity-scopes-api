@@ -215,7 +215,8 @@ TEST(ScopeLoader, null_return)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create_v"
+                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MAJOR),
                      e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
@@ -236,7 +237,8 @@ TEST(ScopeLoader, null_return_unload)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create_v"
+                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MAJOR),
                      e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
