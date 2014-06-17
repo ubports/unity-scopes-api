@@ -62,10 +62,6 @@ public:
 class TestScope : public ScopeBase
 {
 public:
-    virtual void start(std::string const&, RegistryProxy const &) override {}
-    virtual void stop() override {}
-    virtual void run() override {}
-
     virtual SearchQueryBase::UPtr search(CannedQuery const &q, SearchMetadata const &metadata) override
     {
         return SearchQueryBase::UPtr(new TestQuery(q, metadata));
