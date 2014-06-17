@@ -22,7 +22,7 @@ endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower) # Build types should always be lowercase but sometimes they are not.
 
-set(ACCEPTED_BUILD_TYPES release debug relwithdebinfo coverage "")
+set(ACCEPTED_BUILD_TYPES "" none release debug relwithdebinfo coverage)
 list(FIND ACCEPTED_BUILD_TYPES "${cmake_build_type_lower}" IS_BUILD_TYPE_ACCEPTED)
 if(${IS_BUILD_TYPE_ACCEPTED} EQUAL -1)
   message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}\nValid types are: ${ACCEPTED_BUILD_TYPES}")
