@@ -94,7 +94,7 @@ public:
         reply->push(res);
 
         unity::scopes::CannedQuery q("scope-A", "foo", "dep1");
-        unity::scopes::Annotation annotation(unity::scopes::Annotation::Type::Link);
+        unity::scopes::experimental::Annotation annotation(unity::scopes::experimental::Annotation::Type::Link);
         annotation.add_link("Link1", q);
         reply->push(annotation);
     }
