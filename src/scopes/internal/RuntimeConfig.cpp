@@ -65,7 +65,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         registry_identity_ = get_optional_string(runtime_config_group, registry_identity_key);
         registry_configfile_ = get_optional_string(runtime_config_group, registry_configfile_key);
         ss_configfile_ = get_optional_string(runtime_config_group, ss_configfile_key);
-        ss_registry_identity_ = get_optional_string(runtime_config_group, ss_registry_identity_key);
+        ss_registry_identity_ = get_optional_string(runtime_config_group, ss_registry_identity_key, DFLT_SS_REGISTRY_ID);
         default_middleware_ = get_middleware(runtime_config_group, default_middleware_key);
         default_middleware_configfile_ = get_optional_string(runtime_config_group,
                                                              default_middleware_ + default_middleware_configfile_key,

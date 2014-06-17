@@ -114,34 +114,31 @@ int main(int argc, char* argv[])
         SSConfig ss_config(rt_config.ss_configfile());
         std::string ss_scope_id = ss_config.scope_identity();
 
-        // Instantiate SS registry and scopes runtimes
-        RuntimeImpl::UPtr reg_rt = RuntimeImpl::create(ss_reg_id, config_file);
-        RuntimeImpl::UPtr scope_rt = RuntimeImpl::create(ss_scope_id, config_file);
+        // Instantiate the run time
+        RuntimeImpl::UPtr rt = RuntimeImpl::create(ss_reg_id, config_file);
 
         // Get registry config
-        RegistryConfig reg_conf(ss_reg_id, reg_rt->registry_configfile());
+        RegistryConfig reg_conf(ss_reg_id, rt->registry_configfile());
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
-        // Get middleware handles from runtimes
-        MiddlewareBase::SPtr reg_mw = reg_rt->factory()->find(ss_reg_id, mw_kind);
-        MiddlewareBase::SPtr scope_mw = scope_rt->factory()->create(ss_scope_id, mw_kind, mw_configfile);
+        // Get middleware handle from runtime
+        MiddlewareBase::SPtr mw = rt->factory()->find(ss_reg_id, mw_kind);
 
-        signal_handler.signal_raised().connect([reg_mw, scope_mw](core::posix::Signal)
+        signal_handler.signal_raised().connect([mw](core::posix::Signal)
         {
-            scope_mw->stop();
-            reg_mw->stop();
+            mw->stop();
         });
 
         // Instantiate a SS registry object
-        SSRegistryObject::SPtr reg(new SSRegistryObject(reg_mw, ss_config, scope_mw->get_scope_endpoint()));
+        SSRegistryObject::SPtr reg(new SSRegistryObject(mw, ss_config, mw->get_scope_endpoint()));
 
         // Instantiate a SS scope object
-        SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, scope_mw, reg));
+        SSScopeObject::UPtr scope(new SSScopeObject(ss_scope_id, mw, reg));
 
-        // Add objects to the middlewares
-        reg_mw->add_registry_object(reg_rt->ss_registry_identity(), reg);
-        scope_mw->add_dflt_scope_object(std::move(scope));
+        // Add objects to the middleware
+        mw->add_registry_object(rt->ss_registry_identity(), reg);
+        mw->add_dflt_scope_object(std::move(scope));
 
         if (sig_upstart)
         {
@@ -150,8 +147,7 @@ int main(int argc, char* argv[])
         }
 
         // Wait until shutdown
-        scope_mw->wait_for_shutdown();
-        reg_mw->wait_for_shutdown();
+        mw->wait_for_shutdown();
 
         exit_status = 0;
     }
