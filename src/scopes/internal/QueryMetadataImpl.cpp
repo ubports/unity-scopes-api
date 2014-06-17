@@ -53,7 +53,7 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
-void QueryMetadataImpl::serialize(VariantMap &var) const
+void QueryMetadataImpl::serialize(VariantMap& var) const
 {
     var["type"] = metadata_type();
     var["locale"] = locale_;

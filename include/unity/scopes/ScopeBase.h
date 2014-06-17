@@ -253,10 +253,11 @@ public:
     static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
     /**
-     \brief Returns directory where the scope files are.
+    \brief Returns the directory that stores the scope's configuration files and shared library.
 
-     Note, scope directory is only known after the scope has been instantantiated, e.g. it's not available in the constructor.
-     */
+    \note The scope directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+    */
     std::string scope_directory() const;
 
 protected:

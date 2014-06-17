@@ -49,7 +49,7 @@ SearchMetadata::SearchMetadata(SearchMetadata const& other)
 
 SearchMetadata::SearchMetadata(SearchMetadata&&) = default;
 
-SearchMetadata& SearchMetadata::operator=(SearchMetadata const &other)
+SearchMetadata& SearchMetadata::operator=(SearchMetadata const& other)
 {
     if (this != &other)
     {

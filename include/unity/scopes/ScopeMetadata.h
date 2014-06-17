@@ -167,10 +167,8 @@ public:
     ResultsTtlType results_ttl_type() const;
 
     /**
-    \brief Get JSON representing the scope configuration.
-
-    \throws unity::scopes::NotFoundException if attribute is not set
-    \return JSON string
+    \brief Return the JSON string representing the settings definition for the scope.
+    \return The settings definition.
     */
     std::string settings_json() const;
 

@@ -119,7 +119,7 @@ std::string SearchMetadataImpl::metadata_type() const
     return t;
 }
 
-void SearchMetadataImpl::serialize(VariantMap &var) const
+void SearchMetadataImpl::serialize(VariantMap& var) const
 {
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);

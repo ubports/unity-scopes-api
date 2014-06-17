@@ -30,6 +30,7 @@
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 #include <unity/util/ResourcePtr.h>
 
 #include <algorithm>
@@ -223,6 +224,8 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
 
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
+// If the scope uses settings, also read the settings file and add the JSON that defines
+// the supported settings to the metadata.
 
 void add_local_scope(RegistryObject::SPtr const& registry,
                      pair<string, string> const& scope,
@@ -242,13 +245,15 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     if (filesystem::exists(settings_json_path))
     {
-        ifstream in(settings_json_path.native(), ios::in | ios::binary);
-        if (in)
+        try
         {
-            ostringstream contents;
-            contents << in.rdbuf();
-            in.close();
-            mi->set_settings_json(contents.str());
+            string settings_json = unity::util::read_text_file(settings_json_path.native());
+            mi->set_settings_json(settings_json);
+        }
+        catch (std::exception const& e)
+        {
+            error("ignoring settings file " + settings_json_path.native()
+                  + " for scope " + scope.first + ": " + e.what());
         }
     }
 
