@@ -92,7 +92,7 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual int start();    // Mandatory
+    virtual void start();   // Mandatory
     virtual void stop();    // Mandatory
     virtual void run();     // Optional
 };
@@ -126,7 +126,7 @@ UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 ~~~
 
 After the scopes run time has obtained a pointer to the class instance from the create function, it calls start(),
-which allows the scope to intialize itself. This is followed by call to run(). The call to run() is made by
+which allows the scope to intialize itself. This is followed by a call to run(). The call to run() is made by
 a separate thread; its only purpose is to pass a thread of control to the scope, for example, to run an event loop.
 When the scope should complete its activities, the run time calls stop(). The calls to the create function, start(),
 stop(), and the destroy function) are made by the same thread.
@@ -144,11 +144,6 @@ public:
     /// @endcond
 
     /**
-    \brief This value must be returned from the start() method.
-    */
-    static constexpr int VERSION = UNITY_SCOPES_VERSION_MAJOR;
-
-    /**
     \brief Called by the scopes run time after the create function completes.
 
     If start() throws an exception, stop() will _not_ be called.
@@ -159,12 +154,8 @@ public:
 
     \param registry A proxy to the scope registry. This parameter is provided for aggregating
     scopes that need to retrieve proxies to their child scopes.
-
-    \return Any return value other than ScopeBase::VERSION will cause the scopes run time
-    to refuse to load the scope. The return value is used to ensure that the shared library
-    containing the scope is ABI compatible with the scopes run time.
     */
-    virtual int start(std::string const& scope_id, RegistryProxy const& registry) = 0;
+    virtual void start(std::string const& scope_id, RegistryProxy const& registry) = 0;
 
     /**
     \brief Called by the scopes run time when the scope should shut down.

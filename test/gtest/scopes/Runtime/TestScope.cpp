@@ -107,9 +107,8 @@ public:
     }
 };
 
-int TestScope::start(string const&, RegistryProxy const &)
+void TestScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void TestScope::stop()

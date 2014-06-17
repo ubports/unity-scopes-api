@@ -5,7 +5,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(SharedState SHARED Counters.cpp PerScopeVariables.cpp)
 
-add_library(BadVersion MODULE BadVersion.cpp)
 add_library(NoDestroy MODULE NoDestroy.cpp)
 add_library(NullReturn MODULE NullReturn.cpp)
 add_library(ScopeA MODULE ScopeA.cpp)

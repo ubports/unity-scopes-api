@@ -49,9 +49,8 @@ public:
 
 }  // namespace
 
-int SlowSearchScope::start(string const&, RegistryProxy const &)
+void SlowSearchScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void SlowSearchScope::stop()
