@@ -37,9 +37,11 @@ namespace internal
 namespace
 {
     const string zmq_config_group = "Zmq";
-    const string public_dir_key = "EndpointDir";
+    const string endpoint_dir_key = "EndpointDir";
     const string twoway_timeout_key = "Default.Twoway.Timeout";
     const string locate_timeout_key = "Locate.Timeout";
+    const string registry_endpoint_dir_key = "Registry.EndpointDir";
+    const string ss_registry_endpoint_dir_key = "Smartscopes.Registry.EndpointDir";
 }
 
 ZmqConfig::ZmqConfig(string const& configfile) :
@@ -47,13 +49,13 @@ ZmqConfig::ZmqConfig(string const& configfile) :
 {
     if (!configfile.empty())
     {
-        public_dir_ = get_optional_string(zmq_config_group, public_dir_key);
+        endpoint_dir_ = get_optional_string(zmq_config_group, endpoint_dir_key);
     }
 
     // Set the endpoint directory if it was not set explicitly.
     // We look for the XDG_RUNTIME_DIR env variable. If that is not
     // set, we give up.
-    if (public_dir_.empty())
+    if (endpoint_dir_.empty())
     {
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
@@ -61,9 +63,8 @@ ZmqConfig::ZmqConfig(string const& configfile) :
             throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
                                   "environment variable not set");
         }
-        public_dir_ = string(xdg_runtime_dir) + "/zmq";
+        endpoint_dir_ = string(xdg_runtime_dir) + "/zmq";
     }
-    private_dir_ = public_dir_ + "/priv";
 
     twoway_timeout_ = get_optional_int(zmq_config_group, twoway_timeout_key, DFLT_ZMQ_TWOWAY_TIMEOUT);
     if (twoway_timeout_ < -1)
@@ -77,12 +78,17 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         throw_ex("Illegal value (" + to_string(locate_timeout_) + ") for " + locate_timeout_key + ": value must be 10-5000");
     }
 
+    registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
+    ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
+
     const KnownEntries known_entries = {
                                           {  zmq_config_group,
                                              {
-                                                public_dir_key,
+                                                endpoint_dir_key,
                                                 twoway_timeout_key,
-                                                locate_timeout_key
+                                                locate_timeout_key,
+                                                registry_endpoint_dir_key,
+                                                ss_registry_endpoint_dir_key
                                              }
                                           }
                                        };
@@ -93,14 +99,9 @@ ZmqConfig::~ZmqConfig()
 {
 }
 
-string ZmqConfig::public_dir() const
+string ZmqConfig::endpoint_dir() const
 {
-    return public_dir_;
-}
-
-string ZmqConfig::private_dir() const
-{
-    return private_dir_;
+    return endpoint_dir_;
 }
 
 int ZmqConfig::twoway_timeout() const
@@ -111,6 +112,16 @@ int ZmqConfig::twoway_timeout() const
 int ZmqConfig::locate_timeout() const
 {
     return locate_timeout_;
+}
+
+string ZmqConfig::registry_endpoint_dir() const
+{
+    return registry_endpoint_dir_;
+}
+
+string ZmqConfig::ss_registry_endpoint_dir() const
+{
+    return ss_registry_endpoint_dir_;
 }
 
 } // namespace internal

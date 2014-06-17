@@ -32,7 +32,7 @@ using namespace unity::scopes::internal::zmq_middleware;
 
 TEST(PubSub, endpoints)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     auto publisher = mw.create_publisher("testpublisher");
@@ -44,7 +44,7 @@ TEST(PubSub, endpoints)
 
 TEST(PubSub, exceptions)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Test that only one publisher can be created on a single endpoint
@@ -158,7 +158,7 @@ TEST(PubSub, send_receive)
 {
     SubMsgReceiver message_receiver;
 
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Create 2 publishers
@@ -221,7 +221,7 @@ TEST(PubSub, send_receive)
 
 TEST(PubSub, threading)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     {

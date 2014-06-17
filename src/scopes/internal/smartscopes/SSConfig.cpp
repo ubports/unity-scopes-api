@@ -61,10 +61,28 @@ SSConfig::SSConfig(string const& configfile) :
     else
     {
         http_reply_timeout_ = get_optional_int(ss_config_group, http_reply_timeout_key, DFLT_SS_HTTP_TIMEOUT);
+        if (http_reply_timeout_ < 1 || http_reply_timeout_ > 60)
+        {
+            throw_ex("Illegal value (" + to_string(http_reply_timeout_) + ") for " +
+                     http_reply_timeout_key + ": value must be 10 - 60");
+        }
+
         reg_refresh_rate_ = get_optional_int(ss_config_group, reg_refresh_rate_key, DFLT_SS_REG_REFRESH_RATE);
+        if (reg_refresh_rate_ < 60)
+        {
+            throw_ex("Illegal value (" + to_string(reg_refresh_rate_) + ") for " +
+                     reg_refresh_rate_key + ": value must be >= 60");
+        }
+
         reg_refresh_fail_timeout_ = get_optional_int(ss_config_group,
                                                      reg_refresh_fail_timeout_key,
                                                      DFLT_SS_REG_REFRESH_FAIL_TIMEOUT);
+        if (reg_refresh_fail_timeout_ < 1)
+        {
+            throw_ex("Illegal value (" + to_string(reg_refresh_fail_timeout_) + ") for " +
+                     reg_refresh_fail_timeout_key + ": value must be >= 1");
+        }
+
         scope_identity_ = get_optional_string(ss_config_group, scope_identity_key, DFLT_SS_SCOPE_IDENTITY);
     }
 
