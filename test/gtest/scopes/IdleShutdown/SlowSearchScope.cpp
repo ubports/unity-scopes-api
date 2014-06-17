@@ -34,7 +34,8 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery()
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
     {
     }
 
@@ -61,10 +62,10 @@ void SlowSearchScope::run()
 {
 }
 
-SearchQueryBase::UPtr SlowSearchScope::search(CannedQuery const&, SearchMetadata const &)
+SearchQueryBase::UPtr SlowSearchScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     this_thread::sleep_for(chrono::seconds(4));
-    return SearchQueryBase::UPtr(new TestQuery());
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
 PreviewQueryBase::UPtr SlowSearchScope::preview(Result const&, ActionMetadata const &)

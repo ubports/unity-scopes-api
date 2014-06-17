@@ -36,6 +36,11 @@ namespace scopes
 class TestQuery : public SearchQueryBase
 {
 public:
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
+    {
+    }
+
     virtual void cancelled() override {}
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -52,13 +57,25 @@ public:
 class TestActivation : public ActivationQueryBase
 {
 public:
-    TestActivation(std::string const& hint, std::string const& hint_val, std::string const &uri, Variant const& hints)
-        : hint_key_(hint),
+    TestActivation(Result const& result, ActionMetadata const& metadata, std::string const& hint, std::string const& hint_val, std::string const &uri, Variant const& hints)
+        : ActivationQueryBase(result, metadata),
+          hint_key_(hint),
           hint_val_(hint_val),
           uri_(uri),
           recv_hints_(hints)
     {
     }
+
+    TestActivation(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id,
+            std::string const& hint, std::string const& hint_val, std::string const &uri, Variant const& hints)
+        : ActivationQueryBase(result, metadata, widget_id, action_id),
+          hint_key_(hint),
+          hint_val_(hint_val),
+          uri_(uri),
+          recv_hints_(hints)
+    {
+    }
+
 
     virtual ActivationResponse activate() override
     {
@@ -87,9 +104,9 @@ public:
 
     virtual void run() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override
     {
-        return SearchQueryBase::UPtr(new TestQuery());
+        return SearchQueryBase::UPtr(new TestQuery(query, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override
@@ -99,12 +116,12 @@ public:
 
     virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& hints) override
     {
-        return ActivationQueryBase::UPtr(new TestActivation("foo", "bar", result.uri(), hints.scope_data()));
+        return ActivationQueryBase::UPtr(new TestActivation(result, hints, "foo", "bar", result.uri(), hints.scope_data()));
     }
 
     virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id) override
     {
-        return ActivationQueryBase::UPtr(new TestActivation("activated action", widget_id + action_id, result.uri(), hints.scope_data()));
+        return ActivationQueryBase::UPtr(new TestActivation(result, hints, widget_id, action_id, "activated action", widget_id + action_id, result.uri(), hints.scope_data()));
     }
 };
 

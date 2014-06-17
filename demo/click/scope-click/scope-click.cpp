@@ -31,7 +31,8 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery()
+    MyQuery(CannedQuery const& query, SearchMetadata const& metadata) :
+        SearchQueryBase(query, metadata)
     {
     }
 
@@ -59,9 +60,9 @@ public:
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        return SearchQueryBase::UPtr(new MyQuery);
+        return SearchQueryBase::UPtr(new MyQuery(q, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override

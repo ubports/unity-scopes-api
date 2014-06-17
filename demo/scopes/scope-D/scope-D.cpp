@@ -127,9 +127,10 @@ class MyQuery : public SearchQueryBase
 public:
     MyQuery(string const& scope_id,
             CannedQuery const& query,
+            SearchMetadata const& metadata,
             Queue& queue) :
+        SearchQueryBase(query, metadata),
         scope_id_(scope_id),
-        query_(query),
         queue_(queue)
     {
         cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
@@ -137,7 +138,7 @@ public:
 
     virtual ~MyQuery()
     {
-        cerr << scope_id_ << ": query instance for \"" << query_.query_string() << "\" destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -151,7 +152,7 @@ public:
         // work may still be in progress on a query. Note that cancellations are frequent;
         // not responding to cancelled() correctly causes loss of performance.
 
-        cerr << scope_id_ << ": query for \"" << query_.query_string() << "\" cancelled" << endl;
+        cerr << scope_id_ << ": query for \"" << query().query_string() << "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -166,12 +167,11 @@ public:
         // run(). It is OK to push results on the reply from a different thread.
         // The only obligation on run() is that, if cancelled() is called, and run() is still active
         // at that time, run() must tidy up and return in a timely fashion.
-        queue_.put(this, query_.query_string(), reply);
+        queue_.put(this, query().query_string(), reply);
     }
 
 private:
     string scope_id_;
-    CannedQuery query_;
     Queue& queue_;
 };
 
@@ -227,9 +227,9 @@ public:
         }
     }
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, queue_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata, queue_));
         return query;
     }
 

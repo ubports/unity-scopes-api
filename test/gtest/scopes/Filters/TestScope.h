@@ -34,9 +34,8 @@ namespace scopes
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery(CannedQuery const& q) :
-        SearchQueryBase(),
-        query_(q)
+    TestQuery(CannedQuery const& q, SearchMetadata const& metadata) :
+        SearchQueryBase(q, metadata)
     {
     }
 
@@ -49,8 +48,8 @@ public:
         filter->add_option("o1", "Option 1");
         filter->add_option("o2", "Option 2");
         filters.push_back(filter);
-        auto active_opts = filter->active_options(query_.filter_state());
-        reply->push(filters, query_.filter_state()); // send unmodified state back
+        auto active_opts = filter->active_options(query().filter_state());
+        reply->push(filters, query().filter_state()); // send unmodified state back
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
@@ -58,9 +57,6 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
     }
-
-private:
-    CannedQuery query_;
 };
 
 class TestScope : public ScopeBase
@@ -70,9 +66,9 @@ public:
     virtual void stop() override {}
     virtual void run() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const &q, SearchMetadata const &) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const &q, SearchMetadata const &metadata) override
     {
-        return SearchQueryBase::UPtr(new TestQuery(q));
+        return SearchQueryBase::UPtr(new TestQuery(q, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override

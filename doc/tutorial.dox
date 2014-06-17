@@ -162,7 +162,7 @@ unity::scopes::SearchQueryBase interface, e.g:
 \code{.cpp}
 SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata));
     return q;
 }
 \endcode
@@ -320,10 +320,15 @@ a new search query to be executed as follows:
 \code{.cpp}
 class MyActivation : public unity::scopes::ActivationQueryBase
 {
+    MyActivation(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) :
+        ActivationQueryBase(result, metadata)
+    {
+    }
+
     virtual unity::scopes::ActivationResponse activate() override
     {
         ...
-        if (action_id == "search-grooveshark")
+        if (action_id() == "search-grooveshark")
         {
             CannedQuery query("com.canonical.scopes.grooveshark");
             query.set_query_string("metal");
@@ -404,9 +409,9 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const&)
+unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata, scope_to_query_));
     return q;
 }
 
