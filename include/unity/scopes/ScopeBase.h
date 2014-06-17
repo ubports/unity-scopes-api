@@ -90,14 +90,15 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual void start();   // Mandatory
-    virtual void stop();    // Mandatory
+    virtual void start();   // Optional
+    virtual void stop();    // Optional
     virtual void run();     // Optional
 };
 ~~~
 
-The derived class must provide implementations of the pure virtual methods start()
-and stop(). In addition, the library must provide two functions with "C" linkage:
+The derived class gets passed an instance of RegistryProxy in the virtual method
+start(), so aggregating scopes need to override the default implementation.
+In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
 
@@ -153,7 +154,7 @@ public:
     \param registry A proxy to the scope registry. This parameter is provided for aggregating
     scopes that need to retrieve proxies to their child scopes.
     */
-    virtual void start(std::string const& scope_id, RegistryProxy const& registry) = 0;
+    virtual void start(std::string const& scope_id, RegistryProxy const& registry);
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
@@ -166,7 +167,7 @@ public:
 
     The call to stop() is made by the same thread that calls the create function and start().
     */
-    virtual void stop() = 0;
+    virtual void stop();
 
     /**
     \brief Called by the scopes run time after it has called start() to hand a thread of control to the scope.
