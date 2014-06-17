@@ -22,6 +22,7 @@
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::experimental;
 using namespace unity::scopes::internal;
 
 TEST(RatingFilter, basic)

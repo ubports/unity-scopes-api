@@ -34,6 +34,9 @@ namespace internal
 class ValueSliderFilterImpl;
 }
 
+namespace experimental
+{
+
 /**
 \brief A value slider filter that allows for selecting a value within given range.
 
@@ -175,6 +178,8 @@ private:
     internal::ValueSliderFilterImpl* fwd() const;
     friend class internal::ValueSliderFilterImpl;
 };
+
+} // namespace experimental
 
 } // namespace scopes
 

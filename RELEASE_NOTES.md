@@ -3,8 +3,8 @@ Release notes
 
 Changes in version 0.5.0
 ========================
-  - Implemented ValueSliderFilter.
-
+  - Moved all filter classes except for OptionSelectorFilter into experimental namespace, since they are not currently supported by the Shell
+    and their API may get changed.
   - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,
     and uses Department::SCPtr for it. SearchListenerBase::push() method for departments got changed to match as well. Removed
     constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department

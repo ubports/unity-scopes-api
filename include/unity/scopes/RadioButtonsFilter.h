@@ -37,6 +37,9 @@ class RadioButtonsFilterImpl;
 
 }
 
+namespace experimental
+{
+
 /**
 \brief A filter that displays mutually exclusive list of options.
 
@@ -116,6 +119,8 @@ private:
     internal::RadioButtonsFilterImpl* fwd() const;
     friend class internal::RadioButtonsFilterImpl;
 };
+
+} // namespace experimental
 
 } // namespace scopes
 

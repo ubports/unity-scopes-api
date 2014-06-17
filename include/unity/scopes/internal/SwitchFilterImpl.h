@@ -31,6 +31,8 @@ namespace scopes
 namespace internal
 {
 
+using namespace experimental;
+
 class SwitchFilterImpl : public FilterBaseImpl
 {
 public:

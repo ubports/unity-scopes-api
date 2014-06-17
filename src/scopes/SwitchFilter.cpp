@@ -25,6 +25,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 SwitchFilter::UPtr SwitchFilter::create(std::string const& id, std::string const& label)
 {
     return std::unique_ptr<SwitchFilter>(new SwitchFilter(new internal::SwitchFilterImpl(id, label)));
@@ -59,6 +62,8 @@ internal::SwitchFilterImpl* SwitchFilter::fwd() const
 {
     return dynamic_cast<internal::SwitchFilterImpl*>(p.get());
 }
+
+} // namespace experimental
 
 } // namespace scopes
 
