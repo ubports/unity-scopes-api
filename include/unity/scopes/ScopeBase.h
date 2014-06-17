@@ -31,9 +31,7 @@
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
 */
-// TODO: We really should consider a change in the minor version number as
-//       ABI incompatible, instead of just using the major version. See bug 1320026.
-#define UNITY_SCOPE_CREATE_FUNCTION unity_scope_create_v@UNITY_SCOPES_MAJOR@
+#define UNITY_SCOPE_CREATE_FUNCTION UNITY_SCOPES_VERSIONED_CREATE_SYM
 
 /**
 \brief Expands to the identifier of the scope destroy function. @hideinitializer

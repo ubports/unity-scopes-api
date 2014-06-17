@@ -42,6 +42,8 @@
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MINOR) "." \
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MICRO)
 
+#define UNITY_SCOPES_VERSIONED_CREATE_SYM unity_scope_create_v ## @UNITY_SCOPES_SOVERSION@
+
 /**
 \brief Top-level namespace for all things Unity-related.
 */
