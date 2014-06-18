@@ -48,6 +48,8 @@ public:
     unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
+
+    unity::scopes::RegistryProxy registry_;
 };
 
 } // namespace testing

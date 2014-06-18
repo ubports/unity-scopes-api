@@ -22,8 +22,11 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Department.h>
 #include <unity/scopes/PreviewReply.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/ScopeMetadata.h>
+#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchReply.h>
 
 #include "scope.h"
@@ -32,8 +35,6 @@
 
 namespace testing
 {
-
-using namespace unity::scopes;
 
 class ActivationShowingDash : public unity::scopes::ActivationQueryBase
 {
@@ -65,11 +66,32 @@ public:
     }
 };
 
+class SearchListener : public unity::scopes::SearchListenerBase
+{
+public:
+    SearchListener(unity::scopes::SearchReplyProxy const& reply, unity::scopes::Category::SCPtr const& category)
+        : reply_(reply), category_(category)
+    {
+    }
+
+    void finished(unity::scopes::ListenerBase::Reason, std::string const&) override {
+    }
+
+    void push(unity::scopes::CategorisedResult result) override {
+        result.set_category(category_);
+        reply_->push(result);
+    }
+
+private:
+    unity::scopes::SearchReplyProxy reply_;
+    unity::scopes::Category::SCPtr category_;
+};
+
 class Query : public unity::scopes::SearchQueryBase
 {
 public:
-    Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata)
-        : unity::scopes::SearchQueryBase(query, metadata)
+    Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata, unity::scopes::RegistryProxy const& registry)
+        : unity::scopes::SearchQueryBase(query, metadata), registry_(registry)
     {
     }
 
@@ -79,6 +101,16 @@ public:
 
     void run(unity::scopes::SearchReplyProxy const& reply) override
     {
+        if (query().query_string() == "aggregator test") {
+            aggregator_query(reply);
+        } else {
+            standard_query(reply);
+        }
+    }
+
+private:
+    void standard_query(unity::scopes::SearchReplyProxy const& reply) {
+        using namespace unity::scopes;
         Department::SPtr parent = Department::create("all", query(), "All Departments");
         Department::SPtr news_dep = Department::create("news", query(), "News");
         news_dep->set_subdepartments({Department::create("subdep1", query(), "Europe"), Department::create("subdep2", query(), "US")});
@@ -98,6 +130,16 @@ public:
         annotation.add_link("Link1", q);
         reply->push(annotation);
     }
+
+    void aggregator_query(unity::scopes::SearchReplyProxy const& reply) {
+        const auto childscope = registry_->get_metadata("child").proxy();
+        auto cat = reply->register_category("cat1", "Category 1", "");
+        unity::scopes::SearchListenerBase::SPtr listener(
+            new SearchListener(reply, cat));
+        subsearch(childscope, query().query_string(), listener);
+    }
+
+    unity::scopes::RegistryProxy registry_;
 };
 
 class Preview : public unity::scopes::PreviewQueryBase
@@ -125,8 +167,9 @@ public:
 
 } // namespace testing
 
-void testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &)
+void testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &registry)
 {
+    registry_ = registry;
 }
 
 void testing::Scope::stop()
@@ -141,7 +184,7 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &metadata)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata, registry_));
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
