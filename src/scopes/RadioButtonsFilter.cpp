@@ -25,6 +25,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 RadioButtonsFilter::RadioButtonsFilter(internal::RadioButtonsFilterImpl *impl)
     : FilterBase(impl)
 {
@@ -74,6 +77,8 @@ internal::RadioButtonsFilterImpl* RadioButtonsFilter::fwd() const
 {
     return dynamic_cast<internal::RadioButtonsFilterImpl*>(p.get());
 }
+
+} // namespace experimental
 
 } // namespace scopes
 

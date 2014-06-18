@@ -37,6 +37,9 @@ class RatingFilterImpl;
 
 }
 
+namespace experimental
+{
+
 /**
 \brief A filter that allows for rating-based selection.
 
@@ -172,6 +175,8 @@ private:
     internal::RatingFilterImpl* fwd() const;
     friend class internal::RatingFilterImpl;
 };
+
+} // namespace experimental
 
 } // namespace scopes
 

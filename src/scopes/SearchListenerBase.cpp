@@ -49,7 +49,7 @@ void SearchListenerBase::push(Category::SCPtr const& /* category */)
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void SearchListenerBase::push(Annotation /* annotation */)
+void SearchListenerBase::push(experimental::Annotation /* annotation */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

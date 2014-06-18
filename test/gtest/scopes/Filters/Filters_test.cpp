@@ -30,6 +30,7 @@
 #include <TestScope.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::experimental;
 using namespace unity::scopes::internal;
 
 class WaitUntilFinished
