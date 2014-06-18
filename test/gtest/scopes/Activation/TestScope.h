@@ -98,10 +98,7 @@ private:
 class TestScope : public ScopeBase
 {
 public:
-    virtual int start(std::string const&, RegistryProxy const &) override
-    {
-        return VERSION;
-    }
+    virtual void start(std::string const&, RegistryProxy const &) override {}
 
     virtual void stop() override {}
 

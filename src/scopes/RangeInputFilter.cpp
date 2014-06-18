@@ -26,6 +26,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id, std::string const& start_label, std::string const& end_label, std::string const& unit_label)
 {
     return std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id, start_label, end_label, unit_label)));
@@ -85,6 +88,8 @@ internal::RangeInputFilterImpl* RangeInputFilter::fwd() const
 {
     return dynamic_cast<internal::RangeInputFilterImpl*>(p.get());
 }
+
+} // namespace experimental
 
 } // namespace scopes
 

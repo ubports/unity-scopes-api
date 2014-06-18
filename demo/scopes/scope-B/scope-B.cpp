@@ -140,7 +140,7 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_id, RegistryProxy const& registry) override
+    virtual void start(string const& scope_id, RegistryProxy const& registry) override
     {
         scope_id_ = scope_id;
 
@@ -153,8 +153,6 @@ public:
         scope_c_ = meta_c.proxy();
         auto meta_d = registry->get_metadata("scope-D");
         scope_d_ = meta_d.proxy();
-
-        return VERSION;
     }
 
     virtual void stop() override {}

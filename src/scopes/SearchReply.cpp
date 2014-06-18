@@ -30,11 +30,6 @@ SearchReply::SearchReply() = default;
 
 SearchReply::~SearchReply() = default;
 
-bool SearchReply::register_annotation(Annotation const& annotation)
-{
-    return push(annotation);
-}
-
 /// @endcond
 
 } // namespace scopes

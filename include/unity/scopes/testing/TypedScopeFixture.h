@@ -64,8 +64,7 @@ public:
 
     void SetUp()
     {
-        EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR,
-                  scope->start(ScopeTraits<Scope>::name(), registry_proxy));
+        EXPECT_NO_THROW(scope->start(ScopeTraits<Scope>::name(), registry_proxy));
         EXPECT_NO_THROW(scope->run());
     }
 

@@ -38,6 +38,11 @@ namespace scopes
 class CategorisedResult;
 class FilterState;
 
+namespace experimental
+{
+class Annotation;
+}
+
 /**
 \brief Abstract base interface that a scope specializes to
 receive the results of a query.
@@ -77,7 +82,7 @@ public:
 
     The default implementation does nothing.
     */
-    virtual void push(Annotation annotation);
+    virtual void push(experimental::Annotation annotation);
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().

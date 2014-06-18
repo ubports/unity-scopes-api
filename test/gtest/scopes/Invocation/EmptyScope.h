@@ -27,7 +27,7 @@ using namespace unity::scopes;
 class EmptyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const &) override;
+    virtual void start(string const&, RegistryProxy const &) override;
 
     virtual void stop() override;
 

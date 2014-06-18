@@ -150,7 +150,7 @@ TEST_F(TestScopeFixture,
                             id, title, icon, renderer
                         }
                     }));
-    EXPECT_CALL(reply, push(Matcher<unity::scopes::Annotation const&>(_)))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::experimental::Annotation const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
     EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(_)))
