@@ -119,7 +119,7 @@ public:
     std::string action_id() const;
 
 private:
-    std::unique_ptr<internal::ActivationQueryBaseImpl> p;
+    internal::ActivationQueryBaseImpl* fwd() const;
 };
 
 } // namespace scopes

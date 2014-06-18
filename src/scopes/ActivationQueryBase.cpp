@@ -49,27 +49,32 @@ void ActivationQueryBase::cancelled()
 
 ActivationResponse ActivationQueryBase::activate()
 {
-    return p->activate();
+    return fwd()->activate();
 }
 
 Result ActivationQueryBase::result() const
 {
-    return p->result();
+    return fwd()->result();
 }
 
 ActionMetadata ActivationQueryBase::action_metadata() const
 {
-    return p->action_metadata();
+    return fwd()->action_metadata();
 }
 
 std::string ActivationQueryBase::widget_id() const
 {
-    return p->widget_id();
+    return fwd()->widget_id();
 }
 
 std::string ActivationQueryBase::action_id() const
 {
-    return p->action_id();
+    return fwd()->action_id();
+}
+
+internal::ActivationQueryBaseImpl* ActivationQueryBase::fwd() const
+{
+    return dynamic_cast<internal::ActivationQueryBaseImpl*>(p.get());
 }
 
 } // namespace scopes

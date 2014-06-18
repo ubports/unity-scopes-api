@@ -640,6 +640,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActivationResponse::status() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationQueryBase::action_metadata() const@Base" 0replaceme
+ (c++)"unity::scopes::ActivationQueryBase::fwd() const@Base" 0replaceme
  (c++)"unity::scopes::ActivationQueryBase::result() const@Base" 0replaceme
  (c++)"unity::scopes::ActivationQueryBase::action_id() const@Base" 0replaceme
  (c++)"unity::scopes::ActivationQueryBase::widget_id() const@Base" 0replaceme
