@@ -56,10 +56,7 @@ public:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
-    {
-        return VERSION;
-    }
+    virtual void start(string const&, RegistryProxy const&) override {}
 
     virtual void stop() override {}
 

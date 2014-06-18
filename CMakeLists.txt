@@ -181,6 +181,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 5)
 set(UNITY_SCOPES_MICRO 0)
+set(UNITY_SCOPES_SOVERSION 2)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
@@ -318,7 +319,6 @@ add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${CAPNPROTO_S
 set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 # Use the object files to make the normal library.
-set(UNITY_SCOPES_SOVERSION 1)
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
     VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"

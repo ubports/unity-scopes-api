@@ -39,6 +39,16 @@ ScopeBase::~ScopeBase()
 
 //! @endcond
 
+void ScopeBase::start(std::string const&, RegistryProxy const&)
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
+void ScopeBase::stop()
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
 void ScopeBase::run()
 {
     // Intentionally empty: default "do nothing" implementation.
