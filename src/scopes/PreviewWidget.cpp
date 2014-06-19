@@ -69,7 +69,7 @@ void MyPreview::run(PreviewReplyProxy const& reply)
     reply->push(widgets);
 
     // do a costly database lookup for the description
-    std::string description = fetch_description(result.uri());
+    std::string description = fetch_description(result().uri());
 
     reply->push("description", Variant(description));
 }
