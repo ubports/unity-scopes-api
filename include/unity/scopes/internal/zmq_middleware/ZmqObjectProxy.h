@@ -62,7 +62,7 @@ public:
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
-    std::string category() const;
+    std::string target_category() const;
     RequestMode mode() const;
     virtual int64_t timeout() const noexcept override;
 

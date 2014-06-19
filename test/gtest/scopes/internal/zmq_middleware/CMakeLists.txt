@@ -1,6 +1,6 @@
 add_subdirectory(ObjectAdapter)
 add_subdirectory(PubSub)
-#add_subdirectory(RegistryI)
+add_subdirectory(RegistryI)
 add_subdirectory(ServantBase)
 add_subdirectory(StopPublisher)
 add_subdirectory(Util)

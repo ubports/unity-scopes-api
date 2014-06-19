@@ -67,7 +67,7 @@ struct ObjectImpl : public virtual unity::scopes::Object
         return "";
     }
 
-    std::string category() override
+    std::string target_category() override
     {
         return "";
     }
@@ -159,7 +159,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
-    void register_departments(unity::scopes::DepartmentList const&, std::string) override
+    void register_departments(unity::scopes::Department::SCPtr const&) override
     {
     }
 
@@ -192,7 +192,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
         return true;
     }
 
-    bool push(unity::scopes::Annotation const&) override
+    bool push(unity::scopes::experimental::Annotation const&) override
     {
         return true;
     }

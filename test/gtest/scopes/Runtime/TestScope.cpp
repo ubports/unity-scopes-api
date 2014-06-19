@@ -24,6 +24,8 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/UnityExceptions.h>
+#include <gtest/gtest.h>
 
 #include "TestScope.h"
 
@@ -47,9 +49,26 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-        Department dep("news", query_, "News");
-        dep.set_subdepartments({{"subdep1", query_, "Europe"},{"subdep2", query_, "US"}});
-        reply->register_departments({dep}, "news");
+        // pushing invalid departments (current departnent not present in the tree) should throw
+        {
+            Department::SPtr parent = Department::create("unknown1", query_, "All departments");
+            Department::SPtr news_dep = Department::create("unknown2", query_, "News");
+            news_dep->set_subdepartments({Department::create("unknown3", query_, "Europe")});
+            parent->set_subdepartments({news_dep});
+            EXPECT_THROW(reply->register_departments(parent), unity::LogicException);
+        }
+
+        // pushing invalid departments (just one level) should throw
+        {
+            Department::SPtr parent = Department::create("unknown1", query_, "All departments");
+            EXPECT_THROW(reply->register_departments(parent), unity::LogicException);
+        }
+
+        Department::SPtr parent = Department::create("", query_, "All departments");
+        Department::SPtr news_dep = Department::create("news", query_, "News");
+        news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
+        parent->set_subdepartments({news_dep});
+        reply->register_departments(parent);
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
@@ -88,9 +107,8 @@ public:
     }
 };
 
-int TestScope::start(string const&, RegistryProxy const &)
+void TestScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void TestScope::stop()

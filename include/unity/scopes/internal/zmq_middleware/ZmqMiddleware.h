@@ -25,7 +25,6 @@
 #include <unity/scopes/internal/ThreadPool.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqConfig.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 #include <unity/scopes/ObjectProxyFwd.h>
 
@@ -133,9 +132,15 @@ private:
     mutable std::mutex state_mutex_;            // Protects state_
     std::atomic_bool shutdown_flag;
 
-    ZmqConfig config_;
-    const int64_t twoway_timeout_;              // Default timeout for twoway invocations
+    int64_t twoway_timeout_;                    // Default timeout for twoway invocations
     int64_t locate_timeout_;                    // Timeout for registry locate()
+
+    std::string public_endpoint_dir_;
+    std::string private_endpoint_dir_;
+    std::string registry_endpoint_dir_;
+    std::string ss_registry_endpoint_dir_;
+    std::string registry_identity_;
+    std::string ss_registry_identity_;
 };
 
 } // namespace zmq_middleware

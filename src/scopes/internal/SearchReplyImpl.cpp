@@ -40,12 +40,14 @@ namespace internal
 
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
                                  std::shared_ptr<QueryObjectBase> const& qo,
-                                 int cardinality) :
+                                 int cardinality,
+                                 std::string const& current_department_id) :
     ObjectImpl(mw_proxy),
     ReplyImpl(mw_proxy, qo),
     cat_registry_(new CategoryRegistry()),
     cardinality_(cardinality),
-    num_pushes_(0)
+    num_pushes_(0),
+    current_department_(current_department_id)
 {
 }
 
@@ -53,19 +55,19 @@ SearchReplyImpl::~SearchReplyImpl()
 {
 }
 
-void SearchReplyImpl::register_departments(DepartmentList const& departments, std::string current_department_id)
+void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
 {
     // basic consistency check
     try
     {
-        DepartmentImpl::validate_departments(departments, current_department_id);
+        DepartmentImpl::validate_departments(parent, current_department_);
     }
     catch (unity::LogicException const &e)
     {
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
-    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(departments, current_department_id)); // ignore return value?
+    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent)); // ignore return value?
 }
 
 void SearchReplyImpl::register_category(Category::SCPtr category)
@@ -90,7 +92,7 @@ Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
     return cat_registry_->lookup_category(id);
 }
 
-bool SearchReplyImpl::push(unity::scopes::Annotation const& annotation)
+bool SearchReplyImpl::push(unity::scopes::experimental::Annotation const& annotation)
 {
     VariantMap var;
     var["annotation"] = annotation.serialize();

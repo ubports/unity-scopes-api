@@ -37,7 +37,11 @@ namespace scopes
 
 class CategorisedResult;
 class CategoryRenderer;
+
+namespace experimental
+{
 class Annotation;
+}
 
 namespace internal
 {
@@ -47,10 +51,11 @@ class QueryObjectBase;
 class SearchReplyImpl : public virtual unity::scopes::SearchReply, public virtual ReplyImpl
 {
 public:
-    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality);
+    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality,
+            std::string const& current_department_id);
     virtual ~SearchReplyImpl();
 
-    virtual void register_departments(DepartmentList const& departments, std::string current_department_id) override;
+    virtual void register_departments(Department::SCPtr const& parent) override;
 
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
@@ -59,7 +64,7 @@ public:
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 
-    virtual bool push(unity::scopes::Annotation const& annotation) override;
+    virtual bool push(unity::scopes::experimental::Annotation const& annotation) override;
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
@@ -71,6 +76,7 @@ private:
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
+    std::string current_department_;
 };
 
 } // namespace internal

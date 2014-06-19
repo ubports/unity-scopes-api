@@ -29,6 +29,9 @@ namespace unity
 namespace scopes
 {
 
+class Result;
+class ActionMetadata;
+
 namespace internal
 {
 class ActivationQueryBaseImpl;
@@ -46,9 +49,26 @@ class ActivationQueryBase : public QueryBase
 public:
     /// @cond
     UNITY_DEFINES_PTRS(ActivationQueryBase);
-    ActivationQueryBase();
     virtual ~ActivationQueryBase();
     /// @endcond
+
+    /**
+     \brief Create ActivationQueryBase.
+
+     \param result The result received in ScopeBase::activate().
+     \param metadata The metadata received in ScopeBase::activate().
+    */
+    ActivationQueryBase(Result const& result, ActionMetadata const& metadata);
+
+    /**
+     \brief Create ActivationQueryBase.
+
+     \param result The result received in ScopeBase::perform_action().
+     \param metadata The metadata received in ScopeBase::perform_action().
+     \param widget_id The widget identifier receiver in ScopeBase::perform_action().
+     \param action_id The action identifier receiver in ScopeBase::perform_action().
+    */
+    ActivationQueryBase(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
     /**
      \brief Called when the originator of the activation request cancelled it.
@@ -64,8 +84,42 @@ public:
      */
     virtual ActivationResponse activate();
 
+    /**
+    \brief Get the result for this activation request handler.
+
+    \return The result passed to the constructor of this object.
+    */
+    Result result() const;
+
+    /**
+    \brief Get the metadata for this activation request handler.
+
+    \return The metadata passed to the constructor of this object.
+    */
+    ActionMetadata action_metadata() const;
+
+    /**
+    \brief Get the widget identifier for this activation request handler.
+
+    Widget identifier is empty when using the
+    unity::scopes::ActivationQueryBase(Result const& result, ActionMetadata const& metadata) constructor.
+
+    \return The widget identifier passed to the constructor of this object.
+    */
+    std::string widget_id() const;
+
+    /**
+    \brief Get the action identifier for this activation request handler.
+
+    Action identifier is empty when using the
+    unity::scopes::ActivationQueryBase(Result const& result, ActionMetadata const& metadata) constructor.
+
+    \return The action identifier passed to the constructor of this object.
+    */
+    std::string action_id() const;
+
 private:
-    std::unique_ptr<internal::ActivationQueryBaseImpl> p;
+    internal::ActivationQueryBaseImpl* fwd() const;
 };
 
 } // namespace scopes

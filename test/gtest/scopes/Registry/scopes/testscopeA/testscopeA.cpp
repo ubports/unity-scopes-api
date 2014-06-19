@@ -30,8 +30,8 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(CannedQuery const& query) :
-        query_(query)
+    MyQuery(CannedQuery const& query, SearchMetadata const& metadata) :
+        SearchQueryBase(query, metadata)
     {
     }
 
@@ -42,14 +42,16 @@ public:
     virtual void run(SearchReplyProxy const&) override
     {
     }
-
-private:
-    CannedQuery query_;
 };
 
 class MyPreview : public PreviewQueryBase
 {
 public:
+    MyPreview(Result const& result, ActionMetadata const& metadata)
+        : PreviewQueryBase(result, metadata)
+    {
+    }
+
     virtual void cancelled() override
     {
     }
@@ -62,22 +64,19 @@ public:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
-    {
-        return VERSION;
-    }
+    virtual void start(string const&, RegistryProxy const&) override {}
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(q));
+        SearchQueryBase::UPtr query(new MyQuery(q, metadata));
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview());
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata));
         return preview;
     }
 };

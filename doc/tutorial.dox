@@ -60,7 +60,7 @@ In the template, a manifest like the follow is used:
 \code
 {
   "description": "Net scope description",
-  "framework": "ubuntu-sdk-14.04-clibs",
+  "framework": "ubuntu-sdk-14.10-dev1",
   "hooks": {
     "myscope": {
       "scope": "myscope", <-- Point to directory in build tree with .ini and .so
@@ -88,7 +88,7 @@ For a scope confined to access local content only:
 \code
 {
     "template": "ubuntu-scope-local-content",
-    "policy_version": 1.1
+    "policy_version": 1.2
 }
 \endcode
 
@@ -97,10 +97,7 @@ For a scope confined to only be able to access the internet:
 \code
 {
     "template": "ubuntu-scope-network",
-    "policy_groups": [
-        "networking"
-    ],
-    "policy_version": 1.1
+    "policy_version": 1.2
 }
 \endcode
 
@@ -135,7 +132,7 @@ unity::scopes::ScopeBase::preview() methods.
 class MyScope: public unity::scopes::ScopeBase
 {
 public:
-    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override;
+    virtual void start(std::string const&, unity::scopes::RegistryProxy const&) override;
     virtual void stop() override;
     virtual void run() override;
     virtual unity::scopes::SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override;
@@ -143,17 +140,11 @@ public:
 }
 \endcode
 
-The \link unity::scopes::ScopeBase::start() start\endlink method must, at the very least return unity::scopes::ScopeBase::VERSION, e.g.
+The \link unity::scopes::ScopeBase::start() start\endlink method gets passed a RegistryProxy instance, which can be used by aggregating scopes to locate their children.
+The \link unity::scopes::ScopeBase::stop() stop\endlink method is usually used to release any resources, such as network connections where applicable.
+Non-aggregating scopes are not required to override the \link unity::scopes::ScopeBase::start() start\endlink nor \link unity::scopes::ScopeBase::stop() stop\endlink methods.
 
-\code{.cpp}
-int MyScope::start(string const&, unity::scopes::RegistryProxy const&)
-{
-    return ScopeBase::VERSION;
-}
-\endcode
-
-The \link unity::scopes::ScopeBase::stop() stop\endlink method should release any resources, such as network connections where applicable. See the
-documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
+See the documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
 is useful; for typical and simple cases the implementation of run can be an empty function.
 
 \paragraph handlingsearch Handling search
@@ -165,7 +156,7 @@ unity::scopes::SearchQueryBase interface, e.g:
 \code{.cpp}
 SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata));
     return q;
 }
 \endcode
@@ -205,7 +196,7 @@ void MyQuery::run(SearchReplyProxy const& reply)
     auto category = reply->register_category("recommended", "Recommended", icon);
     //... query a local or remote backend
 
-    for (auto res: backend.get_results(search_query)) // for every result returned by a backend
+    for (auto res: backend.get_results(query().query_string())) // for every result returned by a backend
     {
         ...
         CategorisedResult result(category); // create a result item in "recommended" category
@@ -323,10 +314,15 @@ a new search query to be executed as follows:
 \code{.cpp}
 class MyActivation : public unity::scopes::ActivationQueryBase
 {
+    MyActivation(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) :
+        ActivationQueryBase(result, metadata)
+    {
+    }
+
     virtual unity::scopes::ActivationResponse activate() override
     {
         ...
-        if (action_id == "search-grooveshark")
+        if (action_id() == "search-grooveshark")
         {
             CannedQuery query("com.canonical.scopes.grooveshark");
             query.set_query_string("metal");
@@ -378,9 +374,9 @@ extern "C" {
 }
 \endcode
 
-\subsubsection aggscope Case 2: A simple aggregator scope.
+\subsubsection aggscope Case 2: An aggregating scope.
 
-Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
+Aggregator scope is not much different from simple scopes, except for its data sources can include any other scope(s). The main difference is in the
 implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
 \link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
 
@@ -407,9 +403,9 @@ int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& regis
     return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const&)
+unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata, scope_to_query_));
     return q;
 }
 
@@ -584,6 +580,10 @@ The name of the scope's `.ini` file _must_ be a unique ID for the scope. We _str
 suggest to use a unique identifier, such as `com.canonical.scopes.scopename`, to avoid
 clashes with scopes created by other developers.
 
+The name of of the scope's `.so` file can be `libscopename.so`, `scopename.so`, or simply `scope.so`. For example,
+for a scope named `Fred`, the names `libFred.so`, `Fred.so`, and `scope.so` are acceptable. (No other library
+names are valid.)
+
 The scope `.ini` file uses the standard `.ini` file format, with the
 following keys:
 
@@ -598,9 +598,11 @@ following keys:
     ResultsTtlType = None, Small, Medium, or Large
 
     [Appearance]
-    TODO: document valid attributes
+    PageHeader.Logo = image containing scope's logo
+    ForegroundColor = default text color (defaults to theme-provided foreground color)
+    BackgroundColor = color of scope background (default is transparent)
 
-The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and Author.
+The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
 `DisplayName` and `Description` can (and should) be localized. For example:
 
 `Description[de] = Fu&szlig;ballergebnisse`
@@ -608,9 +610,7 @@ The `ScopeConfig` group is mandatory and must contain settings for at least `Dis
 In addition to allowing the registry to make the scope available, this information controls how the scope appears
 in the "Scopes" scope.
 
-The name of of the scope's `.so` file can be `libscopename.so`, `scopename.so`, or simply `scope.so`. For example,
-for a scope named `Fred`, the names `libFred.so`, `Fred.so`, and `scope.so` are acceptable. (No other library
-names are valid.)
+The group `Appearance` and all keys within are optional and can be used to customize the look of the scope.
 
 \subsection scopetool Previewing scope
 

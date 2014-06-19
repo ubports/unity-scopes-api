@@ -54,7 +54,7 @@ void wait(int millisec = 200)
 
 TEST(ObjectAdapter, basic)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Instantiate and destroy oneway and twoway adapters with single and multiple threads.
@@ -133,7 +133,7 @@ TEST(ObjectAdapter, basic)
 
 TEST(ObjectAdapter, state_change)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     {
@@ -228,7 +228,7 @@ TEST(ObjectAdapter, state_change)
 
 TEST(ObjectAdapter, wait_for_shutdown)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     // Start the adapter and call shutdown() from a different thread after a delay, and wait for the
@@ -337,7 +337,7 @@ TEST(ObjectAdapter, add_remove_find)
 
 TEST(ObjectAdapter, dispatch_oneway_to_twoway)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
@@ -373,7 +373,7 @@ TEST(ObjectAdapter, dispatch_oneway_to_twoway)
 
 TEST(ObjectAdapter, dispatch_twoway_to_oneway)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
@@ -400,7 +400,7 @@ TEST(ObjectAdapter, dispatch_twoway_to_oneway)
 
 TEST(ObjectAdapter, dispatch_not_exist)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
@@ -442,7 +442,7 @@ TEST(ObjectAdapter, dispatch_not_exist)
 
 TEST(ObjectAdapter, bad_header)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     {
@@ -503,7 +503,7 @@ TEST(ObjectAdapter, bad_header)
 
 TEST(ObjectAdapter, corrupt_header)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     {
@@ -1056,7 +1056,7 @@ TEST(ObjectAdapter, double_bind)
 
         wait(200);  // Give zmq some time to finish the bind.
 
-        ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+        ZmqMiddleware mw("testscope", nullptr,
                          TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
         wait();
@@ -1093,7 +1093,7 @@ TEST(ObjectAdapter, double_bind)
 
         wait(200);  // Give zmq some time to finish the bind.
 
-        ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+        ZmqMiddleware mw("testscope", nullptr,
                          TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
         wait();
         try
@@ -1121,7 +1121,7 @@ TEST(ObjectAdapter, double_bind)
 
 TEST(ObjectAdapter, dflt_servant)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();
@@ -1176,7 +1176,7 @@ TEST(ObjectAdapter, dflt_servant)
 
 TEST(ObjectAdapter, dflt_servant_exceptions)
 {
-    ZmqMiddleware mw("testscope", (RuntimeImpl*)0x1,
+    ZmqMiddleware mw("testscope", nullptr,
                      TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ObjectAdapter/Zmq.ini");
 
     wait();

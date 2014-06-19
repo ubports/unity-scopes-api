@@ -37,14 +37,14 @@ class DepartmentImpl
 public:
     DepartmentImpl(CannedQuery const& query, std::string const& label);
     DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label);
-    DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
     DepartmentImpl(DepartmentImpl const&) = default;
     ~DepartmentImpl() = default;
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
-    void set_has_subdepartments();
+    void set_has_subdepartments(bool subdepartments);
     void set_subdepartments(DepartmentList const& departments);
+    void add_subdepartment(Department::SCPtr const& department);
     void set_alternate_label(std::string const& label);
     std::string alternate_label() const;
 
@@ -55,13 +55,14 @@ public:
     DepartmentList subdepartments() const;
     VariantMap serialize() const;
 
-    static Department create(VariantMap const& var);
-    static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
-    static VariantMap serialize_departments(DepartmentList const& departments, std::string const& current_department_id);
-    static DepartmentList deserialize_departments(VariantArray const& var);
+    static Department::UPtr create(VariantMap const& var);
+    static void validate_departments(Department::SCPtr const& parent);
+    static void validate_departments(Department::SCPtr const& parent, std::string const& current_id);
+    static VariantMap serialize_departments(Department::SCPtr const& parent);
+    static Department::SCPtr find_subdepartment_by_id(Department::SCPtr const& department, std::string const& id);
 
 private:
-    static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);
+    static void validate_departments(Department::SCPtr const& department, std::unordered_set<std::string>& lookup);
     CannedQuery query_;
     std::string label_;
     std::string alt_label_;

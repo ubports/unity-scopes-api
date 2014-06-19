@@ -57,41 +57,38 @@ public:
         std::string locale_env = "LANGUAGE=test_TEST";
         ::putenv(const_cast<char*>(locale_env.c_str()));
 
-        // Instantiate SS registry and scopes runtimes
-        reg_rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
-        scope_rt_ = RuntimeImpl::create(scope_id_, SS_RUNTIME_PATH);
+        // Instantiate runtime
+        rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
 
         // Get registry config
-        RegistryConfig reg_conf(reg_id_, reg_rt_->registry_configfile());
+        RegistryConfig reg_conf(reg_id_, rt_->registry_configfile());
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
-        ss_config_ = SSConfig(reg_rt_->ss_configfile());
+        ss_config_ = SSConfig(rt_->ss_configfile());
 
         // Get middleware handles from runtimes
-        reg_mw_ = reg_rt_->factory()->find(reg_id_, mw_kind);
-        scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
+        mw_ = rt_->factory()->find(reg_id_, mw_kind);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, ss_config_, scope_mw_->get_scope_endpoint(),
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
                                                            "http://127.0.0.1:" + std::to_string(server_.port_), false));
-        scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
+        scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, mw_, reg_));
 
         // Add objects to the middlewares
-        reg_mw_->add_registry_object(reg_rt_->registry_identity(), reg_);
-        scope_mw_->add_dflt_scope_object(std::move(scope_));
+        mw_->add_registry_object(rt_->registry_identity(), reg_);
+        mw_->add_dflt_scope_object(std::move(scope_));
     }
 
     void reset_reg()
     {
-        reg_.reset(new SSRegistryObject(reg_mw_, ss_config_, scope_mw_->get_scope_endpoint(),
+        reg_.reset(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
                                         "http://127.0.0.1:" + std::to_string(server_.port_), false));
     }
 
     ~smartscopesproxytest()
     {
-        scope_rt_->destroy();
-        reg_rt_->destroy();
+        rt_->destroy();
     }
 
 protected:
@@ -100,13 +97,11 @@ protected:
     std::string reg_id_;
     std::string scope_id_;
 
-    RuntimeImpl::UPtr reg_rt_;
-    RuntimeImpl::UPtr scope_rt_;
+    RuntimeImpl::UPtr rt_;
 
     SSConfig ss_config_;
 
-    MiddlewareBase::SPtr reg_mw_;
-    MiddlewareBase::SPtr scope_mw_;
+    MiddlewareBase::SPtr mw_;
 
     SSRegistryObject::SPtr reg_;
     SSScopeObject::UPtr scope_;
@@ -134,7 +129,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
 
     // locate should throw (via mw)
-    MWRegistryProxy mw_reg = reg_mw_->registry_proxy();
+    MWRegistryProxy mw_reg = mw_->registry_proxy();
     EXPECT_THROW(mw_reg->locate("Dummy Demo Scope"), RegistryException);
 
     // list scopes (via mw)

@@ -25,6 +25,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 RatingFilter::RatingFilter(internal::RatingFilterImpl *impl)
     : FilterBase(impl)
 {
@@ -99,6 +102,8 @@ internal::RatingFilterImpl* RatingFilter::fwd() const
 {
     return dynamic_cast<internal::RatingFilterImpl*>(p.get());
 }
+
+} // namespace experimental
 
 } // namespace scopes
 

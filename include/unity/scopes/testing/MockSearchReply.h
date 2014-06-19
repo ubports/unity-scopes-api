@@ -21,6 +21,7 @@
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/Department.h>
 
 #include <unity/scopes/testing/MockObject.h>
 
@@ -47,7 +48,7 @@ public:
     MOCK_METHOD1(error, void(std::exception_ptr));
 
     // From SearchReply
-    MOCK_METHOD2(register_departments, void(DepartmentList const&, std::string ));
+    MOCK_METHOD1(register_departments, void(Department::SCPtr const&));
     MOCK_METHOD4(register_category,
                  Category::SCPtr(std::string const&,
                                  std::string const&,
@@ -57,8 +58,7 @@ public:
     MOCK_METHOD1(lookup_category, Category::SCPtr(std::string const&));
     MOCK_METHOD1(push, bool(CategorisedResult const&));
     MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
-    MOCK_METHOD1(register_annotation, bool(Annotation const& annotation));
-    MOCK_METHOD1(push, bool(Annotation const& annotation));
+    MOCK_METHOD1(push, bool(experimental::Annotation const& annotation));
 };
 
 /// @endcond

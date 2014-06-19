@@ -43,7 +43,7 @@ public:
     virtual MiddlewareBase* mw_base() const noexcept = 0;
 
     virtual std::string identity() const = 0;
-    virtual std::string category() const = 0;
+    virtual std::string target_category() const = 0;
     virtual std::string endpoint() const = 0;
     virtual int64_t timeout() const noexcept = 0;
 

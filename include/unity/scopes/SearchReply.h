@@ -33,7 +33,11 @@ namespace scopes
 {
 
 class CategorisedResult;
+
+namespace experimental
+{
 class Annotation;
+}
 
 /**
 \brief Allows the results of a search query to be sent to the query source.
@@ -53,33 +57,40 @@ public:
       <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
       <li>create a Department node for parent of current department (if applicable - not when in root department), and attach current Department node to it with
       unity::scopes::Department::set_subdepartments() method.
-      <li>register a unity::scopes::DepartmentList that has just the parent department in it.
+      <li>register the parent department with unity::scopes::SearchReply::register_departments().
       </ul>
 
      For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments such as "World War Two" and "Ancient", the code
      that registers departments for current search in "History" may look like this:
      \code{.cpp}
-     unity::scopes::Department books("books", query, "Books"); // the parent of "History"
-     unity::scopes::Department history({"history", query, "History"});
-     unity::scopes::DepartmentList history_depts({"ww2", query, "World War Two"}, {"ancient", query, "Ancient"});
-     history.set_subdepartments(history_depts);
-     books.set_subdepartments({history});
-     reply->register_departments({books}, "history");
+     unity::scopes::Department::SPtr books = move(unity::scopes::Department::create("books", query, "Books")); // the parent of "History"
+     unity::scopes::Department::SPtr history = move(unity::scopes::Department::create("history", query, "History"));
+     unity::scopes::DepartmentList history_depts({
+                                                 move(unity::scopes::Department::create("ww2", query, "World War Two")),
+                                                 move(unity::scopes::Department::create("ancient", query, "Ancient"))});
+     history->set_subdepartments(history_depts);
+     books->set_subdepartments({history});
+     reply->register_departments(books);
      \endcode
 
-     current_department_id should in most cases be the department returned by unity::scopes::CannedQuery::department_id().
-     Pass an empty string for current_department_id to indicate no active department.
+     Current department should be the department returned by unity::scopes::CannedQuery::department_id(). Empty department id denotes
+     the root deparment.
 
-     \param departments A list of departments.
-     \param current_department_id A department id that should be considered current.
+     \param parent The parent department of current department, or current one if visiting root department.
+     \throws unity::LogicException if departments are invalid (nullptr passed, current department not present in the parent's tree, duplicated department ids present in the tree).
      */
-    virtual void register_departments(DepartmentList const& departments, std::string current_department_id = "") = 0;
+    virtual void register_departments(Department::SCPtr const& parent) = 0;
 
     /**
-    \brief Register an existing category instance and send it to the source of the query.
+    \brief Register new category and send it to the source of the query.
 
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
-    results and categories from other scope(s).
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param renderer_template The renderer template to be used for results in this category
+
+    \return The category instance
+    \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
@@ -87,8 +98,12 @@ public:
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
-    \brief Returns a previously registered category.
-    \return The category instance or `nullptr` if the category does not exist registered.
+    \brief Register an existing category instance and send it to the source of the query.
+
+    The purpose of this call is to register a category obtained via SearchListenerBase::push(Category::SCPtr const&) when aggregating
+    results and categories from other scope(s).
+
+    \throws unity::InvalidArgumentException if category is already registered.
     */
     virtual void register_category(Category::SCPtr category) = 0;
 
@@ -113,18 +128,12 @@ public:
 
     /**
     \brief Push an annotation.
-    \deprecated Push an annotation. Please use push(Annotation const&) instead. This method will be removed with version 0.4.5 of the Scopes API.
-     */
-    virtual bool register_annotation(Annotation const& annotation);
-
-    /**
-    \brief Push an annotation.
 
     The annotation will be rendered at a next available spot below the category of last pushed result.
     To render an annotation in the top annotation area, push it before pushing search results.
     \note The Unity shell can ignore some or all annotations, depending on available screen real estate.
     */
-    virtual bool push(Annotation const& annotation) = 0;
+    virtual bool push(experimental::Annotation const& annotation) = 0;
 
     /**
     \brief Sends all filters and their state to the source of a query.

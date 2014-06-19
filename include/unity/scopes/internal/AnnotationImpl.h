@@ -34,6 +34,8 @@ namespace scopes
 namespace internal
 {
 
+using namespace experimental;
+
 class AnnotationImpl
 {
 public:

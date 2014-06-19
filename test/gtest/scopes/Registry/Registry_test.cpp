@@ -179,7 +179,7 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
     // check now that we get a callback when testscopeB terminates (timed out after 2s)
-    std::this_thread::sleep_for(std::chrono::seconds{3});
+    std::this_thread::sleep_for(std::chrono::seconds{4});
     EXPECT_TRUE(wait_for_state_update());
     EXPECT_FALSE(testscopeB_state);
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
@@ -401,6 +401,9 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
+        // Allow the registry process some time to start up,
+        // so we don't get an ObjectNotExistException.
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         return rc;

@@ -28,6 +28,7 @@
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
+#include <unity/scopes/testing/Result.h>
 #include <TestScope.h>
 
 using namespace unity::scopes;
@@ -583,4 +584,23 @@ TEST(Activation, scope)
         EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->scope_data().get_dict()["activated_uri"].get_string());
     }
+}
+
+class MyActivation : public ActivationQueryBase
+{
+public:
+    MyActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+};
+
+// check that parameters to ActivationQueryBase ctor are accessible via getters
+TEST(Activation, activation_query_base)
+{
+    unity::scopes::testing::Result res;
+    ActionMetadata hints("pl", "phone");
+    MyActivation act(res, hints);
+    EXPECT_EQ("", act.result().uri());
+    EXPECT_EQ("pl", act.action_metadata().locale());
 }

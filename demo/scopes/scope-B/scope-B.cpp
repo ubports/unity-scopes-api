@@ -45,7 +45,7 @@ using namespace unity::scopes;
 class Receiver: public SearchListenerBase
 {
 public:
-    virtual void push(Category::SCPtr category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cerr << scope_id_ << ": received category: id=" << category->id() << endl;
     }
@@ -90,10 +90,11 @@ class MyQuery : public SearchQueryBase
 public:
     MyQuery(string const& scope_id,
             CannedQuery const& query,
+            SearchMetadata const& metadata,
             ScopeProxy const& scope_c,
             ScopeProxy const& scope_d) :
+        SearchQueryBase(query, metadata),
         scope_id_(scope_id),
-        query_(query),
         scope_c_(scope_c),
         scope_d_(scope_d)
     {
@@ -101,7 +102,7 @@ public:
 
     virtual void cancelled()
     {
-        cerr << scope_id_ << ": query " << query_.query_string() << " was cancelled" << endl;
+        cerr << scope_id_ << ": query " << query().query_string() << " was cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& upstream_reply)
@@ -124,13 +125,12 @@ public:
         }
 
         SearchListenerBase::SPtr reply(new Receiver(scope_id_, upstream_reply));
-        subsearch(scope_c_, query_.query_string(), reply);
-        subsearch(scope_d_, query_.query_string(), reply);
+        subsearch(scope_c_, query().query_string(), reply);
+        subsearch(scope_d_, query().query_string(), reply);
     }
 
 private:
     string scope_id_;
-    CannedQuery query_;
     ScopeProxy scope_c_;
     ScopeProxy scope_d_;
 };
@@ -140,7 +140,7 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_id, RegistryProxy const& registry) override
+    virtual void start(string const& scope_id, RegistryProxy const& registry) override
     {
         scope_id_ = scope_id;
 
@@ -153,15 +153,13 @@ public:
         scope_c_ = meta_c.proxy();
         auto meta_d = registry->get_metadata("scope-D");
         scope_d_ = meta_d.proxy();
-
-        return VERSION;
     }
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, scope_c_, scope_d_));
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata, scope_c_, scope_d_));
         cerr << "scope-B: created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }

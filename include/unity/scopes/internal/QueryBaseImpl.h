@@ -36,40 +36,13 @@ namespace scopes
 namespace internal
 {
 
-class QueryBaseImpl final
+class QueryBaseImpl
 {
 public:
     QueryBaseImpl();
-    ~QueryBaseImpl();
-
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
-
-    void cancel();
-    void set_metadata(SearchMetadata const& metadata);
-    bool valid() const;
-
-private:
-    SearchMetadata::UPtr search_metadata_;
-    std::vector<QueryCtrlProxy> subqueries_;
-    bool valid_;
-    mutable std::mutex mutex_;
+    virtual ~QueryBaseImpl();
+    virtual void cancel() = 0;
+    virtual bool valid() const = 0;
 };
 
 } // namespace internal

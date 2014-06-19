@@ -31,6 +31,11 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
+    MyQuery(CannedQuery const& query, SearchMetadata const& metadata) :
+        SearchQueryBase(query, metadata)
+    {
+    }
+
     virtual void cancelled() override
     {
     }
@@ -48,8 +53,8 @@ public:
 class MyPreview : public PreviewQueryBase
 {
 public:
-    MyPreview(string const& uri) :
-        uri_(uri)
+    MyPreview(Result const& result, ActionMetadata const& metadata) :
+        PreviewQueryBase(result, metadata)
     {
     }
 
@@ -67,41 +72,44 @@ public:
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
         reply->push(widgets);
     }
-
-private:
-    string uri_;
 };
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
-    {
-        return VERSION;
-    }
+    virtual void start(string const&, RegistryProxy const&) override {}
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery());
+        SearchQueryBase::UPtr query(new MyQuery(q, metadata));
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
     {
-        PreviewQueryBase::UPtr preview(new MyPreview(result.uri()));
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata));
         return preview;
     }
 };
 
 int main(int argc, char** argv)
 {
-    char const* const rt_config = argc > 1 ? argv[1] : TEST_RUNTIME_FILE;
-    char const* const scope_config = argc > 2 ? argv[2] : TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB.ini";
+    // Set parameter as "FAIL" if not provided as to intentionally break the scope, hence causing
+    // dependant tests to fail (E.g. Registry_test and RegistryI_test).
+    std::string unused_arg_1 = argc > 1 ? argv[1] : "FAIL";
+    std::string scope_config = argc > 2 ? argv[2] : "FAIL";
+    std::string rt_config = argc > 3 ? argv[3] : "FAIL";
+    std::string unused_arg_2 = argc > 4 ? argv[4] : "FAIL";
 
-    MyScope scope;
-    auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
-    runtime->run_scope(&scope, rt_config, scope_config);
-    return 0;
+    // In order to test that custom exec splitting works, we check here that our arbitrary arguments
+    // have been delivered to us as expected.
+    if (unused_arg_1 == "unused arg 1" && unused_arg_2 == "unused arg 2")
+    {
+        MyScope scope;
+        auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
+        runtime->run_scope(&scope, rt_config, scope_config);
+        return 0;
+    }
 }

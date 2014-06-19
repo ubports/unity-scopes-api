@@ -56,9 +56,8 @@ public:
 
 }  // namespace
 
-int TestScope::start(string const&, RegistryProxy const &)
+void TestScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void TestScope::stop()
@@ -83,7 +82,7 @@ SearchQueryBase::UPtr TestScope::search(CannedQuery const&, SearchMetadata const
 
     if (count++ == 0)
     {
-        this_thread::sleep_for(chrono::milliseconds(3000));  // Force timeout on first call
+        this_thread::sleep_for(chrono::milliseconds(4000));  // Force timeout on first call
     }
     return SearchQueryBase::UPtr(new TestQuery());
 }

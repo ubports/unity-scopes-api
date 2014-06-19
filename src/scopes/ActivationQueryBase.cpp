@@ -26,9 +26,14 @@ namespace scopes
 {
 
 /// @cond
-ActivationQueryBase::ActivationQueryBase() :
-    QueryBase(),
-    p(new internal::ActivationQueryBaseImpl())
+ActivationQueryBase::ActivationQueryBase(Result const& result, ActionMetadata const& metadata) :
+    QueryBase(new internal::ActivationQueryBaseImpl(result, metadata))
+{
+}
+
+
+ActivationQueryBase::ActivationQueryBase(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id) :
+    QueryBase(new internal::ActivationQueryBaseImpl(result, metadata, widget_id, action_id))
 {
 }
 
@@ -44,7 +49,32 @@ void ActivationQueryBase::cancelled()
 
 ActivationResponse ActivationQueryBase::activate()
 {
-    return p->activate();
+    return fwd()->activate();
+}
+
+Result ActivationQueryBase::result() const
+{
+    return fwd()->result();
+}
+
+ActionMetadata ActivationQueryBase::action_metadata() const
+{
+    return fwd()->action_metadata();
+}
+
+std::string ActivationQueryBase::widget_id() const
+{
+    return fwd()->widget_id();
+}
+
+std::string ActivationQueryBase::action_id() const
+{
+    return fwd()->action_id();
+}
+
+internal::ActivationQueryBaseImpl* ActivationQueryBase::fwd() const
+{
+    return dynamic_cast<internal::ActivationQueryBaseImpl*>(p.get());
 }
 
 } // namespace scopes

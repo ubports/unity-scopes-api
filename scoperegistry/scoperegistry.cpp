@@ -298,7 +298,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         {
             throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
         }
-        exec_data.scoperunner_path = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+        exec_data.custom_exec = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
     }
     catch (NotFoundException const&)
     {
@@ -475,7 +475,7 @@ main(int argc, char* argv[])
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
-        middleware->add_registry_object(runtime->registry_identity(), registry);
+        auto p = middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware

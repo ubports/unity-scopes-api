@@ -98,7 +98,8 @@ TEST_F(SmartScopesClientTest, search)
 {
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    std::vector<SearchResult> results = search_handle->get_search_results();
+    auto search_results = search_handle->get_search_results();
+    std::vector<SearchResult> results = search_results.second;
     ASSERT_EQ(3u, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
@@ -127,6 +128,32 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ(nullptr, results[2].other_params["icon"]);
     EXPECT_EQ("https://dash.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
     EXPECT_EQ(nullptr, results[2].category);
+
+    // check departments
+    auto dept = search_results.first;
+    EXPECT_TRUE(dept != nullptr);
+    EXPECT_EQ("All", dept->label);
+    EXPECT_EQ("Foo", dept->alternate_label);
+    EXPECT_FALSE(dept->has_subdepartments);
+
+    auto const subdepts = dept->subdepartments;
+    EXPECT_EQ(2u, subdepts.size());
+    EXPECT_EQ("A", subdepts[0]->label);
+    EXPECT_EQ("", subdepts[0]->alternate_label);
+    EXPECT_EQ("scope://foo?q=&dep=a", subdepts[0]->canned_query);
+    EXPECT_FALSE(subdepts[0]->has_subdepartments);
+
+    {
+        auto const subdepts_a = subdepts[0]->subdepartments;
+        EXPECT_EQ(1u, subdepts_a.size());
+        EXPECT_EQ("C", subdepts_a[0]->label);
+        EXPECT_EQ("", subdepts_a[0]->alternate_label);
+        EXPECT_EQ("scope://foo?q=&dep=c", subdepts_a[0]->canned_query);
+    }
+
+    EXPECT_EQ("B", subdepts[1]->label);
+    EXPECT_EQ("scope://foo?q=&dep=b", subdepts[1]->canned_query);
+    EXPECT_FALSE(subdepts[1]->has_subdepartments);
 }
 
 TEST_F(SmartScopesClientTest, preview)
@@ -181,19 +208,24 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
     auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    std::vector<SearchResult> results = search_handle1->get_search_results();
+    auto search_results = search_handle1->get_search_results();
+    std::vector<SearchResult> results = search_results.second;
     EXPECT_EQ(3u, results.size());
 
-    results = search_handle2->get_search_results();
+    search_results = search_handle2->get_search_results();
+    results = search_results.second;
     EXPECT_EQ(3u, results.size());
 
-    results = search_handle3->get_search_results();
+    search_results = search_handle3->get_search_results();
+    results = search_results.second;
     EXPECT_EQ(3u, results.size());
 
-    results = search_handle4->get_search_results();
+    search_results = search_handle4->get_search_results();
+    results = search_results.second;
     EXPECT_EQ(3u, results.size());
 
-    results = search_handle5->get_search_results();
+    search_results = search_handle5->get_search_results();
+    results = search_results.second;
     EXPECT_EQ(3u, results.size());
 }
 
@@ -208,7 +240,8 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
 
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    std::vector<SearchResult> results = search_handle->get_search_results();
+    auto search_results = search_handle->get_search_results();
+    std::vector<SearchResult> results = search_results.second;
     EXPECT_EQ(3u, results.size());
 }
 

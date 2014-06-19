@@ -20,6 +20,7 @@
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/SearchReply.h>
@@ -45,7 +46,8 @@ class SmartQuery : public SearchQueryBase
 {
 public:
     SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)
-        : scope_id_(scope_id)
+        : SearchQueryBase(query, hints),
+          scope_id_(scope_id)
         , query_(query)
     {
         static const std::string no_net_hint("no-internet");
@@ -78,6 +80,22 @@ public:
         }
     }
 
+    Department::SCPtr create_department(std::shared_ptr<DepartmentInfo const> const& deptinfo)
+    {
+        CannedQuery const query = CannedQuery::from_uri(deptinfo->canned_query);
+        Department::SPtr dep = Department::create(query, deptinfo->label);
+        if (!deptinfo->alternate_label.empty())
+        {
+            dep->set_alternate_label(deptinfo->alternate_label);
+        }
+        dep->set_has_subdepartments(deptinfo->has_subdepartments);
+        for (auto const& d: deptinfo->subdepartments)
+        {
+            dep->add_subdepartment(create_department(d));
+        }
+        return dep;
+    }
+
     virtual void run(SearchReplyProxy const& reply) override
     {
         if (search_handle_ == nullptr)
@@ -86,10 +104,25 @@ public:
             return;
         }
 
-        std::vector<SearchResult> results = search_handle_->get_search_results();
+        SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
-        for (auto& result : results)
+        if (results.first) // are there any departments?
+        {
+            try
+            {
+                auto const& deptinfo = results.first;
+                Department::SCPtr root = create_department(deptinfo);
+                reply->register_departments(root);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': "
+                    << e.what() << std::endl;
+            }
+        }
+
+        for (auto& result : results.second)
         {
             if (!result.category)
             {
@@ -138,14 +171,14 @@ class SmartPreview : public PreviewQueryBase
 {
 public:
     SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
-        : scope_id_(scope_id)
-        , result_(result)
+        : PreviewQueryBase(result, hints)
+        , scope_id_(scope_id)
     {
         SmartScopesClient::SPtr ss_client = reg->get_ssclient();
         std::string base_url = reg->get_base_url(scope_id_);
 
         ///! TODO: session_id, widgets_api_version, country
-        preview_handle_ = ss_client->preview(base_url, result_["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
+        preview_handle_ = ss_client->preview(base_url, result["result_json"].get_string(), "session_id", hints.form_factor(), 0, hints.locale(), "");
     }
 
     ~SmartPreview()
@@ -192,17 +225,22 @@ public:
 
         reply->push(widget_list);
 
-        std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result_.uri() << "\" complete" << std::endl;
+        std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
     }
 
 private:
     std::string scope_id_;
-    Result result_;
     PreviewHandle::UPtr preview_handle_;
 };
 
 class NullActivation : public ActivationQueryBase
 {
+public:
+    NullActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+
     ActivationResponse activate() override
     {
         return ActivationResponse(ActivationResponse::Status::NotHandled);
@@ -211,6 +249,12 @@ class NullActivation : public ActivationQueryBase
 
 class SmartActivation : public ActivationQueryBase
 {
+public:
+    SmartActivation(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
+        : ActivationQueryBase(result, metadata, widget_id, action_id)
+    {
+    }
+
     ActivationResponse activate() override
     {
         ///! TODO: need SSS endpoint for this
@@ -226,9 +270,9 @@ public:
     {
     }
 
-    QueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
+    SearchQueryBase::UPtr search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
     {
-        QueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
+        SearchQueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
         std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
         return query;
     }
@@ -240,15 +284,15 @@ public:
         return preview;
     }
 
-    ActivationQueryBase::UPtr activate(std::string const&, Result const&, ActionMetadata const&)
+    ActivationQueryBase::UPtr activate(std::string const&, Result const& result, ActionMetadata const& metadata)
     {
-        ActivationQueryBase::UPtr activation(new NullActivation());
+        ActivationQueryBase::UPtr activation(new NullActivation(result, metadata));
         return activation;
     }
 
-    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& /*hints*/, std::string const& /*widget_id*/, std::string const& /*action_id*/)
+    ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
     {
-        ActivationQueryBase::UPtr activation(new SmartActivation());
+        ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, widget_id, action_id));
         std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
         return activation;
     }

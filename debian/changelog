@@ -1,3 +1,11 @@
+unity-scopes-api (0.5.0-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented ValueSliderFilter.
+  * Changes to departments API.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 23 May 2014 17:49:42 +0200
+
 unity-scopes-api (0.4.8+14.10.20140604.1-0ubuntu1) utopic; urgency=medium
 
   [ Marcus Tomlinson ]
@@ -54,6 +62,16 @@ unity-scopes-api (0.4.6+14.10.20140519-0ubuntu1) utopic; urgency=medium
   * debian/*symbols: auto-update new symbols to released version
 
  -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 19 May 2014 10:10:28 +0000
+
+unity-scopes-api (0.4.6+14.10.20140508-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented RangeInputFilter.
+
+  [ Michi Henning ]
+  * Changed parameter type for pushing categories to Category::SCPtr const&
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 15 May 2014 13:54:38 +1000
 
 unity-scopes-api (0.4.5+14.10.20140513-0ubuntu1) utopic; urgency=low
 

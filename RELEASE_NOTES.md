@@ -1,6 +1,25 @@
 Release notes
 =============
 
+Changes in version 0.5.0
+========================
+  - Changed ScopeBase::start() method to return void instead of int, and made both start() and stop() methods virtual instead of pure virtual.
+  - Moved all filter classes except for OptionSelectorFilter into experimental namespace, since they are not currently supported by the Shell
+    and their API may get changed.
+  - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and shouldn't be used as their API
+    may change or get removed.
+  - removed deprecated SearchReply::register_annotation() method.
+  - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,
+    and uses Department::SCPtr for it. SearchListenerBase::push() method for departments got changed to match as well. Removed
+    constructors of Department and added static create() methods instead. Changed DepartmentList to hold Department
+    pointers instead of values. Changed Department::set_has_subdepartments() method to take bool value (true by default).
+
+  - Changed parameter type for pushing categories on SearchListenerBase to Category::SCPtr const&.
+
+  - Changed constructor of SearchQueryBase to take CannedQuery and SearchMetadata arguments.
+    Changed constructor of PreviewQueryBase to take Result and ActionMetadata arguments. Changed ActivationQueryBase constructor to take Result, widget id and
+    action id argument. All the constructor arguments are then available via respective getters of the base classes.
+
 Changes in version 0.4.8
 ========================
   - Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories, and added API to subscribe to changes in registry.
@@ -8,6 +27,7 @@ Changes in version 0.4.8
 Changes in version 0.4.7
 ========================
   - Implemented RatingFilter and RadioButtonsFilter.
+
   - changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique_ptr (UPtr)
     instead of shared pointers.
 

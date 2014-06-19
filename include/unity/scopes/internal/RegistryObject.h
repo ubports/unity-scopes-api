@@ -47,6 +47,7 @@ public:
         ScopeExecData() = default;
         ScopeExecData(std::initializer_list<std::string>) = delete;
         std::string scope_id;
+        std::string custom_exec;
         std::string scoperunner_path;
         std::string runtime_config;
         std::string scope_config;
@@ -108,6 +109,8 @@ private:
 
         bool wait_for_state(std::unique_lock<std::mutex>& lock, ProcessState state) const;
         void kill(std::unique_lock<std::mutex>& lock);
+
+        std::vector<std::string> expand_custom_exec();
 
     private:
         const ScopeExecData exec_data_;

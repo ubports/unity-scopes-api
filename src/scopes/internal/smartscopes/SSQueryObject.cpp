@@ -198,15 +198,15 @@ void SSQueryObject::add_query(SSQuery::QueryType query_type,
 
 void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
-    QueryBase::SPtr q_base;
+    SearchQueryBase::SPtr q_base;
     SearchReplyProxy q_reply_proxy;
     SearchQueryBase::SPtr search_query;
 
-    q_base = query->q_base;
+    q_base = std::dynamic_pointer_cast<SearchQueryBase>(query->q_base);
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this(), query->q_cardinality);
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this(), query->q_cardinality, q_base->department_id());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 

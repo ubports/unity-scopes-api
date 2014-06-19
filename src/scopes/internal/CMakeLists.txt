@@ -40,6 +40,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
@@ -69,11 +70,14 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ValueSliderFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

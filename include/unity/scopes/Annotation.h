@@ -38,6 +38,9 @@ class AnnotationImpl;
 class ResultReplyObject;
 }
 
+namespace experimental
+{
+
 /**
  * \brief Query link(s) that result in a new search query when clicked by the user.
  */
@@ -130,6 +133,8 @@ private:
 
     friend class internal::ResultReplyObject;
 };
+
+} // namespace experimental
 
 } // namespace scopes
 

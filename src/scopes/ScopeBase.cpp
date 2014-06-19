@@ -39,19 +39,29 @@ ScopeBase::~ScopeBase()
 
 //! @endcond
 
+void ScopeBase::start(std::string const&, RegistryProxy const&)
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
+void ScopeBase::stop()
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
 void ScopeBase::run()
 {
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationQueryBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* metadata */)
+ActivationQueryBase::UPtr ScopeBase::activate(Result const& result, ActionMetadata const& metadata)
 {
-    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata)); // default impl returns NotHandled
 }
 
-ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* widget_id */, std::string const& /* action_id */)
+ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
 {
-    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata, widget_id, action_id)); // default impl returns NotHandled
 }
 
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept

@@ -90,16 +90,9 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        DepartmentList const departments = DepartmentImpl::deserialize_departments(it->second.get_array());
-        it = data.find("current_department");
-        if (it != data.end())
-        {
-            receiver_->push(departments, it->second.get_string());
-        }
-        else
-        {
-            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
-        }
+        Department::SCPtr department = DepartmentImpl::create(it->second.get_dict());
+        internal::DepartmentImpl::validate_departments(department);
+        receiver_->push(department);
     }
 
     it = data.find("annotation");

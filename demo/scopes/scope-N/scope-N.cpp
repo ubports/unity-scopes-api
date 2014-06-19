@@ -32,8 +32,9 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(string const& scope_id)
-        : scope_id_(scope_id)
+    MyQuery(string const& scope_id, CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata),
+          scope_id_(scope_id)
     {
         cerr << scope_id_ << ": query instance created" << endl;
     }
@@ -67,17 +68,16 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_id, RegistryProxy const&) override
+    virtual void start(string const& scope_id, RegistryProxy const&) override
     {
         scope_id_ = scope_id;
-        return VERSION;
     }
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override
     {
-        return SearchQueryBase::UPtr(new MyQuery(scope_id_));
+        return SearchQueryBase::UPtr(new MyQuery(scope_id_, query, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override

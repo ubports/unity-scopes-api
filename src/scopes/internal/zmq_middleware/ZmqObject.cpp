@@ -98,7 +98,7 @@ string ZmqObjectProxy::identity() const
     return identity_;
 }
 
-string ZmqObjectProxy::category() const
+string ZmqObjectProxy::target_category() const
 {
     lock_guard<mutex> lock(shared_mutex);
     return category_;
@@ -230,7 +230,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
         // otherwise we will deadlock on the following ZmqObjectProxy methods)
         std::string endpoint = new_proxy->endpoint();
         std::string identity = new_proxy->identity();
-        std::string category = new_proxy->category();
+        std::string category = new_proxy->target_category();
         int64_t timeout = new_proxy->timeout();
         {
             lock_guard<mutex> lock(shared_mutex);

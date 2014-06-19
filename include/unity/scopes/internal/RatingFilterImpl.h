@@ -31,6 +31,8 @@ namespace scopes
 namespace internal
 {
 
+using namespace experimental;
+
 class RatingFilterImpl : public RadioButtonsFilterImpl
 {
 public:

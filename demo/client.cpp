@@ -57,11 +57,11 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
-std::string to_string(Department const& dep, std::string const& indent = "")
+std::string to_string(Department::SCPtr const& dep, std::string const& indent = "")
 {
     std::ostringstream str;
-    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << ", has_children=" << dep.has_subdepartments() << endl;
-    auto const subdeps = dep.subdepartments();
+    str << indent << "department id=" << dep->id() << ", name=" << dep->label() << ", has_children=" << dep->has_subdepartments() << endl;
+    auto const subdeps = dep->subdepartments();
     if (!subdeps.empty())
     {
         str << indent << "\tsubdepartments:" << endl;
@@ -128,17 +128,13 @@ public:
     {
     }
 
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    virtual void push(Department::SCPtr const& parent) override
     {
         cout << "\treceived departments:" << endl;
-        for (auto const& dep: departments)
-        {
-            cout << to_string(dep);
-        }
-        cout << "\tcurrent department=" << current_department_id << endl;
+        cout << to_string(parent);
     }
 
-    virtual void push(Category::SCPtr category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cout << "received category: id=" << category->id()
              << " title=" << category->title()
@@ -161,7 +157,7 @@ public:
         }
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         auto links = annotation.links();
         cout << "received annotation of type " << annotation.annotation_type()

@@ -84,7 +84,7 @@ The following keys are recognized:
   or terminate correctly. If a scope does not respond
   within the allotted time, it is killed with SIGKILL.
 
-  The default value is 1500 milliseconds.
+  The default value is 2500 milliseconds.
 
   Note that this value must be less than Locate.Timeout in the [<Middleware>]
   config group, otherwise the middleware can prematurely conclude that
@@ -109,12 +109,21 @@ The following keys are recognized:
   This endpoint must be accessible to any process.
 
   The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
-  set, initialization fails.
+  set, or $XDG_RUNTIME_DIR does not exist or is not writable, initialization fails.
 
-  The public directory is created if it does not exist, with mode rwxr-xr-xt.
+  Otherwise, the public directory is created if it does not exist, with mode rwxr-xr-xt.
 
-  Private endpoints are created in "<EndpointDir.Public>/priv". The priv
+  Private endpoints are created in "<EndpointDir>/priv". The priv
   directory is created if it does not exist, with mode rwx------t.
+
+- Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry.)
+
+  The directory is created if it does not exist, with mode rwxr-xr-xt.
 
 - Default.Twoway.Timeout
 
@@ -124,6 +133,14 @@ The following keys are recognized:
   after asking the registry to start the target process first (see Locate.Timeout).
 
   The default value is 300 milliseconds.
+
+- Smartscopes.Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry,
+  while still using the system-wide smartscopes registry.)
 
 - Locate.Timeout
 
@@ -139,7 +156,7 @@ The following keys are recognized:
   this range would either cause locate() to falsely conclude that a scope
   could not be started, or cause an unacceptably long wait time.)
 
-  The default value is 2000 milliseconds.
+  The default value is 3000 milliseconds.
 
 
 Registry.ini
@@ -167,11 +184,12 @@ The following keys are recognized:
 - Scoperunner.Path
 
   The path to the scoperunner executable. The path must be an absolute path.
-  The default value is "/usr/lib/<arch>/scoperunner".
+  The default value is "/usr/lib/<arch>/unity-scopes/scoperunner".
 
 - Scope.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files.
+
   The default value is "/usr/lib/<arch>/unity-scopes".
 
 - OEM.InstallDir
@@ -182,6 +200,7 @@ The following keys are recognized:
 - Click.InstallDir
 
   The directory in which to look for subdirectories containing scopes installed from click packages.
+
   The default value is "$HOME/.local/share/unity-scopes".
 
 
@@ -200,19 +219,29 @@ The following keys are recognized:
 - Http.Reply.Timeout
 
   The amount of time (in seconds) to wait for a reply from the smartscopes server.
+  The value must be in the range 1 - 60.
+
+  The default value is 20 seconds.
 
 - Registry.Refresh.Rate
 
-  The amount of time (in seconds) between a metadata refresh from the smartscopes server.
+  The amount of time (in seconds) between metadata refreshes from the smartscopes server.
+  The value must be >= 60.
+
+  The default value is 24 hours.
 
 - Registry.Refresh.Fail.Timeout
 
   The amount of time (in seconds) in between retry attempts if a metadata refresh from
   the smartscopes server fails.
+  The value must be >= 1.
+
+  The default value is 10 seconds.
 
 - Scope.Identity
 
   The identity for proxy scope provided by smartscopesproxy.
+
   The default value is "SmartScope".
 
 
@@ -268,7 +297,15 @@ The following keys are recognized in the ScopeConfig group:
 
 - ScopeRunner
 
-  The path to a custom scoperunner binary. If not set, the default scoperunner is used.
+  A custom scoperunner command-line to be executed when the scope is invoked.
+  The following placeholders can be used to substitute config paths where required:
+
+  - %R - absolute path to the runtime .ini config file
+  - %S - absolute path to the scope's .ini config file
+
+  E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"
+  
+  If not set, the default scoperunner is used.
 
 - IdleTimeout
 
