@@ -1,4 +1,4 @@
-unity-scopes-api (0.5.0-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.5.0+14.10.20140619-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]
   * Implemented ValueSliderFilter.
@@ -7,7 +7,7 @@ unity-scopes-api (0.5.0-0ubuntu1) UNRELEASED; urgency=medium
   [ Ubuntu daily release ]
   * debian/*symbols: auto-update new symbols to released version
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 23 May 2014 17:49:42 +0200
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 19 Jun 2014 10:47:15 +0000
 
 unity-scopes-api (0.4.8+14.10.20140604.1-0ubuntu1) utopic; urgency=medium
 
