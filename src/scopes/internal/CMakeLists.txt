@@ -70,6 +70,8 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SettingsDB.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp

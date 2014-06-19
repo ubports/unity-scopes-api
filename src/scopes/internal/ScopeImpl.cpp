@@ -98,6 +98,8 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
+    // TODO: Add settings to the metadata. Settings can be accessed via the run time.
+
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 

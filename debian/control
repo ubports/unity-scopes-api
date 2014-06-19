@@ -23,6 +23,7 @@ Build-Depends: debhelper (>= 9),
                lttng-tools,
                qtbase5-dev,
                libjsoncpp-dev,
+               libu1db-dev,
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
