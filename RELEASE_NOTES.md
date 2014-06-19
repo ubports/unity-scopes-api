@@ -3,6 +3,7 @@ Release notes
 
 Changes in version 0.5.0
 ========================
+  - Changed ScopeBase::start() method to return void instead of int, and made both start() and stop() methods virtual instead of pure virtual.
   - Moved all filter classes except for OptionSelectorFilter into experimental namespace, since they are not currently supported by the Shell
     and their API may get changed.
   - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and shouldn't be used as their API
