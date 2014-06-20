@@ -1,0 +1,35 @@
+{
+    "settings": [
+        {
+            "id": "locationSetting",
+            "displayName": "Location",
+            "type": "string",
+            "parameters": {
+            }
+        },
+        {
+            "id": "unitTempSetting",
+            "displayName": "Temperature Units",
+            "type": "list",
+            "parameters": {
+                "values": ["Celcius", "Fahrenheit"]
+            }
+        },
+        {
+            "id": "ageSetting",
+            "displayName": "Age",
+            "type": "number",
+            "parameters": {
+                "defaultValue": 23
+            }
+        },
+        {
+            "id": "enabledSetting",
+            "displayName": "Enabled",
+            "type": "boolean",
+            "parameters": {
+                "defaultValue": true
+            }
+        }
+    ]
+}

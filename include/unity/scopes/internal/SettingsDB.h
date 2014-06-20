@@ -19,7 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 #define UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 
-#include <unity/scopes/internal/SettingsSchema.h>
+#include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
 #include <unity/util/ResourcePtr.h>
 
 #include <u1db/u1db.h>
@@ -45,18 +47,30 @@ public:
     SettingsDB(SettingsDB&&) = default;
     SettingsDB& operator=(SettingsDB&&) = default;
 
-    void get_all_docs();
+    VariantMap settings();  // Returns the current settings (checking the DB each time).
+
+    // These should be private, but we can't make them private because an extern "C"
+    // callback cannot access private members.
+
+    void process_doc_(std::string const& id, std::string const& json);
+
+    bool state_changed_;
 
 private:
+    void process_all_docs();
+    void set_defaults();
+
     std::string path_;
-    unity::scopes::internal::SettingsSchema::UPtr schema_;
     unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
+    int generation_;
+    unity::scopes::VariantMap field_defs_;
+    unity::scopes::VariantMap values_;
 };
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity
 
 #endif

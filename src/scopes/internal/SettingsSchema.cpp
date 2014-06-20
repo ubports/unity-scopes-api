@@ -43,7 +43,7 @@ namespace
 // Parses out a single setting from the given JSON value and makes it available as a Variant value.
 // If no default value is specified for a setting, default_value() returns a Variant containing null.
 
-class Setting
+class Setting final
 {
 public:
     NONCOPYABLE(Setting);
