@@ -202,7 +202,7 @@ void SettingsDB::process_all_docs()
     if (status != U1DB_OK)
     {
         throw ResourceException("SettingsDB(): u1db_whats_changed() failed, status = "
-                                + to_string(status) + ", db = " + path_);                  // LCOV_EXCL_LINE
+                                + to_string(status) + ", db = " + path_);
     }
 
     if (state_changed_)

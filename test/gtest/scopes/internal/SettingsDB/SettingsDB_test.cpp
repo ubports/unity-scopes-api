@@ -21,6 +21,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/FileIO.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 
 using namespace unity;
@@ -239,8 +240,34 @@ TEST(SettingsDB, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsDB: u1db_open() failed, "
-                     "db = /home/michi/src/settings/usa/build/test/gtest/scopes/internal/SettingsDB/db",
-                     e.what());
+        EXPECT_EQ("unity::ResourceException: SettingsDB: u1db_open() failed, db = " + db_name, e.what());
+    }
+
+    try
+    {
+        unlink(db_name.c_str());
+
+        // Create DB with one record.
+        add_doc("default-locationSetting", R"( { "value": "Munich" } )");
+
+        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/schema.json");
+        SettingsDB db(db_name, schema);
+
+        auto s = db.settings();
+        EXPECT_EQ(4, s.size());
+        EXPECT_EQ("Munich", s["locationSetting"].get_string());
+
+        // Clobber the DB.
+        system((string("cat >") + db_name + " <<EOF\nx\nEOF" + db_name).c_str());
+
+        // Call settings(), which will fail.
+        db.settings();
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        boost::regex r(string("unity::ResourceException: SettingsDB\\(\\): u1db_whats_changed\\(\\) failed, "
+                              "status = [0-9]+, db = ") + db_name);
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 }
