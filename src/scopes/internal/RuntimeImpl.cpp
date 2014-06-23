@@ -40,6 +40,8 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
+#include <sys/stat.h>
+
 
 using namespace std;
 using namespace unity::scopes;
@@ -100,7 +102,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
 
-        settings_db_ = config.data_directory() + "/" + scope_id_ + "/settings.db";
+        data_dir_ = config.data_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -303,6 +305,10 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         string json_schema_file = scope_base->scope_directory() + "/" + scope_id_ + ".json";
         string json = unity::util::read_text_file(json_schema_file);
 
+        // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+        ::mkdir(data_dir_.c_str(), 0700);
+        ::mkdir((data_dir_ + "/" + scope_id_).c_str(), 0700);
+        string settings_db = data_dir_ + "/" + scope_id_ + "/settings.db";
         unique_ptr<SettingsDB> db(new SettingsDB(settings_db_, json));
         scope_base->p->set_settings_db(move(db));
     }

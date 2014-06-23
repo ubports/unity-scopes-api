@@ -257,16 +257,21 @@ public:
 
     \note The scope directory is available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
+
+    \return The scope's configuration directory.
     */
     std::string scope_directory() const;
 
     /**
     \brief Returns a dictionary with the scope's current settings.
 
-    \note Instead of storing the return value, it is preferable to call settings()
+    Instead of storing the return value, it is preferable to call settings()
     each time the your implementation requires a settings value. This ensures
     that, if a user changes settings while the scope is running, the new settings
     take effect with the next query.
+
+    \note The are available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
 
     \return The scope's current settings.
     */
