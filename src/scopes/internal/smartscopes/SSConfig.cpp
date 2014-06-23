@@ -49,7 +49,7 @@ namespace
 }
 
 SSConfig::SSConfig(string const& configfile) :
-    ConfigBase(configfile, DFLT_SS_INI)
+    ConfigBase(configfile, DFLT_SS_REGISTRY_INI)
 {
     if (configfile.empty())
     {

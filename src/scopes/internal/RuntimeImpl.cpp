@@ -30,6 +30,7 @@
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 
 #include <signal.h>
 #include <libgen.h>
@@ -98,6 +99,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             auto registry_mw_proxy = middleware_->registry_proxy();
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
+
+        settings_db_ = config.data_directory() + "/" + scope_id_ + "/settings.db";
     }
     catch (unity::Exception const& e)
     {
@@ -292,6 +295,20 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
         const string scope_dir(dirname(&scope_ini[0]));
         scope_base->p->set_scope_directory(scope_dir);
+    }
+
+    // Try to open the scope settings database, if any.
+    try
+    {
+        string json_schema_file = scope_base->scope_directory() + "/" + scope_id_ + ".json";
+        string json = unity::util::read_text_file(json_schema_file);
+
+        unique_ptr<SettingsDB> db(new SettingsDB(settings_db_, json));
+        scope_base->p->set_settings_db(move(db));
+    }
+    catch (FileException const&)
+    {
+        // Scope doesn't have settings.
     }
 
     scope_base->start(scope_id_, registry());

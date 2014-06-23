@@ -260,6 +260,18 @@ public:
     */
     std::string scope_directory() const;
 
+    /**
+    \brief Returns a dictionary with the scope's current settings.
+
+    \note Instead of storing the return value, it is preferable to call settings()
+    each time the your implementation requires a settings value. This ensures
+    that, if a user changes settings while the scope is running, the new settings
+    take effect with the next query.
+
+    \return The scope's current settings.
+    */
+    VariantMap settings() const;
+
 protected:
     /// @cond
     ScopeBase();

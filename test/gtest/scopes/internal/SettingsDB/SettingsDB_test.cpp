@@ -30,19 +30,11 @@ using namespace std;
 
 string const db_name = TEST_BIN_DIR "/db";
 string const add_cmd = TEST_SRC_DIR "/add_doc.py";
-string const del_cmd = TEST_SRC_DIR "/del_doc.py";
 
 void add_doc(const string& doc_id, const string& json)
 {
     ostringstream s;
     s << add_cmd << " " << db_name << " " << doc_id << " '" << json << "'";
-    system(s.str().c_str());
-}
-
-void del_doc(const string& doc_id)
-{
-    ostringstream s;
-    s << del_cmd << " " << db_name << " " << doc_id;
     system(s.str().c_str());
 }
 

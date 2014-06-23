@@ -90,6 +90,18 @@ The following keys are recognized:
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
 
+- DataDir
+
+  The parent directory under the run time writes scope-specific data files
+  (such as settings).
+
+  The default value is $HOME/.local/share/unity-scopes.
+
+  Note that the actual files are written into subdirectories of
+  this directory, for example:
+
+  $HOME/.local/share/unity-scopes/<scope_id>/settings.db
+
 
 Zmq.ini
 -------

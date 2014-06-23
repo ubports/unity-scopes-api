@@ -19,6 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
+#include <unity/scopes/internal/SettingsDB.h>
+
 #include <string>
 
 namespace unity
@@ -37,9 +39,12 @@ public:
     ~ScopeBaseImpl() = default;
     void set_scope_directory(std::string const &path);
     std::string scope_directory() const;
+    void set_settings_db(std::unique_ptr<unity::scopes::internal::SettingsDB> db);
+    unity::scopes::VariantMap settings() const;
 
 private:
     std::string scope_directory_;
+    std::unique_ptr<unity::scopes::internal::SettingsDB> db_;
 };
 
 } // namespace internal

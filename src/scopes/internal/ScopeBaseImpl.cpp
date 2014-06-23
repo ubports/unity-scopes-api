@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
+using namespace unity::scopes;
+
 namespace unity
 {
 
@@ -35,6 +37,16 @@ void ScopeBaseImpl::set_scope_directory(std::string const &path)
 std::string ScopeBaseImpl::scope_directory() const
 {
     return scope_directory_;
+}
+
+void ScopeBaseImpl::set_settings_db(std::unique_ptr<unity::scopes::internal::SettingsDB> db)
+{
+    db_ = move(db);
+}
+
+VariantMap ScopeBaseImpl::settings() const
+{
+    return db_ ? db_->settings() : VariantMap();
 }
 
 } // namespace internal
