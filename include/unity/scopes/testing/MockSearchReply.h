@@ -54,19 +54,11 @@ public:
                                  std::string const&,
                                  std::string const&,
                                  CategoryRenderer const&));
-    MOCK_METHOD6(register_category,
-                 Category::SCPtr(std::string const&,
-                                 std::string const&,
-                                 std::string const&,
-                                 CategoryRenderer const&,
-                                 Category::TapBehavior,
-                                 Category::TapBehavior));
     MOCK_METHOD1(register_category, void(Category::SCPtr category));
     MOCK_METHOD1(lookup_category, Category::SCPtr(std::string const&));
     MOCK_METHOD1(push, bool(CategorisedResult const&));
     MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
-    MOCK_METHOD1(register_annotation, bool(Annotation const& annotation));
-    MOCK_METHOD1(push, bool(Annotation const& annotation));
+    MOCK_METHOD1(push, bool(experimental::Annotation const& annotation));
 };
 
 /// @endcond

@@ -121,12 +121,21 @@ The following keys are recognized:
   This endpoint must be accessible to any process.
 
   The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
-  set, initialization fails.
+  set, or $XDG_RUNTIME_DIR does not exist or is not writable, initialization fails.
 
-  The public directory is created if it does not exist, with mode rwxr-xr-xt.
+  Otherwise, the public directory is created if it does not exist, with mode rwxr-xr-xt.
 
-  Private endpoints are created in "<EndpointDir.Public>/priv". The priv
+  Private endpoints are created in "<EndpointDir>/priv". The priv
   directory is created if it does not exist, with mode rwx------t.
+
+- Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry.)
+
+  The directory is created if it does not exist, with mode rwxr-xr-xt.
 
 - Default.Twoway.Timeout
 
@@ -136,6 +145,14 @@ The following keys are recognized:
   after asking the registry to start the target process first (see Locate.Timeout).
 
   The default value is 300 milliseconds.
+
+- Smartscopes.Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry,
+  while still using the system-wide smartscopes registry.)
 
 - Locate.Timeout
 
@@ -184,6 +201,7 @@ The following keys are recognized:
 - Scope.InstallDir
 
   The directory in which to look for subdirectories containing scope .so and .ini files.
+
   The default value is "/usr/lib/<arch>/unity-scopes".
 
 - OEM.InstallDir
@@ -194,6 +212,7 @@ The following keys are recognized:
 - Click.InstallDir
 
   The directory in which to look for subdirectories containing scopes installed from click packages.
+
   The default value is "$HOME/.local/share/unity-scopes".
 
 
@@ -212,19 +231,29 @@ The following keys are recognized:
 - Http.Reply.Timeout
 
   The amount of time (in seconds) to wait for a reply from the smartscopes server.
+  The value must be in the range 1 - 60.
+
+  The default value is 20 seconds.
 
 - Registry.Refresh.Rate
 
-  The amount of time (in seconds) between a metadata refresh from the smartscopes server.
+  The amount of time (in seconds) between metadata refreshes from the smartscopes server.
+  The value must be >= 60.
+
+  The default value is 24 hours.
 
 - Registry.Refresh.Fail.Timeout
 
   The amount of time (in seconds) in between retry attempts if a metadata refresh from
   the smartscopes server fails.
+  The value must be >= 1.
+
+  The default value is 10 seconds.
 
 - Scope.Identity
 
   The identity for proxy scope provided by smartscopesproxy.
+
   The default value is "SmartScope".
 
 

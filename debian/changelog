@@ -1,11 +1,21 @@
-unity-scopes-api (0.5.0-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.0+14.10.20140624-0ubuntu1) UNRELEASED; urgency=medium
+
+  * [ Michi Henning ]
+
+    Added support for scope settings.
+
+ -- Michi Henning <michi.henning@canonical.com>  Tue, 24 Jun 2014 19:47:52 +1000
+
+unity-scopes-api (0.5.0+14.10.20140619-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]
   * Implemented ValueSliderFilter.
-  * Added support for setting single/long tap behavior to Category API.
   * Changes to departments API.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 06 Jun 2014 10:39:04 +0200
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 19 Jun 2014 10:47:15 +0000
 
 unity-scopes-api (0.4.8+14.10.20140604.1-0ubuntu1) utopic; urgency=medium
 

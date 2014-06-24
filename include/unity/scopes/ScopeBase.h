@@ -31,7 +31,7 @@
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
 */
-#define UNITY_SCOPE_CREATE_FUNCTION unity_scope_create
+#define UNITY_SCOPE_CREATE_FUNCTION UNITY_SCOPES_VERSIONED_CREATE_SYM
 
 /**
 \brief Expands to the identifier of the scope destroy function. @hideinitializer
@@ -90,14 +90,15 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual int start();    // Mandatory
-    virtual void stop();    // Mandatory
+    virtual void start();   // Optional
+    virtual void stop();    // Optional
     virtual void run();     // Optional
 };
 ~~~
 
-The derived class must provide implementations of the pure virtual methods start()
-and stop(). In addition, the library must provide two functions with "C" linkage:
+The derived class gets passed an instance of RegistryProxy in the virtual method
+start(), so aggregating scopes need to override the default implementation.
+In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
 
@@ -124,7 +125,7 @@ UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 ~~~
 
 After the scopes run time has obtained a pointer to the class instance from the create function, it calls start(),
-which allows the scope to intialize itself. This is followed by call to run(). The call to run() is made by
+which allows the scope to intialize itself. This is followed by a call to run(). The call to run() is made by
 a separate thread; its only purpose is to pass a thread of control to the scope, for example, to run an event loop.
 When the scope should complete its activities, the run time calls stop(). The calls to the create function, start(),
 stop(), and the destroy function) are made by the same thread.
@@ -142,11 +143,6 @@ public:
     /// @endcond
 
     /**
-    \brief This value must be returned from the start() method.
-    */
-    static constexpr int VERSION = UNITY_SCOPES_VERSION_MAJOR;
-
-    /**
     \brief Called by the scopes run time after the create function completes.
 
     If start() throws an exception, stop() will _not_ be called.
@@ -157,12 +153,8 @@ public:
 
     \param registry A proxy to the scope registry. This parameter is provided for aggregating
     scopes that need to retrieve proxies to their child scopes.
-
-    \return Any return value other than ScopeBase::VERSION will cause the scopes run time
-    to refuse to load the scope. The return value is used to ensure that the shared library
-    containing the scope is ABI compatible with the scopes run time.
     */
-    virtual int start(std::string const& scope_id, RegistryProxy const& registry) = 0;
+    virtual void start(std::string const& scope_id, RegistryProxy const& registry);
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
@@ -175,7 +167,7 @@ public:
 
     The call to stop() is made by the same thread that calls the create function and start().
     */
-    virtual void stop() = 0;
+    virtual void stop();
 
     /**
     \brief Called by the scopes run time after it has called start() to hand a thread of control to the scope.

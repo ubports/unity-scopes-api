@@ -25,7 +25,7 @@ namespace testing
 class Scope : public unity::scopes::ScopeBase
 {
 public:
-    int start(std::string const&, unity::scopes::RegistryProxy const &) override;
+    void start(std::string const&, unity::scopes::RegistryProxy const &) override;
 
     void stop() override;
 
@@ -48,6 +48,8 @@ public:
     unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
+
+    unity::scopes::RegistryProxy registry_;
 };
 
 } // namespace testing

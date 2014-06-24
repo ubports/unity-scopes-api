@@ -69,9 +69,8 @@ private:
 
 }  // namespace
 
-int PusherScope::start(string const&, RegistryProxy const &)
+void PusherScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void PusherScope::stop()

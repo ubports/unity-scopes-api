@@ -49,9 +49,8 @@ public:
 
 }  // namespace
 
-int EmptyScope::start(string const&, RegistryProxy const &)
+void EmptyScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void EmptyScope::stop()

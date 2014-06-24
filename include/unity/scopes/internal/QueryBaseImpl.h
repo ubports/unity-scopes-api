@@ -19,13 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
 
-#include <unity/scopes/internal/QueryCtrlImpl.h>
-#include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/SearchListenerBase.h>
-#include <unity/scopes/SearchMetadata.h>
 
-#include <vector>
+#include <mutex>
 
 namespace unity
 {
@@ -38,44 +34,19 @@ namespace internal
 
 class SettingsDB;
 
-class QueryBaseImpl final
+class QueryBaseImpl
 {
 public:
     QueryBaseImpl();
-    ~QueryBaseImpl();
+    virtual ~QueryBaseImpl();
 
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
+    virtual void cancel() = 0;
+    virtual bool valid() const = 0;
 
-    void cancel();
-    void set_metadata(SearchMetadata const& metadata);
-    void set_department_id(std::string const& department_id);
-    std::string department_id() const;
-    bool valid() const;
     unity::scopes::VariantMap settings() const;
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
 
 private:
-    SearchMetadata::UPtr search_metadata_;
-    std::string department_id_;
-    std::vector<QueryCtrlProxy> subqueries_;
-    bool valid_;
     std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
     mutable std::mutex mutex_;
 };

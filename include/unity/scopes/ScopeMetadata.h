@@ -170,6 +170,7 @@ public:
     /**
     \brief Return the settings definitions for this scope.
     \return The settings definition.
+    \throws unity::scopes::NotFoundException if the scope has no settings
     */
     VariantMap settings_definitions() const;
 

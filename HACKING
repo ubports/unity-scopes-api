@@ -151,7 +151,7 @@ fail to build. The easiest way to do that is using bzr-builddeb:
     $ bzr bd
     $ # this will exit with an error if symbols file isn't up-to-date
     $ cd ../build-area/unity-scopes-api-[version]
-    $ cat ./debian/libunity-scopes1/DEBIAN/symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes1.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
+    $ cat ./debian/libunity-scopes3.symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes3.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
     $ cd -
     $ # review the symbol differences and if everything is ok, apply the diff
     $ patch -p0 < /tmp/symbols.diff
@@ -182,3 +182,23 @@ to all subscribers.
 Then you can run a subscriber that will display content of the messages:
 
     $ ./zmq-parser.py
+
+Autopkg test suite
+------------------
+
+Scopes comes with an autopkg smoke test.
+
+http://packaging.ubuntu.com/html/auto-pkg-test.html
+
+Running the test manually is simple. After building and installing the
+new packages, just run 'sh debian/tests/scopebuild'.
+
+When making API breaks, make sure to check if autopkg test scripts
+need changing. The point of autopkg is not to exercise the API
+thoroughly, so it should not need changing all that often.
+
+At the moment it is unclear if these tests are executed during Jenkins
+builds.  This will lead to autopkgtest failing later if scopes' API is
+changed in a backwards incompatible way. If this happens the test
+needs to be fixed either by updating the test or backing out the API
+breaking change.

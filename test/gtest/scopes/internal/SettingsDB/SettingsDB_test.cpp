@@ -258,8 +258,7 @@ TEST(SettingsDB, exceptions)
     }
     catch (ResourceException const& e)
     {
-        boost::regex r(string("unity::ResourceException: SettingsDB\\(\\): u1db_whats_changed\\(\\) failed, "
-                              "status = [0-9]+, db = ") + db_name);
+        boost::regex r("unity::ResourceException: SettingsDB\\(\\): u1db_whats_changed\\(\\) failed, status = [0-9]+, db = .*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 }

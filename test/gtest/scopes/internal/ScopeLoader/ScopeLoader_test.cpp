@@ -37,7 +37,6 @@ namespace
 {
 
 char const* scope_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libTestScope.so";
-char const* bad_version_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libBadVersion.so";
 char const* no_destroy_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNoDestroy.so";
 char const* null_return_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNullReturn.so";
 char const* throw_unity_ex_from_start_lib
@@ -80,31 +79,6 @@ TEST(ScopeLoader, basic)
     EXPECT_EQ(1, num_destroy());
     EXPECT_EQ(0, num_start());
     EXPECT_EQ(0, num_stop());
-}
-
-TEST(ScopeLoader, version_mismatch)
-{
-    reset_counters();
-
-    try
-    {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", bad_version_lib, registry);
-        sl->start();
-        sl->unload();
-        FAIL();
-    }
-    catch (unity::Exception const& e)
-    {
-        boost::regex r("unity::ResourceException: Scope testScope: terminated due to exception in start\\(\\):\n"
-                       "    unity::ResourceException: Scope testScope was compiled with major version 666 of the "
-                       "Unity scopes run time. This version is incompatible with the current major version "
-                       "\\([0-9]+\\)\\.");
-        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
-    }
-    EXPECT_EQ(1, num_create());
-    EXPECT_EQ(1, num_destroy());
-    EXPECT_EQ(1, num_start());
-    EXPECT_EQ(1, num_stop());
 }
 
 TEST(ScopeLoader, stop)
@@ -215,7 +189,8 @@ TEST(ScopeLoader, null_return)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from "
+                     UNITY_SCOPE_CREATE_SYMSTR,
                      e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
@@ -236,7 +211,8 @@ TEST(ScopeLoader, null_return_unload)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from unity_scope_create",
+        EXPECT_STREQ("unity::ResourceException: Scope testScope returned nullptr from "
+                     UNITY_SCOPE_CREATE_SYMSTR,
                      e.what());
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());

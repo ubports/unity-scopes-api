@@ -295,6 +295,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("search_hint", var["search_hint"].get_string());
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
     EXPECT_EQ("/foo", var["scope_dir"].get_string());
+    EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
             (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
@@ -312,6 +313,8 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("icon", c.icon());
     EXPECT_EQ("search_hint", c.search_hint());
     EXPECT_EQ("hot_key", c.hot_key());
+    EXPECT_EQ("/foo", c.scope_directory());
+    EXPECT_FALSE(c.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, c.results_ttl_type());
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(vm, c.settings_definitions());
@@ -473,6 +476,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
                      "'description' is missing",
                      e.what());
     }
+
     m["description"] = "description";
     try
     {
@@ -486,13 +490,33 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
                      "'author' is missing",
                      e.what());
     }
+
     m["author"] = "author";
+    m["results_ttl_type"] = -1;
+    try
+    {
+        ScopeMetadataImpl mi(m, &mw);
+        mi.deserialize(m);
+        FAIL();
+    }
+    catch (InvalidArgumentException const&e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadata::deserialize(): "
+                     "invalid attribute 'results_ttl_type' with value -1",
+                     e.what());
+    }
 
     // Optional attributes
     m["art"] = "art";
     m["icon"] = "icon";
     m["search_hint"] = "search_hint";
     m["hot_key"] = "hot_key";
+    m["scope_dir"] = "scope_dir";
+    m["invisible"] = true;
+    VariantMap appearance;
+    appearance["a1"] = "a1";
+    m["appearance_attributes"] = appearance;
+    m["results_ttl_type"] = 0;
 
     ScopeMetadataImpl mi(m, &mw);
     mi.deserialize(m);
@@ -506,4 +530,8 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_EQ("icon", mi.icon());
     EXPECT_EQ("search_hint", mi.search_hint());
     EXPECT_EQ("hot_key", mi.hot_key());
+    EXPECT_EQ("scope_dir", mi.scope_directory());
+    EXPECT_TRUE(mi.invisible());
+    EXPECT_EQ(appearance, mi.appearance_attributes());
+    EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, mi.results_ttl_type());
 }

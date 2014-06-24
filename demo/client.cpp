@@ -157,7 +157,7 @@ public:
         }
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         auto links = annotation.links();
         cout << "received annotation of type " << annotation.annotation_type()

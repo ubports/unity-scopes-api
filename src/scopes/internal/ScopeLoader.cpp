@@ -141,23 +141,7 @@ void ScopeLoader::start()
 
     try
     {
-        const int s_version = scope_base_->start(scope_id_, registry_);
-        const int maj_version = major_version();
-        if (s_version != maj_version)
-        {
-
-            try
-            {
-                scope_base_->stop(); // Make sure to tell the scope to stop again before reporting version mismatch.
-            }
-            catch (...)
-            {
-            }
-            throw unity::ResourceException("Scope " + scope_id_ + " was compiled with major version " +
-                                           std::to_string(s_version) + " of the Unity scopes run time. This " +
-                                           "version is incompatible with the current major " +
-                                           "version (" + std::to_string(maj_version) + ").");
-        }
+        scope_base_->start(scope_id_, registry_);
     }
     catch (...)
     {

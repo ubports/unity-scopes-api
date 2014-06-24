@@ -37,7 +37,11 @@ namespace scopes
 
 class CategorisedResult;
 class CategoryRenderer;
+
+namespace experimental
+{
 class Annotation;
+}
 
 namespace internal
 {
@@ -56,19 +60,11 @@ public:
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
-                                              CategoryRenderer const& renderer_template
-                                              ) override;
-    virtual Category::SCPtr register_category(std::string const& id,
-                                              std::string const& title,
-                                              std::string const &icon,
-                                              CategoryRenderer const& renderer_template,
-                                              Category::TapBehavior tap_behavior,
-                                              Category::TapBehavior long_press_behavior
-                                              ) override;
+                                              CategoryRenderer const& renderer_template) override;
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 
-    virtual bool push(unity::scopes::Annotation const& annotation) override;
+    virtual bool push(unity::scopes::experimental::Annotation const& annotation) override;
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;

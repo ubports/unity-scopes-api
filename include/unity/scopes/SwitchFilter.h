@@ -34,6 +34,9 @@ namespace internal
 class SwitchFilterImpl;
 }
 
+namespace experimental
+{
+
 /**
 \brief A simple on/off switch filter.
 
@@ -91,6 +94,8 @@ private:
     internal::SwitchFilterImpl* fwd() const;
     friend class internal::SwitchFilterImpl;
 };
+
+} // namespace experimental
 
 } // namespace scopes
 

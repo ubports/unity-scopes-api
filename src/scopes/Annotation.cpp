@@ -26,6 +26,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 Annotation::Annotation(Type atype)
     : p(new internal::AnnotationImpl(atype))
 {
@@ -99,6 +102,8 @@ Annotation::Type Annotation::annotation_type() const
 {
     return p->annotation_type();
 }
+
+} // namespace experimental
 
 } // namespace scopes
 

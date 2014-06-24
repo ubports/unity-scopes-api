@@ -33,7 +33,11 @@ namespace scopes
 {
 
 class CategorisedResult;
+
+namespace experimental
+{
 class Annotation;
+}
 
 /**
 \brief Allows the results of a search query to be sent to the query source.
@@ -94,34 +98,13 @@ public:
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
-    \brief Register new category and send it to the source of the query.
-
-    \param id The identifier of the category
-    \param title The title of the category
-    \param icon The icon of the category
-    \param renderer_template The renderer template to be used for results in this category
-    \param tap_behavior The default behavior for tap on the result from this category.
-    \param long_press_behavior The default behavior of long press on to preview the result.
-
-     The default behaviour of both tap and long press is to show a preview.
-     Changing the default behaviour is not recommended.
-
-     \return The category instance
-     */
-    virtual Category::SCPtr register_category(std::string const& id,
-                                              std::string const& title,
-                                              std::string const &icon,
-                                              CategoryRenderer const& renderer_template,
-                                              Category::TapBehavior tap_behavior,
-                                              Category::TapBehavior long_press_behavior) = 0;
-
-    /**
     \brief Register an existing category instance and send it to the source of the query.
 
-    The purpose of this call is to register a category obtained via ReplyBase::push(Category::SCPtr) when aggregating
+    The purpose of this call is to register a category obtained via SearchListenerBase::push(Category::SCPtr const&) when aggregating
     results and categories from other scope(s).
-    */
 
+    \throws unity::InvalidArgumentException if category is already registered.
+    */
     virtual void register_category(Category::SCPtr category) = 0;
 
     /**
@@ -145,18 +128,12 @@ public:
 
     /**
     \brief Push an annotation.
-    \deprecated Push an annotation. Please use push(Annotation const&) instead. This method will be removed with version 0.4.5 of the Scopes API.
-     */
-    virtual bool register_annotation(Annotation const& annotation);
-
-    /**
-    \brief Push an annotation.
 
     The annotation will be rendered at a next available spot below the category of last pushed result.
     To render an annotation in the top annotation area, push it before pushing search results.
     \note The Unity shell can ignore some or all annotations, depending on available screen real estate.
     */
-    virtual bool push(Annotation const& annotation) = 0;
+    virtual bool push(experimental::Annotation const& annotation) = 0;
 
     /**
     \brief Sends all filters and their state to the source of a query.

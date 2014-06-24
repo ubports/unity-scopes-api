@@ -50,8 +50,6 @@ Category (returned by serialize()):
  'title' : string
  'icon' : string
  'renderer_template' : string
- 'tap_behavior' : int
- 'long_press_behavior' : int
 
 Department (returned by serialize()):
 =====================================

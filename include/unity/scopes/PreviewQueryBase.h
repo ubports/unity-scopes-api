@@ -34,9 +34,13 @@ namespace unity
 namespace scopes
 {
 
+class Result;
+class ActionMetadata;
+
 namespace internal
 {
 
+class PreviewQueryBaseImpl;
 class QueryBaseImpl;
 class QueryObject;
 
@@ -78,6 +82,20 @@ public:
     */
     virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this preview
 
+    /**
+     \brief Get result for this preview request.
+     \throws unity::LogicException if result was not initialized (the default ctor was used).
+     \return result
+     */
+    Result result() const;
+
+    /**
+     \brief Get metadata for this preview request.
+     \return search metadata
+     \throws unity::LogicException if preview metadata was not initialized (the default ctor was used).
+    */
+    ActionMetadata action_metadata() const;
+
     // TODO: Add a method for subpreview request?
 
     /// @cond
@@ -85,9 +103,10 @@ public:
     /// @endcond
 
 protected:
-    /// @cond
-    PreviewQueryBase();
-    /// @endcond
+    PreviewQueryBase(Result const& result, ActionMetadata const& metadata);
+
+private:
+    internal::PreviewQueryBaseImpl* fwd() const;
 };
 
 } // namespace scopes

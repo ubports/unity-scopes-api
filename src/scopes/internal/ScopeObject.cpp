@@ -152,7 +152,6 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
     return query(reply, info.mw,
             [&q, &hints, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
-                 search_query->set_metadata(hints);
                  search_query->set_department_id(q.department_id());
                  return search_query;
             },

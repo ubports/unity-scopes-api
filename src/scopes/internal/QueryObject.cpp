@@ -95,10 +95,13 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
         return;
     }
 
+    auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
+    assert(search_query);
+
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, query_base_->department_id());
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id());
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -109,9 +112,6 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
 
     try
     {
-        auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
-        assert(search_query);
-
         lock.unlock();
 
         // Synchronous call into scope implementation.

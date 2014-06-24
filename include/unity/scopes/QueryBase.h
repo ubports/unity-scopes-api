@@ -116,16 +116,12 @@ public:
 
 protected:
     /// @cond
-    QueryBase();
+    QueryBase(internal::QueryBaseImpl* impl);
     void cancel();
     std::unique_ptr<internal::QueryBaseImpl> p;
     /// @endcond
 
 private:
-    void set_metadata(SearchMetadata const& metadata);
-    void set_department_id(std::string const& department_id);
-    std::string department_id() const;
-
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
     friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
     friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata() and set_department_id()

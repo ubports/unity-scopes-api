@@ -70,9 +70,8 @@ private:
 
 }  // namespace
 
-int SlowCreateScope::start(string const&, RegistryProxy const &)
+void SlowCreateScope::start(string const&, RegistryProxy const &)
 {
-    return VERSION;
 }
 
 void SlowCreateScope::stop()

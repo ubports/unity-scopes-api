@@ -242,19 +242,19 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
-    filesystem::path settings_json_schema(scope_dir / (scope.first + ".json"));
+    filesystem::path settings_json_path(scope_dir / (scope.first + ".json"));
 
-    if (filesystem::exists(settings_json_schema))
+    if (filesystem::exists(settings_json_path))
     {
         try
         {
-            string settings_json = unity::util::read_text_file(settings_json_schema.native());
+            string settings_json = unity::util::read_text_file(settings_json_path.native());
             SettingsSchema schema(settings_json);
             mi->set_settings_definitions(schema.definitions());
         }
         catch (std::exception const& e)
         {
-            error("ignoring settings schema file " + settings_json_schema.native()
+            error("ignoring settings schema file " + settings_json_path.native()
                   + " for scope " + scope.first + ": " + e.what());
         }
     }
@@ -498,7 +498,7 @@ main(int argc, char* argv[])
 
         // Now that the registry table is populated, we can add the registry to the middleware, so
         // it starts processing incoming requests.
-        middleware->add_registry_object(runtime->registry_identity(), registry);
+        auto p = middleware->add_registry_object(runtime->registry_identity(), registry);
 
         // Drop our shared_ptr to the RegistryObject. This means that the registry object
         // is kept alive only via the shared_ptr held by the middleware. If the middleware
