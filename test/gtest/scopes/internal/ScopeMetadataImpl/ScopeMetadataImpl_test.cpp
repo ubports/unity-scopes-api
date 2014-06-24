@@ -115,12 +115,12 @@ TEST(ScopeMetadataImpl, basic)
 
     try
     {
-        m.settings_json();
+        m.settings_definitions();
         FAIL();
     }
     catch (NotFoundException const& e)
     {
-        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = settings_json)", e.what());
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = settings_definitions)", e.what());
     }
 
     // when "invisible" is not set, false is returned
@@ -148,7 +148,9 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_appearance_attributes(attrs);
     mi2->set_scope_directory("/foo");
     mi2->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
-    mi2->set_settings_json("{imagine some json here}");
+    VariantMap vm;
+    vm["setting1"] = Variant("hello");
+    mi2->set_settings_definitions(vm);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -159,7 +161,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("hot_key", m.hot_key());
     EXPECT_TRUE(m.invisible());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
-    EXPECT_EQ("{imagine some json here}", m.settings_json());
+    EXPECT_EQ(vm, m.settings_definitions());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -177,7 +179,9 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_scope_directory("/foo");
     ti->set_appearance_attributes(attrs);
     ti->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Small);
-    ti->set_settings_json("{imagine some other json here}");
+    VariantMap tmp_vm;
+    vm["tmp setting1"] = Variant("tmp hello");
+    ti->set_settings_definitions(tmp_vm);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -196,7 +200,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, ci.results_ttl_type());
-    EXPECT_EQ("{imagine some other json here}", ci.settings_json());
+    EXPECT_EQ(tmp_vm, ci.settings_definitions());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -215,7 +219,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, m.results_ttl_type());
     EXPECT_TRUE(m.invisible());
-    EXPECT_EQ("{imagine some other json here}", m.settings_json());
+    EXPECT_EQ(tmp_vm, m.settings_definitions());
 
     // Self-assignment
     tmp = tmp;
@@ -233,7 +237,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", tmp.scope_directory());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp.results_ttl_type());
     EXPECT_TRUE(tmp.invisible());
-    EXPECT_EQ("{imagine some other json here}", tmp.settings_json());
+    EXPECT_EQ(tmp_vm, tmp.settings_definitions());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -251,7 +255,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp2.results_ttl_type());
     EXPECT_TRUE(tmp2.invisible());
-    EXPECT_EQ("{imagine some other json here}", tmp2.settings_json());
+    EXPECT_EQ(tmp_vm, tmp2.settings_definitions());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -273,7 +277,10 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_scope_directory("/foo");
     mi->set_invisible(false);
     mi->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
-    mi->set_settings_json("{imagine some json here}");
+    VariantMap vm;
+    vm["setting1"] = Variant("hello");
+    vm["setting2"] = Variant("world");
+    mi->set_settings_definitions(vm);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
@@ -291,7 +298,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
             (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
-    EXPECT_EQ("{imagine some json here}", var["settings_json"].get_string());
+    EXPECT_EQ(vm, var["settings_definitions"].get_dict());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -307,7 +314,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("hot_key", c.hot_key());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, c.results_ttl_type());
     EXPECT_FALSE(c.invisible());
-    EXPECT_EQ("{imagine some json here}", c.settings_json());
+    EXPECT_EQ(vm, c.settings_definitions());
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)

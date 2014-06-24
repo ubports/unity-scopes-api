@@ -166,11 +166,12 @@ public:
     */
     ResultsTtlType results_ttl_type() const;
 
+    // TODO: Flesh out documentation
     /**
-    \brief Return the JSON string representing the settings definition for the scope.
+    \brief Return the settings definitions for this scope.
     \return The settings definition.
     */
-    std::string settings_json() const;
+    VariantMap settings_definitions() const;
 
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl

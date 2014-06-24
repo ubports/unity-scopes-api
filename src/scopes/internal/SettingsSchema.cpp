@@ -343,7 +343,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
         for (unsigned i = 0; i < settings.size(); ++i)
         {
             Setting s(settings[i]);
-            definitions_.emplace(make_pair(s.id(), s.to_schema_definition()));
+            definitions_.emplace(make_pair(s.id(), Variant(s.to_schema_definition())));
         }
     }
     catch (ResourceException const&)
@@ -360,7 +360,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
 
 SettingsSchema::~SettingsSchema() = default;
 
-SettingsSchema::DefinitionMap SettingsSchema::definitions() const
+VariantMap SettingsSchema::definitions() const
 {
     return definitions_;
 }

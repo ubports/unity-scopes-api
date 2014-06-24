@@ -47,12 +47,10 @@ public:
     SettingsSchema(std::string const& json_schema);
     ~SettingsSchema();
 
-    typedef std::map<std::string, unity::scopes::VariantMap> DefinitionMap;
-
-    DefinitionMap definitions() const;
+    VariantMap definitions() const;
 
 private:
-    DefinitionMap definitions_;
+    VariantMap definitions_;
 };
 
 } // namespace internal

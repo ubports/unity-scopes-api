@@ -28,6 +28,7 @@
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/FileIO.h>
@@ -248,7 +249,8 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         try
         {
             string settings_json = unity::util::read_text_file(settings_json_schema.native());
-            mi->set_settings_json(settings_json);
+            SettingsSchema schema(settings_json);
+            mi->set_settings_definitions(schema.definitions());
         }
         catch (std::exception const& e)
         {

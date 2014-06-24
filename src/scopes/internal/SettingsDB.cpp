@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/SettingsDB.h>
 
+#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -226,7 +227,7 @@ void SettingsDB::set_defaults()
     values_.clear();
     for (auto const& f : definitions_)
     {
-        auto vmap = f.second;
+        auto vmap = f.second.get_dict();
         auto v = vmap.find("defaultValue");
         if (v != vmap.end())
         {

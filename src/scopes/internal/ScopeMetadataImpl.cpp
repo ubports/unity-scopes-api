@@ -80,9 +80,9 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         scope_directory_.reset(new string(*other.scope_directory_));
     }
-    if (other.settings_json_)
+    if (other.settings_definitions_)
     {
-        settings_json_.reset(new string(*other.settings_json_));
+        settings_definitions_.reset(new VariantMap(*other.settings_definitions_));
     }
 }
 
@@ -104,7 +104,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         appearance_attributes_ = rhs.appearance_attributes_;
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
         results_ttl_type_ = rhs.results_ttl_type_;
-        settings_json_.reset(rhs.settings_json_ ? new string(*rhs.settings_json_) : nullptr);
+        settings_definitions_.reset(rhs.settings_definitions_ ? new VariantMap(*rhs.settings_definitions_) : nullptr);
     }
     return *this;
 }
@@ -198,13 +198,13 @@ ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
     return results_ttl_type_;
 }
 
-std::string ScopeMetadataImpl::settings_json() const
+VariantMap ScopeMetadataImpl::settings_definitions() const
 {
-    if (settings_json_)
+    if (settings_definitions_)
     {
-        return *settings_json_;
+        return *settings_definitions_;
     }
-    throw NotFoundException("attribute not set", "settings_json");
+    throw NotFoundException("attribute not set", "settings_definitions");
 }
 
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
@@ -272,9 +272,9 @@ void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType resul
     results_ttl_type_ = results_ttl;
 }
 
-void ScopeMetadataImpl::set_settings_json(std::string const& settings_json)
+void ScopeMetadataImpl::set_settings_definitions(VariantMap const& settings_definitions)
 {
-    settings_json_.reset(new string(settings_json));
+    settings_definitions_.reset(new VariantMap(settings_definitions));
 }
 
 namespace
@@ -344,9 +344,9 @@ VariantMap ScopeMetadataImpl::serialize() const
     {
         var["results_ttl_type"] = (int) results_ttl_type_;
     }
-    if (settings_json_)
+    if (settings_definitions_)
     {
-        var["settings_json"] = *settings_json_;
+        var["settings_definitions"] = *settings_definitions_;
     }
 
     return var;
@@ -452,16 +452,15 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         if(tmp < 0)
         {
             throw InvalidArgumentException(
-                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value '"
-                            + tmp);
+                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value '" + tmp);
         }
         results_ttl_type_ = static_cast<ScopeMetadata::ResultsTtlType>(tmp);
     }
 
-    it = var.find("settings_json");
+    it = var.find("settings_definitions");
     if (it != var.end())
     {
-        settings_json_.reset(new string(it->second.get_string()));
+        settings_definitions_.reset(new VariantMap(it->second.get_dict()));
     }
 }
 

@@ -137,9 +137,9 @@ ScopeMetadata::ResultsTtlType ScopeMetadata::results_ttl_type() const
     return p->results_ttl_type();
 }
 
-std::string ScopeMetadata::settings_json() const
+VariantMap ScopeMetadata::settings_definitions() const
 {
-    return p->settings_json();
+    return p->settings_definitions();
 }
 
 //! @endcond
