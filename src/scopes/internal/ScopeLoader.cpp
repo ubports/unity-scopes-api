@@ -27,8 +27,6 @@
 #include <cassert>
 #include <libgen.h>
 #include <sys/stat.h>
-#include <iostream> // TODO: remove this
-
 
 using namespace std;
 using namespace unity::scopes;

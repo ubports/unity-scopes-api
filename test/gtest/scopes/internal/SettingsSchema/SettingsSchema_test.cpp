@@ -47,7 +47,7 @@ char const* ok_schema = R"delimiter(
             "type": "list",
             "parameters": {
                 "defaultValue": 1,
-                "values": ["Celcius", "Fahrenheit"]
+                "values": ["Celsius", "Fahrenheit"]
             }
         },
         {
@@ -116,23 +116,44 @@ char const* ok_schema = R"delimiter(
 
 TEST(SettingsSchema, basic)
 {
+    // TODO: add tests for localized displayName
     SettingsSchema s(ok_schema);
 
-    auto v = s.settings();
+    auto defs = s.definitions();
+    EXPECT_EQ(11, defs.size());
 
-    EXPECT_EQ("London", v["location"].get_string());
-    EXPECT_EQ(1, v["unitTemp"].get_int());
-    EXPECT_EQ(23, v["age"].get_int());
-    EXPECT_TRUE(v["enabled"].get_bool());
+    EXPECT_EQ("location", defs["location"]["id"].get_string());
+    EXPECT_EQ("string", defs["location"]["type"].get_string());
+    EXPECT_EQ("Location", defs["location"]["displayName"].get_string());
+    EXPECT_EQ("London", defs["location"]["defaultValue"].get_string());
 
-    EXPECT_EQ(Variant(), v["string_no_default"]);
-    EXPECT_EQ(Variant(), v["string_no_default2"]);
-    EXPECT_EQ(Variant(), v["list_no_default"]);
-    EXPECT_EQ(Variant(), v["list_no_default2"]);
-    EXPECT_EQ(Variant(), v["number_no_default"]);
-    EXPECT_EQ(Variant(), v["number_no_default2"]);
-    EXPECT_EQ(Variant(), v["boolean_no_default"]);
-    EXPECT_EQ(Variant(), v["boolean_no_default2"]);
+    // TODO: add tests for localized valuesDisplayNames
+    EXPECT_EQ("unitTemp", defs["unitTemp"]["id"].get_string());
+    EXPECT_EQ("list", defs["unitTemp"]["type"].get_string());
+    EXPECT_EQ("Temperature Units", defs["unitTemp"]["displayName"].get_string());
+    EXPECT_EQ(1, defs["unitTemp"]["defaultValue"].get_int());
+    EXPECT_EQ(2, defs["unitTemp"]["values"].get_array().size());
+    EXPECT_EQ("Celsius", defs["unitTemp"]["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", defs["unitTemp"]["values"].get_array()[1].get_string());
+
+    EXPECT_EQ("age", defs["age"]["id"].get_string());
+    EXPECT_EQ("number", defs["age"]["type"].get_string());
+    EXPECT_EQ("Age", defs["age"]["displayName"].get_string());
+    EXPECT_EQ(23, defs["age"]["defaultValue"].get_int());
+
+    EXPECT_EQ("enabled", defs["enabled"]["id"].get_string());
+    EXPECT_EQ("boolean", defs["enabled"]["type"].get_string());
+    EXPECT_EQ("Enabled", defs["enabled"]["displayName"].get_string());
+    EXPECT_TRUE(defs["enabled"]["defaultValue"].get_bool());
+
+    EXPECT_EQ(Variant(), defs["string_no_default"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["string_no_default2"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["list_no_default"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["list_no_default2"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["number_no_default"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["number_no_default2"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["boolean_no_default"]["defaultValue"]);
+    EXPECT_EQ(Variant(), defs["boolean_no_default2"]["defaultValue"]);
 }
 
 TEST(SettingsSchema, exceptions)
@@ -385,7 +406,7 @@ TEST(SettingsSchema, exceptions)
                         "type": "list",
                         "parameters": {
                             "defaultValue": "hello",
-                            "values": ["Celcius", "Fahrenheit"]
+                            "values": ["Celsius", "Fahrenheit"]
                         }
                     }
                 ]

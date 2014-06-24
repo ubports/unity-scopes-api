@@ -18,7 +18,6 @@
 
 #include <unity/scopes/internal/SettingsDB.h>
 
-#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -58,7 +57,7 @@ SettingsDB::SettingsDB(string const& path, string const& json_schema)
     try
     {
         SettingsSchema schema(json_schema);
-        field_defs_ = schema.settings();
+        definitions_ = schema.definitions();
     }
     catch (std::exception const& e)
     {
@@ -86,8 +85,8 @@ void SettingsDB::process_doc_(string const& id, string const& json)
         return;  // We ignore anything that doesn't match the prefix.
     }
 
-    auto const it = field_defs_.find(id.substr(ID_PREFIX.size()));
-    if (it == field_defs_.end())
+    auto const it = definitions_.find(id.substr(ID_PREFIX.size()));
+    if (it == definitions_.end())
     {
         return;  // We ignore anything for which we don't have a schema.
     }
@@ -225,11 +224,16 @@ void SettingsDB::process_all_docs()
 void SettingsDB::set_defaults()
 {
     values_.clear();
-    for (auto const& f : field_defs_)
+    for (auto const& f : definitions_)
     {
-        if (!f.second.is_null())
+        auto vmap = f.second;
+        auto v = vmap.find("defaultValue");
+        if (v != vmap.end())
         {
-            values_[f.first] = f.second;
+            if (!v->second.is_null())
+            {
+                values_[f.first] = v->second;
+            }
         }
     }
 }

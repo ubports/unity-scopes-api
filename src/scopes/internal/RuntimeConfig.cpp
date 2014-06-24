@@ -20,7 +20,6 @@
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
-#include <iostream>  // TODO: remove this
 
 using namespace std;
 

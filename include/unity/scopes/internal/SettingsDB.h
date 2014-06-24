@@ -19,9 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 #define UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 
-#include <unity/scopes/Variant.h>
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/NonCopyable.h>
+#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/util/ResourcePtr.h>
 
 #include <u1db/u1db.h>
@@ -63,7 +61,7 @@ private:
     std::string path_;
     unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
     int generation_;
-    unity::scopes::VariantMap field_defs_;
+    SettingsSchema::DefinitionMap definitions_;
     unity::scopes::VariantMap values_;
 };
 

@@ -42,8 +42,8 @@ using namespace std;
 namespace
 {
 
-// Parses out a single setting from the given JSON value and makes it available as a Variant value.
-// If no default value is specified for a setting, default_value() returns a Variant containing null.
+// Parses out a single setting from the given JSON value and makes it available as a VariantMap.
+// TODO: flesh out doc in SettingsSchema.h
 
 class Setting final
 {
@@ -56,19 +56,22 @@ public:
     enum Type { BooleanT, ListT, NumberT, StringT };
 
     string id() const;
-    Variant default_value() const;
+    VariantMap to_schema_definition();
 
 private:
     Json::Value get_mandatory(Json::Value const& v, Json::StaticString const& key, Json::ValueType expected_type) const;
     void set_default_value(Json::Value const& v, Type expected_type);
     Variant get_bool_default(Json::Value const& v) const;
-    Variant get_enum_default(Json::Value const& v) const;
+    Variant get_enum_default(Json::Value const& v);
     Variant get_int_default(Json::Value const& v) const;
     Variant get_string_default(Json::Value const& v) const;
-    void check_unique(Json::Value const& v) const;
+    void set_enumerators(Json::Value const& v);
 
     string id_;
+    string type_;
+    string display_name_;
     Variant default_value_;
+    VariantArray enumerators_;
 };
 
 static const map<string, Setting::Type> VALID_TYPES {
@@ -84,6 +87,7 @@ Setting::Setting(Json::Value const& v)
 
     static auto const id_key = Json::StaticString("id");
     static auto const type_key = Json::StaticString("type");
+    static auto const display_name_key = Json::StaticString("displayName");
 
     id_ = get_mandatory(v, id_key, Json::stringValue).asString();
     if (id_.empty())
@@ -99,7 +103,10 @@ Setting::Setting(Json::Value const& v)
         throw ResourceException(string("SettingsSchema(): invalid \"") + type_key.c_str() + "\" setting: \""
                                        + type_string + "\", " "id = \"" + id_ + "\"");
     }
+    type_ = it->first;
     set_default_value(v, it->second);
+
+    display_name_ = get_mandatory(v, display_name_key, Json::stringValue).asString();
 }
 
 string Setting::id() const
@@ -107,9 +114,19 @@ string Setting::id() const
     return id_;
 }
 
-Variant Setting::default_value() const
+VariantMap Setting::to_schema_definition()
 {
-    return default_value_;
+    VariantMap schema;
+    schema["id"] = Variant(id_);
+    schema["defaultValue"] = default_value_;
+    schema["type"] = type_;
+    schema["displayName"] = display_name_;              // TODO: this needs localizing
+    if (type_ == "list")
+    {
+        schema["values"] = enumerators_;
+        schema["valuesDisplayNames"] = enumerators_;    // TODO: this needs localizing
+    }
+    return schema;
 }
 
 Json::Value Setting::get_mandatory(Json::Value const& v,
@@ -209,7 +226,7 @@ Variant Setting::get_int_default(Json::Value const& v) const
     return Variant(v_dflt.asInt());
 }
 
-Variant Setting::get_enum_default(Json::Value const& v) const
+Variant Setting::get_enum_default(Json::Value const& v)
 {
     assert(v.isObject());
 
@@ -243,7 +260,7 @@ Variant Setting::get_enum_default(Json::Value const& v) const
                                        + "\" definition, id = \"" + id_ + "\"");
     }
 
-    check_unique(v_vals);
+    set_enumerators(v_vals);
 
     auto val = v_dflt.asInt();
     if (val < 0 || val >= static_cast<int>(v_vals.size()))
@@ -273,7 +290,7 @@ Variant Setting::get_string_default(Json::Value const& v) const
     return Variant(v_dflt.asString());
 }
 
-void Setting::check_unique(Json::Value const& v) const
+void Setting::set_enumerators(Json::Value const& v)
 {
     assert(v.isArray());
 
@@ -297,6 +314,7 @@ void Setting::check_unique(Json::Value const& v) const
                                     + "\", id = \"" + id_ + "\"");
         }
         enums_seen.insert(enum_str);
+        enumerators_.emplace_back(Variant(enum_str));
     }
 }
 
@@ -325,7 +343,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
         for (unsigned i = 0; i < settings.size(); ++i)
         {
             Setting s(settings[i]);
-            known_settings_.emplace(make_pair(s.id(), s.default_value()));
+            definitions_.emplace(make_pair(s.id(), s.to_schema_definition()));
         }
     }
     catch (ResourceException const&)
@@ -342,9 +360,9 @@ SettingsSchema::SettingsSchema(string const& json_schema)
 
 SettingsSchema::~SettingsSchema() = default;
 
-VariantMap SettingsSchema::settings() const
+SettingsSchema::DefinitionMap SettingsSchema::definitions() const
 {
-    return known_settings_;
+    return definitions_;
 }
 
 } // namespace internal

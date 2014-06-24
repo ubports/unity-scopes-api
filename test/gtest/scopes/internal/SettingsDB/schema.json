@@ -14,7 +14,7 @@
             "type": "list",
             "parameters": {
                 "defaultValue": 1,
-                "values": ["Celcius", "Fahrenheit"]
+                "values": ["Celsius", "Fahrenheit"]
             }
         },
         {
