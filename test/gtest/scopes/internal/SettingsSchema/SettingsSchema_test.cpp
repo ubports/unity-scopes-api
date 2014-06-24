@@ -199,6 +199,27 @@ TEST(SettingsSchema, exceptions)
                 "settings":
                 [
                     {
+                        "id": "",
+                        "type": "number"
+                    }
+                ]
+            }
+        )");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        EXPECT_STREQ("unity::ResourceException: SettingSchema(): invalid empty \"id\" definition",
+                     e.what());
+    }
+
+    try
+    {
+        SettingsSchema(R"(
+            {
+                "settings":
+                [
+                    {
                         "id": "someid",
                         "displayName": "Location"
                     }
@@ -448,6 +469,81 @@ TEST(SettingsSchema, exceptions)
     catch (ResourceException const& e)
     {
         EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty \"values\" definition, id = \"x\"",
+                     e.what());
+    }
+
+    try
+    {
+        SettingsSchema(R"(
+            {
+                "settings":
+                [
+                    {
+                        "id": "x",
+                        "type": "list",
+                        "parameters": {
+                            "defaultValue": -1,
+                            "values": [ 3, 7 ]
+                        }
+                    }
+                ]
+            }
+        )");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid enumerator type, id = \"x\"",
+                     e.what());
+    }
+
+    try
+    {
+        SettingsSchema(R"(
+            {
+                "settings":
+                [
+                    {
+                        "id": "x",
+                        "type": "list",
+                        "parameters": {
+                            "defaultValue": -1,
+                            "values": [ "a", "" ]
+                        }
+                    }
+                ]
+            }
+        )");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty enumerator, id = \"x\"",
+                     e.what());
+    }
+
+    try
+    {
+        SettingsSchema(R"(
+            {
+                "settings":
+                [
+                    {
+                        "id": "x",
+                        "type": "list",
+                        "parameters": {
+                            "defaultValue": -1,
+                            "values": [ "a", "b", "a" ]
+                        }
+                    }
+                ]
+            }
+        )");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): duplicate enumerator \"a\", id = \"x\"",
                      e.what());
     }
 

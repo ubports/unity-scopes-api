@@ -23,6 +23,8 @@
 #include <boost/filesystem.hpp>
 #include <jsoncpp/json/json.h>
 
+#include <set>
+
 namespace unity
 {
 
@@ -63,6 +65,7 @@ private:
     Variant get_enum_default(Json::Value const& v) const;
     Variant get_int_default(Json::Value const& v) const;
     Variant get_string_default(Json::Value const& v) const;
+    void check_unique(Json::Value const& v) const;
 
     string id_;
     Variant default_value_;
@@ -83,6 +86,10 @@ Setting::Setting(Json::Value const& v)
     static auto const type_key = Json::StaticString("type");
 
     id_ = get_mandatory(v, id_key, Json::stringValue).asString();
+    if (id_.empty())
+    {
+        throw ResourceException(string("SettingSchema(): invalid empty \"") + id_key.c_str() + "\" definition");
+    }
 
     auto v_type = get_mandatory(v, type_key, Json::stringValue);
     string type_string = v_type.asString();
@@ -114,7 +121,7 @@ Json::Value Setting::get_mandatory(Json::Value const& v,
     if (val.isNull())
     {
         throw ResourceException(string("SettingSchema(): missing \"") + key.c_str() + "\" definition"
-                                + (!id_.empty() ? ", id = \"" + id_ + "\"" : string()));
+                                       + (!id_.empty() ? ", id = \"" + id_ + "\"" : string()));
     }
     if (val.type() != expected_type)
     {
@@ -236,6 +243,8 @@ Variant Setting::get_enum_default(Json::Value const& v) const
                                        + "\" definition, id = \"" + id_ + "\"");
     }
 
+    check_unique(v_vals);
+
     auto val = v_dflt.asInt();
     if (val < 0 || val >= static_cast<int>(v_vals.size()))
     {
@@ -262,6 +271,33 @@ Variant Setting::get_string_default(Json::Value const& v) const
                                        + "\" definition, id = \"" + id_ + "\"");
     }
     return Variant(v_dflt.asString());
+}
+
+void Setting::check_unique(Json::Value const& v) const
+{
+    assert(v.isArray());
+
+    set<string> enums_seen;
+
+    for (unsigned i = 0; i < v.size(); ++i)
+    {
+        Json::Value enumerator = v[i];
+        if (!enumerator.isString())
+        {
+            throw ResourceException(string("SettingsSchema(): invalid enumerator type, id = \"") + id_ + "\"");
+        }
+        string enum_str = enumerator.asString();
+        if (enum_str.empty())
+        {
+            throw ResourceException(string("SettingsSchema(): invalid empty enumerator, id = \"") + id_ + "\"");
+        }
+        if (enums_seen.find(enum_str) != enums_seen.end())
+        {
+            throw ResourceException(string("SettingsSchema(): duplicate enumerator \"") + enum_str
+                                    + "\", id = \"" + id_ + "\"");
+        }
+        enums_seen.insert(enum_str);
+    }
 }
 
 }  // namespace
