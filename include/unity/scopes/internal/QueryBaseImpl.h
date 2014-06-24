@@ -36,6 +36,8 @@ namespace scopes
 namespace internal
 {
 
+class SettingsDB;
+
 class QueryBaseImpl final
 {
 public:
@@ -66,12 +68,15 @@ public:
     void set_department_id(std::string const& department_id);
     std::string department_id() const;
     bool valid() const;
+    unity::scopes::VariantMap settings() const;
+    void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
 
 private:
     SearchMetadata::UPtr search_metadata_;
     std::string department_id_;
     std::vector<QueryCtrlProxy> subqueries_;
     bool valid_;
+    std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
     mutable std::mutex mutex_;
 };
 

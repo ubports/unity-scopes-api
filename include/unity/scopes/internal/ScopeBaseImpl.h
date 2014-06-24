@@ -19,8 +19,10 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
-#include <unity/scopes/internal/SettingsDB.h>
+#include <unity/scopes/Variant.h>
 
+#include <memory>
+#include <mutex>
 #include <string>
 
 namespace unity
@@ -32,6 +34,8 @@ namespace scopes
 namespace internal
 {
 
+class SettingsDB;
+
 class ScopeBaseImpl final
 {
 public:
@@ -39,12 +43,14 @@ public:
     ~ScopeBaseImpl() = default;
     void set_scope_directory(std::string const &path);
     std::string scope_directory() const;
-    void set_settings_db(std::unique_ptr<unity::scopes::internal::SettingsDB> db);
+    std::shared_ptr<unity::scopes::internal::SettingsDB> settings_db() const;
+    void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
 
 private:
     std::string scope_directory_;
-    std::unique_ptr<unity::scopes::internal::SettingsDB> db_;
+    std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

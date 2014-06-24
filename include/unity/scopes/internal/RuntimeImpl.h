@@ -77,7 +77,6 @@ private:
     int reap_expiry_;
     int reap_interval_;
     std::string data_dir_;
-    std::string settings_db_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;

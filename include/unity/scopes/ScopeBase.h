@@ -266,11 +266,11 @@ public:
     \brief Returns a dictionary with the scope's current settings.
 
     Instead of storing the return value, it is preferable to call settings()
-    each time the your implementation requires a settings value. This ensures
+    each time your implementation requires a settings value. This ensures
     that, if a user changes settings while the scope is running, the new settings
     take effect with the next query.
 
-    \note The are available only after this ScopeBase is instantiated; do not
+    \note The settings are available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
 
     \return The scope's current settings.
@@ -284,6 +284,7 @@ private:
     std::unique_ptr<internal::ScopeBaseImpl> p;
 
     friend class internal::ScopeLoader;
+    friend class internal::ScopeObject;
     friend class internal::RuntimeImpl;
     /// @endcond
 };

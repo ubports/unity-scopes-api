@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -309,8 +310,8 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         ::mkdir(data_dir_.c_str(), 0700);
         ::mkdir((data_dir_ + "/" + scope_id_).c_str(), 0700);
         string settings_db = data_dir_ + "/" + scope_id_ + "/settings.db";
-        unique_ptr<SettingsDB> db(new SettingsDB(settings_db_, json));
-        scope_base->p->set_settings_db(move(db));
+        shared_ptr<SettingsDB> db(new SettingsDB(settings_db, json));
+        scope_base->p->set_settings_db(db);
     }
     catch (FileException const&)
     {

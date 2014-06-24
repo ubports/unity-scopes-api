@@ -28,6 +28,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/filesystem/path.hpp>
 #include <core/posix/signal.h>
 
 #include <cassert>
@@ -38,8 +39,6 @@
 #include <vector>
 
 #include <libgen.h>
-
-#include <boost/filesystem/path.hpp>
 
 using namespace std;
 using namespace unity::scopes;

@@ -22,9 +22,11 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewQueryObject.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -81,6 +83,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
             // TODO: log error, scope returned null pointer.
             throw ResourceException("Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()");
         }
+        query_base->p->set_settings_db(scope_base_->p->settings_db());
     }
     catch (...)
     {

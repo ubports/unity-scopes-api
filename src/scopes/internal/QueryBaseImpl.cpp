@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/QueryCtrl.h>
 #include <unity/scopes/Scope.h>
 #include <unity/scopes/SearchMetadata.h>
@@ -143,6 +144,7 @@ QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
 
 void QueryBaseImpl::set_metadata(SearchMetadata const& metadata)
 {
+    lock_guard<mutex> lock(mutex_);
     search_metadata_.reset(new SearchMetadata(metadata));
 }
 
@@ -167,11 +169,13 @@ void QueryBaseImpl::cancel()
 
 void QueryBaseImpl::set_department_id(std::string const& department_id)
 {
+    lock_guard<mutex> lock(mutex_);
     department_id_ = department_id;
 }
 
 std::string QueryBaseImpl::department_id() const
 {
+    lock_guard<mutex> lock(mutex_);
     return department_id_;
 }
 
@@ -179,6 +183,18 @@ bool QueryBaseImpl::valid() const
 {
     lock_guard<mutex> lock(mutex_);
     return valid_;
+}
+
+VariantMap QueryBaseImpl::settings() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_ ? db_->settings() : VariantMap();
+}
+
+void QueryBaseImpl::set_settings_db(SettingsDB::SPtr const& db)
+{
+    lock_guard<mutex> lock(mutex_);
+    db_ = db;
 }
 
 } // namespace internal

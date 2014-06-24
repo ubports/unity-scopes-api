@@ -241,18 +241,18 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
-    filesystem::path settings_json_path(scope_dir / (scope.first + ".json"));
+    filesystem::path settings_json_schema(scope_dir / (scope.first + ".json"));
 
-    if (filesystem::exists(settings_json_path))
+    if (filesystem::exists(settings_json_schema))
     {
         try
         {
-            string settings_json = unity::util::read_text_file(settings_json_path.native());
+            string settings_json = unity::util::read_text_file(settings_json_schema.native());
             mi->set_settings_json(settings_json);
         }
         catch (std::exception const& e)
         {
-            error("ignoring settings file " + settings_json_path.native()
+            error("ignoring settings schema file " + settings_json_schema.native()
                   + " for scope " + scope.first + ": " + e.what());
         }
     }
