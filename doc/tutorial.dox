@@ -88,6 +88,7 @@ For a scope confined to access local content only:
 \code
 {
     "template": "ubuntu-scope-local-content",
+    "policy_groups": [],
     "policy_version": 1.2
 }
 \endcode
@@ -97,6 +98,7 @@ For a scope confined to only be able to access the internet:
 \code
 {
     "template": "ubuntu-scope-network",
+    "policy_groups": [],
     "policy_version": 1.2
 }
 \endcode
