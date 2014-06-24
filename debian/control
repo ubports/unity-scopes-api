@@ -35,7 +35,7 @@ Homepage: https://launchpad.net/unity-scopes-api
 Vcs-Bzr: lp:unity-scopes-api
 Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 
-Package: libunity-scopes3
+Package: libunity-scopes2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
@@ -43,10 +43,8 @@ Depends: ${misc:Depends},
          ${shlibs:Depends}
 Replaces: libunity-scopes0,
           libunity-scopes1,
-          libunity-scopes2,
 Conflicts: libunity-scopes0,
            libunity-scopes1,
-           libunity-scopes2,
 Description: API for Unity scopes integration
  Library to integrate scopes with the Unity shell
 
@@ -55,7 +53,7 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes3 (= ${binary:Version}),
+Depends: libunity-scopes2 (= ${binary:Version}),
          libproperties-cpp-dev,
          libunity-api-dev,
          ${misc:Depends},
@@ -67,7 +65,7 @@ Section: devel
 Architecture: any
 Multi-Arch: foreign
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes3 (= ${binary:Version}),
+Depends: libunity-scopes2 (= ${binary:Version}),
          ${shlibs:Depends},
          ${misc:Depends},
 Description: Client utility for Unity scopes API
