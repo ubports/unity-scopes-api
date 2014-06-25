@@ -471,7 +471,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareFactory(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::~MiddlewareFactory()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeMetadataImpl::set_settings_definitions(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_settings_definitions(unity::scopes::Variant const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::settings_definitions() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_author(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
