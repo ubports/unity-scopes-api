@@ -55,7 +55,6 @@ public:
 
     enum Type { BooleanT, ListT, NumberT, StringT };
 
-    string id() const;
     Variant to_schema_definition();
 
 private:
@@ -107,11 +106,6 @@ Setting::Setting(Json::Value const& v)
     set_default_value(v, it->second);
 
     display_name_ = get_mandatory(v, display_name_key, Json::stringValue).asString();
-}
-
-string Setting::id() const
-{
-    return id_;
 }
 
 Variant Setting::to_schema_definition()
