@@ -13,3 +13,6 @@ HotKey = a key
 [Appearance]
 arbitrary_key = foo
 another_one = bar
+logo.one = first
+logo.two = second
+page.header.logo = abc
