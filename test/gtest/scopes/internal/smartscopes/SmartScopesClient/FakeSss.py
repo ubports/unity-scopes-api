@@ -60,7 +60,7 @@ remote_scopes_response = '\
 [{"base_url": "http://127.0.0.1:' + str(port) + '/fail", "id" : "fail.scope", "name": "Fail Scope", "description": "Fails due to no author.", "icon": "icon" },\
 {"base_url": "http://127.0.0.1:' + str(port) + '/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "author": "Mr.Fake", "icon": "icon" },\
 {"base_url": "http://127.0.0.1:' + str(port) + '/fail2", "name": "Fail Scope 2", "description": "Fails due to no id.", "author": "Mr.Fake", "icon": "icon" },\
-{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true, "appearance": {"background": "#00BEEF", "header":{"logo":"logo.png"}} },\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true, "appearance": {"background": "#00BEEF", "PageHeader":{"logo":"logo.png"}} },\
 {"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" }]'
 
 search_response = '\
