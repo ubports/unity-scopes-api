@@ -53,7 +53,7 @@ TEST(Utils, convert_to)
     {
         Variant out;
         EXPECT_TRUE(convert_to<double>("10.0", out));
-        EXPECT_TRUE(out.get_double() - 10.0f < 0.0001f);
+        EXPECT_FLOAT_EQ(10.0f, out.get_double());
     }
     {
         Variant out;
