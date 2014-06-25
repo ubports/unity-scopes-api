@@ -1,3 +1,9 @@
+unity-scopes-api (0.5.1-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Added support for nested dictionaries in appearance attributes.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 25 Jun 2014 13:24:32 +0200
+
 unity-scopes-api (0.5.0+14.10.20140619-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]
