@@ -39,9 +39,16 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
 
         auto attrs = cfg.appearance_attributes();
-        EXPECT_EQ(2, attrs.size());
-        EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
+        EXPECT_EQ(5, attrs.size());
+        EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
+        EXPECT_EQ(11, attrs["num_key"].get_int());
+        EXPECT_TRUE(attrs.find("logo") != attrs.end());
+        EXPECT_EQ(Variant::Type::Dict, attrs["logo"].which());
+        EXPECT_EQ("first", attrs["logo"].get_dict()["one"].get_string());
+        EXPECT_EQ("second", attrs["logo"].get_dict()["two"].get_string());
+        EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
+        EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
 
         EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
@@ -104,8 +111,8 @@ TEST_F(ScopeConfigWithIntl, localization)
         EXPECT_EQ("a key", cfg.hot_key());
 
         auto attrs = cfg.appearance_attributes();
-        EXPECT_EQ(2, attrs.size());
-        EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
+        EXPECT_EQ(5, attrs.size());
+        EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
 
         EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);

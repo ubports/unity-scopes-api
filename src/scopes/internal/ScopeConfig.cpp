@@ -21,9 +21,11 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/Utils.h>
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace std;
@@ -141,7 +143,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         for (auto const& key: parser()->get_keys(scope_appearance_group))
         {
-            appearance_attributes_[key] = parser()->get_string(scope_appearance_group, key);
+            parse_appearance_attribute(appearance_attributes_, key, parser()->get_string(scope_appearance_group, key));
         }
     }
     catch (LogicException const&)
@@ -207,6 +209,37 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
 ScopeConfig::~ScopeConfig()
 {
+}
+
+void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val)
+{
+    auto i = key.find(".");
+    if (i == std::string::npos)
+    {
+        Variant v;
+        if (convert_to<int>(val, v) ||
+            convert_to<double>(val, v) ||
+            convert_to<bool>(val, v))
+        {
+            var[uncamelcase(key)] = v;
+        }
+        else
+        {
+            var[uncamelcase(key)] = val;
+        }
+    }
+    else
+    {
+        const std::string keypart = uncamelcase(key.substr(0, i));
+        VariantMap vm;
+        auto it = var.find(keypart);
+        if (it != var.end())
+        {
+            vm = it->second.get_dict();
+        }
+        parse_appearance_attribute(vm, key.substr(i+1), val);
+        var[uncamelcase(keypart)] = vm;
+    }
 }
 
 bool ScopeConfig::overrideable() const
