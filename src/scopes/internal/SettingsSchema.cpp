@@ -56,7 +56,7 @@ public:
     enum Type { BooleanT, ListT, NumberT, StringT };
 
     string id() const;
-    VariantMap to_schema_definition();
+    Variant to_schema_definition();
 
 private:
     Json::Value get_mandatory(Json::Value const& v, Json::StaticString const& key, Json::ValueType expected_type) const;
@@ -114,7 +114,7 @@ string Setting::id() const
     return id_;
 }
 
-VariantMap Setting::to_schema_definition()
+Variant Setting::to_schema_definition()
 {
     VariantMap schema;
     schema["id"] = Variant(id_);
@@ -128,7 +128,7 @@ VariantMap Setting::to_schema_definition()
     }
     params["defaultValue"] = default_value_;
     schema["parameters"] = params;
-    return schema;
+    return Variant(schema);
 }
 
 Json::Value Setting::get_mandatory(Json::Value const& v,
@@ -345,7 +345,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
         for (unsigned i = 0; i < settings.size(); ++i)
         {
             Setting s(settings[i]);
-            definitions_.emplace(make_pair(s.id(), Variant(s.to_schema_definition())));
+            definitions_.push_back(s.to_schema_definition());
         }
     }
     catch (ResourceException const&)
@@ -362,7 +362,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
 
 SettingsSchema::~SettingsSchema() = default;
 
-VariantMap SettingsSchema::definitions() const
+VariantArray SettingsSchema::definitions() const
 {
     return definitions_;
 }

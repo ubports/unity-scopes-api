@@ -30,6 +30,8 @@
 #include <signal.h>
 #include <thread>
 #include <unistd.h>
+#include <iostream> // TODO: remove this
+using namespace std; // TODO: remove this
 
 using namespace boost;
 using namespace unity::scopes;
@@ -90,6 +92,12 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
+    auto defs = meta.settings_definitions().get_array();
+    EXPECT_EQ(1, defs.size());
+    EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
+    EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
+    EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
+    EXPECT_EQ("London", defs[0].get_dict()["parameters"].get_dict()["defaultValue"].get_string());
 
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
@@ -104,6 +112,8 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
+    defs = meta.settings_definitions().get_array();
+    EXPECT_EQ(0, defs.size());
 }
 
 TEST(Registry, scope_state_notify)
@@ -147,6 +157,8 @@ TEST(Registry, scope_state_notify)
     SearchMetadata metadata("C", "desktop");
 
     auto meta = r->get_metadata("testscopeA");
+    auto defs = meta.settings_definitions().get_array();
+    EXPECT_EQ(1, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point
@@ -163,6 +175,8 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(r->is_scope_running("testscopeA"));
 
     meta = r->get_metadata("testscopeB");
+    defs = meta.settings_definitions().get_array();
+    EXPECT_EQ(0, defs.size());
     sp = meta.proxy();
 
     // testscopeB should not be running at this point

@@ -244,13 +244,14 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     filesystem::path scope_dir(scope_path.parent_path());
     filesystem::path settings_json_path(scope_dir / (scope.first + ".json"));
 
+    mi->set_settings_definitions(Variant(VariantArray()));
     if (filesystem::exists(settings_json_path))
     {
         try
         {
             string settings_json = unity::util::read_text_file(settings_json_path.native());
             SettingsSchema schema(settings_json);
-            mi->set_settings_definitions(schema.definitions());
+            mi->set_settings_definitions(Variant(schema.definitions()));
         }
         catch (std::exception const& e)
         {
@@ -362,14 +363,12 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
 // If additional scope configuration files are specified, the corresponding scopes will be added
 // to the registry (overriding any scopes that are found via config files reached via Runtime.ini).
 
-void
-usage(ostream& s = cerr)
+void usage(ostream& s = cerr)
 {
     s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     prog_name = basename(argv[0]);
     if (argc > 1 && (string("-h") == argv[1] || string("--help") == argv[1]))

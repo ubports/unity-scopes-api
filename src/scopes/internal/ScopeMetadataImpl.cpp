@@ -82,7 +82,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     }
     if (other.settings_definitions_)
     {
-        settings_definitions_.reset(new VariantMap(*other.settings_definitions_));
+        settings_definitions_.reset(new Variant(*other.settings_definitions_));
     }
 }
 
@@ -104,7 +104,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         appearance_attributes_ = rhs.appearance_attributes_;
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
         results_ttl_type_ = rhs.results_ttl_type_;
-        settings_definitions_.reset(rhs.settings_definitions_ ? new VariantMap(*rhs.settings_definitions_) : nullptr);
+        settings_definitions_.reset(rhs.settings_definitions_ ? new Variant(*rhs.settings_definitions_) : nullptr);
     }
     return *this;
 }
@@ -198,7 +198,7 @@ ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
     return results_ttl_type_;
 }
 
-VariantMap ScopeMetadataImpl::settings_definitions() const
+Variant ScopeMetadataImpl::settings_definitions() const
 {
     if (settings_definitions_)
     {
@@ -272,9 +272,9 @@ void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType resul
     results_ttl_type_ = results_ttl;
 }
 
-void ScopeMetadataImpl::set_settings_definitions(VariantMap const& settings_definitions)
+void ScopeMetadataImpl::set_settings_definitions(Variant const& settings_definitions)
 {
-    settings_definitions_.reset(new VariantMap(settings_definitions));
+    settings_definitions_.reset(new Variant(settings_definitions));
 }
 
 namespace
@@ -461,7 +461,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     it = var.find("settings_definitions");
     if (it != var.end())
     {
-        settings_definitions_.reset(new VariantMap(it->second.get_dict()));
+        settings_definitions_.reset(new Variant(it->second));
     }
 }
 

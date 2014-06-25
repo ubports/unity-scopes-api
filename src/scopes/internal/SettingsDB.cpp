@@ -59,6 +59,13 @@ SettingsDB::SettingsDB(string const& path, string const& json_schema)
     {
         SettingsSchema schema(json_schema);
         definitions_ = schema.definitions();
+
+        // Initialize the def_map_ so we can look things
+        // up quickly.
+        for (auto const& d : definitions_)
+        {
+            def_map_.emplace(make_pair(d.get_dict()["id"].get_string(), d));
+        }
     }
     catch (std::exception const& e)
     {
@@ -86,8 +93,9 @@ void SettingsDB::process_doc_(string const& id, string const& json)
         return;  // We ignore anything that doesn't match the prefix.
     }
 
-    auto const it = definitions_.find(id.substr(ID_PREFIX.size()));
-    if (it == definitions_.end())
+    string real_id = id.substr(ID_PREFIX.size());  // Discard prefix
+
+    if (def_map_.find(real_id) == def_map_.end())
     {
         return;  // We ignore anything for which we don't have a schema.
     }
@@ -109,7 +117,7 @@ void SettingsDB::process_doc_(string const& id, string const& json)
         {
             if (val.isString())
             {
-                values_[it->first] = Variant(val.asString());
+                values_[real_id] = Variant(val.asString());
             }
             break;
         }
@@ -117,7 +125,7 @@ void SettingsDB::process_doc_(string const& id, string const& json)
         {
             if (val.isBool())
             {
-                values_[it->first] = Variant(val.asBool());
+                values_[real_id] = Variant(val.asBool());
             }
             break;
         }
@@ -125,7 +133,7 @@ void SettingsDB::process_doc_(string const& id, string const& json)
         {
             if (val.isInt())
             {
-                values_[it->first] = Variant(val.asInt());
+                values_[real_id] = Variant(val.asInt());
             }
             break;
         }
@@ -227,7 +235,7 @@ void SettingsDB::set_defaults()
     values_.clear();
     for (auto const& f : definitions_)
     {
-        auto const def = f.second.get_dict();
+        auto const def = f.get_dict();
         auto const params_it = def.find("parameters");
         if (params_it != def.end())
         {
@@ -235,9 +243,11 @@ void SettingsDB::set_defaults()
             auto const v_it = params.find("defaultValue");
             if (v_it != params.end())
             {
+                auto const id_it = def.find("id");
+                assert(id_it != def.end());
                 if (!v_it->second.is_null())
                 {
-                    values_[f.first] = v_it->second;
+                    values_[id_it->second.get_string()] = v_it->second;
                 }
             }
         }

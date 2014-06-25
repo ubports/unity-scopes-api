@@ -56,7 +56,7 @@ public:
     VariantMap appearance_attributes() const;                    // optional (default: empty map)
     std::string scope_directory() const;
     ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
-    VariantMap settings_definitions() const;                     // optional (default: none)
+    Variant settings_definitions() const;                        // optional (default: none)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -71,7 +71,7 @@ public:
     void set_appearance_attributes(VariantMap const& appearance_attributes);
     void set_scope_directory(std::string const& path);
     void set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl);
-    void set_settings_definitions(VariantMap const& settings_definitions);
+    void set_settings_definitions(Variant const& settings_definitions);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -94,7 +94,7 @@ private:
     std::unique_ptr<std::string> scope_directory_;
     VariantMap appearance_attributes_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
-    std::unique_ptr<VariantMap> settings_definitions_; // Optional, hence a pointer
+    std::unique_ptr<Variant> settings_definitions_;    // Optional, hence a pointer
 };
 
 } // namespace internal

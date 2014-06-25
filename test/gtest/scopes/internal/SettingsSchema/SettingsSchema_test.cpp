@@ -122,37 +122,37 @@ TEST(SettingsSchema, basic)
     auto defs = s.definitions();
     EXPECT_EQ(11, defs.size());
 
-    EXPECT_EQ("location", defs["location"].get_dict()["id"].get_string());
-    EXPECT_EQ("string", defs["location"].get_dict()["type"].get_string());
-    EXPECT_EQ("Location", defs["location"].get_dict()["displayName"].get_string());
-    EXPECT_EQ("London", defs["location"].get_dict()["parameters"].get_dict()["defaultValue"].get_string());
+    EXPECT_EQ("location", defs[0].get_dict()["id"].get_string());
+    EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
+    EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
+    EXPECT_EQ("London", defs[0].get_dict()["parameters"].get_dict()["defaultValue"].get_string());
 
     // TODO: add tests for localized valuesDisplayNames
-    EXPECT_EQ("unitTemp", defs["unitTemp"].get_dict()["id"].get_string());
-    EXPECT_EQ("list", defs["unitTemp"].get_dict()["type"].get_string());
-    EXPECT_EQ("Temperature Units", defs["unitTemp"].get_dict()["displayName"].get_string());
-    EXPECT_EQ(1, defs["unitTemp"].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, defs["unitTemp"].get_dict()["parameters"].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", defs["unitTemp"].get_dict()["parameters"].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", defs["unitTemp"].get_dict()["parameters"].get_dict()["values"].get_array()[1].get_string());
+    EXPECT_EQ("unitTemp", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
+    EXPECT_EQ("Temperature Units", defs[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ(1, defs[1].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(2, defs[1].get_dict()["parameters"].get_dict()["values"].get_array().size());
+    EXPECT_EQ("Celsius", defs[1].get_dict()["parameters"].get_dict()["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["parameters"].get_dict()["values"].get_array()[1].get_string());
 
-    EXPECT_EQ("age", defs["age"].get_dict()["id"].get_string());
-    EXPECT_EQ("number", defs["age"].get_dict()["type"].get_string());
-    EXPECT_EQ("Age", defs["age"].get_dict()["displayName"].get_string());
-    EXPECT_EQ(23, defs["age"].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
+    EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());
+    EXPECT_EQ("Age", defs[2].get_dict()["displayName"].get_string());
+    EXPECT_EQ(23, defs[2].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
 
-    EXPECT_EQ("enabled", defs["enabled"].get_dict()["id"].get_string());
-    EXPECT_EQ("boolean", defs["enabled"].get_dict()["type"].get_string());
-    EXPECT_EQ("Enabled", defs["enabled"].get_dict()["displayName"].get_string());
-    EXPECT_TRUE(defs["enabled"].get_dict()["parameters"].get_dict()["defaultValue"].get_bool());
+    EXPECT_EQ("enabled", defs[3].get_dict()["id"].get_string());
+    EXPECT_EQ("boolean", defs[3].get_dict()["type"].get_string());
+    EXPECT_EQ("Enabled", defs[3].get_dict()["displayName"].get_string());
+    EXPECT_TRUE(defs[3].get_dict()["parameters"].get_dict()["defaultValue"].get_bool());
 
-    EXPECT_EQ(Variant(), defs["string_no_default"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["string_no_default2"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["list_no_default"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["number_no_default"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["number_no_default2"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["boolean_no_default"].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs["boolean_no_default2"].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[4].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[5].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[6].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[7].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[8].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[9].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[10].get_dict()["parameters"].get_dict()["defaultValue"]);
 }
 
 TEST(SettingsSchema, exceptions)

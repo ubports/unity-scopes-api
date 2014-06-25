@@ -63,7 +63,8 @@ private:
     std::string path_;
     unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
     int generation_;
-    VariantMap definitions_;
+    VariantArray definitions_;                       // Returned by SettingsSchema
+    std::map<std::string, Variant const&> def_map_;  // Allows fast access to the Variants in definitions_
     unity::scopes::VariantMap values_;
 };
 

@@ -47,10 +47,10 @@ public:
     SettingsSchema(std::string const& json_schema);
     ~SettingsSchema();
 
-    VariantMap definitions() const;
+    VariantArray definitions() const;
 
 private:
-    VariantMap definitions_;
+    VariantArray definitions_;
 };
 
 } // namespace internal
