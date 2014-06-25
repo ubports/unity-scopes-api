@@ -54,7 +54,7 @@ public:
             return;  // Query was cancelled
         }
 
-        Department::SPtr all_depts = Department::create("all", query(), "All departments");
+        Department::SPtr all_depts = Department::create("", query(), "All departments");
         Department::SPtr news_dept = Department::create("news", query(), "News");
         news_dept->set_subdepartments({Department::create("news-world", query(), "World"), Department::create("news-europe", query(), "Europe")});
         all_depts->set_subdepartments({news_dept, Department::create("sport", query(), "Sport")});
