@@ -227,13 +227,18 @@ void SettingsDB::set_defaults()
     values_.clear();
     for (auto const& f : definitions_)
     {
-        auto vmap = f.second.get_dict();
-        auto v = vmap.find("defaultValue");
-        if (v != vmap.end())
+        auto const def = f.second.get_dict();
+        auto const params_it = def.find("parameters");
+        if (params_it != def.end())
         {
-            if (!v->second.is_null())
+            auto const params = params_it->second.get_dict();
+            auto const v_it = params.find("defaultValue");
+            if (v_it != params.end())
             {
-                values_[f.first] = v->second;
+                if (!v_it->second.is_null())
+                {
+                    values_[f.first] = v_it->second;
+                }
             }
         }
     }

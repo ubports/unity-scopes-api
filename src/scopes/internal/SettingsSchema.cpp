@@ -118,14 +118,16 @@ VariantMap Setting::to_schema_definition()
 {
     VariantMap schema;
     schema["id"] = Variant(id_);
-    schema["defaultValue"] = default_value_;
     schema["type"] = type_;
     schema["displayName"] = display_name_;              // TODO: this needs localizing
+    VariantMap params;
     if (type_ == "list")
     {
-        schema["values"] = enumerators_;
-        schema["valuesDisplayNames"] = enumerators_;    // TODO: this needs localizing
+        params["values"] = enumerators_;
+        params["valuesDisplayNames"] = enumerators_;    // TODO: this needs localizing and semantic check
     }
+    params["defaultValue"] = default_value_;
+    schema["parameters"] = params;
     return schema;
 }
 
