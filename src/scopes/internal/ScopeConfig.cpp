@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/Utils.h>
 
 #include <algorithm>
 #include <iostream>
@@ -215,7 +216,7 @@ void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const&
     auto i = key.find(".");
     if (i == std::string::npos)
     {
-        var[key] = val;
+        var[uncamelcase(key)] = val;
     }
     else
     {
@@ -227,7 +228,7 @@ void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const&
             vm = it->second.get_dict();
         }
         parse_appearance_attribute(vm, key.substr(i+1), val);
-        var[keypart] = vm;
+        var[uncamelcase(keypart)] = vm;
     }
 }
 

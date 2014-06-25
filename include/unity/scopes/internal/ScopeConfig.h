@@ -55,7 +55,7 @@ public:
     ScopeMetadata::ResultsTtlType results_ttl_type() const;    // Optional, returns none if not present
 
 private:
-    void parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val);
+    static void parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val);
 
     bool overrideable_;
     std::string display_name_;

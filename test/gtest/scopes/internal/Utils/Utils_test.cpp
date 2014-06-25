@@ -16,30 +16,20 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_UTILS_H
-#define UNITY_INTERNAL_UTILS_H
+#include <unity/scopes/internal/Utils.h>
+#include <unity/UnityExceptions.h>
+#include <gtest/gtest.h>
 
-#include <unity/scopes/Variant.h>
-#include <string>
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
-namespace unity
+TEST(Utils, uncamelcase)
 {
-
-namespace scopes
-{
-
-namespace internal
-{
-
-VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap const& var, std::string const& key);
-std::string to_percent_encoding(std::string const& str);
-std::string from_percent_encoding(std::string const& str);
-std::string uncamelcase(std::string const& str);
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
-
-#endif
+    EXPECT_EQ("", uncamelcase(""));
+    EXPECT_EQ("foo-bar", uncamelcase("FooBar"));
+    EXPECT_EQ("foo-bar", uncamelcase("foo-bar"));
+    EXPECT_EQ("foo_bar", uncamelcase("foo_bar"));
+    EXPECT_EQ("foo-bar", uncamelcase("fooBAR"));
+    EXPECT_EQ("foo-bar", uncamelcase("fooBAr"));
+    EXPECT_EQ("foo-bar", uncamelcase("foo-Bar"));
+}

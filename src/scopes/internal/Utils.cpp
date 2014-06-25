@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 #include <sstream>
 #include <iomanip>
+#include <locale>
 
 namespace unity
 {
@@ -100,6 +101,31 @@ std::string from_percent_encoding(std::string const& str)
         }
     }
     return result.str();
+}
+
+std::string uncamelcase(std::string const& str)
+{
+    const std::locale loc("");
+    if (str.size() == 0)
+    {
+        return str;
+    }
+    auto it = str.begin();
+    int previous_is_lower = std::islower(*it);
+    std::stringstream res;
+    res << std::tolower(*it, loc);
+    ++it;
+    while (it != str.end())
+    {
+        if (std::isupper(*it) && previous_is_lower)
+        {
+            res << "-";
+        }
+        previous_is_lower = std::islower(*it);
+        res << std::tolower(*it, loc);
+        ++it;
+    }
+    return res.str();
 }
 
 } // namespace internal
