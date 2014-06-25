@@ -76,24 +76,12 @@ In the template, a manifest like the follow is used:
 
 \subsubsection apparmor Apparmor manifest
 
-Scopes that are packaged using click are inherently untrusted and must be confined. At present, there are two different choices
-that can be made:
+Scopes that are packaged using click are inherently untrusted and must be confined. At present, there is only a single type of scope that can be defined:
 <ul>
 <li>Network scope - can access the network / internet, but is not allowed to use APIs that could provide access to the user's data.
-<li>Local-content scope - can access local APIs that could provide access to user's data, but cannot access the network / internet.
 </ul>
 
-For a scope confined to access local content only:
-
-\code
-{
-    "template": "ubuntu-scope-local-content",
-    "policy_groups": [],
-    "policy_version": 1.2
-}
-\endcode
-
-For a scope confined to only be able to access the internet:
+The security manifest for this type of scope should be as follows:
 
 \code
 {
