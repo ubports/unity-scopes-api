@@ -47,6 +47,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("first", attrs["logo"].get_dict()["one"].get_string());
         EXPECT_EQ("second", attrs["logo"].get_dict()["two"].get_string());
         EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
+        EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
 
         EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }

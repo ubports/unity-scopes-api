@@ -220,7 +220,7 @@ void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const&
     }
     else
     {
-        const std::string keypart = key.substr(0, i);
+        const std::string keypart = uncamelcase(key.substr(0, i));
         VariantMap vm;
         auto it = var.find(keypart);
         if (it != var.end())

@@ -15,4 +15,5 @@ arbitrary_key = foo
 another_One = bar
 logo.One = first
 logo.two = second
-page.PageHeader.logo = abc
+Page.PageHeader.logo = abc
+Page.PageHeader.logo2 = def
