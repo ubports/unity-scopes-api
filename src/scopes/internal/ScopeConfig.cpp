@@ -142,7 +142,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         for (auto const& key: parser()->get_keys(scope_appearance_group))
         {
-            //appearance_attributes_[key] = parser()->get_string(scope_appearance_group, key);
             parse_appearance_attribute(appearance_attributes_, key, parser()->get_string(scope_appearance_group, key));
         }
     }
