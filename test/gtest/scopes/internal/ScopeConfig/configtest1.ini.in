@@ -11,7 +11,8 @@ SearchHint[test] = earchsay ringstay
 HotKey = a key
 
 [Appearance]
-arbitrary_key = foo
+arbitrary_key = true
+num_key = 11
 another_One = bar
 logo.One = first
 logo.two = second

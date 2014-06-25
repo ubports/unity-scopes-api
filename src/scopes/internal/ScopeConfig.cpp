@@ -216,7 +216,17 @@ void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const&
     auto i = key.find(".");
     if (i == std::string::npos)
     {
-        var[uncamelcase(key)] = val;
+        Variant v;
+        if (convert_to<int>(val, v) ||
+            convert_to<double>(val, v) ||
+            convert_to<bool>(val, v))
+        {
+            var[uncamelcase(key)] = v;
+        }
+        else
+        {
+            var[uncamelcase(key)] = val;
+        }
     }
     else
     {

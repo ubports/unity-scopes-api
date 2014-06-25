@@ -21,6 +21,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <string>
+#include <sstream>
 
 namespace unity
 {
@@ -35,6 +36,23 @@ VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap 
 std::string to_percent_encoding(std::string const& str);
 std::string from_percent_encoding(std::string const& str);
 std::string uncamelcase(std::string const& str);
+
+template<typename T>
+bool convert_to(std::string const& val, Variant& out)
+{
+    std::stringstream str(val);
+    T outval;
+    str >> outval;
+    if (str)
+    {
+        out = Variant(outval);
+        return true;
+    }
+    return false;
+}
+
+template<>
+bool convert_to<bool>(std::string const& val, Variant& out);
 
 } // namespace internal
 

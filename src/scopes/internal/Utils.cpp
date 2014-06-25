@@ -128,6 +128,22 @@ std::string uncamelcase(std::string const& str)
     return res.str();
 }
 
+template<>
+bool convert_to<bool>(std::string const& val, Variant& out)
+{
+    if (val == "true")
+    {
+        out = Variant(true);
+        return true;
+    }
+    if (val == "false")
+    {
+        out = Variant(false);
+        return true;
+    }
+    return false;
+}
+
 } // namespace internal
 
 } // namespace scopes

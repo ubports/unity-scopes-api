@@ -33,3 +33,36 @@ TEST(Utils, uncamelcase)
     EXPECT_EQ("foo-bar", uncamelcase("fooBAr"));
     EXPECT_EQ("foo-bar", uncamelcase("foo-Bar"));
 }
+
+TEST(Utils, convert_to)
+{
+    {
+        Variant out;
+        EXPECT_FALSE(convert_to<int>("foo", out));
+    }
+    {
+        Variant out;
+        EXPECT_TRUE(convert_to<int>("10", out));
+        EXPECT_EQ(10, out.get_int());
+    }
+    {
+        Variant out;
+        EXPECT_TRUE(convert_to<std::string>("foo", out));
+        EXPECT_EQ("foo", out.get_string());
+    }
+    {
+        Variant out;
+        EXPECT_TRUE(convert_to<double>("10.0", out));
+        EXPECT_TRUE(out.get_double() - 10.0f < 0.0001f);
+    }
+    {
+        Variant out;
+        EXPECT_TRUE(convert_to<bool>("true", out));
+        EXPECT_TRUE(out.get_bool());
+    }
+    {
+        Variant out;
+        EXPECT_TRUE(convert_to<bool>("false", out));
+        EXPECT_FALSE(out.get_bool());
+    }
+}
