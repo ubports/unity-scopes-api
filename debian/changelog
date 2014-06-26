@@ -1,6 +1,10 @@
 unity-scopes-api (0.5.1-0ubuntu1) UNRELEASED; urgency=medium
 
+  [ Pawel Stolowski ]
   * Added support for nested dictionaries in appearance attributes.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
 
  -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 25 Jun 2014 13:24:32 +0200
 
