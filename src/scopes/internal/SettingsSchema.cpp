@@ -53,11 +53,14 @@ public:
     Setting(Json::Value const& v);
     ~Setting() = default;
 
+    string id() const;
+
     enum Type { BooleanT, ListT, NumberT, StringT };
 
     Variant to_schema_definition();
 
 private:
+
     Json::Value get_mandatory(Json::Value const& v, Json::StaticString const& key, Json::ValueType expected_type) const;
     void set_default_value(Json::Value const& v, Type expected_type);
     Variant get_bool_default(Json::Value const& v) const;
@@ -106,6 +109,11 @@ Setting::Setting(Json::Value const& v)
     set_default_value(v, it->second);
 
     display_name_ = get_mandatory(v, display_name_key, Json::stringValue).asString();
+}
+
+string Setting::id() const
+{
+    return id_;
 }
 
 Variant Setting::to_schema_definition()
@@ -336,9 +344,14 @@ SettingsSchema::SettingsSchema(string const& json_schema)
         {
             throw ResourceException("SettingsSchema(): value \"settings\" must be an array");
         }
+        set<string> seen_settings;
         for (unsigned i = 0; i < settings.size(); ++i)
         {
             Setting s(settings[i]);
+            if (seen_settings.find(s.id()) != seen_settings.end())
+            {
+                throw ResourceException("SettingsSchema(): duplicate definition, id = \"" + s.id() + "\"");
+            }
             definitions_.push_back(s.to_schema_definition());
         }
     }
