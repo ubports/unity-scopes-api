@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.5.1
+========================
+  - Support nested dictionaries in appearance attributes of scope metadata. To define nested dictionary, use dots in key names in [Appearance] section of
+    scope .ini file, e.g. "PageHeader.Logo" = "logo.svg" creates "Logo" attribute inside "PageHeader" dictionary of appearance attributes.
+
 Changes in version 0.5.0
 ========================
   - Changed ScopeBase::start() method to return void instead of int, and made both start() and stop() methods virtual instead of pure virtual.
