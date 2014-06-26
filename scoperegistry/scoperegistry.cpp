@@ -268,6 +268,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_appearance_attributes(sc.appearance_attributes());
     mi->set_scope_directory(scope_dir.native());
     mi->set_results_ttl_type(sc.results_ttl_type());
+    mi->set_location_data_needed(sc.location_data_needed());
 
     try
     {

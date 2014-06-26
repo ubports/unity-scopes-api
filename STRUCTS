@@ -76,6 +76,7 @@ ScopeMetadata (returned by serialize()):
  'appearance_attributes' : dictionary, optional
  'results_ttl_type'      : int, optional
  'settings_definitions'  : dictionary, optional
+ 'location_data_needed'  : bool, optional
 
 Query (returned by serialize())
 ===============================

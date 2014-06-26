@@ -90,6 +90,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("/foo/scope-A.Art", meta.art());
     EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
+    EXPECT_FALSE(meta.invisible());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
     auto defs = meta.settings_definitions().get_array();
@@ -98,6 +99,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["parameters"].get_dict()["defaultValue"].get_string());
+    EXPECT_TRUE(meta.location_data_needed());
 
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
@@ -114,6 +116,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
     defs = meta.settings_definitions().get_array();
     EXPECT_EQ(0, defs.size());
+    EXPECT_FALSE(meta.location_data_needed());
 }
 
 TEST(Registry, scope_state_notify)

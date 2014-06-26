@@ -11,10 +11,10 @@ SearchHint = search string
 SearchHint[test] = earchsay ringstay
 HotKey = a key
 Invisible = true
-LocationDataNeeded = true
 ScopeRunner = custom runner
 IdleTimeout = 300
 ResultsTtlType = large
+LocationDataNeeded = true
 
 [Appearance]
 arbitrary_key = foo

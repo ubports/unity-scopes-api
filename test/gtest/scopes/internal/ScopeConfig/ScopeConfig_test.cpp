@@ -44,10 +44,10 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("search string", cfg.search_hint());
         EXPECT_EQ("a key", cfg.hot_key());
         EXPECT_TRUE(cfg.invisible());
-        EXPECT_TRUE(cfg.location_data_needed());
         EXPECT_EQ("custom runner", cfg.scope_runner());
         EXPECT_EQ(300, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, cfg.results_ttl_type());
+        EXPECT_TRUE(cfg.location_data_needed());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(2, attrs.size());
@@ -67,9 +67,9 @@ TEST(ScopeConfig, basic)
         // Optional items that have a default
 
         EXPECT_FALSE(cfg.invisible());
-        EXPECT_FALSE(cfg.location_data_needed());
         EXPECT_EQ(DFLT_SCOPE_IDLE_TIMEOUT, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
+        EXPECT_FALSE(cfg.location_data_needed());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
