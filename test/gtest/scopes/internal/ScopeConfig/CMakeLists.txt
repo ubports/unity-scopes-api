@@ -1,10 +1,12 @@
-configure_file(configtest1.ini.in configtest1.ini copyonly)
-configure_file(configtest2.ini.in configtest2.ini copyonly)
-configure_file(configtest3.ini.in configtest3.ini copyonly)
+configure_file(complete_config.ini.in complete_config.ini copyonly)
+configure_file(mandatory_config.ini.in mandatory_config.ini copyonly)
+configure_file(bad_timeout.ini.in bad_timeout.ini copyonly)
+configure_file(bad_ttl.ini.in bad_ttl.ini copyonly)
 
-add_definitions(-DTEST_CONFIG_1="${CMAKE_CURRENT_BINARY_DIR}/configtest1.ini")
-add_definitions(-DTEST_CONFIG_2="${CMAKE_CURRENT_BINARY_DIR}/configtest2.ini")
-add_definitions(-DTEST_CONFIG_3="${CMAKE_CURRENT_BINARY_DIR}/configtest3.ini")
+add_definitions(-DCOMPLETE_CONFIG="${CMAKE_CURRENT_BINARY_DIR}/complete_config.ini")
+add_definitions(-DMANDATORY_CONFIG="${CMAKE_CURRENT_BINARY_DIR}/mandatory_config.ini")
+add_definitions(-DBAD_TIMEOUT="${CMAKE_CURRENT_BINARY_DIR}/bad_timeout.ini")
+add_definitions(-DBAD_TTL="${CMAKE_CURRENT_BINARY_DIR}/bad_ttl.ini")
 
 add_executable(ScopeConfig_test ScopeConfig_test.cpp)
 target_link_libraries(ScopeConfig_test ${TESTLIBS})

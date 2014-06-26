@@ -48,11 +48,12 @@ public:
     std::string search_hint() const;     // Optional, localizable, throws NotFoundException if not present
     std::string hot_key() const;         // Optional, throws NotFoundException if not present
     bool invisible() const;              // Optional, returns false if not present
+    bool location_data_needed() const;   // Optional, returns false if not present
     std::string scope_runner() const;    // Optional, throws NotFoundException if not present
     int idle_timeout() const;            // Optional, returns default value if not present
+    ScopeMetadata::ResultsTtlType results_ttl_type() const;  // Optional, returns none if not present
 
-    VariantMap appearance_attributes() const; // Optional, return empty map if no attributes are present
-    ScopeMetadata::ResultsTtlType results_ttl_type() const;    // Optional, returns none if not present
+    VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
 
 private:
     bool overrideable_;
@@ -64,10 +65,12 @@ private:
     std::unique_ptr<std::string> search_hint_;
     std::unique_ptr<std::string> hot_key_;
     bool invisible_;
+    bool location_data_needed_;
     std::unique_ptr<std::string> scope_runner_;
     int idle_timeout_;
-    VariantMap appearance_attributes_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
+
+    VariantMap appearance_attributes_;
 };
 
 } // namespace internal

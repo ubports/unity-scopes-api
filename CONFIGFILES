@@ -336,6 +336,15 @@ The following keys are recognized in the ScopeConfig group:
 
   - Large - in the order of an hour
 
+- LocationDataNeeded
+
+  Whether the scope wants to have location data delivered to it. Note that this does not mean that the scope
+  will actulla receive location data at run time. (The user may deny access, or may only provide approximate
+  location data.)
+
+  If not set, the default value is false.
+
+
 The following keys are recognized in the Appearance group:
 
 - TODO: document this

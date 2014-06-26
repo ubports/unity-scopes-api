@@ -49,11 +49,12 @@ namespace
     const string search_hint_key = "SearchHint";
     const string hot_key_key = "HotKey";
     const string invisible_key = "Invisible";
+    const string location_data_needed_key = "LocationDataNeeded";
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
+    const string results_ttl_str = "ResultsTtlType";
 
     const string scope_appearance_group = "Appearance";
-    const string results_ttl_str = "ResultsTtlType";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -115,6 +116,14 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         invisible_ = false;
     }
+    try
+    {
+        location_data_needed_ = parser()->get_boolean(scope_config_group, location_data_needed_key);
+    }
+    catch (LogicException const&)
+    {
+        location_data_needed_ = false;
+    }
 
     // custom scope runner executable is optional
     try
@@ -134,18 +143,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
                  ": value must be > 0 and <= " + std::to_string(max_idle_timeout));
-    }
-
-    // read all display attributes from scope_appearance_group
-    try
-    {
-        for (auto const& key: parser()->get_keys(scope_appearance_group))
-        {
-            appearance_attributes_[key] = parser()->get_string(scope_appearance_group, key);
-        }
-    }
-    catch (LogicException const&)
-    {
     }
 
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
@@ -178,6 +175,18 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
+    // read all display attributes from scope_appearance_group
+    try
+    {
+        for (auto const& key: parser()->get_keys(scope_appearance_group))
+        {
+            appearance_attributes_[key] = parser()->get_string(scope_appearance_group, key);
+        }
+    }
+    catch (LogicException const&)
+    {
+    }
+
     const KnownEntries known_entries = {
                                           {  scope_config_group,
                                              {
@@ -188,8 +197,9 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 art_key,
                                                 icon_key,
                                                 search_hint_key,
-                                                invisible_key,
                                                 hot_key_key,
+                                                invisible_key,
+                                                location_data_needed_key,
                                                 scoperunner_key,
                                                 idle_timeout_key,
                                                 results_ttl_str
@@ -260,7 +270,7 @@ string ScopeConfig::hot_key() const
 {
     if (!hot_key_)
     {
-        throw NotFoundException("Key not set", hot_key_key);
+        throw NotFoundException("Hot key not set", hot_key_key);
     }
     return *hot_key_;
 }
@@ -270,11 +280,16 @@ bool ScopeConfig::invisible() const
     return invisible_;
 }
 
+bool ScopeConfig::location_data_needed() const
+{
+    return location_data_needed_;
+}
+
 string ScopeConfig::scope_runner() const
 {
     if (!scope_runner_)
     {
-        throw NotFoundException("Runner binary not set", scoperunner_key);
+        throw NotFoundException("Scope runner binary not set", scoperunner_key);
     }
     return *scope_runner_;
 }
@@ -284,14 +299,14 @@ int ScopeConfig::idle_timeout() const
     return idle_timeout_;
 }
 
-VariantMap ScopeConfig::appearance_attributes() const
-{
-    return appearance_attributes_;
-}
-
 ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
 {
     return results_ttl_type_;
+}
+
+VariantMap ScopeConfig::appearance_attributes() const
+{
+    return appearance_attributes_;
 }
 
 } // namespace internal
