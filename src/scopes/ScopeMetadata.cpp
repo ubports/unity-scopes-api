@@ -142,6 +142,11 @@ Variant ScopeMetadata::settings_definitions() const
     return p->settings_definitions();
 }
 
+bool ScopeMetadata::location_data_needed() const
+{
+    return p->location_data_needed();
+}
+
 //! @endcond
 
 } // namespace scopes

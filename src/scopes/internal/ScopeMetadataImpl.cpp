@@ -35,26 +35,28 @@ namespace scopes
 namespace internal
 {
 
-ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
-    mw_(mw), results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
+ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw)
+    : mw_(mw)
+    , results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
 {
 }
 
-ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw) :
-    mw_(mw), results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
+ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw)
+    : mw_(mw)
+    , results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
 {
     deserialize(variant_map);
 }
 
-ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
-    mw_(other.mw_),
-    scope_id_(other.scope_id_),
-    proxy_(other.proxy_),
-    display_name_(other.display_name_),
-    description_(other.description_),
-    author_(other.author_),
-    appearance_attributes_(other.appearance_attributes_),
-    results_ttl_type_(other.results_ttl_type_)
+ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
+    : mw_(other.mw_)
+    , scope_id_(other.scope_id_)
+    , proxy_(other.proxy_)
+    , display_name_(other.display_name_)
+    , description_(other.description_)
+    , author_(other.author_)
+    , appearance_attributes_(other.appearance_attributes_)
+    , results_ttl_type_(other.results_ttl_type_)
 {
     if (other.art_)
     {
@@ -84,6 +86,10 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         settings_definitions_.reset(new Variant(*other.settings_definitions_));
     }
+    if (other.location_data_needed_)
+    {
+        location_data_needed_.reset(new bool(*other.location_data_needed_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -105,6 +111,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
         results_ttl_type_ = rhs.results_ttl_type_;
         settings_definitions_.reset(rhs.settings_definitions_ ? new Variant(*rhs.settings_definitions_) : nullptr);
+        location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
     }
     return *this;
 }
@@ -207,6 +214,15 @@ Variant ScopeMetadataImpl::settings_definitions() const
     throw NotFoundException("attribute not set", "settings_definitions");
 }
 
+bool ScopeMetadataImpl::location_data_needed() const
+{
+    if (location_data_needed_)
+    {
+        return *location_data_needed_;
+    }
+    return false;
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -275,6 +291,11 @@ void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType resul
 void ScopeMetadataImpl::set_settings_definitions(Variant const& settings_definitions)
 {
     settings_definitions_.reset(new Variant(settings_definitions));
+}
+
+void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
+{
+    location_data_needed_.reset(new bool(location_data_needed));
 }
 
 namespace
@@ -347,6 +368,10 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (settings_definitions_)
     {
         var["settings_definitions"] = *settings_definitions_;
+    }
+    if (location_data_needed_)
+    {
+        var["location_data_needed"] = *location_data_needed_;
     }
 
     return var;
@@ -427,16 +452,16 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         hot_key_.reset(new string(it->second.get_string()));
     }
 
-    it = var.find("scope_dir");
-    if (it != var.end())
-    {
-        scope_directory_.reset(new string(it->second.get_string()));
-    }
-
     it = var.find("invisible");
     if (it != var.end())
     {
         invisible_.reset(new bool(it->second.get_bool()));
+    }
+
+    it = var.find("scope_dir");
+    if (it != var.end())
+    {
+        scope_directory_.reset(new string(it->second.get_string()));
     }
 
     it = var.find("appearance_attributes");
@@ -462,6 +487,12 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         settings_definitions_.reset(new Variant(it->second));
+    }
+
+    it = var.find("location_data_needed");
+    if (it != var.end())
+    {
+        location_data_needed_.reset(new bool(it->second.get_bool()));
     }
 }
 

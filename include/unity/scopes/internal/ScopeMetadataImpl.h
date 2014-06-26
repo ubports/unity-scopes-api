@@ -45,18 +45,19 @@ public:
 
     std::string scope_id() const;
     ScopeProxy proxy() const;
-    std::string display_name() const;                            // localized
-    std::string description() const;                             // localized
-    std::string author() const;
+    std::string display_name() const;                            // mandatory, localized
+    std::string description() const;                             // mandatory, localized
+    std::string author() const;                                  // mandatory
     std::string art() const;                                     // optional
     std::string icon() const;                                    // optional
-    std::string search_hint() const;                             // localized, optional
-    std::string hot_key() const;                                 // localized, optional
-    bool invisible() const;                                      // optional (default = false)
+    std::string search_hint() const;                             // optional, localized
+    std::string hot_key() const;                                 // optional
+    bool invisible() const;                                      // optional (default: false)
     VariantMap appearance_attributes() const;                    // optional (default: empty map)
     std::string scope_directory() const;
     ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
-    Variant settings_definitions() const;                        // optional (default: none)
+    Variant settings_definitions() const;                        // optional (default: null variant)
+    bool location_data_needed() const;                           // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -72,6 +73,7 @@ public:
     void set_scope_directory(std::string const& path);
     void set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl);
     void set_settings_definitions(Variant const& settings_definitions);
+    void set_location_data_needed(bool location_data_needed);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -95,6 +97,7 @@ private:
     VariantMap appearance_attributes_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
     std::unique_ptr<Variant> settings_definitions_;    // Optional, hence a pointer
+    std::unique_ptr<bool> location_data_needed_;       // Optional, hence a pointer
 };
 
 } // namespace internal

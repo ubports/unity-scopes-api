@@ -178,6 +178,12 @@ public:
     */
     Variant settings_definitions() const;
 
+    /**
+    \brief Check if this scope wants location data.
+    \return True if this scope wants location data.
+    */
+    bool location_data_needed() const;  // optional (default = false)
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;
