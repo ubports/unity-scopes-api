@@ -17,5 +17,10 @@ ResultsTtlType = large
 LocationDataNeeded = true
 
 [Appearance]
-arbitrary_key = foo
-another_one = bar
+arbitrary_key = true
+num_key = 11
+another_One = bar
+logo.One = first
+logo.two = second
+Page.PageHeader.logo = abc
+Page.PageHeader.logo2 = def

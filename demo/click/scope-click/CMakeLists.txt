@@ -21,14 +21,16 @@ add_library(scope-click MODULE scope-click.cpp)
 # header to be generated before we start building the client binary.
 add_dependencies(scope-click globalheader)
 set_target_properties(scope-click PROPERTIES
-                      LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
-set_target_properties(scope-click PROPERTIES LINK_DEPENDS ${symbol_map})
+    LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}"
+    LINK_DEPENDS ${symbol_map}
+    OUTPUT_NAME com.ubuntu.scope-click_scope-click
+)
 
-configure_file(scope-click.ini.in scope-click.ini)
+configure_file(scope-click.ini.in com.ubuntu.scope-click_scope-click.ini)
 
 if(CLICK_MODE)
     install(TARGETS scope-click
             DESTINATION "${CMAKE_INSTALL_PREFIX}/scope-click/")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/scope-click.ini"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.ubuntu.scope-click_scope-click.ini"
             DESTINATION "${CMAKE_INSTALL_PREFIX}/scope-click/")
 endif(CLICK_MODE)

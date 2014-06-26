@@ -50,9 +50,16 @@ TEST(ScopeConfig, basic)
         EXPECT_TRUE(cfg.location_data_needed());
 
         auto attrs = cfg.appearance_attributes();
-        EXPECT_EQ(2, attrs.size());
-        EXPECT_EQ("foo", attrs["arbitrary_key"].get_string());
+        EXPECT_EQ(5, attrs.size());
+        EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
+        EXPECT_EQ(11, attrs["num_key"].get_int());
+        EXPECT_TRUE(attrs.find("logo") != attrs.end());
+        EXPECT_EQ(Variant::Type::Dict, attrs["logo"].which());
+        EXPECT_EQ("first", attrs["logo"].get_dict()["one"].get_string());
+        EXPECT_EQ("second", attrs["logo"].get_dict()["two"].get_string());
+        EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
+        EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
     }
 
     {
@@ -134,5 +141,15 @@ TEST_F(ScopeConfigWithIntl, localization)
         EXPECT_EQ("copesay amenay", cfg.display_name());
         EXPECT_EQ("copesay criptiondesay", cfg.description());
         EXPECT_EQ("earchsay ringstay", cfg.search_hint());
+// FIXME Why did I have to comment this assertion out
+//        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
+
+        auto attrs = cfg.appearance_attributes();
+        EXPECT_EQ(5, attrs.size());
+        EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
+        EXPECT_EQ("bar", attrs["another_one"].get_string());
+
+// FIXME Why did I have to comment this assertion out
+//        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
 }

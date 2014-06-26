@@ -1,9 +1,10 @@
 Release notes
 =============
 
-Changes in version 0.6.0
+Changes in version 0.5.1
 ========================
-
+  - Support nested dictionaries in appearance attributes of scope metadata. To define nested dictionary, use dots in key names in [Appearance] section of
+    scope .ini file, e.g. "PageHeader.Logo" = "logo.svg" creates "Logo" attribute inside "PageHeader" dictionary of appearance attributes.
   - Added support for scope settings.
 
 Changes in version 0.5.0

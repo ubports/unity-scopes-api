@@ -56,6 +56,8 @@ public:
     VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
 
 private:
+    static void parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val);
+
     bool overrideable_;
     std::string display_name_;
     std::string description_;
