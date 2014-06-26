@@ -198,8 +198,29 @@ TEST(SettingsSchema, exceptions)
                 "settings":
                 [
                     {
+                        "id": "location",
                         "displayName": "Location",
-                        "type": "string"
+                        "type": "string",
+                        "parameters": {
+                            "defaultValue": "London"
+                        }
+                    },
+                    {
+                        "id": "unitTemp",
+                        "displayName": "Temperature Units",
+                        "type": "list",
+                        "parameters": {
+                            "defaultValue": 1,
+                            "values": ["Celsius", "Fahrenheit"]
+                        }
+                    },
+                    {
+                        "id": "location",
+                        "displayName": "Age",
+                        "type": "number",
+                        "parameters": {
+                            "defaultValue": 23
+                        }
                     }
                 ]
             }
@@ -208,7 +229,7 @@ TEST(SettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingSchema(): missing \"id\" definition",
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): duplicate definition, id = \"location\"",
                      e.what());
     }
 
@@ -229,7 +250,7 @@ TEST(SettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingSchema(): invalid empty \"id\" definition",
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty \"id\" definition",
                      e.what());
     }
 
@@ -250,7 +271,7 @@ TEST(SettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingSchema(): missing \"type\" definition, id = \"someid\"",
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"type\" definition, id = \"someid\"",
                      e.what());
     }
 
@@ -272,7 +293,7 @@ TEST(SettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingSchema(): missing \"id\" definition",
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"id\" definition",
                      e.what());
     }
 

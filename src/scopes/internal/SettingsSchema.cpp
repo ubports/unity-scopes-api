@@ -94,7 +94,7 @@ Setting::Setting(Json::Value const& v)
     id_ = get_mandatory(v, id_key, Json::stringValue).asString();
     if (id_.empty())
     {
-        throw ResourceException(string("SettingSchema(): invalid empty \"") + id_key.c_str() + "\" definition");
+        throw ResourceException(string("SettingsSchema(): invalid empty \"") + id_key.c_str() + "\" definition");
     }
 
     auto v_type = get_mandatory(v, type_key, Json::stringValue);
@@ -141,7 +141,7 @@ Json::Value Setting::get_mandatory(Json::Value const& v,
     auto val = v[key];
     if (val.isNull())
     {
-        throw ResourceException(string("SettingSchema(): missing \"") + key.c_str() + "\" definition"
+        throw ResourceException(string("SettingsSchema(): missing \"") + key.c_str() + "\" definition"
                                        + (!id_.empty() ? ", id = \"" + id_ + "\"" : string()));
     }
     if (val.type() != expected_type)
@@ -353,6 +353,7 @@ SettingsSchema::SettingsSchema(string const& json_schema)
                 throw ResourceException("SettingsSchema(): duplicate definition, id = \"" + s.id() + "\"");
             }
             definitions_.push_back(s.to_schema_definition());
+            seen_settings.insert(s.id());
         }
     }
     catch (ResourceException const&)
