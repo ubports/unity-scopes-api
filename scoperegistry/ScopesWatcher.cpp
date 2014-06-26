@@ -20,7 +20,7 @@
 
 #include "FindFiles.h"
 
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes::internal;
@@ -212,6 +212,24 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             sdir_to_ini_map_.erase(parent_path);
             registry_->remove_local_scope(scope_id);
             std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                      << parent_path << "\"" << std::endl;
+        }
+    }
+    else if (file_type == DirWatcher::File && fs_path.extension() == ".json")
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        std::string parent_path = fs_path.parent_path().native();
+        std::string scope_id = fs_path.stem().native();
+
+        // For add/remove/modify of a settings definition, we pretend that the scope's
+        // config file was added or modified (provided the .ini file exists). This triggers
+        // re-loading the metadata for the scope.
+        filesystem::path fs_ini_path = fs_path.replace_extension(".ini");
+        if (boost::filesystem::exists(fs_ini_path))
+        {
+            ini_added_callback_(std::make_pair(scope_id, fs_ini_path.native()));
+            std::string const action = event_type == DirWatcher::Removed ? "uninstalled from" : "installed to";
+            std::cout << "ScopesWatcher: scope: \"" << scope_id << "\" settings definition " << action << ": \""
                       << parent_path << "\"" << std::endl;
         }
     }
