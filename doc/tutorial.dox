@@ -555,7 +555,7 @@ localized&mdash;see TODO.)
 
 The `parameters` field is optional (except for settings of type `list`, for which it is mandatory) and defines
 a default value that is provided to the scope if the user has not changed anything (or has never used the settings UI
-before using the scope). If a setting does not have a `paremeters` field containing a `defaultValue` field, the
+before using the scope). If a setting does not have a `parameters` field containing a `defaultValue` field, the
 corresponding setting has no default. (It is possible to test for settings that do not have a default value and
 were never set by the user (see TODO).
 
