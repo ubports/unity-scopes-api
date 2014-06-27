@@ -213,6 +213,11 @@ if(NOT DLLIB)
   message(FATAL_ERROR "Dl lib not found.")
 endif()
 
+find_library(U1DBLIB u1db)
+if(NOT U1DBLIB)
+  message(FATAL_ERROR "U1DB lib not found.")
+endif()
+
 
 # Other libraries we depend on
 set(OTHER_LIBS
@@ -225,7 +230,7 @@ set(OTHER_LIBS
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
-    u1db
+    ${U1DBLIB}
     curl
     oauth
     json-c
