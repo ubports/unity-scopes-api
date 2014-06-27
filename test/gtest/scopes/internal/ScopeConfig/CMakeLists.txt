@@ -1,10 +1,14 @@
 configure_file(complete_config.ini.in complete_config.ini copyonly)
 configure_file(mandatory_config.ini.in mandatory_config.ini copyonly)
+configure_file(ttl_small.ini.in ttl_small.ini copyonly)
+configure_file(ttl_medium.ini.in ttl_medium.ini copyonly)
 configure_file(bad_timeout.ini.in bad_timeout.ini copyonly)
 configure_file(bad_ttl.ini.in bad_ttl.ini copyonly)
 
 add_definitions(-DCOMPLETE_CONFIG="${CMAKE_CURRENT_BINARY_DIR}/complete_config.ini")
 add_definitions(-DMANDATORY_CONFIG="${CMAKE_CURRENT_BINARY_DIR}/mandatory_config.ini")
+add_definitions(-DTTL_SMALL="${CMAKE_CURRENT_BINARY_DIR}/ttl_small.ini")
+add_definitions(-DTTL_MEDIUM="${CMAKE_CURRENT_BINARY_DIR}/ttl_medium.ini")
 add_definitions(-DBAD_TIMEOUT="${CMAKE_CURRENT_BINARY_DIR}/bad_timeout.ini")
 add_definitions(-DBAD_TTL="${CMAKE_CURRENT_BINARY_DIR}/bad_ttl.ini")
 

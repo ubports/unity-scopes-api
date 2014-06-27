@@ -88,6 +88,17 @@ TEST(ScopeConfig, basic)
         EXPECT_THROW(cfg.hot_key(), NotFoundException);
         EXPECT_THROW(cfg.scope_runner(), NotFoundException);
     }
+
+    // These two are needed to get 100% coverage.
+    {
+        ScopeConfig cfg(TTL_SMALL);
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, cfg.results_ttl_type());
+    }
+
+    {
+        ScopeConfig cfg(TTL_MEDIUM);
+        EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, cfg.results_ttl_type());
+    }
 }
 
 TEST(ScopeConfig, bad_timeout)
