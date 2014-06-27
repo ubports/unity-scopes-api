@@ -141,15 +141,5 @@ TEST_F(ScopeConfigWithIntl, localization)
         EXPECT_EQ("copesay amenay", cfg.display_name());
         EXPECT_EQ("copesay criptiondesay", cfg.description());
         EXPECT_EQ("earchsay ringstay", cfg.search_hint());
-// FIXME Why did I have to comment this assertion out
-//        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
-
-        auto attrs = cfg.appearance_attributes();
-        EXPECT_EQ(5, attrs.size());
-        EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
-        EXPECT_EQ("bar", attrs["another_one"].get_string());
-
-// FIXME Why did I have to comment this assertion out
-//        EXPECT_THROW(cfg.scope_runner(), unity::scopes::NotFoundException);
     }
 }
