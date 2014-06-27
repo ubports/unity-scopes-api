@@ -12,7 +12,7 @@ Changes in version 0.5.0
   - Changed ScopeBase::start() method to return void instead of int, and made both start() and stop() methods virtual instead of pure virtual.
   - Moved all filter classes except for OptionSelectorFilter into experimental namespace, since they are not currently supported by the Shell
     and their API may get changed.
-  - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and shouldnnot be used as their API
+  - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and should not be used as their API
     may change or get removed.
   - removed deprecated SearchReply::register_annotation() method.
   - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,
