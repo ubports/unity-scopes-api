@@ -102,7 +102,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
     {
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
-        throw ConfigException("Cannot instantiate run time for " + scope_id_ + ", config file: " + configfile);
+        throw ConfigException(msg);
     }
 }
 
