@@ -120,7 +120,6 @@ int main(int argc, char* argv[])
         // Get registry config
         RegistryConfig reg_conf(ss_reg_id, rt->registry_configfile());
         std::string mw_kind = reg_conf.mw_kind();
-        std::string mw_configfile = reg_conf.mw_configfile();
 
         // Get middleware handle from runtime
         MiddlewareBase::SPtr mw = rt->factory()->find(ss_reg_id, mw_kind);
