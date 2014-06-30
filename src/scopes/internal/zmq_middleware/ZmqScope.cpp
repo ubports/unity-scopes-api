@@ -27,8 +27,6 @@
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
 
-#include <iostream> // TODO: remove this
-
 using namespace std;
 
 namespace unity
