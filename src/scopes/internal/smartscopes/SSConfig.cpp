@@ -23,8 +23,6 @@
 
 #include <unistd.h>
 
-#include <unity/UnityExceptions.h> // TODO: remove this in config-fixes-stage2 merge proposal
-
 using namespace std;
 
 namespace unity
