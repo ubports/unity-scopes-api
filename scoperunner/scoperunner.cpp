@@ -104,7 +104,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         {
             try
             {
-                loader = ScopeLoader::load(scope_id, lib, rt->registry());
+                loader = ScopeLoader::load(scope_id, lib, rt_config.data_directory(), rt->registry());
             }
             catch (unity::ResourceException& e)
             {

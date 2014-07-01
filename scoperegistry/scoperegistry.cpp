@@ -31,7 +31,6 @@
 #include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-#include <unity/util/FileIO.h>
 #include <unity/util/ResourcePtr.h>
 
 #include <algorithm>
@@ -225,8 +224,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
 
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
-// If the scope uses settings, also read the settings file and add the JSON that defines
-// the supported settings to the metadata.
+// If the scope uses settings, also parse the settings file and add the settings to the metadata.
 
 void add_local_scope(RegistryObject::SPtr const& registry,
                      pair<string, string> const& scope,
@@ -242,22 +240,18 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
-    filesystem::path settings_json_path(scope_dir / (scope.first + ".json"));
+    filesystem::path settings_schema_path(scope_dir / (scope.first + "-settings.ini"));
 
     mi->set_settings_definitions(Variant(VariantArray()));
-    if (filesystem::exists(settings_json_path))
+    try
     {
-        try
-        {
-            string settings_json = unity::util::read_text_file(settings_json_path.native());
-            SettingsSchema schema(settings_json);
-            mi->set_settings_definitions(Variant(schema.definitions()));
-        }
-        catch (std::exception const& e)
-        {
-            error("ignoring settings schema file " + settings_json_path.native()
-                  + " for scope " + scope.first + ": " + e.what());
-        }
+        SettingsSchema schema(settings_schema_path.native());
+        mi->set_settings_definitions(Variant(schema.definitions()));
+    }
+    catch (std::exception const& e)
+    {
+        error("ignoring settings schema file " + settings_schema_path.native()
+              + " for scope " + scope.first + ": " + e.what());
     }
 
     mi->set_scope_id(scope.first);

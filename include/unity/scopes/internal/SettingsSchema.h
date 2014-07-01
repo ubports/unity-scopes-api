@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
 
 #include <unity/util/DefinesPtrs.h>
+#include <unity/util/IniParser.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Variant.h>
 
@@ -44,12 +45,13 @@ public:
     NONCOPYABLE(SettingsSchema);
     UNITY_DEFINES_PTRS(SettingsSchema);
 
-    SettingsSchema(std::string const& json_schema);
+    SettingsSchema(std::string const& ini_file);
     ~SettingsSchema();
 
     VariantArray definitions() const;
 
 private:
+    std::string const ini_file_;
     VariantArray definitions_;
 };
 

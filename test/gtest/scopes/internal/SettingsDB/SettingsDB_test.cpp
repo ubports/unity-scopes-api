@@ -19,7 +19,6 @@
 #include <unity/scopes/internal/SettingsDB.h>
 
 #include <unity/UnityExceptions.h>
-#include <unity/util/FileIO.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
@@ -40,7 +39,7 @@ void add_doc(const string& doc_id, const string& json)
 
 TEST(SettingsDB, basic)
 {
-    auto schema = unity::util::read_text_file(TEST_SRC_DIR "/schema.json");
+    auto schema = TEST_SRC_DIR "/schema.ini";
 
     {
         unlink(db_name.c_str());
@@ -125,7 +124,7 @@ TEST(SettingsDB, basic)
 
     {
         unlink(db_name.c_str());
-        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/schema.json");
+        auto schema = TEST_SRC_DIR "/schema.ini";
         SettingsDB db(db_name, schema);
 
         // Add a record with a typo, so the value won't be found.
@@ -144,7 +143,7 @@ TEST(SettingsDB, basic)
         unlink(db_name.c_str());
 
         // This schema does not specify a default value for location and unit.
-        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/no_default_schema.json");
+        auto schema = TEST_SRC_DIR "/no_default_schema.ini";
         SettingsDB db(db_name, schema);
 
         // Check that we now can see only the other two values. (DB doesn't exist yet.)
@@ -170,7 +169,7 @@ TEST(SettingsDB, basic)
         unlink(db_name.c_str());
 
         // This schema does not specify a default value for location and unit.
-        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/no_default_schema.json");
+        auto schema = TEST_SRC_DIR "/no_default_schema.ini";
         SettingsDB db(db_name, schema);
 
         // Add records to supply the values.
@@ -202,22 +201,22 @@ TEST(SettingsDB, exceptions)
 {
     try
     {
-        SettingsDB db("unused", "syntax error");
+        SettingsDB db("unused", "no_such_file");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsDB(): cannot parse schema, db = unused:\n"
-                     "    unity::ResourceException: SettingsSchema(): cannot parse schema: * Line 1, Column 1\n"
-                     "  Syntax error: value, object or array expected.\n",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsDB\\(\\): schema = no_such_file, db = unused:\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \"no_such_file\":\n"
+                       "        unity::FileException: Could not load ini file no_such_file: No such file or directory \\(errno = 4\\)");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
         // Open DB that doesn't exist yet.
         unlink(db_name.c_str());
-        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/schema.json");
+        auto schema = TEST_SRC_DIR "/schema.ini";
         SettingsDB db(db_name, schema);
 
         // Add a record, which creates the DB
@@ -242,7 +241,7 @@ TEST(SettingsDB, exceptions)
         // Create DB with one record.
         add_doc("default-locationSetting", R"( { "value": "Munich" } )");
 
-        auto schema = unity::util::read_text_file(TEST_SRC_DIR "/schema.json");
+        auto schema = TEST_SRC_DIR "/schema.ini";
         SettingsDB db(db_name, schema);
 
         auto s = db.settings();

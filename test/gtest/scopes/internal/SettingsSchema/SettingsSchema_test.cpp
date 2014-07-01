@@ -19,622 +19,194 @@
 #include <unity/scopes/internal/SettingsSchema.h>
 
 #include <unity/UnityExceptions.h>
-#include <unity/util/FileIO.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
-#include <jsoncpp/json/json.h>
 
 using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace std;
 
-char const* ok_schema = R"delimiter(
-{
-    "settings":
-    [
-        {
-            "id": "location",
-            "displayName": "Location",
-            "type": "string",
-            "parameters": {
-                "defaultValue": "London"
-            }
-        },
-        {
-            "id": "unitTemp",
-            "displayName": "Temperature Units",
-            "type": "list",
-            "parameters": {
-                "defaultValue": 1,
-                "values": ["Celsius", "Fahrenheit"]
-            }
-        },
-        {
-            "id": "age",
-            "displayName": "Age",
-            "type": "number",
-            "parameters": {
-                "defaultValue": 23
-            }
-        },
-        {
-            "id": "enabled",
-            "displayName": "Enabled",
-            "type": "boolean",
-            "parameters": {
-                "defaultValue": true
-            }
-        },
-        {
-            "id": "string_no_default",
-            "displayName": "string_no_default",
-            "type": "string",
-            "parameters": {
-            }
-        },
-        {
-            "id": "string_no_default2",
-            "displayName": "string_no_default",
-            "type": "string"
-        },
-        {
-            "id": "list_no_default",
-            "displayName": "list_no_default",
-            "type": "list",
-            "parameters": {
-                "values": ["a", "b"]
-            }
-        },
-        {
-            "id": "number_no_default",
-            "displayName": "number_no_default",
-            "type": "number",
-            "parameters": {
-            }
-        },
-        {
-            "id": "number_no_default2",
-            "displayName": "number_no_default",
-            "type": "number"
-        },
-        {
-            "id": "boolean_no_default",
-            "displayName": "boolean_no_default",
-            "type": "boolean",
-            "parameters": {
-            }
-        },
-        {
-            "id": "boolean_no_default2",
-            "displayName": "boolean_no_default",
-            "type": "boolean"
-        }
-    ]
-}
-)delimiter";
-
 TEST(SettingsSchema, basic)
 {
-    // TODO: add tests for localized displayName
-    SettingsSchema s(ok_schema);
+    SettingsSchema s(TEST_SRC_DIR "/schema.ini");
 
     auto defs = s.definitions();
-    EXPECT_EQ(11, defs.size());
+    ASSERT_EQ(8, defs.size());
 
     EXPECT_EQ("location", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
-    EXPECT_EQ("London", defs[0].get_dict()["parameters"].get_dict()["defaultValue"].get_string());
+    EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
 
-    // TODO: add tests for localized valuesDisplayNames
-    EXPECT_EQ("unitTemp", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("tempUnit", defs[1].get_dict()["id"].get_string());
     EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
-    EXPECT_EQ("Temperature Units", defs[1].get_dict()["displayName"].get_string());
-    EXPECT_EQ(1, defs[1].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, defs[1].get_dict()["parameters"].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", defs[1].get_dict()["parameters"].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["parameters"].get_dict()["values"].get_array()[1].get_string());
+    EXPECT_EQ("Temperature Unit", defs[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ(1, defs[1].get_dict()["defaultValue"].get_int());
+    ASSERT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+    EXPECT_EQ("Celsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
 
     EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
     EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());
     EXPECT_EQ("Age", defs[2].get_dict()["displayName"].get_string());
-    EXPECT_EQ(23, defs[2].get_dict()["parameters"].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(23, defs[2].get_dict()["defaultValue"].get_int());
 
     EXPECT_EQ("enabled", defs[3].get_dict()["id"].get_string());
     EXPECT_EQ("boolean", defs[3].get_dict()["type"].get_string());
     EXPECT_EQ("Enabled", defs[3].get_dict()["displayName"].get_string());
-    EXPECT_TRUE(defs[3].get_dict()["parameters"].get_dict()["defaultValue"].get_bool());
+    EXPECT_TRUE(defs[3].get_dict()["defaultValue"].get_bool());
 
-    EXPECT_EQ(Variant(), defs[4].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[5].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[6].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[7].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[8].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[9].get_dict()["parameters"].get_dict()["defaultValue"]);
-    EXPECT_EQ(Variant(), defs[10].get_dict()["parameters"].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[4].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[5].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[6].get_dict()["defaultValue"]);
+    EXPECT_EQ(Variant(), defs[7].get_dict()["defaultValue"]);
 }
 
 TEST(SettingsSchema, exceptions)
 {
     try
     {
-        SettingsSchema("");
+        SettingsSchema("no_such_file");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): cannot parse schema: * Line 1, Column 1\n"
-                     "  Syntax error: value, object or array expected.\n",
+        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): cannot parse settings file \"no_such_file\":\n"
+                     "    unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
                      e.what());
     }
 
     try
     {
-        SettingsSchema(R"({ "a": "b" })");
+        SettingsSchema(TEST_SRC_DIR "/missing_type.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"settings\" definition",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"type\" definition, setting = \"location\":\n"
+                       "        unity::LogicException:.*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"({ "settings": "b" })");
+        SettingsSchema(TEST_SRC_DIR "/bad_type.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): value \"settings\" must be an array",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): invalid \"type\" definition: \"99\", "
+                       "setting = \"location\"");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "location",
-                        "displayName": "Location",
-                        "type": "string",
-                        "parameters": {
-                            "defaultValue": "London"
-                        }
-                    },
-                    {
-                        "id": "unitTemp",
-                        "displayName": "Temperature Units",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": 1,
-                            "values": ["Celsius", "Fahrenheit"]
-                        }
-                    },
-                    {
-                        "id": "location",
-                        "displayName": "Age",
-                        "type": "number",
-                        "parameters": {
-                            "defaultValue": 23
-                        }
-                    }
-                ]
-            }
-        )");
+        SettingsSchema(TEST_SRC_DIR "/bad_list.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): duplicate definition, id = \"location\"",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): invalid number of entries for \"displayValues\" "
+                       "definition, setting = \"tempUnit\"");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "",
-                        "type": "number"
-                    }
-                ]
-            }
-        )");
+        SettingsSchema(TEST_SRC_DIR "/bad_list_default.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty \"id\" definition",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): \"displayValues\" out of range, setting = \"tempUnit\"");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "someid",
-                        "displayName": "Location"
-                    }
-                ]
-            }
-        )");
+        SettingsSchema(TEST_SRC_DIR "/missing_list_values.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"type\" definition, id = \"someid\"",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"displayValues\" definition, "
+                       "setting = \"tempUnit\":.*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "someid": "id",
-                        "displayName": "Location",
-                        "type": 99
-                    }
-                ]
-            }
-        )");
+        SettingsSchema(TEST_SRC_DIR "/bad_bool.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"id\" definition",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n.*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "displayName": "Location",
-                        "type": 99
-                    }
-                ]
-            }
-        )");
+        SettingsSchema(TEST_SRC_DIR "/missing_display_name.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type for \"type\" definition, id = \"x\"",
-                     e.what());
+        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"displayName\" definition, setting = \"location\":\n"
+                       "        unity::LogicException:.*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
+}
+
+class SetLanguage: public ::testing::Test
+{
+public:
+    SetLanguage()
+    {
+        setenv("LANGUAGE", "test", 1);
     }
 
-    try
+    ~SetLanguage()
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "displayName": "Location",
-                        "type": "no_such_type"
-                    }
-                ]
-            }
-        )");
-        FAIL();
+        unsetenv("LANGUAGE");
     }
-    catch (ResourceException const& e)
+};
+
+TEST_F(SetLanguage, localization)
+{
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid \"type\" setting: "
-                     "\"no_such_type\", id = \"x\"",
-                     e.what());
+        SettingsSchema s(TEST_SRC_DIR "/schema.ini");
+
+        auto defs = s.definitions();
+
+        EXPECT_EQ("tempUnit", defs[1].get_dict()["id"].get_string());
+        EXPECT_EQ("testTemperature Unit", defs[1].get_dict()["displayName"].get_string());
+        ASSERT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("testCelsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("testFahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
 
-    try
+    // Check that, if the locale is set, but no strings are defined for that locale,
+    // the non-localized version is returned.
     {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "string",
-                        "parameters": 99
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): expected value of type object "
-                     "for \"parameters\", id = \"x\"",
-                     e.what());
-    }
+        SettingsSchema s(TEST_SRC_DIR "/locale_fallback.ini");
 
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "boolean",
-                        "parameters": {
-                            "defaultValue": "true"
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type "
-                     "for \"defaultValue\" definition, id = \"x\"",
-                     e.what());
-    }
+        auto defs = s.definitions();
+        ASSERT_EQ(1, defs.size());
 
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "number",
-                        "parameters": {
-                            "defaultValue": true
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type "
-                     "for \"defaultValue\" definition, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": "hello",
-                            "values": ["Celsius", "Fahrenheit"]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type "
-                     "for \"defaultValue\" definition, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list"
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): missing \"parameters\" definition, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": "hello"
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type for \"values\" "
-                     "definition, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": [ ]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty \"values\" definition, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": [ 3, 7 ]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid enumerator type, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": [ "a", "" ]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid empty enumerator, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": [ "a", "b", "a" ]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): duplicate enumerator \"a\", id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "list",
-                        "parameters": {
-                            "defaultValue": -1,
-                            "values": [ "a", "b" ]
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): \"defaultValue\" out of range, id = \"x\"",
-                     e.what());
-    }
-
-    try
-    {
-        SettingsSchema(R"(
-            {
-                "settings":
-                [
-                    {
-                        "id": "x",
-                        "type": "string",
-                        "parameters": {
-                            "defaultValue": true
-                        }
-                    }
-                ]
-            }
-        )");
-        FAIL();
-    }
-    catch (ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): invalid value type "
-                     "for \"defaultValue\" definition, id = \"x\"",
-                     e.what());
+        EXPECT_EQ("tempUnit", defs[0].get_dict()["id"].get_string());
+        EXPECT_EQ("Temperature Unit", defs[0].get_dict()["displayName"].get_string());
+        ASSERT_EQ(2, defs[0].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", defs[0].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", defs[0].get_dict()["displayValues"].get_array()[1].get_string());
     }
 }

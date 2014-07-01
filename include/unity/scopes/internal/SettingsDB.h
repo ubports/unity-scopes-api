@@ -61,6 +61,7 @@ private:
     void set_defaults();
 
     std::string path_;
+    std::string schema_path_;
     unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
     int generation_;
     VariantArray definitions_;                       // Returned by SettingsSchema

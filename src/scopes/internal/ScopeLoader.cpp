@@ -22,7 +22,8 @@
 #include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
-#include <unity/util/FileIO.h>
+
+#include <boost/filesystem.hpp>
 
 #include <cassert>
 #include <libgen.h>
@@ -41,7 +42,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath, RegistryProxy const& registry) :
+ScopeLoader::ScopeLoader(string const& scope_id,
+                         string const& libpath,
+                         string const& data_dir,
+                         RegistryProxy const& registry) :
     scope_id_(scope_id),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
     registry_(registry),
@@ -60,29 +64,23 @@ ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath, Registry
     }
 
     {
-        // dirname modifies its argument, so we need a copy of scope lib path
-        std::vector<char> scope_lib(libpath.c_str(), libpath.c_str() + libpath.size() + 1);
-        const std::string scope_dir(dirname(&scope_lib[0]));
-        scope_base_->p->set_scope_directory(scope_dir);
+        boost::filesystem::path libp(libpath);
+        boost::filesystem::path scope_dir(libp.parent_path());
+        scope_base_->p->set_scope_directory(scope_dir.native());
     }
 
-    // Try to open the scope settings database, if any.
-    try
+    string settings_dir = data_dir + "/" + scope_id;
+    string scope_dir = scope_base_->scope_directory();
+    string settings_db = data_dir + "/" + scope_id + "/settings.db";
+    string settings_schema = scope_dir + "/" + scope_id + "-settings.ini";
+    if (boost::filesystem::exists(settings_schema))
     {
-        string json_schema_file = scope_base_->scope_directory() + "/" + scope_id + ".json";
-        string json = unity::util::read_text_file(json_schema_file);
-
         // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
-        string scope_dir = scope_base_->scope_directory();
-        ::mkdir(scope_dir.c_str(), 0700);
-        ::mkdir(scope_dir.c_str(), 0700);
-        string settings_db = scope_dir + "/" + scope_id + "/settings.db";
-        shared_ptr<SettingsDB> db(new SettingsDB(settings_db, json));
+        ::mkdir(data_dir.c_str(), 0700);
+        ::mkdir(settings_dir.c_str(), 0700);
+
+        shared_ptr<SettingsDB> db(new SettingsDB(settings_db, settings_schema));
         scope_base_->p->set_settings_db(db);
-    }
-    catch (FileException const&)
-    {
-        // Scope doesn't have settings.
     }
 }
 
@@ -97,9 +95,12 @@ ScopeLoader::~ScopeLoader()
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath, RegistryProxy const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& scope_id,
+                                    string const& libpath,
+                                    string const& data_dir,
+                                    RegistryProxy const& registry)
 {
-    return UPtr(new ScopeLoader(scope_id, libpath, registry));
+    return UPtr(new ScopeLoader(scope_id, libpath, data_dir, registry));
 }
 
 void ScopeLoader::unload()

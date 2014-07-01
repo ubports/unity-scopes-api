@@ -478,14 +478,14 @@ select a distance unit as metric or imperial.
 
 \subsubsection settings_definitions Settings Definition
 
-You can define such settings in a JSON configuration file.
+You can define such settings in a configuration file.
 The file must be placed into the same directory as the scope's normal
-configuration file, with the name `<scope-name>.json`. For example, for a scope with ID `com.acme.myscope`,
+configuration file, with the name `<scope-name>-settings.ini`. For example, for a scope with ID `com.acme.myscope`,
 the normal configuration file is `com.acme.myscope.ini`, and the settings definition file is
-`com.acme.myscope.json`. Both files must be installed in the same directory (together with the scope's `.so` file).
+`com.acme.myscope-settings.ini`. Both files must be installed in the same directory (together with the scope's `.so` file).
 
-The shell constructs a user interface from the settings definitions. The user can change setting via that UI.
-The scope can retrieve the actual setting values at run time (see TODO).
+The shell constructs a user interface from the settings definitions. The user can change settings via that UI.
+The scope can retrieve the actual setting values at run time (see \ref read_settings).
 
 The following types are supported for settings:
 
@@ -500,82 +500,74 @@ It is possible to optionally define a default value for each setting.
 
 Here are the contents of an example definition file:
 ~~~
-{
-    "settings": [
-        {
-            "id": "location",
-            "displayName": "Location",
-            "type": "string",
-            "parameters": {
-                "defaultValue": "London"
-            }
-        },
-        {
-            "id": "age",
-            "displayName": "Your age",
-            "type": "number",
-            "parameters": {
-                "defaultValue": 23
-            }
-        },
-        {
-            "id": "extended",
-            "displayName": "Extended search",
-            "type": "boolean",
-            "parameters": {
-                "defaultValue": true
-            }
-        },
-        {
-            "id": "unit",
-            "displayName": "Temperature Unit",
-            "type": "list",
-            "parameters": {
-                "defaultValue": 1,
-                "values": ["Celsius", "Fahrenheit"],
-            }
-        }
-    ]
-}
+[location]
+type = string
+defaultValue = London
+displayName = Location
+
+[distanceUnit]
+type = list
+defaultValue = 1
+displayName = Distance Unit
+displayName[de] = Entfernungseinheit
+displayValues = Kilometers;Miles
+displayValues[de] = Kilometer;Meilen
+
+[age]
+type = number
+defaultValue = 23
+displayName = Age
+
+[enabled]
+type = boolean
+defaultValue = true
+displayName = Enabled
+
+# Setting without a default value
+[color]
+type = string
+displayName = Color
 ~~~
 
-The file must contain a single object containing a `settings` array. The array can contain any number (including zero)
-of objects. Each object defines a single setting.
-The order of the definitions in the `settings` array determines the display order for the user interface
-that is constructed by the shell.
+The file must contain a group for each setting.
+The order of the groups determines the display order for the user interface
+that is constructed by the shell. The group name is the ID of the corresponding setting.
 
 Each setting definition must contain at least the following mandatory definitions:
 <ul>
-<li> `id` - Defines an arbitrary identifier for the setting. The identifier must be unique among all the
-setting definitions for the scope.
-<li> `displayName` - Defines a display name that is shown for this setting by the shell. (This string can be
-localized&mdash;see TODO.)
 <li> `type` - Defines the type of the setting (`string`, `number`, `boolean`, or `list`).
+<li> `displayName` - Defines a display name that is shown for this setting by the shell.
 </ul>
 
-The `parameters` field is optional (except for settings of type `list`, for which it is mandatory) and defines
+The defaultValue field is optional. If present, it defines
 a default value that is provided to the scope if the user has not changed anything (or has never used the settings UI
-before using the scope). If a setting does not have a `parameters` field containing a `defaultValue` field, the
-corresponding setting has no default. (It is possible to test for settings that do not have a default value and
-were never set by the user (see TODO).
+before using the scope).
+It is possible to test for settings that do not have a default value and
+were never set by the user (see \ref read_settings).
 
-For settings of type `list`, the `parameters` field is mandatory. It must contain a `values` array that
-lists the available choices. (The choices can be localized&mdash;see TODO.) If you provide a default value,
+For settings of type `list`, the `displayValues` field is mandatory. It must contain an array
+that lists the available choices. If you provide a default value,
 it must be in the range `0..max-1` (where `max` is the number of choices).
+
+The `displayName` and `displayValues` fields can be localized by appending a locale identifier
+in square brackets. If no entry can be found that matches the current locale, the non-localized value
+is used.
 
 \subsubsection read_settings Accessing settings values
 
 The settings that are currently in effect are available to a scope via the unity::scopes::ScopeBase::settings()
 and unity::scopes::QueryBase::settings() methods.
-These methods return a unity::scopes::VariantMap with one entry per setting. For each setting, the key
-value is the setting `id` value from the JSON definition; the lookup value is a unity::scopes::Variant
-containing the value of the setting.
+These methods return a unity::scopes::VariantMap with one entry per setting. The map contains an entry for
+each setting (using the group name as the key). The lookup value is a unity::scopes::Variant that holds
+the current value of the setting.
 
-If a setting has a value, the lookup `Variant` contains a string (for settings of type `string`,
-a boolean (for settings of type `boolean`), or an integer (for settings of type `number` and `list`).
+If a setting has a value, the corresponding entry in the map contains a string (for settings of type `string`,
+a boolean (for settings of type `boolean`), or an integer (for settings of type `number` and `list`). (If the user
+did not a particular value, but the settings definition provided a default value, the `Variant` contains the default
+value.
 
-If a setting does not have a default value, and the user has not established a value for the setting, the
-lookup value is a null `Variant`.
+If a setting does not have a default value, and the user did not establish a value for the setting, the corresponding
+entry is absent from the map.
 
 When you use settings in your scope implementation, do not cache the values and re-use them
 for a different query. If you do, any setting changes made by the user will not take effect until
@@ -584,6 +576,21 @@ can be highly confusing.) Instead, call `settings()` each time you need to use t
 of a setting. That way, your scope will react to any change made by the user as soon as it receives another
 query.
 
+Here is an example of how to read the current settings values for the definition in \ref settings_definitions :
+
+~~~
+// In your `ScopeBase` or `QueryBase` implementation:
+
+unity::scopes::VariantMap s = settings();  // The settings method is provided by the base class
+
+cout << s["location"].get_string();        // Prints "London" unless the user changed the value
+
+auto it = s.find("color");
+if (it != s.end())                         // Setting does not have a default value, need to test
+{
+    cout << it->second.get_string();       // Prints the user-established value
+}
+~~~
 
 \subsection scopetesting Testing
 

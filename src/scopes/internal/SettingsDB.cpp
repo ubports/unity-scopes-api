@@ -48,16 +48,17 @@ auto doc_deleter = [](u1db_document* p){ u1db_free_doc(&p); };
 
 }  // namespace
 
-SettingsDB::SettingsDB(string const& path, string const& json_schema)
+SettingsDB::SettingsDB(string const& path, string const& schema_path)
     : state_changed_(false)
     , path_(path)
+    , schema_path_(schema_path)
     , db_(nullptr, db_deleter)
     , generation_(-1)
 {
     // Parse schema
     try
     {
-        SettingsSchema schema(json_schema);
+        SettingsSchema schema(schema_path);
         definitions_ = schema.definitions();
 
         // Initialize the def_map_ so we can look things
@@ -69,7 +70,7 @@ SettingsDB::SettingsDB(string const& path, string const& json_schema)
     }
     catch (std::exception const& e)
     {
-        throw ResourceException("SettingsDB(): cannot parse schema, db = " + path);
+        throw ResourceException("SettingsDB(): schema = " + schema_path + ", db = " + path);
     }
 
     process_all_docs();
@@ -160,7 +161,7 @@ int check_for_changes(void* instance, char const* /* doc_id */, int /* gen*/, ch
     return 0;
 }
 
-int process_docs(void* instance, u1db_document *docp)
+int process_doc(void* instance, u1db_document *docp)
 {
     ResourcePtr<u1db_document*, decltype(doc_deleter)> doc(docp, doc_deleter);
 
@@ -220,7 +221,7 @@ void SettingsDB::process_all_docs()
         set_defaults();
 
         int new_generation = generation_;
-        status = u1db_get_all_docs(db_.get(), 0, &new_generation, this, process_docs);
+        status = u1db_get_all_docs(db_.get(), 0, &new_generation, this, process_doc);
         if (status != U1DB_OK)
         {
             throw ResourceException("SettingsDB(): u1db_get_all_docs() failed, status = "
@@ -235,21 +236,12 @@ void SettingsDB::set_defaults()
     values_.clear();
     for (auto const& f : definitions_)
     {
-        auto const def = f.get_dict();
-        auto const params_it = def.find("parameters");
-        if (params_it != def.end())
+        auto def = f.get_dict();
+        string const id = def["id"].get_string();
+        Variant const default_value = def["defaultValue"];
+        if (!default_value.is_null())
         {
-            auto const params = params_it->second.get_dict();
-            auto const v_it = params.find("defaultValue");
-            if (v_it != params.end())
-            {
-                auto const id_it = def.find("id");
-                assert(id_it != def.end());
-                if (!v_it->second.is_null())
-                {
-                    values_[id_it->second.get_string()] = v_it->second;
-                }
-            }
+            values_[id] = default_value;
         }
     }
 }
