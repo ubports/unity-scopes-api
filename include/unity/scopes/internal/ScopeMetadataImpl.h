@@ -54,7 +54,7 @@ public:
     std::string hot_key() const;                                 // optional
     bool invisible() const;                                      // optional (default: false)
     VariantMap appearance_attributes() const;                    // optional (default: empty map)
-    std::string scope_directory() const;
+    std::string scope_directory() const;                         // optional
     ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
     Variant settings_definitions() const;                        // optional (default: null variant)
     bool location_data_needed() const;                           // optional (default: false)
@@ -93,7 +93,7 @@ private:
     std::unique_ptr<std::string> search_hint_;         // Optional, hence a pointer
     std::unique_ptr<std::string> hot_key_;             // Optional, hence a pointer
     std::unique_ptr<bool> invisible_;                  // Optional, hence a pointer
-    std::unique_ptr<std::string> scope_directory_;
+    std::unique_ptr<std::string> scope_directory_;     // Optional, hence a pointer
     VariantMap appearance_attributes_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
     std::unique_ptr<Variant> settings_definitions_;    // Optional, hence a pointer
