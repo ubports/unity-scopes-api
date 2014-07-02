@@ -563,8 +563,8 @@ the current value of the setting.
 
 If a setting has a value, the corresponding entry in the map contains a string (for settings of type `string`,
 a boolean (for settings of type `boolean`), or an integer (for settings of type `number` and `list`). (If the user
-did not a particular value, but the settings definition provided a default value, the `Variant` contains the default
-value.
+did not provide a particular value, but the settings definition provided a default value, the `Variant` contains the
+default value.
 
 If a setting does not have a default value, and the user did not establish a value for the setting, the corresponding
 entry is absent from the map.
