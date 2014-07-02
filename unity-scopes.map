@@ -9,6 +9,7 @@ global:
         vtable?for?unity::scopes::[!i]*;
         unity::scopes::internal::Executor::*;
         unity::scopes::internal::IniSettingsSchema::*;
+        unity::scopes::internal::IniSettingsSchema::*;
         unity::scopes::internal::JsonSettingsSchema::*;
         unity::scopes::internal::MiddlewareBase::*;
         unity::scopes::internal::MiddlewareFactory::*;
@@ -24,6 +25,7 @@ global:
         unity::scopes::internal::smartscopes::SSConfig::*;
         unity::scopes::internal::smartscopes::SSRegistryObject::*;
         unity::scopes::internal::smartscopes::SSScopeObject::*;
+        unity::scopes::internal::StateReceiverObject::*;
         unity::scopes::internal::StateReceiverObject::*;
     };
 local:
