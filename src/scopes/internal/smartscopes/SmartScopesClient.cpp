@@ -347,7 +347,11 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     }
     if (!settings.empty())
     {
-        search_uri << "&settings=" << stringify_settings(settings);
+        std::string settings_str = stringify_settings(settings);
+        if (!settings_str.empty())
+        {
+            search_uri << "&settings=" << settings_str;
+        }
     }
     if (!locale.empty())
     {
@@ -394,7 +398,11 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
 
     if (!settings.empty())
     {
-        preview_uri << "&settings=" << stringify_settings(settings);
+        std::string settings_str = stringify_settings(settings);
+        if (!settings_str.empty())
+        {
+            preview_uri << "&settings=" << settings_str;
+        }
     }
     if (!locale.empty())
     {
@@ -751,16 +759,14 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
     std::ostringstream result_str;
     result_str << "{";
 
+    // Loop through the settings, appending each id:value string to result_str
     bool first_setting = true;
     for (auto const& setting : settings)
     {
         std::ostringstream setting_str;
-        if (!first_setting)
-        {
-            setting_str << ",";
-        }
-        setting_str << "\"" << setting.first << "\":";
+        setting_str << (first_setting ? "\"" : ",\"") << setting.first << "\":";
 
+        // Determine what the Variant type is and construct the id:value string accordingly
         bool setting_valid = false;
         switch(setting.second.which())
         {
@@ -784,13 +790,19 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
             std::cerr << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for settings value: \"" << setting.first << "\"" << std::endl;
         }
 
+        // If we have constructed a valid id:value string, append it to result_str
         if (setting_valid)
         {
             result_str << setting_str;
             first_setting = false;
         }
     }
-
     result_str << "}";
+
+    // If no valid settings were found, return an empty string
+    if (first_setting)
+    {
+        return std::string();
+    }
     return result_str.str();
 }
