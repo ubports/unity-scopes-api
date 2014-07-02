@@ -305,7 +305,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     // Try to open the scope settings database, if any.
     string settings_dir = data_dir_ + "/" + scope_id_;
     string scope_dir = scope_base->scope_directory();
-    string settings_db = data_dir_ + "/" + scope_id_ + "/settings.db";
+    string settings_db = settings_dir + "/settings.db";
     string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
     if (boost::filesystem::exists(settings_schema))
     {

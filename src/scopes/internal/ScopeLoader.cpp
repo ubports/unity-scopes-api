@@ -71,7 +71,7 @@ ScopeLoader::ScopeLoader(string const& scope_id,
 
     string settings_dir = data_dir + "/" + scope_id;
     string scope_dir = scope_base_->scope_directory();
-    string settings_db = data_dir + "/" + scope_id + "/settings.db";
+    string settings_db = settings_dir + "/settings.db";
     string settings_schema = scope_dir + "/" + scope_id + "-settings.ini";
     if (boost::filesystem::exists(settings_schema))
     {
