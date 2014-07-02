@@ -153,7 +153,7 @@ public:
                               std::string const& session_id,
                               uint query_id,
                               std::string const& platform,
-                              VariantMap settings = VariantMap(),
+                              VariantMap const& settings = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
                               const uint limit = 0);
@@ -163,7 +163,7 @@ public:
                                 std::string const& session_id,
                                 std::string const& platform,
                                 const uint widgets_api_version,
-                                VariantMap settings = VariantMap(),
+                                VariantMap const& settings = VariantMap(),
                                 std::string const& locale = "",
                                 std::string const& country = "");
 
@@ -181,6 +181,8 @@ private:
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
+
+    std::string stringify_settings(VariantMap const& settings);
 
 private:
     HttpClientInterface::SPtr http_client_;

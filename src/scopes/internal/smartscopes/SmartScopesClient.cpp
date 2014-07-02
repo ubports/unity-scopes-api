@@ -325,7 +325,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              std::string const& session_id,
                                              uint query_id,
                                              std::string const& platform,
-                                             VariantMap settings,
+                                             VariantMap const& settings,
                                              std::string const& locale,
                                              std::string const& country,
                                              uint limit)
@@ -344,6 +344,10 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     if (!department_id.empty())
     {
         search_uri << "&department=" << http_client_->to_percent_encoding(department_id);
+    }
+    if (!settings.empty())
+    {
+        search_uri << "&settings=" << stringify_settings(settings);
     }
     if (!locale.empty())
     {
@@ -372,7 +376,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
                                                std::string const& session_id,
                                                std::string const& platform,
                                                const uint widgets_api_version,
-                                               VariantMap settings,
+                                               VariantMap const& settings,
                                                std::string const& locale,
                                                std::string const& country)
 {
@@ -388,6 +392,10 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
 
     // optional parameters
 
+    if (!settings.empty())
+    {
+        preview_uri << "&settings=" << stringify_settings(settings);
+    }
     if (!locale.empty())
     {
         preview_uri << "&locale=" << locale;
@@ -736,4 +744,9 @@ std::string SmartScopesClient::read_cache()
     }
 
     return cached_scopes_;
+}
+
+std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
+{
+
 }
