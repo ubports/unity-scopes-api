@@ -33,8 +33,8 @@ TEST(CategorisedResult, basic)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
-    auto cat2 = reg.register_category("2", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
+    auto cat2 = reg.register_category("2", "title", "icon", nullptr, rdr);
 
     {
         CategorisedResult result(cat);
@@ -64,7 +64,7 @@ TEST(CategorisedResult, indexop)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     {
         CategorisedResult result(cat);
         result["uri"] = Variant("http://ubuntu.com");
@@ -109,7 +109,7 @@ TEST(CategorisedResult, copy)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     // copy ctor
     {
         CategorisedResult result(cat);
@@ -200,7 +200,7 @@ TEST(CategorisedResult, serialize)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     {
         CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
@@ -242,7 +242,7 @@ TEST(CategorisedResult, serialize_excp)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     CategorisedResult result(cat);
 
     {
@@ -266,7 +266,7 @@ TEST(CategorisedResult, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     Category::SCPtr null_cat;
     {
         try
@@ -316,7 +316,7 @@ TEST(CategorisedResult, deserialize)
 
         CategoryRegistry reg;
         CategoryRenderer rdr;
-        auto cat = reg.register_category("1", "title", "icon", rdr);
+        auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
         auto result = internal::CategorisedResultImpl::create_result(new CategorisedResultImpl(cat, outer));
 
         auto outer_var = result.serialize();
@@ -343,7 +343,7 @@ TEST(CategorisedResult, deserialize)
 
         CategoryRegistry reg;
         CategoryRenderer rdr;
-        auto cat = reg.register_category("1", "title", "icon", rdr);
+        auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
         auto result = internal::CategorisedResultImpl::create_result(new internal::CategorisedResultImpl(cat, outer));
 
         EXPECT_EQ("http://ubuntu.com", result.uri());
@@ -361,8 +361,8 @@ TEST(CategorisedResult, store)
     CategoryRenderer rdr;
     CategoryRegistry input_reg;
     CategoryRegistry output_reg;
-    auto incat = input_reg.register_category("1", "title", "icon", rdr);
-    auto outcat = output_reg.register_category("2", "title", "icon", rdr);
+    auto incat = input_reg.register_category("1", "title", "icon", nullptr, rdr);
+    auto outcat = output_reg.register_category("2", "title", "icon", nullptr, rdr);
 
     CategorisedResult outresult(outcat);
     outresult.set_uri("uri1");

@@ -34,7 +34,7 @@ TEST(CategoryRegistry, basic)
     {
         CategoryRenderer rdr;
         EXPECT_EQ(nullptr, reg.lookup_category("a"));
-        auto cat = reg.register_category("a", "title", "icon", rdr);
+        auto cat = reg.register_category("a", "title", "icon", nullptr, rdr);
         EXPECT_TRUE(cat != nullptr);
 
         auto cat1 = reg.lookup_category("a");
@@ -48,7 +48,7 @@ TEST(CategoryRegistry, exceptions)
     CategoryRegistry reg;
     CategoryRenderer rdr;
 
-    auto cat = reg.register_category("a", "title", "icon", rdr);
-    EXPECT_THROW(reg.register_category("a", "title1", "icon1", rdr), InvalidArgumentException);
+    auto cat = reg.register_category("a", "title", "icon", nullptr, rdr);
+    EXPECT_THROW(reg.register_category("a", "title1", "icon1", nullptr, rdr), InvalidArgumentException);
     EXPECT_THROW(reg.register_category(cat), InvalidArgumentException);
 }

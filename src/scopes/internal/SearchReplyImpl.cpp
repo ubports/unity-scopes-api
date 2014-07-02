@@ -82,7 +82,19 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
                                              CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
-    auto cat = cat_registry_->register_category(id, title, icon, renderer_template);
+    auto cat = cat_registry_->register_category(id, title, icon, nullptr, renderer_template);
+    push(cat);
+    return cat;
+}
+
+Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
+                                             std::string const& title,
+                                             std::string const& icon,
+                                             CannedQuery const& query,
+                                             CategoryRenderer const& renderer_template)
+{
+    // will throw if adding same category again
+    auto cat = cat_registry_->register_category(id, title, icon, make_shared<CannedQuery>(query), renderer_template);
     push(cat);
     return cat;
 }

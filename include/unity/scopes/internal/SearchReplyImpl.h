@@ -61,6 +61,11 @@ public:
                                               std::string const& title,
                                               std::string const &icon,
                                               CategoryRenderer const& renderer_template) override;
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CannedQuery const &query,
+                                              CategoryRenderer const& renderer_template) override;
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 
