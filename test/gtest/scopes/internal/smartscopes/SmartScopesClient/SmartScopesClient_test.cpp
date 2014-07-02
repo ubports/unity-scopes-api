@@ -82,6 +82,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
     EXPECT_EQ(nullptr, scopes[0].appearance);
+    EXPECT_EQ(nullptr, scopes[0].settings);
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
@@ -93,6 +94,24 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_TRUE(scopes[1].invisible);
     EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
     EXPECT_EQ("logo.png", (*scopes[1].appearance)["PageHeader"].get_dict()["logo"].get_string());
+    EXPECT_EQ(nullptr, scopes[1].settings);
+
+    EXPECT_EQ("dummy.scope.3", scopes[2].id);
+    EXPECT_EQ("Dummy Demo Scope 3", scopes[2].name);
+    EXPECT_EQ("Dummy demo scope 3.", scopes[2].description);
+    EXPECT_EQ("Mr.Fake", scopes[2].author);
+    EXPECT_EQ(sss_url_ + "/demo3", scopes[2].base_url);
+    EXPECT_EQ(nullptr, scopes[2].icon);
+    EXPECT_EQ(nullptr, scopes[2].art);
+    EXPECT_FALSE(scopes[2].invisible);
+    EXPECT_EQ(nullptr, scopes[2].appearance);
+    EXPECT_EQ("[{\"displayName\":\"Location\",\"id\":\"location\",\"parameters\":{\"defaultValue\":"
+              "\"London\"},\"type\":\"string\"},{\"displayName\":\"Temperature Units\",\"id\":"
+              "\"unitTemp\",\"parameters\":{\"defaultValue\":1,\"values\":[\"Celsius\",\"Fahrenheit"
+              "\"]},\"type\":\"list\"},{\"displayName\":\"Age\",\"id\":\"age\",\"parameters\":{"
+              "\"defaultValue\":23},\"type\":\"number\"},{\"displayName\":\"Enabled\",\"id\":"
+              "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
+              *scopes[2].settings);
 }
 
 TEST_F(SmartScopesClientTest, search)
