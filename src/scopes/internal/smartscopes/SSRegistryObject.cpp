@@ -256,6 +256,11 @@ void SSRegistryObject::get_remote_scopes()
                 }
             }
 
+            if (scope.needs_location_data)
+            {
+                metadata->set_location_data_needed(*scope.needs_location_data);
+            }
+
             metadata->set_invisible(scope.invisible);
 
             ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
