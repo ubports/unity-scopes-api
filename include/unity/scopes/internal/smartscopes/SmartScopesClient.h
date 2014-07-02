@@ -153,6 +153,7 @@ public:
                               std::string const& session_id,
                               uint query_id,
                               std::string const& platform,
+                              VariantMap settings = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
                               const uint limit = 0);
@@ -162,6 +163,7 @@ public:
                                 std::string const& session_id,
                                 std::string const& platform,
                                 const uint widgets_api_version,
+                                VariantMap settings = VariantMap(),
                                 std::string const& locale = "",
                                 std::string const& country = "");
 

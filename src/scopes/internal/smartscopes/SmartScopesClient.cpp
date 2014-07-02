@@ -325,6 +325,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              std::string const& session_id,
                                              uint query_id,
                                              std::string const& platform,
+                                             VariantMap settings,
                                              std::string const& locale,
                                              std::string const& country,
                                              uint limit)
@@ -371,6 +372,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
                                                std::string const& session_id,
                                                std::string const& platform,
                                                const uint widgets_api_version,
+                                               VariantMap settings,
                                                std::string const& locale,
                                                std::string const& country)
 {
