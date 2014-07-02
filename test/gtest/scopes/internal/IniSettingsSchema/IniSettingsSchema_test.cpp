@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/SettingsSchema.h>
+#include <unity/scopes/internal/IniSettingsSchema.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -28,11 +28,11 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace std;
 
-TEST(SettingsSchema, basic)
+TEST(IniSettingsSchema, basic)
 {
-    SettingsSchema s(TEST_SRC_DIR "/schema.ini");
+    auto s = IniSettingsSchema::create(TEST_SRC_DIR "/schema.ini");
 
-    auto defs = s.definitions();
+    auto defs = s->definitions();
     ASSERT_EQ(8, defs.size());
 
     EXPECT_EQ("location", defs[0].get_dict()["id"].get_string());
@@ -64,104 +64,104 @@ TEST(SettingsSchema, basic)
     EXPECT_EQ(Variant(), defs[7].get_dict()["defaultValue"]);
 }
 
-TEST(SettingsSchema, exceptions)
+TEST(IniSettingsSchema, exceptions)
 {
     try
     {
-        SettingsSchema("no_such_file");
+        IniSettingsSchema::create("no_such_file");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsSchema(): cannot parse settings file \"no_such_file\":\n"
+        EXPECT_STREQ("unity::ResourceException: IniSettingsSchema(): cannot parse settings file \"no_such_file\":\n"
                      "    unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
                      e.what());
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/missing_type.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/missing_type.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"type\" definition, setting = \"location\":\n"
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): missing \"type\" definition, setting = \"location\":\n"
                        "        unity::LogicException:.*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/bad_type.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/bad_type.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): invalid \"type\" definition: \"99\", "
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): invalid \"type\" definition: \"99\", "
                        "setting = \"location\"");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/bad_list.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/bad_list.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): invalid number of entries for \"displayValues\" "
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): invalid number of entries for \"displayValues\" "
                        "definition, setting = \"tempUnit\"");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/bad_list_default.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/bad_list_default.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): \"displayValues\" out of range, setting = \"tempUnit\"");
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): \"displayValues\" out of range, setting = \"tempUnit\"");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/missing_list_values.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/missing_list_values.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"displayValues\" definition, "
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): missing \"displayValues\" definition, "
                        "setting = \"tempUnit\":.*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/bad_bool.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/bad_bool.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n.*");
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n.*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
     {
-        SettingsSchema(TEST_SRC_DIR "/missing_display_name.ini");
+        IniSettingsSchema::create(TEST_SRC_DIR "/missing_display_name.ini");
         FAIL();
     }
     catch (ResourceException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: SettingsSchema\\(\\): missing \"displayName\" definition, setting = \"location\":\n"
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): missing \"displayName\" definition, setting = \"location\":\n"
                        "        unity::LogicException:.*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
@@ -184,9 +184,9 @@ public:
 TEST_F(SetLanguage, localization)
 {
     {
-        SettingsSchema s(TEST_SRC_DIR "/schema.ini");
+        auto s = IniSettingsSchema::create(TEST_SRC_DIR "/schema.ini");
 
-        auto defs = s.definitions();
+        auto defs = s->definitions();
 
         EXPECT_EQ("tempUnit", defs[1].get_dict()["id"].get_string());
         EXPECT_EQ("testTemperature Unit", defs[1].get_dict()["displayName"].get_string());
@@ -198,9 +198,9 @@ TEST_F(SetLanguage, localization)
     // Check that, if the locale is set, but no strings are defined for that locale,
     // the non-localized version is returned.
     {
-        SettingsSchema s(TEST_SRC_DIR "/locale_fallback.ini");
+        auto s = IniSettingsSchema::create(TEST_SRC_DIR "/locale_fallback.ini");
 
-        auto defs = s.definitions();
+        auto defs = s->definitions();
         ASSERT_EQ(1, defs.size());
 
         EXPECT_EQ("tempUnit", defs[0].get_dict()["id"].get_string());

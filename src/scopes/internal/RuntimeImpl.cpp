@@ -313,7 +313,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         ::mkdir(data_dir_.c_str(), 0700);
         ::mkdir(settings_dir.c_str(), 0700);
 
-        shared_ptr<SettingsDB> db(new SettingsDB(settings_db, settings_schema));
+        shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
         scope_base->p->set_settings_db(db);
     }
 

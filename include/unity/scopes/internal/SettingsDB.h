@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 #define UNITY_SCOPES_INTERNAL_SETTINGSDB_H
 
+#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -41,7 +42,9 @@ public:
     NONCOPYABLE(SettingsDB);
     UNITY_DEFINES_PTRS(SettingsDB);
 
-    SettingsDB(std::string const& path, std::string const& json_schema);
+    static UPtr create_from_ini_file(std::string const& db_path, std::string const& ini_file_path);
+    static UPtr create_from_json_string(std::string const& db_path, std::string const& json_string);
+
     ~SettingsDB();
 
     SettingsDB(SettingsDB&&) = default;
@@ -57,11 +60,12 @@ public:
     bool state_changed_;
 
 private:
+    SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema::UPtr const& schema);
+
     void process_all_docs();
     void set_defaults();
 
-    std::string path_;
-    std::string schema_path_;
+    std::string db_path_;
     unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
     int generation_;
     VariantArray definitions_;                       // Returned by SettingsSchema

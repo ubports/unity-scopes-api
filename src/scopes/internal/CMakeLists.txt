@@ -24,7 +24,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IniSettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonCppNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/JsonSettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
@@ -73,7 +75,6 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SettingsDB.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp

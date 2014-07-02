@@ -18,7 +18,8 @@
 
 #include <unity/scopes/internal/SettingsDB.h>
 
-#include <unity/scopes/internal/SettingsSchema.h>
+#include <unity/scopes/internal/IniSettingsSchema.h>
+#include <unity/scopes/internal/JsonSettingsSchema.h>
 #include <unity/UnityExceptions.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -48,29 +49,46 @@ auto doc_deleter = [](u1db_document* p){ u1db_free_doc(&p); };
 
 }  // namespace
 
-SettingsDB::SettingsDB(string const& path, string const& schema_path)
-    : state_changed_(false)
-    , path_(path)
-    , schema_path_(schema_path)
-    , db_(nullptr, db_deleter)
-    , generation_(-1)
+SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string const& ini_file_path)
 {
     // Parse schema
     try
     {
-        SettingsSchema schema(schema_path);
-        definitions_ = schema.definitions();
-
-        // Initialize the def_map_ so we can look things
-        // up quickly.
-        for (auto const& d : definitions_)
-        {
-            def_map_.emplace(make_pair(d.get_dict()["id"].get_string(), d));
-        }
+        auto schema = IniSettingsSchema::create(ini_file_path);
+        return UPtr(new SettingsDB(db_path, move(schema)));
     }
     catch (std::exception const& e)
     {
-        throw ResourceException("SettingsDB(): schema = " + schema_path + ", db = " + path);
+        throw ResourceException("SettingsDB::create_from_ini_file(): schema = " + ini_file_path + ", db = " + db_path);
+    }
+}
+
+SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, string const& json_string)
+{
+    // Parse schema
+    try
+    {
+        auto schema = JsonSettingsSchema::create(json_string);
+        return UPtr(new SettingsDB(db_path, move(schema)));
+    }
+    catch (std::exception const& e)
+    {
+        throw ResourceException("SettingsDB::create_from_json_string(): cannot parse schema, db = " + db_path);
+    }
+}
+
+SettingsDB::SettingsDB(string const& db_path, SettingsSchema::UPtr const& schema)
+    : state_changed_(false)
+    , db_path_(db_path)
+    , db_(nullptr, db_deleter)
+    , generation_(-1)
+{
+    // Initialize the def_map_ so we can look things
+    // up quickly.
+    definitions_ = schema->definitions();
+    for (auto const& d : definitions_)
+    {
+        def_map_.emplace(make_pair(d.get_dict()["id"].get_string(), d));
     }
 
     process_all_docs();
@@ -181,16 +199,16 @@ void SettingsDB::process_all_docs()
 {
     if (db_.get() == nullptr)
     {
-        boost::filesystem::path p(path_);
+        boost::filesystem::path p(db_path_);
         if (boost::filesystem::exists(p))
         {
             // Open the db. (It is possible that no DB existed when the constructor ran,
             // but the DB was created later, when the user first changed a setting.)
-            db_.reset(u1db_open(path_.c_str()));
+            db_.reset(u1db_open(db_path_.c_str()));
             if (db_.get() == nullptr)
             {
                 // We don't get any more detailed info from the u1db API.
-                throw ResourceException("SettingsDB: u1db_open() failed, db = " + path_);
+                throw ResourceException("SettingsDB: u1db_open() failed, db = " + db_path_);
             }
         }
         else
@@ -211,7 +229,7 @@ void SettingsDB::process_all_docs()
     if (status != U1DB_OK)
     {
         throw ResourceException("SettingsDB(): u1db_whats_changed() failed, status = "
-                                + to_string(status) + ", db = " + path_);
+                                + to_string(status) + ", db = " + db_path_);
     }
 
     if (state_changed_)
@@ -225,7 +243,7 @@ void SettingsDB::process_all_docs()
         if (status != U1DB_OK)
         {
             throw ResourceException("SettingsDB(): u1db_get_all_docs() failed, status = "
-                                    + to_string(status) + ", db = " + path_);               // LCOV_EXCL_LINE
+                                    + to_string(status) + ", db = " + db_path_);               // LCOV_EXCL_LINE
         }
         generation_ = new_generation;
     }

@@ -16,13 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
-#define UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
+#ifndef UNITY_SCOPES_INTERNAL_JSONSETTINGSSCHEMA_H
+#define UNITY_SCOPES_INTERNAL_JSONSETTINGSSCHEMA_H
 
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/IniParser.h>
-#include <unity/util/NonCopyable.h>
-#include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/SettingsSchema.h>
 
 namespace unity
 {
@@ -33,19 +30,25 @@ namespace scopes
 namespace internal
 {
 
-class SettingsSchema
+class JsonSettingsSchema : public SettingsSchema
 {
 public:
-    NONCOPYABLE(SettingsSchema);
-    UNITY_DEFINES_PTRS(SettingsSchema);
+    NONCOPYABLE(JsonSettingsSchema);
+    UNITY_DEFINES_PTRS(JsonSettingsSchema);
 
-    SettingsSchema() = default;
-    virtual ~SettingsSchema() = default;
+    static UPtr create(std::string const& json_string);
 
-    SettingsSchema(SettingsSchema&&) = default;
-    SettingsSchema& operator=(SettingsSchema&&) = default;
+    ~JsonSettingsSchema();
 
-    virtual VariantArray definitions() const = 0;
+    JsonSettingsSchema(JsonSettingsSchema&&) = default;
+    JsonSettingsSchema& operator=(JsonSettingsSchema&&) = default;
+
+    virtual VariantArray definitions() const;
+
+private:
+    JsonSettingsSchema(std::string const& ini_file);
+
+    VariantArray definitions_;
 };
 
 } // namespace internal

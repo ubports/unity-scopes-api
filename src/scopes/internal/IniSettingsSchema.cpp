@@ -16,12 +16,11 @@
  * Authored by Michi Henning <michi.henning@canonical.com>
  */
 
-#include <unity/scopes/internal/SettingsSchema.h>
+#include <unity/scopes/internal/IniSettingsSchema.h>
 
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this
 
 namespace unity
 {
@@ -91,7 +90,7 @@ Setting::Setting(IniParser const& p, string const& id)
     auto const it = VALID_TYPES.find(type);
     if (it == VALID_TYPES.end())
     {
-        throw ResourceException(string("SettingsSchema(): invalid \"") + type_key + "\" definition: \""
+        throw ResourceException(string("IniSettingsSchema(): invalid \"") + type_key + "\" definition: \""
                                 + type + "\", setting = \"" + id_ + "\"");
     }
     type_ = it->first;
@@ -124,7 +123,7 @@ string Setting::get_mandatory_string(string const& key)
     }
     catch (LogicException const&)
     {
-        throw ResourceException("SettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
+        throw ResourceException("IniSettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
     }
 }
 
@@ -136,7 +135,7 @@ string Setting::get_mandatory_localized_string(string const& key)
     }
     catch (LogicException const&)
     {
-        throw ResourceException("SettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
+        throw ResourceException("IniSettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
     }
 }
 
@@ -148,7 +147,7 @@ vector<string> Setting::get_mandatory_localized_string_array(string const& key)
     }
     catch (LogicException const&)
     {
-        throw ResourceException("SettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
+        throw ResourceException("IniSettingsSchema(): missing \"" + key + "\" definition, setting = \"" + id_ + "\"");
     }
 }
 
@@ -174,12 +173,12 @@ void Setting::set_value(Type expected_type)
                 auto values = get_mandatory_localized_string_array(d_values_key);
                 if (values.size() < 2)
                 {
-                    throw ResourceException(string("SettingsSchema(): invalid number of entries for \"") + d_values_key +
+                    throw ResourceException(string("IniSettingsSchema(): invalid number of entries for \"") + d_values_key +
                                             "\" definition, setting = \"" + id_ + "\"");
                 }
                 if (default_value_.get_int() < 0 || default_value_.get_int() >= int(values.size()))
                 {
-                    throw ResourceException(string("SettingsSchema(): \"") + d_values_key + "\" out of range, "
+                    throw ResourceException(string("IniSettingsSchema(): \"") + d_values_key + "\" out of range, "
                                             "setting = \"" + id_ + "\"");
                 }
                 for (auto const& v : values)
@@ -206,14 +205,19 @@ void Setting::set_value(Type expected_type)
     }
     catch (LogicException const& e)
     {
-        throw ResourceException(string("SettingsSchema(): invalid value type for \"") + dflt_val_key + "\" definition, "
+        throw ResourceException(string("IniSettingsSchema(): invalid value type for \"") + dflt_val_key + "\" definition, "
                                 "setting = \"" + id_ + "\"");
     }
 }
 
 }  // namespace
 
-SettingsSchema::SettingsSchema(string const& ini_file)
+IniSettingsSchema::UPtr IniSettingsSchema::create(string const& ini_file)
+{
+    return UPtr(new IniSettingsSchema(ini_file));
+}
+
+IniSettingsSchema::IniSettingsSchema(string const& ini_file)
     : ini_file_(ini_file)
 {
     try
@@ -229,13 +233,13 @@ SettingsSchema::SettingsSchema(string const& ini_file)
     }
     catch (std::exception const& e)
     {
-        throw ResourceException("SettingsSchema(): cannot parse settings file \"" + ini_file + "\"");
+        throw ResourceException("IniSettingsSchema(): cannot parse settings file \"" + ini_file + "\"");
     }
 }
 
-SettingsSchema::~SettingsSchema() = default;
+IniSettingsSchema::~IniSettingsSchema() = default;
 
-VariantArray SettingsSchema::definitions() const
+VariantArray IniSettingsSchema::definitions() const
 {
     return definitions_;
 }

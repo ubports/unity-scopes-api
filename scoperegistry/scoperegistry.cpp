@@ -19,6 +19,7 @@
 #include "FindFiles.h"
 #include "ScopesWatcher.h"
 
+#include <unity/scopes/internal/IniSettingsSchema.h>
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryConfig.h>
@@ -28,7 +29,6 @@
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
-#include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
@@ -245,8 +245,8 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_settings_definitions(VariantArray());
     try
     {
-        SettingsSchema schema(settings_schema_path.native());
-        mi->set_settings_definitions(schema.definitions());
+        auto schema = IniSettingsSchema::create(settings_schema_path.native());
+        mi->set_settings_definitions(schema->definitions());
     }
     catch (std::exception const& e)
     {

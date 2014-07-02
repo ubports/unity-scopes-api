@@ -16,13 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
-#define UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
+#ifndef UNITY_SCOPES_INTERNAL_INISETTINGSSCHEMA_H
+#define UNITY_SCOPES_INTERNAL_INISETTINGSSCHEMA_H
 
-#include <unity/util/DefinesPtrs.h>
-#include <unity/util/IniParser.h>
-#include <unity/util/NonCopyable.h>
-#include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/SettingsSchema.h>
 
 namespace unity
 {
@@ -33,19 +30,26 @@ namespace scopes
 namespace internal
 {
 
-class SettingsSchema
+class IniSettingsSchema : public SettingsSchema
 {
 public:
-    NONCOPYABLE(SettingsSchema);
-    UNITY_DEFINES_PTRS(SettingsSchema);
+    NONCOPYABLE(IniSettingsSchema);
+    UNITY_DEFINES_PTRS(IniSettingsSchema);
 
-    SettingsSchema() = default;
-    virtual ~SettingsSchema() = default;
+    static UPtr create(std::string const& ini_file);
 
-    SettingsSchema(SettingsSchema&&) = default;
-    SettingsSchema& operator=(SettingsSchema&&) = default;
+    ~IniSettingsSchema();
 
-    virtual VariantArray definitions() const = 0;
+    IniSettingsSchema(IniSettingsSchema&&) = default;
+    IniSettingsSchema& operator=(IniSettingsSchema&&) = default;
+
+    virtual VariantArray definitions() const;
+
+private:
+    IniSettingsSchema(std::string const& ini_file);
+
+    std::string const ini_file_;
+    VariantArray definitions_;
 };
 
 } // namespace internal

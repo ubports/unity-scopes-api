@@ -79,7 +79,7 @@ ScopeLoader::ScopeLoader(string const& scope_id,
         ::mkdir(data_dir.c_str(), 0700);
         ::mkdir(settings_dir.c_str(), 0700);
 
-        shared_ptr<SettingsDB> db(new SettingsDB(settings_db, settings_schema));
+        shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
         scope_base_->p->set_settings_db(db);
     }
 }
