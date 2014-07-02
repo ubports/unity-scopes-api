@@ -244,7 +244,6 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                 continue;
             }
 
-            scope.id = child_node->get_node("id")->as_string();
             scope.name = child_node->get_node("name")->as_string();
             scope.description = child_node->get_node("description")->as_string();
             scope.author = child_node->get_node("author")->as_string();
