@@ -84,7 +84,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
     }
     if (other.settings_definitions_)
     {
-        settings_definitions_.reset(new Variant(*other.settings_definitions_));
+        settings_definitions_.reset(new VariantArray(*other.settings_definitions_));
     }
     if (other.location_data_needed_)
     {
@@ -110,7 +110,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         appearance_attributes_ = rhs.appearance_attributes_;
         scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
         results_ttl_type_ = rhs.results_ttl_type_;
-        settings_definitions_.reset(rhs.settings_definitions_ ? new Variant(*rhs.settings_definitions_) : nullptr);
+        settings_definitions_.reset(rhs.settings_definitions_ ? new VariantArray(*rhs.settings_definitions_) : nullptr);
         location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
     }
     return *this;
@@ -205,7 +205,7 @@ ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
     return results_ttl_type_;
 }
 
-Variant ScopeMetadataImpl::settings_definitions() const
+VariantArray ScopeMetadataImpl::settings_definitions() const
 {
     if (settings_definitions_)
     {
@@ -288,9 +288,9 @@ void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType resul
     results_ttl_type_ = results_ttl;
 }
 
-void ScopeMetadataImpl::set_settings_definitions(Variant const& settings_definitions)
+void ScopeMetadataImpl::set_settings_definitions(VariantArray const& settings_definitions)
 {
-    settings_definitions_.reset(new Variant(settings_definitions));
+    settings_definitions_.reset(new VariantArray(settings_definitions));
 }
 
 void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
@@ -486,7 +486,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     it = var.find("settings_definitions");
     if (it != var.end())
     {
-        settings_definitions_.reset(new Variant(it->second));
+        settings_definitions_.reset(new VariantArray(it->second.get_array()));
     }
 
     it = var.find("location_data_needed");

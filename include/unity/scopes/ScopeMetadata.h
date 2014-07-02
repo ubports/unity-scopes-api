@@ -169,14 +169,13 @@ public:
     // TODO: Flesh out documentation
     /**
     \brief Return the settings definitions for this scope.
-    \return The settings definition as a Variant. The Variant
-    contains a VariantArray that stores the definition of
-    the settings in their original order.
+    \return The settings definition as a VariantArray. The array
+    contains the definition of the settings in their original order.
 
     \throws unity::scopes::NotFoundException if the scope has no settings
     \see TBD TODO
     */
-    Variant settings_definitions() const;
+    VariantArray settings_definitions() const;
 
     /**
     \brief Check if this scope wants location data.

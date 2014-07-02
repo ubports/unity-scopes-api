@@ -242,11 +242,11 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     filesystem::path scope_dir(scope_path.parent_path());
     filesystem::path settings_schema_path(scope_dir / (scope.first + "-settings.ini"));
 
-    mi->set_settings_definitions(Variant(VariantArray()));
+    mi->set_settings_definitions(VariantArray());
     try
     {
         SettingsSchema schema(settings_schema_path.native());
-        mi->set_settings_definitions(Variant(schema.definitions()));
+        mi->set_settings_definitions(schema.definitions());
     }
     catch (std::exception const& e)
     {

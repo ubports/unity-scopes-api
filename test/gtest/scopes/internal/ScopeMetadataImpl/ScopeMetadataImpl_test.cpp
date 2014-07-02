@@ -153,7 +153,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
     VariantArray va;
     va.push_back(Variant("hello"));
-    mi2->set_settings_definitions(Variant(va));
+    mi2->set_settings_definitions(va);
     mi2->set_location_data_needed(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
@@ -165,7 +165,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("hot_key", m.hot_key());
     EXPECT_TRUE(m.invisible());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
-    EXPECT_EQ(Variant(va), m.settings_definitions());
+    EXPECT_EQ(va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
 
     // Make another value
@@ -186,7 +186,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Small);
     VariantArray tmp_va;
     tmp_va.push_back(Variant("tmp hello"));
-    ti->set_settings_definitions(Variant(tmp_va));
+    ti->set_settings_definitions(tmp_va);
     ti->set_location_data_needed(true);
 
     // Check impl assignment operator
@@ -206,7 +206,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, ci.results_ttl_type());
-    EXPECT_EQ(Variant(tmp_va), ci.settings_definitions());
+    EXPECT_EQ(tmp_va, ci.settings_definitions());
     EXPECT_TRUE(ci.location_data_needed());
 
     // Check public assignment operator
@@ -226,7 +226,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, m.results_ttl_type());
     EXPECT_TRUE(m.invisible());
-    EXPECT_EQ(Variant(tmp_va), m.settings_definitions());
+    EXPECT_EQ(tmp_va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
 
     // Self-assignment
@@ -245,7 +245,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", tmp.scope_directory());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp.results_ttl_type());
     EXPECT_TRUE(tmp.invisible());
-    EXPECT_EQ(Variant(tmp_va), tmp.settings_definitions());
+    EXPECT_EQ(tmp_va, tmp.settings_definitions());
     EXPECT_TRUE(tmp.location_data_needed());
 
     // Copy constructor
@@ -264,7 +264,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp2.results_ttl_type());
     EXPECT_TRUE(tmp2.invisible());
-    EXPECT_EQ(Variant(tmp_va), tmp2.settings_definitions());
+    EXPECT_EQ(tmp_va, tmp2.settings_definitions());
     EXPECT_TRUE(tmp2.location_data_needed());
 }
 
@@ -290,7 +290,7 @@ TEST(ScopeMetadataImpl, serialize)
     VariantArray va;
     va.push_back(Variant("hello"));
     va.push_back(Variant("world"));
-    mi->set_settings_definitions(Variant(va));
+    mi->set_settings_definitions(va);
     mi->set_location_data_needed(false);
 
     // Check that serialize() sets the map values correctly
@@ -310,7 +310,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
             (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
-    EXPECT_EQ(Variant(va), var["settings_definitions"]);
+    EXPECT_EQ(va, var["settings_definitions"].get_array());
     EXPECT_FALSE(var["location_data_needed"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
@@ -329,7 +329,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, c.results_ttl_type());
     EXPECT_FALSE(c.invisible());
-    EXPECT_EQ(Variant(va), c.settings_definitions());
+    EXPECT_EQ(va, c.settings_definitions());
     EXPECT_FALSE(c.location_data_needed());
 }
 

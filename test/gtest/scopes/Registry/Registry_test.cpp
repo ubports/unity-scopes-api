@@ -91,7 +91,7 @@ TEST(Registry, metadata)
     EXPECT_FALSE(meta.invisible());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
-    auto defs = meta.settings_definitions().get_array();
+    auto defs = meta.settings_definitions();
     ASSERT_EQ(1, defs.size());
     EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
@@ -112,7 +112,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
-    defs = meta.settings_definitions().get_array();
+    defs = meta.settings_definitions();
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
 }
@@ -158,7 +158,7 @@ TEST(Registry, scope_state_notify)
     SearchMetadata metadata("C", "desktop");
 
     auto meta = r->get_metadata("testscopeA");
-    auto defs = meta.settings_definitions().get_array();
+    auto defs = meta.settings_definitions();
     EXPECT_EQ(1, defs.size());
     auto sp = meta.proxy();
 
@@ -176,7 +176,7 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(r->is_scope_running("testscopeA"));
 
     meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions().get_array();
+    defs = meta.settings_definitions();
     EXPECT_EQ(0, defs.size());
     sp = meta.proxy();
 
@@ -403,7 +403,7 @@ TEST(Registry, list_update_notify)
 
     // Initially, testscopeB doesn't have any settings.
     auto meta = r->get_metadata("testscopeB");
-    auto defs = meta.settings_definitions().get_array();
+    auto defs = meta.settings_definitions();
     EXPECT_EQ(0, defs.size());
 
     // Add settings definition
@@ -414,7 +414,7 @@ TEST(Registry, list_update_notify)
 
     // Must be able to see the new definitions now
     meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions().get_array();
+    defs = meta.settings_definitions();
     ASSERT_EQ(1, defs.size());
     EXPECT_EQ("tsB id", defs[0].get_dict()["id"].get_string());
 
@@ -425,7 +425,7 @@ TEST(Registry, list_update_notify)
 
     // Definition must be gone now
     meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions().get_array();
+    defs = meta.settings_definitions();
     EXPECT_EQ(0, defs.size());
 }
 
