@@ -27,6 +27,11 @@ namespace scopes
 
 //! @cond
 
+Category::Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+    : p(new internal::CategoryImpl(id, title, icon, nullptr, renderer_template))
+{
+}
+
 Category::Category(std::string const& id, std::string const& title, std::string const &icon, CannedQuery::SCPtr const& query, CategoryRenderer const& renderer_template)
     : p(new internal::CategoryImpl(id, title, icon, query, renderer_template))
 {

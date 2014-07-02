@@ -93,6 +93,8 @@ public:
 protected:
     /// @cond
     Category(std::string const& id, std::string const& title,
+             std::string const &icon, CategoryRenderer const& renderer_template);
+    Category(std::string const& id, std::string const& title,
              std::string const &icon, CannedQuery::SCPtr const& query,
              CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
