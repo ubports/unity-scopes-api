@@ -255,6 +255,23 @@ set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
 set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
 set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
 
+#####################################################################
+# Enable code coverage calculation with gcov/gcovr/lcov
+# Usage:
+#  * Switch build type to coverage (use ccmake or cmake-gui)
+#  * Invoke make, make test, make coverage (or ninja if you use that backend)
+#  * Find html report in subdir coveragereport
+#  * Find xml report suitable for jenkins in coverage.xml
+#####################################################################
+if(cmake_build_type_lower MATCHES coverage)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage -g")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage -g")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -g")
+endif()
+include(EnableCoverageReport)
+
 # Tests
 include(CTest)
 enable_testing()
@@ -292,28 +309,6 @@ endforeach()
 add_custom_command(OUTPUT ${CAPNPROTO_SRC} ${CAPNPROTO_HDRS}
                    DEPENDS ${CAPNPROTO_FILES}
                    COMMAND ${CAPNPC_BIN} ${CAPNPC_FLAGS} -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
-
-# Set up coverage testing
-include(EnableCoverageReport)
-#####################################################################
-# Enable code coverage calculation with gcov/gcovr/lcov
-# Usage:
-#  * Switch build type to coverage (use ccmake or cmake-gui)
-#  * Invoke make, make test, make coverage (or ninja if you use that backend)
-#  * Find html report in subdir coveragereport
-#  * Find xml report suitable for jenkins in coverage.xml
-#####################################################################
-if(cmake_build_type_lower MATCHES coverage)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-
-    # We add -g when building with coverage so valgrind reports line numbers.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
-endif()
 
 # Pseudo-library of object files. We need a version of the library for normal clients
 # that does not expose symbols in the unity::scopes::internal namespace, and another
