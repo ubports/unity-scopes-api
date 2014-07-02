@@ -266,7 +266,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             if (child_node->has_node("settings"))
             {
-                scope.settings.reset(new std::string(child_node->get_node("settings")->as_string()));
+                scope.settings.reset(new std::string(child_node->get_node("settings")->to_json_string()));
             }
 
             if (child_node->has_node("needs_location_data"))
