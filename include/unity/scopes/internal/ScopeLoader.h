@@ -68,7 +68,7 @@ public:
 
 private:
     ScopeLoader(std::string const& scope_id,
-                std::string const& path,
+                std::string const& libpath,
                 std::string const& data_dir,
                 RegistryProxy const& registry);
 
