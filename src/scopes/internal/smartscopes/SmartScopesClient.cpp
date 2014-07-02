@@ -748,5 +748,49 @@ std::string SmartScopesClient::read_cache()
 
 std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
 {
+    std::ostringstream result_str;
+    result_str << "{";
 
+    bool first_setting = true;
+    for (auto const& setting : settings)
+    {
+        std::ostringstream setting_str;
+        if (!first_setting)
+        {
+            setting_str << ",";
+        }
+        setting_str << "\"" << setting.first << "\":";
+
+        bool setting_valid = false;
+        switch(setting.second.which())
+        {
+        case Variant::Int:
+            setting_str << setting.second.get_int();
+            setting_valid = true;
+            break;
+        case Variant::Bool:
+            setting_str << (setting.second.get_bool() ? "true" : "false");
+            setting_valid = true;
+            break;
+        case Variant::String:
+            setting_str << "\"" << setting.second.get_string() << "\"";
+            setting_valid = true;
+            break;
+        case Variant::Double:
+            setting_str << setting.second.get_double();
+            setting_valid = true;
+            break;
+        default:
+            std::cerr << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for settings value: \"" << setting.first << "\"" << std::endl;
+        }
+
+        if (setting_valid)
+        {
+            result_str << setting_str;
+            first_setting = false;
+        }
+    }
+
+    result_str << "}";
+    return result_str.str();
 }
