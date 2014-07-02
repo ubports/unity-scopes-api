@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/JsonSettingsSchema.h>
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
@@ -203,12 +204,11 @@ void SSRegistryObject::get_remote_scopes()
             next_refresh_timeout_ = failed_refresh_timeout_;
         }
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
-        std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
         next_refresh_timeout_ = failed_refresh_timeout_;
-        return;
+        throw;
     }
 
     MetadataMap new_scopes_;
@@ -240,6 +240,20 @@ void SSRegistryObject::get_remote_scopes()
             if (scope.appearance)
             {
                 metadata->set_appearance_attributes(*scope.appearance);
+            }
+
+            if (scope.settings)
+            {
+                try
+                {
+                    auto schema = JsonSettingsSchema::create(*scope.settings);
+                    metadata->set_settings_definitions(schema->definitions());
+                }
+                catch (ResourceException const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                    std::cerr << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\"" << std::endl;
+                }
             }
 
             metadata->set_invisible(scope.invisible);
