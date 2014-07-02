@@ -52,10 +52,11 @@ struct RemoteScope
     std::string description;
     std::string author;
     std::string base_url;
-    std::shared_ptr<std::string> icon;       // optional
-    std::shared_ptr<std::string> art;        // optional
-    std::shared_ptr<VariantMap> appearance;  // optional
-    std::shared_ptr<std::string> settings;   // optional
+    std::shared_ptr<std::string> icon;          // optional
+    std::shared_ptr<std::string> art;           // optional
+    std::shared_ptr<VariantMap> appearance;     // optional
+    std::shared_ptr<std::string> settings;      // optional
+    std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
 };
 

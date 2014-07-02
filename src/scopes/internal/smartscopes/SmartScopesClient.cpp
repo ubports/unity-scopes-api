@@ -270,6 +270,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                 scope.settings.reset(new std::string(child_node->get_node("settings")->as_string()));
             }
 
+            if (child_node->has_node("needs_location_data"))
+            {
+                scope.needs_location_data.reset(new bool(child_node->get_node("needs_location_data")->as_bool()));
+            }
+
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             remote_scopes.push_back(scope);
