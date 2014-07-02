@@ -35,6 +35,9 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
+    if environ['PATH_INFO'] == '/demo3/search' and environ['QUERY_STRING'] == 'q=search_string&session_id=session_id&query_id=0&platform=phone&locale=en':
+        return [search_response]
+
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
         if preview1_complete == False:
             preview1_complete = True
@@ -64,7 +67,7 @@ remote_scopes_response = '\
 {"base_url": "http://127.0.0.1:' + str(port) + '/fail2", "name": "Fail Scope 2", "description": "Fails due to no id.", "author": "Mr.Fake", "icon": "icon" },\
 \
 {"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true,\
-    "appearance":\
+"appearance":\
     {\
         "background": "#00BEEF",\
         "PageHeader": {"logo":"logo.png"}\
@@ -74,7 +77,7 @@ remote_scopes_response = '\
 {"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" },\
 \
 {"base_url": "http://127.0.0.1:' + str(port) + '/demo3", "id" : "dummy.scope.3", "name": "Dummy Demo Scope 3", "description": "Dummy demo scope 3.", "author": "Mr.Fake",\
-    "settings":\
+"settings":\
     [\
         {\
             "id": "location",\

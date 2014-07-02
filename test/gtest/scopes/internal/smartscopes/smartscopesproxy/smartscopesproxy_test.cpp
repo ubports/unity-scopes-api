@@ -125,6 +125,21 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
+    meta = reg_->get_metadata("dummy.scope.3");
+    EXPECT_EQ("dummy.scope.3", meta.scope_id());
+    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+    EXPECT_EQ("Dummy demo scope 3.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
+    EXPECT_FALSE(meta.invisible());
+    EXPECT_EQ(4, meta.settings_definitions().size());
+    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
+    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+
     // non-existant scope (direct)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.4"), NotFoundException);
 
@@ -144,6 +159,21 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("Mr.Fake", meta.author());
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
+
+    meta = mw_reg->get_metadata("dummy.scope.3");
+    EXPECT_EQ("dummy.scope.3", meta.scope_id());
+    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+    EXPECT_EQ("Dummy demo scope 3.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
+    EXPECT_FALSE(meta.invisible());
+    EXPECT_EQ(4, meta.settings_definitions().size());
+    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
+    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
 
     // non-existant scope (via mw)
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.4"), NotFoundException);
@@ -256,6 +286,11 @@ TEST_F(smartscopesproxytest, search)
     auto reply = std::make_shared<Receiver>();
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    meta = reg_->get_metadata("dummy.scope.3");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
