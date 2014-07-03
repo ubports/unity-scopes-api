@@ -33,10 +33,11 @@ CategoryImpl::CategoryImpl(VariantMap const& variant_map)
     deserialize(variant_map);
 }
 
-CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
+CategoryImpl::CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CannedQuery::SCPtr const& query, CategoryRenderer const& renderer_template)
     : id_(id),
       title_(title),
       icon_(icon),
+      query_(query),
       renderer_template_(renderer_template)
 {
     if (id.empty())
@@ -61,6 +62,11 @@ std::string const& CategoryImpl::icon() const
     return icon_;
 }
 
+CannedQuery::SCPtr const& CategoryImpl::query() const
+{
+    return query_;
+}
+
 CategoryRenderer const& CategoryImpl::renderer_template() const
 {
     return renderer_template_;
@@ -73,6 +79,10 @@ VariantMap CategoryImpl::serialize() const
     var["title"] = title_;
     var["icon"] = icon_;
     var["renderer_template"] = renderer_template_.data();
+    if (query_)
+    {
+        var["query"] = query_->to_uri();
+    }
     return var;
 }
 
@@ -95,6 +105,12 @@ void CategoryImpl::deserialize(VariantMap const& variant_map)
     if (it != variant_map.end())
     {
         icon_ = it->second.get_string();
+    }
+
+    it = variant_map.find("query");
+    if (it != variant_map.end())
+    {
+        query_.reset(new CannedQuery(CannedQuery::from_uri(it->second.get_string())));
     }
 
     it = variant_map.find("renderer_template");
