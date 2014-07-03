@@ -32,20 +32,20 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/remote-scopes' and (environ['QUERY_STRING'] == '' or environ['QUERY_STRING'] == 'locale=test_TEST'):
         return [remote_scopes_response]
 
-    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
+    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] == 'q=search_string&session_id=session_id&query_id=0&platform=phone&locale=en':
         return [search_response]
 
     if environ['PATH_INFO'] == '/demo3/search' and environ['QUERY_STRING'] == 'q=search_string&session_id=session_id&query_id=0&platform=phone&locale=en':
         return [search_response]
 
-    if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
+    if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] == 'result=%7B%22cat_id%22%3A%22cat1%22%2C%22icon%22%3A%22https%3A%2F%2Fdash.ubuntu.com%2Fimgs%2Fgoogle.png%22%2C%22title%22%3A%22Things%22%2C%22uri%22%3A%22URI2%22%7D%0A&session_id=session_id&platform=phone&widgets_api_version=0&locale=en':
         if preview1_complete == False:
             preview1_complete = True
             return [preview_response]
         if preview1_complete == True:
             return [preview_response2]
 
-    if environ['PATH_INFO'] == '/demo3/preview' and environ['QUERY_STRING'] == 'q=search_string&session_id=session_id&query_id=0&platform=phone&locale=en':
+    if environ['PATH_INFO'] == '/demo3/preview' and environ['QUERY_STRING'] == 'result=%7B%22cat_id%22%3A%22cat1%22%2C%22icon%22%3A%22https%3A%2F%2Fdash.ubuntu.com%2Fimgs%2Fgoogle.png%22%2C%22title%22%3A%22Things%22%2C%22uri%22%3A%22URI2%22%7D%0A&session_id=session_id&platform=phone&widgets_api_version=0&locale=en':
         return [preview_response]
 
     return ''

@@ -291,6 +291,8 @@ TEST_F(smartscopesproxytest, search)
     reply->wait_until_finished();
 
     // If the search URI is built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
     meta = reg_->get_metadata("dummy.scope.3");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
@@ -502,7 +504,17 @@ TEST_F(smartscopesproxytest, preview)
     previewer_no_cols->wait_until_finished();
 
     // If the preview URI is built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
     meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
 
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
     previewer_with_cols->wait_until_finished();
