@@ -88,8 +88,16 @@ TEST(Registry, metadata)
     EXPECT_EQ("/foo/scope-A.Art", meta.art());
     EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
+    EXPECT_FALSE(meta.invisible());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
+    auto defs = meta.settings_definitions();
+    ASSERT_EQ(1, defs.size());
+    EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
+    EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
+    EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
+    EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
+    EXPECT_TRUE(meta.location_data_needed());
 
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
@@ -104,6 +112,9 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.HotKey", meta.hot_key());
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
+    defs = meta.settings_definitions();
+    EXPECT_EQ(0, defs.size());
+    EXPECT_FALSE(meta.location_data_needed());
 }
 
 TEST(Registry, scope_state_notify)
@@ -147,6 +158,8 @@ TEST(Registry, scope_state_notify)
     SearchMetadata metadata("C", "desktop");
 
     auto meta = r->get_metadata("testscopeA");
+    auto defs = meta.settings_definitions();
+    EXPECT_EQ(1, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point
@@ -163,6 +176,8 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(r->is_scope_running("testscopeA"));
 
     meta = r->get_metadata("testscopeB");
+    defs = meta.settings_definitions();
+    EXPECT_EQ(0, defs.size());
     sp = meta.proxy();
 
     // testscopeB should not be running at this point
@@ -383,11 +398,44 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
+
+    // Check notifications for settings definitions.
+
+    // Initially, testscopeB doesn't have any settings.
+    auto meta = r->get_metadata("testscopeB");
+    auto defs = meta.settings_definitions();
+    EXPECT_EQ(0, defs.size());
+
+    // Add settings definition
+    std::cout << "Make a symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
+    filesystem::create_symlink(TEST_SRC_PATH "/scopes/testscopeB/testscopeB-settings.ini",
+                               TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
+    EXPECT_TRUE(wait_for_update());
+
+    // Must be able to see the new definitions now
+    meta = r->get_metadata("testscopeB");
+    defs = meta.settings_definitions();
+    ASSERT_EQ(1, defs.size());
+    EXPECT_EQ("tsB id", defs[0].get_dict()["id"].get_string());
+
+    // Remove settings definition
+    std::cout << "Remove symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
+    EXPECT_TRUE(wait_for_update());
+
+    // Definition must be gone now
+    meta = r->get_metadata("testscopeB");
+    defs = meta.settings_definitions();
+    EXPECT_EQ(0, defs.size());
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
+
+    // Unlink in case we left the link behind from an earlier interrupted run.
+    system::error_code ec;
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
 
     auto rpid = fork();
     if (rpid == 0)

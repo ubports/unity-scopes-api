@@ -26,10 +26,14 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
+
+#include <boost/filesystem.hpp>
 
 #include <signal.h>
 #include <libgen.h>
@@ -38,6 +42,8 @@
 #include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
+
+#include <sys/stat.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -97,6 +103,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             auto registry_mw_proxy = middleware_->registry_proxy();
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
+
+        data_dir_ = config.data_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -289,10 +297,24 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
-        // dirname modifies its argument, so we need a copy of scope lib path
-        vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
-        const string scope_dir(dirname(&scope_ini[0]));
-        scope_base->p->set_scope_directory(scope_dir);
+        boost::filesystem::path inip(scope_ini_file);
+        boost::filesystem::path scope_dir(inip.parent_path());
+        scope_base->p->set_scope_directory(inip.native());
+    }
+
+    // Try to open the scope settings database, if any.
+    string settings_dir = data_dir_ + "/" + scope_id_;
+    string scope_dir = scope_base->scope_directory();
+    string settings_db = settings_dir + "/settings.db";
+    string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+    if (boost::filesystem::exists(settings_schema))
+    {
+        // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+        ::mkdir(data_dir_.c_str(), 0700);
+        ::mkdir(settings_dir.c_str(), 0700);
+
+        shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+        scope_base->p->set_settings_db(db);
     }
 
     scope_base->start(scope_id_, registry());

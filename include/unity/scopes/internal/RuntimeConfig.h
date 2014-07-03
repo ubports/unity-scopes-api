@@ -45,6 +45,7 @@ public:
     std::string default_middleware_configfile() const;
     int reap_expiry() const;
     int reap_interval() const;
+    std::string data_directory() const;
 
 private:
     std::string registry_identity_;
@@ -55,6 +56,9 @@ private:
     std::string default_middleware_configfile_;
     int reap_expiry_;
     int reap_interval_;
+    std::string data_directory_;
+
+    std::string get_dflt_data_dir();
 };
 
 } // namespace internal

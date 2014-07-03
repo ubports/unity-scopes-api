@@ -31,7 +31,7 @@ namespace internal
 static constexpr const char* DFLT_RUNTIME_INI = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/Runtime.ini";
 static constexpr const char* DFLT_REGISTRY_INI = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/Registry.ini";
 static constexpr char const* DFLT_REGISTRY_ID = "Registry";
-static constexpr const char* DFLT_SS_INI = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/Smartscopes.ini";
+static constexpr const char* DFLT_SS_REGISTRY_INI = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/Smartscopes.ini";
 static constexpr char const* DFLT_SS_REGISTRY_ID = "SSRegistry";
 static constexpr char const* DFLT_SCOPERUNNER_PATH = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@/scoperunner";
 static constexpr char const* DFLT_MIDDLEWARE = "Zmq";

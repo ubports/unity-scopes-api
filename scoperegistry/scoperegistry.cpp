@@ -19,6 +19,7 @@
 #include "FindFiles.h"
 #include "ScopesWatcher.h"
 
+#include <unity/scopes/internal/IniSettingsSchema.h>
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryConfig.h>
@@ -35,12 +36,15 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <map>
 #include <set>
 #include <libgen.h>
 #include <unistd.h>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 using namespace scoperegistry;
 using namespace std;
@@ -220,6 +224,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
 
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
+// If the scope uses settings, also parse the settings file and add the settings to the metadata.
 
 void add_local_scope(RegistryObject::SPtr const& registry,
                      pair<string, string> const& scope,
@@ -235,6 +240,19 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
+    filesystem::path settings_schema_path(scope_dir / (scope.first + "-settings.ini"));
+
+    mi->set_settings_definitions(VariantArray());
+    try
+    {
+        auto schema = IniSettingsSchema::create(settings_schema_path.native());
+        mi->set_settings_definitions(schema->definitions());
+    }
+    catch (std::exception const& e)
+    {
+        error("ignoring settings schema file " + settings_schema_path.native()
+              + " for scope " + scope.first + ": " + e.what());
+    }
 
     mi->set_scope_id(scope.first);
     mi->set_display_name(sc.display_name());
@@ -244,6 +262,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_appearance_attributes(sc.appearance_attributes());
     mi->set_scope_directory(scope_dir.native());
     mi->set_results_ttl_type(sc.results_ttl_type());
+    mi->set_location_data_needed(sc.location_data_needed());
 
     try
     {
@@ -286,7 +305,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     if (click)
     {
         exec_data.confinement_profile =
-                scope_path.parent_path().filename().native();
+                scope_dir.filename().native();
     }
 
     exec_data.timeout_ms = timeout_ms;
@@ -339,14 +358,12 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
 // If additional scope configuration files are specified, the corresponding scopes will be added
 // to the registry (overriding any scopes that are found via config files reached via Runtime.ini).
 
-void
-usage(ostream& s = cerr)
+void usage(ostream& s = cerr)
 {
     s << "usage: " << prog_name << " [runtime.ini] [scope.ini]..." << endl;
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     prog_name = basename(argv[0]);
     if (argc > 1 && (string("-h") == argv[1] || string("--help") == argv[1]))

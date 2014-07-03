@@ -6,3 +6,4 @@ Author = Canonical Ltd.
 Icon = /foo/scope-A.Icon
 SearchHint = scope-A.SearchHint
 HotKey = scope-A.HotKey
+LocationDataNeeded = true

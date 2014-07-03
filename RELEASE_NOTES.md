@@ -5,13 +5,14 @@ Changes in version 0.5.1
 ========================
   - Support nested dictionaries in appearance attributes of scope metadata. To define nested dictionary, use dots in key names in [Appearance] section of
     scope .ini file, e.g. "PageHeader.Logo" = "logo.svg" creates "Logo" attribute inside "PageHeader" dictionary of appearance attributes.
+  - Added support for scope settings.
 
 Changes in version 0.5.0
 ========================
   - Changed ScopeBase::start() method to return void instead of int, and made both start() and stop() methods virtual instead of pure virtual.
   - Moved all filter classes except for OptionSelectorFilter into experimental namespace, since they are not currently supported by the Shell
     and their API may get changed.
-  - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and shouldn't be used as their API
+  - Moved Annotation class into experimental namespace. Annotations are not currently supported by the shell and should not be used as their API
     may change or get removed.
   - removed deprecated SearchReply::register_annotation() method.
   - Changes to departments API: SearchReply::register_departments() method now takes parent department argument only,
@@ -43,7 +44,7 @@ Changes in version 0.4.6
 
   - Added has_subdepartments flag and alternate label to Department class.
 
-  - Added TTL option for scope's results.
+  - Added TTL option for scope results.
 
 Changes in version 0.4.5
 ========================

@@ -166,6 +166,23 @@ public:
     */
     ResultsTtlType results_ttl_type() const;
 
+    // TODO: Flesh out documentation
+    /**
+    \brief Return the settings definitions for this scope.
+    \return The settings definition as a VariantArray. The array
+    contains the definition of the settings in their original order.
+
+    \throws unity::scopes::NotFoundException if the scope has no settings
+    \see TBD TODO
+    */
+    VariantArray settings_definitions() const;
+
+    /**
+    \brief Check if this scope wants location data.
+    \return True if this scope wants location data.
+    */
+    bool location_data_needed() const;  // optional (default = false)
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

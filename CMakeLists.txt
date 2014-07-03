@@ -66,6 +66,8 @@ pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
+pkg_check_modules(JSONCPP jsoncpp REQUIRED)
+
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
@@ -192,8 +194,6 @@ set(UNITY_SCOPES_SOVERSION 2)
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
 
-pkg_check_modules(JSONCPP jsoncpp REQUIRED)
-
 find_library(ZMQLIB zmq)
 if(NOT ZMQLIB)
   message(FATAL_ERROR "Zmq lib not found.")
@@ -219,6 +219,11 @@ if(NOT DLLIB)
   message(FATAL_ERROR "Dl lib not found.")
 endif()
 
+find_library(U1DBLIB u1db)
+if(NOT U1DBLIB)
+  message(FATAL_ERROR "U1DB lib not found.")
+endif()
+
 
 # Other libraries we depend on
 set(OTHER_LIBS
@@ -231,6 +236,10 @@ set(OTHER_LIBS
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
+    ${U1DBLIB}
+    curl
+    oauth
+    json-c
     pthread
     smartscopes
 )
