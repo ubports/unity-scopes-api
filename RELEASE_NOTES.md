@@ -3,6 +3,7 @@ Release notes
 
 Changes in version 0.5.2
 ========================
+  - Added CannedQuery parameter to Category.
   - Added support for scope settings.
 
 Changes in version 0.5.1
