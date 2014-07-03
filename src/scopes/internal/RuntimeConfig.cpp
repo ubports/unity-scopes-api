@@ -61,7 +61,14 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
         reap_expiry_ = DFLT_REAP_EXPIRY;
         reap_interval_ = DFLT_REAP_INTERVAL;
-        data_directory_ = get_dflt_data_dir();
+        try
+        {
+            data_directory_ = default_data_directory();
+        }
+        catch (ResourceException const& e)
+        {
+            throw_ex("Failed to get default data directory: " + std::string(e.what()));
+        }
     }
     else
     {
@@ -86,7 +93,14 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         data_directory_ = get_optional_string(runtime_config_group, data_dir_key);
         if (data_directory_.empty())
         {
-            data_directory_ = get_dflt_data_dir();
+            try
+            {
+                data_directory_ = default_data_directory();
+            }
+            catch (ResourceException const& e)
+            {
+                throw_ex("No DataDir configured and failed to get default: " + std::string(e.what()));
+            }
         }
     }
 
@@ -157,12 +171,12 @@ string RuntimeConfig::data_directory() const
     return data_directory_;
 }
 
-string RuntimeConfig::get_dflt_data_dir()
+string RuntimeConfig::default_data_directory()
 {
     char const* home = getenv("HOME");
     if (!home || *home == '\0')
     {
-        throw_ex("No DataDir configured and $HOME not set");
+        throw ResourceException("RuntimeConfig::default_data_directory(): $HOME not set");
     }
     return string(home) + "/.local/share/unity-scopes";
 }
