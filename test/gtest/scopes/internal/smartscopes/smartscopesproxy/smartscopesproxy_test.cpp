@@ -290,6 +290,7 @@ TEST_F(smartscopesproxytest, search)
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 
+    // If the search URI is built incorrectly we will not get any results back
     meta = reg_->get_metadata("dummy.scope.3");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
@@ -499,6 +500,12 @@ TEST_F(smartscopesproxytest, preview)
 
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     previewer_no_cols->wait_until_finished();
+
+    // If the preview URI is built incorrectly we will not get any results back
+    meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
 }
 
 } // namespace

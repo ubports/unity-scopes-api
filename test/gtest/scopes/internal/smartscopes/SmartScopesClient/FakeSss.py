@@ -45,6 +45,9 @@ def response(environ, start_response):
         if preview1_complete == True:
             return [preview_response2]
 
+    if environ['PATH_INFO'] == '/demo3/preview' and environ['QUERY_STRING'] == 'q=search_string&session_id=session_id&query_id=0&platform=phone&locale=en':
+        return [preview_response]
+
     return ''
 
 serving = False
