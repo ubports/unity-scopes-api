@@ -290,10 +290,18 @@ TEST_F(smartscopesproxytest, search)
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
 
-    // If the search URI is built incorrectly we will not get any results back
+    // If the following search URIs are built incorrectly we will not get any results back
     reply = std::make_shared<Receiver>();
 
     meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
@@ -503,10 +511,26 @@ TEST_F(smartscopesproxytest, preview)
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     previewer_no_cols->wait_until_finished();
 
-    // If the preview URI is built incorrectly we will not get any results back
+    // If the following preview URIs are built incorrectly we will not get any results back
     reply = std::make_shared<Receiver>();
 
     meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();

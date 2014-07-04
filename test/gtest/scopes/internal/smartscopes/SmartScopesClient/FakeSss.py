@@ -38,6 +38,9 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo3/search' and ('settings=%7B%22age%22:23,%22enabled%22:true,%22location%22:%22London%22,%22unitTemp%22:1%7D' in environ['QUERY_STRING']):
         return [search_response]
 
+    if environ['PATH_INFO'] == '/demo4/search' and ('settings=%7B%22is_running%22:false%7D' in environ['QUERY_STRING']):
+        return [search_response]
+
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
         if preview1_complete == False:
             preview1_complete = True
@@ -46,6 +49,9 @@ def response(environ, start_response):
             return [preview_response2]
 
     if environ['PATH_INFO'] == '/demo3/preview' and ('settings=%7B%22age%22:23,%22enabled%22:true,%22location%22:%22London%22,%22unitTemp%22:1%7D' in environ['QUERY_STRING']):
+        return [preview_response]
+
+    if environ['PATH_INFO'] == '/demo4/preview' and ('settings=%7B%22is_running%22:false%7D' in environ['QUERY_STRING']):
         return [preview_response]
 
     return ''
@@ -128,11 +134,11 @@ remote_scopes_response = '[\
             }\
         },\
         {\
-            "id": "enabled",\
-            "displayName": "Enabled",\
+            "id": "is_running",\
+            "displayName": "Is Running",\
             "type": "boolean",\
             "parameters": {\
-                "defaultValue": true\
+                "defaultValue": false\
             }\
         }\
     ]}\
