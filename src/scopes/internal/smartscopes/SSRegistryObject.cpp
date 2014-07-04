@@ -165,6 +165,11 @@ SmartScopesClient::SPtr SSRegistryObject::get_ssclient() const
     return ssclient_;
 }
 
+SettingsDB::SPtr SSRegistryObject::get_settings_db(std::string const& /*scope_id*/) const
+{
+    return nullptr;
+}
+
 void SSRegistryObject::refresh_thread()
 {
     std::lock_guard<std::mutex> lock(refresh_mutex_);

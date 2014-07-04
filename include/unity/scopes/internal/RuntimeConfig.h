@@ -46,7 +46,6 @@ public:
     int reap_expiry() const;
     int reap_interval() const;
     std::string data_directory() const;
-
     static std::string default_data_directory();
 
 private:
