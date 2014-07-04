@@ -67,7 +67,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         }
         catch (ResourceException const& e)
         {
-            throw_ex("Failed to get default data directory: " + std::string(e.what()));
+            throw_ex("Failed to get default data directory");
         }
     }
     else
@@ -99,7 +99,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No DataDir configured and failed to get default: " + std::string(e.what()));
+                throw_ex("No DataDir configured and failed to get default");
             }
         }
     }
