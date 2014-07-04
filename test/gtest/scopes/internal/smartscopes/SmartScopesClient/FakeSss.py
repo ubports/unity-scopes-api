@@ -62,8 +62,8 @@ while serving == False:
 print(str(port))
 sys.stdout.flush()
 
-remote_scopes_response = '\
-[{"base_url": "http://127.0.0.1:' + str(port) + '/fail", "id" : "fail.scope", "name": "Fail Scope", "description": "Fails due to no author.", "icon": "icon" },\
+remote_scopes_response = '[\
+{"base_url": "http://127.0.0.1:' + str(port) + '/fail", "id" : "fail.scope", "name": "Fail Scope", "description": "Fails due to no author.", "icon": "icon" },\
 \
 {"base_url": "http://127.0.0.1:' + str(port) + '/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "author": "Mr.Fake", "icon": "icon" },\
 \
@@ -115,8 +115,28 @@ remote_scopes_response = '\
                 "defaultValue": true\
             }\
         }\
-    ]\
-}]'
+    ]},\
+\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo4", "id" : "dummy.scope.4", "name": "Dummy Demo Scope 4", "description": "Dummy demo scope 4.", "author": "Mr.Fake",\
+"settings":\
+    [\
+        {\
+            "id": "string_no_default",\
+            "displayName": "string_no_default",\
+            "type": "string",\
+            "parameters": {\
+            }\
+        },\
+        {\
+            "id": "enabled",\
+            "displayName": "Enabled",\
+            "type": "boolean",\
+            "parameters": {\
+                "defaultValue": true\
+            }\
+        }\
+    ]}\
+]'
 
 search_response = '\
 {"departments": {"label": "All", "canned_query": "scope://foo?q=&dep=", "alternate_label": "Foo", "subdepartments": [{"label":"A", "canned_query":"scope://foo?q=&dep=a", "subdepartments":[{"label":"Broken department"},{"label":"C", "canned_query":"scope://foo?q=&dep=c", "has_subdepartments":false}]},{"label":"B", "canned_query":"scope://foo?q=&dep=b", "has_subdepartments":false}]}}\r\n\

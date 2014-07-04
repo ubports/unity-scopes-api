@@ -67,11 +67,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
-    ASSERT_EQ(3u, scopes.size());
+    ASSERT_EQ(4u, scopes.size());
 
     // now try a valid locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "test_TEST", false));
-    ASSERT_EQ(3u, scopes.size());
+    ASSERT_EQ(4u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);

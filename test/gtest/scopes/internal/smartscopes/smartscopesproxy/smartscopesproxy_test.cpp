@@ -114,7 +114,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
-    EXPECT_EQ(3u, scopes.size());
+    EXPECT_EQ(4u, scopes.size());
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
@@ -141,7 +141,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
 
     // non-existant scope (direct)
-    EXPECT_THROW(reg_->get_metadata("dummy.scope.4"), NotFoundException);
+    EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
 
     // locate should throw (via mw)
     MWRegistryProxy mw_reg = mw_->registry_proxy();
@@ -149,7 +149,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (via mw)
     scopes = mw_reg->list();
-    EXPECT_EQ(3u, scopes.size());
+    EXPECT_EQ(4u, scopes.size());
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("dummy.scope");
@@ -176,7 +176,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
 
     // non-existant scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.4"), NotFoundException);
+    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
 }
 
 TEST_F(smartscopesproxytest, ss_registry_locale)
@@ -191,25 +191,25 @@ TEST_F(smartscopesproxytest, ss_registry_locale)
     locale_env = "LANGUAGE=";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(3u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a valid LANGUAGE env var (should return 2 scopes)
     locale_env = "LANGUAGE=test_TEST";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(3u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon only LANGUAGE env var (should return 2 scopes)
     locale_env = "LANGUAGE=:";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(3u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first valid - should return 2 scopes)
     locale_env = "LANGUAGE=test_TEST:test_FAIL";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(3u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
     locale_env = "LANGUAGE=test_FAIL:test_TEST";
