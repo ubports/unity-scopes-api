@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/internal/JsonSettingsSchema.h>
 #include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
@@ -165,8 +166,15 @@ SmartScopesClient::SPtr SSRegistryObject::get_ssclient() const
     return ssclient_;
 }
 
-SettingsDB::SPtr SSRegistryObject::get_settings_db(std::string const& /*scope_id*/) const
+SettingsDB::SPtr SSRegistryObject::get_settings_db(std::string const& scope_id) const
 {
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
+
+    auto settings_db = settings_defs_.find(scope_id);
+    if (settings_db != settings_defs_.end())
+    {
+        return settings_db->second.db;
+    }
     return nullptr;
 }
 
@@ -216,6 +224,7 @@ void SSRegistryObject::get_remote_scopes()
         throw;
     }
 
+    bool changed = false;
     MetadataMap new_scopes_;
     std::map<std::string, std::string> new_base_urls_;
 
@@ -253,6 +262,25 @@ void SSRegistryObject::get_remote_scopes()
                 {
                     auto schema = JsonSettingsSchema::create(*scope.settings);
                     metadata->set_settings_definitions(schema->definitions());
+
+                    // Get the previous JSON definition for this scope (if any)
+                    std::lock_guard<std::mutex> lock(scopes_mutex_);
+                    std::string prev_json = "";
+                    auto it = settings_defs_.find(scope.id);
+                    if (it != settings_defs_.end())
+                    {
+                        prev_json = it->second.json;
+                    }
+
+                    // Check if the settings definitions have changed
+                    if (*scope.settings != prev_json)
+                    {
+                        // Store both JSON (for internal comparison) and DB (for external use)
+                        changed = true;
+                        std::string settings_db = RuntimeConfig::default_data_directory() + "/" + scope.id + "/settings.db";
+                        SettingsDB::SPtr db(SettingsDB::create_from_json_string(settings_db, *scope.settings));
+                        settings_defs_[scope.id] = SSSettingsDef{*scope.settings, db};
+                    }
                 }
                 catch (ResourceException const& e)
                 {
@@ -286,7 +314,6 @@ void SSRegistryObject::get_remote_scopes()
         }
     }
 
-    bool changed = false;
     // replace previous scopes with new ones
     {
         std::lock_guard<std::mutex> lock(scopes_mutex_);

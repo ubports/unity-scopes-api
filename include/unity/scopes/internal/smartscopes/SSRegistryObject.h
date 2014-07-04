@@ -70,10 +70,17 @@ private:
     static bool add(RemoteScope const& remotedata, ScopeMetadata const& scope, MetadataMap& scopes, std::map<std::string, std::string>& urls);
 
 private:
+    struct SSSettingsDef
+    {
+        std::string json;
+        SettingsDB::SPtr db;
+    };
+
     SmartScopesClient::SPtr ssclient_;
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;
+    std::map<std::string, SSSettingsDef> settings_defs_;
     mutable std::mutex scopes_mutex_;
 
     std::thread refresh_thread_;
