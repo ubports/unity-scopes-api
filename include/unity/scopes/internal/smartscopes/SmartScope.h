@@ -46,26 +46,13 @@ class SmartQuery : public SearchQueryBase
 {
 public:
     SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints)
-        : SearchQueryBase(query, hints),
-          scope_id_(scope_id)
+        : SearchQueryBase(query, hints)
+        , scope_id_(scope_id)
         , query_(query)
+        , ss_client_(reg->get_ssclient())
+        , base_url_(reg->get_base_url(scope_id))
+        , hints_(hints)
     {
-        static const std::string no_net_hint("no-internet");
-        if (hints.contains_hint(no_net_hint))
-        {
-            auto var = hints[no_net_hint];
-            if (var.which() == Variant::Type::Bool && var.get_bool())
-            {
-                std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id << ", skipping" << std::endl;
-                return;
-            }
-        }
-
-        SmartScopesClient::SPtr ss_client = reg->get_ssclient();
-        std::string base_url = reg->get_base_url(scope_id_);
-
-        ///! TODO: session_id, query_id, country (+location data)
-        search_handle_ = ss_client->search(base_url, query_.query_string(), query.department_id(), "session_id", 0, hints.form_factor(), settings(), hints.locale(), "", hints.cardinality());
     }
 
     ~SmartQuery() noexcept
@@ -98,11 +85,19 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-        if (search_handle_ == nullptr)
+        static const std::string no_net_hint("no-internet");
+        if (hints_.contains_hint(no_net_hint))
         {
-            // this can happen if networking is disabled
-            return;
+            auto var = hints_[no_net_hint];
+            if (var.which() == Variant::Type::Bool && var.get_bool())
+            {
+                std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id_ << ", skipping" << std::endl;
+                return;
+            }
         }
+
+        ///! TODO: session_id, query_id, country (+location data)
+        search_handle_ = ss_client_->search(base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), hints_.locale(), "", hints_.cardinality());
 
         SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
@@ -165,6 +160,9 @@ private:
     std::string scope_id_;
     CannedQuery query_;
     SearchHandle::UPtr search_handle_;
+    SmartScopesClient::SPtr ss_client_;
+    std::string base_url_;
+    SearchMetadata hints_;
 };
 
 class SmartPreview : public PreviewQueryBase
@@ -173,12 +171,11 @@ public:
     SmartPreview(std::string const& scope_id, SSRegistryObject::SPtr reg, Result const& result, ActionMetadata const& hints)
         : PreviewQueryBase(result, hints)
         , scope_id_(scope_id)
+        , result_(result)
+        , ss_client_(reg->get_ssclient())
+        , base_url_(reg->get_base_url(scope_id))
+        , hints_(hints)
     {
-        SmartScopesClient::SPtr ss_client = reg->get_ssclient();
-        std::string base_url = reg->get_base_url(scope_id_);
-
-        ///! TODO: session_id, widgets_api_version, country (+location data)
-        preview_handle_ = ss_client->preview(base_url, result["result_json"].get_string(), "session_id", hints.form_factor(), 0, settings(), hints.locale(), "");
     }
 
     ~SmartPreview()
@@ -192,6 +189,9 @@ public:
 
     virtual void run(PreviewReplyProxy const& reply) override
     {
+        ///! TODO: session_id, widgets_api_version, country (+location data)
+        preview_handle_ = ss_client_->preview(base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
+
         auto results = preview_handle_->get_preview_results();
         PreviewHandle::Columns columns = results.first;
         PreviewHandle::Widgets widgets = results.second;
@@ -231,6 +231,10 @@ public:
 private:
     std::string scope_id_;
     PreviewHandle::UPtr preview_handle_;
+    Result result_;
+    SmartScopesClient::SPtr ss_client_;
+    std::string base_url_;
+    ActionMetadata hints_;
 };
 
 class NullActivation : public ActivationQueryBase
