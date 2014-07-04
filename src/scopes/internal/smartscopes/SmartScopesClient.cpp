@@ -792,7 +792,7 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
         // If we have constructed a valid id:value string, append it to result_str
         if (setting_valid)
         {
-            result_str << setting_str;
+            result_str << setting_str.str();
             first_setting = false;
         }
     }
