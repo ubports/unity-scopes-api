@@ -349,7 +349,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
         std::string settings_str = stringify_settings(settings);
         if (!settings_str.empty())
         {
-            search_uri << "&settings=" << settings_str;
+            search_uri << "&settings=" << http_client_->to_percent_encoding(settings_str);
         }
     }
     if (!locale.empty())
@@ -400,7 +400,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
         std::string settings_str = stringify_settings(settings);
         if (!settings_str.empty())
         {
-            preview_uri << "&settings=" << settings_str;
+            preview_uri << "&settings=" << http_client_->to_percent_encoding(settings_str);
         }
     }
     if (!locale.empty())

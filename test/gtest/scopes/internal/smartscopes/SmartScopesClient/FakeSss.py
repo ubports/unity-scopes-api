@@ -35,10 +35,10 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
-    if environ['PATH_INFO'] == '/demo3/search' and ('settings=%7B%22age%22:23,%22enabled%22:true,%22location%22:%22London%22,%22unitTemp%22:1%7D' in environ['QUERY_STRING']):
+    if environ['PATH_INFO'] == '/demo3/search' and ('settings=%7B%22age%22%3A23%2C%22enabled%22%3Atrue%2C%22location%22%3A%22London%22%2C%22unitTemp%22%3A1%7D' in environ['QUERY_STRING']):
         return [search_response]
 
-    if environ['PATH_INFO'] == '/demo4/search' and ('settings=%7B%22is_running%22:false%7D' in environ['QUERY_STRING']):
+    if environ['PATH_INFO'] == '/demo4/search' and ('settings=%7B%22is_running%22%3Afalse%7D' in environ['QUERY_STRING']):
         return [search_response]
 
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
@@ -48,10 +48,10 @@ def response(environ, start_response):
         if preview1_complete == True:
             return [preview_response2]
 
-    if environ['PATH_INFO'] == '/demo3/preview' and ('settings=%7B%22age%22:23,%22enabled%22:true,%22location%22:%22London%22,%22unitTemp%22:1%7D' in environ['QUERY_STRING']):
+    if environ['PATH_INFO'] == '/demo3/preview' and ('settings=%7B%22age%22%3A23%2C%22enabled%22%3Atrue%2C%22location%22%3A%22London%22%2C%22unitTemp%22%3A1%7D' in environ['QUERY_STRING']):
         return [preview_response]
 
-    if environ['PATH_INFO'] == '/demo4/preview' and ('settings=%7B%22is_running%22:false%7D' in environ['QUERY_STRING']):
+    if environ['PATH_INFO'] == '/demo4/preview' and ('settings=%7B%22is_running%22%3Afalse%7D' in environ['QUERY_STRING']):
         return [preview_response]
 
     return ''
