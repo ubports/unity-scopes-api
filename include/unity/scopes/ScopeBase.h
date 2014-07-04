@@ -248,6 +248,7 @@ public:
     call this method from the constructor!
 
     \return The scope's configuration directory.
+    \throw LogicException if called from the constructor of this instance.
     */
     std::string scope_directory() const;
 
@@ -261,13 +262,18 @@ public:
     call this method from the constructor!
 
     \return The root directory of the filesystem sub-tree that is writable for the scope.
+    \throw LogicException if called from the constructor of this instance.
     */
     std::string cache_directory() const;
 
     /**
     \brief Returns the proxy to the registry.
 
+    \note The registr proxy is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
     \return The proxy to the registry.
+    \throw LogicException if called from the constructor of this instance.
     */
     RegistryProxy registry() const;
 
@@ -283,6 +289,7 @@ public:
     call this method from the constructor!
 
     \return The scope's current settings.
+    \throw LogicException if called from the constructor of this instance.
     */
     VariantMap settings() const;
 

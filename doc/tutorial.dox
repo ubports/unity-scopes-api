@@ -716,7 +716,7 @@ following keys:
 The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
 `DisplayName` and `Description` can (and should) be localized. For example:
 
-`Description[de] = Fu&szlig;ballergebnisse`
+`Description[de_DE] = Fu&szlig;ballergebnisse`
 
 In addition to allowing the registry to make the scope available, this information controls how the scope appears
 in the "Scopes" scope.

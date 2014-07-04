@@ -42,12 +42,6 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
-#if 0
-<<<<<<< TREE
-#include <signal.h>
-=======
->>>>>>> MERGE-SOURCE
-#endif
 #include <sys/stat.h>
 
 using namespace std;
@@ -110,6 +104,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
+        cache_dir_ = find_cache_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -306,6 +301,8 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         scope_base->p->set_scope_directory(dir.native());
     }
 
+    scope_base->p->set_cache_directory(cache_dir_);
+
     {
         // Try to open the scope settings database, if any.
         string settings_dir = data_dir_ + "/" + scope_id_;
@@ -321,10 +318,13 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
         }
+        else
+        {
+            scope_base->p->set_settings_db(nullptr);
+        }
     }
 
     scope_base->p->set_registry(registry_);
-    // TODO: set cache dir
 
     scope_base->start(scope_id_);
 
@@ -387,6 +387,51 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     {
         throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
     }
+}
+
+string RuntimeImpl::find_cache_directory() const
+{
+    vector<boost::filesystem::path> const candidates = { data_dir_ + "/aggregator/" + scope_id_,
+                                                         data_dir_ + "/leaf-net/" + scope_id_,
+                                                         data_dir_ + "/leaf-fs/" + scope_id_
+                                      };
+    vector<string> found_dirs;
+
+    // Try and find one of the three possible directories for the scope to store its
+    // data files. If we find more than one, we throw.
+    for (auto const& path : candidates)
+    {
+        if (boost::filesystem::exists(path))
+        {
+            if (!boost::filesystem::is_directory(path))
+            {
+                cerr << "Warning: ignoring non-directory cache path: " << path.native() << endl;
+            }
+            else
+            {
+                found_dirs.push_back(path.native());
+            }
+        }
+    }
+
+    if (found_dirs.empty())
+    {
+        cerr << "Warning: no cache directory found for scope " << scope_id_ << endl;
+        return "";
+    }
+
+    if (found_dirs.size() > 1)
+    {
+        ostringstream err;
+        err << "Runtime(): bad configuration: found more than one cache directory for scope " << scope_id_ << ":";
+        for (auto const& path : found_dirs)
+        {
+            err << "\n  " << path;
+        }
+        throw ConfigException(err.str());
+    }
+
+    return found_dirs[0];
 }
 
 } // namespace internal

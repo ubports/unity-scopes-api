@@ -39,7 +39,7 @@ class SettingsDB;
 class ScopeBaseImpl final
 {
 public:
-    ScopeBaseImpl() = default;
+    ScopeBaseImpl();
     ~ScopeBaseImpl() = default;
 
     void set_scope_directory(std::string const& path);
@@ -57,9 +57,17 @@ public:
 
 private:
     std::string scope_directory_;
+    bool scope_dir_initialized_;
+
     std::string cache_directory_;
+    bool cache_dir_initialized_;
+
     unity::scopes::RegistryProxy registry_;
+    bool registry_initialized_;
+
     std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
+    bool settings_db_initialized_;
+
     mutable std::mutex mutex_;
 };
 

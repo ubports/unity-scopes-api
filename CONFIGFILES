@@ -92,7 +92,7 @@ The following keys are recognized:
 
 - DataDir
 
-  The parent directory under the run time writes scope-specific data files
+  The parent directory under which the run time writes scope-specific data files
   (such as settings).
 
   The default value is $HOME/.local/share/unity-scopes.
@@ -101,6 +101,19 @@ The following keys are recognized:
   this directory, for example:
 
   $HOME/.local/share/unity-scopes/<scope_id>/settings.db
+
+- CacheDir
+
+  The parent directory for a scope to write its own files, such
+  as cache files.
+
+  The default value depends on whether the scope is an aggregating scope,
+  leaf scope with network permission, or leaf scope with local content permission.
+  The respective default locations are:
+
+  $HOME/.local/share/unity-scopes/aggregator/<scope_id>
+  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>
+  $HOME/.local/share/unity-scopes/leaf-fs/<scope_id>
 
 
 Zmq.ini

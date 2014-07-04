@@ -64,6 +64,7 @@ public:
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
     void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept;
+    std::string find_cache_directory() const;
 
     bool destroyed_;
     std::string scope_id_;
@@ -77,6 +78,7 @@ private:
     int reap_expiry_;
     int reap_interval_;
     std::string data_dir_;
+    std::string cache_dir_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;

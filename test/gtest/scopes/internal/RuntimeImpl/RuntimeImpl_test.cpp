@@ -35,7 +35,6 @@ TEST(RuntimeImpl, basic)
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
     EXPECT_TRUE(rt->factory());
-    cerr << "reg: " << rt->registry_configfile() << endl;
     EXPECT_EQ(TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Registry.ini", rt->registry_configfile());
 
     rt->destroy();
