@@ -41,7 +41,6 @@ public:
     UNITY_DEFINES_PTRS(ScopeLoader);
 
     // Creates a ScopeLoader for a scope with the given ID and library.
-    // so we can pass it to the scope's start method.
     static UPtr load(std::string const& scope_id, std::string const& libpath);
 
     // unload() explicitly finalizes the scope. This is called by the destructor too, but calling it explicity

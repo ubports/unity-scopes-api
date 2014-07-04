@@ -48,7 +48,7 @@ ActionMetadata::~ActionMetadata()
 {
 }
 
-ActionMetadata& ActionMetadata::operator=(ActionMetadata const &other)
+ActionMetadata& ActionMetadata::operator=(ActionMetadata const& other)
 {
     if (this != &other)
     {

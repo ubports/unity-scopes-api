@@ -87,6 +87,11 @@ RegistryProxy ScopeBase::registry() const
     return p->registry();
 }
 
+unity::scopes::VariantMap ScopeBase::settings() const
+{
+    return p->settings();
+}
+
 } // namespace scopes
 
 } // namespace unity

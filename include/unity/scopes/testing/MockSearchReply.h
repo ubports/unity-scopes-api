@@ -54,6 +54,12 @@ public:
                                  std::string const&,
                                  std::string const&,
                                  CategoryRenderer const&));
+    MOCK_METHOD5(register_category,
+                 Category::SCPtr(std::string const&,
+                                 std::string const&,
+                                 std::string const&,
+                                 CannedQuery const&,
+                                 CategoryRenderer const&));
     MOCK_METHOD1(register_category, void(Category::SCPtr category));
     MOCK_METHOD1(lookup_category, Category::SCPtr(std::string const&));
     MOCK_METHOD1(push, bool(CategorisedResult const&));

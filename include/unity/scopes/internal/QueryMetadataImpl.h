@@ -50,7 +50,7 @@ public:
 
 protected:
     virtual VariantMap serialize() const = 0;
-    virtual void serialize(VariantMap &var) const = 0;
+    virtual void serialize(VariantMap& var) const = 0;
     virtual std::string metadata_type() const = 0;
 
 private:

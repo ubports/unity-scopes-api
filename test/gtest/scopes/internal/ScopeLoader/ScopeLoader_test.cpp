@@ -23,7 +23,6 @@
 
 #include <gtest/gtest.h>
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
-#include <scope-api-testconfig.h>
 #include "Counters.h"
 #include "PerScopeVariables.h"
 
@@ -36,23 +35,16 @@ using namespace unity::scopes::internal;
 namespace
 {
 
-char const* scope_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libTestScope.so";
-char const* no_destroy_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNoDestroy.so";
-char const* null_return_lib = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libNullReturn.so";
-char const* throw_unity_ex_from_start_lib
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnityExFromStart.so";
-char const* throw_unity_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnityExFromStop.so";
-char const* throw_std_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowStdExFromStop.so";
-char const* throw_unknown_ex_from_start_lib
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnknownExFromStart.so";
-char const* throw_unknown_ex_from_stop_lib
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libThrowUnknownExFromStop.so";
-char const* scopeA
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libScopeA.so";
-char const* scopeB
-    = TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeLoader/libScopeB.so";
+char const* scope_lib = TEST_DIR "/libTestScope.so";
+char const* no_destroy_lib = TEST_DIR "/libNoDestroy.so";
+char const* null_return_lib = TEST_DIR "/libNullReturn.so";
+char const* throw_unity_ex_from_start_lib = TEST_DIR "/libThrowUnityExFromStart.so";
+char const* throw_unity_ex_from_stop_lib = TEST_DIR "/libThrowUnityExFromStop.so";
+char const* throw_std_ex_from_stop_lib = TEST_DIR "/libThrowStdExFromStop.so";
+char const* throw_unknown_ex_from_start_lib = TEST_DIR "/libThrowUnknownExFromStart.so";
+char const* throw_unknown_ex_from_stop_lib = TEST_DIR "/libThrowUnknownExFromStop.so";
+char const* scopeA = TEST_DIR "/libScopeA.so";
+char const* scopeB = TEST_DIR "/libScopeB.so";
 }
 
 // Basic test.

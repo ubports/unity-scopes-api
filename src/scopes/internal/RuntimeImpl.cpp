@@ -26,10 +26,14 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
+
+#include <boost/filesystem.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -38,7 +42,13 @@
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
+#if 0
+<<<<<<< TREE
 #include <signal.h>
+=======
+>>>>>>> MERGE-SOURCE
+#endif
+#include <sys/stat.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -98,6 +108,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             auto registry_mw_proxy = middleware_->registry_proxy();
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
+
+        data_dir_ = config.data_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -292,6 +304,23 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     {
         boost::filesystem::path dir = boost::filesystem::path(scope_ini_file).parent_path();
         scope_base->p->set_scope_directory(dir.native());
+    }
+
+    {
+        // Try to open the scope settings database, if any.
+        string settings_dir = data_dir_ + "/" + scope_id_;
+        string scope_dir = scope_base->scope_directory();
+        string settings_db = settings_dir + "/settings.db";
+        string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+        if (boost::filesystem::exists(settings_schema))
+        {
+            // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+            ::mkdir(data_dir_.c_str(), 0700);
+            ::mkdir(settings_dir.c_str(), 0700);
+
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+            scope_base->p->set_settings_db(db);
+        }
     }
 
     scope_base->p->set_registry(registry_);

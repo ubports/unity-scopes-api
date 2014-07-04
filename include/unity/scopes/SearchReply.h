@@ -94,7 +94,7 @@ public:
     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
-                                              std::string const &icon,
+                                              std::string const& icon,
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
     /**
@@ -147,6 +147,24 @@ public:
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished().
     */
     virtual ~SearchReply();
+
+    /**
+    \brief Register new category and send it to the source of the query.
+
+    \param id The identifier of the category
+    \param title The title of the category
+    \param icon The icon of the category
+    \param query Query to perform when expanding this category
+    \param renderer_template The renderer template to be used for results in this category
+
+    \return The category instance
+    \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
+    */
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const& icon,
+                                              CannedQuery const& query,
+                                              CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
 protected:
     /// @cond

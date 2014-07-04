@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
 #include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/Variant.h>
 
 #include <mutex>
 #include <string>
@@ -32,6 +33,8 @@ namespace scopes
 
 namespace internal
 {
+
+class SettingsDB;
 
 class ScopeBaseImpl final
 {
@@ -48,10 +51,15 @@ public:
     void set_registry(RegistryProxy const& registry);
     RegistryProxy registry() const;
 
+    std::shared_ptr<unity::scopes::internal::SettingsDB> settings_db() const;
+    void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
+    unity::scopes::VariantMap settings() const;
+
 private:
     std::string scope_directory_;
     std::string cache_directory_;
     unity::scopes::RegistryProxy registry_;
+    std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
     mutable std::mutex mutex_;
 };
 

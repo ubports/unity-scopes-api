@@ -8,21 +8,23 @@ global:
         virtual?thunk?to?unity::scopes::[!i]*;
         vtable?for?unity::scopes::[!i]*;
         unity::scopes::internal::Executor::*;
+        unity::scopes::internal::IniSettingsSchema::*;
+        unity::scopes::internal::JsonSettingsSchema::*;
         unity::scopes::internal::MiddlewareBase::*;
         unity::scopes::internal::MiddlewareFactory::*;
         unity::scopes::internal::RegistryConfig::*;
         unity::scopes::internal::RegistryObject::*;
-        unity::scopes::internal::RuntimeImpl::*;
         unity::scopes::internal::RuntimeConfig::*;
+        unity::scopes::internal::RuntimeImpl::*;
         unity::scopes::internal::ScopeConfig::*;
         unity::scopes::internal::ScopeImpl::*;
         unity::scopes::internal::ScopeLoader::*;
         unity::scopes::internal::ScopeMetadataImpl::*;
         unity::scopes::internal::ScopeObject::*;
-        unity::scopes::internal::StateReceiverObject::*;
         unity::scopes::internal::smartscopes::SSConfig::*;
         unity::scopes::internal::smartscopes::SSRegistryObject::*;
         unity::scopes::internal::smartscopes::SSScopeObject::*;
+        unity::scopes::internal::StateReceiverObject::*;
     };
 local:
     extern "C++" {

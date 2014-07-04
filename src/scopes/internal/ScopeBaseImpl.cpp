@@ -17,6 +17,10 @@
  */
 
 #include <unity/scopes/internal/ScopeBaseImpl.h>
+#include <unity/scopes/internal/SettingsDB.h>
+
+using namespace unity::scopes;
+using namespace std;
 
 using namespace std;
 
@@ -63,6 +67,24 @@ RegistryProxy ScopeBaseImpl::registry() const
 {
     lock_guard<mutex> lock(mutex_);
     return registry_;
+}
+
+SettingsDB::SPtr ScopeBaseImpl::settings_db() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_;
+}
+
+void ScopeBaseImpl::set_settings_db(SettingsDB::SPtr const& db)
+{
+    lock_guard<mutex> lock(mutex_);
+    db_ = db;
+}
+
+VariantMap ScopeBaseImpl::settings() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_ ? db_->settings() : VariantMap();
 }
 
 } // namespace internal
