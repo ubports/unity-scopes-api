@@ -37,8 +37,6 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <libgen.h>
-#include <unistd.h>
 
 #include <boost/filesystem/path.hpp>
 

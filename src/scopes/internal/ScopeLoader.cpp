@@ -22,7 +22,6 @@
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
 
-#include <libgen.h>
 #include <cassert>
 
 using namespace std;
@@ -38,10 +37,9 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath, RegistryProxy const& registry) :
+ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath) :
     scope_id_(scope_id),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
-    registry_(registry),
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
@@ -54,13 +52,6 @@ ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath, Registry
     if (!scope_base_)
     {
         throw unity::ResourceException("Scope " + scope_id_ + " returned nullptr from " + UNITY_SCOPE_CREATE_SYMSTR);
-    }
-
-    {
-        // dirname modifies its argument, so we need a copy of scope lib path
-        std::vector<char> scope_lib(libpath.c_str(), libpath.c_str() + libpath.size() + 1);
-        const std::string scope_dir(dirname(&scope_lib[0]));
-        scope_base_->p->set_scope_directory(scope_dir);
     }
 }
 
@@ -75,9 +66,9 @@ ScopeLoader::~ScopeLoader()
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath, RegistryProxy const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath)
 {
-    return UPtr(new ScopeLoader(scope_id, libpath, registry));
+    return UPtr(new ScopeLoader(scope_id, libpath));
 }
 
 void ScopeLoader::unload()
@@ -119,7 +110,7 @@ void ScopeLoader::start()
 
     try
     {
-        scope_base_->start(scope_id_, registry_);
+        scope_base_->start(scope_id_);
     }
     catch (...)
     {

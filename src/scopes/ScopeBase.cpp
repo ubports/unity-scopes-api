@@ -18,6 +18,7 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 namespace unity
@@ -39,7 +40,7 @@ ScopeBase::~ScopeBase()
 
 //! @endcond
 
-void ScopeBase::start(std::string const&, RegistryProxy const&)
+void ScopeBase::start(std::string const&)
 {
     // Intentionally empty: default "do nothing" implementation.
 }
@@ -74,6 +75,16 @@ void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexce
 std::string ScopeBase::scope_directory() const
 {
     return p->scope_directory();
+}
+
+std::string ScopeBase::cache_directory() const
+{
+    return p->cache_directory();
+}
+
+RegistryProxy ScopeBase::registry() const
+{
+    return p->registry();
 }
 
 } // namespace scopes

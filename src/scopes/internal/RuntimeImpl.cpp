@@ -31,13 +31,14 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <signal.h>
-#include <libgen.h>
+#include <boost/filesystem.hpp>
 
 #include <cassert>
 #include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
+
+#include <signal.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -289,13 +290,15 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
-        // dirname modifies its argument, so we need a copy of scope lib path
-        vector<char> scope_ini(scope_ini_file.c_str(), scope_ini_file.c_str() + scope_ini_file.size() + 1);
-        const string scope_dir(dirname(&scope_ini[0]));
-        scope_base->p->set_scope_directory(scope_dir);
+        boost::filesystem::path dir = boost::filesystem::path(scope_ini_file).parent_path();
+        scope_base->p->set_scope_directory(dir.native());
     }
 
-    scope_base->start(scope_id_, registry());
+    scope_base->p->set_registry(registry_);
+    // TODO: set cache dir
+
+    scope_base->start(scope_id_);
+
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
 

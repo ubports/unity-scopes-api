@@ -140,18 +140,18 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual void start(string const& scope_id, RegistryProxy const& registry) override
+    virtual void start(string const& scope_id) override
     {
         scope_id_ = scope_id;
 
-        if (!registry)
+        if (!registry())
         {
             throw ConfigException(scope_id + ": No registry available, cannot locate child scopes");
         }
         // Lock up scopes C and D in the registry and remember their proxies.
-        auto meta_c = registry->get_metadata("scope-C");
+        auto meta_c = registry()->get_metadata("scope-C");
         scope_c_ = meta_c.proxy();
-        auto meta_d = registry->get_metadata("scope-D");
+        auto meta_d = registry()->get_metadata("scope-D");
         scope_d_ = meta_d.proxy();
     }
 

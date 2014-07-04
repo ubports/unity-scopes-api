@@ -90,9 +90,9 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual void start();   // Optional
-    virtual void stop();    // Optional
-    virtual void run();     // Optional
+    virtual void start(std::string const& scope_id);   // Optional
+    virtual void stop();                               // Optional
+    virtual void run();                                // Optional
 };
 ~~~
 
@@ -150,11 +150,8 @@ public:
     The call to start() is made by the same thread that calls the create function.
 
     \param scope_id The name of the scope as defined by the scope's configuration file.
-
-    \param registry A proxy to the scope registry. This parameter is provided for aggregating
-    scopes that need to retrieve proxies to their child scopes.
     */
-    virtual void start(std::string const& scope_id, RegistryProxy const& registry);
+    virtual void start(std::string const& scope_id);
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
@@ -206,7 +203,7 @@ public:
     \param result The result that should be activated.
     \param metadata additional data sent by the client.
     \return The activation instance.
-     */
+    */
     virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
     /**
@@ -223,7 +220,7 @@ public:
     \param widget_id The identifier of the 'actions' widget of the activated action.
     \param action_id The identifier of the action that was activated.
     \return The activation instance.
-     */
+    */
     virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
     /**
@@ -236,7 +233,7 @@ public:
     \param result The result that should be previewed.
     \param metadata Additional data sent by the client.
     \return The preview instance.
-     */
+    */
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
@@ -245,11 +242,34 @@ public:
     static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
     /**
-     \brief Returns directory where the scope files are.
+    \brief Returns the directory that stores the scope's configuration files and shared library.
 
-     Note, scope directory is only known after the scope has been instantantiated, e.g. it's not available in the constructor.
-     */
+    \note The scope directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The scope's configuration directory.
+    */
     std::string scope_directory() const;
+
+    /**
+    \brief Returns a directory that is (exclusively) writable for the scope.
+
+    This directory is intended to allow scopes to store persistent information, such
+    as cached content or similar.
+
+    \note The cache directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The root directory of the filesystem sub-tree that is writable for the scope.
+    */
+    std::string cache_directory() const;
+
+    /**
+    \brief Returns the proxy to the registry.
+
+    \return The proxy to the registry.
+    */
+    RegistryProxy registry() const;
 
 protected:
     /// @cond
@@ -257,7 +277,6 @@ protected:
 private:
     std::unique_ptr<internal::ScopeBaseImpl> p;
 
-    friend class internal::ScopeLoader;
     friend class internal::RuntimeImpl;
     /// @endcond
 };

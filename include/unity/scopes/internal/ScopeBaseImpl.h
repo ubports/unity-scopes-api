@@ -19,6 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
+#include <unity/scopes/RegistryProxyFwd.h>
+
+#include <mutex>
 #include <string>
 
 namespace unity
@@ -35,11 +38,21 @@ class ScopeBaseImpl final
 public:
     ScopeBaseImpl() = default;
     ~ScopeBaseImpl() = default;
-    void set_scope_directory(std::string const &path);
+
+    void set_scope_directory(std::string const& path);
     std::string scope_directory() const;
+
+    void set_cache_directory(std::string const& path);
+    std::string cache_directory() const;
+
+    void set_registry(RegistryProxy const& registry);
+    RegistryProxy registry() const;
 
 private:
     std::string scope_directory_;
+    std::string cache_directory_;
+    unity::scopes::RegistryProxy registry_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

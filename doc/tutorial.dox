@@ -494,10 +494,10 @@ otherwise require an instance of unity::scopes::SearchReply and a call to unity:
 With the above classes a test case that checks if MyScope calls appropriate methods of unity::scopes::SearchReply may look like this (note that it just checks
 if proper methods get called and uses _ matchers that match any values; put actual values in there for stricts checks):
 \code{.cpp}
-typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixutre;
+typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixture;
 using namespace ::testing;
 
-TEST_F(TestScopeFixutre, search_results)
+TEST_F(TestScopeFixture, search_results)
 {
     const unity::scopes::CategoryRenderer renderer;
 

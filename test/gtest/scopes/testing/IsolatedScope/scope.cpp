@@ -167,9 +167,13 @@ public:
 
 } // namespace testing
 
-void testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &registry)
+testing::Scope::Scope(unity::scopes::RegistryProxy const& registry)
+    : registry_(registry)
 {
-    registry_ = registry;
+}
+
+void testing::Scope::start(std::string const&)
+{
 }
 
 void testing::Scope::stop()
