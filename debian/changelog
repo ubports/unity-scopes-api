@@ -1,3 +1,10 @@
+unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Added cache_directory() method and refactored scoperunner and RuntimeImpl.
+
+ -- Michi Henning <michi.henning@canonical.com>  Mon, 07 Jul 2014 14:34:04 +1000
+
 unity-scopes-api (0.5.2-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Michal Hruby ]
