@@ -46,6 +46,7 @@ public:
     int reap_expiry() const;
     int reap_interval() const;
     std::string data_directory() const;
+    static std::string default_data_directory();
 
 private:
     std::string registry_identity_;
@@ -57,8 +58,6 @@ private:
     int reap_expiry_;
     int reap_interval_;
     std::string data_directory_;
-
-    std::string get_dflt_data_dir();
 };
 
 } // namespace internal

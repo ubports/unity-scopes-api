@@ -336,19 +336,22 @@ JsonSettingsSchema::JsonSettingsSchema(string const& json_string)
             throw ResourceException("JsonSettingsSchema(): cannot parse schema: " + reader.getFormattedErrorMessages());
         }
 
-        auto settings = root["settings"];
-        if (settings.isNull())
+        if (!root.isArray())
+        {
+            root = root["settings"];
+        }
+        if (root.isNull())
         {
             throw ResourceException("JsonSettingsSchema(): missing \"settings\" definition");
         }
-        if (!settings.isArray())
+        if (!root.isArray())
         {
             throw ResourceException("JsonSettingsSchema(): value \"settings\" must be an array");
         }
         set<string> seen_settings;
-        for (unsigned i = 0; i < settings.size(); ++i)
+        for (unsigned i = 0; i < root.size(); ++i)
         {
-            Setting s(settings[i]);
+            Setting s(root[i]);
             if (seen_settings.find(s.id()) != seen_settings.end())
             {
                 throw ResourceException("JsonSettingsSchema(): duplicate definition, id = \"" + s.id() + "\"");

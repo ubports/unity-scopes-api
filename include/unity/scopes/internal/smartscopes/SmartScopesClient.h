@@ -52,9 +52,11 @@ struct RemoteScope
     std::string description;
     std::string author;
     std::string base_url;
-    std::shared_ptr<std::string> icon;  // optional
-    std::shared_ptr<std::string> art;  // optional
-    std::shared_ptr<VariantMap> appearance; // optional
+    std::shared_ptr<std::string> icon;          // optional
+    std::shared_ptr<std::string> art;           // optional
+    std::shared_ptr<VariantMap> appearance;     // optional
+    std::shared_ptr<std::string> settings;      // optional
+    std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
 };
 
@@ -151,6 +153,7 @@ public:
                               std::string const& session_id,
                               uint query_id,
                               std::string const& platform,
+                              VariantMap const& settings = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
                               const uint limit = 0);
@@ -160,6 +163,7 @@ public:
                                 std::string const& session_id,
                                 std::string const& platform,
                                 const uint widgets_api_version,
+                                VariantMap const& settings = VariantMap(),
                                 std::string const& locale = "",
                                 std::string const& country = "");
 
@@ -177,6 +181,8 @@ private:
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
+
+    std::string stringify_settings(VariantMap const& settings);
 
 private:
     HttpClientInterface::SPtr http_client_;

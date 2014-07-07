@@ -114,7 +114,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
-    EXPECT_EQ(2u, scopes.size());
+    EXPECT_EQ(4u, scopes.size());
 
     // visible scope (direct)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
@@ -125,8 +125,23 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
+    meta = reg_->get_metadata("dummy.scope.3");
+    EXPECT_EQ("dummy.scope.3", meta.scope_id());
+    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+    EXPECT_EQ("Dummy demo scope 3.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
+    EXPECT_FALSE(meta.invisible());
+    EXPECT_EQ(4, meta.settings_definitions().size());
+    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
+    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+
     // non-existant scope (direct)
-    EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
+    EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
 
     // locate should throw (via mw)
     MWRegistryProxy mw_reg = mw_->registry_proxy();
@@ -134,7 +149,7 @@ TEST_F(smartscopesproxytest, ss_registry)
 
     // list scopes (via mw)
     scopes = mw_reg->list();
-    EXPECT_EQ(2u, scopes.size());
+    EXPECT_EQ(4u, scopes.size());
 
     // visible scope (via mw)
     meta = mw_reg->get_metadata("dummy.scope");
@@ -145,8 +160,23 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("icon", meta.icon());
     EXPECT_FALSE(meta.invisible());
 
+    meta = mw_reg->get_metadata("dummy.scope.3");
+    EXPECT_EQ("dummy.scope.3", meta.scope_id());
+    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+    EXPECT_EQ("Dummy demo scope 3.", meta.description());
+    EXPECT_EQ("Mr.Fake", meta.author());
+    EXPECT_FALSE(meta.invisible());
+    EXPECT_EQ(4, meta.settings_definitions().size());
+    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
+    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+
     // non-existant scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
+    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
 }
 
 TEST_F(smartscopesproxytest, ss_registry_locale)
@@ -161,25 +191,25 @@ TEST_F(smartscopesproxytest, ss_registry_locale)
     locale_env = "LANGUAGE=";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(2u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a valid LANGUAGE env var (should return 2 scopes)
     locale_env = "LANGUAGE=test_TEST";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(2u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon only LANGUAGE env var (should return 2 scopes)
     locale_env = "LANGUAGE=:";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(2u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first valid - should return 2 scopes)
     locale_env = "LANGUAGE=test_TEST:test_FAIL";
     ::putenv(const_cast<char*>(locale_env.c_str()));
     reset_reg();
-    EXPECT_EQ(2u, reg_->list().size());
+    EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
     locale_env = "LANGUAGE=test_FAIL:test_TEST";
@@ -256,6 +286,22 @@ TEST_F(smartscopesproxytest, search)
     auto reply = std::make_shared<Receiver>();
 
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    // If the following search URIs are built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
@@ -464,6 +510,38 @@ TEST_F(smartscopesproxytest, preview)
 
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     previewer_no_cols->wait_until_finished();
+
+    // If the following preview URIs are built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
 }
 
 } // namespace
