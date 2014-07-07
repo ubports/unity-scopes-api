@@ -46,9 +46,9 @@ struct ScopeTraits
         return "unknown";
     }
 
-    inline static std::shared_ptr<Scope> construct(::unity::scopes::RegistryProxy registry)
+    inline static std::shared_ptr<Scope> construct(RegistryProxy const& r)
     {
-        return std::make_shared<Scope>(registry);
+        return std::make_shared<Scope>(r);
     }
 };
 

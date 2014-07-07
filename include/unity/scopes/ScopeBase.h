@@ -19,14 +19,14 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
-#include <unity/scopes/SearchQueryBase.h>
-#include <unity/scopes/PreviewQueryBase.h>
-#include <unity/scopes/RegistryProxyFwd.h>
-#include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/Version.h>
-#include <unity/scopes/Result.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/PreviewQueryBase.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/Result.h>
 #include <unity/scopes/SearchMetadata.h>
+#include <unity/scopes/SearchQueryBase.h>
+#include <unity/scopes/Version.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
@@ -68,9 +68,10 @@ class CannedQuery;
 
 namespace internal
 {
+
 class ScopeBaseImpl;
-class ScopeLoader;
 class RuntimeImpl;
+
 }
 
 /**
@@ -153,6 +154,9 @@ public:
     */
     virtual void start(std::string const& scope_id);
 
+    __attribute__((deprecated("use void start(std::string const& scope_id) instead")))
+    virtual void start(std::string const& scope_id, RegistryProxy const& registry);
+
     /**
     \brief Called by the scopes run time when the scope should shut down.
 
@@ -221,7 +225,10 @@ public:
     \param action_id The identifier of the action that was activated.
     \return The activation instance.
     */
-    virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
+    virtual ActivationQueryBase::UPtr perform_action(Result const& result,
+                                                     ActionMetadata const& metadata,
+                                                     std::string const& widget_id,
+                                                     std::string const& action_id);
 
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
@@ -248,9 +255,9 @@ public:
     call this method from the constructor!
 
     \return The scope's configuration directory.
-    \throw LogicException if called from the constructor of this instance.
+    \throws LogicException if called from the constructor of this instance.
     */
-    std::string scope_directory() const;
+    virtual std::string scope_directory() const;
 
     /**
     \brief Returns a directory that is (exclusively) writable for the scope.
@@ -262,9 +269,9 @@ public:
     call this method from the constructor!
 
     \return The root directory of the filesystem sub-tree that is writable for the scope.
-    \throw LogicException if called from the constructor of this instance.
+    \throws LogicException if called from the constructor of this instance.
     */
-    std::string cache_directory() const;
+    virtual std::string cache_directory() const;
 
     /**
     \brief Returns the proxy to the registry.
@@ -273,9 +280,9 @@ public:
     call this method from the constructor!
 
     \return The proxy to the registry.
-    \throw LogicException if called from the constructor of this instance.
+    \throws LogicException if called from the constructor of this instance.
     */
-    RegistryProxy registry() const;
+    virtual unity::scopes::RegistryProxy registry() const;
 
     /**
     \brief Returns a dictionary with the scope's current settings.
@@ -289,9 +296,9 @@ public:
     call this method from the constructor!
 
     \return The scope's current settings.
-    \throw LogicException if called from the constructor of this instance.
+    \throws LogicException if called from the constructor of this instance.
     */
-    VariantMap settings() const;
+    virtual VariantMap settings() const;
 
 protected:
     /// @cond

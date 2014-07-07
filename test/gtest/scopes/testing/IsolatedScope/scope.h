@@ -27,7 +27,7 @@ class Scope : public unity::scopes::ScopeBase
 {
 public:
     Scope(unity::scopes::RegistryProxy const&);
-    virtual ~Scope() = default;
+    virtual ~Scope();
 
     void start(std::string const&) override;
 
@@ -52,6 +52,8 @@ public:
     unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
+
+    unity::scopes::RegistryProxy registry() const override;
 
     unity::scopes::RegistryProxy registry_;
 };

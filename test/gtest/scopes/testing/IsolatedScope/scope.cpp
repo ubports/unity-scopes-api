@@ -91,7 +91,8 @@ class Query : public unity::scopes::SearchQueryBase
 {
 public:
     Query(unity::scopes::CannedQuery const& query, unity::scopes::SearchMetadata const& metadata, unity::scopes::RegistryProxy const& registry)
-        : unity::scopes::SearchQueryBase(query, metadata), registry_(registry)
+        : unity::scopes::SearchQueryBase(query, metadata)
+        , registry_(registry)
     {
     }
 
@@ -167,10 +168,12 @@ public:
 
 } // namespace testing
 
-testing::Scope::Scope(unity::scopes::RegistryProxy const& registry)
-    : registry_(registry)
+testing::Scope::Scope(unity::scopes::RegistryProxy const& r)
+    : registry_(r)
 {
 }
+
+testing::Scope::~Scope() = default;
 
 void testing::Scope::start(std::string const&)
 {
@@ -188,7 +191,7 @@ unity::scopes::SearchQueryBase::UPtr testing::Scope::search(
         unity::scopes::CannedQuery const& query,
         unity::scopes::SearchMetadata const &metadata)
 {
-    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata, registry_));
+    return unity::scopes::SearchQueryBase::UPtr(new testing::Query(query, metadata, registry()));
 }
 
 unity::scopes::ActivationQueryBase::UPtr testing::Scope::activate(
@@ -212,4 +215,9 @@ unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::ActionMetadata const& metadata)
 {
     return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview(result, metadata));
+}
+
+unity::scopes::RegistryProxy testing::Scope::registry() const
+{
+    return registry_;
 }

@@ -40,7 +40,14 @@ ScopeBase::~ScopeBase()
 
 //! @endcond
 
-void ScopeBase::start(std::string const&)
+void ScopeBase::start(std::string const& scope_id)
+{
+    // Intentionally empty: default "do nothing" implementation.
+    // TODO: delete the following line once start(scope_id, registry) is removed,
+    start(scope_id, registry());  // Allow deprecated method to still work
+}
+
+void ScopeBase::start(std::string const&, RegistryProxy const&)
 {
     // Intentionally empty: default "do nothing" implementation.
 }
