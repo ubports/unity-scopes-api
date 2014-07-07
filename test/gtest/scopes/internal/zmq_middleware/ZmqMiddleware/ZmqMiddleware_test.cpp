@@ -18,7 +18,6 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 
-#include <scope-api-testconfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
@@ -31,12 +30,14 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
+string const runtime_ini = TEST_DIR "/Runtime.ini";
+string const zmq_ini = TEST_DIR "/Zmq.ini";
+
 // Basic test.
 
 TEST(ZmqMiddleware, basic)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     mw.start();
     sleep(1);
     mw.stop();
@@ -44,8 +45,8 @@ TEST(ZmqMiddleware, basic)
 
 TEST(ZmqMiddleware, string_to_proxy)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     ObjectProxy p;
     ScopeProxy sp;
@@ -83,8 +84,7 @@ TEST(ZmqMiddleware, string_to_proxy)
 
 TEST(ZmqMiddleware, string_to_proxy_ex)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
 
     try
     {
@@ -352,8 +352,7 @@ void wait_for_shutdown_thread(ZmqMiddleware* mw)
 
 TEST(ZmqMiddleware, shutdown_before_start)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
 
     vector<thread> threads;
     num_waiters = 0;
@@ -378,8 +377,7 @@ TEST(ZmqMiddleware, shutdown_before_start)
 
 TEST(ZmqMiddleware, shutdown_after_start)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
 
     vector<thread> threads;
     num_waiters = 0;
@@ -461,8 +459,7 @@ public:
 
 TEST(ZmqMiddleware, shutdown_after_start_with_adapter)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ZmqMiddleware/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
 
     auto so = make_shared<MyScopeObject>();
     mw.add_scope_object("fred", so, 1000);

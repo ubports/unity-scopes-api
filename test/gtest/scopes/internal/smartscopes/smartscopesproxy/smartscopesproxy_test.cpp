@@ -33,7 +33,6 @@
 
 #include <memory>
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace testing;
 using namespace unity::scopes;
