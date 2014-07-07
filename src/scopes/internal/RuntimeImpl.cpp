@@ -326,6 +326,18 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     scope_base->p->set_registry(registry_);
 
+    {
+        // Set environment variables before initializing the scope.
+        string path = string("/run/user/") + std::to_string(geteuid());
+        setenv("XDG_RUNTIME_DIR", path.c_str(), 1);
+        setenv("XDG_DATA_HOME", cache_dir_.c_str(), 1);
+        setenv("XDG_CONFIG_HOME", scope_base->scope_directory().c_str(), 1);
+        setenv("LD_LIBRARY_PATH", scope_base->scope_directory().c_str(), 1);
+        setenv("TMPDIR", cache_dir_.c_str(), 1);
+        setenv("UBUNTU_APPLICATION_ISOLATION", "1", 1);
+    }
+
+    // We are finally set up, initialize the scope.
     scope_base->start(scope_id_);
 
     // Ensure the scope gets stopped.
@@ -431,7 +443,15 @@ string RuntimeImpl::find_cache_directory() const
         throw ConfigException(err.str());
     }
 
-    return found_dirs[0];
+    auto dir = found_dirs[0];
+    auto perms = boost::filesystem::status(dir).permissions();
+    if (perms & boost::filesystem::group_all || perms & boost::filesystem::others_all)
+    {
+        cerr << "Warning: ignoring cache directory accessible by group or others for " << scope_id_
+             << ": " << dir << endl;
+    }
+
+    return dir;
 }
 
 } // namespace internal
