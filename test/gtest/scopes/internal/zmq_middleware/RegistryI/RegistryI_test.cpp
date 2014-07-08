@@ -440,12 +440,12 @@ public:
 
     int first_child_pid()
     {
-        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));
+        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers | egrep -v 'ps|egrep'"));
     }
 
     int process_count()
     {
-        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
+        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | egrep -v 'ps|egrep|wc' | wc -l"));
         return current_process_count - start_process_count;
     }
 
