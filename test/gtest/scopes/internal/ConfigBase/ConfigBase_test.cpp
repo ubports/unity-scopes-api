@@ -22,8 +22,6 @@
 
 #include <gtest/gtest.h>
 
-#include <scope-api-testconfig.h>
-
 using namespace std;
 using namespace unity;
 using namespace unity::scopes;
@@ -43,8 +41,7 @@ public:
     }
 };
 
-const string TEST_DIR = string(TEST_BUILD_ROOT) + "/gtest/scopes/internal/ConfigBase";
-const string TEST_INI = TEST_DIR + "/Test.ini";
+const string TEST_INI = TEST_DIR "/Test.ini";
 
 TEST(ConfigBase, basic)
 {
