@@ -333,6 +333,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         setenv("XDG_DATA_HOME", cache_dir_.c_str(), 1);
         setenv("XDG_CONFIG_HOME", scope_base->scope_directory().c_str(), 1);
         setenv("LD_LIBRARY_PATH", scope_base->scope_directory().c_str(), 1);
+        setenv("PATH", scope_base->scope_directory().c_str(), 1);
         setenv("TMPDIR", cache_dir_.c_str(), 1);
         setenv("UBUNTU_APPLICATION_ISOLATION", "1", 1);
     }
