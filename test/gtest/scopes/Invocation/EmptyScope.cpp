@@ -34,7 +34,8 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery()
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
     {
     }
 
@@ -49,7 +50,7 @@ public:
 
 }  // namespace
 
-void EmptyScope::start(string const&, RegistryProxy const &)
+void EmptyScope::start(string const&)
 {
 }
 
@@ -61,12 +62,12 @@ void EmptyScope::run()
 {
 }
 
-SearchQueryBase::UPtr EmptyScope::search(CannedQuery const&, SearchMetadata const &)
+SearchQueryBase::UPtr EmptyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
-    return SearchQueryBase::UPtr(new TestQuery());
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
-PreviewQueryBase::UPtr EmptyScope::preview(Result const&, ActionMetadata const &)
+PreviewQueryBase::UPtr EmptyScope::preview(Result const&, ActionMetadata const&)
 {
     return nullptr;  // unused
 }
