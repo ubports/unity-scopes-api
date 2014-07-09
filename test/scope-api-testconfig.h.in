@@ -1,8 +1,0 @@
-/* This file contains all configuration data needed to run unit tests. */
-
-#ifndef SCOPE_API_TESTCONFIG
-#define SCOPE_API_TESTCONFIG
-
-#define TEST_BUILD_ROOT "@TEST_BUILD_ROOT@"
-
-#endif

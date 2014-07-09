@@ -115,6 +115,7 @@ TEST(RuntimeConfig, exceptions)
     catch (ConfigException const& e)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoDataDir.ini\": No DataDir configured and "
+                     "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_data_directory(): "
                      "$HOME not set",
                      e.what());
     }

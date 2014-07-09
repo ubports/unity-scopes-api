@@ -58,19 +58,19 @@ namespace internal
 
 RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
-    lock_guard<mutex> lock(mutex_);
-
-    destroyed_ = false;
-
-    scope_id_ = scope_id;
-    if (scope_id_.empty())
-    {
-        UniqueID id;
-        scope_id_ = "c-" + id.gen();
-    }
-
     try
     {
+        lock_guard<mutex> lock(mutex_);
+
+        destroyed_ = false;
+
+        scope_id_ = scope_id;
+        if (scope_id_.empty())
+        {
+            UniqueID id;
+            scope_id_ = "c-" + id.gen();
+        }
+
         // Create the middleware factory and get the registry identity and config filename.
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
@@ -108,6 +108,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
     }
     catch (unity::Exception const& e)
     {
+        destroy();
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         throw ConfigException(msg);
@@ -173,10 +174,13 @@ void RuntimeImpl::destroy()
     }
 
     // Shut down server-side.
-    middleware_->stop();
-    middleware_->wait_for_shutdown();
-    middleware_ = nullptr;
-    middleware_factory_.reset(nullptr);
+    if (middleware_)
+    {
+        middleware_->stop();
+        middleware_->wait_for_shutdown();
+        middleware_ = nullptr;
+        middleware_factory_.reset(nullptr);
+    }
 }
 
 string RuntimeImpl::scope_id() const
