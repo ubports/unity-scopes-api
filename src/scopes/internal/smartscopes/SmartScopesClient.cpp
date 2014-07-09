@@ -244,7 +244,6 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                 continue;
             }
 
-            scope.id = child_node->get_node("id")->as_string();
             scope.name = child_node->get_node("name")->as_string();
             scope.description = child_node->get_node("description")->as_string();
             scope.author = child_node->get_node("author")->as_string();
@@ -263,6 +262,16 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             if (child_node->has_node("appearance"))
             {
                 scope.appearance.reset(new VariantMap(child_node->get_node("appearance")->to_variant().get_dict()));
+            }
+
+            if (child_node->has_node("settings"))
+            {
+                scope.settings.reset(new std::string(child_node->get_node("settings")->to_json_string()));
+            }
+
+            if (child_node->has_node("needs_location_data"))
+            {
+                scope.needs_location_data.reset(new bool(child_node->get_node("needs_location_data")->as_bool()));
             }
 
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
@@ -315,6 +324,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              std::string const& session_id,
                                              uint query_id,
                                              std::string const& platform,
+                                             VariantMap const& settings,
                                              std::string const& locale,
                                              std::string const& country,
                                              uint limit)
@@ -333,6 +343,14 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     if (!department_id.empty())
     {
         search_uri << "&department=" << http_client_->to_percent_encoding(department_id);
+    }
+    if (!settings.empty())
+    {
+        std::string settings_str = stringify_settings(settings);
+        if (!settings_str.empty())
+        {
+            search_uri << "&settings=" << http_client_->to_percent_encoding(settings_str);
+        }
     }
     if (!locale.empty())
     {
@@ -361,6 +379,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
                                                std::string const& session_id,
                                                std::string const& platform,
                                                const uint widgets_api_version,
+                                               VariantMap const& settings,
                                                std::string const& locale,
                                                std::string const& country)
 {
@@ -376,6 +395,14 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
 
     // optional parameters
 
+    if (!settings.empty())
+    {
+        std::string settings_str = stringify_settings(settings);
+        if (!settings_str.empty())
+        {
+            preview_uri << "&settings=" << http_client_->to_percent_encoding(settings_str);
+        }
+    }
     if (!locale.empty())
     {
         preview_uri << "&locale=" << locale;
@@ -724,4 +751,53 @@ std::string SmartScopesClient::read_cache()
     }
 
     return cached_scopes_;
+}
+
+std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
+{
+    std::ostringstream result_str;
+    result_str << "{";
+
+    // Loop through the settings, appending each id:value string to result_str
+    bool first_setting = true;
+    for (auto const& setting : settings)
+    {
+        std::ostringstream setting_str;
+        setting_str << (first_setting ? "\"" : ",\"") << setting.first << "\":";
+
+        // Determine what the Variant type is and construct the id:value string accordingly
+        bool setting_valid = false;
+        switch(setting.second.which())
+        {
+        case Variant::Int:
+            setting_str << setting.second.get_int();
+            setting_valid = true;
+            break;
+        case Variant::Bool:
+            setting_str << (setting.second.get_bool() ? "true" : "false");
+            setting_valid = true;
+            break;
+        case Variant::String:
+            setting_str << "\"" << setting.second.get_string() << "\"";
+            setting_valid = true;
+            break;
+        default:
+            std::cerr << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for settings value: \"" << setting.first << "\"" << std::endl;
+        }
+
+        // If we have constructed a valid id:value string, append it to result_str
+        if (setting_valid)
+        {
+            result_str << setting_str.str();
+            first_setting = false;
+        }
+    }
+    result_str << "}";
+
+    // If no valid settings were found, return an empty string
+    if (first_setting)
+    {
+        return std::string();
+    }
+    return result_str.str();
 }

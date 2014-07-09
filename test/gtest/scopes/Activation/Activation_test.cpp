@@ -120,7 +120,7 @@ TEST(Activation, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     {
         CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
@@ -138,7 +138,7 @@ TEST(Activation, direct_activation)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     // activation interception not set
     {
@@ -172,7 +172,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
@@ -224,7 +224,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
@@ -282,7 +282,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
@@ -336,7 +336,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
@@ -391,7 +391,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
@@ -450,7 +450,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;

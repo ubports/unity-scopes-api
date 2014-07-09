@@ -45,17 +45,19 @@ public:
 
     std::string scope_id() const;
     ScopeProxy proxy() const;
-    std::string display_name() const;   // localized
-    std::string description() const;    // localized
-    std::string author() const;
-    std::string art() const;            // optional
-    std::string icon() const;           // optional
-    std::string search_hint() const;    // localized, optional
-    std::string hot_key() const;        // localized, optional
-    bool invisible() const;             // optional (default = false)
-    VariantMap appearance_attributes() const; // optional (default: empty map)
-    std::string scope_directory() const;
-    ScopeMetadata::ResultsTtlType results_ttl_type() const; // optional (default: none)
+    std::string display_name() const;                            // mandatory, localized
+    std::string description() const;                             // mandatory, localized
+    std::string author() const;                                  // mandatory
+    std::string art() const;                                     // optional
+    std::string icon() const;                                    // optional
+    std::string search_hint() const;                             // optional, localized
+    std::string hot_key() const;                                 // optional
+    bool invisible() const;                                      // optional (default: false)
+    VariantMap appearance_attributes() const;                    // optional (default: empty map)
+    std::string scope_directory() const;                         // optional
+    ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
+    VariantArray settings_definitions() const;                   // optional (default: empty array)
+    bool location_data_needed() const;                           // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -70,6 +72,8 @@ public:
     void set_appearance_attributes(VariantMap const& appearance_attributes);
     void set_scope_directory(std::string const& path);
     void set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl);
+    void set_settings_definitions(VariantArray const& settings_definitions);
+    void set_location_data_needed(bool location_data_needed);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -84,14 +88,16 @@ private:
     std::string display_name_;
     std::string description_;
     std::string author_;
-    std::unique_ptr<std::string> art_;          // Optional, hence a pointer
-    std::unique_ptr<std::string> icon_;         // Optional, hence a pointer
-    std::unique_ptr<std::string> search_hint_;  // Optional, hence a pointer
-    std::unique_ptr<std::string> hot_key_;      // Optional, hence a pointer
-    std::unique_ptr<bool> invisible_;           // Optional, hence a pointer
-    std::unique_ptr<std::string> scope_directory_;
+    std::unique_ptr<std::string> art_;                    // Optional, hence a pointer
+    std::unique_ptr<std::string> icon_;                   // Optional, hence a pointer
+    std::unique_ptr<std::string> search_hint_;            // Optional, hence a pointer
+    std::unique_ptr<std::string> hot_key_;                // Optional, hence a pointer
+    std::unique_ptr<bool> invisible_;                     // Optional, hence a pointer
+    std::unique_ptr<std::string> scope_directory_;        // Optional, hence a pointer
     VariantMap appearance_attributes_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
+    std::unique_ptr<VariantArray> settings_definitions_;  // Optional, hence a pointer
+    std::unique_ptr<bool> location_data_needed_;          // Optional, hence a pointer
 };
 
 } // namespace internal

@@ -16,6 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
 #include <unity/scopes/internal/smartscopes/SmartScope.h>
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
@@ -145,6 +146,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
             // TODO: log error, scope returned null pointer.
             throw ResourceException("SmartScope returned nullptr from query_factory_fun()");
         }
+        query_base->p->set_settings_db(ss_registry_->get_settings_db(info.id));
     }
     catch (...)
     {

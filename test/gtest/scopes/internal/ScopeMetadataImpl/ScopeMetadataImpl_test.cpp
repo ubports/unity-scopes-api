@@ -26,7 +26,6 @@
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity;
@@ -34,10 +33,13 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
+string const runtime_ini = TEST_DIR "/Runtime.ini";
+string const zmq_ini = TEST_DIR "/Zmq.ini";
+
 TEST(ScopeMetadataImpl, basic)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_id("scope_id");
@@ -113,8 +115,21 @@ TEST(ScopeMetadataImpl, basic)
         EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = scope_directory)", e.what());
     }
 
+    try
+    {
+        m.settings_definitions();
+        FAIL();
+    }
+    catch (NotFoundException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::NotFoundException: attribute not set (name = settings_definitions)", e.what());
+    }
+
     // when "invisible" is not set, false is returned
     EXPECT_FALSE(m.invisible());
+
+    // when "location_data_needed" is not set, false is returned
+    EXPECT_FALSE(m.location_data_needed());
 
     // Check that the copy has the same values as the original
     EXPECT_EQ("scope_id", mi2->scope_id());
@@ -138,6 +153,10 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_appearance_attributes(attrs);
     mi2->set_scope_directory("/foo");
     mi2->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
+    VariantArray va;
+    va.push_back(Variant("hello"));
+    mi2->set_settings_definitions(va);
+    mi2->set_location_data_needed(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -148,6 +167,8 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("hot_key", m.hot_key());
     EXPECT_TRUE(m.invisible());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
+    EXPECT_EQ(va, m.settings_definitions());
+    EXPECT_TRUE(m.location_data_needed());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -165,6 +186,10 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_scope_directory("/foo");
     ti->set_appearance_attributes(attrs);
     ti->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Small);
+    VariantArray tmp_va;
+    tmp_va.push_back(Variant("tmp hello"));
+    ti->set_settings_definitions(tmp_va);
+    ti->set_location_data_needed(true);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -183,6 +208,8 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", ci.appearance_attributes()["foo"].get_string());
     EXPECT_TRUE(ci.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, ci.results_ttl_type());
+    EXPECT_EQ(tmp_va, ci.settings_definitions());
+    EXPECT_TRUE(ci.location_data_needed());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -201,6 +228,8 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, m.results_ttl_type());
     EXPECT_TRUE(m.invisible());
+    EXPECT_EQ(tmp_va, m.settings_definitions());
+    EXPECT_TRUE(m.location_data_needed());
 
     // Self-assignment
     tmp = tmp;
@@ -218,6 +247,8 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", tmp.scope_directory());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp.results_ttl_type());
     EXPECT_TRUE(tmp.invisible());
+    EXPECT_EQ(tmp_va, tmp.settings_definitions());
+    EXPECT_TRUE(tmp.location_data_needed());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -235,12 +266,14 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp2.results_ttl_type());
     EXPECT_TRUE(tmp2.invisible());
+    EXPECT_EQ(tmp_va, tmp2.settings_definitions());
+    EXPECT_TRUE(tmp2.location_data_needed());
 }
 
 TEST(ScopeMetadataImpl, serialize)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_id("scope_id");
@@ -256,11 +289,16 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_scope_directory("/foo");
     mi->set_invisible(false);
     mi->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
+    VariantArray va;
+    va.push_back(Variant("hello"));
+    va.push_back(Variant("world"));
+    mi->set_settings_definitions(va);
+    mi->set_location_data_needed(false);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(12u, var.size());
+    EXPECT_EQ(14u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -273,6 +311,9 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
             (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
+    EXPECT_FALSE(var["invisible"].get_bool());
+    EXPECT_EQ(va, var["settings_definitions"].get_array());
+    EXPECT_FALSE(var["location_data_needed"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -289,12 +330,15 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("/foo", c.scope_directory());
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, c.results_ttl_type());
+    EXPECT_FALSE(c.invisible());
+    EXPECT_EQ(va, c.settings_definitions());
+    EXPECT_FALSE(c.location_data_needed());
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     ScopeMetadataImpl mi(&mw);
     try
@@ -360,8 +404,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
 
 TEST(ScopeMetadataImpl, deserialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     VariantMap m;
     try
@@ -488,6 +532,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     appearance["a1"] = "a1";
     m["appearance_attributes"] = appearance;
     m["results_ttl_type"] = 0;
+    m["location_data_needed"] = true;
 
     ScopeMetadataImpl mi(m, &mw);
     mi.deserialize(m);
@@ -505,4 +550,5 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_TRUE(mi.invisible());
     EXPECT_EQ(appearance, mi.appearance_attributes());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, mi.results_ttl_type());
+    EXPECT_TRUE(mi.location_data_needed());
 }

@@ -23,7 +23,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 #include <cassert>
 
@@ -32,6 +31,8 @@ using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
+
+string const zmq_ini = TEST_DIR "/Zmq.ini";
 
 // Test servant that throws the exception passed to the constructor from the op() method.
 
@@ -93,8 +94,7 @@ private:
 
 TEST(ServantBase, success)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";
@@ -110,8 +110,7 @@ TEST(ServantBase, success)
 
 TEST(ServantBase, ping)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "ping";
@@ -127,8 +126,7 @@ TEST(ServantBase, ping)
 
 TEST(ServantBase, exceptions)
 {
-    ZmqMiddleware mw("testscope", nullptr,
-                     TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini");
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";

@@ -46,14 +46,14 @@ public:
     /// @endcond
 
     /**
-    \brief Create SearchMetadata with given locale and form factor.
+    \brief Create SearchMetadata with the given locale and form factor.
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
     SearchMetadata(std::string const& locale, std::string const& form_factor);
 
     /**
-    \brief Create SearchMetadata with given cardinality, locale and form factor.
+    \brief Create SearchMetadata with the given cardinality, locale, and form factor.
     \param cardinality maximum number of search results
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
@@ -67,7 +67,7 @@ public:
     SearchMetadata(SearchMetadata const& other);
     SearchMetadata(SearchMetadata&&);
 
-    SearchMetadata& operator=(SearchMetadata const &other);
+    SearchMetadata& operator=(SearchMetadata const& other);
     SearchMetadata& operator=(SearchMetadata&&);
     //@}
 

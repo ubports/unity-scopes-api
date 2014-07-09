@@ -47,7 +47,7 @@ private:
     std::map<std::string, std::set<std::string>> idir_to_sdirs_map_;
     std::mutex mutex_;
 
-    std::string parent_dir(std::string const& child_dir);
+    static std::string parent_dir(std::string const& child_dir);
 
     void remove_install_dir(std::string const& dir);
 

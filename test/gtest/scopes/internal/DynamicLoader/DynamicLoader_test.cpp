@@ -21,15 +21,13 @@
 
 #include <gtest/gtest.h>
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
-#include <scope-api-testconfig.h>
-
 using namespace std;
 using namespace unity::scopes::internal;
 
 namespace
 {
-char const* goodlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libtestlib.so";
-char const* badlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libbadtestlib.so";
+char const* goodlib = TEST_DIR "/libtestlib.so";
+char const* badlib = TEST_DIR "/libbadtestlib.so";
 }
 
 // Basic test.

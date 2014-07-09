@@ -23,8 +23,6 @@
 
 #include <unistd.h>
 
-#include <unity/UnityExceptions.h> // TODO: remove this in config-fixes-stage2 merge proposal
-
 using namespace std;
 
 namespace unity
@@ -49,7 +47,7 @@ namespace
 }
 
 SSConfig::SSConfig(string const& configfile) :
-    ConfigBase(configfile, DFLT_SS_INI)
+    ConfigBase(configfile, DFLT_SS_REGISTRY_INI)
 {
     if (configfile.empty())
     {

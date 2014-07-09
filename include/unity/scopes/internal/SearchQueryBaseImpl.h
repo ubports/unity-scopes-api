@@ -20,9 +20,12 @@
 #ifndef UNITY_INTERNAL_SEARCHQUERYBASEIMPL_H
 #define UNITY_INTERNAL_SEARCHQUERYBASEIMPL_H
 
-#include <unity/scopes/internal/QueryBaseImpl.h>
-#include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/SearchListenerBase.h>
+#include <unity/scopes/SearchMetadata.h>
 
 namespace unity
 {

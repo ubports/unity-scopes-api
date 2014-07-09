@@ -61,7 +61,7 @@ public:
 
 protected:
     virtual std::string metadata_type() const override;
-    virtual void serialize(VariantMap &var) const override;
+    virtual void serialize(VariantMap& var) const override;
 
     void check_cardinality(std::string const& func_name, int cardinality);
 

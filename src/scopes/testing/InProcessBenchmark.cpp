@@ -169,7 +169,17 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
             std::string const& icon,
             unity::scopes::CategoryRenderer const& renderer) override
     {
-        return category_registry.register_category(id, title, icon, renderer);
+        return category_registry.register_category(id, title, icon, nullptr, renderer);
+    }
+
+    unity::scopes::Category::SCPtr register_category(
+            std::string const& id,
+            std::string const& title,
+            std::string const& icon,
+            unity::scopes::CannedQuery const& query,
+            unity::scopes::CategoryRenderer const& renderer) override
+    {
+        return category_registry.register_category(id, title, icon, std::make_shared<unity::scopes::CannedQuery>(query), renderer);
     }
 
     void register_category(unity::scopes::Category::SCPtr category) override

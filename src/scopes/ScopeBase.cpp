@@ -76,6 +76,11 @@ std::string ScopeBase::scope_directory() const
     return p->scope_directory();
 }
 
+unity::scopes::VariantMap ScopeBase::settings() const
+{
+    return p->settings();
+}
+
 } // namespace scopes
 
 } // namespace unity

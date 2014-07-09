@@ -49,7 +49,7 @@ public:
      \param renderer_template The renderer template
      */
     inline Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template) :
-        unity::scopes::Category(id, title, icon, renderer_template)
+        unity::scopes::Category(id, title, icon, nullptr, renderer_template)
     {
     }
 
