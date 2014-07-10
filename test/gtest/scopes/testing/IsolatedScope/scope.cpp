@@ -217,7 +217,22 @@ unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
     return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview(result, metadata));
 }
 
+std::string testing::Scope::scope_directory() const
+{
+    return "";
+}
+
+std::string testing::Scope::cache_directory() const
+{
+    return "";
+}
+
 unity::scopes::RegistryProxy testing::Scope::registry() const
 {
     return registry_;
+}
+
+unity::scopes::VariantMap testing::Scope::settings() const
+{
+    return unity::scopes::VariantMap();
 }
