@@ -54,7 +54,7 @@ public:
     /**
     \brief Called once by the scopes run time after receiving an activation response.
 
-    Default implementation does nothing.
+    The default implementation does nothing.
 
     Calls to finished() are made by an arbitrary thread.
 
