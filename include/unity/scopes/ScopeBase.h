@@ -94,6 +94,7 @@ public:
     virtual void start(std::string const& scope_id);   // Optional
     virtual void stop();                               // Optional
     virtual void run();                                // Optional
+    // ...
 };
 ~~~
 

@@ -104,6 +104,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
+        cerr << "constructor: set data dir: " << data_dir_ << endl;
         cache_dir_ = find_cache_directory(scope_type_);
     }
     catch (unity::Exception const& e)
@@ -421,14 +422,17 @@ string RuntimeImpl::find_cache_directory(string& type)
     for (auto const& scope_type : scope_types)
     {
         boost::filesystem::path path = data_dir_ + "/" + scope_type + "/" + scope_id_;
+        cerr << "checking " << path.native() << endl;
         if (boost::filesystem::exists(path))
         {
+            cerr << "exists " << path.native() << endl;
             if (!boost::filesystem::is_directory(path))
             {
                 cerr << "Warning: ignoring non-directory cache path: " << path.native() << endl;
             }
             else
             {
+                cerr << "is dir " << path.native() << endl;
                 found_dirs.push_back(path.native());
             }
         }
@@ -460,6 +464,7 @@ string RuntimeImpl::find_cache_directory(string& type)
     }
 
     type = found_type;
+    cerr << "found: " << found_dirs[0] << endl;
     return found_dirs[0];
 }
 
@@ -490,6 +495,7 @@ void RuntimeImpl::set_env_vars(ScopeBase const* scope_base)
         setenv("TMPDIR", path.c_str(), 1);
     }
 
+    cerr << "setting XDG_DATA: " << cache_dir_ << endl;
     setenv("XDG_DATA_HOME", cache_dir_.c_str(), 1);
     setenv("XDG_CONFIG_HOME", scope_base->scope_directory().c_str(), 1);
     setenv("UBUNTU_APPLICATION_ISOLATION", "1", 1);

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
+#include <iostream>  // TODO: remove this
 
 using namespace std;
 
@@ -168,6 +169,7 @@ int RuntimeConfig::reap_interval() const
 
 string RuntimeConfig::data_directory() const
 {
+    cerr << "config: returning " << data_directory_ << endl;
     return data_directory_;
 }
 
