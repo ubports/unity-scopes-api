@@ -395,13 +395,13 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 
 string RuntimeImpl::find_cache_directory() const
 {
-    vector<boost::filesystem::path> const candidates = { data_dir_ + "/aggregator/" + scope_id_,
+    vector<boost::filesystem::path> const candidates = { data_dir_ + "/unconfined/" + scope_id_,
                                                          data_dir_ + "/leaf-net/" + scope_id_,
                                                          data_dir_ + "/leaf-fs/" + scope_id_
                                       };
     vector<string> found_dirs;
 
-    // Try and find one of the three possible directories for the scope to store its
+    // Try and find one of the possible directories for the scope to store its
     // data files. If we find more than one, we throw.
     for (auto const& path : candidates)
     {
