@@ -35,12 +35,24 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
+    if environ['PATH_INFO'] == '/demo3/search' and ('settings=%7B%22age%22%3A23%2C%22enabled%22%3Atrue%2C%22location%22%3A%22London%22%2C%22unitTemp%22%3A1%7D' in environ['QUERY_STRING']):
+        return [search_response]
+
+    if environ['PATH_INFO'] == '/demo4/search' and ('settings=%7B%22is_running%22%3Afalse%7D' in environ['QUERY_STRING']):
+        return [search_response]
+
     if environ['PATH_INFO'] == '/demo/preview' and environ['QUERY_STRING'] != '':
         if preview1_complete == False:
             preview1_complete = True
             return [preview_response]
         if preview1_complete == True:
             return [preview_response2]
+
+    if environ['PATH_INFO'] == '/demo3/preview' and ('settings=%7B%22age%22%3A23%2C%22enabled%22%3Atrue%2C%22location%22%3A%22London%22%2C%22unitTemp%22%3A1%7D' in environ['QUERY_STRING']):
+        return [preview_response]
+
+    if environ['PATH_INFO'] == '/demo4/preview' and ('settings=%7B%22is_running%22%3Afalse%7D' in environ['QUERY_STRING']):
+        return [preview_response]
 
     return ''
 
@@ -56,12 +68,81 @@ while serving == False:
 print(str(port))
 sys.stdout.flush()
 
-remote_scopes_response = '\
-[{"base_url": "http://127.0.0.1:' + str(port) + '/fail", "id" : "fail.scope", "name": "Fail Scope", "description": "Fails due to no author.", "icon": "icon" },\
+remote_scopes_response = '[\
+{"base_url": "http://127.0.0.1:' + str(port) + '/fail", "id" : "fail.scope", "name": "Fail Scope", "description": "Fails due to no author.", "icon": "icon" },\
+\
 {"base_url": "http://127.0.0.1:' + str(port) + '/demo", "id" : "dummy.scope", "name": "Dummy Demo Scope", "description": "Dummy demo scope.", "author": "Mr.Fake", "icon": "icon" },\
+\
 {"base_url": "http://127.0.0.1:' + str(port) + '/fail2", "name": "Fail Scope 2", "description": "Fails due to no id.", "author": "Mr.Fake", "icon": "icon" },\
-{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true, "appearance": {"background": "#00BEEF", "PageHeader":{"logo":"logo.png"}} },\
-{"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" }]'
+\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true,\
+"appearance":\
+    {\
+        "background": "#00BEEF",\
+        "PageHeader": {"logo":"logo.png"}\
+    }\
+},\
+\
+{"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" },\
+\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo3", "id" : "dummy.scope.3", "name": "Dummy Demo Scope 3", "description": "Dummy demo scope 3.", "author": "Mr.Fake",\
+"settings":\
+    [\
+        {\
+            "id": "location",\
+            "displayName": "Location",\
+            "type": "string",\
+            "parameters": {\
+                "defaultValue": "London"\
+            }\
+        },\
+        {\
+            "id": "unitTemp",\
+            "displayName": "Temperature Units",\
+            "type": "list",\
+            "parameters": {\
+                "defaultValue": 1,\
+                "values": ["Celsius", "Fahrenheit"]\
+            }\
+        },\
+        {\
+            "id": "age",\
+            "displayName": "Age",\
+            "type": "number",\
+            "parameters": {\
+                "defaultValue": 23\
+            }\
+        },\
+        {\
+            "id": "enabled",\
+            "displayName": "Enabled",\
+            "type": "boolean",\
+            "parameters": {\
+                "defaultValue": true\
+            }\
+        }\
+    ]},\
+\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo4", "id" : "dummy.scope.4", "name": "Dummy Demo Scope 4", "description": "Dummy demo scope 4.", "author": "Mr.Fake",\
+"settings":\
+    [\
+        {\
+            "id": "string_no_default",\
+            "displayName": "string_no_default",\
+            "type": "string",\
+            "parameters": {\
+            }\
+        },\
+        {\
+            "id": "is_running",\
+            "displayName": "Is Running",\
+            "type": "boolean",\
+            "parameters": {\
+                "defaultValue": false\
+            }\
+        }\
+    ]}\
+]'
 
 search_response = '\
 {"departments": {"label": "All", "canned_query": "scope://foo?q=&dep=", "alternate_label": "Foo", "subdepartments": [{"label":"A", "canned_query":"scope://foo?q=&dep=a", "subdepartments":[{"label":"Broken department"},{"label":"C", "canned_query":"scope://foo?q=&dep=c", "has_subdepartments":false}]},{"label":"B", "canned_query":"scope://foo?q=&dep=b", "has_subdepartments":false}]}}\r\n\

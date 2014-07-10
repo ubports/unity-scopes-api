@@ -19,7 +19,9 @@
 #include <unity/scopes/internal/smartscopes/SSRegistryObject.h>
 
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/JsonSettingsSchema.h>
 #include <unity/scopes/internal/RegistryException.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
@@ -164,6 +166,18 @@ SmartScopesClient::SPtr SSRegistryObject::get_ssclient() const
     return ssclient_;
 }
 
+SettingsDB::SPtr SSRegistryObject::get_settings_db(std::string const& scope_id) const
+{
+    std::lock_guard<std::mutex> lock(scopes_mutex_);
+
+    auto settings_db = settings_defs_.find(scope_id);
+    if (settings_db != settings_defs_.end())
+    {
+        return settings_db->second.db;
+    }
+    return nullptr;
+}
+
 void SSRegistryObject::refresh_thread()
 {
     std::lock_guard<std::mutex> lock(refresh_mutex_);
@@ -203,14 +217,14 @@ void SSRegistryObject::get_remote_scopes()
             next_refresh_timeout_ = failed_refresh_timeout_;
         }
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
-        std::cerr << e.what() << std::endl;
         // refresh again soon as get_remote_scopes failed
         next_refresh_timeout_ = failed_refresh_timeout_;
-        return;
+        throw;
     }
 
+    bool changed = false;
     MetadataMap new_scopes_;
     std::map<std::string, std::string> new_base_urls_;
 
@@ -242,6 +256,44 @@ void SSRegistryObject::get_remote_scopes()
                 metadata->set_appearance_attributes(*scope.appearance);
             }
 
+            if (scope.settings)
+            {
+                try
+                {
+                    auto schema = JsonSettingsSchema::create(*scope.settings);
+                    metadata->set_settings_definitions(schema->definitions());
+
+                    // Get the previous JSON definition for this scope (if any)
+                    std::lock_guard<std::mutex> lock(scopes_mutex_);
+                    std::string prev_json = "";
+                    auto it = settings_defs_.find(scope.id);
+                    if (it != settings_defs_.end())
+                    {
+                        prev_json = it->second.json;
+                    }
+
+                    // Check if the settings definitions have changed
+                    if (*scope.settings != prev_json)
+                    {
+                        // Store both JSON (for internal comparison) and DB (for external use)
+                        changed = true;
+                        std::string settings_db = RuntimeConfig::default_data_directory() + "/" + scope.id + "/settings.db";
+                        SettingsDB::SPtr db(SettingsDB::create_from_json_string(settings_db, *scope.settings));
+                        settings_defs_[scope.id] = SSSettingsDef{*scope.settings, db};
+                    }
+                }
+                catch (ResourceException const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                    std::cerr << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\"" << std::endl;
+                }
+            }
+
+            if (scope.needs_location_data)
+            {
+                metadata->set_location_data_needed(*scope.needs_location_data);
+            }
+
             metadata->set_invisible(scope.invisible);
 
             ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
@@ -262,7 +314,6 @@ void SSRegistryObject::get_remote_scopes()
         }
     }
 
-    bool changed = false;
     // replace previous scopes with new ones
     {
         std::lock_guard<std::mutex> lock(scopes_mutex_);

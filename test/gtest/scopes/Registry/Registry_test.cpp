@@ -454,6 +454,7 @@ int main(int argc, char **argv)
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
+        waitpid(rpid, nullptr, 0);
         return rc;
     }
     else

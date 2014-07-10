@@ -1,3 +1,4 @@
+add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(DynamicLoader_test DynamicLoader_test.cpp)
 target_link_libraries(DynamicLoader_test ${TESTLIBS})
 

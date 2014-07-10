@@ -26,7 +26,6 @@
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity;
@@ -34,10 +33,13 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
+string const runtime_ini = TEST_DIR "/Runtime.ini";
+string const zmq_ini = TEST_DIR "/Zmq.ini";
+
 TEST(ScopeMetadataImpl, basic)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_id("scope_id");
@@ -270,8 +272,8 @@ TEST(ScopeMetadataImpl, basic)
 
 TEST(ScopeMetadataImpl, serialize)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(&mw));
     mi->set_scope_id("scope_id");
@@ -335,8 +337,8 @@ TEST(ScopeMetadataImpl, serialize)
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     ScopeMetadataImpl mi(&mw);
     try
@@ -402,8 +404,8 @@ TEST(ScopeMetadataImpl, serialize_exceptions)
 
 TEST(ScopeMetadataImpl, deserialize_exceptions)
 {
-    auto rt = RuntimeImpl::create("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
-    ZmqMiddleware mw("testscope", rt.get(), TEST_BUILD_ROOT "/gtest/scopes/internal/ScopeMetadataImpl/Zmq.ini");
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
     VariantMap m;
     try
