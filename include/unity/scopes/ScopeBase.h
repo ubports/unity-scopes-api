@@ -150,9 +150,6 @@ public:
     */
     virtual void start(std::string const& scope_id);
 
-    __attribute__((deprecated("use void start(std::string const& scope_id) instead")))
-    virtual void start(std::string const& scope_id, RegistryProxy const& registry);
-
     /**
     \brief Called by the scopes run time when the scope should shut down.
 
