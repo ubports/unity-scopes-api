@@ -412,12 +412,12 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 
 string RuntimeImpl::find_cache_directory(string& type)
 {
-    static vector<string> const scope_types = { "aggregator", "leaf-net", "leaf-fs" };
+    static vector<string> const scope_types = { "unconfined", "leaf-net", "leaf-fs" };
 
-    vector<string> found_dirs;
+    vector<boost::filesystem::path> found_dirs;
     string found_type;
 
-    // Try and find one of the three possible directories for the scope to store its
+    // Try and find one of the possible directories for the scope to store its
     // data files. If we find more than one, we throw.
     for (auto const& scope_type : scope_types)
     {
@@ -433,7 +433,8 @@ string RuntimeImpl::find_cache_directory(string& type)
             else
             {
                 cerr << "is dir " << path.native() << endl;
-                found_dirs.push_back(path.native());
+                found_type = scope_type;
+                found_dirs.push_back(path);
             }
         }
     }
@@ -456,16 +457,19 @@ string RuntimeImpl::find_cache_directory(string& type)
         throw ConfigException(err.str());
     }
 
+    auto dir = found_dirs[0].native();
     auto perms = boost::filesystem::status(found_dirs[0]).permissions();
     if (perms & boost::filesystem::group_all || perms & boost::filesystem::others_all)
     {
         cerr << "Warning: ignoring cache directory accessible by group or others for " << scope_id_
-             << ": " << found_dirs[0] << endl;
+             << ": " << dir << endl;
+        type = "";
+        return "";
     }
 
     type = found_type;
-    cerr << "found: " << found_dirs[0] << endl;
-    return found_dirs[0];
+    cerr << "found: " << dir << endl;
+    return dir;
 }
 
 void RuntimeImpl::set_env_vars(ScopeBase const* scope_base)

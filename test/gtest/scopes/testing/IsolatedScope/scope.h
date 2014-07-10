@@ -17,13 +17,13 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/testing/MockRegistry.h>
 
 namespace testing
 {
 
-class Scope : public unity::scopes::ScopeBase
+class Scope : public unity::scopes::AbstractScopeBase
 {
 public:
     Scope(unity::scopes::RegistryProxy const&);
@@ -53,7 +53,13 @@ public:
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
 
+    std::string scope_directory() const override;
+
+    std::string cache_directory() const override;
+
     unity::scopes::RegistryProxy registry() const override;
+
+    unity::scopes::VariantMap settings() const override;
 
     unity::scopes::RegistryProxy registry_;
 };

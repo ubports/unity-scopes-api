@@ -19,13 +19,9 @@
 #ifndef UNITY_SCOPES_SCOPEBASE_H
 #define UNITY_SCOPES_SCOPEBASE_H
 
+#include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
-#include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/PreviewQueryBase.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/Result.h>
 #include <unity/scopes/SearchMetadata.h>
-#include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/Version.h>
 
 /**
@@ -136,7 +132,7 @@ The scope implementation, if it does not return from run(), is expected to retur
 call to stop() in a timely manner.
 */
 
-class ScopeBase
+class ScopeBase : public AbstractScopeBase
 {
 public:
     /// @cond
@@ -186,7 +182,7 @@ public:
     /**
     \brief Called by the scopes run time when a scope needs to instantiate a query.
 
-    This method must return an instance that is derived from QueryBase. The implementation
+    This method must return an instance that is derived from `QueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to search() is made
     by an arbitrary thread.
@@ -199,7 +195,7 @@ public:
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
 
-    This method must return an instance that is derived from ActivationQueryBase. The implementation
+    This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -214,7 +210,7 @@ public:
     /**
     \brief Invoked when a scope is requested to handle a preview action.
 
-    This method must return an instance that is derived from ActivationQueryBase. The implementation
+    This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -234,7 +230,7 @@ public:
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
 
-    This method must return an instance that is derived from PreviewQueryBase. The implementation
+    This method must return an instance that is derived from `PreviewQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -258,7 +254,7 @@ public:
     \return The scope's configuration directory.
     \throws LogicException if called from the constructor of this instance.
     */
-    virtual std::string scope_directory() const;
+    virtual std::string scope_directory() const final;
 
     /**
     \brief Returns a directory that is (exclusively) writable for the scope.
@@ -272,7 +268,7 @@ public:
     \return The root directory of the filesystem sub-tree that is writable for the scope.
     \throws LogicException if called from the constructor of this instance.
     */
-    virtual std::string cache_directory() const;
+    virtual std::string cache_directory() const final;
 
     /**
     \brief Returns the proxy to the registry.
@@ -283,7 +279,7 @@ public:
     \return The proxy to the registry.
     \throws LogicException if called from the constructor of this instance.
     */
-    virtual unity::scopes::RegistryProxy registry() const;
+    virtual unity::scopes::RegistryProxy registry() const final;
 
     /**
     \brief Returns a dictionary with the scope's current settings.
@@ -299,7 +295,7 @@ public:
     \return The scope's current settings.
     \throws LogicException if called from the constructor of this instance.
     */
-    virtual VariantMap settings() const;
+    virtual VariantMap settings() const final;
 
 protected:
     /// @cond
@@ -318,12 +314,16 @@ private:
 
 /**
 \brief The function called by the scopes run time to initialize the scope.
-It must return a pointer to an instance derived from ScopeBase. The returned
+It must return a pointer to an instance derived from `ScopeBase`. The returned
 instance need not be heap-allocated, but must remain in scope until the
 destroy function is called by the scopes run time.
 
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
+
+\note The only purpose of the create function is to return the an instance.
+Do not do anything in the implementation that might block, and do
+not attempt to call any methods on `ScopeBase` from the constructor.
 
 \return The pointer to the ScopeBase instance.
 */
