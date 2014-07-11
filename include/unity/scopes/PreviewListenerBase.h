@@ -38,6 +38,8 @@ namespace scopes
 \brief Abstract base class for a scope to respond to preview requests.
 
 An instance of this class must be returned from Scope::preview().
+
+\see ListenerBase
 */
 
 class PreviewListenerBase : public ListenerBase
