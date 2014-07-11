@@ -26,6 +26,8 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 
+#include <fcntl.h>
+
 using namespace std;
 using namespace unity;
 using namespace unity::scopes;
@@ -33,6 +35,9 @@ using namespace unity::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
+    // Make sure we start out with a clean slate.
+    boost::filesystem::remove_all(TEST_DIR "/cache_dir");
+
     RuntimeImpl::UPtr rt = RuntimeImpl::create("TestScope", TEST_DIR "/Runtime.ini");
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
@@ -81,27 +86,15 @@ TEST(RuntimeImpl, error)
     }
 }
 
-TEST(RuntimeImpl, defaults)
-{
-}
-
 void testscope_thread(Runtime::SPtr const& rt, TestScope* testscope, string const& runtime_ini_file)
 {
-    cerr << "thread: calling run_scope" << endl;
     rt->run_scope(testscope, runtime_ini_file, TEST_DIR "/TestScope.ini");
-    cerr << "thread: done calling run_scope" << endl;
 }
 
-TEST(RuntimeImpl, env_vars)
+TEST(RuntimeImpl, directories)
 {
-    // Make sure we start out with a clean slate.
-    boost::filesystem::remove_all(TEST_DIR "/cache_dir");
 
     {
-        // Try with PATH and LD_LIBRARY_PATH not set.
-        setenv("LD_LIBRARY_PATH", "", 1);
-        setenv("PATH", "", 1);
-
         Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
         TestScope testscope;
         std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
@@ -109,30 +102,29 @@ TEST(RuntimeImpl, env_vars)
         // Give thread some time to start up.
         this_thread::sleep_for(chrono::milliseconds(200));
 
-        auto env_vars = testscope.env_vars();
-        EXPECT_EQ(string("/run/user/") + to_string(geteuid()), env_vars["XDG_RUNTIME_DIR"]);
-        EXPECT_EQ("/tmp", env_vars["TMPDIR"]);
-        cerr << "data: " << env_vars["XDG_DATA_HOME"] << endl;
-        EXPECT_EQ(TEST_DIR, env_vars["XDG_CONFIG_HOME"]);
-        EXPECT_EQ("1", env_vars["UBUNTU_APPLICATION_ISOLATION"]);
-        auto var = env_vars["LD_LIBRARY_PATH"];
-        EXPECT_TRUE(boost::starts_with(var, string(TEST_DIR) + ":" + TEST_DIR + "/lib"));
-        var = env_vars["PATH"];
-        EXPECT_TRUE(boost::starts_with(var, string(TEST_DIR) + ":" + TEST_DIR + "/bin"));
+        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
+        EXPECT_EQ("/tmp", testscope.tmp_directory());
+
+        try
+        {
+            testscope.cache_directory();
+            FAIL();
+        }
+        catch (ConfigException const& e)
+        {
+            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
+                         e.what());
+        }
 
         rt->destroy();
         testscope_t.join();
     }
 
-    {
-        // Again with PATH and LD_LIBRARY_PATH set to something, so we get coverage,
-        // and with the cache directory created, also for coverage.
-        setenv("LD_LIBRARY_PATH", "/lib", 1);
-        setenv("PATH", "/bin", 1);
-        ::mkdir(TEST_DIR "/cache_dir", 0700);
-        ::mkdir(TEST_DIR "/cache_dir/leaf-net", 0700);
-        ::mkdir(TEST_DIR "/cache_dir/leaf-net/TestScope", 0700);
+    ::mkdir(TEST_DIR "/cache_dir", 0700);
+    ::mkdir(TEST_DIR "/cache_dir/leaf-net", 0700);
+    ::mkdir(TEST_DIR "/cache_dir/leaf-net/TestScope", 0700);
 
+    {
         Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
         TestScope testscope;
         std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
@@ -140,15 +132,100 @@ TEST(RuntimeImpl, env_vars)
         // Give thread some time to start up.
         this_thread::sleep_for(chrono::milliseconds(200));
 
-        auto env_vars = testscope.env_vars();
-        EXPECT_EQ("1", env_vars["UBUNTU_APPLICATION_ISOLATION"]);
-        auto var = env_vars["LD_LIBRARY_PATH"];
-        EXPECT_TRUE(boost::starts_with(var, string(TEST_DIR) + ":" + TEST_DIR + "/lib"));
-        var = env_vars["PATH"];
-        EXPECT_TRUE(boost::starts_with(var, string(TEST_DIR) + ":" + TEST_DIR + "/bin"));
-        EXPECT_EQ(string(TEST_DIR) + "/cache_dir/leaf-net/TestScope", env_vars["TMPDIR"]);
+        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
+
+        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/leaf-net/TestScope";
+        EXPECT_EQ(tmpdir, testscope.tmp_directory());
+
+        EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
 
         rt->destroy();
         testscope_t.join();
+    }
+
+    // Again, but with wrong permission on directory.
+    ::chmod(TEST_DIR "/cache_dir/leaf-net/TestScope", 0750);
+
+    {
+        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
+        TestScope testscope;
+        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
+
+        // Give thread some time to start up.
+        this_thread::sleep_for(chrono::milliseconds(200));
+
+        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
+
+        EXPECT_EQ("/tmp", testscope.tmp_directory());
+
+        try
+        {
+            testscope.cache_directory();
+            FAIL();
+        }
+        catch (ConfigException const& e)
+        {
+            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
+                         e.what());
+        }
+
+        rt->destroy();
+        testscope_t.join();
+    }
+
+    // Again, but with a file where we expect a directory.
+    ::rmdir(TEST_DIR "/cache_dir/leaf-net/TestScope");
+    int fd = ::open(TEST_DIR "/cache_dir/leaf-net/TestScope", O_CREAT, 0700);
+    ::close(fd);
+
+    {
+        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
+        TestScope testscope;
+        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
+
+        // Give thread some time to start up.
+        this_thread::sleep_for(chrono::milliseconds(200));
+
+        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
+
+        EXPECT_EQ("/tmp", testscope.tmp_directory());
+
+        try
+        {
+            testscope.cache_directory();
+            FAIL();
+        }
+        catch (ConfigException const& e)
+        {
+            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
+                         e.what());
+        }
+
+        rt->destroy();
+        testscope_t.join();
+    }
+
+    // Again, but with two candidates for the directory.
+    ::unlink(TEST_DIR "/cache_dir/leaf-net/TestScope");
+    ::mkdir(TEST_DIR "/cache_dir/leaf-net/TestScope", 0700);
+    ::mkdir(TEST_DIR "/cache_dir/leaf-fs", 0700);
+    ::mkdir(TEST_DIR "/cache_dir/leaf-fs/TestScope", 0700);
+
+    {
+        try
+        {
+            Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
+            FAIL();
+        }
+        catch (ConfigException const& e)
+        {
+            EXPECT_STREQ("unity::scopes::ConfigException: Cannot instantiate run time for TestScope, "
+                             "config file: " TEST_DIR "/Runtime.ini:\n"
+                         "    unity::scopes::ConfigException: Runtime(): bad configuration: found more "
+                             "than one cache directory for scope TestScope:\n"
+                         "  \"" TEST_DIR "/cache_dir/leaf-net/TestScope\"\n"
+                         "  \"" TEST_DIR "/cache_dir/leaf-fs/TestScope\"",
+                         e.what());
+        }
     }
 }

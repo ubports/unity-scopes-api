@@ -23,23 +23,6 @@ using namespace unity::scopes;
 
 void TestScope::start(string const&)
 {
-    lock_guard<mutex> lock(mutex_);
-
-    // Retrieve all the environment variables that are supposed to be set
-    // and make them available via the env_vars() method.
-    env_vars_["XDG_RUNTIME_DIR"] = getenv("XDG_RUNTIME_DIR");
-    env_vars_["TMPDIR"] = getenv("TMPDIR");
-    env_vars_["XDG_DATA_HOME"] = getenv("XDG_DATA_HOME");
-    env_vars_["XDG_CONFIG_HOME"] = getenv("XDG_CONFIG_HOME");
-    env_vars_["UBUNTU_APPLICATION_ISOLATION"] = getenv("UBUNTU_APPLICATION_ISOLATION");
-    env_vars_["LD_LIBRARY_PATH"] = getenv("LD_LIBRARY_PATH");
-    env_vars_["PATH"] = getenv("PATH");
-}
-
-map<string, string> TestScope::env_vars() const
-{
-    lock_guard<mutex> lock(mutex_);
-    return env_vars_;
 }
 
 SearchQueryBase::UPtr TestScope::search(CannedQuery const&, SearchMetadata const&)

@@ -227,6 +227,11 @@ std::string testing::Scope::cache_directory() const
     return "";
 }
 
+std::string testing::Scope::tmp_directory() const
+{
+    return "";
+}
+
 unity::scopes::RegistryProxy testing::Scope::registry() const
 {
     return registry_;

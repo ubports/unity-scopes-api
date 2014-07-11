@@ -22,6 +22,8 @@
 #include <unity/scopes/PreviewWidget.h>
 #include <unity/scopes/SearchReply.h>
 
+#include <boost/algorithm/string.hpp>
+
 #define EXPORT __attribute__ ((visibility ("default")))
 
 using namespace std;
@@ -64,7 +66,14 @@ public:
 class MyScope : public ScopeBase
 {
 public:
-    virtual void start(string const&) override {}
+    virtual void start(string const&) override
+    {
+        string ld_lib_path = getenv("LD_LIBRARY_PATH");
+        string expected_path_prefix = string(TEST_RUNTIME_PATH) + ":" + TEST_RUNTIME_PATH + "/lib";
+        // We don't use gtest here because then the scope would have to link against it,
+        // but libgtest.a isn't compiled with -fPIC.
+        assert(boost::algorithm::starts_with(ld_lib_path, expected_path_prefix));
+    }
 
     virtual void stop() override {}
 

@@ -104,8 +104,29 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
-        cerr << "constructor: set data dir: " << data_dir_ << endl;
-        cache_dir_ = find_cache_directory(scope_type_);
+
+        string scope_type;
+        cache_dir_ = find_cache_directory(scope_type);
+
+        // Set tmp dir.
+        if (scope_type.empty())
+        {
+            tmp_dir_ = "/tmp";
+        }
+        else
+        {
+            // We need to create any directories under /run/user/<uid> because they might not
+            // exist. (/run/user/<uid> gets cleaned out periodically.)
+            string path = string("/run/user/") + std::to_string(geteuid());
+            path += "/scopes";
+            ::mkdir(path.c_str(), 0700);
+            path += "/" + scope_type;
+            ::mkdir(path.c_str(), 0700);
+            path += "/" + scope_id_;
+            ::mkdir(path.c_str(), 0700);
+
+            tmp_dir_ = path;
+        }
     }
     catch (unity::Exception const& e)
     {
@@ -302,7 +323,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
-        boost::filesystem::path dir = boost::filesystem::path(scope_ini_file).parent_path();
+        boost::filesystem::path dir = boost::filesystem::canonical(scope_ini_file).parent_path();
         scope_base->p->set_scope_directory(dir.native());
     }
 
@@ -311,6 +332,8 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     // unless the scope actually tries to write something there, in which
     // case it will get an error if it does.
     scope_base->p->set_cache_directory(cache_dir_);
+
+    scope_base->p->set_tmp_directory(tmp_dir_);
 
     {
         // Try to open the scope settings database, if any.
@@ -334,8 +357,6 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     }
 
     scope_base->p->set_registry(registry_);
-
-    set_env_vars(scope_base);
 
     // We are finally set up, initialize the scope.
     scope_base->start(scope_id_);
@@ -422,17 +443,14 @@ string RuntimeImpl::find_cache_directory(string& type)
     for (auto const& scope_type : scope_types)
     {
         boost::filesystem::path path = data_dir_ + "/" + scope_type + "/" + scope_id_;
-        cerr << "checking " << path.native() << endl;
         if (boost::filesystem::exists(path))
         {
-            cerr << "exists " << path.native() << endl;
             if (!boost::filesystem::is_directory(path))
             {
                 cerr << "Warning: ignoring non-directory cache path: " << path.native() << endl;
             }
             else
             {
-                cerr << "is dir " << path.native() << endl;
                 found_type = scope_type;
                 found_dirs.push_back(path);
             }
@@ -468,63 +486,7 @@ string RuntimeImpl::find_cache_directory(string& type)
     }
 
     type = found_type;
-    cerr << "found: " << dir << endl;
     return dir;
-}
-
-void RuntimeImpl::set_env_vars(ScopeBase const* scope_base)
-{
-    // Set environment variables before initializing the scope.
-    string path = string("/run/user/") + std::to_string(geteuid());
-    // TODO: Is this the right setting for XDG_RUNTIME_DIR?
-    //       The scope can probably not write to that, so
-    //       it might be better to set this to
-    //       /run/user/<uid>/<scope_type>/<scope_id>?
-    setenv("XDG_RUNTIME_DIR", path.c_str(), 1);
-    if (scope_type_.empty())
-    {
-        setenv("TMPDIR", "/tmp", 1);
-    }
-    else
-    {
-        // We need to create any directories under /run/user/<uid> because they might not
-        // exist. (/run/user/<uid> gets cleaned out periodically.)
-        path += "/scopes";
-        ::mkdir(path.c_str(), 0700);
-        path += "/" + scope_type_;
-        ::mkdir(path.c_str(), 0700);
-        path += "/" + scope_id_;
-        ::mkdir(path.c_str(), 0700);
-
-        setenv("TMPDIR", path.c_str(), 1);
-    }
-
-    cerr << "setting XDG_DATA: " << cache_dir_ << endl;
-    setenv("XDG_DATA_HOME", cache_dir_.c_str(), 1);
-    setenv("XDG_CONFIG_HOME", scope_base->scope_directory().c_str(), 1);
-    setenv("UBUNTU_APPLICATION_ISOLATION", "1", 1);
-
-    path = scope_base->scope_directory() + ":" + scope_base->scope_directory() + "/lib";
-    auto env = getenv("LD_LIBRARY_PATH");
-    if (!env || *env == '\0')
-    {
-        setenv("LD_LIBRARY_PATH", path.c_str(), 1);
-    }
-    else
-    {
-        setenv("LD_LIBRARY_PATH", (path + ":" + env).c_str(), 1);
-    }
-
-    path = scope_base->scope_directory() + ":" + scope_base->scope_directory() + "/bin";
-    env = getenv("PATH");
-    if (!env || *env == '\0')
-    {
-        setenv("PATH", path.c_str(), 1);
-    }
-    else
-    {
-        setenv("PATH", (path + ":" + env).c_str(), 1);
-    }
 }
 
 } // namespace internal
