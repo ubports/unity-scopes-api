@@ -433,7 +433,7 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 
 string RuntimeImpl::find_cache_directory(string& type)
 {
-    static vector<string> const scope_types = { "unconfined", "leaf-net", "leaf-fs" };
+    static vector<string> const scope_types = { "unconfined", "aggregator", "leaf-net", "leaf-fs" };
 
     vector<boost::filesystem::path> found_dirs;
     string found_type;

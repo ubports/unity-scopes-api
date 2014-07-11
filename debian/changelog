@@ -5,7 +5,7 @@ unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Michi Henning <michi.henning@canonical.com>  Mon, 07 Jul 2014 14:34:04 +1000
 
-unity-scopes-api (0.5.2-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.5.2+14.10.20140709.2-0ubuntu1) utopic; urgency=medium
 
   [ Michal Hruby ]
   * Added CannedQuery parameter to Category
@@ -13,7 +13,11 @@ unity-scopes-api (0.5.2-0ubuntu1) UNRELEASED; urgency=medium
   [ Michi Henning ]
   * Added support for scope settings.
 
- -- Michal Hruby <michal.hruby@canonical.com>  Wed, 02 Jul 2014 10:39:53 +0100
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 09 Jul 2014 14:26:31 +0000
 
 unity-scopes-api (0.5.1+14.10.20140626-0ubuntu1) utopic; urgency=medium
 

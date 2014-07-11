@@ -69,7 +69,7 @@ public:
     virtual void start(string const&) override
     {
         string ld_lib_path = getenv("LD_LIBRARY_PATH");
-        string expected_path_prefix = string(TEST_RUNTIME_PATH) + ":" + TEST_RUNTIME_PATH + "/lib";
+        string expected_path_prefix = string(SCOPE_CONFIG_PATH) + ":" + SCOPE_CONFIG_PATH + "/lib";
         // We don't use gtest here because then the scope would have to link against it,
         // but libgtest.a isn't compiled with -fPIC.
         assert(boost::algorithm::starts_with(ld_lib_path, expected_path_prefix));
