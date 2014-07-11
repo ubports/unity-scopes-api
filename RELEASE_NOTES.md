@@ -3,7 +3,9 @@ Release notes
 
 Changes in version 0.6.0
 ========================
-  - Added cache_directory() method to ScopeBase, so a scope can find out where it can write its files.
+  - Added cache_directory() method to ScopeBase, so a scope can find out where it can write its data files.
+
+  - Added tmp_directory() method to ScopeBase, so a scope can find out where it can write temporary files.
 
   - Refactored scoperunner and ScopeLoader. ScopeLoader no longer knows about the registry and
     scoperunner now calls RuntimeImpl::run_scope() to set the scope running, instead of duplicating
