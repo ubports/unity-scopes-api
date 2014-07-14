@@ -139,8 +139,8 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
     EXPECT_TRUE(duration > chrono::seconds(4));
     if (duration > chrono::seconds(6))
     {
-        cerr << "finished() message not received after server timeout." << endl;
-        cerr << "Test finished due to client-side timeout." << endl;
+        cout << "finished() message not received after server timeout." << endl;
+        cout << "Test finished due to client-side timeout." << endl;
     }
 }
 
