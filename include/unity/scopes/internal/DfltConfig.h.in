@@ -47,11 +47,12 @@ static constexpr int DFLT_SCOPE_IDLE_TIMEOUT = 40;           // seconds
 
 static constexpr char const* DFLT_SS_SCOPE_IDENTITY = "SmartScope";
 
-static const int DFLT_REAP_EXPIRY = 45;           // seconds
-static const int DFLT_REAP_INTERVAL = 10;         // seconds
-static const int DFLT_PROCESS_TIMEOUT = 2500;     // milliseconds
-static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 300;   // milliseconds
-static const int DFLT_ZMQ_LOCATE_TIMEOUT = 3000;  // milliseconds
+static const int DFLT_REAP_EXPIRY = 45;              // seconds
+static const int DFLT_REAP_INTERVAL = 10;            // seconds
+static const int DFLT_PROCESS_TIMEOUT = 2500;        // milliseconds
+static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 300;      // milliseconds
+static const int DFLT_ZMQ_LOCATE_TIMEOUT = 3000;     // milliseconds
+static const int DFLT_ZMQ_REGISTRY_TIMEOUT = 5000;   // milliseconds
 
 } // namespace internal
 
