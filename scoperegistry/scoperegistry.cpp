@@ -27,24 +27,27 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeConfig.h>
-#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+
 #include <algorithm>
 #include <cassert>
-#include <iostream>
-#include <sstream>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <set>
+#include <sstream>
+
 #include <libgen.h>
 #include <unistd.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 
 using namespace scoperegistry;
 using namespace std;
@@ -142,23 +145,28 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
     map<string, string> overrideable_scopes;    // Scopes that the OEM can override
 
     auto config_files = find_install_dir_configs(scope_installdir, ".ini", error);
-    for (auto&& path : config_files)
+    for (auto&& pair : config_files)
     {
+        if (boost::ends_with(pair.second, "-settings.ini"))
+        {
+            // Don't try to parse settings metadata file as scope config file.
+            continue;
+        }
         try
         {
-            ScopeConfig config(path.second);
+            ScopeConfig config(pair.second);
             if (config.overrideable())
             {
-                overrideable_scopes[path.first] = path.second;
+                overrideable_scopes[pair.first] = pair.second;
             }
             else
             {
-                fixed_scopes[path.first] = path.second;
+                fixed_scopes[pair.first] = pair.second;
             }
         }
         catch (unity::Exception const& e)
         {
-            error("ignoring scope \"" + path.first + "\": configuration error:\n" + e.what());
+            error("ignoring scope \"" + pair.first + "\": configuration error:\n" + e.what());
         }
     }
 
@@ -200,15 +208,20 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
         try
         {
             auto click_paths = find_install_dir_configs(click_installdir, ".ini", error);
-            for (auto&& path : click_paths)
+            for (auto&& pair : click_paths)
             {
-                if (local_scopes.find(path.first) == local_scopes.end())
+                if (boost::ends_with(pair.second, "-settings.ini"))
                 {
-                    click_scopes[path.first] = path.second;
+                    // Don't try to parse settings metadata file as scope config file.
+                    continue;
+                }
+                if (local_scopes.find(pair.first) == local_scopes.end())
+                {
+                    click_scopes[pair.first] = pair.second;
                 }
                 else
                 {
-                    error("ignoring non-overrideable scope config \"" + path.second + "\" in click directory " + click_installdir);
+                    error("ignoring non-overrideable scope config \"" + pair.second + "\" in click directory " + click_installdir);
                 }
             }
         }
@@ -245,8 +258,12 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_settings_definitions(VariantArray());
     try
     {
-        auto schema = IniSettingsSchema::create(settings_schema_path.native());
-        mi->set_settings_definitions(schema->definitions());
+        // File is optional, so don't generate noise if it isn't there.
+        if (filesystem::exists(settings_schema_path))
+        {
+            auto schema = IniSettingsSchema::create(settings_schema_path.native());
+            mi->set_settings_definitions(schema->definitions());
+        }
     }
     catch (std::exception const& e)
     {
