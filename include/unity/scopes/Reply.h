@@ -68,7 +68,7 @@ public:
     For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
     in order to properly evaluate its results, but currently does not have internet connectivity.
     */
-    enum Warning { NoInternet, NoLocation, NoAccountData };
+    enum Warning { NoInternet, NoLocation, NoAccount, InvalidAccount };
 
     /**
     \brief Informs the source of a query that the query has encountered a warning condition.
@@ -77,8 +77,9 @@ public:
     went wrong during execution of the query, possibly causing a partial result set to be returned.
     Multiple calls to warning() for each warning condition encountered are legal.
     \param w Indicates the cause for the call to warning().
+    \param warning_message Contains further details about the warning (optional).
     */
-    virtual void warning(Warning w) = 0;
+    virtual void warning(Warning w, std::string const& warning_message = "") = 0;
 
     /**
     \brief Destroys a Reply.

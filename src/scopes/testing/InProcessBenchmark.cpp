@@ -136,7 +136,7 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
         wait_condition.notify_all();
     }
 
-    void warning(Warning) override
+    void warning(Warning, std::string const&) override
     {
         ///!TODO
     }

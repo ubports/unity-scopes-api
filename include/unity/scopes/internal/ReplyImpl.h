@@ -48,7 +48,7 @@ public:
     virtual void finished() override;
     void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
-    virtual void warning(Warning w) override;
+    virtual void warning(Warning w, std::string const& warning_message) override;
 
     typedef std::function<void()> CleanupFunc;
 
@@ -60,6 +60,7 @@ protected:
 private:
     std::shared_ptr<QueryObjectBase> qo_;
     std::atomic_bool finished_;
+    std::atomic_bool warning_occurred_;
 };
 
 } // namespace internal

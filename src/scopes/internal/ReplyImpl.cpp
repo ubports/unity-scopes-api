@@ -42,7 +42,8 @@ namespace internal
 ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
     ObjectImpl(mw_proxy),
     qo_(qo),
-    finished_(false)
+    finished_(false),
+    warning_occurred_(false)
 {
     assert(mw_proxy);
 }
@@ -88,7 +89,14 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
-    finished(ListenerBase::Finished);
+    if (warning_occurred_)
+    {
+        finished(ListenerBase::FinishedWithWarnings);
+    }
+    else
+    {
+        finished(ListenerBase::Finished);
+    }
 }
 
 void ReplyImpl::finished(ListenerBase::Reason reason)
@@ -143,8 +151,9 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-void ReplyImpl::warning(Warning /*w*/)
+void ReplyImpl::warning(Warning /*w*/, std::string const& /*warning_message*/)
 {
+    warning_occurred_.exchange(true);
     ///!TODO
 }
 

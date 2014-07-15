@@ -44,7 +44,7 @@ public:
     // From Reply
     MOCK_METHOD0(finished, void());
     MOCK_METHOD1(error, void(std::exception_ptr));
-    MOCK_METHOD1(warning, void(Warning));
+    MOCK_METHOD2(warning, void(Warning, std::string const&));
 
     // From SearchReply
     MOCK_METHOD1(register_layout, bool(ColumnLayoutList const&));
