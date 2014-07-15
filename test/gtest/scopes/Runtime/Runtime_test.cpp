@@ -56,7 +56,8 @@ public:
         query_complete_(false),
         count_(0),
         dep_count_(0),
-        annotation_count_(0)
+        annotation_count_(0),
+        warning_count_(0)
     {
     }
 
@@ -101,15 +102,23 @@ public:
 
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
-        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(FinishedWithWarnings, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
+        EXPECT_EQ(1, warning_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
+    }
+
+    virtual void warning(Reply::Warning w, string const& warning_message) override
+    {
+        EXPECT_EQ(Reply::NoInternet, w);
+        EXPECT_EQ("Partial results returned due to no internet connection.", warning_message);
+        warning_count_++;
     }
 
     void wait_until_finished()
@@ -130,6 +139,7 @@ private:
     int count_;
     int dep_count_;
     int annotation_count_;
+    int warning_count_;
     std::shared_ptr<Result> last_result_;
 };
 
@@ -139,44 +149,68 @@ public:
     PreviewReceiver() :
         query_complete_(false),
         widgets_pushes_(0),
-        data_pushes_(0)
+        data_pushes_(0),
+        warning_count_(0)
     {
     }
+
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
         widgets_pushes_++;
     }
+
     virtual void push(std::string const& key, Variant const&) override
     {
         EXPECT_TRUE(key == "author" || key == "rating");
         data_pushes_++;
     }
+
     virtual void push(ColumnLayoutList const&) override
     {
     }
+
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
-        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(FinishedWithWarnings, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, widgets_pushes_);
         EXPECT_EQ(2, data_pushes_);
+        EXPECT_EQ(2, warning_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
     }
+
+    virtual void warning(Reply::Warning w, string const& warning_message) override
+    {
+        if (warning_count_ == 0)
+        {
+            EXPECT_EQ(Reply::NoLocation, w);
+            EXPECT_EQ("", warning_message);
+        }
+        else if (warning_count_ == 1)
+        {
+            EXPECT_EQ(Reply::NoAccount, w);
+            EXPECT_EQ("Partial results returned due to missing online account data.", warning_message);
+        }
+        warning_count_++;
+    }
+
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+
 private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
     int widgets_pushes_;
     int data_pushes_;
+    int warning_count_;
 };
 
 class PushReceiver : public SearchListenerBase

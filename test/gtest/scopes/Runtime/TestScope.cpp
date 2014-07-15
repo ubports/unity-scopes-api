@@ -65,6 +65,9 @@ public:
             EXPECT_THROW(reply->register_departments(parent), unity::LogicException);
         }
 
+        // send test warning for no internet connection (mid run)
+        reply->warning(Reply::NoInternet, "Partial results returned due to no internet connection.");
+
         Department::SPtr parent = Department::create("", query_, "All departments");
         Department::SPtr news_dep = Department::create("news", query_, "News");
         news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
@@ -104,12 +107,18 @@ public:
     }
     virtual void run(PreviewReplyProxy const& reply) override
     {
+        // send test warning for no location data (run start)
+        reply->warning(Reply::NoLocation);
+
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
         widgets.emplace_back(PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
         reply->push(widgets);
         reply->push("author", Variant("Foo"));
         reply->push("rating", Variant("Bar"));
+
+        // send test warning for no account data (run end)
+        reply->warning(Reply::NoAccount, "Partial results returned due to missing online account data.");
     }
 };
 
