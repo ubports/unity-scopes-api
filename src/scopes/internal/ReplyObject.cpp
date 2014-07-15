@@ -45,7 +45,8 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
-    num_push_(0)
+    num_push_(0),
+    warning_occurred_(false)
 {
     assert(receiver_base);
     assert(runtime);
@@ -157,7 +158,14 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        listener_base_->finished(r, error_message);
+        if (r == ListenerBase::Finished && warning_occurred_.load())
+        {
+            listener_base_->finished(ListenerBase::FinishedWithWarnings, error_message);
+        }
+        else
+        {
+            listener_base_->finished(r, error_message);
+        }
     }
     catch (std::exception const& e)
     {
@@ -179,6 +187,7 @@ void ReplyObject::warning(Reply::Warning w, std::string const& warning_message) 
     }
 
     reap_item_->refresh();
+    warning_occurred_.exchange(true);
 
     try
     {
