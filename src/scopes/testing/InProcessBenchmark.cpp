@@ -135,6 +135,11 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
         state.store(State::finished_with_error);
         wait_condition.notify_all();
     }
+
+    void warning(Warning) override
+    {
+        ///!TODO
+    }
 };
 
 struct DevNullPreviewReply : public unity::scopes::PreviewReply, public WaitableReply

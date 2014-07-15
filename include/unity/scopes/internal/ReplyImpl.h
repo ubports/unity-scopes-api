@@ -48,6 +48,7 @@ public:
     virtual void finished() override;
     void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
+    virtual void warning(Warning w) override;
 
     typedef std::function<void()> CleanupFunc;
 

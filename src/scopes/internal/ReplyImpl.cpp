@@ -143,6 +143,11 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
+void ReplyImpl::warning(Warning /*w*/)
+{
+    ///!TODO
+}
+
 MWReplyProxy ReplyImpl::fwd()
 {
     return dynamic_pointer_cast<MWReply>(proxy());
