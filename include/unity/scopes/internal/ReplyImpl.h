@@ -60,7 +60,6 @@ protected:
 private:
     std::shared_ptr<QueryObjectBase> qo_;
     std::atomic_bool finished_;
-    std::atomic_bool warning_occurred_;
 };
 
 } // namespace internal
