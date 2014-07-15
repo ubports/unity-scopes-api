@@ -709,9 +709,16 @@ following keys:
     ResultsTtlType = None, Small, Medium, or Large
 
     [Appearance]
-    PageHeader.Logo = image containing scope's logo
     ForegroundColor = default text color (defaults to theme-provided foreground color)
     BackgroundColor = color of scope background (default is transparent)
+    ShapeImages = whether to use Ubuntu-shape for all cards and artwork (defaults to true)
+    CategoryHeaderBackground = background scheme of the results categories
+    PreviewButtonColor = color of preview buttons (defaults to theme-provided color)
+    PageHeader.Logo = image containing scope's logo
+    PageHeader.ForegroundColor = default header text color (defaults to the overall foreground color)
+    PageHeader.Background = background scheme of the header
+    PageHeader.DividerColor = color of the header divider
+    PageHeader.NavigationBackground = background scheme of the navigation bar
 
 The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
 `DisplayName` and `Description` can (and should) be localized. For example:
@@ -722,6 +729,15 @@ In addition to allowing the registry to make the scope available, this informati
 in the "Scopes" scope.
 
 The group `Appearance` and all keys within are optional and can be used to customize the look of the scope.
+Some of the `Appearance` keys (like `PageHeader.Background`) require background scheme uris, valid uris for these keys include:
+
+<ul>
+<li>color:///\#aarrggbb</li>
+<li>color:///black</li>
+<li>gradient:///\#aarrggbb/\#aarrggbb</li>
+<li>/absolute/path/to/image</li>
+<li>http://remote-server.com/path/to/image</li>
+</ul>
 
 \subsection scopetool Previewing scope
 
