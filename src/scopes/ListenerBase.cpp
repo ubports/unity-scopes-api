@@ -39,6 +39,11 @@ ListenerBase::~ListenerBase()
 {
 }
 
+void ListenerBase::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/)
+{
+    ///!TODO
+}
+
 // Possibly overkill, but safer than using the enum as the index into an array,
 // in case the enumeration is ever added to or the enumerators get re-ordered.
 

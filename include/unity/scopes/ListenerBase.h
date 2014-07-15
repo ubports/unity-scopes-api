@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_LISTENERBASE_H
 #define UNITY_SCOPES_LISTENERBASE_H
 
+#include <unity/scopes/Reply.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -68,6 +69,17 @@ public:
            Otherwise, `error_message` is the empty string.
     */
     virtual void finished(Reason r, std::string const& error_message) = 0;
+
+    /**
+    \brief Called by the scopes run time on encountering a warning condition.
+
+    Calls to warning() are made by an arbitrary thread.
+
+    Exceptions thrown from warning() are ignored.
+    \param w Indicates the cause for the call to warning().
+    \param warning_message Contains further details about the warning (optional).
+    */
+    virtual void warning(Reply::Warning w, std::string const& warning_message);
 
 protected:
     /// @cond
