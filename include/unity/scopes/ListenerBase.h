@@ -30,13 +30,13 @@ namespace unity
 namespace scopes
 {
 
-//TODO: fix doc
 /**
-\brief Abstract base class to be notified of query completion.
+\brief Abstract base class to be notified of request completion
+(such as a query or activation request).
 
-Once a query is complete, the run time calls the finished() method once,
-to inform the caller that the query is complete.
-
+\see ActivationListenerBase
+\see PreviewQueryBase
+\see SearchListenerBase
 */
 
 class ListenerBase
@@ -58,7 +58,7 @@ public:
     enum Reason { Finished, Cancelled, Error };
 
     /**
-    \brief Called once by the scopes run time after the final result for a query() was sent.
+    \brief Called once by the scopes run time after the final result for a request was sent.
 
     Calls to finished() are made by an arbitrary thread.
 
