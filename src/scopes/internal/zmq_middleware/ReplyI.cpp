@@ -51,7 +51,8 @@ using namespace std::placeholders;
 
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
-                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
+                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) },
+                      { "warning", bind(&ReplyI::warning_, this, _1, _2, _3) } })
 {
 }
 
@@ -103,6 +104,13 @@ void ReplyI::finished_(Current const&,
         }
     }
     delegate->finished(reason, err);
+}
+
+void ReplyI::warning_(Current const&,
+                      capnp::AnyPointer::Reader& /*in_params*/,
+                      capnproto::Response::Builder&)
+{
+    ///!TODO
 }
 
 } // namespace zmq_middleware

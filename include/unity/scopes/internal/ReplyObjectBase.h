@@ -39,6 +39,7 @@ public:
 
     virtual void push(VariantMap const& result) noexcept = 0;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
+    virtual void warning(Reply::Warning w, std::string const& warning_message) noexcept = 0;
 };
 
 } // namespace internal

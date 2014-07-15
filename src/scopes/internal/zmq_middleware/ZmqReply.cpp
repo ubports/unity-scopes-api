@@ -103,6 +103,11 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
+void ZmqReply::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/)
+{
+    ///!TODO
+}
+
 } // namespace zmq_middleware
 
 } // namespace internal

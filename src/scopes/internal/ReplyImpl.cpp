@@ -151,10 +151,23 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-void ReplyImpl::warning(Warning /*w*/, std::string const& /*warning_message*/)
+void ReplyImpl::warning(Warning w, std::string const& warning_message)
 {
-    warning_occurred_.exchange(true);
-    ///!TODO
+    if (finished_)
+    {
+        return;
+    }
+
+    try
+    {
+        fwd()->warning(w, warning_message);
+        warning_occurred_.exchange(true);
+    }
+    catch (std::exception const& e)
+    {
+        // TODO: log error
+        cerr << e.what() << endl;
+    }
 }
 
 MWReplyProxy ReplyImpl::fwd()

@@ -171,6 +171,11 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
+void ReplyObject::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/) noexcept
+{
+    ///!TODO
+}
+
 std::string ReplyObject::origin_proxy() const
 {
     return origin_proxy_;

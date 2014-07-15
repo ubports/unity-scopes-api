@@ -46,6 +46,7 @@ public:
 
     virtual void push(VariantMap const& result) override;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+    virtual void warning(Reply::Warning w, std::string const& warning_message) override;
 };
 
 } // namespace zmq_middleware
