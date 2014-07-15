@@ -56,3 +56,17 @@ struct FinishedRequest
     reason @0 : FinishedReason;
     error @1  : Text;               # Present only if reason is error
 }
+
+enum Warning
+{
+    unused @0;
+    noInternet @1;
+    noLocation @2;
+    noAccount @3;
+}
+
+struct WarningRequest
+{
+    warning @0 : Warning;
+    message @1 : Text;
+}

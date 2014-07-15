@@ -107,10 +107,34 @@ void ReplyI::finished_(Current const&,
 }
 
 void ReplyI::warning_(Current const&,
-                      capnp::AnyPointer::Reader& /*in_params*/,
+                      capnp::AnyPointer::Reader& in_params,
                       capnproto::Response::Builder&)
 {
-    ///!TODO
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
+    auto req = in_params.getAs<capnproto::Reply::WarningRequest>();
+    auto w = req.getWarning();
+    switch (w)
+    {
+        case capnproto::Reply::Warning::NO_INTERNET:
+        {
+            delegate->warning(Reply::NoInternet, req.getMessage());
+            break;
+        }
+        case capnproto::Reply::Warning::NO_LOCATION:
+        {
+            delegate->warning(Reply::NoLocation, req.getMessage());
+            break;
+        }
+        case capnproto::Reply::Warning::NO_ACCOUNT:
+        {
+            delegate->warning(Reply::NoAccount, req.getMessage());
+            break;
+        }
+        default:
+        {
+            assert(false); // LCOV_EXCL_LINE
+        }
+    }
 }
 
 } // namespace zmq_middleware

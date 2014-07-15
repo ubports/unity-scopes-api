@@ -39,9 +39,8 @@ ListenerBase::~ListenerBase()
 {
 }
 
-void ListenerBase::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/)
+void ListenerBase::warning(Reply::Warning, std::string const&)
 {
-    ///!TODO
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,

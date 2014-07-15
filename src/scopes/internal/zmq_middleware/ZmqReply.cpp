@@ -103,9 +103,38 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
-void ZmqReply::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/)
+void ZmqReply::warning(Reply::Warning w, std::string const& warning_message)
 {
-    ///!TODO
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "warning");
+    auto in_params = request.initInParams().getAs<capnproto::Reply::WarningRequest>();
+    switch (w)
+    {
+        case Reply::NoInternet:
+        {
+            in_params.setWarning(capnproto::Reply::Warning::NO_INTERNET);
+            break;
+        }
+        case Reply::NoLocation:
+        {
+            in_params.setWarning(capnproto::Reply::Warning::NO_LOCATION);
+            break;
+        }
+        case Reply::NoAccount:
+        {
+            in_params.setWarning(capnproto::Reply::Warning::NO_ACCOUNT);
+            break;
+        }
+        default:
+        {
+            assert(false);
+            return;
+        }
+    }
+    in_params.setMessage(warning_message);
+
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.wait();
 }
 
 } // namespace zmq_middleware
