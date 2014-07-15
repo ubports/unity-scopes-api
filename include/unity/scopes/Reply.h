@@ -75,6 +75,7 @@ public:
 
     Calling warning() does not terminate the query, it simply informs the source that something
     went wrong during execution of the query, possibly causing a partial result set to be returned.
+
     Multiple calls to warning() for each warning condition encountered are legal.
     \param w Indicates the cause for the call to warning().
     \param warning_message Contains further details about the warning (optional).
