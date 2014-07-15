@@ -171,9 +171,29 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
-void ReplyObject::warning(Reply::Warning /*w*/, std::string const& /*warning_message*/) noexcept
+void ReplyObject::warning(Reply::Warning w, std::string const& warning_message) noexcept
 {
-    ///!TODO
+    if (finished_.load())
+    {
+        return; // Ignore warnings that arrive after finished().
+    }
+
+    reap_item_->refresh();
+
+    try
+    {
+        listener_base_->warning(w, warning_message);
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "ReplyObject::warning(): " << e.what() << endl;
+        // TODO: log error
+    }
+    catch (...)
+    {
+        cerr << "ReplyObject::warning(): unknown exception" << endl;
+        // TODO: log error
+    }
 }
 
 std::string ReplyObject::origin_proxy() const

@@ -145,9 +145,9 @@ void ReplyImpl::error(exception_ptr ex)
 
 void ReplyImpl::warning(Warning w, std::string const& warning_message)
 {
-    if (finished_)
+    if (finished_.load())
     {
-        return;
+        return; // Ignore warnings that arrive after finished().
     }
 
     try
