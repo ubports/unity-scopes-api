@@ -63,6 +63,24 @@ public:
     virtual void error(std::exception_ptr ex) = 0;
 
     /**
+    \brief Indicates the cause of a call to warning().
+
+    For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
+    in order to properly evaluate its results, but currently does not have internet connectivity.
+    */
+    enum Warning { NoInternet, NoLocation, NoAccountData };
+
+    /**
+    \brief Informs the source of a query that the query has encountered a warning condition.
+
+    Calling warning() does not terminate the query, it simply informs the source that something
+    went wrong during execution of the query, possibly causing a partial result set to be returned.
+    Multiple calls to warning() for each warning condition encountered are legal.
+    \param w Indicates the cause for the call to warning().
+    */
+    virtual void warning(Warning w) = 0;
+
+    /**
     \brief Destroys a Reply.
 
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished(),
