@@ -71,7 +71,9 @@ public:
     virtual void finished(Reason r, std::string const& error_message) = 0;
 
     /**
-    \brief Called by the scopes run time on encountering a warning condition.
+    \brief Called by the scopes run time each time a scope reports a warning condition.
+
+    More than one warning() call can arrive during processing of a single query.
 
     Calls to warning() are made by an arbitrary thread.
 

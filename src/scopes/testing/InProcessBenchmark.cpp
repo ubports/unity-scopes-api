@@ -138,7 +138,6 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
 
     void warning(Warning, std::string const&) override
     {
-        ///!TODO
     }
 };
 

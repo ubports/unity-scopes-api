@@ -127,8 +127,8 @@ void ZmqReply::warning(Reply::Warning w, std::string const& warning_message)
         }
         default:
         {
-            assert(false);
-            return;
+            assert(false); // LCOV_EXCL_LINE
+            return;        // LCOV_EXCL_LINE
         }
     }
     in_params.setMessage(warning_message);

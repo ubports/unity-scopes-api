@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.5.3
+========================
+  - Added support for scope warnings.
+
 Changes in version 0.5.2
 ========================
   - Added CannedQuery parameter to Category.
