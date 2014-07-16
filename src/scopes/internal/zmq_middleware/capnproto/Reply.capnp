@@ -60,9 +60,10 @@ struct FinishedRequest
 enum Warning
 {
     unused @0;
-    noInternet @1;
-    noLocation @2;
-    noAccount @3;
+    noInternetConnection @1;
+    poorInternetConnection @2;
+    noLocationData @3;
+    inaccurateLocationData @4;
 }
 
 struct WarningRequest

@@ -110,19 +110,24 @@ void ZmqReply::warning(Reply::Warning w, std::string const& warning_message)
     auto in_params = request.initInParams().getAs<capnproto::Reply::WarningRequest>();
     switch (w)
     {
-        case Reply::NoInternet:
+        case Reply::NoInternetConnection:
         {
-            in_params.setWarning(capnproto::Reply::Warning::NO_INTERNET);
+            in_params.setWarning(capnproto::Reply::Warning::NO_INTERNET_CONNECTION);
             break;
         }
-        case Reply::NoLocation:
+        case Reply::PoorInternetConnection:
         {
-            in_params.setWarning(capnproto::Reply::Warning::NO_LOCATION);
+            in_params.setWarning(capnproto::Reply::Warning::POOR_INTERNET_CONNECTION);
             break;
         }
-        case Reply::NoAccount:
+        case Reply::NoLocationData:
         {
-            in_params.setWarning(capnproto::Reply::Warning::NO_ACCOUNT);
+            in_params.setWarning(capnproto::Reply::Warning::NO_LOCATION_DATA);
+            break;
+        }
+        case Reply::InaccurateLocationData:
+        {
+            in_params.setWarning(capnproto::Reply::Warning::INACCURATE_LOCATION_DATA);
             break;
         }
         default:

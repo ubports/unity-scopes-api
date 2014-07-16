@@ -115,19 +115,24 @@ void ReplyI::warning_(Current const&,
     auto w = req.getWarning();
     switch (w)
     {
-        case capnproto::Reply::Warning::NO_INTERNET:
+        case capnproto::Reply::Warning::NO_INTERNET_CONNECTION:
         {
-            delegate->warning(Reply::NoInternet, req.getMessage());
+            delegate->warning(Reply::NoInternetConnection, req.getMessage());
             break;
         }
-        case capnproto::Reply::Warning::NO_LOCATION:
+        case capnproto::Reply::Warning::POOR_INTERNET_CONNECTION:
         {
-            delegate->warning(Reply::NoLocation, req.getMessage());
+            delegate->warning(Reply::PoorInternetConnection, req.getMessage());
             break;
         }
-        case capnproto::Reply::Warning::NO_ACCOUNT:
+        case capnproto::Reply::Warning::NO_LOCATION_DATA:
         {
-            delegate->warning(Reply::NoAccount, req.getMessage());
+            delegate->warning(Reply::NoLocationData, req.getMessage());
+            break;
+        }
+    case capnproto::Reply::Warning::INACCURATE_LOCATION_DATA:
+        {
+            delegate->warning(Reply::InaccurateLocationData, req.getMessage());
             break;
         }
         default:

@@ -107,7 +107,7 @@ public:
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
-        EXPECT_EQ(1, warning_count_);
+        EXPECT_EQ(2, warning_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
@@ -116,8 +116,16 @@ public:
 
     virtual void warning(Reply::Warning w, string const& warning_message) override
     {
-        EXPECT_EQ(Reply::NoInternet, w);
-        EXPECT_EQ("Partial results returned due to no internet connection.", warning_message);
+        if (warning_count_ == 0)
+        {
+            EXPECT_EQ(Reply::NoInternetConnection, w);
+            EXPECT_EQ("Partial results returned due to no internet connection.", warning_message);
+        }
+        else if (warning_count_ == 1)
+        {
+            EXPECT_EQ(Reply::PoorInternetConnection, w);
+            EXPECT_EQ("Partial results returned due to poor internet connection.", warning_message);
+        }
         warning_count_++;
     }
 
@@ -187,13 +195,13 @@ public:
     {
         if (warning_count_ == 0)
         {
-            EXPECT_EQ(Reply::NoLocation, w);
+            EXPECT_EQ(Reply::NoLocationData, w);
             EXPECT_EQ("", warning_message);
         }
         else if (warning_count_ == 1)
         {
-            EXPECT_EQ(Reply::NoAccount, w);
-            EXPECT_EQ("Partial results returned due to missing online account data.", warning_message);
+            EXPECT_EQ(Reply::InaccurateLocationData, w);
+            EXPECT_EQ("Partial results returned due to inaccurate location data.", warning_message);
         }
         warning_count_++;
     }

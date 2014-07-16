@@ -65,10 +65,17 @@ public:
     /**
     \brief Indicates the cause of a call to warning().
 
-    For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
-    in order to properly evaluate its results, but currently does not have internet connectivity.
+    For example, the `NoInternetConnection` enumerator indicates that a scope requires access to
+    the internet in order to properly evaluate its results, but currently does not have internet
+    connectivity.
     */
-    enum Warning { NoInternet, NoLocation, NoAccount };
+    enum Warning
+    {
+        NoInternetConnection,
+        PoorInternetConnection,
+        NoLocationData,
+        InaccurateLocationData
+    };
 
     /**
     \brief Informs the source of a query that the query has encountered a warning condition.
