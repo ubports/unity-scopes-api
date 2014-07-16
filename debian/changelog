@@ -6,6 +6,28 @@ unity-scopes-api (0.6.2+14.10.20140716-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Michi Henning <michi.henning@canonical.com>  Wed, 16 Jul 2014 16:09:14 +1000
 
+unity-scopes-api (0.5.2+14.10.20140715-0ubuntu1) utopic; urgency=low
+
+  [ Michal Hruby ]
+  * Sync with devel.
+
+  [ Pete Woods ]
+  * Sync with devel.
+
+  [ Marcus Tomlinson ]
+  * Sync with devel.
+
+  [ Tarmac ]
+  * Sync with devel.
+
+  [ CI bot ]
+  * Sync with devel.
+
+  [ Michi Henning ]
+  * Sync with devel.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 15 Jul 2014 18:47:01 +0000
+
 unity-scopes-api (0.5.2+14.10.20140709.2-0ubuntu1) utopic; urgency=medium
 
   [ Michal Hruby ]
