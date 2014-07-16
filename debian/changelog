@@ -2,7 +2,7 @@ unity-scopes-api (0.5.3-0ubuntu1) UNRELEASED; urgency=medium
 
   * Added support for scope warnings
 
- -- Marcus Tomlinson <marcustomlinson@ubuntu>  Wed, 16 Jul 2014 05:40:24 +0200
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 16 Jul 2014 05:40:24 +0200
 
 unity-scopes-api (0.5.2+14.10.20140709.2-0ubuntu1) utopic; urgency=medium
 

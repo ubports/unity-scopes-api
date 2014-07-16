@@ -41,6 +41,7 @@ ListenerBase::~ListenerBase()
 
 void ListenerBase::warning(Reply::Warning, std::string const&)
 {
+    // Intentionally stubbed to allow listeners to ignore warnings
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,
