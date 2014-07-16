@@ -62,6 +62,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ColumnLayout::operator=(unity::scopes::ColumnLayout const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::FilterOption(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::~FilterOption()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ListenerBase::warning(unity::scopes::Reply::Warning, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::ListenerBase::ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
