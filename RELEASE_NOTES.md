@@ -1,7 +1,7 @@
 Release notes
 =============
 
-Changes in version 0.5.3
+Changes in version 0.6.0
 ========================
   - Added support for scope warnings.
 

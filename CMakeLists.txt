@@ -187,8 +187,8 @@ set(UNITY_SCOPES_LIB unity-scopes)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 5)
-set(UNITY_SCOPES_MICRO 3)
+set(UNITY_SCOPES_MINOR 6)
+set(UNITY_SCOPES_MICRO 0)
 set(UNITY_SCOPES_SOVERSION 2)
 
 # Version for testing, with all symbols visible
