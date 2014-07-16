@@ -88,7 +88,7 @@ public:
         last_result_ = std::make_shared<Result>(result);
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());

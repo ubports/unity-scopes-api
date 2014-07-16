@@ -110,8 +110,8 @@ TEST(Invocation, timeout)
     EXPECT_EQ(ListenerBase::Error, receiver->reason());
     EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 3000 milliseconds", receiver->error_message());
 
-    // Wait another second, so TestScope is finally able to receive another request.
-    this_thread::sleep_for(chrono::seconds(1));
+    // Wait another two seconds, so TestScope is finally able to receive another request.
+    this_thread::sleep_for(chrono::seconds(2));
 
     // Second call must succeed
     scope->search("test", SearchMetadata("unused", "unused"), receiver);
