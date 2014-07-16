@@ -620,7 +620,7 @@ void ObjectAdapter::broker_thread()
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(make_exception_ptr(e));
         }
-        catch (future_error)  // LCOV_EXCL_LINE
+        catch (const future_error&)  // LCOV_EXCL_LINE
         {
         }
     }
@@ -791,7 +791,7 @@ void ObjectAdapter::worker_thread()
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(make_exception_ptr(e));
         }
-        catch (future_error)
+        catch (const future_error&)
         {
         }
     }
