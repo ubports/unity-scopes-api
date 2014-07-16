@@ -12,6 +12,8 @@ add_definitions(-DTEST_REGISTRY_PATH="${PROJECT_BINARY_DIR}/scoperegistry")
 add_executable(Registry_test Registry_test.cpp)
 target_link_libraries(Registry_test ${TESTLIBS})
 
+add_dependencies(Registry_test scoperegistry)
+
 add_test(Registry Registry_test)
 add_subdirectory(scopes)
 add_subdirectory(other_scopes)
