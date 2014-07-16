@@ -1,4 +1,4 @@
-libunity-scopes.so.2 libunity-scopes2 #MINVER#
+libunity-scopes.so.06 libunity-scopes06 #MINVER#
  (c++)"unity::scopes::Department::add_subdepartment(std::shared_ptr<unity::scopes::Department const> const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::Department::set_subdepartments(std::list<std::shared_ptr<unity::scopes::Department const>, std::allocator<std::shared_ptr<unity::scopes::Department const> > > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::Department::set_alternate_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619

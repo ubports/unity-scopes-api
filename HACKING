@@ -202,3 +202,50 @@ builds.  This will lead to autopkgtest failing later if scopes' API is
 changed in a backwards incompatible way. If this happens the test
 needs to be fixed either by updating the test or backing out the API
 breaking change.
+
+ABI compatibility
+-----------------
+
+By definition, if a change is ABI compatible, you must increment
+UNITY_SCOPES_MICRO in CMakeLists.txt.
+
+For ABI incompatible changes, either UNITY_SCOPES_MINOR or
+UNITY_SCOPES_MAJOR must be incremented, and the lower-order
+version numbers should be reset to zero.
+
+UNITY_SCOPES_MAJOR is meant to indicate major official releases.
+What is "major" or "official" is somewhat arbitrary; unless we
+are about to release a new Ubuntu version or there are major
+feature changes in the scopes run time or API, incrementing
+UNITY_SCOPES_MINOR is sufficient.
+
+The .so version for the library is <major><minor>. For example,
+version 0.6.3 has the name libunity-scopes.so.06.
+This is defined in CMakeLists.txt as UNITY_SCOPES_SOVERSION.
+
+When incrementing the minor or major version number, follow these steps:
+
+1) Set UNITY_SCOPES_MAJOR, UNITY_SCOPES_MINOR, and UNITY_SCOPES_MICRO
+   in CMakeLists.txt as appropriate. This automatically sets
+   UNITY_SCOPES_SOVERSION.
+
+2) Add an entry to debian/changelog with the new version number.
+
+3) Modify debian/control/unity-scopes-api and modify the
+   Package name for the new version. For example, when
+   changing from version 0.6.3 to 1.0.0, set the Package
+   to "libunity-scopes10".
+
+   Add the previous version (such as libunity-scopes06) to
+   the "Replaces" and "Conflicts" sections.
+
+   Update the "Depends" section with the new soversion.
+
+4) Rename the following files to reflect the new soversion.
+
+   libunity-scopes<soversion>.install
+   libunity-scopes<soversion>.scope.click-hook
+   libunity-scopes<soversion>.symbols
+
+5) Edit the first line of libunity-scopes<soversion>.symbols
+   to reflect the new soversion (two occurences on that line).
