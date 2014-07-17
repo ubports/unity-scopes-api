@@ -27,14 +27,8 @@ using namespace unity::scopes;
 class SlowCreateScope : public ScopeBase
 {
 public:
-    virtual void start(string const&, RegistryProxy const &) override;
-
-    virtual void stop() override;
-
-    virtual void run() override;
-
-    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
-    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const &) override;
+    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override;
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override;
 };
 
 #endif
