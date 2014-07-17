@@ -208,20 +208,11 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params)
 
 ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout)
 {
-    try
-    {
-        return invoke_twoway__(out_params, timeout);
-    }
-    catch (TimeoutException const&)
-    {
-        auto registry_proxy = mw_base()->registry_proxy();
+    auto registry_proxy = mw_base()->registry_proxy();
 
-        // If no registry is configured or if this object is the registry itself, rethrow the exception
-        if (!registry_proxy || identity() == registry_proxy->identity())
-        {
-            throw;
-        }
-
+    // If no registry is configured or if this object is the registry itself, rethrow the exception
+    if (registry_proxy && identity() != registry_proxy->identity())
+    {
         // rebind
         ObjectProxy new_proxy = registry_proxy->locate(identity());
 
@@ -239,10 +230,10 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
             category_ = category;
             timeout_ = timeout;
         }
-
-        // retry the invocation
-        return invoke_twoway__(out_params, timeout);
     }
+
+    // try the invocation
+    return invoke_twoway__(out_params, timeout);
 }
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
