@@ -54,7 +54,8 @@ namespace
     const string location_data_needed_key = "LocationDataNeeded";
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
-    const string results_ttl_str = "ResultsTtlType";
+    const string results_ttl_key = "ResultsTtlType";
+    const string confinement_type_key = "ConfinementType";
 
     const string scope_appearance_group = "Appearance";
 }
@@ -130,8 +131,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     // custom scope runner executable is optional
     try
     {
-        string key = parser()->get_string(scope_config_group, scoperunner_key);
-        scope_runner_.reset(new string(key));
+        string scope_runner = parser()->get_string(scope_config_group, scoperunner_key);
+        scope_runner_.reset(new string(scope_runner));
     }
     catch (LogicException const&)
     {
@@ -151,7 +152,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
     try
     {
-        string orig = parser()->get_string(scope_config_group, results_ttl_str);
+        string orig = parser()->get_string(scope_config_group, results_ttl_key);
         string ttl = orig;
         to_lower(ttl);
         if (ttl.empty() || ttl == "none")
@@ -171,11 +172,22 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         }
         else
         {
-            throw_ex("Illegal value (" + orig + ") for " + results_ttl_str);
+            throw_ex("Illegal value (\"" + orig + "\") for " + results_ttl_key);
         }
     }
     catch (LogicException const&)
     {
+    }
+
+    {
+        static set<string> const valid_types = { "leaf-net", "unconfined" };
+
+        string type = get_optional_string(scope_config_group, confinement_type_key, DFLT_CONFINEMENT_TYPE);
+        if (valid_types.find(type) == valid_types.end())
+        {
+            throw_ex("Illegal value (\"" + type + "\") for " + confinement_type_key);
+        }
+        confinement_type_ = type;
     }
 
     // read all display attributes from scope_appearance_group
@@ -190,7 +202,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  scope_config_group,
                                              {
                                                 overrideable_key,
@@ -205,7 +217,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 location_data_needed_key,
                                                 scoperunner_key,
                                                 idle_timeout_key,
-                                                results_ttl_str
+                                                results_ttl_key,
+                                                confinement_type_key
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -336,6 +349,11 @@ int ScopeConfig::idle_timeout() const
 ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
 {
     return results_ttl_type_;
+}
+
+string ScopeConfig::confinement_type() const
+{
+    return confinement_type_;
 }
 
 VariantMap ScopeConfig::appearance_attributes() const

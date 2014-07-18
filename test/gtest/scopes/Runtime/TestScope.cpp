@@ -114,18 +114,6 @@ public:
     }
 };
 
-void TestScope::start(string const&)
-{
-}
-
-void TestScope::stop()
-{
-}
-
-void TestScope::run()
-{
-}
-
 SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     return SearchQueryBase::UPtr(new TestQuery(query, metadata));

@@ -48,6 +48,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(300, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, cfg.results_ttl_type());
         EXPECT_TRUE(cfg.location_data_needed());
+        EXPECT_EQ("unconfined", cfg.confinement_type());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
@@ -77,6 +78,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(DFLT_SCOPE_IDLE_TIMEOUT, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
         EXPECT_FALSE(cfg.location_data_needed());
+        EXPECT_EQ(DFLT_CONFINEMENT_TYPE, cfg.confinement_type());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
@@ -125,7 +127,21 @@ TEST(ScopeConfig, bad_ttl)
     }
     catch(ConfigException const& e)
     {
-        boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(blah\\) for ResultsTtlType");
+        boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(\"blah\"\\) for ResultsTtlType");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, bad_confinement)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_CONFINEMENT);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(\"invalid\"\\) for ConfinementType");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
 }

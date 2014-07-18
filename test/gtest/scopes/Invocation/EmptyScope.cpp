@@ -50,18 +50,6 @@ public:
 
 }  // namespace
 
-void EmptyScope::start(string const&)
-{
-}
-
-void EmptyScope::stop()
-{
-}
-
-void EmptyScope::run()
-{
-}
-
 SearchQueryBase::UPtr EmptyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     return SearchQueryBase::UPtr(new TestQuery(query, metadata));

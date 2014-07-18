@@ -34,7 +34,10 @@ void add_doc(const string& doc_id, const string& json)
 {
     ostringstream s;
     s << add_cmd << " " << db_name << " " << doc_id << " '" << json << "'";
-    system(s.str().c_str());
+    if (system(s.str().c_str()) < 0)
+    {
+        FAIL();
+    }
 }
 
 TEST(SettingsDB, basic)
@@ -271,7 +274,10 @@ TEST(SettingsDB, exceptions)
         add_doc("default-locationSetting", R"( { "value": "New York" } )");
 
         // Remove read permission.
-        system(string("chmod -r " + db_name).c_str());
+        if (system(string("chmod -r " + db_name).c_str()) < 0)
+        {
+            FAIL();
+        }
 
         // Call settings(), which will try to open the DB and fail.
         db->settings();
@@ -297,7 +303,10 @@ TEST(SettingsDB, exceptions)
         EXPECT_EQ("Munich", s["locationSetting"].get_string());
 
         // Clobber the DB.
-        system((string("cat >") + db_name + " <<EOF\nx\nEOF" + db_name).c_str());
+        if (system((string("cat >") + db_name + " <<EOF\nx\nEOF" + db_name).c_str()) < 0)
+        {
+            FAIL();
+        }
 
         // Call settings(), which will fail.
         db->settings();

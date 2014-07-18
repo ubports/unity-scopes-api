@@ -15,6 +15,7 @@ ScopeRunner = custom runner
 IdleTimeout = 300
 ResultsTtlType = large
 LocationDataNeeded = true
+ConfinementType = unconfined
 
 [Appearance]
 arbitrary_key = true

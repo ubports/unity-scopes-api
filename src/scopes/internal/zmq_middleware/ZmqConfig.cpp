@@ -40,6 +40,7 @@ namespace
     const string endpoint_dir_key = "EndpointDir";
     const string twoway_timeout_key = "Default.Twoway.Timeout";
     const string locate_timeout_key = "Locate.Timeout";
+    const string registry_timeout_key = "Registry.Timeout";
     const string registry_endpoint_dir_key = "Registry.EndpointDir";
     const string ss_registry_endpoint_dir_key = "Smartscopes.Registry.EndpointDir";
 }
@@ -76,6 +77,12 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         throw_ex("Illegal value (" + to_string(twoway_timeout_) + ") for " + twoway_timeout_key + ": value must be >= -1");
     }
 
+    registry_timeout_ = get_optional_int(zmq_config_group, registry_timeout_key, DFLT_ZMQ_REGISTRY_TIMEOUT);
+    if (registry_timeout_ < 10 || registry_timeout_ > 15000)
+    {
+        throw_ex("Illegal value (" + to_string(registry_timeout_) + ") for " + registry_timeout_key + ": value must be 10-15000");
+    }
+
     locate_timeout_ = get_optional_int(zmq_config_group, locate_timeout_key, DFLT_ZMQ_LOCATE_TIMEOUT);
     if (locate_timeout_ < 10 || locate_timeout_ > 5000)
     {
@@ -85,12 +92,13 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
     ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  zmq_config_group,
                                              {
                                                 endpoint_dir_key,
                                                 twoway_timeout_key,
                                                 locate_timeout_key,
+                                                registry_timeout_key,
                                                 registry_endpoint_dir_key,
                                                 ss_registry_endpoint_dir_key
                                              }
@@ -116,6 +124,11 @@ int ZmqConfig::twoway_timeout() const
 int ZmqConfig::locate_timeout() const
 {
     return locate_timeout_;
+}
+
+int ZmqConfig::registry_timeout() const
+{
+    return registry_timeout_;
 }
 
 string ZmqConfig::registry_endpoint_dir() const

@@ -71,18 +71,6 @@ private:
 
 }  // namespace
 
-void SlowCreateScope::start(string const&)
-{
-}
-
-void SlowCreateScope::stop()
-{
-}
-
-void SlowCreateScope::run()
-{
-}
-
 SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     // Sleep for a while. This allows the client to call cancel() before this function

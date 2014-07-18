@@ -102,18 +102,20 @@ The following keys are recognized:
 
   $HOME/.local/share/unity-scopes/<scope_id>/settings.db
 
-- CacheDir
+- ConfinementType
 
-  The parent directory for a scope to write its own files, such
-  as cache files.
+  The confinement policy for the scope. The value must be set
+  to either "leaf-net" or "unconfined".
 
-  The default value depends on whether the scope is an aggregating scope,
-  leaf scope with network permission, or leaf scope with local content permission.
-  The respective default locations are:
+  The default value is "leaf-net".
 
-  $HOME/.local/share/unity-scopes/aggregator/<scope_id>
+  The confinement type is used to determine the location of the
+  scope's writable cache directory (returned by ScopeBase::cache_directory()).
+
+  The cache directory is <DataDir>/<ConfinementType>/<scope_id>. With default
+  settings, this is
+
   $HOME/.local/share/unity-scopes/leaf-net/<scope_id>
-  $HOME/.local/share/unity-scopes/leaf-fs/<scope_id>
 
 
 Zmq.ini
@@ -182,6 +184,15 @@ The following keys are recognized:
   could not be started, or cause an unacceptably long wait time.)
 
   The default value is 3000 milliseconds.
+
+- Registry.Timeout
+
+  The timeout to be used when invoking a twoway operation on the registry other
+  than locate().
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 5000 milliseconds.
 
 
 Registry.ini

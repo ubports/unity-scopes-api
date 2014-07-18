@@ -103,129 +103,14 @@ TEST(RuntimeImpl, directories)
         this_thread::sleep_for(chrono::milliseconds(200));
 
         EXPECT_EQ(TEST_DIR, testscope.scope_directory());
-        EXPECT_EQ("/tmp", testscope.tmp_directory());
-
-        try
-        {
-            testscope.cache_directory();
-            FAIL();
-        }
-        catch (ConfigException const& e)
-        {
-            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
-                         e.what());
-        }
-
-        rt->destroy();
-        testscope_t.join();
-    }
-
-    ::mkdir(TEST_DIR "/cache_dir", 0700);
-    ::mkdir(TEST_DIR "/cache_dir/leaf-net", 0700);
-    ::mkdir(TEST_DIR "/cache_dir/leaf-net/TestScope", 0700);
-
-    {
-        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
-        TestScope testscope;
-        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
-
-        // Give thread some time to start up.
-        this_thread::sleep_for(chrono::milliseconds(200));
-
-        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
 
         string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/leaf-net/TestScope";
         EXPECT_EQ(tmpdir, testscope.tmp_directory());
 
+        // Cache dir does not actually exist at this point, but must still be returned.
         EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
 
         rt->destroy();
         testscope_t.join();
-    }
-
-    // Again, but with wrong permission on directory.
-    ::chmod(TEST_DIR "/cache_dir/leaf-net/TestScope", 0750);
-
-    {
-        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
-        TestScope testscope;
-        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
-
-        // Give thread some time to start up.
-        this_thread::sleep_for(chrono::milliseconds(200));
-
-        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
-
-        EXPECT_EQ("/tmp", testscope.tmp_directory());
-
-        try
-        {
-            testscope.cache_directory();
-            FAIL();
-        }
-        catch (ConfigException const& e)
-        {
-            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
-                         e.what());
-        }
-
-        rt->destroy();
-        testscope_t.join();
-    }
-
-    // Again, but with a file where we expect a directory.
-    ::rmdir(TEST_DIR "/cache_dir/leaf-net/TestScope");
-    int fd = ::open(TEST_DIR "/cache_dir/leaf-net/TestScope", O_CREAT, 0700);
-    ::close(fd);
-
-    {
-        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
-        TestScope testscope;
-        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
-
-        // Give thread some time to start up.
-        this_thread::sleep_for(chrono::milliseconds(200));
-
-        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
-
-        EXPECT_EQ("/tmp", testscope.tmp_directory());
-
-        try
-        {
-            testscope.cache_directory();
-            FAIL();
-        }
-        catch (ConfigException const& e)
-        {
-            EXPECT_STREQ("unity::scopes::ConfigException: ScopeBase::cache_directory(): no cache directory available",
-                         e.what());
-        }
-
-        rt->destroy();
-        testscope_t.join();
-    }
-
-    // Again, but with two candidates for the directory.
-    ::unlink(TEST_DIR "/cache_dir/leaf-net/TestScope");
-    ::mkdir(TEST_DIR "/cache_dir/leaf-net/TestScope", 0700);
-    ::mkdir(TEST_DIR "/cache_dir/leaf-fs", 0700);
-    ::mkdir(TEST_DIR "/cache_dir/leaf-fs/TestScope", 0700);
-
-    {
-        try
-        {
-            Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
-            FAIL();
-        }
-        catch (ConfigException const& e)
-        {
-            EXPECT_STREQ("unity::scopes::ConfigException: Cannot instantiate run time for TestScope, "
-                             "config file: " TEST_DIR "/Runtime.ini:\n"
-                         "    unity::scopes::ConfigException: Runtime(): bad configuration: found more "
-                             "than one cache directory for scope TestScope:\n"
-                         "  \"" TEST_DIR "/cache_dir/leaf-net/TestScope\"\n"
-                         "  \"" TEST_DIR "/cache_dir/leaf-fs/TestScope\"",
-                         e.what());
-        }
     }
 }

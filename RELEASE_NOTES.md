@@ -22,6 +22,7 @@ Changes in version 0.5.2
 ========================
   - Added CannedQuery parameter to Category.
   - Added support for scope settings.
+  - Added Registry.Timeout configuration parameter to Zmq.ini.
 
 Changes in version 0.5.1
 ========================

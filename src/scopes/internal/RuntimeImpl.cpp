@@ -104,29 +104,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
-
-        string scope_type;
-        cache_dir_ = find_cache_directory(scope_type);
-
-        // Set tmp dir.
-        if (scope_type.empty())
-        {
-            tmp_dir_ = "/tmp";
-        }
-        else
-        {
-            // We need to create any directories under /run/user/<uid> because they might not
-            // exist. (/run/user/<uid> gets cleaned out periodically.)
-            string path = string("/run/user/") + std::to_string(geteuid());
-            path += "/scopes";
-            ::mkdir(path.c_str(), 0700);
-            path += "/" + scope_type;
-            ::mkdir(path.c_str(), 0700);
-            path += "/" + scope_id_;
-            ::mkdir(path.c_str(), 0700);
-
-            tmp_dir_ = path;
-        }
     }
     catch (unity::Exception const& e)
     {
@@ -327,14 +304,6 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
         scope_base->p->set_scope_directory(dir.native());
     }
 
-    // cache_dir_ will not be empty for a properly installed (real) scope,
-    // but may be empty for some of the tests. It does not matter
-    // unless the scope actually tries to write something there, in which
-    // case it will get an error if it does.
-    scope_base->p->set_cache_directory(cache_dir_);
-
-    scope_base->p->set_tmp_directory(tmp_dir_);
-
     {
         // Try to open the scope settings database, if any.
         string settings_dir = data_dir_ + "/" + scope_id_;
@@ -358,7 +327,34 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     scope_base->p->set_registry(registry_);
 
-    // We are finally set up, initialize the scope.
+    int idle_timeout_ms = 0;
+    string confinement_type = "unconfined";
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        idle_timeout_ms = scope_config.idle_timeout() * 1000;
+        confinement_type = scope_config.confinement_type();
+    }
+
+    // Set cache dir.
+    auto const cache_dir = data_dir_ + "/" + confinement_type + "/" + scope_id_;
+    scope_base->p->set_cache_directory(cache_dir);
+
+    {
+        // Set tmp dir.
+        // We need to create any directories under /run/user/<uid> because they might not
+        // exist. (/run/user/<uid> gets cleaned out periodically.)
+        string path = string("/run/user/") + std::to_string(geteuid());
+        path += "/scopes";
+        ::mkdir(path.c_str(), 0700);
+        path += "/" + confinement_type;
+        ::mkdir(path.c_str(), 0700);
+        path += "/" + scope_id_;
+        ::mkdir(path.c_str(), 0700);
+
+        scope_base->p->set_tmp_directory(path);
+    }
+
     scope_base->start(scope_id_);
 
     // Ensure the scope gets stopped.
@@ -371,15 +367,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    if (!scope_ini_file.empty())
-    {
-        ScopeConfig scope_config(scope_ini_file);
-        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
-    }
-    else
-    {
-        mw->add_scope_object(scope_id_, move(scope));
-    }
+    mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
@@ -420,73 +408,6 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     {
         throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
     }
-}
-
-// Figure out what kind of scope we are dealing with by looking for
-// the scope's writable area in the file system. For a properly-installed
-// scope, there will be exactly one such directory. If we can't find any,
-// we print a warning return the empty string. (This allows the tests to
-// to run without having to create the directories.) If we find more
-// than one such directory, we throw, because the scope is not installed
-// correctly. Otherwise, we return the found directory and set the
-// scope type to the found type.
-
-string RuntimeImpl::find_cache_directory(string& type)
-{
-    static vector<string> const scope_types = { "unconfined", "aggregator", "leaf-net", "leaf-fs" };
-
-    vector<boost::filesystem::path> found_dirs;
-    string found_type;
-
-    // Try and find one of the possible directories for the scope to store its
-    // data files. If we find more than one, we throw.
-    for (auto const& scope_type : scope_types)
-    {
-        boost::filesystem::path path = data_dir_ + "/" + scope_type + "/" + scope_id_;
-        if (boost::filesystem::exists(path))
-        {
-            if (!boost::filesystem::is_directory(path))
-            {
-                cerr << "Warning: ignoring non-directory cache path: " << path.native() << endl;
-            }
-            else
-            {
-                found_type = scope_type;
-                found_dirs.push_back(path);
-            }
-        }
-    }
-
-    if (found_dirs.empty())
-    {
-        cerr << "Warning: no cache directory found for scope " << scope_id_ << endl;
-        type = "";
-        return "";
-    }
-
-    if (found_dirs.size() > 1)
-    {
-        ostringstream err;
-        err << "Runtime(): bad configuration: found more than one cache directory for scope " << scope_id_ << ":";
-        for (auto const& path : found_dirs)
-        {
-            err << "\n  " << path;
-        }
-        throw ConfigException(err.str());
-    }
-
-    auto dir = found_dirs[0].native();
-    auto perms = boost::filesystem::status(found_dirs[0]).permissions();
-    if (perms & boost::filesystem::group_all || perms & boost::filesystem::others_all)
-    {
-        cerr << "Warning: ignoring cache directory accessible by group or others for " << scope_id_
-             << ": " << dir << endl;
-        type = "";
-        return "";
-    }
-
-    type = found_type;
-    return dir;
 }
 
 } // namespace internal

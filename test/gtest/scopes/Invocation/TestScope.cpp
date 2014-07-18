@@ -57,18 +57,6 @@ public:
 
 }  // namespace
 
-void TestScope::start(string const&)
-{
-}
-
-void TestScope::stop()
-{
-}
-
-void TestScope::run()
-{
-}
-
 namespace
 {
 

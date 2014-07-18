@@ -70,21 +70,9 @@ private:
 
 }  // namespace
 
-void PusherScope::start(string const&)
+SearchQueryBase::UPtr PusherScope::search(CannedQuery const& q, SearchMetadata const& md)
 {
-}
-
-void PusherScope::stop()
-{
-}
-
-void PusherScope::run()
-{
-}
-
-SearchQueryBase::UPtr PusherScope::search(CannedQuery const& query, SearchMetadata const& md)
-{
-    return SearchQueryBase::UPtr(new PusherQuery(query, md));
+    return SearchQueryBase::UPtr(new PusherQuery(q, md));
 }
 
 PreviewQueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
