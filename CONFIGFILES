@@ -185,6 +185,15 @@ The following keys are recognized:
 
   The default value is 3000 milliseconds.
 
+- Registry.Timeout
+
+  The timeout to be used when invoking a twoway operation on the registry other
+  than locate().
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 5000 milliseconds.
+
 
 Registry.ini
 ------------
