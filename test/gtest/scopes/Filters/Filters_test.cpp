@@ -99,21 +99,13 @@ struct RaiiScopeThread
 
 RuntimeImpl::SPtr run_test_registry()
 {
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
     std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
     std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
 
-    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
-
-    std::string identity = runtime->registry_identity();
-    RegistryConfig c(identity, runtime->registry_configfile());
-    std::string mw_kind = c.mw_kind();
-    std::string mw_configfile = c.mw_configfile();
-
-    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
-    Executor::SPtr executor = std::make_shared<Executor>();
-    RegistryObject::SPtr ro(std::make_shared<RegistryObject>(*death_observer, executor, middleware));
-    middleware->add_registry_object(runtime->registry_identity(), ro);
-
+    RegistryObject::SPtr ro(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", ro);
     return runtime;
 }
 
