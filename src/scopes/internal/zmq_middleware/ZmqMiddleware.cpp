@@ -863,7 +863,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         endpoint = "ipc://" + endpoint_dir + "/" + name;
     }
 
-    shared_ptr<ObjectAdapter> a(new ObjectAdapter(*this, name, endpoint, mode, pool_size, idle_timeout));
+    auto a = make_shared<ObjectAdapter>(*this, name, endpoint, mode, pool_size, idle_timeout);
     a->activate();
     am_[name] = a;
     return a;
