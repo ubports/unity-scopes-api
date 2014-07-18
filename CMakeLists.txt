@@ -124,7 +124,7 @@ include_directories(
 # Note that this must match what is specifed in debian/control.
 set(cxx_version_required 4.9)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL ${cxx_version_required})
+    if (NOT CMAKE_CXX_COMPILER_VERSION MATCHES "^${cxx_version_required}")
         message(FATAL_ERROR "g++ version must be ${cxx_version_required}!")
     endif()
 endif()
