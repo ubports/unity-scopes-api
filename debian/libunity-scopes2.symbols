@@ -722,7 +722,6 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::string_to_proxy(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::find_cache_directory() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::ss_registry_identity() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0.4.0+14.04.20140312.1
@@ -733,6 +732,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::idle_timeout() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::scope_runner() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::ScopeConfig::confinement_type() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::results_ttl_type() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::internal::ScopeConfig::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeConfig::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
