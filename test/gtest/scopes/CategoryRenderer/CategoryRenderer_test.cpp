@@ -16,7 +16,6 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <scope-api-testconfig.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 #include <fstream>
@@ -34,7 +33,7 @@ TEST(CategoryRenderer, basic)
 
 TEST(CategoryRenderer, from_file)
 {
-    const std::string input_file(TEST_BUILD_ROOT "/gtest/scopes/CategoryRenderer/renderer.json");
+    const std::string input_file(TEST_DIR "/renderer.json");
 
     EXPECT_THROW(CategoryRenderer::from_file("/non-existing-file"), unity::ResourceException);
     EXPECT_NO_THROW(CategoryRenderer::from_file(input_file));

@@ -1,14 +1,20 @@
 [ScopeConfig]
+Override = true
 DisplayName = Scope name
 DisplayName[test] = copesay amenay
 Description = Scope description
 Description[test] = copesay criptiondesay
-Art = scope art
 Author = Canonical
+Art = scope art
 Icon = an icon
 SearchHint = search string
 SearchHint[test] = earchsay ringstay
 HotKey = a key
+Invisible = true
+ScopeRunner = custom runner
+IdleTimeout = 300
+ResultsTtlType = large
+LocationDataNeeded = true
 
 [Appearance]
 arbitrary_key = true

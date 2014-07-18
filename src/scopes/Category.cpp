@@ -28,7 +28,12 @@ namespace scopes
 //! @cond
 
 Category::Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template)
-    : p(new internal::CategoryImpl(id, title, icon, renderer_template))
+    : p(new internal::CategoryImpl(id, title, icon, nullptr, renderer_template))
+{
+}
+
+Category::Category(std::string const& id, std::string const& title, std::string const &icon, CannedQuery::SCPtr const& query, CategoryRenderer const& renderer_template)
+    : p(new internal::CategoryImpl(id, title, icon, query, renderer_template))
 {
 }
 
@@ -46,19 +51,24 @@ std::string Category::id() const
     return p->id();
 }
 
+std::string Category::title() const
+{
+    return p->title();
+}
+
 std::string Category::icon() const
 {
     return p->icon();
 }
 
+CannedQuery::SCPtr Category::query() const
+{
+    return p->query();
+}
+
 CategoryRenderer const& Category::renderer_template() const
 {
     return p->renderer_template();
-}
-
-std::string Category::title() const
-{
-    return p->title();
 }
 
 VariantMap Category::serialize() const

@@ -17,6 +17,10 @@
  */
 
 #include <unity/scopes/internal/ScopeBaseImpl.h>
+#include <unity/scopes/internal/SettingsDB.h>
+
+using namespace unity::scopes;
+using namespace std;
 
 namespace unity
 {
@@ -29,12 +33,32 @@ namespace internal
 
 void ScopeBaseImpl::set_scope_directory(std::string const &path)
 {
+    lock_guard<mutex> lock(mutex_);
     scope_directory_ = path;
 }
 
 std::string ScopeBaseImpl::scope_directory() const
 {
+    lock_guard<mutex> lock(mutex_);
     return scope_directory_;
+}
+
+SettingsDB::SPtr ScopeBaseImpl::settings_db() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_;
+}
+
+void ScopeBaseImpl::set_settings_db(SettingsDB::SPtr const& db)
+{
+    lock_guard<mutex> lock(mutex_);
+    db_ = db;
+}
+
+VariantMap ScopeBaseImpl::settings() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_ ? db_->settings() : VariantMap();
 }
 
 } // namespace internal

@@ -21,7 +21,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace std;
 using namespace unity;
@@ -30,13 +29,11 @@ using namespace unity::scopes::internal;
 
 TEST(RuntimeImpl, basic)
 {
-    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope",
-                                               TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Runtime.ini");
+    RuntimeImpl::UPtr rt = RuntimeImpl::create("testscope", TEST_DIR "/Runtime.ini");
 
     EXPECT_TRUE(rt->registry().get() != nullptr);
     EXPECT_TRUE(rt->factory());
-    cerr << "reg: " << rt->registry_configfile() << endl;
-    EXPECT_EQ(TEST_BUILD_ROOT "/gtest/scopes/internal/RuntimeImpl/Registry.ini", rt->registry_configfile());
+    EXPECT_EQ(TEST_DIR "/Registry.ini", rt->registry_configfile());
 
     rt->destroy();
 

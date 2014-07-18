@@ -44,15 +44,16 @@ class Annotation;
 }
 
 /**
-\brief Abstract base interface that a scope specializes to
-receive the results of a query.
+\brief Abstract base interface for a client to receive the results of a query.
 
-An instance of this interface must be passed to Scope::create_query().
-Results for the query are delivered to the instance by the scopes run
+An instance of this interface must be passed to Scope::search().
+Results for the query are delivered to the client by the scopes run
 time by invoking the appropriate push method.
 
-If a scope throw an exception from one of the push() methods, the scopes
+If the implementation of a push method throws an exception, the scopes
 run time calls ListenerBase::finished() with an 'Error' reason.
+
+\see ListenerBase
 */
 
 class SearchListenerBase : public ListenerBase
@@ -87,9 +88,11 @@ public:
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().
 
-    The default implementation does nothing. Receipt of categories may be interleaved with
+    Receipt of categories may be interleaved with
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
+
+    The default implementation does nothing.
     */
     virtual void push(Category::SCPtr const& category);
 

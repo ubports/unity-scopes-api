@@ -9,6 +9,12 @@ set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-fi
 set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers")
 set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers")
 
+# Make sure we always build gtest/gmock with debug info, otherwise we don't
+# get line numbers for the code that is dragged in by the test macros.
+set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
+set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
+set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
+
 include_directories(${GMOCK_ROOT}/gtest/include)
 
 set(LIBGTEST gtest gmock gmock_main)

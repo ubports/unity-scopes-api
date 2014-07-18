@@ -41,7 +41,7 @@ class ActivationQueryBaseImpl;
 \brief Base class for an activation request that is executed inside a scope.
 
 The default implementation responds with ActivationResponse(ActivationResponse::Status::NotHandled).
-Reimplement this class and return an instance in ScopeBase::activate method for custom activation handling.
+Reimplement this class and return an instance from ScopeBase::activate method for custom activation handling.
 */
 
 class ActivationQueryBase : public QueryBase
@@ -55,18 +55,18 @@ public:
     /**
      \brief Create ActivationQueryBase.
 
-     \param result The result received in ScopeBase::activate().
-     \param metadata The metadata received in ScopeBase::activate().
+     \param result The result received by ScopeBase::activate().
+     \param metadata The metadata received by ScopeBase::activate().
     */
     ActivationQueryBase(Result const& result, ActionMetadata const& metadata);
 
     /**
      \brief Create ActivationQueryBase.
 
-     \param result The result received in ScopeBase::perform_action().
-     \param metadata The metadata received in ScopeBase::perform_action().
-     \param widget_id The widget identifier receiver in ScopeBase::perform_action().
-     \param action_id The action identifier receiver in ScopeBase::perform_action().
+     \param result The result received by ScopeBase::perform_action().
+     \param metadata The metadata received by ScopeBase::perform_action().
+     \param widget_id The widget identifier receiver of ScopeBase::perform_action().
+     \param action_id The action identifier receiver of ScopeBase::perform_action().
     */
     ActivationQueryBase(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 

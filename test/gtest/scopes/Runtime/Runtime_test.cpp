@@ -88,7 +88,7 @@ public:
         last_result_ = std::make_shared<Result>(result);
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
@@ -421,7 +421,7 @@ int main(int argc, char **argv)
 
     // Give threads some time to bind to their endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(500));
 
     auto rc = RUN_ALL_TESTS();
 

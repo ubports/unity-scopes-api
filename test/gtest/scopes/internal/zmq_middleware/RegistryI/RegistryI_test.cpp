@@ -34,7 +34,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 #include <cassert>
 #include <set>
@@ -45,6 +44,8 @@ using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
+
+string const runtime_ini = TEST_DIR "/Runtime.ini";
 
 namespace
 {
@@ -91,8 +92,7 @@ ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, Middl
 TEST(RegistryI, get_metadata)
 {
     RegistryObject::ScopeExecData dummy_exec_data;
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", runtime_ini);
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -114,8 +114,7 @@ TEST(RegistryI, get_metadata)
 
 TEST(RegistryI, list)
 {
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", runtime_ini);
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -163,8 +162,7 @@ TEST(RegistryI, list)
 
 TEST(RegistryI, add_remove)
 {
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", runtime_ini);
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -215,8 +213,7 @@ TEST(RegistryI, add_remove)
 
 TEST(RegistryI, exceptions)
 {
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", runtime_ini);
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -307,8 +304,7 @@ public:
 
 TEST(RegistryI, locate_mock)
 {
-    RuntimeImpl::UPtr runtime = RuntimeImpl::create(
-        "TestRegistry", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini");
+    RuntimeImpl::UPtr runtime = RuntimeImpl::create("TestRegistry", runtime_ini);
 
     string identity = runtime->registry_identity();
     RegistryConfig c(identity, runtime->registry_configfile());
@@ -382,14 +378,13 @@ public:
         start_process_count = process_count();
 
         // configure registry
-        rt_config = TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/RegistryI/Runtime.ini";
-
-        rt = RuntimeImpl::create("TestRegistry", rt_config);
+        rt = RuntimeImpl::create("TestRegistry", runtime_ini);
         std::string reg_id = rt->registry_identity();
 
         RegistryConfig c(reg_id, rt->registry_configfile());
         std::string mw_kind = c.mw_kind();
         std::string scoperunner_path = c.scoperunner_path();
+        process_timeout = c.process_timeout();
 
         mw = rt->factory()->find(reg_id, mw_kind);
 
@@ -416,9 +411,9 @@ public:
             RegistryObject::ScopeExecData exec_data;
             exec_data.scope_id = scope_id;
             exec_data.scoperunner_path = scoperunner_path;
-            exec_data.runtime_config = rt_config;
-            exec_data.scope_config = TEST_BUILD_ROOT "/../demo/scopes/" + scope_id + "/" + scope_id + ".ini";
-            exec_data.timeout_ms = 1500;
+            exec_data.runtime_config = runtime_ini;
+            exec_data.scope_config = DEMO_DIR "/scopes/" + scope_id + "/" + scope_id + ".ini";
+            exec_data.timeout_ms = process_timeout;
 
             reg->add_local_scope(scope_id, move(meta), exec_data);
         }
@@ -440,19 +435,19 @@ public:
 
     int first_child_pid()
     {
-        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers"));
+        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers | egrep -v 'ps|egrep'"));
     }
 
     int process_count()
     {
-        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | wc -l"));
+        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | egrep -v 'ps|egrep|wc' | wc -l"));
         return current_process_count - start_process_count;
     }
 
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
-        std::string test_scope_config = TEST_BUILD_ROOT "/gtest/scopes/Registry/scopes/testscopeB/testscopeB.ini";
+        std::string test_scope_config = REGISTRY_TEST_DIR "/scopes/testscopeB/testscopeB.ini";
         ScopeConfig sc(test_scope_config);
         ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
 
@@ -468,9 +463,9 @@ public:
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
         exec_data.custom_exec = sc.scope_runner();
-        exec_data.runtime_config = rt_config;
+        exec_data.runtime_config = runtime_ini;
         exec_data.scope_config = test_scope_config;
-        exec_data.timeout_ms = 1500;
+        exec_data.timeout_ms = process_timeout;
 
         reg->add_local_scope(test_scope_id, move(meta), exec_data);
 
@@ -507,6 +502,7 @@ protected:
     RegistryObject::SPtr reg;
     std::array<std::string, 6> scope_ids;
     std::map<std::string, ScopeProxy> proxies;
+    int process_timeout;
 };
 
 // test initial state

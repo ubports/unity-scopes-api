@@ -245,11 +245,29 @@ public:
     static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
     /**
-     \brief Returns directory where the scope files are.
+    \brief Returns the directory that stores the scope's configuration files and shared library.
 
-     Note, scope directory is only known after the scope has been instantantiated, e.g. it's not available in the constructor.
-     */
+    \note The scope directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The scope's configuration directory.
+    */
     std::string scope_directory() const;
+
+    /**
+    \brief Returns a dictionary with the scope's current settings.
+
+    Instead of storing the return value, it is preferable to call settings()
+    each time your implementation requires a settings value. This ensures
+    that, if a user changes settings while the scope is running, the new settings
+    take effect with the next query.
+
+    \note The settings are available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The scope's current settings.
+    */
+    VariantMap settings() const;
 
 protected:
     /// @cond
@@ -258,6 +276,7 @@ private:
     std::unique_ptr<internal::ScopeBaseImpl> p;
 
     friend class internal::ScopeLoader;
+    friend class internal::ScopeObject;
     friend class internal::RuntimeImpl;
     /// @endcond
 };
