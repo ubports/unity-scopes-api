@@ -93,9 +93,6 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
     EXPECT_TRUE(duration < chrono::seconds(6));
 }
 
-// Check that the idle timeout for a server waits for synchronous operations
-// to complete.
-
 RuntimeImpl::SPtr run_test_registry()
 {
     std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
@@ -115,6 +112,9 @@ RuntimeImpl::SPtr run_test_registry()
 
     return runtime;
 }
+
+// Check that the idle timeout for a server waits for synchronous operations
+// to complete.
 
 TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
 {

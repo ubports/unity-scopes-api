@@ -25,6 +25,8 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ListenerBase.h>
@@ -40,6 +42,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 class TestReceiver : public SearchListenerBase
 {
@@ -89,12 +92,33 @@ private:
     condition_variable cond_;
 };
 
+RuntimeImpl::SPtr run_test_registry()
+{
+    std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+
+    std::string identity = runtime->registry_identity();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    std::string mw_kind = c.mw_kind();
+    std::string mw_configfile = c.mw_configfile();
+
+    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+    Executor::SPtr executor = std::make_shared<Executor>();
+    RegistryObject::SPtr ro(std::make_shared<RegistryObject>(*death_observer, executor, middleware));
+    middleware->add_registry_object(runtime->registry_identity(), ro);
+
+    return runtime;
+}
+
 // Check that invoking on a scope after a timeout exception from a previous
 // invocation works correctly. This tests that a failed socket is removed
 // from the connection pool in ZmqObject::invoke_twoway_().
 
 TEST(Invocation, timeout)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -108,7 +132,7 @@ TEST(Invocation, timeout)
     receiver->wait_until_finished();
 
     EXPECT_EQ(ListenerBase::Error, receiver->reason());
-    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 3000 milliseconds", receiver->error_message());
+    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 300 milliseconds", receiver->error_message());
 
     // Wait another two seconds, so TestScope is finally able to receive another request.
     this_thread::sleep_for(chrono::seconds(2));
