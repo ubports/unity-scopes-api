@@ -1,7 +1,7 @@
 add_subdirectory(internal)
 add_subdirectory(testing)
 
-#add_subdirectory(Activation)
+add_subdirectory(Activation)
 add_subdirectory(ActivationResponse)
 add_subdirectory(Annotation)
 add_subdirectory(CannedQuery)

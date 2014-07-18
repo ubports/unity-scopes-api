@@ -210,29 +210,35 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
 {
     auto registry_proxy = mw_base()->registry_proxy();
 
-    // If no registry is configured or if this object is the registry itself, rethrow the exception
+    // If a registry is configured and this object is not the registry itself,
+    // attempt to locate the scope before invoking it.
     if (registry_proxy && identity() != registry_proxy->identity())
     {
-        // rebind
-        ObjectProxy new_proxy = registry_proxy->locate(identity());
-
-        // update our proxy with the newly received data
-        // (we need to first store values in local variables outside of the mutex,
-        // otherwise we will deadlock on the following ZmqObjectProxy methods)
-        std::string endpoint = new_proxy->endpoint();
-        std::string identity = new_proxy->identity();
-        std::string category = new_proxy->target_category();
-        int64_t timeout = new_proxy->timeout();
+        try
         {
-            lock_guard<mutex> lock(shared_mutex);
-            endpoint_ = endpoint;
-            identity_ = identity;
-            category_ = category;
-            timeout_ = timeout;
+            ObjectProxy new_proxy = registry_proxy->locate(identity());
+            // update our proxy with the newly received data
+            // (we need to first store values in local variables outside of the mutex,
+            // otherwise we will deadlock on the following ZmqObjectProxy methods)
+            std::string endpoint = new_proxy->endpoint();
+            std::string identity = new_proxy->identity();
+            std::string category = new_proxy->target_category();
+            int64_t timeout = new_proxy->timeout();
+            {
+                lock_guard<mutex> lock(shared_mutex);
+                endpoint_ = endpoint;
+                identity_ = identity;
+                category_ = category;
+                timeout_ = timeout;
+            }
+        }
+        catch (NotFoundException const&)
+        {
+            // Ignore a failed locate() for a scope unknown to the registry
         }
     }
 
-    // try the invocation
+    // Try the invocation
     return invoke_twoway__(out_params, timeout);
 }
 

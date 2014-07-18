@@ -21,6 +21,8 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/RegistryConfig.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
@@ -523,9 +525,30 @@ struct RaiiScopeThread
     }
 };
 
+RuntimeImpl::SPtr run_test_registry()
+{
+    std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+
+    std::string identity = runtime->registry_identity();
+    RegistryConfig c(identity, runtime->registry_configfile());
+    std::string mw_kind = c.mw_kind();
+    std::string mw_configfile = c.mw_configfile();
+
+    MiddlewareBase::SPtr middleware = runtime->factory()->create(identity, mw_kind, mw_configfile);
+    Executor::SPtr executor = std::make_shared<Executor>();
+    RegistryObject::SPtr ro(std::make_shared<RegistryObject>(*death_observer, executor, middleware));
+    middleware->add_registry_object(runtime->registry_identity(), ro);
+
+    return runtime;
+}
+
 // does actual activation with a test scope
 TEST(Activation, scope)
 {
+    auto reg_rt = run_test_registry();
     RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
 
     // parent: connect to scope and run a query
