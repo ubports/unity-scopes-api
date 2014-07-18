@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
