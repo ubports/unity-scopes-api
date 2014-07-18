@@ -50,6 +50,11 @@ bool QueryBase::valid() const
     return p->valid();
 }
 
+VariantMap QueryBase::settings() const
+{
+    return p->settings();
+}
+
 } // namespace scopes
 
 } // namespace unity

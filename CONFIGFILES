@@ -90,6 +90,18 @@ The following keys are recognized:
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
 
+- DataDir
+
+  The parent directory under the run time writes scope-specific data files
+  (such as settings).
+
+  The default value is $HOME/.local/share/unity-scopes.
+
+  Note that the actual files are written into subdirectories of
+  this directory, for example:
+
+  $HOME/.local/share/unity-scopes/<scope_id>/settings.db
+
 
 Zmq.ini
 -------
@@ -157,6 +169,15 @@ The following keys are recognized:
   could not be started, or cause an unacceptably long wait time.)
 
   The default value is 3000 milliseconds.
+
+- Registry.Timeout
+
+  The timeout to be used when invoking a twoway operation on the registry other
+  than locate().
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 5000 milliseconds.
 
 
 Registry.ini
@@ -323,6 +344,15 @@ The following keys are recognized in the ScopeConfig group:
   - Medium - in the order of a few minutes
 
   - Large - in the order of an hour
+
+- LocationDataNeeded
+
+  Whether the scope wants to have location data delivered to it. Note that this does not mean that the scope
+  will actually receive location data at run time. (The user may deny access, or may only provide approximate
+  location data.)
+
+  If not set, the default value is false.
+
 
 The following keys are recognized in the Appearance group:
 

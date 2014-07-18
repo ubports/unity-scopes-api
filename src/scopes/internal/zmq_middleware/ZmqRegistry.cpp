@@ -85,7 +85,9 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
     in_params.setIdentity(scope_id.c_str());
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -119,7 +121,9 @@ MetadataMap ZmqRegistry::list()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);
@@ -195,7 +199,9 @@ bool ZmqRegistry::is_scope_running(std::string const& scope_id)
     auto in_params = request.initInParams().getAs<capnproto::Registry::IsScopeRunningRequest>();
     in_params.setIdentity(scope_id.c_str());
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
     capnp::SegmentArrayMessageReader reader(segments);

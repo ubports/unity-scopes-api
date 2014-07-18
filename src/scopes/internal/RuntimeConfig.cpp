@@ -34,16 +34,19 @@ namespace internal
 
 namespace
 {
-    const string runtime_config_group = "Runtime";
-    const string registry_identity_key = "Registry.Identity";
-    const string registry_configfile_key = "Registry.ConfigFile";
-    const string ss_registry_identity_key = "Smartscopes.Registry.Identity";
-    const string ss_configfile_key = "Smartscopes.ConfigFile";
-    const string default_middleware_key = "Default.Middleware";
-    const string default_middleware_configfile_key = ".ConfigFile";
-    const string reap_expiry_key = "Reap.Expiry";
-    const string reap_interval_key = "Reap.Interval";
-}
+
+const string runtime_config_group = "Runtime";
+const string registry_identity_key = "Registry.Identity";
+const string registry_configfile_key = "Registry.ConfigFile";
+const string ss_registry_identity_key = "Smartscopes.Registry.Identity";
+const string ss_configfile_key = "Smartscopes.ConfigFile";
+const string default_middleware_key = "Default.Middleware";
+const string default_middleware_configfile_key = ".ConfigFile";
+const string reap_expiry_key = "Reap.Expiry";
+const string reap_interval_key = "Reap.Interval";
+const string data_dir_key = "DataDir";
+
+}  // namespace
 
 RuntimeConfig::RuntimeConfig(string const& configfile) :
     ConfigBase(configfile)
@@ -53,11 +56,19 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         registry_identity_ = DFLT_REGISTRY_ID;
         registry_configfile_ = DFLT_REGISTRY_INI;
         ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
-        ss_configfile_ = DFLT_SS_INI;
+        ss_configfile_ = DFLT_SS_REGISTRY_INI;
         default_middleware_ = DFLT_MIDDLEWARE;
         default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
         reap_expiry_ = DFLT_REAP_EXPIRY;
         reap_interval_ = DFLT_REAP_INTERVAL;
+        try
+        {
+            data_directory_ = default_data_directory();
+        }
+        catch (ResourceException const& e)
+        {
+            throw_ex("Failed to get default data directory");
+        }
     }
     else
     {
@@ -79,6 +90,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         {
             throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
         }
+        data_directory_ = get_optional_string(runtime_config_group, data_dir_key);
+        if (data_directory_.empty())
+        {
+            try
+            {
+                data_directory_ = default_data_directory();
+            }
+            catch (ResourceException const& e)
+            {
+                throw_ex("No DataDir configured and failed to get default");
+            }
+        }
     }
 
     const KnownEntries known_entries = {
@@ -91,7 +114,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 default_middleware_key,
                                                 default_middleware_ + default_middleware_configfile_key,
                                                 reap_expiry_key,
-                                                reap_interval_key
+                                                reap_interval_key,
+                                                data_dir_key
                                              }
                                           }
                                        };
@@ -141,6 +165,22 @@ int RuntimeConfig::reap_interval() const
 {
     return reap_interval_;
 }
+
+string RuntimeConfig::data_directory() const
+{
+    return data_directory_;
+}
+
+string RuntimeConfig::default_data_directory()
+{
+    char const* home = getenv("HOME");
+    if (!home || *home == '\0')
+    {
+        throw ResourceException("RuntimeConfig::default_data_directory(): $HOME not set");
+    }
+    return string(home) + "/.local/share/unity-scopes";
+}
+
 
 } // namespace internal
 

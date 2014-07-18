@@ -28,6 +28,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/filesystem/path.hpp>
 #include <core/posix/signal.h>
 
 #include <cassert>
@@ -38,8 +39,6 @@
 #include <vector>
 
 #include <libgen.h>
-
-#include <boost/filesystem/path.hpp>
 
 using namespace std;
 using namespace unity::scopes;
@@ -105,7 +104,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         {
             try
             {
-                loader = ScopeLoader::load(scope_id, lib, rt->registry());
+                loader = ScopeLoader::load(scope_id, lib, rt_config.data_directory(), rt->registry());
             }
             catch (unity::ResourceException& e)
             {

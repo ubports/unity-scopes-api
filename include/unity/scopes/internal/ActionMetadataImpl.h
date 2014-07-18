@@ -53,7 +53,7 @@ public:
     static ActionMetadata create(VariantMap const& var);
 
 protected:
-    virtual void serialize(VariantMap &var) const override;
+    virtual void serialize(VariantMap& var) const override;
     virtual std::string metadata_type() const override;
 
 private:

@@ -48,7 +48,7 @@ public:
     /// @endcond
 
     /**
-    \brief Create ActionMetadata with given locale and form factor
+    \brief Create ActionMetadata with the given locale and form factor.
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
@@ -85,7 +85,7 @@ public:
     ActionMetadata(ActionMetadata const& other);
     ActionMetadata(ActionMetadata&&);
 
-    ActionMetadata& operator=(ActionMetadata const &other);
+    ActionMetadata& operator=(ActionMetadata const& other);
     ActionMetadata& operator=(ActionMetadata&&);
     //@}
 

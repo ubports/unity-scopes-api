@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
+#include <unity/scopes/internal/SettingsDB.h>
+
 using namespace std;
 
 namespace unity
@@ -35,6 +37,18 @@ QueryBaseImpl::QueryBaseImpl()
 
 QueryBaseImpl::~QueryBaseImpl()
 {
+}
+
+VariantMap QueryBaseImpl::settings() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return db_ ? db_->settings() : VariantMap();
+}
+
+void QueryBaseImpl::set_settings_db(SettingsDB::SPtr const& db)
+{
+    lock_guard<mutex> lock(mutex_);
+    db_ = db;
 }
 
 } // namespace internal

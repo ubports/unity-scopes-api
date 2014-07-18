@@ -68,7 +68,7 @@ public:
     virtual int64_t timeout() = 0;      // Timeout in milliseconds, -1 == no timeout
 
     /**
-    \brief converts a proxy into its string representation.
+    \brief Converts a proxy into its string representation.
 
     A proxy string can be converted back into a proxy by calling Runtime::string_to_proxy().
     \return The string representation of the proxy.

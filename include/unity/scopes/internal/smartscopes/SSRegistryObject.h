@@ -21,6 +21,7 @@
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/internal/smartscopes/SSConfig.h>
 
@@ -60,6 +61,8 @@ public:
     std::string get_base_url(std::string const& scope_id) const;
     SmartScopesClient::SPtr get_ssclient() const;
 
+    SettingsDB::SPtr get_settings_db(std::string const& scope_id) const;
+
 private:
     void refresh_thread();
 
@@ -67,10 +70,17 @@ private:
     static bool add(RemoteScope const& remotedata, ScopeMetadata const& scope, MetadataMap& scopes, std::map<std::string, std::string>& urls);
 
 private:
+    struct SSSettingsDef
+    {
+        std::string json;
+        SettingsDB::SPtr db;
+    };
+
     SmartScopesClient::SPtr ssclient_;
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;
+    std::map<std::string, SSSettingsDef> settings_defs_;
     mutable std::mutex scopes_mutex_;
 
     std::thread refresh_thread_;

@@ -1,0 +1,4 @@
+[locationSetting]
+displayName = Location
+type = string
+defaultValue = London
