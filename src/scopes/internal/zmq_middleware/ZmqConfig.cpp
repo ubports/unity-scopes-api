@@ -81,7 +81,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
     ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  zmq_config_group,
                                              {
                                                 endpoint_dir_key,

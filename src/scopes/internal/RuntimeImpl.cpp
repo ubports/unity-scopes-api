@@ -104,7 +104,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
-        cache_dir_ = find_cache_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -305,8 +304,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         scope_base->p->set_scope_directory(dir.native());
     }
 
-    scope_base->p->set_cache_directory(cache_dir_);
-
     {
         // Try to open the scope settings database, if any.
         string settings_dir = data_dir_ + "/" + scope_id_;
@@ -330,6 +327,18 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     scope_base->p->set_registry(registry_);
 
+    int idle_timeout_ms = 0;
+    string confinement_type = "unconfined";
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        idle_timeout_ms = scope_config.idle_timeout() * 1000;
+        confinement_type = scope_config.confinement_type();
+    }
+
+    auto const cache_dir = data_dir_ + "/" + confinement_type + "/" + scope_id_;
+    scope_base->p->set_cache_directory(cache_dir);
+
     scope_base->start(scope_id_);
 
     // Ensure the scope gets stopped.
@@ -342,15 +351,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    if (!scope_ini_file.empty())
-    {
-        ScopeConfig scope_config(scope_ini_file);
-        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
-    }
-    else
-    {
-        mw->add_scope_object(scope_id_, move(scope));
-    }
+    mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
@@ -391,52 +392,6 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     {
         throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
     }
-}
-
-string RuntimeImpl::find_cache_directory() const
-{
-    vector<boost::filesystem::path> const candidates = { data_dir_ + "/unconfined/" + scope_id_,
-                                                         data_dir_ + "/aggregator/" + scope_id_,
-                                                         data_dir_ + "/leaf-net/" + scope_id_,
-                                                         data_dir_ + "/leaf-fs/" + scope_id_
-                                      };
-    vector<string> found_dirs;
-
-    // Try and find one of the possible directories for the scope to store its
-    // data files. If we find more than one, we throw.
-    for (auto const& path : candidates)
-    {
-        if (boost::filesystem::exists(path))
-        {
-            if (!boost::filesystem::is_directory(path))
-            {
-                cerr << "Warning: ignoring non-directory cache path: " << path.native() << endl;
-            }
-            else
-            {
-                found_dirs.push_back(path.native());
-            }
-        }
-    }
-
-    if (found_dirs.empty())
-    {
-        cerr << "Warning: no cache directory found for scope " << scope_id_ << endl;
-        return "";
-    }
-
-    if (found_dirs.size() > 1)
-    {
-        ostringstream err;
-        err << "Runtime(): bad configuration: found more than one cache directory for scope " << scope_id_ << ":";
-        for (auto const& path : found_dirs)
-        {
-            err << "\n  " << path;
-        }
-        throw ConfigException(err.str());
-    }
-
-    return found_dirs[0];
 }
 
 } // namespace internal

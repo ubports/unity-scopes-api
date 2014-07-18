@@ -39,19 +39,20 @@ public:
     ScopeConfig(std::string const& configfile);
     ~ScopeConfig();
 
-    bool overrideable() const;           // Optional, returns false if not present
-    std::string display_name() const;    // Mandatory, localizable
-    std::string description() const;     // Mandatory, localizable
-    std::string author() const;          // Mandatory
-    std::string art() const;             // Optional, throws NotFoundException if not present
-    std::string icon() const;            // Optional, throws NotFoundException if not present
-    std::string search_hint() const;     // Optional, localizable, throws NotFoundException if not present
-    std::string hot_key() const;         // Optional, throws NotFoundException if not present
-    bool invisible() const;              // Optional, returns false if not present
-    bool location_data_needed() const;   // Optional, returns false if not present
-    std::string scope_runner() const;    // Optional, throws NotFoundException if not present
-    int idle_timeout() const;            // Optional, returns default value if not present
+    bool overrideable() const;             // Optional, returns false if not present
+    std::string display_name() const;      // Mandatory, localizable
+    std::string description() const;       // Mandatory, localizable
+    std::string author() const;            // Mandatory
+    std::string art() const;               // Optional, throws NotFoundException if not present
+    std::string icon() const;              // Optional, throws NotFoundException if not present
+    std::string search_hint() const;       // Optional, localizable, throws NotFoundException if not present
+    std::string hot_key() const;           // Optional, throws NotFoundException if not present
+    bool invisible() const;                // Optional, returns false if not present
+    bool location_data_needed() const;     // Optional, returns false if not present
+    std::string scope_runner() const;      // Optional, throws NotFoundException if not present
+    int idle_timeout() const;              // Optional, returns default value if not present
     ScopeMetadata::ResultsTtlType results_ttl_type() const;  // Optional, returns none if not present
+    std::string confinement_type() const;  // Optional, throws NotFoundException if not present
 
     VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
 
@@ -71,6 +72,7 @@ private:
     std::unique_ptr<std::string> scope_runner_;
     int idle_timeout_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
+    std::string confinement_type_;
 
     VariantMap appearance_attributes_;
 };
