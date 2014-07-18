@@ -108,7 +108,7 @@ protected:
 
 TEST_F(smartscopesproxytest, ss_registry)
 {
-    // non-existant scope (direct)
+    // non-existent scope (direct)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
     EXPECT_THROW(reg_->locate("dummy.scope.5"), NotFoundException);
 
@@ -140,7 +140,7 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
     EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
 
-    // non-existant scope (via mw)
+    // non-existent scope (via mw)
     MWRegistryProxy mw_reg = mw_->registry_proxy();
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
     EXPECT_THROW(mw_reg->locate("dummy.scope.5"), NotFoundException);
