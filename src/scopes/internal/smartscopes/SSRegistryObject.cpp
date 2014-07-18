@@ -124,9 +124,10 @@ MetadataMap SSRegistryObject::list() const
     return scopes_;
 }
 
-ObjectProxy SSRegistryObject::locate(std::string const& /*identity*/)
+ObjectProxy SSRegistryObject::locate(std::string const& identity)
 {
-    throw internal::RegistryException("SSRegistryObject::locate(): operation not available");
+    // Smart Scopes are not fork and execed, so we simply return the proxy here
+    return get_metadata(identity).proxy();
 }
 
 bool SSRegistryObject::is_scope_running(std::string const&)
