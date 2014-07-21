@@ -59,14 +59,14 @@ TEST(VariantConverter, basic)
     EXPECT_EQ(Variant::Dict, resultVar.which());
     auto outerDict = resultVar.get_dict();
     EXPECT_EQ(1, outerDict["foo"].get_int());
-    EXPECT_EQ(true, outerDict["bar"].get_bool());
+    EXPECT_TRUE(outerDict["bar"].get_bool());
     EXPECT_TRUE(outerDict["nil"].is_null());
 
     EXPECT_EQ(Variant::Array, outerDict["baz"].which());
     auto varArray = outerDict["baz"].get_array();
     EXPECT_EQ(2u, varArray.size());
     EXPECT_EQ(1, varArray[0].get_int());
-    EXPECT_EQ(true, varArray[1].get_bool());
+    EXPECT_TRUE(varArray[1].get_bool());
 
     auto innerDict = outerDict["hints"].get_dict();
     EXPECT_EQ("maiden", innerDict["iron"].get_string());
