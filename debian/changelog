@@ -1,3 +1,9 @@
+unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Added set_internet_connectivity() and internet_connectivity() to *Metadata classes.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 21 Jul 2014 09:14:39 +0200
+
 unity-scopes-api (0.5.2+14.10.20140715-0ubuntu1) utopic; urgency=low
 
   [ Michal Hruby ]
