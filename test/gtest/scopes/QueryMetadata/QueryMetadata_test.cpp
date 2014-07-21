@@ -33,6 +33,16 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
+    }
+    {
+        SearchMetadata meta("pl", "phone");
+
+        meta.set_internet_connectivity(true);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ("pl", meta.locale());
+        EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(true, *meta.internet_connectivity());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -40,6 +50,7 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(50, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -52,12 +63,14 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ("bar", meta.hints()["foo"].get_string());
         EXPECT_EQ(1000, meta.hints()["baz"].get_int());
         EXPECT_TRUE(meta.contains_hint("foo"));
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
     }
     {
         // referencing non-existing hint with a const object throws
         SearchMetadata const meta(50, "pl", "phone");
         EXPECT_THROW(meta["foo"], unity::LogicException);
         EXPECT_FALSE(meta.contains_hint("foo"));
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
     }
 }
 
@@ -72,6 +85,19 @@ TEST(SearchMetadata, serialize)
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
         EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_EQ(var.end(), var.find("internet_connectivity"));
+    }
+    {
+        SearchMetadata meta("pl", "phone");
+        meta["foo"] = "bar";
+        meta.set_internet_connectivity(false);
+
+        auto var = meta.serialize();
+        EXPECT_EQ("search_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_EQ(false, var["internet_connectivity"].get_bool());
     }
 }
 
@@ -84,14 +110,36 @@ TEST(SearchMetadata, copy)
         meta.set_cardinality(0);
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
     }
     {
         SearchMetadata meta(100, "pl", "phone");
         SearchMetadata meta2(meta);
-        meta.set_cardinality(0);
 
+        meta.set_cardinality(0);
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
+    }
+    {
+        SearchMetadata meta(100, "pl", "phone");
+        auto meta2 = meta;
+
+        meta.set_cardinality(0);
+        meta.set_internet_connectivity(true);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(true, *meta.internet_connectivity());
+    }
+    {
+        SearchMetadata meta(100, "pl", "phone");
+        SearchMetadata meta2(meta);
+
+        meta.set_cardinality(0);
+        meta.set_internet_connectivity(false);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(false, *meta.internet_connectivity());
     }
 }
 
@@ -106,6 +154,19 @@ TEST(ActionMetadata, basic)
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
         EXPECT_EQ("bar", meta.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
+    }
+    {
+        VariantMap var;
+        var["foo"] = "bar";
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(var));
+        meta.set_internet_connectivity(false);
+
+        EXPECT_EQ("pl", meta.locale());
+        EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ("bar", meta.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(false, *meta.internet_connectivity());
     }
 }
 
@@ -120,12 +181,34 @@ TEST(ActionMetadata, serialize_and_deserialize)
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
         EXPECT_EQ(1234, var["scope_data"].get_int());
+        EXPECT_EQ(var.end(), var.find("internet_connectivity"));
 
         // deserialize
         auto meta2 = internal::ActionMetadataImpl::create(var);
         EXPECT_EQ("pl", meta2.locale());
         EXPECT_EQ("phone", meta2.form_factor());
         EXPECT_EQ(1234, meta2.scope_data().get_int());
+        EXPECT_EQ(nullptr, meta2.internet_connectivity());
+    }
+
+    {
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(1234));
+        meta.set_internet_connectivity(true);
+
+        auto var = meta.serialize();
+        EXPECT_EQ("action_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ(1234, var["scope_data"].get_int());
+        EXPECT_EQ(true, var["internet_connectivity"].get_bool());
+
+        // deserialize
+        auto meta2 = internal::ActionMetadataImpl::create(var);
+        EXPECT_EQ("pl", meta2.locale());
+        EXPECT_EQ("phone", meta2.form_factor());
+        EXPECT_EQ(1234, meta2.scope_data().get_int());
+        EXPECT_EQ(true, *meta2.internet_connectivity());
     }
 }
 
@@ -140,6 +223,7 @@ TEST(ActionMetadata, copy)
 
         EXPECT_TRUE(meta2.scope_data().is_null());
         EXPECT_EQ("foo", meta.scope_data().get_string());
+        EXPECT_EQ(nullptr, meta.internet_connectivity());
     }
     {
         ActionMetadata meta("pl", "phone");
@@ -147,8 +231,10 @@ TEST(ActionMetadata, copy)
 
         Variant var(10);
         meta.set_scope_data(var);
+        meta.set_internet_connectivity(false);
 
         EXPECT_TRUE(meta2.scope_data().is_null());
         EXPECT_EQ(10, meta.scope_data().get_int());
+        EXPECT_EQ(false, *meta.internet_connectivity());
     }
 }
