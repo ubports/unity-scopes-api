@@ -48,6 +48,9 @@ public:
     std::string locale() const;
     std::string form_factor() const;
 
+    void set_internet_connectivity(bool is_connected);
+    std::shared_ptr<bool> internet_connectivity() const;
+
 protected:
     virtual VariantMap serialize() const = 0;
     virtual void serialize(VariantMap& var) const = 0;
@@ -56,6 +59,7 @@ protected:
 private:
     std::string locale_;
     std::string form_factor_;
+    std::shared_ptr<bool> internet_connectivity_;
 };
 
 } // namespace internal

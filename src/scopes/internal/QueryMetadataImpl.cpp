@@ -41,6 +41,11 @@ QueryMetadataImpl::QueryMetadataImpl(VariantMap const& var)
     locale_ = it->second.get_string();
     it = find_or_throw(context, var, "form_factor");
     form_factor_ = it->second.get_string();
+    it = var.find("internet_connectivity");
+    if (it != var.end())
+    {
+        internet_connectivity_ = std::make_shared<bool>(it->second.get_bool());
+    }
 }
 
 std::string QueryMetadataImpl::locale() const
@@ -53,11 +58,25 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
+void QueryMetadataImpl::set_internet_connectivity(bool is_connected)
+{
+    internet_connectivity_ = std::make_shared<bool>(is_connected);
+}
+
+std::shared_ptr<bool> QueryMetadataImpl::internet_connectivity() const
+{
+    return internet_connectivity_;
+}
+
 void QueryMetadataImpl::serialize(VariantMap& var) const
 {
     var["type"] = metadata_type();
     var["locale"] = locale_;
     var["form_factor"] = form_factor_;
+    if (internet_connectivity_)
+    {
+        var["internet_connectivity"] = *internet_connectivity_;
+    }
 }
 
 VariantMap QueryMetadataImpl::serialize() const

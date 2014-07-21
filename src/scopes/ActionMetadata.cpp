@@ -87,6 +87,16 @@ Variant ActionMetadata::scope_data() const
     return p->scope_data();
 }
 
+void ActionMetadata::set_internet_connectivity(bool is_connected)
+{
+    p->set_internet_connectivity(is_connected);
+}
+
+std::shared_ptr<bool> ActionMetadata::internet_connectivity() const
+{
+    return p->internet_connectivity();
+}
+
 } // namespace scopes
 
 } // namespace unity

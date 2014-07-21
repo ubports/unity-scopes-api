@@ -143,6 +143,19 @@ public:
     */
     Variant const& operator[](std::string const& key) const;
 
+    /**
+    \brief Set internet connectivity status.
+    \param is_connected A boolean indicating whether or not we have internet connectivity
+    */
+    void set_internet_connectivity(bool is_connected);
+
+    /**
+    \brief Get internet connectivity status.
+    \return A pointer to a boolean indicating whether or not we have internet connectivity
+    (nullptr if state unknown).
+    */
+    std::shared_ptr<bool> internet_connectivity() const;
+
     /// @cond
     VariantMap serialize() const;
     /// @endcond

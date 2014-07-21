@@ -115,6 +115,16 @@ bool SearchMetadata::contains_hint(std::string const& key) const
     return p->contains_hint(key);
 }
 
+void SearchMetadata::set_internet_connectivity(bool is_connected)
+{
+    p->set_internet_connectivity(is_connected);
+}
+
+std::shared_ptr<bool> SearchMetadata::internet_connectivity() const
+{
+    return p->internet_connectivity();
+}
+
 } // namespace scopes
 
 } // namespace unity
