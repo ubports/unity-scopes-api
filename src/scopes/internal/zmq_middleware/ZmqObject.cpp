@@ -234,7 +234,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
         }
         catch (NotFoundException const&)
         {
-            // Ignore a failed locate() for a scope unknown to the registry
+            // Ignore a failed locate() for scopes unknown to the registry
         }
     }
 
