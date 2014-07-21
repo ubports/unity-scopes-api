@@ -27,7 +27,13 @@ using namespace unity::scopes;
 class PusherScope : public ScopeBase
 {
 public:
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override;
+    virtual void start(string const&, RegistryProxy const &) override;
+
+    virtual void stop() override;
+
+    virtual void run() override;
+
+    virtual SearchQueryBase::UPtr search(CannedQuery const &, SearchMetadata const &) override;
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
 };
 

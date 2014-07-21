@@ -384,7 +384,6 @@ public:
         RegistryConfig c(reg_id, rt->registry_configfile());
         std::string mw_kind = c.mw_kind();
         std::string scoperunner_path = c.scoperunner_path();
-        process_timeout = c.process_timeout();
 
         mw = rt->factory()->find(reg_id, mw_kind);
 
@@ -413,7 +412,7 @@ public:
             exec_data.scoperunner_path = scoperunner_path;
             exec_data.runtime_config = runtime_ini;
             exec_data.scope_config = DEMO_DIR "/scopes/" + scope_id + "/" + scope_id + ".ini";
-            exec_data.timeout_ms = process_timeout;
+            exec_data.timeout_ms = 1500;
 
             reg->add_local_scope(scope_id, move(meta), exec_data);
         }
@@ -465,7 +464,7 @@ public:
         exec_data.custom_exec = sc.scope_runner();
         exec_data.runtime_config = runtime_ini;
         exec_data.scope_config = test_scope_config;
-        exec_data.timeout_ms = process_timeout;
+        exec_data.timeout_ms = 1500;
 
         reg->add_local_scope(test_scope_id, move(meta), exec_data);
 
@@ -502,7 +501,6 @@ protected:
     RegistryObject::SPtr reg;
     std::array<std::string, 6> scope_ids;
     std::map<std::string, ScopeProxy> proxies;
-    int process_timeout;
 };
 
 // test initial state

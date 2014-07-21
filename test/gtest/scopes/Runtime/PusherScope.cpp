@@ -36,9 +36,8 @@ namespace
 class PusherQuery : public SearchQueryBase
 {
 public:
-    PusherQuery(CannedQuery const& query, SearchMetadata const& metadata)
-        : SearchQueryBase(query, metadata)
-        , cardinality_(metadata.cardinality())
+    PusherQuery(int cardinality)
+        : cardinality_(cardinality)
     {
     }
 
@@ -70,9 +69,21 @@ private:
 
 }  // namespace
 
-SearchQueryBase::UPtr PusherScope::search(CannedQuery const& q, SearchMetadata const& md)
+void PusherScope::start(string const&, RegistryProxy const &)
 {
-    return SearchQueryBase::UPtr(new PusherQuery(q, md));
+}
+
+void PusherScope::stop()
+{
+}
+
+void PusherScope::run()
+{
+}
+
+SearchQueryBase::UPtr PusherScope::search(CannedQuery const& /* query */, SearchMetadata const& md)
+{
+    return SearchQueryBase::UPtr(new PusherQuery(md.cardinality()));
 }
 
 PreviewQueryBase::UPtr PusherScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
