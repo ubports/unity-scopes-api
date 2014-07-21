@@ -344,16 +344,6 @@ set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
 
 set(ldflags "")
 
-# We add the soversion to the link flags for the libraries so, if we upgrade from,
-# say 1.1.2 to 1.1.3, the dependency is on libunity-scopes.so.11, not on
-# libunity-scopes.so.1.1.2, and existing binaries can still be used with the
-# ABI compatible updated library.
-set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-                      LINK_FLAGS "${ldflags} -Wl,-so-name=lib${UNITY_SCOPES_LIB}.so.${UNITY_SCOPES_SOVERSION}")
-
-set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-                      LINK_FLAGS "${ldflags} -Wl,-so-name=lib${UNITY_SCOPES_TEST_LIB}.so.${UNITY_SCOPES_SOVERSION}")
-
 # Clang sanitizers don't work if --no-undefined is given as a linker argument.
 if(NOT IS_CLANG)
     set(ldflags "-Wl,--no-undefined")
