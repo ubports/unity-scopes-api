@@ -135,6 +135,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::micro_version()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::minor_version()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::set_scope_data(unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ActionMetadata::set_internet_connectivity(bool)@Base" 0replaceme
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::internal::ActionMetadataImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
@@ -147,6 +148,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::set_cardinality(int)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchMetadata::set_internet_connectivity(bool)@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::set_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::internal::SearchMetadataImpl*)@Base" 0.4.0+14.04.20140312.1
@@ -625,11 +627,13 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::scope_data() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::form_factor() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ActionMetadata::internet_connectivity() const@Base" 0replaceme
  (c++)"unity::scopes::ActionMetadata::locale() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::form_factor() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchMetadata::internet_connectivity() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::locale() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
