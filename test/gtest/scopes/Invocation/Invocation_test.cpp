@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 
     // Give threads some time to bind to endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(500));
 
     auto rc = RUN_ALL_TESTS();
 

@@ -87,7 +87,10 @@ struct RaiiScopeThread
 
     RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
         : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
-          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); }) {}
+          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); })
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
 
     ~RaiiScopeThread()
     {

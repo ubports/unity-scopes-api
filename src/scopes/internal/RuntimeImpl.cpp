@@ -298,8 +298,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
-    cerr << "---1---\n";
-
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
@@ -313,7 +311,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     string scope_dir = scope_base->scope_directory();
     string settings_db = settings_dir + "/settings.db";
     string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
-    cerr << "---2---\n";
     if (boost::filesystem::exists(settings_schema))
     {
         // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
@@ -323,7 +320,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
         scope_base->p->set_settings_db(db);
     }
-    cerr << "---3---\n";
 
     scope_base->start(scope_id_, registry());
     // Ensure the scope gets stopped.
@@ -334,7 +330,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     // that's fine.
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
 
-    cerr << "---4---\n";
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
     if (!scope_ini_file.empty())
@@ -347,7 +342,6 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
         mw->add_scope_object(scope_id_, move(scope));
     }
 
-    cerr << "---5---\n";
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
 

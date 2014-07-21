@@ -84,7 +84,6 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
       lib_dir += '/';
     }
 
-    cerr << "---1---\n";
     int exit_status = 1;
     try
     {
@@ -101,8 +100,6 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         string failed_libs;
         ScopeLoader::SPtr loader;
         exception_ptr ep;
-
-        cerr << "---2---\n";
         for (auto const& lib : libs)
         {
             try
@@ -126,9 +123,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
             e.remember(ep);
             throw e;
         }
-        cerr << "---3---\n";
         loader->start();
-        cerr << "---4---\n";
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
         // immediately returns from run(), that's fine.
@@ -143,8 +138,6 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         {
             mw->stop();
         });
-
-        cerr << "---5---\n";
 
         // Inform the registry that this scope is now ready to process requests
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
