@@ -144,7 +144,7 @@ The following keys are recognized:
   within the specified time, the invocation throws a TimeoutException, possibly
   after asking the registry to start the target process first (see Locate.Timeout).
 
-  The default value is 300 milliseconds.
+  The default value is 500 milliseconds.
 
 - Smartscopes.Registry.EndpointDir
 
