@@ -196,6 +196,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         cerr << "---40---\n";
 
         exit_status = 0;
+        cerr << "---41---\n";
     }
     catch (std::exception const& e)
     {
