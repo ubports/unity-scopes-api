@@ -61,28 +61,43 @@ void error(string const& msg)
 
 int run_scope(std::string const& runtime_config, std::string const& scope_configfile)
 {
+    cerr << "---1---\n";
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
         core::posix::Signal::sig_hup,
         core::posix::Signal::sig_term
     });
+    cerr << "---2---\n";
 
     std::thread trap_worker([trap]() { trap->run(); });
+    cerr << "---3---\n";
 
     // Retrieve the registry middleware and create a proxy to its state receiver
     RuntimeConfig rt_config(runtime_config);
+    cerr << "---4---\n";
     RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
+    cerr << "---5---\n";
     auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
+    cerr << "---6---\n";
     auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
+    cerr << "---7---\n";
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
 
+    cerr << "---8---\n";
+
     filesystem::path scope_config_path(scope_configfile);
+    cerr << "---9---\n";
     string lib_dir = scope_config_path.parent_path().native();
+    cerr << "---10---\n";
     string scope_id = scope_config_path.stem().native();
+    cerr << "---11---\n";
     if (!lib_dir.empty())
     {
       lib_dir += '/';
+      cerr << "---12---\n";
     }
+
+    cerr << "---13---\n";
 
     int exit_status = 1;
     try
@@ -90,68 +105,95 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         // Instantiate the run time, create the middleware, load the scope from its
         // shared library, and call the scope's start() method.
         auto rt = RuntimeImpl::create(scope_id, runtime_config);
+        cerr << "---14---\n";
         auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
+        cerr << "---15---\n";
 
         // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
         vector<string> libs;
+        cerr << "---16---\n";
         libs.push_back(lib_dir + "lib" + scope_id + ".so");
+        cerr << "---17---\n";
         libs.push_back(lib_dir + scope_id + ".so");
+        cerr << "---18---\n";
         libs.push_back(lib_dir + "scope.so");
+        cerr << "---19---\n";
         string failed_libs;
+        cerr << "---20---\n";
         ScopeLoader::SPtr loader;
+        cerr << "---21---\n";
         exception_ptr ep;
+        cerr << "---22---\n";
         for (auto const& lib : libs)
         {
             try
             {
                 loader = ScopeLoader::load(scope_id, lib, rt_config.data_directory(), rt->registry());
+                cerr << "---23---\n";
             }
             catch (unity::ResourceException& e)
             {
                 failed_libs += "\n    " + lib;
+                cerr << "---24---\n";
                 ep = e.remember(ep);
+                cerr << "---25---\n";
             }
             if (loader)
             {
                 break;
+                cerr << "---26---\n";
             }
         }
         if (!loader)
         {
             unity::ResourceException e("Cannot load scope " + scope_id + "; tried in the following locations:"
                                        + failed_libs);
+            cerr << "---27---\n";
             e.remember(ep);
+            cerr << "---28---\n";
             throw e;
         }
+        cerr << "---29---\n";
         loader->start();
+        cerr << "---30---\n";
 
         // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
         // immediately returns from run(), that's fine.
         auto run_future = std::async(launch::async, [loader] { loader->scope_base()->run(); });
+        cerr << "---31---\n";
 
         // Create a servant for the scope and register the servant.
         ScopeConfig scope_config(scope_configfile);
+        cerr << "---32---\n";
         auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
+        cerr << "---33---\n";
         auto proxy = mw->add_scope_object(scope_id, move(scope), scope_config.idle_timeout() * 1000);
+        cerr << "---34---\n";
 
         trap->signal_raised().connect([mw](core::posix::Signal)
         {
             mw->stop();
+            cerr << "---35---\n";
         });
 
         // Inform the registry that this scope is now ready to process requests
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
+        cerr << "---36---\n";
 
         mw->wait_for_shutdown();
+        cerr << "---37---\n";
 
         // Inform the registry that this scope is shutting down
         reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
+        cerr << "---38---\n";
 
         loader->stop();
+        cerr << "---39---\n";
 
         // Collect exit status from the run thread. If this throws, the ScopeLoader
         // destructor will still call stop() on the scope.
         run_future.get();
+        cerr << "---40---\n";
 
         exit_status = 0;
     }
