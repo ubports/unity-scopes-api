@@ -85,11 +85,18 @@ public:
     void set_internet_connectivity(bool is_connected);
 
     /**
-    \brief Get internet connectivity status.
-    \return A pointer to a boolean indicating whether or not we have internet connectivity
-    (nullptr if state unknown).
+    \brief Indicates the internet connectivity status.
+
+    The `Unknown` enumerator indicates that set_internet_connectivity() has not yet been called,
+    hense the connectivity status is currently unknown.
     */
-    std::shared_ptr<bool> internet_connectivity() const;
+    enum ConnectivityStatus { Unknown, Connected, Disconnected };
+
+    /**
+    \brief Get internet connectivity status.
+    \return Enum indicating the internet connectivity status.
+    */
+    ConnectivityStatus internet_connectivity() const;
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.

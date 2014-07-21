@@ -92,9 +92,20 @@ void ActionMetadata::set_internet_connectivity(bool is_connected)
     p->set_internet_connectivity(is_connected);
 }
 
-std::shared_ptr<bool> ActionMetadata::internet_connectivity() const
+ActionMetadata::ConnectivityStatus ActionMetadata::internet_connectivity() const
 {
-    return p->internet_connectivity();
+    if (p->internet_connectivity() == nullptr)
+    {
+        return Unknown;
+    }
+    else if (*p->internet_connectivity() == true)
+    {
+        return Connected;
+    }
+    else
+    {
+        return Disconnected;
+    }
 }
 
 } // namespace scopes
