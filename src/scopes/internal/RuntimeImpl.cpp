@@ -291,66 +291,95 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     {
         throw InvalidArgumentException("Runtime::run_scope(): scope_base cannot be nullptr");
     }
+    cerr << "----1----\n";
 
     // Retrieve the registry middleware and create a proxy to its state receiver
     RegistryConfig reg_conf(registry_identity_, registry_configfile_);
+    cerr << "----2----\n";
     auto reg_runtime = create(registry_identity_, runtime_ini_file);
+    cerr << "----3----\n";
     auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
+    cerr << "----4----\n";
     auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
+    cerr << "----5----\n";
 
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
+    cerr << "----6----\n";
 
     {
         boost::filesystem::path inip(scope_ini_file);
+        cerr << "----7----\n";
         boost::filesystem::path scope_dir(inip.parent_path());
+        cerr << "----8----\n";
         scope_base->p->set_scope_directory(inip.native());
+        cerr << "----9----\n";
     }
 
     // Try to open the scope settings database, if any.
     string settings_dir = data_dir_ + "/" + scope_id_;
+    cerr << "----10----\n";
     string scope_dir = scope_base->scope_directory();
+    cerr << "----11----\n";
     string settings_db = settings_dir + "/settings.db";
+    cerr << "----12----\n";
     string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+    cerr << "----13----\n";
     if (boost::filesystem::exists(settings_schema))
     {
+        cerr << "----14----\n";
         // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
         ::mkdir(data_dir_.c_str(), 0700);
+        cerr << "----15----\n";
         ::mkdir(settings_dir.c_str(), 0700);
+        cerr << "----16----\n";
 
         shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+        cerr << "----17----\n";
         scope_base->p->set_settings_db(db);
+        cerr << "----18----\n";
     }
 
     scope_base->start(scope_id_, registry());
+    cerr << "----19----\n";
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
+    cerr << "----20----\n";
 
     // Give a thread to the scope to do with as it likes. If the scope
     // doesn't want to use it and immediately returns from run(),
     // that's fine.
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
+    cerr << "----21----\n";
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+    cerr << "----22----\n";
     if (!scope_ini_file.empty())
     {
         ScopeConfig scope_config(scope_ini_file);
+        cerr << "----23----\n";
         mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
+        cerr << "----24----\n";
     }
     else
     {
         mw->add_scope_object(scope_id_, move(scope));
+        cerr << "----25----\n";
     }
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+    cerr << "----26----\n";
 
     mw->wait_for_shutdown();
+    cerr << "----27----\n";
 
     // Inform the registry that this scope is shutting down
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
+    cerr << "----28----\n";
 
     run_future.get();
+    cerr << "----29----\n";
 }
 
 ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const
