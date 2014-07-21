@@ -87,9 +87,22 @@ Variant ActionMetadata::scope_data() const
     return p->scope_data();
 }
 
-void ActionMetadata::set_internet_connectivity(bool is_connected)
+void ActionMetadata::set_internet_connectivity(ConnectivityStatus connectivity_status)
 {
-    p->set_internet_connectivity(is_connected);
+    switch (connectivity_status)
+    {
+        case Unknown:
+            p->set_internet_connectivity(nullptr);
+            break;
+        case Connected:
+            p->set_internet_connectivity(std::make_shared<bool>(true));
+            break;
+        case Disconnected:
+            p->set_internet_connectivity(std::make_shared<bool>(false));
+            break;
+        default:
+            break;
+    }
 }
 
 ActionMetadata::ConnectivityStatus ActionMetadata::internet_connectivity() const

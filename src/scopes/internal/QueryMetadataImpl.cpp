@@ -58,9 +58,9 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
-void QueryMetadataImpl::set_internet_connectivity(bool is_connected)
+void QueryMetadataImpl::set_internet_connectivity(std::shared_ptr<bool> is_connected)
 {
-    internet_connectivity_ = std::make_shared<bool>(is_connected);
+    internet_connectivity_ = is_connected;
 }
 
 std::shared_ptr<bool> QueryMetadataImpl::internet_connectivity() const

@@ -79,18 +79,18 @@ public:
     Variant scope_data() const;
 
     /**
-    \brief Set internet connectivity status.
-    \param is_connected A boolean indicating whether or not we have internet connectivity
-    */
-    void set_internet_connectivity(bool is_connected);
-
-    /**
     \brief Indicates the internet connectivity status.
 
     The `Unknown` enumerator indicates that set_internet_connectivity() has not yet been called,
     hense the connectivity status is currently unknown.
     */
     enum ConnectivityStatus { Unknown, Connected, Disconnected };
+
+    /**
+    \brief Set internet connectivity status.
+    \param connectivity_status Enum indicating the internet connectivity status.
+    */
+    void set_internet_connectivity(ConnectivityStatus connectivity_status);
 
     /**
     \brief Get internet connectivity status.

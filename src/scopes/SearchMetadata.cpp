@@ -115,9 +115,22 @@ bool SearchMetadata::contains_hint(std::string const& key) const
     return p->contains_hint(key);
 }
 
-void SearchMetadata::set_internet_connectivity(bool is_connected)
+void SearchMetadata::set_internet_connectivity(ConnectivityStatus connectivity_status)
 {
-    p->set_internet_connectivity(is_connected);
+    switch (connectivity_status)
+    {
+        case Unknown:
+            p->set_internet_connectivity(nullptr);
+            break;
+        case Connected:
+            p->set_internet_connectivity(std::make_shared<bool>(true));
+            break;
+        case Disconnected:
+            p->set_internet_connectivity(std::make_shared<bool>(false));
+            break;
+        default:
+            break;
+    }
 }
 
 SearchMetadata::ConnectivityStatus SearchMetadata::internet_connectivity() const

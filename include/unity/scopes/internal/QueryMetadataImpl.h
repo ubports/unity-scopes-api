@@ -48,7 +48,7 @@ public:
     std::string locale() const;
     std::string form_factor() const;
 
-    void set_internet_connectivity(bool is_connected);
+    void set_internet_connectivity(std::shared_ptr<bool> is_connected);
     std::shared_ptr<bool> internet_connectivity() const;
 
 protected:
