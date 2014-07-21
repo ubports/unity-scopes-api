@@ -99,6 +99,18 @@ TEST(Registry, metadata)
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
     EXPECT_TRUE(meta.location_data_needed());
 
+    auto attrs = meta.appearance_attributes();
+    EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
+    EXPECT_EQ("bg_color", attrs["background-color"].get_string());
+    EXPECT_TRUE(attrs["shape-images"].get_bool());
+    EXPECT_EQ("cat_header_bg_scheme", attrs["category-header-background"].get_string());
+    EXPECT_EQ("preview_button_color", attrs["preview-button-color"].get_string());
+    auto page_hdr = attrs["page-header"].get_dict();
+    EXPECT_EQ("some_url", page_hdr["logo"].get_string());
+    EXPECT_EQ("fg_color", page_hdr["foreground-color"].get_string());
+    EXPECT_EQ("div_color", page_hdr["divider-color"].get_string());
+    EXPECT_EQ("nav_background", page_hdr["navigation-background"].get_string());
+
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
 
