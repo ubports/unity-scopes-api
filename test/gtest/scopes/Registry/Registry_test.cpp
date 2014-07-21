@@ -193,6 +193,11 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(testscopeB_state);
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
+    // check that the scope is still running after 1s (should only time out after 2s)
+    std::this_thread::sleep_for(std::chrono::seconds{1});
+    EXPECT_TRUE(testscopeB_state);
+    EXPECT_TRUE(r->is_scope_running("testscopeB"));
+
     // check now that we get a callback when testscopeB terminates (timed out after 2s)
     std::this_thread::sleep_for(std::chrono::seconds{4});
     EXPECT_TRUE(wait_for_state_update());
