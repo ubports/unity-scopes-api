@@ -56,7 +56,7 @@ public:
     The `Error` enumerator indicates that a query terminated abnormally, for example,
     because a scope could not be reached over the network or explicitly reported an error.
     */
-    enum Reason { Finished, FinishedWithWarnings, Cancelled, Error };
+    enum Reason { Finished, Cancelled, Error };
 
     /**
     \brief Called once by the scopes run time after the final result for a request was sent.

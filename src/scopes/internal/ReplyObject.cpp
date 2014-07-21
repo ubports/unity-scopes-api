@@ -158,14 +158,7 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        if (r == ListenerBase::Finished && warning_occurred_.load())
-        {
-            listener_base_->finished(ListenerBase::FinishedWithWarnings, error_message);
-        }
-        else
-        {
-            listener_base_->finished(r, error_message);
-        }
+        listener_base_->finished(r, error_message);
     }
     catch (std::exception const& e)
     {

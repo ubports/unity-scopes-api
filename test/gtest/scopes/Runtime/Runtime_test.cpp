@@ -102,7 +102,7 @@ public:
 
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
-        EXPECT_EQ(FinishedWithWarnings, reason);
+        EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
@@ -180,7 +180,7 @@ public:
 
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
-        EXPECT_EQ(FinishedWithWarnings, reason);
+        EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, widgets_pushes_);
         EXPECT_EQ(2, data_pushes_);

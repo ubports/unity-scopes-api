@@ -50,7 +50,6 @@ void ListenerBase::warning(Reply::Warning, std::string const&)
 static unordered_map<int, char const*> const reasons =
 {
     pair<int, char const*>(static_cast<int>(ListenerBase::Finished),  "finished"),
-    pair<int, char const*>(static_cast<int>(ListenerBase::FinishedWithWarnings),  "finished (with warnings)"),
     pair<int, char const*>(static_cast<int>(ListenerBase::Cancelled), "cancelled"),
     pair<int, char const*>(static_cast<int>(ListenerBase::Error),     "error")
 };
