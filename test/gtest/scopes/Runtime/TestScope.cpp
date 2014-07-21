@@ -108,6 +108,7 @@ public:
     virtual void cancelled() override
     {
     }
+
     virtual void run(PreviewReplyProxy const& reply) override
     {
         // send test warning for no location data (run start)
@@ -124,18 +125,6 @@ public:
         reply->warning(Reply::InaccurateLocationData, "Partial results returned due to inaccurate location data.");
     }
 };
-
-void TestScope::start(string const&, RegistryProxy const &)
-{
-}
-
-void TestScope::stop()
-{
-}
-
-void TestScope::run()
-{
-}
 
 SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {

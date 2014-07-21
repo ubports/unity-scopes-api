@@ -378,14 +378,14 @@ void RegistryObject::ScopeProcess::exec(
         if (!wait_for_state(lock, ScopeProcess::Stopped))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
-                 << exec_data_.scope_id << "\" took too long to stop." << endl;
+                 << exec_data_.scope_id << "\" did not stop after " << exec_data_.timeout_ms << " ms." << endl;
             try
             {
                 kill(lock);
             }
             catch(std::exception const& e)
             {
-                cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+                cerr << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what() << endl;
             }
         }
     }
@@ -443,10 +443,11 @@ void RegistryObject::ScopeProcess::exec(
         }
         catch(std::exception const& e)
         {
-            cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+            cerr << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what() << endl;
         }
         throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
-                                       + exec_data_.scope_id + "\" took too long to start.");
+                                       + exec_data_.scope_id + "\" took longer than "
+                                       + std::to_string(exec_data_.timeout_ms) + " ms to start.");
     }
 
     cout << "RegistryObject::ScopeProcess::exec(): Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
@@ -562,7 +563,7 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
             std::error_code ec;
 
             cerr << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
-                 << "\" is taking longer than expected to terminate gracefully. "
+                 << "\" took longer than " << exec_data_.timeout_ms << " ms to terminate gracefully. "
                  << "Killing the process instead." << endl;
 
             // scope is taking too long to close, send kill signal

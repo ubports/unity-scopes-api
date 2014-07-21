@@ -49,7 +49,7 @@ class Setting final
 public:
     NONCOPYABLE(Setting);
 
-    Setting(Json::Value const& v);
+    explicit Setting(Json::Value const& v);
     ~Setting() = default;
 
     string id() const;

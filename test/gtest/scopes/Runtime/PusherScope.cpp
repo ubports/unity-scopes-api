@@ -70,18 +70,6 @@ private:
 
 }  // namespace
 
-void PusherScope::start(string const&, RegistryProxy const &)
-{
-}
-
-void PusherScope::stop()
-{
-}
-
-void PusherScope::run()
-{
-}
-
 SearchQueryBase::UPtr PusherScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     return SearchQueryBase::UPtr(new PusherQuery(query, metadata));

@@ -36,7 +36,7 @@ class TestQuery : public SearchQueryBase
 {
 public:
     TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
-      : SearchQueryBase(query, metadata)
+        : SearchQueryBase(query, metadata)
     {
         lock_guard<mutex> lock(mutex_);
         cancelled_ = false;
@@ -70,18 +70,6 @@ private:
 };
 
 }  // namespace
-
-void SlowCreateScope::start(string const&, RegistryProxy const &)
-{
-}
-
-void SlowCreateScope::stop()
-{
-}
-
-void SlowCreateScope::run()
-{
-}
 
 SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
