@@ -148,6 +148,13 @@ public:
 
     The `Unknown` enumerator indicates that set_internet_connectivity() has not yet been called,
     hense the connectivity status is currently unknown.
+
+    The `Connected` enumerator simply indicates that we are currently connected to the internet.
+    This does not necessarily mean that a particular host on the internet will be reachable.
+
+    The `Disconnected` enumerator indicates that we are currently not connected to the internet.
+    In this state, a scope need not waste any time attempting remote calls, as they will almost
+    certainly fail.
     */
     enum ConnectivityStatus { Unknown, Connected, Disconnected };
 
