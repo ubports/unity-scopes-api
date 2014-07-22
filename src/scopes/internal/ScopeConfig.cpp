@@ -55,7 +55,6 @@ namespace
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
-    const string confinement_type_key = "ConfinementType";
 
     const string scope_appearance_group = "Appearance";
 }
@@ -179,17 +178,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
-    {
-        static set<string> const valid_types = { "leaf-net", "unconfined" };
-
-        string type = get_optional_string(scope_config_group, confinement_type_key, DFLT_CONFINEMENT_TYPE);
-        if (valid_types.find(type) == valid_types.end())
-        {
-            throw_ex("Illegal value (\"" + type + "\") for " + confinement_type_key);
-        }
-        confinement_type_ = type;
-    }
-
     // read all display attributes from scope_appearance_group
     try
     {
@@ -217,8 +205,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 location_data_needed_key,
                                                 scoperunner_key,
                                                 idle_timeout_key,
-                                                results_ttl_key,
-                                                confinement_type_key
+                                                results_ttl_key
                                              }
                                           },
                                           // TODO: once we know what appearance attributes are supported,
@@ -349,11 +336,6 @@ int ScopeConfig::idle_timeout() const
 ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
 {
     return results_ttl_type_;
-}
-
-string ScopeConfig::confinement_type() const
-{
-    return confinement_type_;
 }
 
 VariantMap ScopeConfig::appearance_attributes() const

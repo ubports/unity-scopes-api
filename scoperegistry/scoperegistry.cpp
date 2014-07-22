@@ -43,8 +43,6 @@
 #include <map>
 #include <set>
 
-#include <sys/stat.h>  // TODO: will not be needed once the calls to mkdir are removed
-
 using namespace scoperegistry;
 using namespace std;
 using namespace unity;
@@ -241,19 +239,11 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                      string const& scoperunner_path,
                      string const& config_file,
                      bool click,
-                     int timeout_ms,
-                     string const& data_dir)
+                     int timeout_ms)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
     string scope_config(scope.second);
     ScopeConfig sc(scope_config);
-
-    // TODO: HACK: We create the scope's cache dir until we get a fancier Apparmor API.
-    //       Once we have that, the scope will be able to find out what its writable
-    //       directory is and create it itself if necessary.
-    string confinement_type = sc.confinement_type();
-    ::mkdir((data_dir + "/" + confinement_type).c_str(), 0700);
-    ::mkdir((data_dir + "/" + confinement_type + "/" + scope.first).c_str(), 0700);
 
     filesystem::path scope_path(scope_config);
     filesystem::path scope_dir(scope_path.parent_path());
@@ -355,14 +345,13 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       string const& scoperunner_path,
                       string const& config_file,
                       bool click,
-                      int timeout_ms,
-                      string const& data_dir)
+                      int timeout_ms)
 {
     for (auto&& pair : all_scopes)
     {
         try
         {
-            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms, data_dir);
+            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms);
         }
         catch (unity::Exception const& e)
         {
@@ -402,12 +391,6 @@ int main(int argc, char* argv[])
         SignalThreadWrapper signal_handler_wrapper;
 
         // And finally creating our runtime.
-        // TODO: We need to make sure that the cache directory for each scope
-        //       is created if it does not exist. Once we have a fancier Apparmor
-        //       API, the dir should be created by the scope itself, so data_dir
-        //       should be removed again then.
-        string data_dir;
-
         string identity;
         string ss_reg_id;
         RuntimeImpl::UPtr runtime;
@@ -417,12 +400,6 @@ int main(int argc, char* argv[])
 
             identity = runtime->registry_identity();
             ss_reg_id = runtime->ss_registry_identity();
-
-            // TODO: We need to make sure that the cache directory for each scope
-            //       is created if it does not exist. Once we have a fancier Apparmor
-            //       API, the dir should be created by the scope itself, so this
-            //       should be removed again then.
-            data_dir = rt_config.data_directory();
         } // Release memory for config parser
 
         // Collect the registry config data.
@@ -482,10 +459,8 @@ int main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path,
-                         config_file, false, process_timeout, data_dir);
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path,
-                         config_file, true, process_timeout, data_dir);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
         if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");
@@ -496,13 +471,12 @@ int main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        auto local_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout, data_dir]
+        auto local_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
                                   (pair<string, string> const& scope)
         {
             try
             {
-                add_local_scope(registry, scope, middleware, scoperunner_path,
-                                config_file, false, process_timeout, data_dir);
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, false, process_timeout);
             }
             catch (unity::Exception const& e)
             {
@@ -513,13 +487,12 @@ int main(int argc, char* argv[])
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
-        auto click_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout, data_dir]
+        auto click_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
                                   (pair<string, string> const& scope)
         {
             try
             {
-                add_local_scope(registry, scope, middleware, scoperunner_path,
-                                config_file, true, process_timeout, data_dir);
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, true, process_timeout);
             }
             catch (unity::Exception const& e)
             {

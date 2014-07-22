@@ -104,11 +104,10 @@ TEST(RuntimeImpl, directories)
 
         EXPECT_EQ(TEST_DIR, testscope.scope_directory());
 
-        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/leaf-net/TestScope";
+        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/unconfined/TestScope";
         EXPECT_EQ(tmpdir, testscope.tmp_directory());
 
-        // Cache dir does not actually exist at this point, but must still be returned.
-        EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
+        EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
 
         rt->destroy();
         testscope_t.join();
