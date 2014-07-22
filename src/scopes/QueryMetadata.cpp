@@ -27,18 +27,18 @@ namespace scopes
 
 /// @cond
 
-QueryMetadata::QueryMetadata(std::shared_ptr<internal::QueryMetadataImpl> impl)
+QueryMetadata::QueryMetadata(internal::QueryMetadataImpl* impl)
     : p(impl)
 {
 }
 
+QueryMetadata::QueryMetadata(QueryMetadata const& other) = delete;
+QueryMetadata::QueryMetadata(QueryMetadata&&) = default;
+QueryMetadata& QueryMetadata::operator=(QueryMetadata const& other) = delete;
+QueryMetadata& QueryMetadata::operator=(QueryMetadata&&) = default;
+
 QueryMetadata::~QueryMetadata()
 {
-}
-
-VariantMap QueryMetadata::serialize() const
-{
-    return p->serialize();
 }
 
 /// @endcond
@@ -86,6 +86,15 @@ QueryMetadata::ConnectivityStatus QueryMetadata::internet_connectivity() const
         return Disconnected;
     }
 }
+
+/// @cond
+
+VariantMap QueryMetadata::serialize() const
+{
+    return p->serialize();
+}
+
+/// @endcond
 
 } // namespace scopes
 

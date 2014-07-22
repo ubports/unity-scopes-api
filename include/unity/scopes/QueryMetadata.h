@@ -42,12 +42,18 @@ class QueryMetadataImpl;
 class QueryMetadata
 {
 public:
-    /// @cond
-    QueryMetadata(QueryMetadata const&) = delete;
-    QueryMetadata(QueryMetadata&&) = delete;
-    QueryMetadata& operator=(QueryMetadata const&) = delete;
-    QueryMetadata& operator=(QueryMetadata&&) = delete;
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    QueryMetadata(QueryMetadata const& other);
+    QueryMetadata(QueryMetadata&&);
 
+    QueryMetadata& operator=(QueryMetadata const& other);
+    QueryMetadata& operator=(QueryMetadata&&);
+    //@}
+
+    /// @cond
     virtual ~QueryMetadata();
     /// @endcond
 
@@ -92,13 +98,14 @@ public:
 
     /// @cond
     VariantMap serialize() const;
-
-protected:
-    QueryMetadata(std::shared_ptr<internal::QueryMetadataImpl> impl);
     /// @endcond
 
 private:
-    std::shared_ptr<internal::QueryMetadataImpl> p;
+    std::unique_ptr<internal::QueryMetadataImpl> p;
+
+    QueryMetadata(internal::QueryMetadataImpl* impl);
+    friend class ActionMetadata;
+    friend class SearchMetadata;
 };
 
 } // namespace scopes

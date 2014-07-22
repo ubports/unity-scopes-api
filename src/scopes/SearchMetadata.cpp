@@ -27,23 +27,23 @@ namespace scopes
 {
 
 SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor)
-    : p(new internal::SearchMetadataImpl(locale, form_factor))
+    : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor))
 {
 }
 
 SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor)
-    : p(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
+    : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
 {
 }
 
 /// @cond
 SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
-    : p(impl)
+    : QueryMetadata(impl)
 {
 }
 
 SearchMetadata::SearchMetadata(SearchMetadata const& other)
-    : p(new internal::SearchMetadataImpl(*(other.p)))
+    : QueryMetadata(new internal::SearchMetadataImpl(*((internal::SearchMetadataImpl*)other.p.get())))
 {
 }
 
@@ -53,7 +53,7 @@ SearchMetadata& SearchMetadata::operator=(SearchMetadata const& other)
 {
     if (this != &other)
     {
-        p.reset(new internal::SearchMetadataImpl(*(other.p)));
+        p.reset(new internal::SearchMetadataImpl(*((internal::SearchMetadataImpl*)other.p.get())));
     }
     return *this;
 }
@@ -62,46 +62,31 @@ SearchMetadata& SearchMetadata::operator=(SearchMetadata&&) = default;
 
 SearchMetadata::~SearchMetadata() = default;
 
-VariantMap SearchMetadata::serialize() const
-{
-    return p->serialize();
-}
-
 /// @endcond
-
-std::string SearchMetadata::locale() const
-{
-    return p->locale();
-}
-
-std::string SearchMetadata::form_factor() const
-{
-    return p->form_factor();
-}
 
 void SearchMetadata::set_cardinality(int cardinality)
 {
-    p->set_cardinality(cardinality);
+    ((internal::SearchMetadataImpl*)p.get())->set_cardinality(cardinality);
 }
 
 int SearchMetadata::cardinality() const
 {
-    return p->cardinality();
+    return ((internal::SearchMetadataImpl*)p.get())->cardinality();
 }
 
 void SearchMetadata::set_hint(std::string const& key, Variant const& value)
 {
-    p->hint(key) = value;
+    ((internal::SearchMetadataImpl*)p.get())->hint(key) = value;
 }
 
 VariantMap SearchMetadata::hints() const
 {
-    return p->hints();
+    return ((internal::SearchMetadataImpl*)p.get())->hints();
 }
 
 Variant& SearchMetadata::operator[](std::string const& key)
 {
-    return p->hint(key);
+    return ((internal::SearchMetadataImpl*)p.get())->hint(key);
 }
 
 Variant const& SearchMetadata::operator[](std::string const& key) const
@@ -112,41 +97,7 @@ Variant const& SearchMetadata::operator[](std::string const& key) const
 
 bool SearchMetadata::contains_hint(std::string const& key) const
 {
-    return p->contains_hint(key);
-}
-
-void SearchMetadata::set_internet_connectivity(ConnectivityStatus connectivity_status)
-{
-    switch (connectivity_status)
-    {
-        case Unknown:
-            p->set_internet_connectivity(nullptr);
-            break;
-        case Connected:
-            p->set_internet_connectivity(std::make_shared<bool>(true));
-            break;
-        case Disconnected:
-            p->set_internet_connectivity(std::make_shared<bool>(false));
-            break;
-        default:
-            break;
-    }
-}
-
-SearchMetadata::ConnectivityStatus SearchMetadata::internet_connectivity() const
-{
-    if (p->internet_connectivity() == nullptr)
-    {
-        return Unknown;
-    }
-    else if (*p->internet_connectivity() == true)
-    {
-        return Connected;
-    }
-    else
-    {
-        return Disconnected;
-    }
+    return ((internal::SearchMetadataImpl*)p.get())->contains_hint(key);
 }
 
 } // namespace scopes

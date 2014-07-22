@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_SEARCHMETADATA_H
 #define UNITY_SCOPES_SEARCHMETADATA_H
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -38,7 +39,7 @@ class ScopeObject;
 \brief Metadata passed with search requests.
 */
 
-class SearchMetadata final
+class SearchMetadata : public QueryMetadata
 {
 public:
     /// @cond
@@ -74,18 +75,6 @@ public:
     /// @cond
     ~SearchMetadata();
     /// @endcond
-
-    /**
-    \brief Get the locale string.
-    \return The locale string
-    */
-    std::string locale() const;
-
-    /**
-    \brief Get the form factor string.
-    \return The form factor string
-    */
-    std::string form_factor() const;
 
     /**
     \brief Set cardinality.
@@ -143,40 +132,7 @@ public:
     */
     Variant const& operator[](std::string const& key) const;
 
-    /**
-    \brief Indicates the internet connectivity status.
-
-    The `Unknown` enumerator indicates that set_internet_connectivity() has not yet been called,
-    hense the connectivity status is currently unknown.
-
-    The `Connected` enumerator simply indicates that we are currently connected to the internet.
-    This does not necessarily mean that a particular host on the internet will be reachable.
-
-    The `Disconnected` enumerator indicates that we are currently not connected to the internet.
-    In this state, a scope need not waste any time attempting remote calls, as they will almost
-    certainly fail.
-    */
-    enum ConnectivityStatus { Unknown, Connected, Disconnected };
-
-    /**
-    \brief Set internet connectivity status.
-    \param connectivity_status Enum indicating the internet connectivity status.
-    */
-    void set_internet_connectivity(ConnectivityStatus connectivity_status);
-
-    /**
-    \brief Get internet connectivity status.
-    \return Enum indicating the internet connectivity status.
-    */
-    ConnectivityStatus internet_connectivity() const;
-
-    /// @cond
-    VariantMap serialize() const;
-    /// @endcond
-
 private:
-    std::unique_ptr<internal::SearchMetadataImpl> p;
-
     SearchMetadata(internal::SearchMetadataImpl *impl);
     friend class internal::SearchMetadataImpl;
 };

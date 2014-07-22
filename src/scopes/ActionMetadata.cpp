@@ -27,18 +27,18 @@ namespace scopes
 {
 
 ActionMetadata::ActionMetadata(std::string const& locale, std::string const& form_factor)
-    : p(new internal::ActionMetadataImpl(locale, form_factor))
+    : QueryMetadata(new internal::ActionMetadataImpl(locale, form_factor))
 {
 }
 
 /// @cond
 ActionMetadata::ActionMetadata(internal::ActionMetadataImpl *impl)
-    : p(impl)
+    : QueryMetadata(impl)
 {
 }
 
 ActionMetadata::ActionMetadata(ActionMetadata const& other)
-    : p(new internal::ActionMetadataImpl(*(other.p.get())))
+    : QueryMetadata(new internal::ActionMetadataImpl(*((internal::ActionMetadataImpl*)other.p.get())))
 {
 }
 
@@ -52,73 +52,23 @@ ActionMetadata& ActionMetadata::operator=(ActionMetadata const& other)
 {
     if (this != &other)
     {
-        p.reset(new internal::ActionMetadataImpl(*(other.p.get())));
+        p.reset(new internal::ActionMetadataImpl(*((internal::ActionMetadataImpl*)other.p.get())));
     }
     return *this;
 }
 
 ActionMetadata& ActionMetadata::operator=(ActionMetadata&&) = default;
 
-
-VariantMap ActionMetadata::serialize() const
-{
-    return p->serialize();
-}
-
 /// @endcond
-
-std::string ActionMetadata::locale() const
-{
-    return p->locale();
-}
-
-std::string ActionMetadata::form_factor() const
-{
-    return p->form_factor();
-}
 
 void ActionMetadata::set_scope_data(Variant const& data)
 {
-    p->set_scope_data(data);
+    ((internal::ActionMetadataImpl*)p.get())->set_scope_data(data);
 }
 
 Variant ActionMetadata::scope_data() const
 {
-    return p->scope_data();
-}
-
-void ActionMetadata::set_internet_connectivity(ConnectivityStatus connectivity_status)
-{
-    switch (connectivity_status)
-    {
-        case Unknown:
-            p->set_internet_connectivity(nullptr);
-            break;
-        case Connected:
-            p->set_internet_connectivity(std::make_shared<bool>(true));
-            break;
-        case Disconnected:
-            p->set_internet_connectivity(std::make_shared<bool>(false));
-            break;
-        default:
-            break;
-    }
-}
-
-ActionMetadata::ConnectivityStatus ActionMetadata::internet_connectivity() const
-{
-    if (p->internet_connectivity() == nullptr)
-    {
-        return Unknown;
-    }
-    else if (*p->internet_connectivity() == true)
-    {
-        return Connected;
-    }
-    else
-    {
-        return Disconnected;
-    }
+    return ((internal::ActionMetadataImpl*)p.get())->scope_data();
 }
 
 } // namespace scopes
