@@ -105,6 +105,7 @@ TEST(Registry, metadata)
     EXPECT_TRUE(attrs["shape-images"].get_bool());
     EXPECT_EQ("cat_header_bg_scheme", attrs["category-header-background"].get_string());
     EXPECT_EQ("preview_button_color", attrs["preview-button-color"].get_string());
+    EXPECT_EQ("overlay_color", attrs["logo-overlay-color"].get_string());
     auto page_hdr = attrs["page-header"].get_dict();
     EXPECT_EQ("some_url", page_hdr["logo"].get_string());
     EXPECT_EQ("fg_color", page_hdr["foreground-color"].get_string());

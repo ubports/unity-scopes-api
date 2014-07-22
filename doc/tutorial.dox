@@ -714,6 +714,7 @@ following keys:
     ShapeImages = whether to use Ubuntu-shape for all cards and artwork (defaults to true)
     CategoryHeaderBackground = background scheme of the results categories
     PreviewButtonColor = color of preview buttons (defaults to theme-provided color)
+    LogoOverlayColor = color for the overlay in scopes overview (defaults to semi-transparent black)
     PageHeader.Logo = image containing scope's logo
     PageHeader.ForegroundColor = default header text color (defaults to the overall foreground color)
     PageHeader.Background = background scheme of the header
