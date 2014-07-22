@@ -245,6 +245,17 @@ static bool starts_with(const string& compare, const string& prefix)
     return result;
 }
 
+static bool is_uri(const string& path)
+{
+    return starts_with(path, "color://")
+            || starts_with(path, "file://")
+            || starts_with(path, "ftp://")
+            || starts_with(path, "gradient://")
+            || starts_with(path, "http://")
+            || starts_with(path, "https://")
+            || starts_with(path, "image://");
+}
+
 void convert_relative_attribute(VariantMap& inner_map, const string& id, const filesystem::path& scope_dir)
 {
     auto logo_it = inner_map.find(id);
@@ -254,19 +265,11 @@ void convert_relative_attribute(VariantMap& inner_map, const string& id, const f
         auto path = logo_it->second.get_string();
 
         // Do not normalize supported URI schemas
-        if (starts_with(path, "color://")
-                || starts_with(path, "file://")
-                || starts_with(path, "ftp://")
-                || starts_with(path, "gradient://")
-                || starts_with(path, "http://")
-                || starts_with(path, "https://")
-                || starts_with(path, "image://"))
+        if(!is_uri(path))
         {
-            return;
+            logo_it->second = Variant(
+                    relative_scope_path_to_abs_path(path, scope_dir).native());
         }
-
-        logo_it->second = Variant(
-                relative_scope_path_to_abs_path(path, scope_dir).native());
     }
 }
 
@@ -337,14 +340,24 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     try
     {
-        mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
+        auto art = sc.art();
+        if (!is_uri(art))
+        {
+            art = relative_scope_path_to_abs_path(art, scope_dir).native();
+        }
+        mi->set_art(art);
     }
     catch (NotFoundException const&)
     {
     }
     try
     {
-        mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
+        auto icon = sc.icon();
+        if (!is_uri(icon))
+        {
+            icon = relative_scope_path_to_abs_path(icon, scope_dir).native();
+        }
+        mi->set_icon(icon);
     }
     catch (NotFoundException const&)
     {
