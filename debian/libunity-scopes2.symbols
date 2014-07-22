@@ -122,6 +122,13 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::PreviewWidget::~PreviewWidget()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::QueryMetadata::set_internet_connectivity(unity::scopes::QueryMetadata::ConnectivityStatus)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::~QueryMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::operator=(unity::scopes::QueryMetadata&&)@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
@@ -135,7 +142,6 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::micro_version()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::minor_version()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::set_scope_data(unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ActionMetadata::set_internet_connectivity(unity::scopes::ActionMetadata::ConnectivityStatus)@Base" 0replaceme
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::internal::ActionMetadataImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
@@ -148,7 +154,6 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::set_cardinality(int)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::set_internet_connectivity(unity::scopes::SearchMetadata::ConnectivityStatus)@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::set_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::internal::SearchMetadataImpl*)@Base" 0.4.0+14.04.20140312.1
@@ -609,6 +614,10 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::PreviewWidget::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::data() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::serialize() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::QueryMetadata::form_factor() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::internet_connectivity() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::locale() const@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::serialize() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0.4.0+14.04.20140312.1
@@ -626,17 +635,9 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::invisible() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::scope_data() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ActionMetadata::form_factor() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ActionMetadata::internet_connectivity() const@Base" 0replaceme
- (c++)"unity::scopes::ActionMetadata::locale() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ActionMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::form_factor() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::internet_connectivity() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::locale() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ConfigException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchQueryBase::department_id() const@Base" 0.5.0+14.10.20140619
@@ -816,6 +817,9 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"typeinfo for unity::scopes::experimental::ValueSliderFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
@@ -858,6 +862,9 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"typeinfo name for unity::scopes::experimental::ValueSliderFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo name for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo name for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
@@ -911,6 +918,9 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"vtable for unity::scopes::experimental::ValueSliderFilter@Base" 0.5.0+14.10.20140619
  (c++)"vtable for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"vtable for unity::scopes::PreviewWidget@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::QueryMetadata@Base" 0replaceme
+ (c++)"vtable for unity::scopes::ActionMetadata@Base" 0replaceme
+ (c++)"vtable for unity::scopes::SearchMetadata@Base" 0replaceme
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::SearchQueryBase@Base" 0.4.0+14.04.20140312.1
