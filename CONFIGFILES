@@ -102,21 +102,6 @@ The following keys are recognized:
 
   $HOME/.local/share/unity-scopes/<scope_id>/settings.db
 
-- ConfinementType
-
-  The confinement policy for the scope. The value must be set
-  to either "leaf-net" or "unconfined".
-
-  The default value is "leaf-net".
-
-  The confinement type is used to determine the location of the
-  scope's writable cache directory (returned by ScopeBase::cache_directory()).
-
-  The cache directory is <DataDir>/<ConfinementType>/<scope_id>. With default
-  settings, this is
-
-  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>
-
 
 Zmq.ini
 -------

@@ -327,17 +327,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     scope_base->p->set_registry(registry_);
 
-    int idle_timeout_ms = 0;
-    string confinement_type = "unconfined";
-    if (!scope_ini_file.empty())
-    {
-        ScopeConfig scope_config(scope_ini_file);
-        idle_timeout_ms = scope_config.idle_timeout() * 1000;
-        confinement_type = scope_config.confinement_type();
-    }
-
-    auto const cache_dir = data_dir_ + "/" + confinement_type + "/" + scope_id_;
-    scope_base->p->set_cache_directory(cache_dir);
+    scope_base->p->set_cache_directory(find_cache_dir());
 
     scope_base->start(scope_id_);
 
@@ -351,6 +341,12 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+    int idle_timeout_ms = 0;
+    if (!scope_ini_file.empty())
+    {
+        ScopeConfig scope_config(scope_ini_file);
+        idle_timeout_ms = scope_config.idle_timeout() * 1000;
+    }
     mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
 
     // Inform the registry that this scope is now ready to process requests
@@ -392,6 +388,42 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     {
         throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
     }
+}
+
+string RuntimeImpl::find_cache_dir() const
+{
+    // TODO: HACK: Until we get a fancier Apparmor query API, we try
+    //             to create the scope cache dir and figure out whether
+    //             whether we are confined or unconfined. We first try to
+    //             create <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
+    //             in case they don't exist. Then we try to create a file in
+    //             <data_dir>unconfined/<scope_id_>. If that works, we unlink
+    //             the file again and can conclude that the scope is unconfined.
+    //             Otherwise, the scope must be confined, in which case
+    //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
+
+    string cache_dir = data_dir_ + "/unconfined/" + scope_id_;
+
+    // The following two mkdir() calls will fail if the scope is confined or
+    // the directories exist already.
+    ::mkdir((data_dir_ + "/unconfined").c_str(), 0700);
+    ::mkdir(cache_dir.c_str(), 0700);
+    string tmp = cache_dir + "/.unconfined_scope_XXXXXX";
+    int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
+    if (fd != -1)
+    {
+        // If mkstemp succeeded, the scope is unconfined.
+        assert(::unlink(tmp.c_str()) == 0);
+        ::close(fd);
+    }
+    else
+    {
+        // mkstemp() failed, the scope must be confined.
+        ::mkdir((data_dir_ + "/leaf-net").c_str(), 0700);
+        ::mkdir(cache_dir.c_str(), 0700);
+        cache_dir = data_dir_ + "/leaf-net/" + scope_id_;
+    }
+    return cache_dir;
 }
 
 } // namespace internal
