@@ -79,7 +79,7 @@ public:
     //@}
 
 private:
-    ActionMetadata(internal::ActionMetadataImpl *impl);
+    ActionMetadata(internal::ActionMetadataImpl* impl);
     friend class internal::ActionMetadataImpl;
 };
 

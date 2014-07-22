@@ -100,12 +100,11 @@ public:
     VariantMap serialize() const;
     /// @endcond
 
-private:
+protected:
+    /// @cond
     std::unique_ptr<internal::QueryMetadataImpl> p;
-
     QueryMetadata(internal::QueryMetadataImpl* impl);
-    friend class ActionMetadata;
-    friend class SearchMetadata;
+    /// @endcond
 };
 
 } // namespace scopes

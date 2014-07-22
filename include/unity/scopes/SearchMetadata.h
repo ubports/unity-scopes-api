@@ -133,7 +133,7 @@ public:
     Variant const& operator[](std::string const& key) const;
 
 private:
-    SearchMetadata(internal::SearchMetadataImpl *impl);
+    SearchMetadata(internal::SearchMetadataImpl* impl);
     friend class internal::SearchMetadataImpl;
 };
 

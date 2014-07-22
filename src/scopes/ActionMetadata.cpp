@@ -32,13 +32,13 @@ ActionMetadata::ActionMetadata(std::string const& locale, std::string const& for
 }
 
 /// @cond
-ActionMetadata::ActionMetadata(internal::ActionMetadataImpl *impl)
+ActionMetadata::ActionMetadata(internal::ActionMetadataImpl* impl)
     : QueryMetadata(impl)
 {
 }
 
 ActionMetadata::ActionMetadata(ActionMetadata const& other)
-    : QueryMetadata(new internal::ActionMetadataImpl(*((internal::ActionMetadataImpl*)other.p.get())))
+    : QueryMetadata(new internal::ActionMetadataImpl(*static_cast<internal::ActionMetadataImpl*>(other.p.get())))
 {
 }
 
@@ -52,7 +52,7 @@ ActionMetadata& ActionMetadata::operator=(ActionMetadata const& other)
 {
     if (this != &other)
     {
-        p.reset(new internal::ActionMetadataImpl(*((internal::ActionMetadataImpl*)other.p.get())));
+        p.reset(new internal::ActionMetadataImpl(*static_cast<internal::ActionMetadataImpl*>(other.p.get())));
     }
     return *this;
 }
@@ -63,12 +63,12 @@ ActionMetadata& ActionMetadata::operator=(ActionMetadata&&) = default;
 
 void ActionMetadata::set_scope_data(Variant const& data)
 {
-    ((internal::ActionMetadataImpl*)p.get())->set_scope_data(data);
+    static_cast<internal::ActionMetadataImpl*>(p.get())->set_scope_data(data);
 }
 
 Variant ActionMetadata::scope_data() const
 {
-    return ((internal::ActionMetadataImpl*)p.get())->scope_data();
+    return static_cast<internal::ActionMetadataImpl*>(p.get())->scope_data();
 }
 
 } // namespace scopes
