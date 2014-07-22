@@ -51,8 +51,9 @@ public:
     void set_internet_connectivity(std::shared_ptr<bool> is_connected);
     std::shared_ptr<bool> internet_connectivity() const;
 
-protected:
     virtual VariantMap serialize() const = 0;
+
+protected:
     virtual void serialize(VariantMap& var) const = 0;
     virtual std::string metadata_type() const = 0;
 
