@@ -1,6 +1,7 @@
 unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
 
-  * Added set_internet_connectivity() and internet_connectivity() to *Metadata classes.
+  * Introduced QueryMetadata base for shared functionality of *Metadata classes.
+  * Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 21 Jul 2014 09:14:39 +0200
 
