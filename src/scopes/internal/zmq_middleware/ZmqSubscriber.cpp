@@ -133,7 +133,7 @@ void ZmqSubscriber::subscriber_thread()
         std::string message;
         while (true)
         {
-            // poll() throws when the zmq context is destroyed (hense stopping the thread)
+            // poll() throws when the zmq context is destroyed (hence stopping the thread)
             poller.poll();
 
             // Flush out the message queue before stopping the thread

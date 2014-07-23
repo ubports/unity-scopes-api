@@ -30,7 +30,8 @@ namespace internal
 
 QueryMetadataImpl::QueryMetadataImpl(std::string const& locale, std::string const& form_factor)
     : locale_(locale),
-      form_factor_(form_factor)
+      form_factor_(form_factor),
+      internet_connectivity_(QueryMetadata::Unknown)
 {
 }
 
@@ -44,7 +45,11 @@ QueryMetadataImpl::QueryMetadataImpl(VariantMap const& var)
     it = var.find("internet_connectivity");
     if (it != var.end())
     {
-        internet_connectivity_ = std::make_shared<bool>(it->second.get_bool());
+        internet_connectivity_ = it->second.get_bool() ? QueryMetadata::Connected : QueryMetadata::Disconnected;
+    }
+    else
+    {
+        internet_connectivity_ = QueryMetadata::Unknown;
     }
 }
 
@@ -58,12 +63,12 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
-void QueryMetadataImpl::set_internet_connectivity(std::shared_ptr<bool> is_connected)
+void QueryMetadataImpl::set_internet_connectivity(QueryMetadata::ConnectivityStatus connectivity_status)
 {
-    internet_connectivity_ = is_connected;
+    internet_connectivity_ = connectivity_status;
 }
 
-std::shared_ptr<bool> QueryMetadataImpl::internet_connectivity() const
+QueryMetadata::ConnectivityStatus QueryMetadataImpl::internet_connectivity() const
 {
     return internet_connectivity_;
 }
@@ -73,9 +78,9 @@ void QueryMetadataImpl::serialize(VariantMap& var) const
     var["type"] = metadata_type();
     var["locale"] = locale_;
     var["form_factor"] = form_factor_;
-    if (internet_connectivity_)
+    if (internet_connectivity_ != QueryMetadata::Unknown)
     {
-        var["internet_connectivity"] = *internet_connectivity_;
+        var["internet_connectivity"] = internet_connectivity_ == QueryMetadata::Connected;
     }
 }
 

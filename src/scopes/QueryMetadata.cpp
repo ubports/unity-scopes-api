@@ -55,36 +55,12 @@ std::string QueryMetadata::form_factor() const
 
 void QueryMetadata::set_internet_connectivity(ConnectivityStatus connectivity_status)
 {
-    switch (connectivity_status)
-    {
-        case Unknown:
-            p->set_internet_connectivity(nullptr);
-            break;
-        case Connected:
-            p->set_internet_connectivity(std::make_shared<bool>(true));
-            break;
-        case Disconnected:
-            p->set_internet_connectivity(std::make_shared<bool>(false));
-            break;
-        default:
-            break;
-    }
+    p->set_internet_connectivity(connectivity_status);
 }
 
 QueryMetadata::ConnectivityStatus QueryMetadata::internet_connectivity() const
 {
-    if (p->internet_connectivity() == nullptr)
-    {
-        return Unknown;
-    }
-    else if (*p->internet_connectivity() == true)
-    {
-        return Connected;
-    }
-    else
-    {
-        return Disconnected;
-    }
+    return p->internet_connectivity();
 }
 
 /// @cond

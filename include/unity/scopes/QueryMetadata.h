@@ -21,7 +21,6 @@
 
 #include <unity/scopes/Variant.h>
 #include <string>
-#include <memory>
 
 namespace unity
 {
@@ -42,17 +41,6 @@ class QueryMetadataImpl;
 class QueryMetadata
 {
 public:
-    /**@name Copy and assignment
-    Copy and assignment operators (move and non-move versions) have the usual value semantics.
-    */
-    //{@
-    QueryMetadata(QueryMetadata const& other);
-    QueryMetadata(QueryMetadata&&);
-
-    QueryMetadata& operator=(QueryMetadata const& other);
-    QueryMetadata& operator=(QueryMetadata&&);
-    //@}
-
     /// @cond
     virtual ~QueryMetadata();
     /// @endcond
@@ -73,7 +61,7 @@ public:
     \brief Indicates the internet connectivity status.
 
     The `Unknown` enumerator indicates that set_internet_connectivity() has not yet been called,
-    hense the connectivity status is currently unknown.
+    hence the connectivity status is currently unknown.
 
     The `Connected` enumerator simply indicates that we are currently connected to the internet.
     This does not necessarily mean that a particular host on the internet will be reachable.
@@ -102,6 +90,11 @@ public:
 
 protected:
     /// @cond
+    QueryMetadata(QueryMetadata const& other);
+    QueryMetadata& operator=(QueryMetadata const& other);
+    QueryMetadata(QueryMetadata&&);
+    QueryMetadata& operator=(QueryMetadata&&);
+
     std::unique_ptr<internal::QueryMetadataImpl> p;
     QueryMetadata(internal::QueryMetadataImpl* impl);
     /// @endcond
