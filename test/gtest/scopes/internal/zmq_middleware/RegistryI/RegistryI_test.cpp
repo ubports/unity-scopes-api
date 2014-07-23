@@ -370,10 +370,10 @@ TEST(RegistryI, locate_mock)
     }
 }
 
-class RegistryTest : public Test
+class RegistryITest : public Test
 {
 public:
-    RegistryTest()
+    RegistryITest()
     {
         start_process_count = process_count();
 
@@ -418,7 +418,7 @@ public:
         }
     }
 
-    ~RegistryTest()
+    ~RegistryITest()
     {
         // tear down the registry
         reg.reset();
@@ -504,7 +504,7 @@ protected:
 };
 
 // test initial state
-TEST_F(RegistryTest, locate_init)
+TEST_F(RegistryITest, locate_init)
 {
     // check that no scope processes are running
     for (auto const& scope_id : scope_ids)
@@ -517,7 +517,7 @@ TEST_F(RegistryTest, locate_init)
 }
 
 // test locating the same scope multiple times
-TEST_F(RegistryTest, locate_one)
+TEST_F(RegistryITest, locate_one)
 {
     // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
@@ -539,7 +539,7 @@ TEST_F(RegistryTest, locate_one)
 }
 
 // test locating all scopes
-TEST_F(RegistryTest, locate_all)
+TEST_F(RegistryITest, locate_all)
 {
     // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
@@ -583,7 +583,7 @@ private:
 };
 
 // test scope death and rebinding
-TEST_F(RegistryTest, locate_rebinding)
+TEST_F(RegistryITest, locate_rebinding)
 {
     // locate first scope
     EXPECT_EQ(proxies[scope_ids[0]], reg->locate(scope_ids[0]));
@@ -620,7 +620,7 @@ TEST_F(RegistryTest, locate_rebinding)
 }
 
 // test removing a scope
-TEST_F(RegistryTest, locate_remove)
+TEST_F(RegistryITest, locate_remove)
 {
     // locate all scopes (hence starting all scope processes)
     for (auto const& scope_id : scope_ids)
@@ -647,7 +647,7 @@ TEST_F(RegistryTest, locate_remove)
 }
 
 // test custom scoperunner executable
-TEST_F(RegistryTest, locate_custom_exec)
+TEST_F(RegistryITest, locate_custom_exec)
 {
     ScopeProxy test_proxy = start_testscopeB();
 
@@ -678,7 +678,7 @@ TEST_F(RegistryTest, locate_custom_exec)
 }
 
 // test idle timeout of a scope
-TEST_F(RegistryTest, locate_idle_timeout)
+TEST_F(RegistryITest, locate_idle_timeout)
 {
     ScopeProxy test_proxy = start_testscopeB();
 
@@ -702,7 +702,7 @@ TEST_F(RegistryTest, locate_idle_timeout)
     // check that we still have 1 child process
     EXPECT_EQ(1, process_count());
 
-    std::this_thread::sleep_for(std::chrono::seconds{3});
+    std::this_thread::sleep_for(std::chrono::seconds{4});
 
     // check now that the scope has shutdown automatically (timed out after 2s)
     EXPECT_FALSE(reg->is_scope_running("testscopeB"));
