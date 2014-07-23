@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_ACTIONMETADATA_H
 #define UNITY_SCOPES_ACTIONMETADATA_H
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -38,7 +39,7 @@ class ActionMetadataImpl;
 \see unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
 */
 
-class ActionMetadata final
+class ActionMetadata : public QueryMetadata
 {
 public:
     /// @cond
@@ -53,18 +54,6 @@ public:
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
     ActionMetadata(std::string const& locale, std::string const& form_factor);
-
-    /**
-    \brief Get the locale string.
-    \return The locale string
-    */
-    std::string locale() const;
-
-    /**
-    \brief Get the form factor string.
-    \return The form factor string
-    */
-    std::string form_factor() const;
 
     /**
      \brief Attach arbitrary data to this ActionMetadata.
@@ -89,14 +78,8 @@ public:
     ActionMetadata& operator=(ActionMetadata&&);
     //@}
 
-    /// @cond
-    VariantMap serialize() const;
-    /// @endcond
-
 private:
-    std::unique_ptr<internal::ActionMetadataImpl> p;
-
-    ActionMetadata(internal::ActionMetadataImpl *impl);
+    ActionMetadata(internal::ActionMetadataImpl* impl);
     friend class internal::ActionMetadataImpl;
 };
 

@@ -704,7 +704,7 @@ TEST_F(RegistryTest, locate_idle_timeout)
     // check that we still have 1 child process
     EXPECT_EQ(1, process_count());
 
-    std::this_thread::sleep_for(std::chrono::seconds{3});
+    std::this_thread::sleep_for(std::chrono::seconds{4});
 
     // check now that the scope has shutdown automatically (timed out after 2s)
     EXPECT_FALSE(reg->is_scope_running("testscopeB"));

@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.0
+========================
+  - Introduced QueryMetadata base for shared functionality of *Metadata classes.
+  - Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
+
 Changes in version 0.5.2
 ========================
   - Added CannedQuery parameter to Category.
