@@ -108,8 +108,9 @@ protected:
 
 TEST_F(smartscopesproxytest, ss_registry)
 {
-    // locate should throw (direct)
-    EXPECT_THROW(reg_->locate("dummy.scope"), RegistryException);
+    // non-existent scope (direct)
+    EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
+    EXPECT_THROW(reg_->locate("dummy.scope.5"), NotFoundException);
 
     // list scopes (direct)
     MetadataMap scopes = reg_->list();
@@ -139,12 +140,10 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
     EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
 
-    // non-existant scope (direct)
-    EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
-
-    // locate should throw (via mw)
+    // non-existent scope (via mw)
     MWRegistryProxy mw_reg = mw_->registry_proxy();
-    EXPECT_THROW(mw_reg->locate("Dummy Demo Scope"), RegistryException);
+    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
+    EXPECT_THROW(mw_reg->locate("dummy.scope.5"), NotFoundException);
 
     // list scopes (via mw)
     scopes = mw_reg->list();
@@ -173,9 +172,6 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
     EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
     EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
-
-    // non-existant scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
 }
 
 TEST_F(smartscopesproxytest, ss_registry_locale)
