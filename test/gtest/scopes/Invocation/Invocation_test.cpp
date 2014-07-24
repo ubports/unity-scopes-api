@@ -25,6 +25,7 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ListenerBase.h>
@@ -40,6 +41,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 class TestReceiver : public SearchListenerBase
 {
@@ -89,12 +91,25 @@ private:
     condition_variable cond_;
 };
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
+}
+
 // Check that invoking on a scope after a timeout exception from a previous
 // invocation works correctly. This tests that a failed socket is removed
 // from the connection pool in ZmqObject::invoke_twoway_().
 
 TEST(Invocation, timeout)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -108,7 +123,7 @@ TEST(Invocation, timeout)
     receiver->wait_until_finished();
 
     EXPECT_EQ(ListenerBase::Error, receiver->reason());
-    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 3000 milliseconds", receiver->error_message());
+    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 500 milliseconds", receiver->error_message());
 
     // Wait another three seconds, so TestScope is finally able to receive another request.
     this_thread::sleep_for(chrono::seconds(3));
@@ -180,7 +195,7 @@ int main(int argc, char **argv)
 
     // Give threads some time to bind to endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(500));
 
     auto rc = RUN_ALL_TESTS();
 

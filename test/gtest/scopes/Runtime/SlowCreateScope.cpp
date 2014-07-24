@@ -35,8 +35,7 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
-        : SearchQueryBase(query, metadata)
+    TestQuery()
     {
         lock_guard<mutex> lock(mutex_);
         cancelled_ = false;
@@ -71,7 +70,19 @@ private:
 
 }  // namespace
 
-SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const& query, SearchMetadata const& metadata)
+void SlowCreateScope::start(string const&, RegistryProxy const &)
+{
+}
+
+void SlowCreateScope::stop()
+{
+}
+
+void SlowCreateScope::run()
+{
+}
+
+SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const&, SearchMetadata const &)
 {
     // Sleep for a while. This allows the client to call cancel() before this function
     // returns, while the test still holds a fake QueryCtrl returned by the async
@@ -80,10 +91,10 @@ SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const& query, SearchMe
     // causes TestQuery::run() to complete.
     this_thread::sleep_for(chrono::milliseconds(200));
 
-    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
+    return SearchQueryBase::UPtr(new TestQuery());
 }
 
-PreviewQueryBase::UPtr SlowCreateScope::preview(Result const&, ActionMetadata const&)
+PreviewQueryBase::UPtr SlowCreateScope::preview(Result const&, ActionMetadata const &)
 {
     return nullptr;  // Not called
 }

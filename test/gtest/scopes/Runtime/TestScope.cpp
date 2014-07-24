@@ -38,9 +38,8 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
-        : SearchQueryBase(query, metadata)
-        , query_(query)
+    TestQuery(CannedQuery const& query)
+        : query_(query)
     {
     }
 
@@ -80,7 +79,7 @@ public:
         reply->push(res);
 
         CannedQuery query("scope-A", "foo", "dep1");
-        experimental::Annotation annotation(experimental::Annotation::Type::Link);
+        Annotation annotation(Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->push(annotation);
     }
@@ -94,15 +93,9 @@ private:
 class TestPreview : public PreviewQueryBase
 {
 public:
-    TestPreview(Result const& result, ActionMetadata const& metadata)
-        : PreviewQueryBase(result, metadata)
-    {
-    }
-
     virtual void cancelled() override
     {
     }
-
     virtual void run(PreviewReplyProxy const& reply) override
     {
         PreviewWidgetList widgets;
@@ -114,12 +107,24 @@ public:
     }
 };
 
-SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
+void TestScope::start(string const&, RegistryProxy const &)
 {
-    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
-PreviewQueryBase::UPtr TestScope::preview(Result const& result, ActionMetadata const& metadata)
+void TestScope::stop()
 {
-    return PreviewQueryBase::UPtr(new TestPreview(result, metadata));
+}
+
+void TestScope::run()
+{
+}
+
+SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
+{
+    return SearchQueryBase::UPtr(new TestQuery(query));
+}
+
+PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
+{
+    return PreviewQueryBase::UPtr(new TestPreview());
 }
