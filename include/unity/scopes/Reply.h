@@ -82,14 +82,15 @@ public:
     };
 
     /**
-    \brief Informs the source of a query that the query has encountered a warning condition.
+    \brief Informs the source of a query that additional info regarding the query operation is
+    available.
 
-    Calling warning() does not terminate the query, it simply informs the source that something
-    went wrong during execution of the query, possibly causing a partial result set to be returned.
+    Calling info() does not terminate the query, it simply informs the source that something
+    interesting occured during execution of the query.
 
-    Multiple calls to warning() for each warning condition encountered are legal.
-    \param info_code Indicates the cause for the call to warning().
-    \param info_message Contains further details about the warning (optional).
+    Multiple calls to info() for each condition encountered are legal.
+    \param info_code Indicates the cause for the call to info().
+    \param info_message Contains further details about the info code (optional).
     */
     virtual void info(InfoCode info_code, std::string const& info_message = "") = 0;
 
