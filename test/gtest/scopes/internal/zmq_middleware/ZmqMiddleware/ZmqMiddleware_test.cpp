@@ -462,8 +462,8 @@ TEST(ZmqMiddleware, shutdown_after_start_with_adapter)
     ZmqMiddleware mw("testscope", nullptr, zmq_ini);
 
     auto so = make_shared<MyScopeObject>();
-    mw.start();
     mw.add_scope_object("fred", so, 1000);
+    mw.start();
 
     vector<thread> threads;
     num_waiters = 0;

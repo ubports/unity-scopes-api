@@ -92,7 +92,7 @@ void create_dir(string const& dir, mode_t mode)
 ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile) :
     MiddlewareBase(runtime),
     server_name_(server_name),
-    state_(Stopped),
+    state_(Created),
     shutdown_flag(false)
 {
     assert(!server_name.empty());
@@ -172,11 +172,11 @@ void ZmqMiddleware::start()
             return; // Already started, no-op
         }
         case Stopping:
-        {
-            state_changed_.wait(lock, [this] { return state_ == Stopped; }); // LCOV_EXCL_LINE
-            // FALLTHROUGH
-        }
         case Stopped:
+        {
+            throw MiddlewareException("Cannot re-start stopped middleware");
+        }
+        case Created:
         {
             {
                 lock_guard<mutex> lock(data_mutex_);
@@ -202,10 +202,11 @@ void ZmqMiddleware::stop()
     unique_lock<mutex> lock(state_mutex_);
     switch (state_)
     {
+        case Created:
         case Stopped:
         case Stopping:
         {
-            break;  // Already stopped, or about to stop, no-op
+            break;  // Already stopped, about to stop, or never started: no-op
         }
         case Started:
         {
@@ -730,7 +731,7 @@ ThreadPool* ZmqMiddleware::oneway_pool()
     lock(state_mutex_, data_mutex_);
     lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Stopped || state_ == Stopping)
+    if (state_ != Started)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
@@ -742,7 +743,7 @@ ThreadPool* ZmqMiddleware::twoway_pool()
     lock(state_mutex_, data_mutex_);
     lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
-    if (state_ == Stopped || state_ == Stopping)
+    if (state_ != Started)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");
     }
@@ -794,7 +795,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> map_lock(data_mutex_, std::adopt_lock);
 
-    if (state_ != Started)
+    if (state_ == Stopping || state_ == Stopped)
     {
         throw MiddlewareException("Cannot invoke operations while middleware is stopped");  // TODO: report mw name
     }
