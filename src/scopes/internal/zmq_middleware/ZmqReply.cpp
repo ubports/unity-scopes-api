@@ -103,12 +103,12 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
-void ZmqReply::info(Reply::InfoCode w, std::string const& warning_message)
+void ZmqReply::info(Reply::InfoCode info_code, std::string const& info_message)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "warning");
     auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
-    switch (w)
+    switch (info_code)
     {
         case Reply::NoInternet:
         {
@@ -150,7 +150,7 @@ void ZmqReply::info(Reply::InfoCode w, std::string const& warning_message)
             in_params.setCode(capnproto::Reply::InfoCode::UNKNOWN);
         }
     }
-    in_params.setMessage(warning_message);
+    in_params.setMessage(info_message);
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();

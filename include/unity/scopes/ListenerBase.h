@@ -78,10 +78,10 @@ public:
     Calls to info() are made by an arbitrary thread.
 
     Exceptions thrown from info() are ignored.
-    \param w Indicates the cause for the call to info().
-    \param warning_message Contains further details about the info code (optional).
+    \param info_code Indicates the cause for the call to info().
+    \param info_message Contains further details about the info code (optional).
     */
-    virtual void info(Reply::InfoCode w, std::string const& warning_message);
+    virtual void info(Reply::InfoCode info_code, std::string const& info_message);
 
 protected:
     /// @cond

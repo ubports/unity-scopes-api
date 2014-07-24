@@ -57,7 +57,7 @@ public:
     // Remote operation implementations
     void push(VariantMap const& result) noexcept override;
     void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
-    void info(Reply::InfoCode w, std::string const& warning_message) noexcept override;
+    void info(Reply::InfoCode info_code, std::string const& info_message) noexcept override;
 
 private:
     ListenerBase::SPtr listener_base_;

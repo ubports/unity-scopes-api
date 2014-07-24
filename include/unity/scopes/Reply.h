@@ -88,10 +88,10 @@ public:
     went wrong during execution of the query, possibly causing a partial result set to be returned.
 
     Multiple calls to warning() for each warning condition encountered are legal.
-    \param w Indicates the cause for the call to warning().
-    \param warning_message Contains further details about the warning (optional).
+    \param info_code Indicates the cause for the call to warning().
+    \param info_message Contains further details about the warning (optional).
     */
-    virtual void info(InfoCode w, std::string const& warning_message = "") = 0;
+    virtual void info(InfoCode info_code, std::string const& info_message = "") = 0;
 
     /**
     \brief Destroys a Reply.

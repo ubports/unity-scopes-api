@@ -172,7 +172,7 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
-void ReplyObject::info(Reply::InfoCode w, std::string const& warning_message) noexcept
+void ReplyObject::info(Reply::InfoCode info_code, std::string const& info_message) noexcept
 {
     if (finished_.load())
     {
@@ -184,7 +184,7 @@ void ReplyObject::info(Reply::InfoCode w, std::string const& warning_message) no
 
     try
     {
-        listener_base_->info(w, warning_message);
+        listener_base_->info(info_code, info_message);
     }
     catch (std::exception const& e)
     {
