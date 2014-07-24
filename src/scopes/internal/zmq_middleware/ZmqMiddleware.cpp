@@ -257,7 +257,7 @@ void ZmqMiddleware::wait_for_shutdown()
     // Exactly one thread gets to this point.
     AdapterMap adapter_map;
     {
-        lock_guard<mutex> data_lock(data_mutex_, std::adopt_lock);
+        lock_guard<mutex> data_lock(data_mutex_);
         adapter_map = move(am_);
     }
     for (auto&& pair : adapter_map)
@@ -728,7 +728,7 @@ zmqpp::context* ZmqMiddleware::context() const noexcept
 ThreadPool* ZmqMiddleware::oneway_pool()
 {
     lock(state_mutex_, data_mutex_);
-    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
     if (state_ == Stopped || state_ == Stopping)
     {
@@ -740,7 +740,7 @@ ThreadPool* ZmqMiddleware::oneway_pool()
 ThreadPool* ZmqMiddleware::twoway_pool()
 {
     lock(state_mutex_, data_mutex_);
-    unique_lock<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
     lock_guard<mutex> invokers_lock(data_mutex_, std::adopt_lock);
     if (state_ == Stopped || state_ == Stopping)
     {
@@ -790,7 +790,14 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
 shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string const& endpoint_dir,
                                                       string const& category, int64_t idle_timeout)
 {
-    lock_guard<mutex> lock(data_mutex_);
+    lock(state_mutex_, data_mutex_);
+    lock_guard<mutex> state_lock(state_mutex_, std::adopt_lock);
+    lock_guard<mutex> map_lock(data_mutex_, std::adopt_lock);
+
+    if (state_ != Started)
+    {
+        throw MiddlewareException("Cannot invoke operations while middleware is stopped");  // TODO: report mw name
+    }
 
     auto it = am_.find(name);
     if (it != am_.end())
@@ -864,8 +871,8 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
     }
 
     auto a = make_shared<ObjectAdapter>(*this, name, endpoint, mode, pool_size, idle_timeout);
-    a->activate();
     am_[name] = a;
+    a->activate();
     return a;
 }
 

@@ -69,8 +69,8 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
 }
 
 ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string const& endpoint,
-                                                    RequestMode m,
-                                                    int64_t timeout)
+                                                                    RequestMode m,
+                                                                    int64_t timeout)
 {
     if (timeout == -1)
     {

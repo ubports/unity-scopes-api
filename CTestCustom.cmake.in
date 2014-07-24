@@ -7,6 +7,9 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     noglobalincludes
     stand-alone-unity-scopes-headers
     stand-alone-unity-scopes-internal-headers
+    stand-alone-unity-scopes-testing-headers
     clean-public-unity-scopes-headers
+    clean-public-unity-scopes-testing-headers
+    IsolatedScopeBenchmark
     copyright
     whitespace)
