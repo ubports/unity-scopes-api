@@ -71,8 +71,8 @@ public:
     virtual void finished(Reason r, std::string const& error_message) = 0;
 
     /**
-    \brief Called by the scopes run time each time a scope reports additional info regarding the
-    query operation.
+    \brief Called by the scopes run time each time a scope reports additional info about the reply
+    to a query.
 
     More than one info() call can arrive during processing of a single query.
 
