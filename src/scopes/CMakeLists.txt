@@ -22,6 +22,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Object.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RangeInputFilter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBase.cpp
