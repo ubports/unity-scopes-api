@@ -69,7 +69,7 @@ public:
     the internet in order to properly evaluate its results, but currently does not have internet
     connectivity.
     */
-    enum Warning
+    enum InfoCode
     {
         Unknown,                // Scope used a code that isn't known to the client-side run-time
         NoInternet,             // Scope had no internet access
@@ -91,7 +91,7 @@ public:
     \param w Indicates the cause for the call to warning().
     \param warning_message Contains further details about the warning (optional).
     */
-    virtual void warning(Warning w, std::string const& warning_message = "") = 0;
+    virtual void info(InfoCode w, std::string const& warning_message = "") = 0;
 
     /**
     \brief Destroys a Reply.

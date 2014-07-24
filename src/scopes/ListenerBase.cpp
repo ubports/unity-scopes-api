@@ -39,9 +39,9 @@ ListenerBase::~ListenerBase()
 {
 }
 
-void ListenerBase::warning(Reply::Warning, std::string const&)
+void ListenerBase::info(Reply::InfoCode, std::string const&)
 {
-    // Intentionally stubbed to allow listeners to ignore warnings
+    // Intentionally stubbed to allow listeners to ignore info messages
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,

@@ -42,7 +42,7 @@ public:
 
     virtual void push(VariantMap const& result) = 0;
     virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;
-    virtual void warning(Reply::Warning w, std::string const& warning_message) = 0;
+    virtual void info(Reply::InfoCode w, std::string const& warning_message) = 0;
 
 protected:
     MWReply(MiddlewareBase* mw_base);

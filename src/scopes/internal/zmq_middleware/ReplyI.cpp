@@ -52,7 +52,7 @@ using namespace std::placeholders;
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
                       { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) },
-                      { "warning", bind(&ReplyI::warning_, this, _1, _2, _3) } })
+                      { "warning", bind(&ReplyI::info_, this, _1, _2, _3) } })
 {
 }
 
@@ -106,7 +106,7 @@ void ReplyI::finished_(Current const&,
     delegate->finished(reason, err);
 }
 
-void ReplyI::warning_(Current const&,
+void ReplyI::info_(Current const&,
                       capnp::AnyPointer::Reader& in_params,
                       capnproto::Response::Builder&)
 {
@@ -117,42 +117,42 @@ void ReplyI::warning_(Current const&,
     {
         case capnproto::Reply::InfoCode::NO_INTERNET:
         {
-            delegate->warning(Reply::NoInternet, req.getMessage());
+            delegate->info(Reply::NoInternet, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::POOR_INTERNET:
         {
-            delegate->warning(Reply::PoorInternet, req.getMessage());
+            delegate->info(Reply::PoorInternet, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::NO_LOCATION_DATA:
         {
-            delegate->warning(Reply::NoLocationData, req.getMessage());
+            delegate->info(Reply::NoLocationData, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA:
         {
-            delegate->warning(Reply::InaccurateLocationData, req.getMessage());
+            delegate->info(Reply::InaccurateLocationData, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::RESULTS_INCOMPLETE:
         {
-            delegate->warning(Reply::ResultsIncomplete, req.getMessage());
+            delegate->info(Reply::ResultsIncomplete, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED:
         {
-            delegate->warning(Reply::DefaultSettingsUsed, req.getMessage());
+            delegate->info(Reply::DefaultSettingsUsed, req.getMessage());
             break;
         }
         case capnproto::Reply::InfoCode::SETTINGS_PROBLEM:
         {
-            delegate->warning(Reply::SettingsProblem, req.getMessage());
+            delegate->info(Reply::SettingsProblem, req.getMessage());
             break;
         }
         default:
         {
-            delegate->warning(Reply::Unknown, req.getMessage());
+            delegate->info(Reply::Unknown, req.getMessage());
         }
     }
 }

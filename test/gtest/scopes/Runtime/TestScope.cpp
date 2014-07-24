@@ -66,7 +66,7 @@ public:
         }
 
         // send test warning for no internet connection (mid run)
-        reply->warning(Reply::NoInternet, "Partial results returned due to no internet connection.");
+        reply->info(Reply::NoInternet, "Partial results returned due to no internet connection.");
 
         Department::SPtr parent = Department::create("", query_, "All departments");
         Department::SPtr news_dep = Department::create("news", query_, "News");
@@ -83,7 +83,7 @@ public:
         reply->push(res);
 
         // send test warning for no internet connection (mid run)
-        reply->warning(Reply::PoorInternet, "Partial results returned due to poor internet connection.");
+        reply->info(Reply::PoorInternet, "Partial results returned due to poor internet connection.");
 
         CannedQuery query("scope-A", "foo", "dep1");
         experimental::Annotation annotation(experimental::Annotation::Type::Link);
@@ -112,7 +112,7 @@ public:
     virtual void run(PreviewReplyProxy const& reply) override
     {
         // send test warning for no location data (run start)
-        reply->warning(Reply::NoLocationData);
+        reply->info(Reply::NoLocationData);
 
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
@@ -122,7 +122,7 @@ public:
         reply->push("rating", Variant("Bar"));
 
         // send test warning for no account data (run end)
-        reply->warning(Reply::InaccurateLocationData, "Partial results returned due to inaccurate location data.");
+        reply->info(Reply::InaccurateLocationData, "Partial results returned due to inaccurate location data.");
     }
 };
 

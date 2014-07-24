@@ -172,7 +172,7 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     }
 }
 
-void ReplyObject::warning(Reply::Warning w, std::string const& warning_message) noexcept
+void ReplyObject::info(Reply::InfoCode w, std::string const& warning_message) noexcept
 {
     if (finished_.load())
     {
@@ -184,16 +184,16 @@ void ReplyObject::warning(Reply::Warning w, std::string const& warning_message) 
 
     try
     {
-        listener_base_->warning(w, warning_message);
+        listener_base_->info(w, warning_message);
     }
     catch (std::exception const& e)
     {
-        cerr << "ReplyObject::warning(): " << e.what() << endl;
+        cerr << "ReplyObject::info(): " << e.what() << endl;
         // TODO: log error
     }
     catch (...)
     {
-        cerr << "ReplyObject::warning(): unknown exception" << endl;
+        cerr << "ReplyObject::info(): unknown exception" << endl;
         // TODO: log error
     }
 }

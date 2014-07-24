@@ -114,7 +114,7 @@ public:
         cond_.notify_one();
     }
 
-    virtual void warning(Reply::Warning w, string const& warning_message) override
+    virtual void info(Reply::InfoCode w, string const& warning_message) override
     {
         if (warning_count_ == 0)
         {
@@ -191,7 +191,7 @@ public:
         cond_.notify_one();
     }
 
-    virtual void warning(Reply::Warning w, string const& warning_message) override
+    virtual void info(Reply::InfoCode w, string const& warning_message) override
     {
         if (warning_count_ == 0)
         {

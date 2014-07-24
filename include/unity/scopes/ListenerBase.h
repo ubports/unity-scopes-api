@@ -71,17 +71,17 @@ public:
     virtual void finished(Reason r, std::string const& error_message) = 0;
 
     /**
-    \brief Called by the scopes run time each time a scope reports a warning condition.
+    \brief Called by the scopes run time each time a scope reports additional reply info.
 
-    More than one warning() call can arrive during processing of a single query.
+    More than one info() call can arrive during processing of a single query.
 
-    Calls to warning() are made by an arbitrary thread.
+    Calls to info() are made by an arbitrary thread.
 
-    Exceptions thrown from warning() are ignored.
-    \param w Indicates the cause for the call to warning().
-    \param warning_message Contains further details about the warning (optional).
+    Exceptions thrown from info() are ignored.
+    \param w Indicates the cause for the call to info().
+    \param warning_message Contains further details about the info code (optional).
     */
-    virtual void warning(Reply::Warning w, std::string const& warning_message);
+    virtual void info(Reply::InfoCode w, std::string const& warning_message);
 
 protected:
     /// @cond

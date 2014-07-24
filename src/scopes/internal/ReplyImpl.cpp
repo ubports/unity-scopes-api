@@ -143,7 +143,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-void ReplyImpl::warning(Warning w, std::string const& warning_message)
+void ReplyImpl::info(InfoCode w, std::string const& warning_message)
 {
     if (finished_.load())
     {
@@ -152,7 +152,7 @@ void ReplyImpl::warning(Warning w, std::string const& warning_message)
 
     try
     {
-        fwd()->warning(w, warning_message);
+        fwd()->info(w, warning_message);
     }
     catch (std::exception const& e)
     {

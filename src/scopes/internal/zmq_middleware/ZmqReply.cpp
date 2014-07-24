@@ -103,7 +103,7 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
-void ZmqReply::warning(Reply::Warning w, std::string const& warning_message)
+void ZmqReply::info(Reply::InfoCode w, std::string const& warning_message)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "warning");
