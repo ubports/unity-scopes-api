@@ -49,7 +49,7 @@ TEST(Variant, basic)
     {
         Variant v(true);
         EXPECT_EQ(Variant::Type::Bool, v.which());
-        EXPECT_EQ(true, v.get_bool());
+        EXPECT_TRUE(v.get_bool());
     }
 
     {
