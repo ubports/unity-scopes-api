@@ -107,33 +107,47 @@ void ZmqReply::warning(Reply::Warning w, std::string const& warning_message)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "warning");
-    auto in_params = request.initInParams().getAs<capnproto::Reply::WarningRequest>();
+    auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
     switch (w)
     {
-        case Reply::NoInternetConnection:
+        case Reply::NoInternet:
         {
-            in_params.setWarning(capnproto::Reply::Warning::NO_INTERNET_CONNECTION);
+            in_params.setCode(capnproto::Reply::InfoCode::NO_INTERNET);
             break;
         }
-        case Reply::PoorInternetConnection:
+        case Reply::PoorInternet:
         {
-            in_params.setWarning(capnproto::Reply::Warning::POOR_INTERNET_CONNECTION);
+            in_params.setCode(capnproto::Reply::InfoCode::POOR_INTERNET);
             break;
         }
         case Reply::NoLocationData:
         {
-            in_params.setWarning(capnproto::Reply::Warning::NO_LOCATION_DATA);
+            in_params.setCode(capnproto::Reply::InfoCode::NO_LOCATION_DATA);
             break;
         }
         case Reply::InaccurateLocationData:
         {
-            in_params.setWarning(capnproto::Reply::Warning::INACCURATE_LOCATION_DATA);
+            in_params.setCode(capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA);
+            break;
+        }
+        case Reply::ResultsIncomplete:
+        {
+            in_params.setCode(capnproto::Reply::InfoCode::RESULTS_INCOMPLETE);
+            break;
+        }
+        case Reply::DefaultSettingsUsed:
+        {
+            in_params.setCode(capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED);
+            break;
+        }
+        case Reply::SettingsProblem:
+        {
+            in_params.setCode(capnproto::Reply::InfoCode::SETTINGS_PROBLEM);
             break;
         }
         default:
         {
-            assert(false); // LCOV_EXCL_LINE
-            return;        // LCOV_EXCL_LINE
+            in_params.setCode(capnproto::Reply::InfoCode::UNKNOWN);
         }
     }
     in_params.setMessage(warning_message);

@@ -118,12 +118,12 @@ public:
     {
         if (warning_count_ == 0)
         {
-            EXPECT_EQ(Reply::NoInternetConnection, w);
+            EXPECT_EQ(Reply::NoInternet, w);
             EXPECT_EQ("Partial results returned due to no internet connection.", warning_message);
         }
         else if (warning_count_ == 1)
         {
-            EXPECT_EQ(Reply::PoorInternetConnection, w);
+            EXPECT_EQ(Reply::PoorInternet, w);
             EXPECT_EQ("Partial results returned due to poor internet connection.", warning_message);
         }
         warning_count_++;

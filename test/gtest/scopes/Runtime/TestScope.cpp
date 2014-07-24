@@ -66,7 +66,7 @@ public:
         }
 
         // send test warning for no internet connection (mid run)
-        reply->warning(Reply::NoInternetConnection, "Partial results returned due to no internet connection.");
+        reply->warning(Reply::NoInternet, "Partial results returned due to no internet connection.");
 
         Department::SPtr parent = Department::create("", query_, "All departments");
         Department::SPtr news_dep = Department::create("news", query_, "News");
@@ -83,7 +83,7 @@ public:
         reply->push(res);
 
         // send test warning for no internet connection (mid run)
-        reply->warning(Reply::PoorInternetConnection, "Partial results returned due to poor internet connection.");
+        reply->warning(Reply::PoorInternet, "Partial results returned due to poor internet connection.");
 
         CannedQuery query("scope-A", "foo", "dep1");
         experimental::Annotation annotation(experimental::Annotation::Type::Link);

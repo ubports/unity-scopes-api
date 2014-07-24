@@ -71,10 +71,14 @@ public:
     */
     enum Warning
     {
-        NoInternetConnection,
-        PoorInternetConnection,
-        NoLocationData,
-        InaccurateLocationData
+        Unknown,                // Scope used a code that isn't known to the client-side run-time
+        NoInternet,             // Scope had no internet access
+        PoorInternet,           // Slow or incomplete internet results (e.g. timeout)
+        NoLocationData,         // No location data was available
+        InaccurateLocationData, // Location data was available, but "fuzzy"
+        ResultsIncomplete,      // Results are incomplete (e.g. not all data sources could be reached)
+        DefaultSettingsUsed,    // Scope used default settings; results may be better with explicit settings
+        SettingsProblem         // Scope needed some settings that were not provided (e.g. URL for data source)
     };
 
     /**

@@ -111,33 +111,48 @@ void ReplyI::warning_(Current const&,
                       capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
-    auto req = in_params.getAs<capnproto::Reply::WarningRequest>();
-    auto w = req.getWarning();
+    auto req = in_params.getAs<capnproto::Reply::InfoRequest>();
+    auto w = req.getCode();
     switch (w)
     {
-        case capnproto::Reply::Warning::NO_INTERNET_CONNECTION:
+        case capnproto::Reply::InfoCode::NO_INTERNET:
         {
-            delegate->warning(Reply::NoInternetConnection, req.getMessage());
+            delegate->warning(Reply::NoInternet, req.getMessage());
             break;
         }
-        case capnproto::Reply::Warning::POOR_INTERNET_CONNECTION:
+        case capnproto::Reply::InfoCode::POOR_INTERNET:
         {
-            delegate->warning(Reply::PoorInternetConnection, req.getMessage());
+            delegate->warning(Reply::PoorInternet, req.getMessage());
             break;
         }
-        case capnproto::Reply::Warning::NO_LOCATION_DATA:
+        case capnproto::Reply::InfoCode::NO_LOCATION_DATA:
         {
             delegate->warning(Reply::NoLocationData, req.getMessage());
             break;
         }
-    case capnproto::Reply::Warning::INACCURATE_LOCATION_DATA:
+        case capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA:
         {
             delegate->warning(Reply::InaccurateLocationData, req.getMessage());
             break;
         }
+        case capnproto::Reply::InfoCode::RESULTS_INCOMPLETE:
+        {
+            delegate->warning(Reply::ResultsIncomplete, req.getMessage());
+            break;
+        }
+        case capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED:
+        {
+            delegate->warning(Reply::DefaultSettingsUsed, req.getMessage());
+            break;
+        }
+        case capnproto::Reply::InfoCode::SETTINGS_PROBLEM:
+        {
+            delegate->warning(Reply::SettingsProblem, req.getMessage());
+            break;
+        }
         default:
         {
-            assert(false); // LCOV_EXCL_LINE
+            delegate->warning(Reply::Unknown, req.getMessage());
         }
     }
 }

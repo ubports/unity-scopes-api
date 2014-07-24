@@ -15,3 +15,7 @@
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
+
+class OperationInfo
+{
+};

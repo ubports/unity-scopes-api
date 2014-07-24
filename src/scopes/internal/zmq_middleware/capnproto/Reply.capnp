@@ -57,17 +57,21 @@ struct FinishedRequest
     error @1  : Text;               # Present only if reason is error
 }
 
-enum Warning
+enum InfoCode
 {
     unused @0;
-    noInternetConnection @1;
-    poorInternetConnection @2;
-    noLocationData @3;
-    inaccurateLocationData @4;
+    unknown @1;
+    noInternet @2;
+    poorInternet @3;
+    noLocationData @4;
+    inaccurateLocationData @5;
+    resultsIncomplete @6;
+    defaultSettingsUsed @7;
+    settingsProblem @8;
 }
 
-struct WarningRequest
+struct InfoRequest
 {
-    warning @0 : Warning;
+    code @0 : InfoCode;
     message @1 : Text;
 }
