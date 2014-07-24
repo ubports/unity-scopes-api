@@ -63,11 +63,10 @@ public:
     virtual void error(std::exception_ptr ex) = 0;
 
     /**
-    \brief Indicates the cause of a call to warning().
+    \brief Indicates the cause of a call to info().
 
-    For example, the `NoInternetConnection` enumerator indicates that a scope requires access to
-    the internet in order to properly evaluate its results, but currently does not have internet
-    connectivity.
+    For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
+    in order to properly evaluate its results but currently does not have internet connectivity.
     */
     enum InfoCode
     {
