@@ -52,7 +52,7 @@ using namespace std::placeholders;
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
                       { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) },
-                      { "warning", bind(&ReplyI::info_, this, _1, _2, _3) } })
+                      { "info", bind(&ReplyI::info_, this, _1, _2, _3) } })
 {
 }
 

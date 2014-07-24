@@ -106,7 +106,7 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
 void ZmqReply::info(Reply::InfoCode info_code, std::string const& info_message)
 {
     capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "warning");
+    auto request = make_request_(request_builder, "info");
     auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
     switch (info_code)
     {

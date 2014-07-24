@@ -67,7 +67,7 @@ private:
     std::condition_variable idle_;
     std::string origin_proxy_;
     int num_push_;
-    std::atomic_bool warning_occurred_;
+    std::atomic_bool info_occurred_;
 };
 
 } // namespace internal

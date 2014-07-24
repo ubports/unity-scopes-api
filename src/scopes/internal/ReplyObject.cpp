@@ -46,7 +46,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     finished_(false),
     origin_proxy_(scope_proxy),
     num_push_(0),
-    warning_occurred_(false)
+    info_occurred_(false)
 {
     assert(receiver_base);
     assert(runtime);
@@ -176,11 +176,11 @@ void ReplyObject::info(Reply::InfoCode info_code, std::string const& info_messag
 {
     if (finished_.load())
     {
-        return; // Ignore warnings that arrive after finished().
+        return; // Ignore info messages that arrive after finished().
     }
 
     reap_item_->refresh();
-    warning_occurred_.exchange(true);
+    info_occurred_.exchange(true);
 
     try
     {

@@ -57,7 +57,7 @@ public:
         count_(0),
         dep_count_(0),
         annotation_count_(0),
-        warning_count_(0)
+        info_count_(0)
     {
     }
 
@@ -107,7 +107,7 @@ public:
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
-        EXPECT_EQ(2, warning_count_);
+        EXPECT_EQ(2, info_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
@@ -116,17 +116,17 @@ public:
 
     virtual void info(Reply::InfoCode info_code, string const& info_message) override
     {
-        if (warning_count_ == 0)
+        if (info_count_ == 0)
         {
             EXPECT_EQ(Reply::NoInternet, info_code);
             EXPECT_EQ("Partial results returned due to no internet connection.", info_message);
         }
-        else if (warning_count_ == 1)
+        else if (info_count_ == 1)
         {
             EXPECT_EQ(Reply::PoorInternet, info_code);
             EXPECT_EQ("Partial results returned due to poor internet connection.", info_message);
         }
-        warning_count_++;
+        info_count_++;
     }
 
     void wait_until_finished()
@@ -147,7 +147,7 @@ private:
     int count_;
     int dep_count_;
     int annotation_count_;
-    int warning_count_;
+    int info_count_;
     std::shared_ptr<Result> last_result_;
 };
 

@@ -65,7 +65,7 @@ public:
             EXPECT_THROW(reply->register_departments(parent), unity::LogicException);
         }
 
-        // send test warning for no internet connection (mid run)
+        // send test info for no internet connection (mid run)
         reply->info(Reply::NoInternet, "Partial results returned due to no internet connection.");
 
         Department::SPtr parent = Department::create("", query_, "All departments");
@@ -82,7 +82,7 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
-        // send test warning for no internet connection (mid run)
+        // send test info for no internet connection (mid run)
         reply->info(Reply::PoorInternet, "Partial results returned due to poor internet connection.");
 
         CannedQuery query("scope-A", "foo", "dep1");
@@ -111,7 +111,7 @@ public:
 
     virtual void run(PreviewReplyProxy const& reply) override
     {
-        // send test warning for no location data (run start)
+        // send test info for no location data (run start)
         reply->info(Reply::NoLocationData);
 
         PreviewWidgetList widgets;
@@ -121,7 +121,7 @@ public:
         reply->push("author", Variant("Foo"));
         reply->push("rating", Variant("Bar"));
 
-        // send test warning for no account data (run end)
+        // send test info for no account data (run end)
         reply->info(Reply::InaccurateLocationData, "Partial results returned due to inaccurate location data.");
     }
 };

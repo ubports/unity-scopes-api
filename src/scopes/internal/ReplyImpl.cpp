@@ -147,7 +147,7 @@ void ReplyImpl::info(InfoCode info_code, std::string const& info_message)
 {
     if (finished_.load())
     {
-        return; // Ignore warnings that arrive after finished().
+        return; // Ignore info messages that arrive after finished().
     }
 
     try
