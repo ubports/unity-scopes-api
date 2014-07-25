@@ -38,7 +38,7 @@ class OperationInfoImpl;
 }
 
 /**
- \brief A container for details about something of interest that occured during the operation of a
+ \brief A container for details about something of interest that occurs during the operation of a
  request.
 */
 
