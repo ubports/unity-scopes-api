@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
@@ -91,11 +92,24 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
     EXPECT_TRUE(duration < chrono::seconds(6));
 }
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
+}
+
 // Check that the idle timeout for a server waits for synchronous operations
 // to complete.
 
 TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
 {
+    auto reg_rt = run_test_registry();
     auto start_time = chrono::steady_clock::now();
 
     {

@@ -16,6 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
@@ -86,7 +87,10 @@ struct RaiiScopeThread
 
     RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
         : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
-          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); }) {}
+          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); })
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
 
     ~RaiiScopeThread()
     {
@@ -95,8 +99,21 @@ struct RaiiScopeThread
     }
 };
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
+}
+
 TEST(Filters, scope)
 {
+    auto reg_rt = run_test_registry();
     RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
 
     // parent: connect to scope and run a query

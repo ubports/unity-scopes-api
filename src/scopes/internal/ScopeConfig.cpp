@@ -57,6 +57,17 @@ namespace
     const string results_ttl_key = "ResultsTtlType";
 
     const string scope_appearance_group = "Appearance";
+    const string fg_color_key = "ForegroundColor";
+    const string bg_color_key = "BackgroundColor";
+    const string shape_images_key = "ShapeImages";
+    const string category_header_bg_key = "CategoryHeaderBackground";
+    const string preview_button_color_key = "PreviewButtonColor";
+    const string logo_overlay_color_key = "LogoOverlayColor";
+    const string pageheader_logo_key = "PageHeader.Logo";
+    const string pageheader_fg_color_key = "PageHeader.ForegroundColor";
+    const string pageheader_background_key = "PageHeader.Background";
+    const string pageheader_div_color_key = "PageHeader.DividerColor";
+    const string pageheader_nav_bg_key = "PageHeader.NavigationBackground";
 }
 
 ScopeConfig::ScopeConfig(string const& configfile) :
@@ -208,10 +219,19 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 results_ttl_key
                                              }
                                           },
-                                          // TODO: once we know what appearance attributes are supported,
-                                          //       we need to add them here.
                                           {  scope_appearance_group,
                                              {
+                                                fg_color_key,
+                                                bg_color_key,
+                                                shape_images_key,
+                                                category_header_bg_key,
+                                                preview_button_color_key,
+                                                logo_overlay_color_key,
+                                                pageheader_logo_key,
+                                                pageheader_fg_color_key,
+                                                pageheader_background_key,
+                                                pageheader_div_color_key,
+                                                pageheader_nav_bg_key
                                              }
                                           }
                                        };
@@ -224,6 +244,28 @@ ScopeConfig::~ScopeConfig()
 
 void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val)
 {
+    // TODO: (michi) I'm not happy about this, it's too clever by half. For example, if I set PageHeader.Logo = 42
+    // and then run the registry, I get no hint whatsoever that I've done something wrong. Further,
+    // when other code later calls get_string() on the Variant for the logo, an exception is thrown.
+    // It would be far preferable to explicitly run through the list of known attributes and verify
+    // that each attribute parses correctly according to its type. If not, we can produce a meaningful
+    // error message:
+    //
+    // "testscopeA.ini: Attribute ShapeImages in group [Appearance] must have a boolean value"
+    //
+    // As is, we fall over ages later when the attribute is read and, likely, much of the relevant context
+    // is lost:
+    //
+    // "unity::LogicException: Variant does not contain a string value:
+    // " boost::bad_get: failed value get using boost::get'
+    //
+    // That's what happens, and it's not good enough, because I have no idea which Variant
+    // out of the hundreds that are kicking around is to blame, and where it was first set.
+    //
+    // This affects other attributes here and in other config files too. Anything that isn't of type
+    // string needs to be checked whether it parses according to its expected type, with a meaningful
+    // message in the exception if not.
+
     auto i = key.find(".");
     if (i == std::string::npos)
     {

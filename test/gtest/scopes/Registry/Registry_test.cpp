@@ -86,7 +86,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.DisplayName", meta.display_name());
     EXPECT_EQ("scope-A.Description", meta.description());
     EXPECT_EQ("/foo/scope-A.Art", meta.art());
-    EXPECT_EQ("/foo/scope-A.Icon", meta.icon());
+    EXPECT_EQ("file://scope-A.Icon", meta.icon());
     EXPECT_EQ("scope-A.HotKey", meta.hot_key());
     EXPECT_FALSE(meta.invisible());
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
@@ -98,6 +98,19 @@ TEST(Registry, metadata)
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
     EXPECT_TRUE(meta.location_data_needed());
+
+    auto attrs = meta.appearance_attributes();
+    EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
+    EXPECT_EQ("bg_color", attrs["background-color"].get_string());
+    EXPECT_TRUE(attrs["shape-images"].get_bool());
+    EXPECT_EQ(TEST_SCOPE_A_PATH "/cat_header_bg_scheme", attrs["category-header-background"].get_string());
+    EXPECT_EQ("preview_button_color", attrs["preview-button-color"].get_string());
+    EXPECT_EQ("overlay_color", attrs["logo-overlay-color"].get_string());
+    auto page_hdr = attrs["page-header"].get_dict();
+    EXPECT_EQ(TEST_SCOPE_A_PATH "/some_url", page_hdr["logo"].get_string());
+    EXPECT_EQ("fg_color", page_hdr["foreground-color"].get_string());
+    EXPECT_EQ("div_color", page_hdr["divider-color"].get_string());
+    EXPECT_EQ("http://nav_background", page_hdr["navigation-background"].get_string());
 
     const char *bart = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Art";
     const char *bicon = TEST_RUNTIME_PATH "/scopes/testscopeB/data/scope-B.Icon";
@@ -190,6 +203,11 @@ TEST(Registry, scope_state_notify)
 
     // testscopeB should now be running
     EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(testscopeB_state);
+    EXPECT_TRUE(r->is_scope_running("testscopeB"));
+
+    // check that the scope is still running after 1s (should only time out after 2s)
+    std::this_thread::sleep_for(std::chrono::seconds{1});
     EXPECT_TRUE(testscopeB_state);
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
