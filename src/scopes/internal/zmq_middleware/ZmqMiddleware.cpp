@@ -202,12 +202,12 @@ void ZmqMiddleware::stop()
     unique_lock<mutex> lock(state_mutex_);
     switch (state_)
     {
-        case Created:
         case Stopped:
         case Stopping:
         {
             break;  // Already stopped, about to stop, or never started: no-op
         }
+        case Created:
         case Started:
         {
             lock_guard<mutex> lock(data_mutex_);
@@ -237,7 +237,9 @@ void ZmqMiddleware::wait_for_shutdown()
 {
     {
         unique_lock<mutex> state_lock(state_mutex_);
-        state_changed_.wait(state_lock, [this] { return state_ == Stopping || state_ == Stopped; });
+        state_changed_.wait(state_lock, [this] {
+            return state_ == Stopping || state_ == Stopped || state_ == Created;
+        });
         if (state_ == Stopped)
         {
             return; // Return immediately if stopped already, or never started in the first place.

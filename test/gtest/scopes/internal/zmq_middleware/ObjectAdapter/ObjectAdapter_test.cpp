@@ -65,35 +65,42 @@ TEST(ObjectAdapter, basic)
         EXPECT_EQ("testscope", a.name());
         EXPECT_EQ("ipc://testscope", a.endpoint());
     }
+    cerr << "1" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
     }
+    cerr << "2" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
     }
+    cerr << "3" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
     }
 
     // Same thing, but with activation.
+    cerr << "4" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
         a.activate();
     }
+    cerr << "5" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
         a.activate();
     }
+    cerr << "6" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
         a.activate();
     }
+    cerr << "7" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
@@ -101,6 +108,7 @@ TEST(ObjectAdapter, basic)
     }
 
     // Again, with explicit deactivation and waiting.
+    cerr << "8" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
@@ -109,6 +117,7 @@ TEST(ObjectAdapter, basic)
         a.wait_for_shutdown();
         a.wait_for_shutdown(); // Second call benign, returns immediately
     }
+    cerr << "9" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 1);
@@ -116,6 +125,7 @@ TEST(ObjectAdapter, basic)
         a.shutdown();
         a.wait_for_shutdown();
     }
+    cerr << "10" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 5);
@@ -123,6 +133,7 @@ TEST(ObjectAdapter, basic)
         a.shutdown();
         a.wait_for_shutdown();
     }
+    cerr << "11" << endl;
     {
         wait();
         ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 10);
@@ -130,8 +141,10 @@ TEST(ObjectAdapter, basic)
         a.shutdown();
         a.wait_for_shutdown();
     }
+    cerr << "12" << endl;
 }
 
+#if 0
 TEST(ObjectAdapter, state_change)
 {
     ZmqMiddleware mw("testscope", nullptr, zmq_ini);
@@ -1227,3 +1240,4 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
                      e.what());
     }
 }
+#endif
