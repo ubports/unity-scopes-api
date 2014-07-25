@@ -64,15 +64,15 @@ public:
     virtual void error(std::exception_ptr ex) = 0;
 
     /**
-    \brief Informs the source of a query that additional info regarding the reply is available.
+    \brief Informs the source of a query that additional information regarding the reply is
+    available.
 
     Calling info() does not terminate the query, it simply informs the source that something
     interesting occured during execution of the query (usually effecting the results returned in
     some way).
 
     Multiple calls to info() for each condition are legal.
-    \param info_code Indicates the cause for the call to info().
-    \param info_message Contains further details about the info code (optional).
+    \param op_info Contains all details of the information being reported.
     */
     virtual void info(OperationInfo const& op_info) = 0;
 

@@ -134,7 +134,7 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
         wait_condition.notify_all();
     }
 
-    void info(unity::scopes::OperationInfo const& op_info) override
+    void info(unity::scopes::OperationInfo const&) override
     {
     }
 };

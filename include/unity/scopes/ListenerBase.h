@@ -71,16 +71,15 @@ public:
     virtual void finished(Reason r, std::string const& error_message) = 0;
 
     /**
-    \brief Called by the scopes run time each time a scope reports additional info about the reply
-    to a query.
+    \brief Called by the scopes run time each time a scope reports additional information about the
+    reply to a query.
 
     More than one info() call can arrive during processing of a single query.
 
     Calls to info() are made by an arbitrary thread.
 
     Exceptions thrown from info() are ignored.
-    \param info_code Indicates the cause for the call to info().
-    \param info_message Contains further details about the info code (optional).
+    \param op_info Contains all details of the information being reported.
     */
     virtual void info(OperationInfo const& op_info);
 
