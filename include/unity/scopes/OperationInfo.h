@@ -27,33 +27,70 @@ namespace unity
 namespace scopes
 {
 
+/**
+ \brief A container for details about something of interest that occured during the operation of a
+ request.
+*/
+
 class OperationInfo final
 {
 public:
     /**
-    \brief Indicates the cause of a call to info().
+    \brief Indicates the type of / cause for the information being reported.
 
-    For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
-    in order to properly evaluate its results but currently does not have internet connectivity.
+    For example, the `NoInternet` enumerator may indicate that access to the internet was required
+    in order to properly evaluate a request, but no internet connectivity was available.
     */
     enum InfoCode
     {
-        Unknown,                // Scope used a code that isn't known to the client-side run-time
-        NoInternet,             // Scope had no internet access
-        PoorInternet,           // Slow or incomplete internet results (e.g. timeout)
-        NoLocationData,         // No location data was available
-        InaccurateLocationData, // Location data was available, but "fuzzy"
+        Unknown,                // A code unknown to the client-side run-time was used
+        NoInternet,             // No internet access
+        PoorInternet,           // Slow or intermittent internet access
+        NoLocationData,         // No location data available
+        InaccurateLocationData, // Location data available, but "fuzzy"
         ResultsIncomplete,      // Results are incomplete (e.g. not all data sources could be reached)
-        DefaultSettingsUsed,    // Scope used default settings; results may be better with explicit settings
-        SettingsProblem         // Scope needed some settings that were not provided (e.g. URL for data source)
+        DefaultSettingsUsed,    // Default settings used; results may be better with explicit settings
+        SettingsProblem         // Some required settings were not provided (e.g. URL for data source)
     };
 
+    /**
+    \brief Create OperationInfo with the given info code.
+    \param code Indicates the type of / cause for the information.
+    */
     OperationInfo(InfoCode code);
+
+    /**
+    \brief Create OperationInfo with the given info code and message.
+    \param code Indicates the type of / cause for the information.
+    \param message Contains further details about the info code.
+    */
     OperationInfo(InfoCode code, std::string message);
 
-    ~OperationInfo();
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    OperationInfo(OperationInfo const&);
+    OperationInfo(OperationInfo&&);
 
+    OperationInfo& operator=(OperationInfo const&);
+    OperationInfo& operator=(OperationInfo&&);
+    //@}
+
+    /// @cond
+    ~OperationInfo();
+    /// @endcond
+
+    /**
+    \brief Get the info code.
+    \return Enum indicating the type of info contained.
+    */
     InfoCode code() const noexcept;
+
+    /**
+    \brief Get the message string.
+    \return The message string.
+    */
     std::string message() const noexcept;
 
 private:

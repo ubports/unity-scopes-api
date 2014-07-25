@@ -35,9 +35,14 @@ OperationInfo::OperationInfo(InfoCode code, std::string message)
 {
 }
 
-OperationInfo::~OperationInfo()
-{
-}
+/// @cond
+OperationInfo::OperationInfo(OperationInfo const&) = default;
+OperationInfo::OperationInfo(OperationInfo&&) = default;
+OperationInfo& OperationInfo::operator=(OperationInfo const&) = default;
+OperationInfo& OperationInfo::operator=(OperationInfo&&) = default;
+
+OperationInfo::~OperationInfo() = default;
+/// @endcond
 
 OperationInfo::InfoCode OperationInfo::code() const noexcept
 {
