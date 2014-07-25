@@ -46,7 +46,7 @@ public:
     // From Reply
     MOCK_METHOD0(finished, void());
     MOCK_METHOD1(error, void(std::exception_ptr));
-    MOCK_METHOD2(info, void(InfoCode, std::string const&));
+    MOCK_METHOD1(info, void(OperationInfo const&));
 
     // From SearchReply
     MOCK_METHOD1(register_departments, void(Department::SCPtr const&));

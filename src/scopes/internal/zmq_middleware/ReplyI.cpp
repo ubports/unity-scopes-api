@@ -107,8 +107,8 @@ void ReplyI::finished_(Current const&,
 }
 
 void ReplyI::info_(Current const&,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder&)
+                   capnp::AnyPointer::Reader& in_params,
+                   capnproto::Response::Builder&)
 {
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::InfoRequest>();
@@ -117,42 +117,42 @@ void ReplyI::info_(Current const&,
     {
         case capnproto::Reply::InfoCode::NO_INTERNET:
         {
-            delegate->info(Reply::NoInternet, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::NoInternet, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::POOR_INTERNET:
         {
-            delegate->info(Reply::PoorInternet, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::PoorInternet, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::NO_LOCATION_DATA:
         {
-            delegate->info(Reply::NoLocationData, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::NoLocationData, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA:
         {
-            delegate->info(Reply::InaccurateLocationData, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::InaccurateLocationData, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::RESULTS_INCOMPLETE:
         {
-            delegate->info(Reply::ResultsIncomplete, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::ResultsIncomplete, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED:
         {
-            delegate->info(Reply::DefaultSettingsUsed, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::DefaultSettingsUsed, req.getMessage()));
             break;
         }
         case capnproto::Reply::InfoCode::SETTINGS_PROBLEM:
         {
-            delegate->info(Reply::SettingsProblem, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::SettingsProblem, req.getMessage()));
             break;
         }
         default:
         {
-            delegate->info(Reply::Unknown, req.getMessage());
+            delegate->info(OperationInfo(OperationInfo::Unknown, req.getMessage()));
         }
     }
 }

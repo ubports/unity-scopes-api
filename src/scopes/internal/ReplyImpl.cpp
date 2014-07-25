@@ -143,7 +143,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
-void ReplyImpl::info(InfoCode info_code, std::string const& info_message)
+void ReplyImpl::info(OperationInfo const& op_info)
 {
     if (finished_.load())
     {
@@ -152,7 +152,7 @@ void ReplyImpl::info(InfoCode info_code, std::string const& info_message)
 
     try
     {
-        fwd()->info(info_code, info_message);
+        fwd()->info(op_info);
     }
     catch (std::exception const& e)
     {

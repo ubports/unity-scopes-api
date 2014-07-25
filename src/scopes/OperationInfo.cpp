@@ -17,3 +17,38 @@
  */
 
 #include <unity/scopes/OperationInfo.h>
+
+namespace unity
+{
+
+namespace scopes
+{
+
+OperationInfo::OperationInfo(InfoCode code)
+    : code_(code)
+{
+}
+
+OperationInfo::OperationInfo(InfoCode code, std::string message)
+    : code_(code)
+    , message_(message)
+{
+}
+
+OperationInfo::~OperationInfo()
+{
+}
+
+OperationInfo::InfoCode OperationInfo::code() const noexcept
+{
+    return code_;
+}
+
+std::string OperationInfo::message() const noexcept
+{
+    return message_;
+}
+
+} // namespace scopes
+
+} // namespace unity

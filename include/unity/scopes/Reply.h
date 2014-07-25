@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_REPLY_H
 
 #include <unity/scopes/Object.h>
+#include <unity/scopes/OperationInfo.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <exception>
@@ -63,24 +64,6 @@ public:
     virtual void error(std::exception_ptr ex) = 0;
 
     /**
-    \brief Indicates the cause of a call to info().
-
-    For example, the `NoInternet` enumerator indicates that a scope requires access to the internet
-    in order to properly evaluate its results but currently does not have internet connectivity.
-    */
-    enum InfoCode
-    {
-        Unknown,                // Scope used a code that isn't known to the client-side run-time
-        NoInternet,             // Scope had no internet access
-        PoorInternet,           // Slow or incomplete internet results (e.g. timeout)
-        NoLocationData,         // No location data was available
-        InaccurateLocationData, // Location data was available, but "fuzzy"
-        ResultsIncomplete,      // Results are incomplete (e.g. not all data sources could be reached)
-        DefaultSettingsUsed,    // Scope used default settings; results may be better with explicit settings
-        SettingsProblem         // Scope needed some settings that were not provided (e.g. URL for data source)
-    };
-
-    /**
     \brief Informs the source of a query that additional info regarding the reply is available.
 
     Calling info() does not terminate the query, it simply informs the source that something
@@ -91,7 +74,7 @@ public:
     \param info_code Indicates the cause for the call to info().
     \param info_message Contains further details about the info code (optional).
     */
-    virtual void info(InfoCode info_code, std::string const& info_message = "") = 0;
+    virtual void info(OperationInfo const& op_info) = 0;
 
     /**
     \brief Destroys a Reply.

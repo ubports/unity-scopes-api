@@ -39,7 +39,7 @@ ListenerBase::~ListenerBase()
 {
 }
 
-void ListenerBase::info(Reply::InfoCode, std::string const&)
+void ListenerBase::info(OperationInfo const&)
 {
     // Intentionally stubbed to allow listeners to ignore info messages
 }

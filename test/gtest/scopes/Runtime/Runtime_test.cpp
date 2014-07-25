@@ -114,17 +114,17 @@ public:
         cond_.notify_one();
     }
 
-    virtual void info(Reply::InfoCode info_code, string const& info_message) override
+    virtual void info(OperationInfo const& op_info) override
     {
         if (info_count_ == 0)
         {
-            EXPECT_EQ(Reply::NoInternet, info_code);
-            EXPECT_EQ("Partial results returned due to no internet connection.", info_message);
+            EXPECT_EQ(OperationInfo::NoInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to no internet connection.", op_info.message());
         }
         else if (info_count_ == 1)
         {
-            EXPECT_EQ(Reply::PoorInternet, info_code);
-            EXPECT_EQ("Partial results returned due to poor internet connection.", info_message);
+            EXPECT_EQ(OperationInfo::PoorInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to poor internet connection.", op_info.message());
         }
         info_count_++;
     }
@@ -191,17 +191,17 @@ public:
         cond_.notify_one();
     }
 
-    virtual void info(Reply::InfoCode info_code, string const& info_message) override
+    virtual void info(OperationInfo const& op_info) override
     {
         if (info_count_ == 0)
         {
-            EXPECT_EQ(Reply::NoLocationData, info_code);
-            EXPECT_EQ("", info_message);
+            EXPECT_EQ(OperationInfo::NoLocationData, op_info.code());
+            EXPECT_EQ("", op_info.message());
         }
         else if (info_count_ == 1)
         {
-            EXPECT_EQ(Reply::InaccurateLocationData, info_code);
-            EXPECT_EQ("Partial results returned due to inaccurate location data.", info_message);
+            EXPECT_EQ(OperationInfo::InaccurateLocationData, op_info.code());
+            EXPECT_EQ("Partial results returned due to inaccurate location data.", op_info.message());
         }
         info_count_++;
     }

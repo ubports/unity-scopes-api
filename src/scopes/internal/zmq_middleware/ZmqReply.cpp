@@ -103,44 +103,44 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
-void ZmqReply::info(Reply::InfoCode info_code, std::string const& info_message)
+void ZmqReply::info(OperationInfo const& op_info)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "info");
     auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
-    switch (info_code)
+    switch (op_info.code())
     {
-        case Reply::NoInternet:
+        case OperationInfo::NoInternet:
         {
             in_params.setCode(capnproto::Reply::InfoCode::NO_INTERNET);
             break;
         }
-        case Reply::PoorInternet:
+        case OperationInfo::PoorInternet:
         {
             in_params.setCode(capnproto::Reply::InfoCode::POOR_INTERNET);
             break;
         }
-        case Reply::NoLocationData:
+        case OperationInfo::NoLocationData:
         {
             in_params.setCode(capnproto::Reply::InfoCode::NO_LOCATION_DATA);
             break;
         }
-        case Reply::InaccurateLocationData:
+        case OperationInfo::InaccurateLocationData:
         {
             in_params.setCode(capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA);
             break;
         }
-        case Reply::ResultsIncomplete:
+        case OperationInfo::ResultsIncomplete:
         {
             in_params.setCode(capnproto::Reply::InfoCode::RESULTS_INCOMPLETE);
             break;
         }
-        case Reply::DefaultSettingsUsed:
+        case OperationInfo::DefaultSettingsUsed:
         {
             in_params.setCode(capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED);
             break;
         }
-        case Reply::SettingsProblem:
+        case OperationInfo::SettingsProblem:
         {
             in_params.setCode(capnproto::Reply::InfoCode::SETTINGS_PROBLEM);
             break;
@@ -150,7 +150,7 @@ void ZmqReply::info(Reply::InfoCode info_code, std::string const& info_message)
             in_params.setCode(capnproto::Reply::InfoCode::UNKNOWN);
         }
     }
-    in_params.setMessage(info_message);
+    in_params.setMessage(op_info.message());
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();

@@ -82,7 +82,7 @@ public:
     \param info_code Indicates the cause for the call to info().
     \param info_message Contains further details about the info code (optional).
     */
-    virtual void info(Reply::InfoCode info_code, std::string const& info_message);
+    virtual void info(OperationInfo const& op_info);
 
 protected:
     /// @cond
