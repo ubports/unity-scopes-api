@@ -5,6 +5,30 @@ unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 21 Jul 2014 09:14:39 +0200
 
+unity-scopes-api (0.5.2+14.10.20140723-0ubuntu1) utopic; urgency=low
+
+  [ Pete Woods ]
+  * Normalize relative paths (LP: #1340135)
+
+  [ Marcus Tomlinson ]
+  * Call locate() before every two-way request. Increased two-way
+    invocation timeouts.
+
+  [ Michi Henning ]
+  * Normalize relative paths (LP: #1340135)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 23 Jul 2014 22:06:06 +0000
+
+unity-scopes-api (0.5.2+14.10.20140722-0ubuntu1) utopic; urgency=low
+
+  [ thomas-voss ]
+  * Force building with g++ 4.9
+
+  [ Michi Henning ]
+  * Force building with g++ 4.9
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 22 Jul 2014 09:52:30 +0000
+
 unity-scopes-api (0.5.2+14.10.20140715-0ubuntu1) utopic; urgency=low
 
   [ Michal Hruby ]

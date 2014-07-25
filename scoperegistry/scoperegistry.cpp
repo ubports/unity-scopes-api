@@ -235,6 +235,44 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
     return click_scopes;
 }
 
+static bool starts_with(const string& compare, const string& prefix)
+{
+    bool result = false;
+    if (compare.length() >= prefix.length())
+    {
+        result = (compare.compare(0, prefix.length(), prefix) == 0);
+    }
+    return result;
+}
+
+static bool is_uri(const string& path)
+{
+    return starts_with(path, "color://")
+            || starts_with(path, "file://")
+            || starts_with(path, "ftp://")
+            || starts_with(path, "gradient://")
+            || starts_with(path, "http://")
+            || starts_with(path, "https://")
+            || starts_with(path, "image://");
+}
+
+void convert_relative_attribute(VariantMap& inner_map, const string& id, const filesystem::path& scope_dir)
+{
+    auto logo_it = inner_map.find(id);
+    if (logo_it != inner_map.end()
+            && logo_it->second.which() == Variant::String)
+    {
+        auto path = logo_it->second.get_string();
+
+        // Do not normalize supported URI schemas
+        if(!is_uri(path))
+        {
+            logo_it->second = Variant(
+                    relative_scope_path_to_abs_path(path, scope_dir).native());
+        }
+    }
+}
+
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 // If the scope uses settings, also parse the settings file and add the settings to the metadata.
@@ -277,20 +315,49 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_author(sc.author());
     mi->set_invisible(sc.invisible());
     mi->set_appearance_attributes(sc.appearance_attributes());
+
+    // Prepend scope_dir to pageheader logo path if logo path is relative.
+    // TODO: Once we have type-safe parsing in the config files, remove
+    //       the calls to which(). We should be able to rely on things
+    //       having the correct type. That's the whole point of having
+    //       the *Config classes.
+    auto app_attrs = sc.appearance_attributes();
+    auto ph_it = app_attrs.find("page-header");
+    if (ph_it != app_attrs.end() && ph_it->second.which() == Variant::Dict)
+    {
+        auto inner_map = ph_it->second.get_dict();
+        convert_relative_attribute(inner_map, "logo", scope_dir);
+        convert_relative_attribute(inner_map, "background", scope_dir);
+        convert_relative_attribute(inner_map, "navigation-background", scope_dir);
+        app_attrs["page-header"] = Variant(inner_map);
+    }
+    convert_relative_attribute(app_attrs, "category-header-background", scope_dir);
+    mi->set_appearance_attributes(app_attrs);
+
     mi->set_scope_directory(scope_dir.native());
     mi->set_results_ttl_type(sc.results_ttl_type());
     mi->set_location_data_needed(sc.location_data_needed());
 
     try
     {
-        mi->set_art(relative_scope_path_to_abs_path(sc.art(), scope_dir).native());
+        auto art = sc.art();
+        if (!is_uri(art))
+        {
+            art = relative_scope_path_to_abs_path(art, scope_dir).native();
+        }
+        mi->set_art(art);
     }
     catch (NotFoundException const&)
     {
     }
     try
     {
-        mi->set_icon(relative_scope_path_to_abs_path(sc.icon(), scope_dir).native());
+        auto icon = sc.icon();
+        if (!is_uri(icon))
+        {
+            icon = relative_scope_path_to_abs_path(icon, scope_dir).native();
+        }
+        mi->set_icon(icon);
     }
     catch (NotFoundException const&)
     {
