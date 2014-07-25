@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -51,6 +52,14 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
     it = find_or_throw("SearchMetadataImpl()", var, "hints");
     hints_ = it->second.get_dict();
+    try
+    {
+        it = find_or_throw("SearchMetadataImpl()", var, "location");
+        location_ = Location(it->second.get_dict());
+    }
+    catch (std::exception &e)
+    {
+    }
 }
 
 void SearchMetadataImpl::set_cardinality(int cardinality)
@@ -62,6 +71,20 @@ void SearchMetadataImpl::set_cardinality(int cardinality)
 int SearchMetadataImpl::cardinality() const
 {
     return cardinality_;
+}
+
+void SearchMetadataImpl::set_location(Location const& location)
+{
+    location_ = location;
+}
+
+Location SearchMetadataImpl::location() const
+{
+    if (location_)
+    {
+        return *location_;
+    }
+    throw NotFoundException("SearchMetadata::location()", "location");
 }
 
 Variant& SearchMetadataImpl::hint(std::string const& key)
@@ -124,6 +147,10 @@ void SearchMetadataImpl::serialize(VariantMap& var) const
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);
     var["hints"] = hints_;
+    if (location_)
+    {
+        var["location"] = location_->serialize();
+    }
 }
 
 VariantMap SearchMetadataImpl::serialize() const

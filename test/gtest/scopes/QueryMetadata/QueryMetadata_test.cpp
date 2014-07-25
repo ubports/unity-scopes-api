@@ -16,14 +16,17 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
 */
 
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/internal/ActionMetadataImpl.h>
+#include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <gtest/gtest.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(SearchMetadata, basic)
 {
@@ -33,6 +36,7 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_THROW(meta.location(), NotFoundException);
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -40,13 +44,17 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(50, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_THROW(meta.location(), NotFoundException);
     }
     {
         SearchMetadata meta(50, "pl", "phone");
 
         meta.set_cardinality(100);
+        meta.set_location(Location(1.0, 2.0));
         meta["foo"] = "bar";
         meta.set_hint("baz", Variant(1000));
+        EXPECT_DOUBLE_EQ(1.0, meta.location().latitude());
+        EXPECT_DOUBLE_EQ(2.0, meta.location().longitude());
         EXPECT_EQ(100, meta.cardinality());
         EXPECT_EQ("bar", meta["foo"].get_string());
         EXPECT_EQ("bar", meta.hints()["foo"].get_string());
@@ -66,12 +74,22 @@ TEST(SearchMetadata, serialize)
     {
         SearchMetadata meta("pl", "phone");
         meta["foo"] = "bar";
+        meta.set_location(Location(1.0, 2.0));
 
         auto var = meta.serialize();
         EXPECT_EQ("search_metadata", var["type"].get_string());
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
         EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_EQ(1.0, var["location"].get_dict()["latitude"].get_double());
+        EXPECT_EQ(2.0, var["location"].get_dict()["longitude"].get_double());
+
+        SearchMetadata meta2 = SearchMetadataImpl::create(var);
+        EXPECT_EQ("pl", meta2.locale());
+        EXPECT_EQ("phone", meta2.form_factor());
+        EXPECT_EQ("bar", meta2.hints()["foo"].get_string());
+        EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
+        EXPECT_DOUBLE_EQ(2.0, meta2.location().longitude());
     }
 }
 
@@ -79,19 +97,30 @@ TEST(SearchMetadata, copy)
 {
     {
         SearchMetadata meta(100, "pl", "phone");
+        meta.set_location(Location(1.0, 2.0));
         auto meta2 = meta;
 
         meta.set_cardinality(0);
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_DOUBLE_EQ(1.0, meta.location().latitude());
+        EXPECT_DOUBLE_EQ(2.0, meta.location().longitude());
+        EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
+        EXPECT_DOUBLE_EQ(2.0, meta2.location().longitude());
     }
     {
         SearchMetadata meta(100, "pl", "phone");
+        meta.set_location(Location(1.0, 2.0));
         SearchMetadata meta2(meta);
         meta.set_cardinality(0);
+        meta.set_location(Location(3.0, 4.0));
 
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
+        EXPECT_DOUBLE_EQ(2.0, meta2.location().longitude());
+        EXPECT_DOUBLE_EQ(3.0, meta.location().latitude());
+        EXPECT_DOUBLE_EQ(4.0, meta.location().longitude());
     }
 }
 
