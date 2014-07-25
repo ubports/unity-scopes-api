@@ -19,6 +19,9 @@
 #ifndef UNITY_SCOPES_OPERATIONINFO_H
 #define UNITY_SCOPES_OPERATIONINFO_H
 
+#include <unity/util/NonCopyable.h>
+
+#include <memory>
 #include <string>
 
 namespace unity
@@ -26,6 +29,13 @@ namespace unity
 
 namespace scopes
 {
+
+namespace internal
+{
+
+class OperationInfoImpl;
+
+}
 
 /**
  \brief A container for details about something of interest that occured during the operation of a
@@ -35,6 +45,10 @@ namespace scopes
 class OperationInfo final
 {
 public:
+    /// @cond
+    NONCOPYABLE(OperationInfo);
+    /// @endcond
+
     /**
     \brief Indicates the type of / cause for the information being reported.
 
@@ -66,17 +80,6 @@ public:
     */
     OperationInfo(InfoCode code, std::string message);
 
-    /**@name Copy and assignment
-    Copy and assignment operators (move and non-move versions) have the usual value semantics.
-    */
-    //{@
-    OperationInfo(OperationInfo const&);
-    OperationInfo(OperationInfo&&);
-
-    OperationInfo& operator=(OperationInfo const&);
-    OperationInfo& operator=(OperationInfo&&);
-    //@}
-
     /// @cond
     ~OperationInfo();
     /// @endcond
@@ -94,8 +97,7 @@ public:
     std::string message() const noexcept;
 
 private:
-    InfoCode code_;
-    std::string message_;
+    std::unique_ptr<internal::OperationInfoImpl> p;
 };
 
 } // namespace scopes

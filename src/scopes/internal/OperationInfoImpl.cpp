@@ -14,9 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
- */
+*/
 
-#include <unity/scopes/OperationInfo.h>
 #include <unity/scopes/internal/OperationInfoImpl.h>
 
 namespace unity
@@ -25,29 +24,31 @@ namespace unity
 namespace scopes
 {
 
-OperationInfo::OperationInfo(InfoCode code)
-    : p(new internal::OperationInfoImpl(code))
+namespace internal
+{
+
+OperationInfoImpl::OperationInfoImpl(OperationInfo::InfoCode code)
+    : code_(code)
 {
 }
 
-OperationInfo::OperationInfo(InfoCode code, std::string message)
-    : p(new internal::OperationInfoImpl(code, message))
+OperationInfoImpl::OperationInfoImpl(OperationInfo::InfoCode code, std::string message)
+    : code_(code)
+    , message_(message)
 {
 }
 
-/// @cond
-OperationInfo::~OperationInfo() = default;
-/// @endcond
-
-OperationInfo::InfoCode OperationInfo::code() const noexcept
+OperationInfo::InfoCode OperationInfoImpl::code() const noexcept
 {
-    return p->code();
+    return code_;
 }
 
-std::string OperationInfo::message() const noexcept
+std::string OperationInfoImpl::message() const noexcept
 {
-    return p->message();
+    return message_;
 }
+
+} // namespace internal
 
 } // namespace scopes
 
