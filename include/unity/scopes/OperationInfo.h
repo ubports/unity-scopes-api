@@ -45,10 +45,6 @@ class OperationInfoImpl;
 class OperationInfo final
 {
 public:
-    /// @cond
-    NONCOPYABLE(OperationInfo);
-    /// @endcond
-
     /**
     \brief Indicates the type of / cause for the information being reported.
 
@@ -80,6 +76,17 @@ public:
     */
     OperationInfo(InfoCode code, std::string message);
 
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    OperationInfo(OperationInfo const& other);
+    OperationInfo(OperationInfo&&);
+
+    OperationInfo& operator=(OperationInfo const& other);
+    OperationInfo& operator=(OperationInfo&&);
+    //@}
+
     /// @cond
     ~OperationInfo();
     /// @endcond
@@ -94,7 +101,7 @@ public:
     \brief Get the message string.
     \return The message string.
     */
-    std::string message() const noexcept;
+    std::string message() const;
 
 private:
     std::unique_ptr<internal::OperationInfoImpl> p;

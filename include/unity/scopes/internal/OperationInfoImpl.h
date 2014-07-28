@@ -33,10 +33,14 @@ namespace internal
 class OperationInfoImpl final
 {
 public:
-    NONCOPYABLE(OperationInfoImpl);
-
     OperationInfoImpl(OperationInfo::InfoCode code);
     OperationInfoImpl(OperationInfo::InfoCode code, std::string message);
+
+    OperationInfoImpl(OperationInfoImpl const&) = default;
+    OperationInfoImpl(OperationInfoImpl&&) = default;
+
+    OperationInfoImpl& operator=(OperationInfoImpl const&) = default;
+    OperationInfoImpl& operator=(OperationInfoImpl&&) = default;
 
     OperationInfo::InfoCode code() const noexcept;
     std::string message() const noexcept;

@@ -19,7 +19,7 @@
 #ifndef UNITY_SCOPES_LISTENERBASE_H
 #define UNITY_SCOPES_LISTENERBASE_H
 
-#include <unity/scopes/Reply.h>
+#include <unity/scopes/OperationInfo.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
