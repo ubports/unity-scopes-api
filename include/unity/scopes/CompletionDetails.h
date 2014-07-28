@@ -39,7 +39,8 @@ class CompletionDetailsImpl;
 }
 
 /**
- \brief blah.
+ \brief A container for details about the completion status of a query as well as any additional
+ information regarding the operation of the request.
 */
 
 class CompletionDetails final
