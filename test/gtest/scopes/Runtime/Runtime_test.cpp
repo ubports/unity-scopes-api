@@ -102,10 +102,10 @@ public:
         annotation_count_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
@@ -180,10 +180,10 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, widgets_pushes_);
         EXPECT_EQ(2, data_pushes_);
         EXPECT_EQ(2, info_count_);
@@ -241,9 +241,9 @@ public:
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
         EXPECT_EQ(pushes_expected_, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
@@ -399,10 +399,10 @@ public:
         FAIL();
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Cancelled, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::Cancelled, details.status());
+        EXPECT_EQ("", details.message());
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;

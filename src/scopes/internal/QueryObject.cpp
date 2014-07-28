@@ -122,16 +122,14 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(CompletionDetails(CompletionDetails::Error,
-                         {OperationInfo::ExceptionThrown, e.what()}));  // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(CompletionDetails(CompletionDetails::Error,
-                         {OperationInfo::ExceptionThrown, "unknown exception"}));  // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }

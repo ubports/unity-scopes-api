@@ -34,7 +34,7 @@ class CompletionDetailsImpl final
 {
 public:
     CompletionDetailsImpl(CompletionDetails::CompletionStatus status);
-    CompletionDetailsImpl(CompletionDetails::CompletionStatus status, OperationInfo const& status_info);
+    CompletionDetailsImpl(CompletionDetails::CompletionStatus status, std::string const& message);
 
     CompletionDetailsImpl(CompletionDetailsImpl const&) = default;
     CompletionDetailsImpl(CompletionDetailsImpl&&) = default;
@@ -43,10 +43,12 @@ public:
     CompletionDetailsImpl& operator=(CompletionDetailsImpl&&) = default;
 
     CompletionDetails::CompletionStatus status() const noexcept;
+    std::string message() const;
     std::list<OperationInfo> details() const noexcept;
 
 private:
     CompletionDetails::CompletionStatus status_;
+    std::string message_;
     std::list<OperationInfo> details_;
 };
 

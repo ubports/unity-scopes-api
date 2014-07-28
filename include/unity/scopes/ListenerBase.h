@@ -52,24 +52,15 @@ public:
     /// @endcond
 
     /**
-    \brief Indicates the cause of a call to finished().
-
-    The `Error` enumerator indicates that a query terminated abnormally, for example,
-    because a scope could not be reached over the network or explicitly reported an error.
-    */
-    enum Reason { Finished, Cancelled, Error };
-
-    /**
     \brief Called once by the scopes run time after the final result for a request was sent.
 
     Calls to finished() are made by an arbitrary thread.
 
     Exceptions thrown from finished() are ignored.
-    \param r Indicates the cause for the call to finished().
-    \param error_message If `r` is set to `Error`, `error_message` contains further details.
-           Otherwise, `error_message` is the empty string.
+    \param details Contains details about the completion status of a query as well as any additional
+    information regarding the operation of the request.
     */
-    virtual void finished(Reason r, std::string const& error_message) = 0;
+    virtual void finished(CompletionDetails const& details) = 0;
 
     /**
     \brief Called by the scopes run time each time a scope reports additional information about the
@@ -89,12 +80,6 @@ protected:
     ListenerBase();
     /// @endcond
 };
-
-/**
-\brief Convenience function to convert a ListenerBase::Reason enumerator to a string.
-\return Possible return values are "finished", "cancelled", and "error".
-*/
-char const* to_string(ListenerBase::Reason reason);
 
 } // namespace scopes
 

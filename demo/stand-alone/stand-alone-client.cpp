@@ -44,9 +44,9 @@ public:
         cout << "received result: uri=" << result.uri() << endl;
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        cout << "query complete, status: " << to_string(reason) << endl;
+        cout << "query complete, status: " << to_string(details.status()) << endl;
         lock_guard<decltype(mutex_)> lock(mutex_);
         query_complete_ = true;
         condvar_.notify_one();

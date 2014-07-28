@@ -73,37 +73,37 @@ void ReplyI::push_(Current const&,
 void ReplyI::finished_(Current const&,
                        capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
-{
-    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
-    auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
-    auto r = req.getReason();
-    ListenerBase::Reason reason;
-    string err;
-    switch (r)
-    {
-        case capnproto::Reply::FinishedReason::FINISHED:
-        {
-            reason = ListenerBase::Finished;
-            break;
-        }
-        case capnproto::Reply::FinishedReason::CANCELLED:
-        {
-            reason = ListenerBase::Cancelled;
-            break;
-        }
-        case capnproto::Reply::FinishedReason::ERROR:
-        {
-            reason = ListenerBase::Error;
-            err = req.getError();
-            break;
-        }
-        default:
-        {
-            assert(false);                // LCOV_EXCL_LINE
-            reason = ListenerBase::Error; // LCOV_EXCL_LINE
-        }
-    }
-    delegate->finished(reason, err);
+{///!
+//    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
+//    auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
+//    auto r = req.getReason();
+//    ListenerBase::Reason reason;
+//    string err;
+//    switch (r)
+//    {
+//        case capnproto::Reply::FinishedReason::FINISHED:
+//        {
+//            reason = ListenerBase::Finished;
+//            break;
+//        }
+//        case capnproto::Reply::FinishedReason::CANCELLED:
+//        {
+//            reason = ListenerBase::Cancelled;
+//            break;
+//        }
+//        case capnproto::Reply::FinishedReason::ERROR:
+//        {
+//            reason = ListenerBase::Error;
+//            err = req.getError();
+//            break;
+//        }
+//        default:
+//        {
+//            assert(false);                // LCOV_EXCL_LINE
+//            reason = ListenerBase::Error; // LCOV_EXCL_LINE
+//        }
+//    }
+//    delegate->finished(reason, err);
 }
 
 void ReplyI::info_(Current const&,

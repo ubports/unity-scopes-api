@@ -61,12 +61,11 @@ public:
     CompletionDetails(CompletionStatus status);
 
     /**
-    \brief Create CompletionDetails with the given completion status and further information about
-    that status.
+    \brief Create CompletionDetails with the given completion status and message.
     \param status Indicates the completion status of the query.
-    \param status_info Contains additional information regarding the completion status of the query.
+    \param message Contains further details about the completion status.
     */
-    CompletionDetails(CompletionStatus status, OperationInfo const& status_info);
+    CompletionDetails(CompletionStatus status, std::string const& message);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -90,6 +89,12 @@ public:
     CompletionStatus status() const noexcept;
 
     /**
+    \brief Get the completion message string.
+    \return The completion message string.
+    */
+    std::string message() const;
+
+    /**
     \brief Get more details about the query operation.
     \return List containing additional information regarding the operation of the query.
     */
@@ -98,6 +103,12 @@ public:
 private:
     std::unique_ptr<internal::CompletionDetailsImpl> p;
 };
+
+/**
+\brief Convenience function to convert a CompletionDetails::CompletionStatus enumerator to a string.
+\return Possible return values are "ok", "cancelled", and "error".
+*/
+char const* to_string(CompletionDetails::CompletionStatus status);
 
 } // namespace scopes
 

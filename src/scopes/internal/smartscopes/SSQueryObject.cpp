@@ -96,8 +96,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
 
         query_it->second->q_pushable = false;
         // TODO: log error
-        reply->finished(CompletionDetails(CompletionDetails::Error,
-                        {OperationInfo::ExceptionThrown, e.what()}));  // Oneway, can't block
+        reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         cerr << "SSQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
@@ -106,8 +105,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
 
         query_it->second->q_pushable = false;
         // TODO: log error
-        reply->finished(CompletionDetails(CompletionDetails::Error,
-                        {OperationInfo::ExceptionThrown, "unknown exception"}));  // Oneway, can't block
+        reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         cerr << "SSQueryObject::run(): unknown exception" << endl;
     }
 

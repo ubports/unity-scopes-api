@@ -119,8 +119,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     {
         try
         {
-            reply->finished(CompletionDetails(CompletionDetails::Error,
-                            {OperationInfo::ExceptionThrown, e.what()}));  // Oneway, can't block
+            reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         }
         catch (...)
         {
@@ -133,8 +132,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     {
         try
         {
-            reply->finished(CompletionDetails(CompletionDetails::Error,
-                            {OperationInfo::ExceptionThrown, "unknown exception"}));  // Oneway, can't block
+            reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         }
         catch (...)
         {

@@ -19,6 +19,9 @@
 #include <unity/scopes/CompletionDetails.h>
 #include <unity/scopes/internal/CompletionDetailsImpl.h>
 
+#include <assert.h>
+#include <unordered_map>
+
 namespace unity
 {
 
@@ -30,8 +33,8 @@ CompletionDetails::CompletionDetails(CompletionStatus status)
 {
 }
 
-CompletionDetails::CompletionDetails(CompletionStatus status, OperationInfo const& status_info)
-    : p(new internal::CompletionDetailsImpl(status, status_info))
+CompletionDetails::CompletionDetails(CompletionStatus status, std::string const& message)
+    : p(new internal::CompletionDetailsImpl(status, message))
 {
 }
 
@@ -64,9 +67,30 @@ CompletionDetails::CompletionStatus CompletionDetails::status() const noexcept
     return p->status();
 }
 
+std::string CompletionDetails::message() const
+{
+    return p->message();
+}
+
 std::list<OperationInfo> CompletionDetails::details() const noexcept
 {
     return p->details();
+}
+
+// Possibly overkill, but safer than using the enum as the index into an array,
+// in case the enumeration is ever added to or the enumerators get re-ordered.
+
+static std::unordered_map<int, char const*> const statuses =
+{
+    std::pair<int, char const*>(static_cast<int>(CompletionDetails::OK), "ok"),
+    std::pair<int, char const*>(static_cast<int>(CompletionDetails::Cancelled), "cancelled"),
+    std::pair<int, char const*>(static_cast<int>(CompletionDetails::Error), "error")
+};
+
+char const* to_string(CompletionDetails::CompletionStatus status)
+{
+    assert(statuses.find(static_cast<int>(status)) != statuses.end());
+    return statuses.find(static_cast<int>(status))->second;
 }
 
 } // namespace scopes
