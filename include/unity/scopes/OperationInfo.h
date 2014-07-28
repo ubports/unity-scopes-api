@@ -19,8 +19,6 @@
 #ifndef UNITY_SCOPES_OPERATIONINFO_H
 #define UNITY_SCOPES_OPERATIONINFO_H
 
-#include <unity/util/NonCopyable.h>
-
 #include <memory>
 #include <string>
 
