@@ -89,6 +89,16 @@ int SearchMetadata::cardinality() const
     return p->cardinality();
 }
 
+void SearchMetadata::set_location(Location const& location)
+{
+    p->set_location(location);
+}
+
+Location SearchMetadata::location() const
+{
+    return p->location();
+}
+
 void SearchMetadata::set_hint(std::string const& key, Variant const& value)
 {
     p->hint(key) = value;
