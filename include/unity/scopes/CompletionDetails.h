@@ -96,6 +96,8 @@ public:
 
     /**
     \brief Add additional operation info to the info list.
+    \param info Contains details about something of interest that occurs during the operation of a
+    query.
     */
     void add_info(OperationInfo const& info) noexcept;
 
