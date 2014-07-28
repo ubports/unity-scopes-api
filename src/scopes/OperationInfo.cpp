@@ -36,6 +36,25 @@ OperationInfo::OperationInfo(InfoCode code, std::string message)
 }
 
 /// @cond
+
+OperationInfo::OperationInfo(OperationInfo const& other)
+    : p(new internal::OperationInfoImpl(*other.p.get()))
+{
+}
+
+OperationInfo::OperationInfo(OperationInfo&&) = default;
+
+OperationInfo& OperationInfo::operator=(OperationInfo const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::OperationInfoImpl(*other.p.get()));
+    }
+    return *this;
+}
+
+OperationInfo& OperationInfo::operator=(OperationInfo&&) = default;
+
 OperationInfo::~OperationInfo() = default;
 /// @endcond
 
@@ -44,7 +63,7 @@ OperationInfo::InfoCode OperationInfo::code() const noexcept
     return p->code();
 }
 
-std::string OperationInfo::message() const noexcept
+std::string OperationInfo::message() const
 {
     return p->message();
 }

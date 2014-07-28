@@ -68,7 +68,7 @@ public:
     available.
 
     Calling info() does not terminate the query, it simply informs the source that something
-    interesting occured during execution of the query (usually effecting the results returned in
+    interesting occured during execution of the query (usually affecting the results returned in
     some way).
 
     Multiple calls to info() for each condition are legal.

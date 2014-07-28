@@ -45,10 +45,6 @@ class OperationInfoImpl;
 class OperationInfo final
 {
 public:
-    /// @cond
-    NONCOPYABLE(OperationInfo);
-    /// @endcond
-
     /**
     \brief Indicates the type of / cause for the information being reported.
 
@@ -57,14 +53,15 @@ public:
     */
     enum InfoCode
     {
-        Unknown,                // A code unknown to the client-side run-time was used
-        NoInternet,             // No internet access
-        PoorInternet,           // Slow or intermittent internet access
-        NoLocationData,         // No location data available
-        InaccurateLocationData, // Location data available, but "fuzzy"
-        ResultsIncomplete,      // Results are incomplete (e.g. not all data sources could be reached)
-        DefaultSettingsUsed,    // Default settings used; results may be better with explicit settings
-        SettingsProblem         // Some required settings were not provided (e.g. URL for data source)
+        Unknown,                        // A code unknown to the run-time was used
+        NoInternet,                     // No internet access
+        PoorInternet,                   // Slow or intermittent internet access
+        NoLocationData,                 // No location data available
+        InaccurateLocationData,         // Location data available, but "fuzzy"
+        ResultsIncomplete,              // Results are incomplete (e.g. not all data sources could be reached)
+        DefaultSettingsUsed,            // Default settings used; results may be better with explicit settings
+        SettingsProblem,                // Some required settings were not provided (e.g. URL for data source)
+        LastInfoCode_ = SettingsProblem // Dummy end marker
     };
 
     /**
@@ -80,6 +77,17 @@ public:
     */
     OperationInfo(InfoCode code, std::string message);
 
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    OperationInfo(OperationInfo const& other);
+    OperationInfo(OperationInfo&&);
+
+    OperationInfo& operator=(OperationInfo const& other);
+    OperationInfo& operator=(OperationInfo&&);
+    //@}
+
     /// @cond
     ~OperationInfo();
     /// @endcond
@@ -94,7 +102,7 @@ public:
     \brief Get the message string.
     \return The message string.
     */
-    std::string message() const noexcept;
+    std::string message() const;
 
 private:
     std::unique_ptr<internal::OperationInfoImpl> p;

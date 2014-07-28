@@ -57,21 +57,8 @@ struct FinishedRequest
     error @1  : Text;               # Present only if reason is error
 }
 
-enum InfoCode
-{
-    unused @0;
-    unknown @1;
-    noInternet @2;
-    poorInternet @3;
-    noLocationData @4;
-    inaccurateLocationData @5;
-    resultsIncomplete @6;
-    defaultSettingsUsed @7;
-    settingsProblem @8;
-}
-
 struct InfoRequest
 {
-    code @0 : InfoCode;
+    code @0 : Int16;
     message @1 : Text;
 }

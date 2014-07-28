@@ -112,49 +112,15 @@ void ReplyI::info_(Current const&,
 {
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::InfoRequest>();
-    auto w = req.getCode();
-    switch (w)
+    auto c = req.getCode();
+
+    OperationInfo::InfoCode code = OperationInfo::Unknown;
+    if (c >= 0 && c <= OperationInfo::LastInfoCode_)
     {
-        case capnproto::Reply::InfoCode::NO_INTERNET:
-        {
-            delegate->info(OperationInfo{OperationInfo::NoInternet, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::POOR_INTERNET:
-        {
-            delegate->info(OperationInfo{OperationInfo::PoorInternet, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::NO_LOCATION_DATA:
-        {
-            delegate->info(OperationInfo{OperationInfo::NoLocationData, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA:
-        {
-            delegate->info(OperationInfo{OperationInfo::InaccurateLocationData, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::RESULTS_INCOMPLETE:
-        {
-            delegate->info(OperationInfo{OperationInfo::ResultsIncomplete, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED:
-        {
-            delegate->info(OperationInfo{OperationInfo::DefaultSettingsUsed, req.getMessage()});
-            break;
-        }
-        case capnproto::Reply::InfoCode::SETTINGS_PROBLEM:
-        {
-            delegate->info(OperationInfo{OperationInfo::SettingsProblem, req.getMessage()});
-            break;
-        }
-        default:
-        {
-            delegate->info(OperationInfo{OperationInfo::Unknown, req.getMessage()});
-        }
+        code = static_cast<OperationInfo::InfoCode>(c);
     }
+
+    delegate->info(OperationInfo{code, req.getMessage()});
 }
 
 } // namespace zmq_middleware
