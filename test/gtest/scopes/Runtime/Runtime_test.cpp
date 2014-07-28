@@ -199,9 +199,10 @@ public:
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
+        EXPECT_EQ("", error_message);
         EXPECT_EQ(pushes_expected_, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
