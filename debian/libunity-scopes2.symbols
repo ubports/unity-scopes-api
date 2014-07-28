@@ -122,43 +122,43 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::PreviewWidget::~PreviewWidget()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::operator=(unity::scopes::PreviewWidget const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Location::set_altitude(double)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_latitude(double)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_area_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_longitude(double)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_region_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_region_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_country_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_country_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_zip_postal_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_vertical_accuracy(double)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_horizontal_accuracy(double)@Base" 0replaceme
- (c++)"unity::scopes::Location::set_city(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(unity::scopes::Location&&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(unity::scopes::Location const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(double, double)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(unity::scopes::Location&&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(unity::scopes::Location const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::Location(double, double)@Base" 0replaceme
- (c++)"unity::scopes::Location::~Location()@Base" 0replaceme
- (c++)"unity::scopes::Location::~Location()@Base" 0replaceme
- (c++)"unity::scopes::Location::operator=(unity::scopes::Location&&)@Base" 0replaceme
- (c++)"unity::scopes::Location::operator=(unity::scopes::Location const&)@Base" 0replaceme
- (c++)"unity::scopes::Location::region_code() const@Base" 0replaceme
- (c++)"unity::scopes::Location::region_name() const@Base" 0replaceme
- (c++)"unity::scopes::Location::country_code() const@Base" 0replaceme
- (c++)"unity::scopes::Location::country_name() const@Base" 0replaceme
- (c++)"unity::scopes::Location::zip_postal_code() const@Base" 0replaceme
- (c++)"unity::scopes::Location::vertical_accuracy() const@Base" 0replaceme
- (c++)"unity::scopes::Location::horizontal_accuracy() const@Base" 0replaceme
- (c++)"unity::scopes::Location::city() const@Base" 0replaceme
- (c++)"unity::scopes::Location::altitude() const@Base" 0replaceme
- (c++)"unity::scopes::Location::latitude() const@Base" 0replaceme
- (c++)"unity::scopes::Location::area_code() const@Base" 0replaceme
- (c++)"unity::scopes::Location::longitude() const@Base" 0replaceme
- (c++)"unity::scopes::Location::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::set_altitude(double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_latitude(double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_area_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_longitude(double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_region_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_region_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_country_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_country_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_zip_postal_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_vertical_accuracy(double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_horizontal_accuracy(double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::set_city(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(unity::scopes::Location&&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(unity::scopes::Location const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(double, double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(unity::scopes::Location&&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(unity::scopes::Location const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::Location(double, double)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::~Location()@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::~Location()@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::operator=(unity::scopes::Location&&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::operator=(unity::scopes::Location const&)@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::region_code() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::region_name() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::country_code() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::country_name() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::zip_postal_code() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::vertical_accuracy() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::horizontal_accuracy() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::city() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::altitude() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::latitude() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::area_code() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::longitude() const@Base" 0.5.3+14.10.20140728
+ (c++)"unity::scopes::Location::serialize() const@Base" 0.5.3+14.10.20140728
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
@@ -184,7 +184,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::operator=(unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::set_cardinality(int)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::set_location(unity::scopes::Location const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::set_location(unity::scopes::Location const&)@Base" 0.5.3+14.10.20140728
  (c++)"unity::scopes::SearchMetadata::set_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::SearchMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(unity::scopes::internal::SearchMetadataImpl*)@Base" 0.4.0+14.04.20140312.1
@@ -664,7 +664,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActionMetadata::locale() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::location() const@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::location() const@Base" 0.5.3+14.10.20140728
  (c++)"unity::scopes::SearchMetadata::form_factor() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0.4.0+14.04.20140312.1
