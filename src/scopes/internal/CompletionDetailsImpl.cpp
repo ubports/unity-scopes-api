@@ -50,12 +50,12 @@ std::string CompletionDetailsImpl::message() const
 
 void CompletionDetailsImpl::add_info(OperationInfo const& info) noexcept
 {
-    details_.emplace_back(info);
+    info_list_.push_back(info);
 }
 
-std::list<OperationInfo> CompletionDetailsImpl::details() const noexcept
+std::vector<OperationInfo> CompletionDetailsImpl::info_list() const noexcept
 {
-    return details_;
+    return info_list_;
 }
 
 } // namespace internal

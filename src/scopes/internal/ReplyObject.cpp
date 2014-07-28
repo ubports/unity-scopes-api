@@ -158,7 +158,12 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        listener_base_->finished(details);
+        CompletionDetails details_with_info(details);
+        for (auto const& info : info_list_)
+        {
+            details_with_info.add_info(info);
+        }
+        listener_base_->finished(details_with_info);
     }
     catch (std::exception const& e)
     {
@@ -184,6 +189,7 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
 
     try
     {
+        info_list_.push_back(op_info);
         listener_base_->info(op_info);
     }
     catch (std::exception const& e)

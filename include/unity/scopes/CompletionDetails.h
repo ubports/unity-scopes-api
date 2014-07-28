@@ -21,9 +21,9 @@
 
 #include <unity/scopes/OperationInfo.h>
 
-#include <list>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace unity
 {
@@ -95,15 +95,15 @@ public:
     std::string message() const;
 
     /**
-    \brief Add additional operation info to the details list.
+    \brief Add additional operation info to the info list.
     */
     void add_info(OperationInfo const& info) noexcept;
 
     /**
-    \brief Get more details about the query operation.
+    \brief Get a list of all additional opertation info.
     \return List containing additional information regarding the operation of the query.
     */
-    std::list<OperationInfo> details() const noexcept;
+    std::vector<OperationInfo> info_list() const noexcept;
 
 private:
     std::unique_ptr<internal::CompletionDetailsImpl> p;

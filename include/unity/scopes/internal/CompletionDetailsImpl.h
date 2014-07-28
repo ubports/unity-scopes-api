@@ -45,12 +45,12 @@ public:
     CompletionDetails::CompletionStatus status() const noexcept;
     std::string message() const;
     void add_info(OperationInfo const& info) noexcept;
-    std::list<OperationInfo> details() const noexcept;
+    std::vector<OperationInfo> info_list() const noexcept;
 
 private:
     CompletionDetails::CompletionStatus status_;
     std::string message_;
-    std::list<OperationInfo> details_;
+    std::vector<OperationInfo> info_list_;
 };
 
 } // namespace internal

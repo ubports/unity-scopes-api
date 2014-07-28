@@ -68,6 +68,7 @@ private:
     std::string origin_proxy_;
     int num_push_;
     std::atomic_bool info_occurred_;
+    std::vector<OperationInfo> info_list_;
 };
 
 } // namespace internal

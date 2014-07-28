@@ -77,9 +77,9 @@ void CompletionDetails::add_info(OperationInfo const& info) noexcept
     p->add_info(info);
 }
 
-std::list<OperationInfo> CompletionDetails::details() const noexcept
+std::vector<OperationInfo> CompletionDetails::info_list() const noexcept
 {
-    return p->details();
+    return p->info_list();
 }
 
 // Possibly overkill, but safer than using the enum as the index into an array,
