@@ -66,7 +66,7 @@ private:
 
     typedef std::unordered_map<std::string, SocketData> CPool;
 
-    CPool::value_type create_connection(std::string const& endpoint, RequestMode m, int64_t timeout);
+    CPool::value_type create_connection(std::string const& endpoint, RequestMode m);
 
     zmqpp::context& context_;
     CPool pool_;
