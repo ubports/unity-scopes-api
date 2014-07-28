@@ -25,6 +25,7 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ListenerBase.h>
@@ -41,6 +42,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Runtime, basic)
 {
@@ -263,8 +265,22 @@ private:
     atomic_int count_;
 };
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
+}
+
 TEST(Runtime, search)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -279,6 +295,7 @@ TEST(Runtime, search)
 
 TEST(Runtime, consecutive_search)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -320,6 +337,8 @@ TEST(Runtime, consecutive_search)
 
 TEST(Runtime, preview)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -345,6 +364,8 @@ TEST(Runtime, preview)
 
 TEST(Runtime, cardinality)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
@@ -402,6 +423,7 @@ private:
 
 TEST(Runtime, early_cancel)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("SlowCreateScope", "Zmq", "Zmq.ini");
     mw->start();
