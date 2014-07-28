@@ -43,6 +43,8 @@
 #include <map>
 #include <set>
 
+#include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
+
 using namespace scoperegistry;
 using namespace std;
 using namespace unity;
@@ -467,6 +469,13 @@ int main(int argc, char* argv[])
 
             identity = runtime->registry_identity();
             ss_reg_id = runtime->ss_registry_identity();
+
+            // TODO: HACK: We create the root of the data directory for confined scopes,
+            //       in case the scope is confined and the dir doesn't exist
+            //       yet. This really should be done by the click-installation but,
+            //       prior to RTM, we don't rely on that.
+            string data_root = rt_config.data_directory() + "/leaf-net";
+            ::mkdir(data_root.c_str(), 0700);
         } // Release memory for config parser
 
         // Collect the registry config data.

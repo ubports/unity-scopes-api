@@ -51,7 +51,8 @@ using namespace std::placeholders;
 
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
     ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
-                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
+                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) },
+                      { "info", bind(&ReplyI::info_, this, _1, _2, _3) } })
 {
 }
 
@@ -103,6 +104,23 @@ void ReplyI::finished_(Current const&,
         }
     }
     delegate->finished(reason, err);
+}
+
+void ReplyI::info_(Current const&,
+                   capnp::AnyPointer::Reader& in_params,
+                   capnproto::Response::Builder&)
+{
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
+    auto req = in_params.getAs<capnproto::Reply::InfoRequest>();
+    auto c = req.getCode();
+
+    OperationInfo::InfoCode code = OperationInfo::Unknown;
+    if (c >= 0 && c <= OperationInfo::LastInfoCode_)
+    {
+        code = static_cast<OperationInfo::InfoCode>(c);
+    }
+
+    delegate->info(OperationInfo{code, req.getMessage()});
 }
 
 } // namespace zmq_middleware

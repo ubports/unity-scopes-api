@@ -143,6 +143,24 @@ void ReplyImpl::error(exception_ptr ex)
     }
 }
 
+void ReplyImpl::info(OperationInfo const& op_info)
+{
+    if (finished_.load())
+    {
+        return; // Ignore info messages that arrive after finished().
+    }
+
+    try
+    {
+        fwd()->info(op_info);
+    }
+    catch (std::exception const& e)
+    {
+        // TODO: log error
+        cerr << e.what() << endl;
+    }
+}
+
 MWReplyProxy ReplyImpl::fwd()
 {
     return dynamic_pointer_cast<MWReply>(proxy());

@@ -18,7 +18,10 @@ Changes in version 0.6.0
 
   - Made methods on ScopeBase virtual, so the testing framework can override them in a test scope.
 
+  - Added support for additional query reply info.
+
   - Introduced QueryMetadata base for shared functionality of *Metadata classes.
+
   - Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
 
 Changes in version 0.5.2

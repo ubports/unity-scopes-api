@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,18 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
- */
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+*/
 
-#ifndef UNITY_SCOPES_INTERNAL_MWREPLY_H
-#define UNITY_SCOPES_INTERNAL_MWREPLY_H
-
-#include <unity/scopes/internal/MWObjectProxy.h>
-#include <unity/scopes/internal/MWReplyProxyFwd.h>
-#include <unity/scopes/ListenerBase.h>
-#include <unity/scopes/Variant.h>
-
-#include <string>
+#include <unity/scopes/internal/OperationInfoImpl.h>
 
 namespace unity
 {
@@ -35,23 +27,29 @@ namespace scopes
 namespace internal
 {
 
-class MWReply : public virtual MWObjectProxy
+OperationInfoImpl::OperationInfoImpl(OperationInfo::InfoCode code)
+    : code_(code)
 {
-public:
-    virtual ~MWReply();
+}
 
-    virtual void push(VariantMap const& result) = 0;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;
-    virtual void info(OperationInfo const& op_info) = 0;
+OperationInfoImpl::OperationInfoImpl(OperationInfo::InfoCode code, std::string message)
+    : code_(code)
+    , message_(message)
+{
+}
 
-protected:
-    MWReply(MiddlewareBase* mw_base);
-};
+OperationInfo::InfoCode OperationInfoImpl::code() const noexcept
+{
+    return code_;
+}
+
+std::string OperationInfoImpl::message() const noexcept
+{
+    return message_;
+}
 
 } // namespace internal
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif
