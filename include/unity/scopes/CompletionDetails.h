@@ -20,7 +20,6 @@
 #define UNITY_SCOPES_COMPLETIONDETAILS_H
 
 #include <unity/scopes/OperationInfo.h>
-#include <unity/util/NonCopyable.h>
 
 #include <list>
 #include <memory>
@@ -46,10 +45,6 @@ class CompletionDetailsImpl;
 class CompletionDetails final
 {
 public:
-    /// @cond
-    NONCOPYABLE(CompletionDetails);
-    /// @endcond
-
     /**
     \brief Indicates the completion status for a query.
 
@@ -76,6 +71,17 @@ public:
     \param details Contains additional information regarding the query operation.
     */
     CompletionDetails(CompletionStatus status, std::list<OperationInfo> const& details);
+
+    /**@name Copy and assignment
+    Copy and assignment operators (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    CompletionDetails(CompletionDetails const& other);
+    CompletionDetails(CompletionDetails&&);
+
+    CompletionDetails& operator=(CompletionDetails const& other);
+    CompletionDetails& operator=(CompletionDetails&&);
+    //@}
 
     /// @cond
     ~CompletionDetails();

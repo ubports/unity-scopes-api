@@ -26,6 +26,24 @@ namespace scopes
 {
 
 /// @cond
+CompletionDetails::CompletionDetails(CompletionDetails const& other)
+    : p(new internal::CompletionDetailsImpl(*other.p.get()))
+{
+}
+
+CompletionDetails::CompletionDetails(CompletionDetails&&) = default;
+
+CompletionDetails& CompletionDetails::operator=(CompletionDetails const& other)
+{
+    if (this != &other)
+    {
+        p.reset(new internal::CompletionDetailsImpl(*other.p.get()));
+    }
+    return *this;
+}
+
+CompletionDetails& CompletionDetails::operator=(CompletionDetails&&) = default;
+
 CompletionDetails::~CompletionDetails() = default;
 /// @endcond
 

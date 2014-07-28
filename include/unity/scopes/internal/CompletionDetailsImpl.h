@@ -33,7 +33,11 @@ namespace internal
 class CompletionDetailsImpl final
 {
 public:
-    NONCOPYABLE(CompletionDetailsImpl);
+    CompletionDetailsImpl(CompletionDetailsImpl const&) = default;
+    CompletionDetailsImpl(CompletionDetailsImpl&&) = default;
+
+    CompletionDetailsImpl& operator=(CompletionDetailsImpl const&) = default;
+    CompletionDetailsImpl& operator=(CompletionDetailsImpl&&) = default;
 
 private:
 };
