@@ -51,12 +51,7 @@ public:
     The `Error` enumerator indicates that a query terminated abnormally, for example, a scope could
     not be reached over the network or explicitly reported an error.
     */
-    enum CompletionStatus
-    {
-      OK,
-      Cancelled,
-      Error
-    };
+    enum CompletionStatus { OK, Cancelled, Error };
 
     /**
     \brief Create CompletionDetails with the given completion status code.

@@ -33,13 +33,21 @@ namespace internal
 class CompletionDetailsImpl final
 {
 public:
+    CompletionDetailsImpl(CompletionDetails::CompletionStatus status);
+    CompletionDetailsImpl(CompletionDetails::CompletionStatus status, std::list<OperationInfo> const& details);
+
     CompletionDetailsImpl(CompletionDetailsImpl const&) = default;
     CompletionDetailsImpl(CompletionDetailsImpl&&) = default;
 
     CompletionDetailsImpl& operator=(CompletionDetailsImpl const&) = default;
     CompletionDetailsImpl& operator=(CompletionDetailsImpl&&) = default;
 
+    CompletionDetails::CompletionStatus status() const noexcept;
+    std::list<OperationInfo> details() const noexcept;
+
 private:
+    CompletionDetails::CompletionStatus status_;
+    std::list<OperationInfo> details_;
 };
 
 } // namespace internal

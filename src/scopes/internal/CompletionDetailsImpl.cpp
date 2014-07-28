@@ -27,6 +27,27 @@ namespace scopes
 namespace internal
 {
 
+CompletionDetailsImpl::CompletionDetailsImpl(CompletionDetails::CompletionStatus status)
+    : status_(status)
+{
+}
+
+CompletionDetailsImpl::CompletionDetailsImpl(CompletionDetails::CompletionStatus status, std::list<OperationInfo> const& details)
+    : status_(status)
+    , details_(details)
+{
+}
+
+CompletionDetails::CompletionStatus CompletionDetailsImpl::status() const noexcept
+{
+    return status_;
+}
+
+std::list<OperationInfo> CompletionDetailsImpl::details() const noexcept
+{
+    return details_;
+}
+
 } // namespace internal
 
 } // namespace scopes

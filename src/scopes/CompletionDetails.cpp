@@ -25,7 +25,18 @@ namespace unity
 namespace scopes
 {
 
+CompletionDetails::CompletionDetails(CompletionStatus status)
+    : p(new internal::CompletionDetailsImpl(status))
+{
+}
+
+CompletionDetails::CompletionDetails(CompletionStatus status, std::list<OperationInfo> const& details)
+    : p(new internal::CompletionDetailsImpl(status, details))
+{
+}
+
 /// @cond
+
 CompletionDetails::CompletionDetails(CompletionDetails const& other)
     : p(new internal::CompletionDetailsImpl(*other.p.get()))
 {
@@ -45,7 +56,18 @@ CompletionDetails& CompletionDetails::operator=(CompletionDetails const& other)
 CompletionDetails& CompletionDetails::operator=(CompletionDetails&&) = default;
 
 CompletionDetails::~CompletionDetails() = default;
+
 /// @endcond
+
+CompletionDetails::CompletionStatus CompletionDetails::status() const noexcept
+{
+    return p->status();
+}
+
+std::list<OperationInfo> CompletionDetails::details() const noexcept
+{
+    return p->details();
+}
 
 } // namespace scopes
 
