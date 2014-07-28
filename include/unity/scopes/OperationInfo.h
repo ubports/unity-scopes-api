@@ -53,14 +53,15 @@ public:
     */
     enum InfoCode
     {
-        Unknown,                // A code unknown to the client-side run-time was used
-        NoInternet,             // No internet access
-        PoorInternet,           // Slow or intermittent internet access
-        NoLocationData,         // No location data available
-        InaccurateLocationData, // Location data available, but "fuzzy"
-        ResultsIncomplete,      // Results are incomplete (e.g. not all data sources could be reached)
-        DefaultSettingsUsed,    // Default settings used; results may be better with explicit settings
-        SettingsProblem         // Some required settings were not provided (e.g. URL for data source)
+        Unknown,                        // A code unknown to the run-time was used
+        NoInternet,                     // No internet access
+        PoorInternet,                   // Slow or intermittent internet access
+        NoLocationData,                 // No location data available
+        InaccurateLocationData,         // Location data available, but "fuzzy"
+        ResultsIncomplete,              // Results are incomplete (e.g. not all data sources could be reached)
+        DefaultSettingsUsed,            // Default settings used; results may be better with explicit settings
+        SettingsProblem,                // Some required settings were not provided (e.g. URL for data source)
+        LastInfoCode_ = SettingsProblem // Dummy end marker
     };
 
     /**

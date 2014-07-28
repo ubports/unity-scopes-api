@@ -108,48 +108,8 @@ void ZmqReply::info(OperationInfo const& op_info)
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "info");
     auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
-    switch (op_info.code())
-    {
-        case OperationInfo::NoInternet:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::NO_INTERNET);
-            break;
-        }
-        case OperationInfo::PoorInternet:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::POOR_INTERNET);
-            break;
-        }
-        case OperationInfo::NoLocationData:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::NO_LOCATION_DATA);
-            break;
-        }
-        case OperationInfo::InaccurateLocationData:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::INACCURATE_LOCATION_DATA);
-            break;
-        }
-        case OperationInfo::ResultsIncomplete:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::RESULTS_INCOMPLETE);
-            break;
-        }
-        case OperationInfo::DefaultSettingsUsed:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::DEFAULT_SETTINGS_USED);
-            break;
-        }
-        case OperationInfo::SettingsProblem:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::SETTINGS_PROBLEM);
-            break;
-        }
-        default:
-        {
-            in_params.setCode(capnproto::Reply::InfoCode::UNKNOWN);
-        }
-    }
+
+    in_params.setCode(static_cast<int16_t>(op_info.code()));
     in_params.setMessage(op_info.message());
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
