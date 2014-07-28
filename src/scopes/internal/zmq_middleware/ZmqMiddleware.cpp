@@ -841,7 +841,7 @@ shared_ptr<ObjectAdapter> ZmqMiddleware::find_adapter(string const& name, string
         // TODO: get pool size from config
         // NB: On rebind, locate() is called on this adapter. A scope may then call registry methods during
         // its start() method, hence we must ensure this adapter has enough threads available to handle this.
-        pool_size = 6;
+        pool_size = 11;
         mode = RequestMode::Twoway;
     }
     else
