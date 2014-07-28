@@ -68,39 +68,39 @@ void ZmqReply::push(VariantMap const& result)
     future.wait();
 }
 
-void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message)
-{
-    capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "finished");
-    auto in_params = request.initInParams().getAs<capnproto::Reply::FinishedRequest>();
-    capnproto::Reply::FinishedReason r;
-    switch (reason)
-    {
-        case ListenerBase::Finished:
-        {
-            r = capnproto::Reply::FinishedReason::FINISHED;
-            break;
-        }
-        case ListenerBase::Cancelled:
-        {
-            r = capnproto::Reply::FinishedReason::CANCELLED;
-            break;
-        }
-        case ListenerBase::Error:
-        {
-            r = capnproto::Reply::FinishedReason::ERROR;
-            in_params.setError(error_message);
-            break;
-        }
-        default:
-        {
-            assert(false);
-        }
-    }
-    in_params.setReason(r);
+void ZmqReply::finished(CompletionDetails const& details)
+{///!
+//    capnp::MallocMessageBuilder request_builder;
+//    auto request = make_request_(request_builder, "finished");
+//    auto in_params = request.initInParams().getAs<capnproto::Reply::FinishedRequest>();
+//    capnproto::Reply::FinishedReason r;
+//    switch (reason)
+//    {
+//        case ListenerBase::Finished:
+//        {
+//            r = capnproto::Reply::FinishedReason::FINISHED;
+//            break;
+//        }
+//        case ListenerBase::Cancelled:
+//        {
+//            r = capnproto::Reply::FinishedReason::CANCELLED;
+//            break;
+//        }
+//        case ListenerBase::Error:
+//        {
+//            r = capnproto::Reply::FinishedReason::ERROR;
+//            in_params.setError(error_message);
+//            break;
+//        }
+//        default:
+//        {
+//            assert(false);
+//        }
+//    }
+//    in_params.setReason(r);
 
-    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+//    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+//    future.wait();
 }
 
 void ZmqReply::info(OperationInfo const& op_info)

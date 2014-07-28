@@ -55,18 +55,18 @@ public:
     enum CompletionStatus { OK, Cancelled, Error };
 
     /**
-    \brief Create CompletionDetails with the given completion status code.
+    \brief Create CompletionDetails with the given completion status.
     \param status Indicates the completion status of the query.
     */
     CompletionDetails(CompletionStatus status);
 
     /**
-    \brief Create CompletionDetails with the given completion status code and details about the
-    query operation.
+    \brief Create CompletionDetails with the given completion status and further information about
+    that status.
     \param status Indicates the completion status of the query.
-    \param details Contains additional information regarding the query operation.
+    \param status_info Contains additional information regarding the completion status of the query.
     */
-    CompletionDetails(CompletionStatus status, std::list<OperationInfo> const& details);
+    CompletionDetails(CompletionStatus status, OperationInfo const& status_info);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -84,14 +84,14 @@ public:
     /// @endcond
 
     /**
-    \brief Get the completion status code.
+    \brief Get the completion status.
     \return Enum indicating the completion status of the query.
     */
     CompletionStatus status() const noexcept;
 
     /**
     \brief Get more details about the query operation.
-    \return List containing additional information regarding the query operation.
+    \return List containing additional information regarding the operation of the query.
     */
     std::list<OperationInfo> details() const noexcept;
 

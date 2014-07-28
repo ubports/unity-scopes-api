@@ -97,7 +97,7 @@ void ReplyImpl::finished(ListenerBase::Reason reason)
     {
         try
         {
-            fwd()->finished(reason, "");
+            ///!fwd()->finished(reason, "");
         }
         catch (std::exception const& e)
         {
@@ -134,7 +134,8 @@ void ReplyImpl::error(exception_ptr ex)
 
     try
     {
-        fwd()->finished(ListenerBase::Error, error_message);
+        fwd()->finished(CompletionDetails(CompletionDetails::Error,
+                        {OperationInfo::ExceptionThrown, error_message}));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {

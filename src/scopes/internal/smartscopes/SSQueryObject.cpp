@@ -96,7 +96,8 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
 
         query_it->second->q_pushable = false;
         // TODO: log error
-        reply->finished(ListenerBase::Error, e.what());  // Oneway, can't block
+        reply->finished(CompletionDetails(CompletionDetails::Error,
+                        {OperationInfo::ExceptionThrown, e.what()}));  // Oneway, can't block
         cerr << "SSQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
@@ -105,7 +106,8 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
 
         query_it->second->q_pushable = false;
         // TODO: log error
-        reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
+        reply->finished(CompletionDetails(CompletionDetails::Error,
+                        {OperationInfo::ExceptionThrown, "unknown exception"}));  // Oneway, can't block
         cerr << "SSQueryObject::run(): unknown exception" << endl;
     }
 
@@ -143,7 +145,7 @@ void SSQueryObject::cancel(InvokeInfo const& info)
         // Send finished() to up-stream client to tell him the query is done.
         // We send via the MWReplyProxy here because that allows passing
         // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-        q_reply->finished(ListenerBase::Cancelled, "");  // Oneway, can't block
+        q_reply->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
     }
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
@@ -255,7 +257,7 @@ void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& repl
     // and just push it ourseleves
     auto res = activation_query->activate();
     reply->push(res.serialize());
-    reply->finished(ListenerBase::Finished, "");
+    reply->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
 }
 
 }  // namespace smartscopes

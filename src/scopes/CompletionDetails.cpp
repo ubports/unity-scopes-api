@@ -30,8 +30,8 @@ CompletionDetails::CompletionDetails(CompletionStatus status)
 {
 }
 
-CompletionDetails::CompletionDetails(CompletionStatus status, std::list<OperationInfo> const& details)
-    : p(new internal::CompletionDetailsImpl(status, details))
+CompletionDetails::CompletionDetails(CompletionStatus status, OperationInfo const& status_info)
+    : p(new internal::CompletionDetailsImpl(status, status_info))
 {
 }
 

@@ -59,6 +59,7 @@ public:
         ResultsIncomplete,              // Results are incomplete (e.g. not all data sources could be reached)
         DefaultSettingsUsed,            // Default settings used; results may be better with explicit settings
         SettingsProblem,                // Some required settings were not provided (e.g. URL for data source)
+        ExceptionThrown,                // An exception was thrown during the operation of a request
         LastInfoCode_ = SettingsProblem // Dummy end marker
     };
 

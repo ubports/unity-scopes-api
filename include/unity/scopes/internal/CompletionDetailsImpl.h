@@ -34,7 +34,7 @@ class CompletionDetailsImpl final
 {
 public:
     CompletionDetailsImpl(CompletionDetails::CompletionStatus status);
-    CompletionDetailsImpl(CompletionDetails::CompletionStatus status, std::list<OperationInfo> const& details);
+    CompletionDetailsImpl(CompletionDetails::CompletionStatus status, OperationInfo const& status_info);
 
     CompletionDetailsImpl(CompletionDetailsImpl const&) = default;
     CompletionDetailsImpl(CompletionDetailsImpl&&) = default;

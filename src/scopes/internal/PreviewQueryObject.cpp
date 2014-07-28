@@ -77,13 +77,15 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                         {OperationInfo::ExceptionThrown, e.what()}));  // Oneway, can't block
         cerr << "PreviewQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
     {
         // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                         {OperationInfo::ExceptionThrown, "unknown exception"}));  // Oneway, can't block
         cerr << "PreviewQueryObject::run(): unknown exception" << endl;
     }
 }

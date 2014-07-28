@@ -32,10 +32,10 @@ CompletionDetailsImpl::CompletionDetailsImpl(CompletionDetails::CompletionStatus
 {
 }
 
-CompletionDetailsImpl::CompletionDetailsImpl(CompletionDetails::CompletionStatus status, std::list<OperationInfo> const& details)
+CompletionDetailsImpl::CompletionDetailsImpl(CompletionDetails::CompletionStatus status, OperationInfo const& status_info)
     : status_(status)
-    , details_(details)
 {
+    details_.push_back(status_info);
 }
 
 CompletionDetails::CompletionStatus CompletionDetailsImpl::status() const noexcept
