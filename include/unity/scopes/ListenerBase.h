@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_LISTENERBASE_H
 #define UNITY_SCOPES_LISTENERBASE_H
 
+#include <unity/scopes/OperationInfo.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -68,6 +69,19 @@ public:
            Otherwise, `error_message` is the empty string.
     */
     virtual void finished(Reason r, std::string const& error_message) = 0;
+
+    /**
+    \brief Called by the scopes run time each time a scope reports additional information about the
+    reply to a query.
+
+    More than one info() call can arrive during processing of a single query.
+
+    Calls to info() are made by an arbitrary thread.
+
+    Exceptions thrown from info() are ignored.
+    \param op_info Contains all details of the information being reported.
+    */
+    virtual void info(OperationInfo const& op_info);
 
 protected:
     /// @cond

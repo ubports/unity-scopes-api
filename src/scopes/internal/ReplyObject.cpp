@@ -45,7 +45,8 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
-    num_push_(0)
+    num_push_(0),
+    info_occurred_(false)
 {
     assert(receiver_base);
     assert(runtime);
@@ -167,6 +168,32 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     catch (...)
     {
         cerr << "ReplyObject::finished(): unknown exception" << endl;
+        // TODO: log error
+    }
+}
+
+void ReplyObject::info(OperationInfo const& op_info) noexcept
+{
+    if (finished_.load())
+    {
+        return; // Ignore info messages that arrive after finished().
+    }
+
+    reap_item_->refresh();
+    info_occurred_.exchange(true);
+
+    try
+    {
+        listener_base_->info(op_info);
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "ReplyObject::info(): " << e.what() << endl;
+        // TODO: log error
+    }
+    catch (...)
+    {
+        cerr << "ReplyObject::info(): unknown exception" << endl;
         // TODO: log error
     }
 }

@@ -86,10 +86,10 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
     }
 
     // Check that the scope has indeed timed out. The server shuts down after 2 seconds,
-    // so we allow between 2 and 6 seconds for it to time out.
+    // so we allow between 2 and 7 seconds for it to time out.
     auto duration = chrono::steady_clock::now() - start_time;
     EXPECT_TRUE(duration > chrono::seconds(2));
-    EXPECT_TRUE(duration < chrono::seconds(6));
+    EXPECT_TRUE(duration < chrono::seconds(7));
 }
 
 std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
