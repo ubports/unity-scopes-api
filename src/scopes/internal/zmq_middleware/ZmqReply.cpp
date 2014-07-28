@@ -38,8 +38,8 @@ namespace zmq_middleware
 
 interface Reply
 {
-    void push(VariantMap result);                                      // oneway
-    void finished(ListenerBase::Reason reason, string error_message);  // oneway
+    void push(VariantMap result);                     // oneway
+    void finished(CompletionDetails const& details);  // oneway
 };
 
 */

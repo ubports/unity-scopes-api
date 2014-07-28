@@ -142,7 +142,7 @@ void SSQueryObject::cancel(InvokeInfo const& info)
     {
         // Send finished() to up-stream client to tell him the query is done.
         // We send via the MWReplyProxy here because that allows passing
-        // a ListenerBase::Reason (whereas the public ReplyProxy does not).
+        // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
         q_reply->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
     }
 
