@@ -62,6 +62,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ColumnLayout::operator=(unity::scopes::ColumnLayout const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::FilterOption(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::~FilterOption()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ListenerBase::info(unity::scopes::OperationInfo const&)@Base" 0replaceme
  (c++)"unity::scopes::ListenerBase::ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ListenerBase::~ListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewReply::PreviewReply()@Base" 0.4.0+14.04.20140312.1
@@ -107,6 +108,17 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::experimental::RadioButtonsFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::RadioButtonsFilter(unity::scopes::internal::RadioButtonsFilterImpl*)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::~RadioButtonsFilter()@Base" 0.5.0+14.10.20140619
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo::InfoCode)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo::InfoCode, std::basic_string<char, std::char_traits<char>, std::allocator<char> >)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo&&)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo::InfoCode)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo::InfoCode, std::basic_string<char, std::char_traits<char>, std::allocator<char> >)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo&&)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::OperationInfo(unity::scopes::OperationInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::~OperationInfo()@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::operator=(unity::scopes::OperationInfo&&)@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::operator=(unity::scopes::OperationInfo const&)@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::add_attribute_value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::add_attribute_mapping(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
@@ -608,6 +620,8 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::experimental::RadioButtonsFilter::fwd() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::label() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::options() const@Base" 0.5.0+14.10.20140619
+ (c++)"unity::scopes::OperationInfo::code() const@Base" 0replaceme
+ (c++)"unity::scopes::OperationInfo::message() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::widget_type() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_values() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::attribute_mappings() const@Base" 0.4.0+14.04.20140312.1

@@ -1,11 +1,11 @@
 unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
 
-  [ Michi Henning ]
   * Added cache_directory() method and refactored scoperunner and RuntimeImpl.
 
   [ Marcus Tomlinson ]
   * Introduced QueryMetadata base for shared functionality of *Metadata classes.
   * Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
+  * Added support for additional query reply info.
 
  -- Michi Henning <michi.henning@canonical.com>  Mon, 07 Jul 2014 14:34:04 +1000
 

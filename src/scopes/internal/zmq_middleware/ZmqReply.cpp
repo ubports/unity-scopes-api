@@ -103,6 +103,19 @@ void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message
     future.wait();
 }
 
+void ZmqReply::info(OperationInfo const& op_info)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "info");
+    auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
+
+    in_params.setCode(static_cast<int16_t>(op_info.code()));
+    in_params.setMessage(op_info.message());
+
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.wait();
+}
+
 } // namespace zmq_middleware
 
 } // namespace internal
