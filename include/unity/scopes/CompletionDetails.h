@@ -95,6 +95,11 @@ public:
     std::string message() const;
 
     /**
+    \brief Add additional operation info to the details list.
+    */
+    void add_info(OperationInfo const& info) noexcept;
+
+    /**
     \brief Get more details about the query operation.
     \return List containing additional information regarding the operation of the query.
     */

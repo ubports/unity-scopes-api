@@ -72,6 +72,11 @@ std::string CompletionDetails::message() const
     return p->message();
 }
 
+void CompletionDetails::add_info(OperationInfo const& info) noexcept
+{
+    p->add_info(info);
+}
+
 std::list<OperationInfo> CompletionDetails::details() const noexcept
 {
     return p->details();
