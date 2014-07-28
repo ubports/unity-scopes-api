@@ -27,9 +27,10 @@
 #include <core/posix/signal.h>
 
 #include <cassert>
-#include <signal.h>
-#include <libgen.h>
 #include <iostream>
+
+#include <libgen.h>
+#include <signal.h>
 #include <unistd.h>
 
 using namespace unity::scopes;

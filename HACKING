@@ -193,12 +193,17 @@ http://packaging.ubuntu.com/html/auto-pkg-test.html
 Running the test manually is simple. After building and installing the
 new packages, just run 'sh debian/tests/scopebuild'.
 
-When making API breaks, make sure to check if autopkg test scripts
-need changing. The point of autopkg is not to exercise the API
-thoroughly, so it should not need changing all that often.
+To run the autopkg tests the same way Jenkins does, without installing
+the packages, follow the instructions here:
 
-At the moment it is unclear if these tests are executed during Jenkins
-builds.  This will lead to autopkgtest failing later if scopes' API is
-changed in a backwards incompatible way. If this happens the test
-needs to be fixed either by updating the test or backing out the API
-breaking change.
+http://packaging.ubuntu.com/html/auto-pkg-test.html
+
+When adding new tests to debian/tests, be sure that the new tests
+are built and run by adding them to tests/autopkg. Doing this doesn't
+run the tests exactly the same way as on Jenkins because they will
+be built and run against the headers and library in the build area,
+rather than against the installed packages. But it provides a basic
+sanity check for them. Without this, it's very easy to make a breaking
+change to the API and forgetting to update the autopkg tests too,
+meaning that the failure will show up only in Jenkins, but not
+when running the tests locally.

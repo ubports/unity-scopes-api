@@ -9,60 +9,11 @@ set -e
 
 WORKDIR=$(mktemp -d)
 trap "rm -rf $WORKDIR" 0 INT QUIT ABRT PIPE TERM
+cp scopetest.cpp $WORKDIR
 cd $WORKDIR
-cat <<EOF > scopetest.cpp
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/QueryBase.h>
-#include <unity/scopes/ReplyProxyFwd.h>
-#include <unity/scopes/QueryBase.h>
-#include <unity/scopes/PreviewQueryBase.h>
 
-class DemoScope : public unity::scopes::ScopeBase
-{
-public:
-    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override;
-
-    virtual void stop() override;
-
-    unity::scopes::PreviewQueryBase::UPtr preview(const unity::scopes::Result&,
-            const unity::scopes::ActionMetadata&) override;
-
-    virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const& q,
-            unity::scopes::SearchMetadata const&) override;
-};
-
-using namespace unity::scopes;
-
-int DemoScope::start(std::string const&, unity::scopes::RegistryProxy const&)
-{
-    return 0;
-}
-
-void DemoScope::stop()
-{
-}
-
-SearchQueryBase::UPtr DemoScope::search(unity::scopes::CannedQuery const &q,
-        unity::scopes::SearchMetadata const&)
-{
-    unity::scopes::SearchQueryBase::UPtr query(nullptr);
-    return query;
-}
-
-PreviewQueryBase::UPtr DemoScope::preview(Result const& result, ActionMetadata const& /*metadata*/) {
-    unity::scopes::PreviewQueryBase::UPtr preview(nullptr);
-    return preview;
-}
-
-int main(int, char**)
-{
-    DemoScope d;
-    return 0;
-}
-EOF
-
-g++ -std=c++11 -o scopebin scopetest.cpp `pkg-config --cflags --libs libunity-scopes`
+g++ -std=c++11 -o scopetest scopetest.cpp `pkg-config --cflags --libs libunity-scopes`
 echo "Scope build: OK"
-[ -x scopebin ]
-./scopebin
+[ -x scopetest ]
+./scopetest
 echo "Scope run: OK"

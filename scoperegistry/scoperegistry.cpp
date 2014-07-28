@@ -35,7 +35,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -43,11 +42,8 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <sstream>
 
-#include <libgen.h>
-#include <unistd.h>
-
+#include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
 
 using namespace scoperegistry;
 using namespace std;
@@ -464,11 +460,23 @@ int main(int argc, char* argv[])
         SignalThreadWrapper signal_handler_wrapper;
 
         // And finally creating our runtime.
-        RuntimeConfig rt_config(config_file);
-        RuntimeImpl::UPtr runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
+        string identity;
+        string ss_reg_id;
+        RuntimeImpl::UPtr runtime;
+        {
+            RuntimeConfig rt_config(config_file);
+            runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
 
-        string identity = runtime->registry_identity();
-        string ss_reg_id = runtime->ss_registry_identity();
+            identity = runtime->registry_identity();
+            ss_reg_id = runtime->ss_registry_identity();
+
+            // TODO: HACK: We create the root of the data directory for confined scopes,
+            //       in case the scope is confined and the dir doesn't exist
+            //       yet. This really should be done by the click-installation but,
+            //       prior to RTM, we don't rely on that.
+            string data_root = rt_config.data_directory() + "/leaf-net";
+            ::mkdir(data_root.c_str(), 0700);
+        } // Release memory for config parser
 
         // Collect the registry config data.
 
@@ -539,9 +547,8 @@ int main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        ScopesWatcher local_scopes_watcher(registry,
-                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
-                                           (pair<string, string> const& scope)
+        auto local_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                  (pair<string, string> const& scope)
         {
             try
             {
@@ -551,13 +558,13 @@ int main(int argc, char* argv[])
             {
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
-        });
+        };
+        ScopesWatcher local_scopes_watcher(registry, local_watch_lambda);
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
-        ScopesWatcher click_scopes_watcher(registry,
-                                           [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
-                                           (pair<string, string> const& scope)
+        auto click_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+                                  (pair<string, string> const& scope)
         {
             try
             {
@@ -567,7 +574,8 @@ int main(int argc, char* argv[])
             {
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
-        });
+        };
+        ScopesWatcher click_scopes_watcher(registry, click_watch_lambda);
         click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform

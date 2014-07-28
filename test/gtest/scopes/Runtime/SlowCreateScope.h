@@ -21,14 +21,13 @@
 
 #include <unity/scopes/ScopeBase.h>
 
-using namespace std;
-using namespace unity::scopes;
-
-class SlowCreateScope : public ScopeBase
+class SlowCreateScope : public unity::scopes::ScopeBase
 {
 public:
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override;
-    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override;
+    virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
+                                                        unity::scopes::SearchMetadata const&) override;
+    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
+                                                          unity::scopes::ActionMetadata const&) override;
 };
 
 #endif

@@ -78,7 +78,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
         throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-5000 ms");
     }
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  registry_config_group,
                                              {
                                                 mw_kind_key,

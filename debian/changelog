@@ -1,9 +1,13 @@
 unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
 
-  * Upgraded finished() callback to be more flexible and expandable.
-  * Added support for additional query reply info.
+  [ Michi Henning ]
+  * Added cache_directory() method and refactored scoperunner and RuntimeImpl.
+
+  [ Marcus Tomlinson ]
   * Introduced QueryMetadata base for shared functionality of *Metadata classes.
   * Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
+  * Added support for additional query reply info.
+  * Upgraded finished() callback to be more flexible and expandable.
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 28 Jul 2014 15:18:12 +0200
 

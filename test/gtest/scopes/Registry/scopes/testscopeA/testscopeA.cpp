@@ -64,7 +64,7 @@ public:
 class MyScope : public ScopeBase
 {
 public:
-    virtual void start(string const&, RegistryProxy const&) override {}
+    virtual void start(string const&) override {}
 
     virtual void stop() override {}
 
