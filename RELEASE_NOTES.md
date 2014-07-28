@@ -3,8 +3,23 @@ Release notes
 
 Changes in version 0.6.0
 ========================
+  - Added cache_directory() method to ScopeBase, so a scope can find out where it can write its files.
+
+  - Refactored scoperunner and ScopeLoader. ScopeLoader no longer knows about the registry and
+    scoperunner now calls RuntimeImpl::run_scope() to set the scope running, instead of duplicating
+    lots of functionality.
+
+  - Removed registry parameter from ScopeBase::start(). The registry is now available via a registry()
+    accessor on ScopeBase. The original start() method is still present, but deprecated. The default
+    implementation of the new start() method forwards to the old one so, if a scope implements only the
+    old one but not the new one, things still work.
+
+  - Made methods on ScopeBase virtual, so the testing framework can override them in a test scope.
+
   - Added support for additional query reply info.
+
   - Introduced QueryMetadata base for shared functionality of *Metadata classes.
+
   - Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
 
 Changes in version 0.5.2

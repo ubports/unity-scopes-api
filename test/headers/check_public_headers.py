@@ -53,7 +53,7 @@ def test_files(hdr_dir, hdrs):
     for hdr in hdrs:
         try:
             hdr_name = os.path.join(hdr_dir, hdr)
-            file = open(hdr_name, "r")
+            file = open(hdr_name, 'r', encoding = 'utf=8')
         except OSError as e:
             error("cannot open \"" + hdr_name + "\": " + e.strerror)
             sys.exit(1)
