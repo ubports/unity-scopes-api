@@ -73,37 +73,39 @@ void ReplyI::push_(Current const&,
 void ReplyI::finished_(Current const&,
                        capnp::AnyPointer::Reader& in_params,
                        capnproto::Response::Builder&)
-{///!
-//    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
-//    auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
-//    auto r = req.getReason();
-//    ListenerBase::Reason reason;
-//    string err;
-//    switch (r)
-//    {
-//        case capnproto::Reply::FinishedReason::FINISHED:
-//        {
-//            reason = ListenerBase::Finished;
-//            break;
-//        }
-//        case capnproto::Reply::FinishedReason::CANCELLED:
-//        {
-//            reason = ListenerBase::Cancelled;
-//            break;
-//        }
-//        case capnproto::Reply::FinishedReason::ERROR:
-//        {
-//            reason = ListenerBase::Error;
-//            err = req.getError();
-//            break;
-//        }
-//        default:
-//        {
-//            assert(false);                // LCOV_EXCL_LINE
-//            reason = ListenerBase::Error; // LCOV_EXCL_LINE
-//        }
-//    }
-//    delegate->finished(reason, err);
+{
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
+    auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
+    auto s = req.getStatus();
+    CompletionDetails::CompletionStatus status;
+    string msg;
+    switch (s)
+    {
+        case capnproto::Reply::CompletionStatus::OK:
+        {
+            status = CompletionDetails::OK;
+            msg = req.getMessage();
+            break;
+        }
+        case capnproto::Reply::CompletionStatus::CANCELLED:
+        {
+            status = CompletionDetails::Cancelled;
+            msg = req.getMessage();
+            break;
+        }
+        case capnproto::Reply::CompletionStatus::ERROR:
+        {
+            status = CompletionDetails::Error;
+            msg = req.getMessage();
+            break;
+        }
+        default:
+        {
+            assert(false);                     // LCOV_EXCL_LINE
+            status = CompletionDetails::Error; // LCOV_EXCL_LINE
+        }
+    }
+    delegate->finished(CompletionDetails(status, msg));
 }
 
 void ReplyI::info_(Current const&,
