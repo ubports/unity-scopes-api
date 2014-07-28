@@ -284,7 +284,7 @@ public:
     /**
     \brief Returns the proxy to the registry.
 
-    \note The registr proxy is available only after this ScopeBase is instantiated; do not
+    \note The registry proxy is available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
 
     \return The proxy to the registry.
