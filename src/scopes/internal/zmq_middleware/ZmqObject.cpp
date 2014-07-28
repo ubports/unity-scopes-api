@@ -211,6 +211,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     auto registry_proxy = mw_base()->registry_proxy();
     auto ss_registry_proxy = mw_base()->ss_registry_proxy();
 
+    // TODO: HACK: this builds knowledge about the smartscopes proxy running permanently into the run time.
     bool this_is_registry = registry_proxy && identity() == registry_proxy->identity();
     bool this_is_ss_registry = ss_registry_proxy && identity() == ss_registry_proxy->identity();
 
