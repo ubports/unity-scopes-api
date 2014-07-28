@@ -3,6 +3,7 @@ Release notes
 
 Changes in version 0.6.0
 ========================
+  - Upgraded finished() callback to be more flexible and expandable.
   - Added support for additional query reply info.
   - Introduced QueryMetadata base for shared functionality of *Metadata classes.
   - Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
