@@ -39,8 +39,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <libgen.h>
-
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -60,7 +58,7 @@ void error(string const& msg)
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
-int run_scope(std::string const& runtime_config, std::string const& scope_configfile)
+int run_scope(std::string const& runtime_config, std::string const& scope_config)
 {
     auto trap = core::posix::trap_signals_for_all_subsequent_threads(
     {
@@ -70,16 +68,11 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
 
     std::thread trap_worker([trap]() { trap->run(); });
 
-    // Retrieve the registry middleware and create a proxy to its state receiver
-    RuntimeConfig rt_config(runtime_config);
-    RegistryConfig reg_conf(rt_config.registry_identity(), rt_config.registry_configfile());
-    auto reg_runtime = RuntimeImpl::create(rt_config.registry_identity(), runtime_config);
-    auto reg_mw = reg_runtime->factory()->find(reg_runtime->registry_identity(), reg_conf.mw_kind());
-    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
-
-    filesystem::path scope_config_path(scope_configfile);
+    // Figure out what the scope ID is from the name of the scope config file.
+    filesystem::path scope_config_path(scope_config);
     string lib_dir = scope_config_path.parent_path().native();
     string scope_id = scope_config_path.stem().native();
+
     if (!lib_dir.empty())
     {
       lib_dir += '/';
@@ -88,11 +81,6 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     int exit_status = 1;
     try
     {
-        // Instantiate the run time, create the middleware, load the scope from its
-        // shared library, and call the scope's start() method.
-        auto rt = RuntimeImpl::create(scope_id, runtime_config);
-        auto mw = rt->factory()->create(scope_id, reg_conf.mw_kind(), reg_conf.mw_configfile());
-
         // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
         vector<string> libs;
         libs.push_back(lib_dir + "lib" + scope_id + ".so");
@@ -105,7 +93,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         {
             try
             {
-                loader = ScopeLoader::load(scope_id, lib, rt_config.data_directory(), rt->registry());
+                loader = ScopeLoader::load(scope_id, lib);
             }
             catch (unity::ResourceException& e)
             {
@@ -124,35 +112,24 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
             e.remember(ep);
             throw e;
         }
-        loader->start();
 
-        // Give a thread to the scope to do with as it likes. If the scope doesn't want to use it and
-        // immediately returns from run(), that's fine.
-        auto run_future = std::async(launch::async, [loader] { loader->scope_base()->run(); });
+        static mutex rt_mutex;
+        RuntimeImpl::SPtr rt;
 
-        // Create a servant for the scope and register the servant.
-        ScopeConfig scope_config(scope_configfile);
-        auto scope = unique_ptr<ScopeObject>(new ScopeObject(rt.get(), loader->scope_base()));
-        auto proxy = mw->add_scope_object(scope_id, move(scope), scope_config.idle_timeout() * 1000);
-
-        trap->signal_raised().connect([mw](core::posix::Signal)
+        // Signal handler to shut down the run time on receipt of a signal.
+        trap->signal_raised().connect([rt](core::posix::Signal)
         {
-            mw->stop();
+            lock_guard<mutex> lock(rt_mutex);
+            rt->destroy();
         });
 
-        // Inform the registry that this scope is now ready to process requests
-        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeReady);
+        // Instantiate the run time and run the scope.
+        {
+            lock_guard<mutex> lock(rt_mutex);
+            rt = RuntimeImpl::create(scope_id, runtime_config);
+        }
 
-        mw->wait_for_shutdown();
-
-        // Inform the registry that this scope is shutting down
-        reg_state_receiver->push_state(scope_id, StateReceiverObject::State::ScopeStopping);
-
-        loader->stop();
-
-        // Collect exit status from the run thread. If this throws, the ScopeLoader
-        // destructor will still call stop() on the scope.
-        run_future.get();
+        rt->run_scope(loader->scope_base(), runtime_config, scope_config);
 
         exit_status = 0;
     }

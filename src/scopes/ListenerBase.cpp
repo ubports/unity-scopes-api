@@ -19,7 +19,6 @@
 #include <unity/scopes/ListenerBase.h>
 
 #include <cassert>
-#include <unordered_map>
 
 using namespace std;
 
@@ -39,20 +38,9 @@ ListenerBase::~ListenerBase()
 {
 }
 
-// Possibly overkill, but safer than using the enum as the index into an array,
-// in case the enumeration is ever added to or the enumerators get re-ordered.
-
-static unordered_map<int, char const*> const reasons =
+void ListenerBase::info(OperationInfo const&)
 {
-    pair<int, char const*>(static_cast<int>(ListenerBase::Finished),  "finished"),
-    pair<int, char const*>(static_cast<int>(ListenerBase::Cancelled), "cancelled"),
-    pair<int, char const*>(static_cast<int>(ListenerBase::Error),     "error")
-};
-
-char const* to_string(ListenerBase::Reason reason)
-{
-    assert(reasons.find(static_cast<int>(reason)) != reasons.end());
-    return reasons.find(static_cast<int>(reason))->second;
+    // Intentionally stubbed to allow listeners to ignore info messages
 }
 
 //! @endcond

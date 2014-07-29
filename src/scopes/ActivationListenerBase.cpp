@@ -39,7 +39,7 @@ void ActivationListenerBase::activated(ActivationResponse const& /* response */)
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void ActivationListenerBase::finished(Reason /* r */, std::string const& /* error_message */)
+void ActivationListenerBase::finished(CompletionDetails const& /* details */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

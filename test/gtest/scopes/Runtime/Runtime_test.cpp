@@ -58,7 +58,8 @@ public:
         query_complete_(false),
         count_(0),
         dep_count_(0),
-        annotation_count_(0)
+        annotation_count_(0),
+        info_count_(0)
     {
     }
 
@@ -101,17 +102,40 @@ public:
         annotation_count_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
+        EXPECT_EQ(2, info_count_);
+
+        ASSERT_EQ(2, details.info_list().size());
+        EXPECT_EQ(OperationInfo::NoInternet, details.info_list()[0].code());
+        EXPECT_EQ("Partial results returned due to no internet connection.", details.info_list()[0].message());
+        EXPECT_EQ(OperationInfo::PoorInternet, details.info_list()[1].code());
+        EXPECT_EQ("Partial results returned due to poor internet connection.", details.info_list()[1].message());
+
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
+    }
+
+    virtual void info(OperationInfo const& op_info) override
+    {
+        if (info_count_ == 0)
+        {
+            EXPECT_EQ(OperationInfo::NoInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to no internet connection.", op_info.message());
+        }
+        else if (info_count_ == 1)
+        {
+            EXPECT_EQ(OperationInfo::PoorInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to poor internet connection.", op_info.message());
+        }
+        info_count_++;
     }
 
     void wait_until_finished()
@@ -132,6 +156,7 @@ private:
     int count_;
     int dep_count_;
     int annotation_count_;
+    int info_count_;
     std::shared_ptr<Result> last_result_;
 };
 
@@ -141,44 +166,75 @@ public:
     PreviewReceiver() :
         query_complete_(false),
         widgets_pushes_(0),
-        data_pushes_(0)
+        data_pushes_(0),
+        info_count_(0)
     {
     }
+
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
         widgets_pushes_++;
     }
+
     virtual void push(std::string const& key, Variant const&) override
     {
         EXPECT_TRUE(key == "author" || key == "rating");
         data_pushes_++;
     }
+
     virtual void push(ColumnLayoutList const&) override
     {
     }
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, widgets_pushes_);
         EXPECT_EQ(2, data_pushes_);
+        EXPECT_EQ(2, info_count_);
+
+        ASSERT_EQ(2, details.info_list().size());
+        EXPECT_EQ(OperationInfo::NoLocationData, details.info_list()[0].code());
+        EXPECT_EQ("", details.info_list()[0].message());
+        EXPECT_EQ(OperationInfo::InaccurateLocationData, details.info_list()[1].code());
+        EXPECT_EQ("Partial results returned due to inaccurate location data.", details.info_list()[1].message());
+
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
     }
+
+    virtual void info(OperationInfo const& op_info) override
+    {
+        if (info_count_ == 0)
+        {
+            EXPECT_EQ(OperationInfo::NoLocationData, op_info.code());
+            EXPECT_EQ("", op_info.message());
+        }
+        else if (info_count_ == 1)
+        {
+            EXPECT_EQ(OperationInfo::InaccurateLocationData, op_info.code());
+            EXPECT_EQ("Partial results returned due to inaccurate location data.", op_info.message());
+        }
+        info_count_++;
+    }
+
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+
 private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
     int widgets_pushes_;
     int data_pushes_;
+    int info_count_;
 };
 
 class PushReceiver : public SearchListenerBase
@@ -199,9 +255,9 @@ public:
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& /* error_message */) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
         EXPECT_EQ(pushes_expected_, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
@@ -357,10 +413,10 @@ public:
         FAIL();
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Cancelled, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::Cancelled, details.status());
+        EXPECT_EQ("", details.message());
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;

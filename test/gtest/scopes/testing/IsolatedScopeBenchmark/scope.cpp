@@ -155,7 +155,7 @@ testing::Scope::Scope(
 {
 }
 
-void testing::Scope::start(std::string const&, unity::scopes::RegistryProxy const &)
+void testing::Scope::start(std::string const&)
 {
 }
 

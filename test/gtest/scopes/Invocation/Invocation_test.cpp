@@ -55,11 +55,11 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
         lock_guard<mutex> lock(mutex_);
-        reason_ = reason;
-        error_message_ = error_message;
+        status_ = details.status();
+        error_message_ = details.message();
         query_complete_ = true;
         cond_.notify_one();
     }
@@ -71,10 +71,10 @@ public:
         query_complete_ = false;
     }
 
-    ListenerBase::Reason reason()
+    CompletionDetails::CompletionStatus status()
     {
         lock_guard<mutex> lock(mutex_);
-        return reason_;
+        return status_;
     }
 
     string error_message()
@@ -85,7 +85,7 @@ public:
 
 private:
     bool query_complete_;
-    ListenerBase::Reason reason_;
+    CompletionDetails::CompletionStatus status_;
     string error_message_;
     mutex mutex_;
     condition_variable cond_;
@@ -122,7 +122,7 @@ TEST(Invocation, timeout)
     scope->search("test", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
 
-    EXPECT_EQ(ListenerBase::Error, receiver->reason());
+    EXPECT_EQ(CompletionDetails::Error, receiver->status());
     EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 500 milliseconds", receiver->error_message());
 
     // Wait another three seconds, so TestScope is finally able to receive another request.
@@ -132,7 +132,7 @@ TEST(Invocation, timeout)
     scope->search("test", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
 
-    EXPECT_EQ(ListenerBase::Finished, receiver->reason());
+    EXPECT_EQ(CompletionDetails::OK, receiver->status());
     EXPECT_EQ("", receiver->error_message());
 }
 
@@ -147,7 +147,7 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, string const& /* error_message */) override
+    virtual void finished(CompletionDetails const&) override
     {
     }
 };

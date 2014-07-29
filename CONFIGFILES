@@ -92,7 +92,7 @@ The following keys are recognized:
 
 - DataDir
 
-  The parent directory under the run time writes scope-specific data files
+  The parent directory under which the run time writes scope-specific data files
   (such as settings).
 
   The default value is $HOME/.local/share/unity-scopes.

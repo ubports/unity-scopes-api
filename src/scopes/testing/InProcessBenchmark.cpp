@@ -18,13 +18,11 @@
 
 #include <unity/scopes/testing/InProcessBenchmark.h>
 
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-
-#include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/PreviewReply.h>
-
 #include <unity/scopes/testing/Category.h>
 
 #include <core/posix/fork.h>
@@ -135,6 +133,10 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
     {
         state.store(State::finished_with_error);
         wait_condition.notify_all();
+    }
+
+    void info(unity::scopes::OperationInfo const&) override
+    {
     }
 };
 

@@ -38,7 +38,8 @@ public:
     UNITY_DEFINES_PTRS(ReplyObjectBase);
 
     virtual void push(VariantMap const& result) noexcept = 0;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
+    virtual void finished(CompletionDetails const& details) noexcept = 0;
+    virtual void info(OperationInfo const& op_info) noexcept = 0;
 };
 
 } // namespace internal

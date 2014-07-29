@@ -17,6 +17,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayoutImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetailsImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DepartmentImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
@@ -40,6 +41,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWStateReceiver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWSubscriber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfoImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBaseImpl.cpp

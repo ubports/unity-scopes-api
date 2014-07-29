@@ -68,7 +68,7 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual void start(string const& scope_id, RegistryProxy const&) override
+    virtual void start(string const& scope_id) override
     {
         scope_id_ = scope_id;
     }

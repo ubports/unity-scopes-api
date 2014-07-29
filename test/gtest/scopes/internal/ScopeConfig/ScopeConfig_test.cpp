@@ -126,7 +126,7 @@ TEST(ScopeConfig, bad_ttl)
     }
     catch(ConfigException const& e)
     {
-        boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(blah\\) for ResultsTtlType");
+        boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(\"blah\"\\) for ResultsTtlType");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
 }

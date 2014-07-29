@@ -50,7 +50,7 @@ public:
 
 }  // namespace
 
-void SlowSearchScope::start(string const&, RegistryProxy const &)
+void SlowSearchScope::start(string const&)
 {
 }
 

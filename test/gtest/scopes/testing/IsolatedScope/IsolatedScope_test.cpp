@@ -204,7 +204,7 @@ TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
         result.set_dnd_uri("dnd_uri");
         listener->push(result);
 
-        listener->finished(unity::scopes::ListenerBase::Finished, "");
+        listener->finished(unity::scopes::CompletionDetails(unity::scopes::CompletionDetails::OK));
         return queryctrl_proxy;
     };
 

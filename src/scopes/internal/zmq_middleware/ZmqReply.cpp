@@ -38,8 +38,8 @@ namespace zmq_middleware
 
 interface Reply
 {
-    void push(VariantMap result);                                      // oneway
-    void finished(ListenerBase::Reason reason, string error_message);  // oneway
+    void push(VariantMap result);                     // oneway
+    void finished(CompletionDetails const& details);  // oneway
 };
 
 */
@@ -68,36 +68,50 @@ void ZmqReply::push(VariantMap const& result)
     future.wait();
 }
 
-void ZmqReply::finished(ListenerBase::Reason reason, string const& error_message)
+void ZmqReply::finished(CompletionDetails const& details)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "finished");
     auto in_params = request.initInParams().getAs<capnproto::Reply::FinishedRequest>();
-    capnproto::Reply::FinishedReason r;
-    switch (reason)
+    capnproto::Reply::CompletionStatus s;
+    switch (details.status())
     {
-        case ListenerBase::Finished:
+        case CompletionDetails::OK:
         {
-            r = capnproto::Reply::FinishedReason::FINISHED;
+            s = capnproto::Reply::CompletionStatus::OK;
             break;
         }
-        case ListenerBase::Cancelled:
+        case CompletionDetails::Cancelled:
         {
-            r = capnproto::Reply::FinishedReason::CANCELLED;
+            s = capnproto::Reply::CompletionStatus::CANCELLED;
             break;
         }
-        case ListenerBase::Error:
+        case CompletionDetails::Error:
         {
-            r = capnproto::Reply::FinishedReason::ERROR;
-            in_params.setError(error_message);
+            s = capnproto::Reply::CompletionStatus::ERROR;
             break;
         }
         default:
         {
             assert(false);
+            s = capnproto::Reply::CompletionStatus::ERROR;
         }
     }
-    in_params.setReason(r);
+    in_params.setStatus(s);
+    in_params.setMessage(details.message());
+
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.wait();
+}
+
+void ZmqReply::info(OperationInfo const& op_info)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "info");
+    auto in_params = request.initInParams().getAs<capnproto::Reply::InfoRequest>();
+
+    in_params.setCode(static_cast<int16_t>(op_info.code()));
+    in_params.setMessage(op_info.message());
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
     future.wait();

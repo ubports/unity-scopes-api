@@ -23,12 +23,7 @@
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
-#include <boost/filesystem.hpp>
-
 #include <cassert>
-#include <libgen.h>
-#include <sys/stat.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -43,13 +38,9 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& scope_id,
-                         string const& libpath,
-                         string const& data_dir,
-                         RegistryProxy const& registry) :
+ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath) :
     scope_id_(scope_id),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
-    registry_(registry),
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
@@ -62,26 +53,6 @@ ScopeLoader::ScopeLoader(string const& scope_id,
     if (!scope_base_)
     {
         throw unity::ResourceException("Scope " + scope_id_ + " returned nullptr from " + UNITY_SCOPE_CREATE_SYMSTR);
-    }
-
-    {
-        boost::filesystem::path libp(libpath);
-        boost::filesystem::path scope_dir(libp.parent_path());
-        scope_base_->p->set_scope_directory(scope_dir.native());
-    }
-
-    string settings_dir = data_dir + "/" + scope_id;
-    string scope_dir = scope_base_->scope_directory();
-    string settings_db = settings_dir + "/settings.db";
-    string settings_schema = scope_dir + "/" + scope_id + "-settings.ini";
-    if (boost::filesystem::exists(settings_schema))
-    {
-        // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
-        ::mkdir(data_dir.c_str(), 0700);
-        ::mkdir(settings_dir.c_str(), 0700);
-
-        shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
-        scope_base_->p->set_settings_db(db);
     }
 }
 
@@ -96,12 +67,9 @@ ScopeLoader::~ScopeLoader()
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& scope_id,
-                                    string const& libpath,
-                                    string const& data_dir,
-                                    RegistryProxy const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath)
 {
-    return UPtr(new ScopeLoader(scope_id, libpath, data_dir, registry));
+    return UPtr(new ScopeLoader(scope_id, libpath));
 }
 
 void ScopeLoader::unload()
@@ -143,7 +111,7 @@ void ScopeLoader::start()
 
     try
     {
-        scope_base_->start(scope_id_, registry_);
+        scope_base_->start(scope_id_);
     }
     catch (...)
     {
