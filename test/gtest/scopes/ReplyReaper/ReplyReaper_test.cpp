@@ -70,7 +70,7 @@ std::unique_ptr<core::posix::ChildProcess::DeathObserver>
 
 RuntimeImpl::SPtr run_test_registry()
 {
-    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", TEST_DIR "/Runtime.ini");
     MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
     RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
     middleware->add_registry_object("TestRegistry", reg_obj);
@@ -87,13 +87,13 @@ TEST(ReplyReaper, reap)
 {
     auto reg_rt = run_test_registry();
 
-    Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, no_reply_rt, "Runtime.ini");
+    Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
+    std::thread scope_t(scope_thread, no_reply_rt, TEST_DIR "/Runtime.ini");
 
     // Run a query in the scope. The query will do nothing for 3 seconds,
     // but the reaper will reap after at most 2 seconds.
-    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("NoReplyScope", "Zmq", "Zmq.ini");
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("NoReplyScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
