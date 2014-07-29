@@ -1,6 +1,6 @@
 [Runtime]
 Registry.Identity = TestRegistry
-Registry.ConfigFile = Registry.ini
+Registry.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Registry.ini
 Reap.Expiry = 2
 Reap.Interval = 1
 Default.Middleware = Zmq
