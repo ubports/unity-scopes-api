@@ -47,11 +47,6 @@ char const* scopeA = TEST_DIR "/libScopeA.so";
 char const* scopeB = TEST_DIR "/libScopeB.so";
 }
 
-// Need to make a dummy registry proxy because, if we pass a null shared_ptr to load(),
-// load() throws an exception.
-
-RegistryProxy registry(make_shared<RegistryImpl>(nullptr, (RuntimeImpl*)0x1));
-
 // Basic test.
 
 TEST(ScopeLoader, basic)
@@ -59,13 +54,12 @@ TEST(ScopeLoader, basic)
     reset_counters();
 
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
         EXPECT_EQ(1, num_create());
         EXPECT_EQ(0, num_destroy());
 
         EXPECT_EQ("testScope", sl->scope_id());
         EXPECT_EQ(scope_lib, sl->libpath());
-        EXPECT_EQ(TEST_DIR, sl->scope_base()->scope_directory());
     }
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_destroy());
@@ -78,7 +72,7 @@ TEST(ScopeLoader, stop)
     reset_counters();
 
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
 
         // Check that calling stop on a stopped thread does nothing.
         sl->stop();
@@ -116,7 +110,7 @@ TEST(ScopeLoader, unload_while_started)
     reset_counters();
 
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
 
         sl->start();
         EXPECT_EQ(1, num_start());
@@ -136,7 +130,7 @@ TEST(ScopeLoader, no_library)
 
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", "no_such_lib", TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", "no_such_lib");
         FAIL();
     }
     catch (unity::Exception const& e)
@@ -156,7 +150,7 @@ TEST(ScopeLoader, no_load)
 
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", no_destroy_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", no_destroy_lib);
         FAIL();
     }
     catch (unity::Exception const& e)
@@ -176,7 +170,7 @@ TEST(ScopeLoader, null_return)
 
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib);
         FAIL();
     }
     catch (unity::Exception const& e)
@@ -197,7 +191,7 @@ TEST(ScopeLoader, null_return_unload)
 
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", null_return_lib);
         sl->unload();
         FAIL();
     }
@@ -217,7 +211,7 @@ TEST(ScopeLoader, throw_unity_exception_from_start)
 {
     reset_counters();
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib);
         try
         {
             sl->start();
@@ -242,7 +236,7 @@ TEST(ScopeLoader, throw_unity_exception_from_start_no_unload)
 {
     reset_counters();
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib);
         try
         {
             sl->start();
@@ -266,7 +260,7 @@ TEST(ScopeLoader, throw_unknown_exception_from_start)
 {
     reset_counters();
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_start_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_start_lib);
         try
         {
             sl->start();
@@ -293,7 +287,7 @@ TEST(ScopeLoader, throw_unity_exception_from_stop)
     reset_counters();
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib);
         sl->start();
         sl->stop();
         EXPECT_EQ(1, num_start());
@@ -319,7 +313,7 @@ TEST(ScopeLoader, throw_std_exception_from_stop)
     reset_counters();
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_std_ex_from_stop_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_std_ex_from_stop_lib);
         sl->start();
         sl->stop();
         EXPECT_EQ(1, num_start());
@@ -345,7 +339,7 @@ TEST(ScopeLoader, throw_unknown_exception_from_stop)
     reset_counters();
     try
     {
-        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_stop_lib, TEST_DIR, registry);
+        ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unknown_ex_from_stop_lib);
         sl->start();
         sl->stop();
         EXPECT_EQ(1, num_start());
@@ -369,7 +363,7 @@ TEST(ScopeLoader, unload)
 {
     reset_counters();
 
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
     sl->start();
     sl->stop();
     sl->unload();
@@ -387,7 +381,7 @@ TEST(ScopeLoader, unload_stop_exception)
 {
     reset_counters();
 
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib, TEST_DIR, registry);
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_stop_lib);
     sl->start();
     try
     {
@@ -418,7 +412,7 @@ TEST(ScopeLoader, restart_exception)
 {
     reset_counters();
 
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
     sl->start();
     sl->unload();
     try
@@ -438,7 +432,7 @@ TEST(ScopeLoader, stop_after_unload_exception)
 {
     reset_counters();
 
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib, TEST_DIR, registry);
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", scope_lib);
     sl->start();
     sl->unload();
     try
@@ -458,7 +452,7 @@ TEST(ScopeLoader, restart_failed)
 {
     reset_counters();
 
-    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib, TEST_DIR, registry);
+    ScopeLoader::UPtr sl = ScopeLoader::load("testScope", throw_unity_ex_from_start_lib);
     try
     {
         sl->start();
@@ -495,12 +489,12 @@ TEST(ScopeLoader, two_scopes)
     reset_counters();
     clear_vars();
 
-    ScopeLoader::UPtr slA = ScopeLoader::load("scopeA", scopeA, TEST_DIR, registry);
+    ScopeLoader::UPtr slA = ScopeLoader::load("scopeA", scopeA);
     slA->start();
     EXPECT_EQ(1, num_create());
     EXPECT_EQ(1, num_start());
 
-    ScopeLoader::UPtr slB = ScopeLoader::load("scopeB", scopeB, TEST_DIR, registry);
+    ScopeLoader::UPtr slB = ScopeLoader::load("scopeB", scopeB);
     slB->start();
     EXPECT_EQ(2, num_create());
     EXPECT_EQ(2, num_start());

@@ -125,7 +125,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
         {
             try
             {
-                ro->finished(ListenerBase::Error, e.what());
+                ro->finished(CompletionDetails(CompletionDetails::Error, e.what()));
             }
             catch (...)
             {
@@ -173,7 +173,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
         {
             try
             {
-                ro->finished(ListenerBase::Error, e.what());
+                ro->finished(CompletionDetails(CompletionDetails::Error, e.what()));
             }
             catch (...)
             {
@@ -224,7 +224,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
         {
             try
             {
-                ro->finished(ListenerBase::Error, e.what());
+                ro->finished(CompletionDetails(CompletionDetails::Error, e.what()));
             }
             catch (...)
             {
@@ -270,7 +270,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
         {
             try
             {
-                ro->finished(ListenerBase::Error, e.what());
+                ro->finished(CompletionDetails(CompletionDetails::Error, e.what()));
             }
             catch (...)
             {

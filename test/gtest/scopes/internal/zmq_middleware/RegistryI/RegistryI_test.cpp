@@ -564,7 +564,7 @@ class Receiver : public SearchListenerBase
 public:
     void push(CategorisedResult) override {}
 
-    void finished(Reason, std::string const&) override
+    void finished(CompletionDetails const&) override
     {
         // Signal that the query is complete
         unique_lock<std::mutex> lock(mutex_);

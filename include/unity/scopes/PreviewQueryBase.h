@@ -103,6 +103,11 @@ public:
     /// @endcond
 
 protected:
+    /**
+    \brief Instantiates a PreviewQueryBase.
+    \param result The result to be previewed.
+    \param metadata Additional data for the preview.
+    */
     PreviewQueryBase(Result const& result, ActionMetadata const& metadata);
 
 private:

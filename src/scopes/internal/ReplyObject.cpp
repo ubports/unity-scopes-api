@@ -45,13 +45,14 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
-    num_push_(0)
+    num_push_(0),
+    info_occurred_(false)
 {
     assert(receiver_base);
     assert(runtime);
     reap_item_ = runtime->reply_reaper()->add([this] {
         string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
-        this->finished(ListenerBase::Error, msg);
+        this->finished(CompletionDetails(CompletionDetails::Error, msg));
     });
 }
 
@@ -59,7 +60,7 @@ ReplyObject::~ReplyObject()
 {
     try
     {
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
     catch (...)
     {
@@ -125,16 +126,16 @@ void ReplyObject::push(VariantMap const& result) noexcept
     if (!error.empty())
     {
         // TODO: log error
-        finished(ListenerBase::Error, error);
+        finished(CompletionDetails(CompletionDetails::Error, error));
     }
     else if (stop)
     {
         // TODO: log error
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
 }
 
-void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) noexcept
+void ReplyObject::finished(CompletionDetails const& details) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -157,7 +158,12 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        listener_base_->finished(r, error_message);
+        CompletionDetails details_with_info(details);
+        for (auto const& info : info_list_)
+        {
+            details_with_info.add_info(info);
+        }
+        listener_base_->finished(details_with_info);
     }
     catch (std::exception const& e)
     {
@@ -167,6 +173,33 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     catch (...)
     {
         cerr << "ReplyObject::finished(): unknown exception" << endl;
+        // TODO: log error
+    }
+}
+
+void ReplyObject::info(OperationInfo const& op_info) noexcept
+{
+    if (finished_.load())
+    {
+        return; // Ignore info messages that arrive after finished().
+    }
+
+    reap_item_->refresh();
+    info_occurred_.exchange(true);
+
+    try
+    {
+        info_list_.push_back(op_info);
+        listener_base_->info(op_info);
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "ReplyObject::info(): " << e.what() << endl;
+        // TODO: log error
+    }
+    catch (...)
+    {
+        cerr << "ReplyObject::info(): unknown exception" << endl;
         // TODO: log error
     }
 }

@@ -14,6 +14,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetails.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
@@ -22,6 +23,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Object.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RangeInputFilter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBase.cpp

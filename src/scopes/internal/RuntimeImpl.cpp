@@ -35,8 +35,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <signal.h>
-#include <libgen.h>
+#include <boost/filesystem.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -301,27 +300,37 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
-        boost::filesystem::path inip(scope_ini_file);
-        boost::filesystem::path scope_dir(inip.parent_path());
-        scope_base->p->set_scope_directory(inip.native());
+        boost::filesystem::path dir = boost::filesystem::path(scope_ini_file).parent_path();
+        scope_base->p->set_scope_directory(dir.native());
     }
 
-    // Try to open the scope settings database, if any.
-    string settings_dir = data_dir_ + "/" + scope_id_;
-    string scope_dir = scope_base->scope_directory();
-    string settings_db = settings_dir + "/settings.db";
-    string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
-    if (boost::filesystem::exists(settings_schema))
     {
-        // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
-        ::mkdir(data_dir_.c_str(), 0700);
-        ::mkdir(settings_dir.c_str(), 0700);
+        // Try to open the scope settings database, if any.
+        string settings_dir = data_dir_ + "/" + scope_id_;
+        string scope_dir = scope_base->scope_directory();
+        string settings_db = settings_dir + "/settings.db";
+        string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+        if (boost::filesystem::exists(settings_schema))
+        {
+            // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+            ::mkdir(data_dir_.c_str(), 0700);
+            ::mkdir(settings_dir.c_str(), 0700);
 
-        shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
-        scope_base->p->set_settings_db(db);
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+            scope_base->p->set_settings_db(db);
+        }
+        else
+        {
+            scope_base->p->set_settings_db(nullptr);
+        }
     }
 
-    scope_base->start(scope_id_, registry());
+    scope_base->p->set_registry(registry_);
+
+    scope_base->p->set_cache_directory(find_cache_dir());
+
+    scope_base->start(scope_id_);
+
     // Ensure the scope gets stopped.
     unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
 
@@ -332,15 +341,13 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+    int idle_timeout_ms = 0;
     if (!scope_ini_file.empty())
     {
         ScopeConfig scope_config(scope_ini_file);
-        mw->add_scope_object(scope_id_, move(scope), scope_config.idle_timeout() * 1000);
+        idle_timeout_ms = scope_config.idle_timeout() * 1000;
     }
-    else
-    {
-        mw->add_scope_object(scope_id_, move(scope));
-    }
+    mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
@@ -381,6 +388,42 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     {
         throw ResourceException("Runtime::proxy_to_string(): Cannot stringify proxy");
     }
+}
+
+string RuntimeImpl::find_cache_dir() const
+{
+    // TODO: HACK: Until we get a fancier Apparmor query API, we try
+    //             to create the scope cache dir and figure out whether
+    //             whether we are confined or unconfined. We first try to
+    //             create <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
+    //             in case they don't exist. Then we try to create a file in
+    //             <data_dir>unconfined/<scope_id_>. If that works, we unlink
+    //             the file again and can conclude that the scope is unconfined.
+    //             Otherwise, the scope must be confined, in which case
+    //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
+
+    string cache_dir = data_dir_ + "/unconfined/" + scope_id_;
+
+    // The following two mkdir() calls will fail if the scope is confined or
+    // the directories exist already.
+    ::mkdir((data_dir_ + "/unconfined").c_str(), 0700);
+    ::mkdir(cache_dir.c_str(), 0700);
+    string tmp = cache_dir + "/.unconfined_scope_XXXXXX";
+    int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
+    if (fd != -1)
+    {
+        // If mkstemp succeeded, the scope is unconfined.
+        assert(::unlink(tmp.c_str()) == 0);
+        ::close(fd);
+    }
+    else
+    {
+        // mkstemp() failed, the scope must be confined.
+        ::mkdir((data_dir_ + "/leaf-net").c_str(), 0700);
+        ::mkdir(cache_dir.c_str(), 0700);
+        cache_dir = data_dir_ + "/leaf-net/" + scope_id_;
+    }
+    return cache_dir;
 }
 
 } // namespace internal

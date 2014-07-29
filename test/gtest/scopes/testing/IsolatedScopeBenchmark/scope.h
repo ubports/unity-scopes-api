@@ -30,7 +30,7 @@ class Scope : public unity::scopes::ScopeBase
 public:
     Scope(const std::chrono::milliseconds& mean, const std::chrono::milliseconds& variance);
 
-    void start(std::string const&, unity::scopes::RegistryProxy const &) override;
+    void start(std::string const&) override;
 
     void stop() override;
 

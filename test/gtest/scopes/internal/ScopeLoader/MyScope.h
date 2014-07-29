@@ -31,7 +31,7 @@ public:
     MyScope() {}
     virtual ~MyScope() {}
 
-    virtual void start(std::string const&, unity::scopes::RegistryProxy const&) override
+    virtual void start(std::string const&) override
     {
         inc_start();
     }
