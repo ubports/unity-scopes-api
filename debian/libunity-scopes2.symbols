@@ -137,10 +137,13 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::QueryMetadata::set_internet_connectivity(unity::scopes::QueryMetadata::ConnectivityStatus)@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata&&)@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::internal::QueryMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::QueryMetadata(unity::scopes::QueryMetadata const&)@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::~QueryMetadata()@Base" 0replaceme
  (c++)"unity::scopes::QueryMetadata::operator=(unity::scopes::QueryMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::QueryMetadata::operator=(unity::scopes::QueryMetadata const&)@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(unity::scopes::ScopeMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::ScopeMetadata(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
