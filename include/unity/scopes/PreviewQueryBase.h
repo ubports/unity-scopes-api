@@ -104,7 +104,7 @@ public:
 
 protected:
     /**
-    Instantiates a PreviewQueryBase.
+    \brief Instantiates a PreviewQueryBase.
     \param result The result to be previewed.
     \param metadata Additional data for the preview.
     */
