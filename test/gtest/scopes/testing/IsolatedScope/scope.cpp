@@ -74,7 +74,7 @@ public:
     {
     }
 
-    void finished(unity::scopes::ListenerBase::Reason, std::string const&) override {
+    void finished(unity::scopes::CompletionDetails const&) override {
     }
 
     void push(unity::scopes::CategorisedResult result) override {

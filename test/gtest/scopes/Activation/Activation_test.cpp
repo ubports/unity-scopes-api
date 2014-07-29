@@ -46,7 +46,7 @@ public:
     {
         push_func_(result);
     }
-    void finished(Reason /* r */, std::string const& /* error_message */) override {}
+    void finished(CompletionDetails const&) override {}
 
     std::function<void(CategorisedResult)> push_func_;
 };
@@ -84,7 +84,7 @@ public:
         this->result = std::make_shared<Result>(result);
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(CompletionDetails const&) override
     {
         notify();
     }
@@ -100,7 +100,7 @@ public:
         this->response = std::make_shared<ActivationResponse>(response);
     }
 
-    void finished(Reason /* r */, std::string const& /* error_message */) override
+    void finished(CompletionDetails const&) override
     {
         notify();
     }

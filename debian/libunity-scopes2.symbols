@@ -237,6 +237,18 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::CategorisedResult::~CategorisedResult()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::operator=(unity::scopes::CategorisedResult&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::operator=(unity::scopes::CategorisedResult const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::CompletionDetails::add_info(unity::scopes::OperationInfo const&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails::CompletionStatus)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails::CompletionStatus, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails&&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails const&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails::CompletionStatus)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails::CompletionStatus, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails&&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::CompletionDetails(unity::scopes::CompletionDetails const&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::~CompletionDetails()@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::operator=(unity::scopes::CompletionDetails&&)@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::operator=(unity::scopes::CompletionDetails const&)@Base" 0replaceme
  (c++)"unity::scopes::NotFoundException::NotFoundException(unity::scopes::NotFoundException const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::NotFoundException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::NotFoundException(unity::scopes::NotFoundException const&)@Base" 0.4.0+14.04.20140312.1
@@ -283,7 +295,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::OptionSelectorFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::OptionSelectorFilter::OptionSelectorFilter(unity::scopes::internal::OptionSelectorFilterImpl*)@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::OptionSelectorFilter::~OptionSelectorFilter()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::ActivationListenerBase::finished(unity::scopes::ListenerBase::Reason, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ActivationListenerBase::finished(unity::scopes::CompletionDetails const&)@Base" 0replaceme
  (c++)"unity::scopes::ActivationListenerBase::activated(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::ActivationListenerBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationListenerBase::~ActivationListenerBase()@Base" 0.4.0+14.04.20140312.1
@@ -551,7 +563,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ScopeBase::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeBase::ScopeBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeBase::~ScopeBase()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::to_string(unity::scopes::ListenerBase::Reason)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::to_string(unity::scopes::CompletionDetails::CompletionStatus)@Base" 0replaceme
  (c++)"unity::scopes::operator==(unity::scopes::CategoryRenderer const&, unity::scopes::CategoryRenderer const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::subdepartments() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Department::alternate_label() const@Base" 0.4.6+14.10.20140519
@@ -665,6 +677,9 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::TimeoutException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::fwd() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::category() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::CompletionDetails::status() const@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::message() const@Base" 0replaceme
+ (c++)"unity::scopes::CompletionDetails::info_list() const@Base" 0replaceme
  (c++)"unity::scopes::NotFoundException::name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::NotFoundException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::scope_data() const@Base" 0.4.0+14.04.20140312.1

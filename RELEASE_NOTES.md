@@ -3,6 +3,8 @@ Release notes
 
 Changes in version 0.6.0
 ========================
+  - Upgraded finished() callback to be more flexible and expandable.
+
   - Added cache_directory() method to ScopeBase, so a scope can find out where it can write its files.
 
   - Refactored scoperunner and ScopeLoader. ScopeLoader no longer knows about the registry and

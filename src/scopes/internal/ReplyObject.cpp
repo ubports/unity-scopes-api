@@ -52,7 +52,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
     assert(runtime);
     reap_item_ = runtime->reply_reaper()->add([this] {
         string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
-        this->finished(ListenerBase::Error, msg);
+        this->finished(CompletionDetails(CompletionDetails::Error, msg));
     });
 }
 
@@ -60,7 +60,7 @@ ReplyObject::~ReplyObject()
 {
     try
     {
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
     catch (...)
     {
@@ -126,16 +126,16 @@ void ReplyObject::push(VariantMap const& result) noexcept
     if (!error.empty())
     {
         // TODO: log error
-        finished(ListenerBase::Error, error);
+        finished(CompletionDetails(CompletionDetails::Error, error));
     }
     else if (stop)
     {
         // TODO: log error
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
 }
 
-void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) noexcept
+void ReplyObject::finished(CompletionDetails const& details) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -158,7 +158,12 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        listener_base_->finished(r, error_message);
+        CompletionDetails details_with_info(details);
+        for (auto const& info : info_list_)
+        {
+            details_with_info.add_info(info);
+        }
+        listener_base_->finished(details_with_info);
     }
     catch (std::exception const& e)
     {
@@ -184,6 +189,7 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
 
     try
     {
+        info_list_.push_back(op_info);
         listener_base_->info(op_info);
     }
     catch (std::exception const& e)

@@ -76,34 +76,36 @@ void ReplyI::finished_(Current const&,
 {
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
-    auto r = req.getReason();
-    ListenerBase::Reason reason;
-    string err;
-    switch (r)
+    auto s = req.getStatus();
+    CompletionDetails::CompletionStatus status;
+    string msg;
+    switch (s)
     {
-        case capnproto::Reply::FinishedReason::FINISHED:
+        case capnproto::Reply::CompletionStatus::OK:
         {
-            reason = ListenerBase::Finished;
+            status = CompletionDetails::OK;
+            msg = req.getMessage();
             break;
         }
-        case capnproto::Reply::FinishedReason::CANCELLED:
+        case capnproto::Reply::CompletionStatus::CANCELLED:
         {
-            reason = ListenerBase::Cancelled;
+            status = CompletionDetails::Cancelled;
+            msg = req.getMessage();
             break;
         }
-        case capnproto::Reply::FinishedReason::ERROR:
+        case capnproto::Reply::CompletionStatus::ERROR:
         {
-            reason = ListenerBase::Error;
-            err = req.getError();
+            status = CompletionDetails::Error;
+            msg = req.getMessage();
             break;
         }
         default:
         {
-            assert(false);                // LCOV_EXCL_LINE
-            reason = ListenerBase::Error; // LCOV_EXCL_LINE
+            assert(false);                     // LCOV_EXCL_LINE
+            status = CompletionDetails::Error; // LCOV_EXCL_LINE
         }
     }
-    delegate->finished(reason, err);
+    delegate->finished(CompletionDetails(status, msg));
 }
 
 void ReplyI::info_(Current const&,
