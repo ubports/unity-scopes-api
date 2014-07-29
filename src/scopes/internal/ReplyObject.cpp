@@ -149,7 +149,6 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     // Only one thread can reach this point, any others were thrown out above.
 
     reap_item_->destroy();
-    disconnect();               // Disconnect self from middleware, if this hasn't happened yet.
 
     // Wait until all currently executing calls to push() have completed.
     unique_lock<mutex> lock(mutex_);
@@ -170,6 +169,12 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
         cerr << "ReplyObject::finished(): unknown exception" << endl;
         // TODO: log error
     }
+
+    // Disconnect self from middleware, if this hasn't happened yet.
+    // We do this last because disconnect() can trigger
+    // the destructor of this instance (if finished() is called
+    // by the reaper, for example).
+    disconnect();
 }
 
 void ReplyObject::info(OperationInfo const& op_info) noexcept

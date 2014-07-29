@@ -19,13 +19,14 @@
 #ifndef UNITY_SCOPES_SEARCHLISTENERBASE_H
 #define UNITY_SCOPES_SEARCHLISTENERBASE_H
 
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/FilterBase.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Annotation.h>
-#include <unity/scopes/Department.h>
-#include <unity/scopes/FilterBase.h>
 
 #include <string>
 
@@ -34,9 +35,6 @@ namespace unity
 
 namespace scopes
 {
-
-class CategorisedResult;
-class FilterState;
 
 namespace experimental
 {
