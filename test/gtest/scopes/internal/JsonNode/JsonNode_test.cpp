@@ -52,7 +52,8 @@ TEST_F(JsonNodeTest, flat_values)
                           })";
 
     std::string value_str;
-    int value_int;
+    int value_int = 99;
+    bool value_bool = false;
 
     // parse json
 
@@ -73,7 +74,8 @@ TEST_F(JsonNodeTest, flat_values)
     EXPECT_NO_THROW(value_int = root_node_->get_node("age")->as_int());
     EXPECT_EQ(25, value_int);
 
-    EXPECT_NO_THROW(root_node_->get_node("human")->as_bool());
+    EXPECT_NO_THROW(value_bool = root_node_->get_node("human")->as_bool());
+    EXPECT_TRUE(value_bool);
 
     // try get invalid value
 
