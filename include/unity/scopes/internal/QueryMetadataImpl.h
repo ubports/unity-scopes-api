@@ -19,6 +19,7 @@
 #ifndef UNITY_INTERNAL_QUERYMETADATAIMPL_H
 #define UNITY_INTERNAL_QUERYMETADATAIMPL_H
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 
@@ -48,14 +49,19 @@ public:
     std::string locale() const;
     std::string form_factor() const;
 
-protected:
+    void set_internet_connectivity(QueryMetadata::ConnectivityStatus connectivity_status);
+    QueryMetadata::ConnectivityStatus internet_connectivity() const;
+
     virtual VariantMap serialize() const = 0;
+
+protected:
     virtual void serialize(VariantMap& var) const = 0;
     virtual std::string metadata_type() const = 0;
 
 private:
     std::string locale_;
     std::string form_factor_;
+    QueryMetadata::ConnectivityStatus internet_connectivity_;
 };
 
 } // namespace internal

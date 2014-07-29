@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_SEARCHMETADATA_H
 #define UNITY_SCOPES_SEARCHMETADATA_H
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -38,7 +39,7 @@ class ScopeObject;
 \brief Metadata passed with search requests.
 */
 
-class SearchMetadata final
+class SearchMetadata : public QueryMetadata
 {
 public:
     /// @cond
@@ -74,18 +75,6 @@ public:
     /// @cond
     ~SearchMetadata();
     /// @endcond
-
-    /**
-    \brief Get the locale string.
-    \return The locale string
-    */
-    std::string locale() const;
-
-    /**
-    \brief Get the form factor string.
-    \return The form factor string
-    */
-    std::string form_factor() const;
 
     /**
     \brief Set cardinality.
@@ -143,14 +132,8 @@ public:
     */
     Variant const& operator[](std::string const& key) const;
 
-    /// @cond
-    VariantMap serialize() const;
-    /// @endcond
-
 private:
-    std::unique_ptr<internal::SearchMetadataImpl> p;
-
-    SearchMetadata(internal::SearchMetadataImpl *impl);
+    SearchMetadata(internal::SearchMetadataImpl* impl);
     friend class internal::SearchMetadataImpl;
 };
 

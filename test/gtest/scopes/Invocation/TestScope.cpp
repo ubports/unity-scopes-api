@@ -34,7 +34,8 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery()
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
     {
     }
 
@@ -56,18 +57,6 @@ public:
 
 }  // namespace
 
-void TestScope::start(string const&, RegistryProxy const &)
-{
-}
-
-void TestScope::stop()
-{
-}
-
-void TestScope::run()
-{
-}
-
 namespace
 {
 
@@ -76,15 +65,15 @@ int count = 0;
 
 }  // namespace
 
-SearchQueryBase::UPtr TestScope::search(CannedQuery const&, SearchMetadata const &)
+SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     lock_guard<mutex> lock(m);
 
     if (count++ == 0)
     {
-        this_thread::sleep_for(chrono::milliseconds(4000));  // Force timeout on first call
+        this_thread::sleep_for(chrono::milliseconds(1000));  // Force timeout on first call
     }
-    return SearchQueryBase::UPtr(new TestQuery());
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
 PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)

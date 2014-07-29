@@ -56,3 +56,9 @@ struct FinishedRequest
     reason @0 : FinishedReason;
     error @1  : Text;               # Present only if reason is error
 }
+
+struct InfoRequest
+{
+    code @0 : Int16;
+    message @1 : Text;
+}

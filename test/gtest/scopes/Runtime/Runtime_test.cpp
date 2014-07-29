@@ -25,6 +25,7 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/ListenerBase.h>
@@ -41,6 +42,7 @@
 
 using namespace std;
 using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
 TEST(Runtime, basic)
 {
@@ -56,7 +58,8 @@ public:
         query_complete_(false),
         count_(0),
         dep_count_(0),
-        annotation_count_(0)
+        annotation_count_(0),
+        info_count_(0)
     {
     }
 
@@ -88,7 +91,7 @@ public:
         last_result_ = std::make_shared<Result>(result);
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         EXPECT_EQ(1u, annotation.links().size());
         EXPECT_EQ("Link1", annotation.links().front()->label());
@@ -106,10 +109,26 @@ public:
         EXPECT_EQ(1, count_);
         EXPECT_EQ(1, dep_count_);
         EXPECT_EQ(1, annotation_count_);
+        EXPECT_EQ(2, info_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
+    }
+
+    virtual void info(OperationInfo const& op_info) override
+    {
+        if (info_count_ == 0)
+        {
+            EXPECT_EQ(OperationInfo::NoInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to no internet connection.", op_info.message());
+        }
+        else if (info_count_ == 1)
+        {
+            EXPECT_EQ(OperationInfo::PoorInternet, op_info.code());
+            EXPECT_EQ("Partial results returned due to poor internet connection.", op_info.message());
+        }
+        info_count_++;
     }
 
     void wait_until_finished()
@@ -130,6 +149,7 @@ private:
     int count_;
     int dep_count_;
     int annotation_count_;
+    int info_count_;
     std::shared_ptr<Result> last_result_;
 };
 
@@ -139,44 +159,68 @@ public:
     PreviewReceiver() :
         query_complete_(false),
         widgets_pushes_(0),
-        data_pushes_(0)
+        data_pushes_(0),
+        info_count_(0)
     {
     }
+
     virtual void push(PreviewWidgetList const& widgets) override
     {
         EXPECT_EQ(2u, widgets.size());
         widgets_pushes_++;
     }
+
     virtual void push(std::string const& key, Variant const&) override
     {
         EXPECT_TRUE(key == "author" || key == "rating");
         data_pushes_++;
     }
+
     virtual void push(ColumnLayoutList const&) override
     {
     }
+
     virtual void finished(ListenerBase::Reason reason, string const& error_message) override
     {
         EXPECT_EQ(Finished, reason);
         EXPECT_EQ("", error_message);
         EXPECT_EQ(1, widgets_pushes_);
         EXPECT_EQ(2, data_pushes_);
+        EXPECT_EQ(2, info_count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
     }
+
+    virtual void info(OperationInfo const& op_info) override
+    {
+        if (info_count_ == 0)
+        {
+            EXPECT_EQ(OperationInfo::NoLocationData, op_info.code());
+            EXPECT_EQ("", op_info.message());
+        }
+        else if (info_count_ == 1)
+        {
+            EXPECT_EQ(OperationInfo::InaccurateLocationData, op_info.code());
+            EXPECT_EQ("Partial results returned due to inaccurate location data.", op_info.message());
+        }
+        info_count_++;
+    }
+
     void wait_until_finished()
     {
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
     }
+
 private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
     int widgets_pushes_;
     int data_pushes_;
+    int info_count_;
 };
 
 class PushReceiver : public SearchListenerBase
@@ -221,8 +265,22 @@ private:
     atomic_int count_;
 };
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
+}
+
 TEST(Runtime, search)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -237,6 +295,7 @@ TEST(Runtime, search)
 
 TEST(Runtime, consecutive_search)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -278,6 +337,8 @@ TEST(Runtime, consecutive_search)
 
 TEST(Runtime, preview)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
@@ -303,6 +364,8 @@ TEST(Runtime, preview)
 
 TEST(Runtime, cardinality)
 {
+    auto reg_rt = run_test_registry();
+
     // connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
@@ -360,6 +423,7 @@ private:
 
 TEST(Runtime, early_cancel)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("SlowCreateScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -421,7 +485,7 @@ int main(int argc, char **argv)
 
     // Give threads some time to bind to their endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(500));
 
     auto rc = RUN_ALL_TESTS();
 

@@ -39,6 +39,11 @@ ListenerBase::~ListenerBase()
 {
 }
 
+void ListenerBase::info(OperationInfo const&)
+{
+    // Intentionally stubbed to allow listeners to ignore info messages
+}
+
 // Possibly overkill, but safer than using the enum as the index into an array,
 // in case the enumeration is ever added to or the enumerators get re-ordered.
 
