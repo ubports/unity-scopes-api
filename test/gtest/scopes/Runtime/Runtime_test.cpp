@@ -257,7 +257,7 @@ public:
 
     virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ(CompletionDetails::OK, details.status()) << details.message();
         EXPECT_EQ(pushes_expected_, count_);
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);

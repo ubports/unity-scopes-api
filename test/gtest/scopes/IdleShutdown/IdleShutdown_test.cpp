@@ -124,7 +124,7 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
         auto rt = RuntimeImpl::create("", "Runtime.ini");
 
         // Make a proxy for the scope
-        auto mw = rt->factory()->create("SlowSearchScope", "Zmq", "Zmq.ini");
+        auto mw = rt->factory()->create("client_middleware", "Zmq", "Zmq.ini");
         mw->start();
         auto proxy = mw->create_scope_proxy("SlowSearchScope");
         auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowSearchScope");

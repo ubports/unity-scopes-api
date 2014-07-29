@@ -1,5 +1,9 @@
 #
-# Tests listed here will not be run by the valgrind target.
+# Tests listed here will not be run by the valgrind target,
+# either because there is not point (we don't want to
+# test that a python script doesn't leak), or because,
+# under valgrind, the test runs too slowly to meet
+# its timing constraints (or crashes valgrind).
 #
 
 SET(CTEST_CUSTOM_MEMCHECK_IGNORE
@@ -7,6 +11,9 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     noglobalincludes
     stand-alone-unity-scopes-headers
     stand-alone-unity-scopes-internal-headers
+    stand-alone-unity-scopes-testing-headers
     clean-public-unity-scopes-headers
+    clean-public-unity-scopes-testing-headers
+    IsolatedScopeBenchmark                      # Runs too slowly and crashes valgrind 3.10.0 with g++-4.9
     copyright
     whitespace)
