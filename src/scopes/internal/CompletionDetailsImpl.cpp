@@ -48,12 +48,12 @@ std::string CompletionDetailsImpl::message() const
     return message_;
 }
 
-void CompletionDetailsImpl::add_info(OperationInfo const& info) noexcept
+void CompletionDetailsImpl::add_info(OperationInfo const& info)
 {
     info_list_.push_back(info);
 }
 
-std::vector<OperationInfo> CompletionDetailsImpl::info_list() const noexcept
+std::vector<OperationInfo> CompletionDetailsImpl::info_list() const
 {
     return info_list_;
 }

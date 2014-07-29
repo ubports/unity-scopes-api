@@ -44,8 +44,8 @@ public:
 
     CompletionDetails::CompletionStatus status() const noexcept;
     std::string message() const;
-    void add_info(OperationInfo const& info) noexcept;
-    std::vector<OperationInfo> info_list() const noexcept;
+    void add_info(OperationInfo const& info);
+    std::vector<OperationInfo> info_list() const;
 
 private:
     CompletionDetails::CompletionStatus status_;

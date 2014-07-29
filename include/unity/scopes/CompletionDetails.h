@@ -99,13 +99,13 @@ public:
     \param info Contains details about something of interest that occurs during the operation of a
     query.
     */
-    void add_info(OperationInfo const& info) noexcept;
+    void add_info(OperationInfo const& info);
 
     /**
-    \brief Get a list of all additional opertation info.
+    \brief Get a list of all additional operation info.
     \return List containing additional information regarding the operation of the query.
     */
-    std::vector<OperationInfo> info_list() const noexcept;
+    std::vector<OperationInfo> info_list() const;
 
 private:
     std::unique_ptr<internal::CompletionDetailsImpl> p;
