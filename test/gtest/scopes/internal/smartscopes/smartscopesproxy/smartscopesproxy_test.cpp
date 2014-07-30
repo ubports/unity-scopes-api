@@ -245,10 +245,10 @@ public:
         last_result_ = std::make_shared<Result>(result);
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(2, count_);
 
         // signal wait_until_finished
@@ -394,10 +394,10 @@ public:
         col_pushes_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, widget_pushes_);
         EXPECT_EQ(1, col_pushes_);
 
@@ -455,10 +455,10 @@ public:
         col_pushes_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(1, widget_pushes_);
         EXPECT_EQ(0, col_pushes_);
 

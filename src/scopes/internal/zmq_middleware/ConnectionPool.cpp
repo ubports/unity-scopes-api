@@ -64,22 +64,17 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
     }
 
     // No existing connection yet, establish one.
-    auto entry = create_connection(endpoint, m, -1);
+    auto entry = create_connection(endpoint, m);
     return pool_.emplace(move(entry)).first->second.socket;
 }
 
-ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string const& endpoint,
-                                                    RequestMode m,
-                                                    int64_t timeout)
+ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string const& endpoint, RequestMode m)
 {
-    if (timeout == -1)
-    {
-        timeout = 0;    // Don't linger on close
-    }
     zmqpp::socket_type stype = m == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push;
     zmqpp::socket s(context_, stype);
-    auto zmqpp_timeout = m == RequestMode::Twoway ? int32_t(timeout) : 0;
-    s.set(zmqpp::socket_option::linger, zmqpp_timeout);
+    // Allow some linger time so messages written just before we shut down
+    // are sent instead of discarded.
+    s.set(zmqpp::socket_option::linger, 1000);
     s.connect(endpoint);
     return CPool::value_type{ endpoint, SocketData{ move(s), m } };
 }

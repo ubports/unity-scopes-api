@@ -19,6 +19,7 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
@@ -178,12 +179,12 @@ public:
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        cout << "query complete, status: " << to_string(reason);
-        if (reason == ListenerBase::Error)
+        cout << "query complete, status: " << to_string(details.status());
+        if (details.status() == CompletionDetails::Error)
         {
-            cout << ": " << error_message;
+            cout << ": " << details.message();
         }
         cout << endl;
         {
@@ -231,9 +232,9 @@ public:
         cout << "\tGot activation response: " << response.status() << endl;
     }
 
-    void finished(Reason r, std::string const& error_message)
+    void finished(CompletionDetails const& details)
     {
-        cout << "\tActivation finished, reason: " << r << ", error_message: " << error_message << endl;
+        cout << "\tActivation finished, status: " << to_string(details.status()) << ", message: " << details.message() << endl;
         lock_guard<decltype(mutex_)> lock(mutex_);
         query_complete_ = true;
         condvar_.notify_one();
@@ -300,10 +301,10 @@ public:
         cout << to_string(value) << endl;
     }
 
-    void finished(Reason r, std::string const& error_message) override
+    void finished(CompletionDetails const& details) override
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
-        cout << "\tPreview finished, reason: " << r << ", error_message: " << error_message << endl;
+        cout << "\tPreview finished, status: " << to_string(details.status()) << ", message: " << details.message() << endl;
         query_complete_ = true;
         condvar_.notify_one();
     }

@@ -41,11 +41,11 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
         // Check that finished() was called by the reaper.
-        EXPECT_EQ(ListenerBase::Error, reason) << error_message;
-        EXPECT_TRUE(boost::starts_with(error_message, "No activity on ReplyObject for scope"));
+        EXPECT_EQ(CompletionDetails::Error, details.status()) << details.message();
+        EXPECT_TRUE(boost::starts_with(details.message(), "No activity on ReplyObject for scope"));
         lock_guard<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_all();

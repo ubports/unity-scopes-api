@@ -7,4 +7,4 @@ add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(ReplyReaper_test ReplyReaper_test.cpp NoReplyScope.cpp)
 target_link_libraries(ReplyReaper_test ${TESTLIBS})
 
-add_test(Runtime ReplyReaper_test)
+add_test(ReplyReaper ReplyReaper_test)

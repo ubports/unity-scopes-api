@@ -88,16 +88,11 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
-    finished(ListenerBase::Finished);
-}
-
-void ReplyImpl::finished(ListenerBase::Reason reason)
-{
     if (!finished_.exchange(true))
     {
         try
         {
-            fwd()->finished(reason, "");
+            fwd()->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
         }
         catch (std::exception const& e)
         {
@@ -134,7 +129,7 @@ void ReplyImpl::error(exception_ptr ex)
 
     try
     {
-        fwd()->finished(ListenerBase::Error, error_message);
+        fwd()->finished(CompletionDetails(CompletionDetails::Error, error_message));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {

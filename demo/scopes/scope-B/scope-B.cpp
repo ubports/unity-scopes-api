@@ -64,12 +64,12 @@ public:
         }
     }
 
-    virtual void finished(Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        cerr << scope_id_ << ": subquery complete, status: " << to_string(reason);
-        if (reason == ListenerBase::Error)
+        cerr << scope_id_ << ": subquery complete, status: " << to_string(details.status());
+        if (details.status() == CompletionDetails::Error)
         {
-            cerr << ": " << error_message;
+            cerr << ": " << details.message();
         }
         cerr << endl;
     }

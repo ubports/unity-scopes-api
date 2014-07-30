@@ -49,7 +49,7 @@ Results for the query are delivered to the client by the scopes run
 time by invoking the appropriate push method.
 
 If the implementation of a push method throws an exception, the scopes
-run time calls ListenerBase::finished() with an 'Error' reason.
+run time calls ListenerBase::finished() with an 'Error' status.
 
 \see ListenerBase
 */

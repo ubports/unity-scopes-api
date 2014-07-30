@@ -23,7 +23,9 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem/operations.hpp>
+
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -47,13 +49,13 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message ) override
+    virtual void finished(CompletionDetails const& details) override
     {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
-        finished_ok_ = reason == Finished;
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
+        finished_ok_ = details.status() == CompletionDetails::OK;
         done_ = true;
         cond_.notify_all();
     }

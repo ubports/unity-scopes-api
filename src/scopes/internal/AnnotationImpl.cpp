@@ -36,6 +36,7 @@ AnnotationImpl::AnnotationImpl(Annotation::Type annotation_type)
 }
 
 AnnotationImpl::AnnotationImpl(const VariantMap &variant_map)
+    : annotation_type_(static_cast<Annotation::Type>(0xefff))    // Impossible value
 {
     auto it = variant_map.find("type");
     if (it == variant_map.end())

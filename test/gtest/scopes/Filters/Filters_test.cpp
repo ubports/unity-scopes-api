@@ -69,7 +69,7 @@ public:
         this->filter_state = filter_state;
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(CompletionDetails const&) override
     {
         notify();
     }
