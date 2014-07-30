@@ -83,7 +83,7 @@ RegistryObject::~RegistryObject()
         // thread, so we need a full fence here.
         lock_guard<decltype(mutex_)> lock(mutex_);
     }
-    
+
     // kill all scope processes
     for (auto& scope_process : scope_processes_)
     {
