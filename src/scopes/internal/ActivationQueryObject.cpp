@@ -63,18 +63,18 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* 
         // and just push it ourseleves
         auto res = act_base_->activate();
         reply->push(res.serialize());
-        reply_->finished(ListenerBase::Finished, "");
+        reply_->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {
         // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         cerr << "ActivationQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
     {
         // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         cerr << "ActivationQueryObject::run(): unknown exception" << endl;
     }
 }

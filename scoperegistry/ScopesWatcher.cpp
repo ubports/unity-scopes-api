@@ -20,9 +20,11 @@
 
 #include "FindFiles.h"
 
+#include <unity/UnityExceptions.h>
+
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <unity/UnityExceptions.h>
 
 using namespace unity::scopes::internal;
 using namespace boost;

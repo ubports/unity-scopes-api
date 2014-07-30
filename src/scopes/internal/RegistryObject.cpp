@@ -133,7 +133,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
         }
         catch (std::exception const& e)
         {
-            cerr << "cannot get metdata from remote registry: " << e.what() << endl;
+            cerr << "cannot get metadata from remote registry: " << e.what() << endl;
             // TODO: log error
         }
     }

@@ -127,7 +127,7 @@ private:
 
     UniqueID unique_id_;
 
-    enum State { Stopped, Started, Stopping };
+    enum State { Created, Started, Stopping, Stopped };
     State state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;            // Protects state_

@@ -41,12 +41,12 @@ public:
     {
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(ListenerBase::Reason::Error, reason);
+        EXPECT_EQ(CompletionDetails::Error, details.status());
         EXPECT_EQ("unity::scopes::MiddlewareException: unity::scopes::MiddlewareException: "
                   "Cannot invoke operations while middleware is stopped",
-                  error_message);
+                  details.message());
         lock_guard<mutex> lock(mutex_);
         query_complete_ = true;
         cond_.notify_one();
@@ -124,7 +124,7 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
         auto rt = RuntimeImpl::create("", "Runtime.ini");
 
         // Make a proxy for the scope
-        auto mw = rt->factory()->create("SlowSearchScope", "Zmq", "Zmq.ini");
+        auto mw = rt->factory()->create("client_middleware", "Zmq", "Zmq.ini");
         mw->start();
         auto proxy = mw->create_scope_proxy("SlowSearchScope");
         auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowSearchScope");

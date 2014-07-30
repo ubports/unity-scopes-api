@@ -33,6 +33,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/FileIO.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 
 #include <boost/filesystem.hpp>

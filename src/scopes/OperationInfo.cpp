@@ -56,6 +56,7 @@ OperationInfo& OperationInfo::operator=(OperationInfo const& other)
 OperationInfo& OperationInfo::operator=(OperationInfo&&) = default;
 
 OperationInfo::~OperationInfo() = default;
+
 /// @endcond
 
 OperationInfo::InfoCode OperationInfo::code() const noexcept

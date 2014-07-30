@@ -43,7 +43,7 @@ public:
         departments_push_func_(parent);
     }
 
-    void finished(Reason /* r */, std::string const& /* error_message */) override {}
+    void finished(CompletionDetails const& /*details*/) override {}
 
     std::function<void(Department::SCPtr const&)> departments_push_func_;
 };

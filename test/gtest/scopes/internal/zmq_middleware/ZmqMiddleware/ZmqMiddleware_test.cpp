@@ -463,12 +463,11 @@ TEST(ZmqMiddleware, shutdown_after_start_with_adapter)
 
     auto so = make_shared<MyScopeObject>();
     mw.add_scope_object("fred", so, 1000);
+    mw.start();
 
     vector<thread> threads;
     num_waiters = 0;
     num_returned = 0;
-
-    mw.start();
 
     for (int i = 0; i < num_threads; ++i)
     {

@@ -77,6 +77,19 @@ public:
     // TODO: Update above to state what the default configuration is exactly
     static UPtr create(std::string const& configfile = "");
 
+    /**
+    \brief Create a run time for a scope.
+
+           This method is provided for custom scoperunner implementations,
+           for example, for scopes written in Go.
+
+    \param scope_id The unique ID of the scope. If scope_id is empty, a
+    unique ID is used. Calling `create_scope_runtime("", "Runtime.ini")` is
+    equivalent to calling `create("Runtime.ini")`.
+    \param configfile The path to the run time .ini file. If empty,
+    the default configuration is used.
+    \return A `unique_ptr` to the run time instance.
+    */
     static UPtr create_scope_runtime(std::string const& scope_id, std::string const& configfile = "");
 
     /**

@@ -43,18 +43,18 @@ struct PushRequest
     result @0 : ValueDict.ValueDict;
 }
 
-enum FinishedReason
+enum CompletionStatus
 {
     unused @0;
-    finished @1;
+    ok @1;
     cancelled @2;
     error @3;
 }
 
 struct FinishedRequest
 {
-    reason @0 : FinishedReason;
-    error @1  : Text;               # Present only if reason is error
+    status @0 : CompletionStatus;
+    message @1 : Text;
 }
 
 struct InfoRequest
