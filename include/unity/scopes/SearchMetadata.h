@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_SEARCHMETADATA_H
 
 #include <unity/scopes/QueryMetadata.h>
+#include <unity/scopes/Location.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -87,6 +88,18 @@ public:
     \return The maxmium number of search results, or 0 for no limit.
     */
     int cardinality() const;
+
+    /**
+    \brief Set location.
+    \param location Location data.
+    */
+    void set_location(Location const& location);
+
+    /**
+    \brief Get location.
+    \return Location data representing the current location, including attributes such as city and country.
+    */
+    Location location() const;
 
     /**
     \brief Sets a hint.
