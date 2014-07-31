@@ -48,6 +48,9 @@ public:
     void set_cache_directory(std::string const& path);
     std::string cache_directory() const;
 
+    void set_tmp_directory(std::string const& path);
+    std::string tmp_directory() const;
+
     void set_registry(RegistryProxy const& registry);
     RegistryProxy registry() const;
 
@@ -61,6 +64,9 @@ private:
 
     std::string cache_directory_;
     bool cache_dir_initialized_;
+
+    std::string tmp_directory_;
+    bool tmp_dir_initialized_;
 
     unity::scopes::RegistryProxy registry_;
     bool registry_initialized_;

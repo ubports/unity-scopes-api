@@ -280,12 +280,12 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& scope_ini_file)
 {
     run_scope(scope_base, "", scope_ini_file);
 }
 
-void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_ini_file, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_file, string const& scope_ini_file)
 {
     if (!scope_base)
     {
@@ -301,7 +301,7 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     {
-        boost::filesystem::path dir = boost::filesystem::path(scope_ini_file).parent_path();
+        boost::filesystem::path dir = boost::filesystem::canonical(scope_ini_file).parent_path();
         scope_base->p->set_scope_directory(dir.native());
     }
 
@@ -328,7 +328,23 @@ void RuntimeImpl::run_scope(ScopeBase *const scope_base, string const& runtime_i
 
     scope_base->p->set_registry(registry_);
 
-    scope_base->p->set_cache_directory(find_cache_dir());
+    string confinement_type;
+    scope_base->p->set_cache_directory(find_cache_dir(confinement_type));
+
+    {
+        // Set tmp dir.
+        // We need to create any directories under /run/user/<uid> because they might not
+        // exist. (/run/user/<uid> gets cleaned out periodically.)
+        string path = string("/run/user/") + std::to_string(geteuid());
+        path += "/scopes";
+        ::mkdir(path.c_str(), 0700);
+        path += "/" + confinement_type;
+        ::mkdir(path.c_str(), 0700);
+        path += "/" + scope_id_;
+        ::mkdir(path.c_str(), 0700);
+
+        scope_base->p->set_tmp_directory(path);
+    }
 
     scope_base->start(scope_id_);
 
@@ -391,7 +407,7 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
-string RuntimeImpl::find_cache_dir() const
+string RuntimeImpl::find_cache_dir(string& confinement_type) const
 {
     // TODO: HACK: Until we get a fancier Apparmor query API, we try
     //             to create the scope cache dir and figure out whether
@@ -403,13 +419,18 @@ string RuntimeImpl::find_cache_dir() const
     //             Otherwise, the scope must be confined, in which case
     //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
 
-    string cache_dir = data_dir_ + "/unconfined/" + scope_id_;
+    ::mkdir(data_dir_.c_str(), 0700); // We don't care if this fails.
+
+    // Assume we are unconfined initially.
+    confinement_type = "unconfined";
+    string dir = data_dir_ + "/" + confinement_type;
 
     // The following two mkdir() calls will fail if the scope is confined or
     // the directories exist already.
-    ::mkdir((data_dir_ + "/unconfined").c_str(), 0700);
-    ::mkdir(cache_dir.c_str(), 0700);
-    string tmp = cache_dir + "/.unconfined_scope_XXXXXX";
+    ::mkdir(dir.c_str(), 0700);
+    dir += "/" + scope_id_;
+    ::mkdir(dir.c_str(), 0700);
+    string tmp = dir + "/.scope_tmp_XXXXXX";
     int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
     if (fd != -1)
     {
@@ -420,11 +441,13 @@ string RuntimeImpl::find_cache_dir() const
     else
     {
         // mkstemp() failed, the scope must be confined.
-        ::mkdir((data_dir_ + "/leaf-net").c_str(), 0700);
-        ::mkdir(cache_dir.c_str(), 0700);
-        cache_dir = data_dir_ + "/leaf-net/" + scope_id_;
+        confinement_type = "leaf-net";
+        dir = data_dir_ + "/" + confinement_type;
+        ::mkdir(dir.c_str(), 0700);
+        dir += "/" + scope_id_;
+        ::mkdir(dir.c_str(), 0700);
     }
-    return cache_dir;
+    return dir;
 }
 
 } // namespace internal

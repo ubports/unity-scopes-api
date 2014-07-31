@@ -61,15 +61,15 @@ TEST(DynamicLoader, basic)
 TEST(DynamicLoader, flags)
 {
     {
-        DynamicLoader::UPtr dl = DynamicLoader::create(badlib);
-        DynamicLoader::VoidFunc f = dl->find_function("test_function");   // Must work despite unreslved().
+        DynamicLoader::UPtr dl = DynamicLoader::create(badlib, DynamicLoader::Binding::lazy);
+        DynamicLoader::VoidFunc f = dl->find_function("test_function");   // Must work despite unresolved().
         EXPECT_NE(nullptr, f);
     }
 
     try
     {
         // Must fail because of unresolved symbol.
-        DynamicLoader::UPtr dl = DynamicLoader::create(badlib, DynamicLoader::Binding::now);
+        DynamicLoader::UPtr dl = DynamicLoader::create(badlib);
     }
     catch (unity::ResourceException const& e)
     {

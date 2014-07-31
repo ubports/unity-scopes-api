@@ -16,18 +16,25 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TEST_TESTSCOPE_H
-#define TEST_TESTSCOPE_H
+#include "TestScope.h"
 
-#include <unity/scopes/ScopeBase.h>
+using namespace std;
+using namespace unity::scopes;
 
-class TestScope : public unity::scopes::ScopeBase
+void TestScope::start(string const&)
 {
-public:
-    virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
-                                                        unity::scopes::SearchMetadata const&) override;
-    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
-                                                          unity::scopes::ActionMetadata const&) override;
-};
+}
 
-#endif
+SearchQueryBase::UPtr TestScope::search(CannedQuery const&, SearchMetadata const&)
+{
+    // Never called
+    abort();
+    return nullptr;
+}
+
+PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const&)
+{
+    // Never called
+    abort();
+    return nullptr;
+}

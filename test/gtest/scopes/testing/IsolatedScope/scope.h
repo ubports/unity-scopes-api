@@ -57,6 +57,8 @@ public:
 
     std::string cache_directory() const override;
 
+    std::string tmp_directory() const override;
+
     unity::scopes::RegistryProxy registry() const override;
 
     unity::scopes::VariantMap settings() const override;

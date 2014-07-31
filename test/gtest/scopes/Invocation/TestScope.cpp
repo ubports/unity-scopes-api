@@ -76,7 +76,7 @@ SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata
     return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
-PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
+PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const&)
 {
     return nullptr;  // unused
 }

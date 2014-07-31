@@ -90,6 +90,7 @@ public:
     virtual void start(std::string const& scope_id);   // Optional
     virtual void stop();                               // Optional
     virtual void run();                                // Optional
+    // ...
 };
 ~~~
 
@@ -261,15 +262,29 @@ public:
     \note The cache directory is available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
 
-    \return The root directory of the filesystem sub-tree that is writable for the scope.
+    \return The root directory of a filesystem sub-tree that is writable for the scope.
     \throws LogicException if called from the constructor of this instance.
     */
     virtual std::string cache_directory() const final;
 
     /**
+    \brief Returns a tmp directory that is (exclusively) writable for the scope.
+
+    This directory is periodically cleaned of unused files. The exact amount of time
+    may vary, but is on the order of a few hours.
+
+    \note The tmp directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return A directory for temporary files.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string tmp_directory() const final;
+
+    /**
     \brief Returns the proxy to the registry.
 
-    \note The registr proxy is available only after this ScopeBase is instantiated; do not
+    \note The registry proxy is available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
 
     \return The proxy to the registry.

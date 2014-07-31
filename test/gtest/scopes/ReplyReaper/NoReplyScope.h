@@ -16,12 +16,12 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TEST_TESTSCOPE_H
-#define TEST_TESTSCOPE_H
+#ifndef TEST_NOREPLYSCOPE_H
+#define TEST_NOREPLYSCOPE_H
 
 #include <unity/scopes/ScopeBase.h>
 
-class TestScope : public unity::scopes::ScopeBase
+class NoReplyScope : public unity::scopes::ScopeBase
 {
 public:
     virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
