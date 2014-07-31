@@ -209,10 +209,15 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params)
 ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout)
 {
     auto registry_proxy = mw_base()->registry_proxy();
+    auto ss_registry_proxy = mw_base()->ss_registry_proxy();
 
-    // If a registry is configured and this object is not the registry itself,
+    // TODO: HACK: this builds knowledge about the smartscopes proxy running permanently into the run time.
+    bool this_is_registry = registry_proxy && identity() == registry_proxy->identity();
+    bool this_is_ss_registry = ss_registry_proxy && identity() == ss_registry_proxy->identity();
+
+    // If a registry is configured and this object is not a registry itself,
     // attempt to locate the scope before invoking it.
-    if (registry_proxy && identity() != registry_proxy->identity())
+    if (!this_is_registry && !this_is_ss_registry)
     {
         try
         {
