@@ -29,8 +29,10 @@
 #include <unity/UnityExceptions.h>
 
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
-#include <boost/filesystem/path.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <core/posix/signal.h>
+#include <core/posix/this_process.h>
 
 #include <cassert>
 #include <future>
@@ -69,13 +71,29 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     std::thread trap_worker([trap]() { trap->run(); });
 
     // Figure out what the scope ID is from the name of the scope config file.
-    filesystem::path scope_config_path(scope_config);
+    auto scope_config_path = filesystem::canonical(scope_config);
     string lib_dir = scope_config_path.parent_path().native();
     string scope_id = scope_config_path.stem().native();
 
-    if (!lib_dir.empty())
     {
-      lib_dir += '/';
+        // Make sure we set LD_LIBRARY_PATH to include <lib_dir> and <lib_dir>/lib
+        // before loading the scope's .so.
+        string scope_ld_lib_path = lib_dir + ":" + lib_dir + "/lib";
+        string ld_lib_path = core::posix::this_process::env::get("LD_LIBRARY_PATH", "");
+        if (!starts_with(ld_lib_path, lib_dir))
+        {
+            scope_ld_lib_path = scope_ld_lib_path + (ld_lib_path.empty() ? "" : (":" + ld_lib_path));
+            try
+            {
+                // No overwrite option for this_process::env::set(), need to unset first
+                core::posix::this_process::env::unset_or_throw("LD_LIBRARY_PATH");
+                core::posix::this_process::env::set_or_throw("LD_LIBRARY_PATH", scope_ld_lib_path);
+            }
+            catch (std::exception const&)
+            {
+                throw unity::ResourceException("cannot set LD_LIBRARY_PATH for scope " + scope_id);
+            }
+        }
     }
 
     int exit_status = 1;
@@ -83,9 +101,9 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     {
         // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
         vector<string> libs;
-        libs.push_back(lib_dir + "lib" + scope_id + ".so");
-        libs.push_back(lib_dir + scope_id + ".so");
-        libs.push_back(lib_dir + "scope.so");
+        libs.push_back(lib_dir + "/lib" + scope_id + ".so");
+        libs.push_back(lib_dir + "/" + scope_id + ".so");
+        libs.push_back(lib_dir + "/scope.so");
         string failed_libs;
         ScopeLoader::SPtr loader;
         exception_ptr ep;

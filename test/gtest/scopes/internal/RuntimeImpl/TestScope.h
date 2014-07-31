@@ -24,8 +24,11 @@
 class TestScope : public unity::scopes::ScopeBase
 {
 public:
+    virtual void start(std::string const&);
+
     virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
                                                         unity::scopes::SearchMetadata const&) override;
+
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const&) override;
 };

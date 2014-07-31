@@ -125,7 +125,7 @@ To re-format all source and header files in the tree:
     $ make formatcode
 
 Thread and address sanitizer
-----------------
+----------------------------
 
 Set SANITIZER to "thread" or "address" to build with the
 corresponding sanitizer enabled.

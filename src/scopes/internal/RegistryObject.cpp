@@ -24,6 +24,8 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
@@ -413,13 +415,26 @@ void RegistryObject::ScopeProcess::exec(
         argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
     }
 
-    std::map<std::string, std::string> env;
-    core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
     {
-        env.insert(std::make_pair(key, value));
-    });
+        // Copy current env vars into env.
+        std::map<std::string, std::string> env;
+        core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
+        {
+            env.insert(std::make_pair(key, value));
+        });
 
-    {
+        // Make sure we set LD_LIBRARY_PATH to include <lib_dir> and <lib_dir>/lib
+        // before exec'ing the scope.
+        auto scope_config_path = boost::filesystem::canonical(exec_data_.scope_config);
+        string lib_dir = scope_config_path.parent_path().native();
+        string scope_ld_lib_path = lib_dir + ":" + lib_dir + "/lib";
+        string ld_lib_path = core::posix::this_process::env::get("LD_LIBRARY_PATH", "");
+        if (!boost::algorithm::starts_with(ld_lib_path, lib_dir))
+        {
+            scope_ld_lib_path = scope_ld_lib_path + (ld_lib_path.empty() ? "" : (":" + ld_lib_path));
+        }
+        env["LD_LIBRARY_PATH"] = scope_ld_lib_path;  // Overwrite any LD_LIBRARY_PATH entry that may already be there.
+
         process_ = executor->exec(program, argv, env,
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
                                      exec_data_.confinement_profile);

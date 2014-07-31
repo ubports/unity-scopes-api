@@ -53,6 +53,7 @@ public:
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
     virtual std::string scope_directory() const = 0;
     virtual std::string cache_directory() const = 0;
+    virtual std::string tmp_directory() const = 0;
     virtual unity::scopes::RegistryProxy registry() const = 0;
     virtual VariantMap settings() const = 0;
 /// @endcond
