@@ -148,6 +148,23 @@ ZmqMiddleware::~ZmqMiddleware()
     {
         stop();
         wait_for_shutdown();
+
+        // We terminate explicitly here instead of relying
+        // on the destructor so we can measure how long it
+        // takes. There is an intermittent problem with
+        // zmq taking several seconds to terminate the context.
+        // Until we figure out what's going on here, we measure
+        // how long it takes and print a warning if it takes
+        // longer than 100 ms.
+        auto start_time = chrono::system_clock::now();
+        context_.terminate();
+        auto end_time = chrono::system_clock::now();
+        auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
+        if (millisecs > 100)
+        {
+            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+                 << " ms to complete for " << server_name_ << endl;
+        }
     }
     catch (std::exception const& e)
     {

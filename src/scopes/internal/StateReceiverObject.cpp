@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/StateReceiverObject.h>
 
+using namespace std;
+
 namespace unity
 {
 
@@ -37,11 +39,13 @@ StateReceiverObject::~StateReceiverObject()
 
 void StateReceiverObject::push_state(std::string const& sender_id, State const& state)
 {
+    lock_guard<mutex> lock(mutex_);
     state_received_(sender_id, state);
 }
 
 core::Signal<std::string, StateReceiverObject::State> const& StateReceiverObject::state_received() const
 {
+    lock_guard<mutex> lock(mutex_);
     return state_received_;
 }
 

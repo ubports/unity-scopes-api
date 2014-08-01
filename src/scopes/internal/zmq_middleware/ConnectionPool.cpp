@@ -72,9 +72,9 @@ ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string 
 {
     zmqpp::socket_type stype = m == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push;
     zmqpp::socket s(context_, stype);
-    // Allow some linger time so messages written just before we shut down
-    // are sent instead of discarded.
-    s.set(zmqpp::socket_option::linger, 1000);
+    // Allow short linger time so messages written just before we shut down
+    // have some chance of being sent.
+    s.set(zmqpp::socket_option::linger, 50);
     s.connect(endpoint);
     return CPool::value_type{ endpoint, SocketData{ move(s), m } };
 }

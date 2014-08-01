@@ -40,7 +40,9 @@ class LocationImpl;
 class Location final
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(Location);
+    /// @endcond
 
     /**
      \brief Construct a new Location with the specified latitude and longitude
@@ -54,6 +56,7 @@ public:
      */
     Location(VariantMap const& variant);
 
+    /// @cond
     ~Location();
     /// @endcond
 

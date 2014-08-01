@@ -57,6 +57,35 @@ void error(string const& msg)
     cerr << prog_name << ": " << msg << endl;
 }
 
+class ThreadWrapper
+{
+public:
+    ThreadWrapper(std::thread t, std::function<void()> cleanup)
+        : t_(std::move(t))
+        , f_(cleanup)
+    {
+    }
+
+    ~ThreadWrapper()
+    {
+        try
+        {
+            f_();
+        }
+        catch (...)
+        {
+        }
+        if (t_.joinable())
+        {
+            t_.join();
+        }
+    }
+
+private:
+    std::thread t_;
+    std::function<void()> f_;
+};
+
 // Run the scope specified by the config_file in a separate thread and wait for the thread to finish.
 // Return exit status for main to use.
 
@@ -68,7 +97,8 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         core::posix::Signal::sig_term
     });
 
-    std::thread trap_worker([trap]() { trap->run(); });
+    std::thread trap_worker([trap]{ trap->run(); });
+    ThreadWrapper trap_wrapper(std::move(trap_worker), [trap]{ trap->stop(); });
 
     // Figure out what the scope ID is from the name of the scope config file.
     auto scope_config_path = filesystem::canonical(scope_config);
@@ -135,10 +165,13 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         RuntimeImpl::SPtr rt;
 
         // Signal handler to shut down the run time on receipt of a signal.
-        trap->signal_raised().connect([rt](core::posix::Signal)
+        trap->signal_raised().connect([&rt](core::posix::Signal)
         {
             lock_guard<mutex> lock(rt_mutex);
-            rt->destroy();
+            if (rt)
+            {
+                rt->destroy();
+            }
         });
 
         // Instantiate the run time and run the scope.
@@ -159,11 +192,6 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     {
         error("unknown exception");
     }
-
-    trap->stop();
-
-    if (trap_worker.joinable())
-        trap_worker.join();
 
     return exit_status;
 }

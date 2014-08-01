@@ -77,7 +77,7 @@ public:
     StateReceiverObject::SPtr state_receiver();
 
 private:
-    void on_process_death(core::posix::Process const& process);
+    void on_process_death(core::posix::ChildProcess const& process);
     void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
 
     class ScopeProcess
