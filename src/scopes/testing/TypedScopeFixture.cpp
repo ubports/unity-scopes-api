@@ -28,4 +28,3 @@ void TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeB
     scope->p->set_registry(r);
 }
 /// @endcond
-
