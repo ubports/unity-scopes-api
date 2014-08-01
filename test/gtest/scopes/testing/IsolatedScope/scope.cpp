@@ -168,8 +168,7 @@ public:
 
 } // namespace testing
 
-testing::Scope::Scope(unity::scopes::RegistryProxy const& r)
-    : registry_(r)
+testing::Scope::Scope()
 {
 }
 
@@ -215,29 +214,4 @@ unity::scopes::PreviewQueryBase::UPtr testing::Scope::preview(
         unity::scopes::ActionMetadata const& metadata)
 {
     return unity::scopes::PreviewQueryBase::UPtr(new testing::Preview(result, metadata));
-}
-
-std::string testing::Scope::scope_directory() const
-{
-    return "";
-}
-
-std::string testing::Scope::cache_directory() const
-{
-    return "";
-}
-
-std::string testing::Scope::tmp_directory() const
-{
-    return "";
-}
-
-unity::scopes::RegistryProxy testing::Scope::registry() const
-{
-    return registry_;
-}
-
-unity::scopes::VariantMap testing::Scope::settings() const
-{
-    return unity::scopes::VariantMap();
 }

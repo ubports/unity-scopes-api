@@ -33,6 +33,8 @@ namespace unity
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace testing
 {
 
@@ -46,10 +48,19 @@ struct ScopeTraits
         return "unknown";
     }
 
-    inline static std::shared_ptr<Scope> construct(RegistryProxy const& r)
+    inline static std::shared_ptr<Scope> construct()
     {
-        return std::make_shared<Scope>(r);
+        return std::make_shared<Scope>();
     }
+};
+
+struct TypedScopeFixtureHelper
+{
+private:
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
+
+    template<typename Scope>
+    friend class TypedScopeFixture;
 };
 
 template<typename Scope>
@@ -58,8 +69,9 @@ class TypedScopeFixture : public ::testing::Test
 public:
     TypedScopeFixture()
         : registry_proxy(&registry, [](unity::scopes::Registry*) {})
-        , scope(ScopeTraits<Scope>::construct(registry_proxy))
+        , scope(ScopeTraits<Scope>::construct())
     {
+        TypedScopeFixtureHelper::set_registry(scope, registry_proxy);
     }
 
     void SetUp()

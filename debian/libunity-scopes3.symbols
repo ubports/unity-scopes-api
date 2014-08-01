@@ -410,6 +410,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::invisible(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::ScopeMetadataBuilder()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::~ScopeMetadataBuilder()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::testing::TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const&, std::shared_ptr<unity::scopes::Registry> const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_action(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActionConfiguration)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_preview(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::PreviewConfiguration)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_activation(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::ActivationConfiguration)@Base" 0.4.0+14.04.20140312.1
