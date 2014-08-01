@@ -26,7 +26,7 @@ Build-Depends: g++-4.9,
                libjsoncpp-dev,
                libu1db-dev,
                python-u1db,
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
