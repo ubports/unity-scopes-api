@@ -370,6 +370,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
 
     mw->wait_for_shutdown();
+    cleanup_scope.reset();   // Causes ScopeBase::run() to terminate if the scope is properly written
 
     // Inform the registry that this scope is shutting down
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
