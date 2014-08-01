@@ -134,7 +134,8 @@ TEST(Registry, metadata)
 
 TEST(Registry, scope_state_notify)
 {
-    bool update_received = false;
+    bool updateA_received = false;
+    bool updateB_received = false;
     bool testscopeA_state = false;
     bool testscopeB_state = false;
     std::mutex mutex;
@@ -144,32 +145,49 @@ TEST(Registry, scope_state_notify)
     RegistryProxy r = rt->registry();
 
     // Configure testscopeA scope_state_callback
-    auto connA = r->set_scope_state_callback("testscopeA", [&update_received, &testscopeA_state, &mutex, &cond](bool is_running)
+    auto connA = r->set_scope_state_callback("testscopeA", [&updateA_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
+        std::cerr << "scopeA updated, running: " << is_running << std::endl;
+        //std::cerr << ts() << " scopeA updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
-        update_received = true;
+        updateA_received = true;
         testscopeA_state = is_running;
         cond.notify_one();
     });
+
     // Configure testscopeB scope_state_callback
-    auto connB = r->set_scope_state_callback("testscopeB", [&update_received, &testscopeB_state, &mutex, &cond](bool is_running)
+    auto connB = r->set_scope_state_callback("testscopeB", [&updateB_received, &testscopeB_state, &mutex, &cond](bool is_running)
     {
+        std::cerr << "scopeB updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
-        update_received = true;
+        updateB_received = true;
         testscopeB_state = is_running;
         cond.notify_one();
     });
-    auto wait_for_state_update = [&update_received, &mutex, &cond]
+
+    auto wait_for_stateA_update = [&updateA_received, &mutex, &cond]
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; });
-        update_received = false;
+        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&updateA_received] { return updateA_received; });
+        updateA_received = false;
         return success;
     };
 
-    auto receiver = std::make_shared<Receiver>();
-    SearchListenerBase::SPtr reply(receiver);
+    auto wait_for_stateB_update = [&updateB_received, &mutex, &cond]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&updateB_received] { return updateB_received; });
+        updateB_received = false;
+        return success;
+    };
+
+    auto get_stateA = [&testscopeA_state, &mutex] { std::lock_guard<std::mutex> lock(mutex); return testscopeA_state; };
+    auto get_stateB = [&testscopeB_state, &mutex] { std::lock_guard<std::mutex> lock(mutex); return testscopeB_state; };
+
+    auto receiver_A = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply_A(receiver_A);
     SearchMetadata metadata("C", "desktop");
 
     auto meta = r->get_metadata("testscopeA");
@@ -179,15 +197,15 @@ TEST(Registry, scope_state_notify)
 
     // testscopeA should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeA"));
-    EXPECT_FALSE(wait_for_state_update());
+    EXPECT_FALSE(wait_for_stateA_update());
 
     // search would fail if testscopeA can't be executed
-    auto ctrl = sp->search("foo", metadata, reply);
-    EXPECT_TRUE(receiver->wait_until_finished());
+    auto ctrl = sp->search("foo", metadata, reply_A);
+    EXPECT_TRUE(receiver_A->wait_until_finished());
 
     // testscopeA should now be running
-    EXPECT_TRUE(wait_for_state_update());
-    EXPECT_TRUE(testscopeA_state);
+    EXPECT_TRUE(wait_for_stateA_update());
+    EXPECT_TRUE(get_stateA());
     EXPECT_TRUE(r->is_scope_running("testscopeA"));
 
     meta = r->get_metadata("testscopeB");
@@ -197,26 +215,28 @@ TEST(Registry, scope_state_notify)
 
     // testscopeB should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
-    EXPECT_FALSE(wait_for_state_update());
+    EXPECT_FALSE(wait_for_stateB_update());
 
     // search would fail if testscopeB can't be executed
-    ctrl = sp->search("foo", metadata, reply);
-    EXPECT_TRUE(receiver->wait_until_finished());
+    auto receiver_B = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply_B(receiver_B);
+    ctrl = sp->search("foo", metadata, reply_B);
+    EXPECT_TRUE(receiver_B->wait_until_finished());
 
     // testscopeB should now be running
-    EXPECT_TRUE(wait_for_state_update());
-    EXPECT_TRUE(testscopeB_state);
+    EXPECT_TRUE(wait_for_stateB_update());
+    EXPECT_TRUE(get_stateB());
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
     // check that the scope is still running after 1s (should only time out after 2s)
     std::this_thread::sleep_for(std::chrono::seconds{1});
-    EXPECT_TRUE(testscopeB_state);
+    EXPECT_TRUE(get_stateB());
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
     // check now that we get a callback when testscopeB terminates (timed out after 2s)
     std::this_thread::sleep_for(std::chrono::seconds{4});
-    EXPECT_TRUE(wait_for_state_update());
-    EXPECT_FALSE(testscopeB_state);
+    EXPECT_TRUE(wait_for_stateB_update());
+    EXPECT_FALSE(get_stateB());
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
 }
 

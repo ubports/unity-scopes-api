@@ -213,7 +213,7 @@ bool RegistryObject::is_scope_running(std::string const& scope_id)
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+        return it->second.state() == ScopeProcess::ProcessState::Running;
     }
 
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
@@ -506,13 +506,13 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
     update_state_unlocked(Stopped);
 }
 
-void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
+void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 {
-    if (state == state_)
+    if (new_state == state_)
     {
         return;
     }
-    else if (state == Running)
+    else if (new_state == Running)
     {
         if (reg_publisher_)
         {
@@ -525,11 +525,11 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
             cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
                  << "\" started manually" << endl;
 
-            // Don't update state, treat this scope as not running if a locate() is requested
+            // Don't update state_, treat this scope as not running if a locate() is requested
             return;
         }
     }
-    else if (state == Stopped)
+    else if (new_state == Stopped)
     {
         if (reg_publisher_)
         {
@@ -543,7 +543,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
                  << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
         }
     }
-    else if (state == Stopping && state_ != Running)
+    else if (new_state == Stopping && state_ != Running)
     {
         if (reg_publisher_)
         {
@@ -554,10 +554,10 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" exited" << endl;
 
-        // Don't update state, treat this scope as not running if a locate() is requested
+        // Don't update state_, treat this scope as not running if a locate() is requested
         return;
     }
-    state_ = state;
+    state_ = new_state;
     state_change_cond_.notify_all();
 }
 
