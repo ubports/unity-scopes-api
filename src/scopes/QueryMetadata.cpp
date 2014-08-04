@@ -19,6 +19,8 @@
 #include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 
+#include <stdlib.h>
+
 namespace unity
 {
 

@@ -61,7 +61,7 @@ namespace
 {
 
 mutex m;
-int count = 0;
+int call_count = 0;
 
 }  // namespace
 
@@ -69,7 +69,7 @@ SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata
 {
     lock_guard<mutex> lock(m);
 
-    if (count++ == 0)
+    if (call_count++ == 0)
     {
         this_thread::sleep_for(chrono::milliseconds(1000));  // Force timeout on first call
     }

@@ -41,7 +41,7 @@ class HttpClientQtThread;
 class HttpClientQt : public HttpClientInterface
 {
 public:
-    explicit HttpClientQt(uint no_reply_timeout);
+    explicit HttpClientQt(unsigned int no_reply_timeout);
     ~HttpClientQt();
 
     HttpResponseHandle::SPtr get(std::string const& request_url) override;
@@ -49,13 +49,13 @@ public:
     std::string to_percent_encoding(std::string const& string) override;
 
 private:
-    void cancel_get(uint session_id) override;
+    void cancel_get(unsigned int session_id) override;
 
 private:
     class HttpSession
     {
     public:
-        HttpSession(std::string const& request_url, uint timeout);
+        HttpSession(std::string const& request_url, unsigned int timeout);
         ~HttpSession();
 
         std::future<std::string> get_future();
@@ -72,11 +72,11 @@ private:
     };
 
 private:
-    uint session_index_;
-    std::map<uint, std::shared_ptr<HttpSession>> sessions_;
+    unsigned int session_index_;
+    std::map<unsigned int, std::shared_ptr<HttpSession>> sessions_;
     std::mutex sessions_mutex_;
 
-    uint const no_reply_timeout_;
+    unsigned int const no_reply_timeout_;
 
     std::unique_ptr<QCoreApplication> app_;
 };

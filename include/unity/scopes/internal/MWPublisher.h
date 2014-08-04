@@ -22,6 +22,8 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
+#include <string>
+
 namespace unity
 {
 

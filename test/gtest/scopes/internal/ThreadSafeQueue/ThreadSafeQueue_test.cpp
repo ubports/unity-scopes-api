@@ -96,7 +96,7 @@ TEST(ThreadSafeQueue, exception)
     }
 }
 
-atomic_int count;
+atomic_int call_count;
 
 void int_reader_thread(ThreadSafeQueue<int>* q)
 {
@@ -107,14 +107,14 @@ void int_reader_thread(ThreadSafeQueue<int>* q)
     }
     catch (std::runtime_error const&)
     {
-        ++count;
+        ++call_count;
     }
 }
 
 TEST(ThreadSafeQueue, wait_for_threads)
 {
     ThreadSafeQueue<int> q;
-    count = 0;
+    call_count = 0;
     vector<thread> threads;
     for (auto i = 0; i < 20; ++i)
     {
@@ -130,7 +130,7 @@ TEST(ThreadSafeQueue, wait_for_threads)
     {
         t.join();
     }
-    EXPECT_EQ(20, count);
+    EXPECT_EQ(20, call_count);
 }
 
 void destroy_thread(ThreadSafeQueue<int>* q)

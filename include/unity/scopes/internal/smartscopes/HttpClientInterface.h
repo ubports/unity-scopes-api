@@ -23,6 +23,7 @@
 #include <unity/util/NonCopyable.h>
 
 #include <future>
+#include <string>
 
 namespace unity
 {
@@ -54,7 +55,7 @@ public:
 private:
     friend class HttpResponseHandle;
 
-    virtual void cancel_get(uint session_id) = 0;
+    virtual void cancel_get(unsigned int session_id) = 0;
 };
 
 class HttpResponseHandle
@@ -63,7 +64,7 @@ public:
     NONCOPYABLE(HttpResponseHandle);
     UNITY_DEFINES_PTRS(HttpResponseHandle);
 
-    HttpResponseHandle(HttpClientInterface::SPtr client, uint session_id, std::shared_future<std::string> future)
+    HttpResponseHandle(HttpClientInterface::SPtr client, unsigned int session_id, std::shared_future<std::string> future)
         : client_(client)
         , session_id_(session_id)
         , future_(future)
@@ -92,7 +93,7 @@ public:
 
 private:
     std::shared_ptr<HttpClientInterface> client_;
-    uint session_id_;
+    unsigned int session_id_;
     std::shared_future<std::string> future_;
 };
 

@@ -22,6 +22,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <fstream>
 #include <future>

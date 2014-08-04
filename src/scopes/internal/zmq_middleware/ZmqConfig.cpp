@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 
 using namespace std;
