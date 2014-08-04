@@ -38,6 +38,7 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ("phone", meta.form_factor());
         EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
     }
     {
         SearchMetadata meta("pl", "phone");
@@ -47,6 +48,8 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
         EXPECT_EQ(QueryMetadata::Connected, meta.internet_connectivity());
+        EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -56,6 +59,7 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ("phone", meta.form_factor());
         EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -64,6 +68,7 @@ TEST(SearchMetadata, basic)
         meta.set_location(Location(1.0, 2.0));
         meta["foo"] = "bar";
         meta.set_hint("baz", Variant(1000));
+        EXPECT_TRUE(meta.has_location());
         EXPECT_DOUBLE_EQ(1.0, meta.location().latitude());
         EXPECT_DOUBLE_EQ(2.0, meta.location().longitude());
         EXPECT_EQ(100, meta.cardinality());

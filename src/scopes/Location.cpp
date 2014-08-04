@@ -68,9 +68,19 @@ double Location::altitude() const
     return p->altitude();
 }
 
+bool Location::has_altitude() const
+{
+    return p->has_altitude();
+}
+
 string Location::area_code() const
 {
     return p->area_code();
+}
+
+bool Location::has_area_code() const
+{
+    return p->has_area_code();
 }
 
 string Location::city() const
@@ -78,9 +88,19 @@ string Location::city() const
     return p->city();
 }
 
+bool Location::has_city() const
+{
+    return p->has_city();
+}
+
 string Location::country_code() const
 {
     return p->country_code();
+}
+
+bool Location::has_country_code() const
+{
+    return p->has_country_code();
 }
 
 string Location::country_name() const
@@ -88,9 +108,19 @@ string Location::country_name() const
     return p->country_name();
 }
 
+bool Location::has_country_name() const
+{
+    return p->has_country_name();
+}
+
 double Location::horizontal_accuracy() const
 {
     return p->horizontal_accuracy();
+}
+
+bool Location::has_horizontal_accuracy() const
+{
+    return p->has_horizontal_accuracy();
 }
 
 double Location::latitude() const
@@ -113,9 +143,19 @@ string Location::region_code() const
     return p->region_code();
 }
 
+bool Location::has_region_code() const
+{
+    return p->has_region_code();
+}
+
 string Location::region_name() const
 {
     return p->region_name();
+}
+
+bool Location::has_region_name() const
+{
+    return p->has_region_name();
 }
 
 double Location::vertical_accuracy() const
@@ -123,9 +163,19 @@ double Location::vertical_accuracy() const
     return p->vertical_accuracy();
 }
 
+bool Location::has_vertical_accuracy() const
+{
+    return p->has_vertical_accuracy();
+}
+
 string Location::zip_postal_code() const
 {
     return p->zip_postal_code();
+}
+
+bool Location::has_zip_postal_code() const
+{
+    return p->has_zip_postal_code();
 }
 
 void Location::set_altitude(double altitude)

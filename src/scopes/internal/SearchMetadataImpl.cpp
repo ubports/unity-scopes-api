@@ -80,11 +80,16 @@ void SearchMetadataImpl::set_location(Location const& location)
 
 Location SearchMetadataImpl::location() const
 {
-    if (location_)
+    if (has_location())
     {
         return *location_;
     }
     throw NotFoundException("SearchMetadata::location()", "location");
+}
+
+bool SearchMetadataImpl::has_location() const
+{
+    return location_;
 }
 
 Variant& SearchMetadataImpl::hint(std::string const& key)
