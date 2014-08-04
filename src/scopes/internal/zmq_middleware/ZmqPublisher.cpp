@@ -109,7 +109,7 @@ void ZmqPublisher::publisher_thread()
     {
         // Create the publisher socket
         zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
-        pub_socket.set(zmqpp::socket_option::linger, 5000);
+        pub_socket.set(zmqpp::socket_option::linger, 50);
         safe_bind(pub_socket, endpoint_);
 
         // Notify constructor that the thread is now running

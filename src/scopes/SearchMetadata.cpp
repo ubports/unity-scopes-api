@@ -27,23 +27,23 @@ namespace scopes
 {
 
 SearchMetadata::SearchMetadata(std::string const& locale, std::string const& form_factor)
-    : p(new internal::SearchMetadataImpl(locale, form_factor))
+    : QueryMetadata(new internal::SearchMetadataImpl(locale, form_factor))
 {
 }
 
 SearchMetadata::SearchMetadata(int cardinality, std::string const& locale, std::string const& form_factor)
-    : p(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
+    : QueryMetadata(new internal::SearchMetadataImpl(cardinality, locale, form_factor))
 {
 }
 
 /// @cond
-SearchMetadata::SearchMetadata(internal::SearchMetadataImpl *impl)
-    : p(impl)
+SearchMetadata::SearchMetadata(internal::SearchMetadataImpl* impl)
+    : QueryMetadata(impl)
 {
 }
 
 SearchMetadata::SearchMetadata(SearchMetadata const& other)
-    : p(new internal::SearchMetadataImpl(*(other.p)))
+    : QueryMetadata(new internal::SearchMetadataImpl(*static_cast<internal::SearchMetadataImpl*>(other.p.get())))
 {
 }
 
@@ -53,7 +53,7 @@ SearchMetadata& SearchMetadata::operator=(SearchMetadata const& other)
 {
     if (this != &other)
     {
-        p.reset(new internal::SearchMetadataImpl(*(other.p)));
+        p.reset(new internal::SearchMetadataImpl(*static_cast<internal::SearchMetadataImpl*>(other.p.get())));
     }
     return *this;
 }
@@ -62,67 +62,57 @@ SearchMetadata& SearchMetadata::operator=(SearchMetadata&&) = default;
 
 SearchMetadata::~SearchMetadata() = default;
 
-VariantMap SearchMetadata::serialize() const
-{
-    return p->serialize();
-}
-
 /// @endcond
-
-std::string SearchMetadata::locale() const
-{
-    return p->locale();
-}
-
-std::string SearchMetadata::form_factor() const
-{
-    return p->form_factor();
-}
 
 void SearchMetadata::set_cardinality(int cardinality)
 {
-    p->set_cardinality(cardinality);
+    static_cast<internal::SearchMetadataImpl*>(p.get())->set_cardinality(cardinality);
 }
 
 int SearchMetadata::cardinality() const
 {
-    return p->cardinality();
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->cardinality();
 }
 
 void SearchMetadata::set_location(Location const& location)
 {
-    p->set_location(location);
+    static_cast<internal::SearchMetadataImpl*>(p.get())->set_location(location);
 }
 
 Location SearchMetadata::location() const
 {
-    return p->location();
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->location();
+}
+
+bool SearchMetadata::has_location() const
+{
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->has_location();
 }
 
 void SearchMetadata::set_hint(std::string const& key, Variant const& value)
 {
-    p->hint(key) = value;
+    static_cast<internal::SearchMetadataImpl*>(p.get())->hint(key) = value;
 }
 
 VariantMap SearchMetadata::hints() const
 {
-    return p->hints();
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->hints();
 }
 
 Variant& SearchMetadata::operator[](std::string const& key)
 {
-    return p->hint(key);
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->hint(key);
 }
 
 Variant const& SearchMetadata::operator[](std::string const& key) const
 {
     // force const hint() method
-    return static_cast<internal::SearchMetadataImpl const *>(p.get())->hint(key);
+    return static_cast<internal::SearchMetadataImpl const*>(p.get())->hint(key);
 }
 
 bool SearchMetadata::contains_hint(std::string const& key) const
 {
-    return p->contains_hint(key);
+    return static_cast<internal::SearchMetadataImpl*>(p.get())->contains_hint(key);
 }
 
 } // namespace scopes

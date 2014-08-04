@@ -160,7 +160,7 @@ protected:
         exec_data.scope_id = "scope-id";
         exec_data.scoperunner_path = "/path/scoperunner";
         exec_data.runtime_config = "/path/runtime.ini";
-        exec_data.scope_config = "/path/scope.ini";
+        exec_data.scope_config = "scope.ini";
         exec_data.confinement_profile = confinement_profile;
         exec_data.timeout_ms = 1500;
 
@@ -188,7 +188,7 @@ TEST_F(TestRegistryObject, basic)
 {
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
-                    {   "/path/runtime.ini", "/path/scope.ini"}, _,
+                    {   "/path/runtime.ini", "scope.ini"}, _,
                     StandardStream::stdin | StandardStream::stdout,
                     string())).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));
@@ -200,7 +200,7 @@ TEST_F(TestRegistryObject, confined)
 {
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
-                    {   "/path/runtime.ini", "/path/scope.ini"}, _,
+                    {   "/path/runtime.ini", "scope.ini"}, _,
                     StandardStream::stdin | StandardStream::stdout,
                     "confinement profile")).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));

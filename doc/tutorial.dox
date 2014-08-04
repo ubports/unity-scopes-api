@@ -615,10 +615,10 @@ otherwise require an instance of unity::scopes::SearchReply and a call to unity:
 With the above classes a test case that checks if MyScope calls appropriate methods of unity::scopes::SearchReply may look like this (note that it just checks
 if proper methods get called and uses _ matchers that match any values; put actual values in there for stricts checks):
 \code{.cpp}
-typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixutre;
+typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixture;
 using namespace ::testing;
 
-TEST_F(TestScopeFixutre, search_results)
+TEST_F(TestScopeFixture, search_results)
 {
     const unity::scopes::CategoryRenderer renderer;
 
@@ -714,6 +714,7 @@ following keys:
     ShapeImages = whether to use Ubuntu-shape for all cards and artwork (defaults to true)
     CategoryHeaderBackground = background scheme of the results categories
     PreviewButtonColor = color of preview buttons (defaults to theme-provided color)
+    LogoOverlayColor = color for the overlay in scopes overview (defaults to semi-transparent black)
     PageHeader.Logo = image containing scope's logo
     PageHeader.ForegroundColor = default header text color (defaults to the overall foreground color)
     PageHeader.Background = background scheme of the header
@@ -723,7 +724,7 @@ following keys:
 The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
 `DisplayName` and `Description` can (and should) be localized. For example:
 
-`Description[de] = Fu&szlig;ballergebnisse`
+`Description[de_DE] = Fu&szlig;ballergebnisse`
 
 In addition to allowing the registry to make the scope available, this information controls how the scope appears
 in the "Scopes" scope.

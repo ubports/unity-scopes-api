@@ -60,7 +60,7 @@ public:
 
     virtual std::string as_string() const = 0;
     virtual int as_int() const = 0;
-    virtual uint as_uint() const = 0;
+    virtual unsigned int as_uint() const = 0;
     virtual double as_double() const = 0;
     virtual bool as_bool() const = 0;
 
@@ -68,7 +68,7 @@ public:
 
     virtual JsonNodeInterface::SPtr get_node() const = 0;
     virtual JsonNodeInterface::SPtr get_node(std::string const& node_name) const = 0;
-    virtual JsonNodeInterface::SPtr get_node(uint node_index) const = 0;
+    virtual JsonNodeInterface::SPtr get_node(unsigned int node_index) const = 0;
 };
 
 } // namespace internal

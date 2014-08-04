@@ -40,7 +40,9 @@ class LocationImpl;
 class Location final
 {
 public:
+    /// @cond
     UNITY_DEFINES_PTRS(Location);
+    /// @endcond
 
     /**
      \brief Construct a new Location with the specified latitude and longitude
@@ -54,6 +56,7 @@ public:
      */
     Location(VariantMap const& variant);
 
+    /// @cond
     ~Location();
     /// @endcond
 
@@ -75,10 +78,22 @@ public:
     double altitude() const;            // optional
 
     /**
+    \brief Is there an altitude property.
+    \return True if there is an altitude property.
+    */
+    bool has_altitude() const;
+
+    /**
     \brief Get the area code.
     \return The area code.
     */
     std::string area_code() const;            // optional
+
+    /**
+    \brief Is there an area code property.
+    \return True if there is an area code property.
+    */
+    bool has_area_code() const;
 
     /**
     \brief Get the city name.
@@ -87,10 +102,22 @@ public:
     std::string city() const;            // optional
 
     /**
+    \brief Is there a city property.
+    \return True if there is a city property.
+    */
+    bool has_city() const;
+
+    /**
     \brief Get the country code.
     \return The country code.
     */
     std::string country_code() const;            // optional
+
+    /**
+    \brief Is there a country code property.
+    \return True if there is a country code property.
+    */
+    bool has_country_code() const;
 
     /**
     \brief Get the country name.
@@ -99,10 +126,22 @@ public:
     std::string country_name() const;            // optional
 
     /**
+    \brief Is there a country name property.
+    \return True if there is a country name property.
+    */
+    bool has_country_name() const;
+
+    /**
     \brief Get the horizontal accuracy.
     \return The horizontal accuracy.
     */
     double horizontal_accuracy() const;            // optional
+
+    /**
+    \brief Is there a horizontal accuracy property.
+    \return True if there is a horizontal accuracy property.
+    */
+    bool has_horizontal_accuracy() const;
 
     /**
     \brief Get the latitude.
@@ -129,10 +168,22 @@ public:
     std::string region_code() const;            // optional
 
     /**
+    \brief Is there a region code property.
+    \return True if there is a region code property.
+    */
+    bool has_region_code() const;
+
+    /**
     \brief Get the region name.
     \return The region name.
     */
     std::string region_name() const;            // optional
+
+    /**
+    \brief Is there a region name property.
+    \return True if there is a region name property.
+    */
+    bool has_region_name() const;
 
     /**
     \brief Get the vertical accuracy.
@@ -141,10 +192,22 @@ public:
     double vertical_accuracy() const;            // optional
 
     /**
+    \brief Is there a vertical accuracy property.
+    \return True if there is a vertical accuracy property.
+    */
+    bool has_vertical_accuracy() const;
+
+    /**
     \brief Get the zip or postal code.
     \return The zip or postal code.
     */
     std::string zip_postal_code() const;            // optional
+
+    /**
+    \brief Is there a zip / postal code property.
+    \return True if there is a zip / postal code property.
+    */
+    bool has_zip_postal_code() const;
 
     /**
     \brief Set the altitude.

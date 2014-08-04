@@ -37,17 +37,17 @@ TEST(ThreadPool, basic)
     }
 }
 
-atomic_int count;
+atomic_int call_count;
 
 void f()
 {
-    ++count;
+    ++call_count;
     this_thread::sleep_for(chrono::milliseconds(200));
 }
 
 void g()
 {
-    ++count;
+    ++call_count;
 }
 
 TEST(ThreadPool, submit)
@@ -65,22 +65,22 @@ TEST(ThreadPool, submit)
     }
 
     {
-        count = 0;
+        call_count = 0;
         ThreadPool p(20);
         p.submit(f);
         p.submit(f);
         this_thread::sleep_for(chrono::milliseconds(300));
-        EXPECT_EQ(2, count);
+        EXPECT_EQ(2, call_count);
     }
 
     {
-        count = 0;
+        call_count = 0;
         ThreadPool p(20);
         p.submit(g);
         p.submit(g);
         p.submit(g);
         this_thread::sleep_for(chrono::milliseconds(300));
-        EXPECT_EQ(3, count);
+        EXPECT_EQ(3, call_count);
     }
 }
 

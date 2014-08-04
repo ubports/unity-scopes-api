@@ -19,9 +19,9 @@
 #ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 #define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
 
+#include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
-#include <memory>
 #include <mutex>
 #include <string>
 
@@ -39,17 +39,41 @@ class SettingsDB;
 class ScopeBaseImpl final
 {
 public:
-    ScopeBaseImpl() = default;
+    ScopeBaseImpl();
     ~ScopeBaseImpl() = default;
-    void set_scope_directory(std::string const &path);
+
+    void set_scope_directory(std::string const& path);
     std::string scope_directory() const;
+
+    void set_cache_directory(std::string const& path);
+    std::string cache_directory() const;
+
+    void set_tmp_directory(std::string const& path);
+    std::string tmp_directory() const;
+
+    void set_registry(RegistryProxy const& registry);
+    RegistryProxy registry() const;
+
     std::shared_ptr<unity::scopes::internal::SettingsDB> settings_db() const;
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
 
 private:
     std::string scope_directory_;
+    bool scope_dir_initialized_;
+
+    std::string cache_directory_;
+    bool cache_dir_initialized_;
+
+    std::string tmp_directory_;
+    bool tmp_dir_initialized_;
+
+    unity::scopes::RegistryProxy registry_;
+    bool registry_initialized_;
+
     std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
+    bool settings_db_initialized_;
+
     mutable std::mutex mutex_;
 };
 

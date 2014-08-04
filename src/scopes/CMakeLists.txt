@@ -14,6 +14,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetails.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
@@ -23,6 +24,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Location.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Object.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RangeInputFilter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBase.cpp
@@ -30,6 +32,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RadioButtonsFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RatingFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Registry.cpp

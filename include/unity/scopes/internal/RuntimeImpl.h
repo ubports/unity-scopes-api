@@ -53,8 +53,8 @@ public:
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
-    void run_scope(ScopeBase* const scope_base, std::string const& scope_ini_file);
-    void run_scope(ScopeBase* const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
+    void run_scope(ScopeBase* scope_base, std::string const& scope_ini_file);
+    void run_scope(ScopeBase* scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
 
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
@@ -64,6 +64,7 @@ public:
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
     void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept;
+    std::string find_cache_dir(std::string& confinement_type) const;
 
     bool destroyed_;
     std::string scope_id_;
@@ -77,6 +78,7 @@ private:
     int reap_expiry_;
     int reap_interval_;
     std::string data_dir_;
+    std::string tmp_dir_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;

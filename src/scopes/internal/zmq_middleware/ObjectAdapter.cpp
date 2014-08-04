@@ -389,6 +389,11 @@ void ObjectAdapter::wait_for_shutdown()
     // We join with threads and call servant destructors outside synchronization.
     call_once(once_, [this](){ this->cleanup(); });
 
+    {
+        unique_lock<mutex> lock(state_mutex_);
+        stopper_ = nullptr;
+    }
+
     if (state == Failed)
     {
         throw_bad_state("wait_for_shutdown()", state);
@@ -487,6 +492,7 @@ void ObjectAdapter::run_workers()
         // LCOV_EXCL_START
         catch (...) //
         {
+            lock_guard<mutex> state_lock(state_mutex_);
             stopper_->stop();
             throw MiddlewareException("ObjectAdapter::run_workers(): worker thread failure (adapter: " + name_ + ")");
         }
@@ -509,7 +515,11 @@ void ObjectAdapter::broker_thread()
     try
     {
         // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
-        auto stop = stopper_->subscribe();
+        zmqpp::socket stop(*mw_.context(), zmqpp::socket_type::subscribe);
+        {
+            lock_guard<mutex> state_lock(state_mutex_);
+            stop = stopper_->subscribe();
+        }
 
         // Set up message pump. Router-dealer for twoway adapter, pull-push for oneway adapter.
         auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
@@ -620,7 +630,7 @@ void ObjectAdapter::broker_thread()
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(make_exception_ptr(e));
         }
-        catch (future_error)  // LCOV_EXCL_LINE
+        catch (const future_error&)  // LCOV_EXCL_LINE
         {
         }
     }
@@ -633,7 +643,11 @@ void ObjectAdapter::worker_thread()
         zmqpp::poller poller;
 
         // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
-        auto stop = stopper_->subscribe();
+        zmqpp::socket stop(*mw_.context(), zmqpp::socket_type::subscribe);
+        {
+            lock_guard<mutex> lock(state_mutex_);
+            stop = stopper_->subscribe();
+        }
         poller.add(stop);
 
         auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
@@ -782,7 +796,10 @@ void ObjectAdapter::worker_thread()
     // LCOV_EXCL_START
     catch (...)
     {
-        stopper_->stop();  // Fatal error, we need to stop all other workers and the broker.
+        {
+            lock_guard<mutex> lock(state_mutex_);
+            stopper_->stop();  // Fatal error, we need to stop all other workers and the broker.
+        }
         MiddlewareException e("ObjectAdapter: worker thread failure (adapter: " + name_ + ")");
         store_exception(e);
         // We may not have signaled the parent yet, depending on where things went wrong.
@@ -791,7 +808,7 @@ void ObjectAdapter::worker_thread()
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(make_exception_ptr(e));
         }
-        catch (future_error)
+        catch (const future_error&)
         {
         }
     }
@@ -801,6 +818,12 @@ void ObjectAdapter::worker_thread()
 void ObjectAdapter::cleanup()
 {
     join_with_all_threads();
+    {
+        // Need a full fence here to make sure this thread sees up-to-date
+        // memory for servants_ and dflt_servants_.
+        lock_guard<mutex> lock(map_mutex_);
+    }
+    // Don't hold a lock while the servant destructors run.
     servants_.clear();
     dflt_servants_.clear();
 }

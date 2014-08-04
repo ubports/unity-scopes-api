@@ -45,7 +45,8 @@ public:
     virtual ~ZmqReply();
 
     virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+    virtual void finished(CompletionDetails const& details) override;
+    virtual void info(OperationInfo const& op_info) override;
 };
 
 } // namespace zmq_middleware

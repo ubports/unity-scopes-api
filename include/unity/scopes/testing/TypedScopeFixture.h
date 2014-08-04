@@ -33,6 +33,8 @@ namespace unity
 namespace scopes
 {
 
+class ScopeBase;
+
 namespace testing
 {
 
@@ -52,19 +54,29 @@ struct ScopeTraits
     }
 };
 
+struct TypedScopeFixtureHelper
+{
+private:
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
+
+    template<typename Scope>
+    friend class TypedScopeFixture;
+};
+
 template<typename Scope>
 class TypedScopeFixture : public ::testing::Test
 {
 public:
     TypedScopeFixture()
-        : scope(ScopeTraits<Scope>::construct()),
-          registry_proxy(&registry, [](unity::scopes::Registry*) {})
+        : registry_proxy(&registry, [](unity::scopes::Registry*) {})
+        , scope(ScopeTraits<Scope>::construct())
     {
+        TypedScopeFixtureHelper::set_registry(scope, registry_proxy);
     }
 
     void SetUp()
     {
-        EXPECT_NO_THROW(scope->start(ScopeTraits<Scope>::name(), registry_proxy));
+        EXPECT_NO_THROW(scope->start(ScopeTraits<Scope>::name()));
         EXPECT_NO_THROW(scope->run());
     }
 
@@ -74,9 +86,9 @@ public:
     }
 
 protected:
-    std::shared_ptr<Scope> scope;
     unity::scopes::testing::MockRegistry registry;
     unity::scopes::RegistryProxy registry_proxy;
+    std::shared_ptr<Scope> scope;
 };
 
 /// @endcond

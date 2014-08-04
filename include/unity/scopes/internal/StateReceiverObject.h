@@ -56,6 +56,7 @@ public:
 
 private:
     core::Signal<std::string, State> state_received_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal

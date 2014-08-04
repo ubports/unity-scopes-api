@@ -127,7 +127,7 @@ include_directories(
 set(cxx_version_required 4.9)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (NOT CMAKE_CXX_COMPILER_VERSION MATCHES "^${cxx_version_required}")
-        message(FATAL_ERROR "g++ version must be ${cxx_version_required}!")
+        message(FATAL_ERROR "g++ version must be ${cxx_version_required}, found ${CMAKE_CXX_COMPILER_VERSION}!")
     endif()
 endif()
 
@@ -190,9 +190,9 @@ set(UNITY_SCOPES_LIB unity-scopes)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 5)
-set(UNITY_SCOPES_MICRO 3)
-set(UNITY_SCOPES_SOVERSION 2)
+set(UNITY_SCOPES_MINOR 6)
+set(UNITY_SCOPES_MICRO 0)
+set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)

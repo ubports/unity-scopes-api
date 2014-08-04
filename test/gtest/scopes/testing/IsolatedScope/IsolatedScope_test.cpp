@@ -111,7 +111,7 @@ TEST(ScopeMetadataBuilder, construct_full)
     EXPECT_EQ("icon", metadata.icon());
     EXPECT_EQ("search_hint", metadata.search_hint());
     EXPECT_EQ("hot_key", metadata.hot_key());
-    EXPECT_EQ(true, metadata.invisible());
+    EXPECT_TRUE(metadata.invisible());
     EXPECT_EQ(appearance_attrs, metadata.appearance_attributes());
     EXPECT_EQ("scope_dir", metadata.scope_directory());
     EXPECT_EQ(unity::scopes::ScopeMetadata::ResultsTtlType::Large, metadata.results_ttl_type());
@@ -204,7 +204,7 @@ TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
         result.set_dnd_uri("dnd_uri");
         listener->push(result);
 
-        listener->finished(unity::scopes::ListenerBase::Finished, "");
+        listener->finished(unity::scopes::CompletionDetails(unity::scopes::CompletionDetails::OK));
         return queryctrl_proxy;
     };
 

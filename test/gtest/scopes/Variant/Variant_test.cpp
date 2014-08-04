@@ -19,8 +19,10 @@
 #include <unity/scopes/Variant.h>
 #include <unity/UnityExceptions.h>
 
-#include <gtest/gtest.h>
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/variant.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity;
@@ -49,7 +51,7 @@ TEST(Variant, basic)
     {
         Variant v(true);
         EXPECT_EQ(Variant::Type::Bool, v.which());
-        EXPECT_EQ(true, v.get_bool());
+        EXPECT_TRUE(v.get_bool());
     }
 
     {

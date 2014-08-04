@@ -56,6 +56,17 @@ public:
     double vertical_accuracy() const;                            // optional
     std::string zip_postal_code() const;                         // optional
 
+    bool has_altitude() const;
+    bool has_area_code() const;
+    bool has_city() const;
+    bool has_country_code() const;
+    bool has_country_name() const;
+    bool has_horizontal_accuracy() const;
+    bool has_region_code() const;
+    bool has_region_name() const;
+    bool has_vertical_accuracy() const;
+    bool has_zip_postal_code() const;
+
     void set_altitude(double altitude);
     void set_area_code(std::string const& area_code);
     void set_city(std::string const& city);

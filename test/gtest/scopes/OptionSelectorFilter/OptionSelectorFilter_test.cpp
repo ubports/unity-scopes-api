@@ -173,7 +173,7 @@ TEST(OptionSelectorFilter, deserialize)
 
         EXPECT_EQ("f1", filter.id());
         EXPECT_EQ("Filter 1", filter.label());
-        EXPECT_EQ(true, filter.multi_select());
+        EXPECT_TRUE(filter.multi_select());
         EXPECT_EQ(1u, filter.options().size());
         EXPECT_EQ("1", filter.options().front()->id());
     }

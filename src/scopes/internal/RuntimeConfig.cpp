@@ -21,6 +21,8 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/UnityExceptions.h>
 
+#include <stdlib.h>
+
 using namespace std;
 
 namespace unity
@@ -104,7 +106,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         }
     }
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  runtime_config_group,
                                              {
                                                 registry_identity_key,

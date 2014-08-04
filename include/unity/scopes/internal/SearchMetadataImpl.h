@@ -53,6 +53,7 @@ public:
 
     void set_location(Location const& location);
     Location location() const;
+    bool has_location() const;
 
     bool contains_hint(std::string const& key) const;
     void set_hint(std::string const& key, Variant const& value);

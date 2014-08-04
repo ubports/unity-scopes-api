@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = TestScope
+Description = Scope to test environment variable settings
+Author = Michi Henning

@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 
 using namespace std;
@@ -55,7 +56,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
 
     // Set the endpoint directory if it was not set explicitly.
     // We look for the XDG_RUNTIME_DIR env variable. If that is not
-    // set, we give up.
+    // set correctly, we give up.
     if (endpoint_dir_.empty())
     {
         char* xdg_runtime_dir = secure_getenv("XDG_RUNTIME_DIR");
@@ -63,6 +64,10 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         {
             throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
                                   "environment variable not set");
+        }
+        if (*xdg_runtime_dir != '/')
+        {
+            throw ConfigException("Invalid XDG_RUNTIME_DIR: path must be absolute");
         }
         endpoint_dir_ = string(xdg_runtime_dir) + "/zmq";
     }
@@ -88,7 +93,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
     ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  zmq_config_group,
                                              {
                                                 endpoint_dir_key,

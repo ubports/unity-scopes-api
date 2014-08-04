@@ -36,7 +36,20 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
+    }
+    {
+        SearchMetadata meta("pl", "phone");
+
+        meta.set_internet_connectivity(QueryMetadata::Connected);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ("pl", meta.locale());
+        EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(QueryMetadata::Connected, meta.internet_connectivity());
+        EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -44,7 +57,9 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ(50, meta.cardinality());
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_THROW(meta.location(), NotFoundException);
+        EXPECT_FALSE(meta.has_location());
     }
     {
         SearchMetadata meta(50, "pl", "phone");
@@ -53,6 +68,7 @@ TEST(SearchMetadata, basic)
         meta.set_location(Location(1.0, 2.0));
         meta["foo"] = "bar";
         meta.set_hint("baz", Variant(1000));
+        EXPECT_TRUE(meta.has_location());
         EXPECT_DOUBLE_EQ(1.0, meta.location().latitude());
         EXPECT_DOUBLE_EQ(2.0, meta.location().longitude());
         EXPECT_EQ(100, meta.cardinality());
@@ -60,12 +76,14 @@ TEST(SearchMetadata, basic)
         EXPECT_EQ("bar", meta.hints()["foo"].get_string());
         EXPECT_EQ(1000, meta.hints()["baz"].get_int());
         EXPECT_TRUE(meta.contains_hint("foo"));
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
     }
     {
         // referencing non-existing hint with a const object throws
         SearchMetadata const meta(50, "pl", "phone");
         EXPECT_THROW(meta["foo"], unity::LogicException);
         EXPECT_FALSE(meta.contains_hint("foo"));
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
     }
 }
 
@@ -81,6 +99,7 @@ TEST(SearchMetadata, serialize)
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
         EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_EQ(var.end(), var.find("internet_connectivity"));
         EXPECT_EQ(1.0, var["location"].get_dict()["latitude"].get_double());
         EXPECT_EQ(2.0, var["location"].get_dict()["longitude"].get_double());
 
@@ -90,6 +109,18 @@ TEST(SearchMetadata, serialize)
         EXPECT_EQ("bar", meta2.hints()["foo"].get_string());
         EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
         EXPECT_DOUBLE_EQ(2.0, meta2.location().longitude());
+    }
+    {
+        SearchMetadata meta("pl", "phone");
+        meta["foo"] = "bar";
+        meta.set_internet_connectivity(QueryMetadata::Disconnected);
+
+        auto var = meta.serialize();
+        EXPECT_EQ("search_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ("bar", var["hints"].get_dict()["foo"].get_string());
+        EXPECT_FALSE(var["internet_connectivity"].get_bool());
     }
 }
 
@@ -103,6 +134,7 @@ TEST(SearchMetadata, copy)
         meta.set_cardinality(0);
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_DOUBLE_EQ(1.0, meta.location().latitude());
         EXPECT_DOUBLE_EQ(2.0, meta.location().longitude());
         EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
@@ -112,15 +144,36 @@ TEST(SearchMetadata, copy)
         SearchMetadata meta(100, "pl", "phone");
         meta.set_location(Location(1.0, 2.0));
         SearchMetadata meta2(meta);
+
         meta.set_cardinality(0);
         meta.set_location(Location(3.0, 4.0));
-
         EXPECT_EQ(0, meta.cardinality());
         EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
         EXPECT_DOUBLE_EQ(1.0, meta2.location().latitude());
         EXPECT_DOUBLE_EQ(2.0, meta2.location().longitude());
         EXPECT_DOUBLE_EQ(3.0, meta.location().latitude());
         EXPECT_DOUBLE_EQ(4.0, meta.location().longitude());
+    }
+    {
+        SearchMetadata meta(100, "pl", "phone");
+        auto meta2 = meta;
+
+        meta.set_cardinality(0);
+        meta.set_internet_connectivity(QueryMetadata::Connected);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(QueryMetadata::Connected, meta.internet_connectivity());
+    }
+    {
+        SearchMetadata meta(100, "pl", "phone");
+        SearchMetadata meta2(meta);
+
+        meta.set_cardinality(0);
+        meta.set_internet_connectivity(QueryMetadata::Disconnected);
+        EXPECT_EQ(0, meta.cardinality());
+        EXPECT_EQ(100, meta2.cardinality());
+        EXPECT_EQ(QueryMetadata::Disconnected, meta.internet_connectivity());
     }
 }
 
@@ -135,6 +188,19 @@ TEST(ActionMetadata, basic)
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());
         EXPECT_EQ("bar", meta.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
+    }
+    {
+        VariantMap var;
+        var["foo"] = "bar";
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(var));
+        meta.set_internet_connectivity(QueryMetadata::Disconnected);
+
+        EXPECT_EQ("pl", meta.locale());
+        EXPECT_EQ("phone", meta.form_factor());
+        EXPECT_EQ("bar", meta.scope_data().get_dict()["foo"].get_string());
+        EXPECT_EQ(QueryMetadata::Disconnected, meta.internet_connectivity());
     }
 }
 
@@ -149,12 +215,34 @@ TEST(ActionMetadata, serialize_and_deserialize)
         EXPECT_EQ("pl", var["locale"].get_string());
         EXPECT_EQ("phone", var["form_factor"].get_string());
         EXPECT_EQ(1234, var["scope_data"].get_int());
+        EXPECT_EQ(var.end(), var.find("internet_connectivity"));
 
         // deserialize
         auto meta2 = internal::ActionMetadataImpl::create(var);
         EXPECT_EQ("pl", meta2.locale());
         EXPECT_EQ("phone", meta2.form_factor());
         EXPECT_EQ(1234, meta2.scope_data().get_int());
+        EXPECT_EQ(QueryMetadata::Unknown, meta2.internet_connectivity());
+    }
+
+    {
+        ActionMetadata meta("pl", "phone");
+        meta.set_scope_data(Variant(1234));
+        meta.set_internet_connectivity(QueryMetadata::Connected);
+
+        auto var = meta.serialize();
+        EXPECT_EQ("action_metadata", var["type"].get_string());
+        EXPECT_EQ("pl", var["locale"].get_string());
+        EXPECT_EQ("phone", var["form_factor"].get_string());
+        EXPECT_EQ(1234, var["scope_data"].get_int());
+        EXPECT_TRUE(var["internet_connectivity"].get_bool());
+
+        // deserialize
+        auto meta2 = internal::ActionMetadataImpl::create(var);
+        EXPECT_EQ("pl", meta2.locale());
+        EXPECT_EQ("phone", meta2.form_factor());
+        EXPECT_EQ(1234, meta2.scope_data().get_int());
+        EXPECT_EQ(QueryMetadata::Connected, meta2.internet_connectivity());
     }
 }
 
@@ -169,6 +257,7 @@ TEST(ActionMetadata, copy)
 
         EXPECT_TRUE(meta2.scope_data().is_null());
         EXPECT_EQ("foo", meta.scope_data().get_string());
+        EXPECT_EQ(QueryMetadata::Unknown, meta.internet_connectivity());
     }
     {
         ActionMetadata meta("pl", "phone");
@@ -176,8 +265,10 @@ TEST(ActionMetadata, copy)
 
         Variant var(10);
         meta.set_scope_data(var);
+        meta.set_internet_connectivity(QueryMetadata::Disconnected);
 
         EXPECT_TRUE(meta2.scope_data().is_null());
         EXPECT_EQ(10, meta.scope_data().get_int());
+        EXPECT_EQ(QueryMetadata::Disconnected, meta.internet_connectivity());
     }
 }

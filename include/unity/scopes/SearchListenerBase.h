@@ -19,13 +19,14 @@
 #ifndef UNITY_SCOPES_SEARCHLISTENERBASE_H
 #define UNITY_SCOPES_SEARCHLISTENERBASE_H
 
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/FilterBase.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Annotation.h>
-#include <unity/scopes/Department.h>
-#include <unity/scopes/FilterBase.h>
 
 #include <string>
 
@@ -34,9 +35,6 @@ namespace unity
 
 namespace scopes
 {
-
-class CategorisedResult;
-class FilterState;
 
 namespace experimental
 {
@@ -51,7 +49,7 @@ Results for the query are delivered to the client by the scopes run
 time by invoking the appropriate push method.
 
 If the implementation of a push method throws an exception, the scopes
-run time calls ListenerBase::finished() with an 'Error' reason.
+run time calls ListenerBase::finished() with an 'Error' status.
 
 \see ListenerBase
 */

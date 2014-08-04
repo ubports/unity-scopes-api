@@ -41,7 +41,8 @@ public:
     virtual ~MWReply();
 
     virtual void push(VariantMap const& result) = 0;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;
+    virtual void finished(CompletionDetails const& details) = 0;
+    virtual void info(OperationInfo const& op_info) = 0;
 
 protected:
     MWReply(MiddlewareBase* mw_base);

@@ -86,7 +86,7 @@ public:
         automatic, noclose
     };
 
-    static UPtr create(std::string const& path, Binding b = Binding::lazy, Unload ul = Unload::automatic);
+    static UPtr create(std::string const& path, Binding b = Binding::now, Unload ul = Unload::automatic);
 
     typedef void (*VoidFunc)();
     VoidFunc find_function(std::string const& symbol);

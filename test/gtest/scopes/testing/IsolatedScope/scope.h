@@ -18,6 +18,7 @@
  */
 
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/testing/MockRegistry.h>
 
 namespace testing
 {
@@ -25,7 +26,10 @@ namespace testing
 class Scope : public unity::scopes::ScopeBase
 {
 public:
-    void start(std::string const&, unity::scopes::RegistryProxy const &) override;
+    Scope();
+    virtual ~Scope();
+
+    void start(std::string const&) override;
 
     void stop() override;
 
@@ -48,8 +52,6 @@ public:
     unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
-
-    unity::scopes::RegistryProxy registry_;
 };
 
 } // namespace testing

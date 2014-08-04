@@ -14,6 +14,7 @@ BackgroundColor = bg_color
 ShapeImages = true
 CategoryHeaderBackground = cat_header_bg_scheme
 PreviewButtonColor = preview_button_color
+LogoOverlayColor = overlay_color
 PageHeader.Logo = some_url
 PageHeader.ForegroundColor = fg_color
 PageHeader.Background = bg_scheme

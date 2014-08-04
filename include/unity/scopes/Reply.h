@@ -20,6 +20,7 @@
 #define UNITY_SCOPES_REPLY_H
 
 #include <unity/scopes/Object.h>
+#include <unity/scopes/OperationInfo.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <exception>
@@ -61,6 +62,19 @@ public:
               the query source receives `"unknown exception"`.
     */
     virtual void error(std::exception_ptr ex) = 0;
+
+    /**
+    \brief Informs the source of a query that additional information regarding the reply is
+    available.
+
+    Calling info() does not terminate the query, it simply informs the source that something
+    interesting occured during execution of the query (usually affecting the results returned in
+    some way).
+
+    Multiple calls to info() for each condition are legal.
+    \param op_info Contains all details of the information being reported.
+    */
+    virtual void info(OperationInfo const& op_info) = 0;
 
     /**
     \brief Destroys a Reply.

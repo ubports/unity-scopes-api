@@ -24,6 +24,8 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
@@ -41,12 +43,13 @@ namespace scopes
 namespace internal
 {
 
-RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
+RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer,
+                               Executor::SPtr const& executor,
                                MiddlewareBase::SPtr middleware)
     : death_observer_(death_observer),
       death_observer_connection_
       {
-          death_observer_.child_died().connect([this](const core::posix::ChildProcess& cp)
+          death_observer_.child_died().connect([this](core::posix::ChildProcess const& cp)
           {
               on_process_death(cp);
           })
@@ -77,6 +80,12 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
 
 RegistryObject::~RegistryObject()
 {
+    {
+        // The destructor may be called from an arbitrary
+        // thread, so we need a full fence here.
+        lock_guard<decltype(mutex_)> lock(mutex_);
+    }
+
     // kill all scope processes
     for (auto& scope_process : scope_processes_)
     {
@@ -96,10 +105,6 @@ RegistryObject::~RegistryObject()
             cerr << "RegistryObject::~RegistryObject(): " << e.what() << endl;
         }
     }
-
-    // clear scope maps
-    scopes_.clear();
-    scope_processes_.clear();
 }
 
 ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
@@ -131,7 +136,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
         }
         catch (std::exception const& e)
         {
-            cerr << "cannot get metdata from remote registry: " << e.what() << endl;
+            cerr << "cannot get metadata from remote registry: " << e.what() << endl;
             // TODO: log error
         }
     }
@@ -208,7 +213,7 @@ bool RegistryObject::is_scope_running(std::string const& scope_id)
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
-        return it->second.state() != ScopeProcess::ProcessState::Stopped;
+        return it->second.state() == ScopeProcess::ProcessState::Running;
     }
 
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
@@ -283,8 +288,10 @@ StateReceiverObject::SPtr RegistryObject::state_receiver()
     return state_receiver_;
 }
 
-void RegistryObject::on_process_death(core::posix::Process const& process)
+void RegistryObject::on_process_death(core::posix::ChildProcess const& process)
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     // The death observer has signaled that a child has died.
     // Broadcast this message to each scope process until we have found the process in question.
     // (This is slightly more efficient than just connecting the signal to every scope process.)
@@ -300,6 +307,8 @@ void RegistryObject::on_process_death(core::posix::Process const& process)
 
 void RegistryObject::on_state_received(std::string const& scope_id, StateReceiverObject::State const& state)
 {
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
@@ -378,14 +387,14 @@ void RegistryObject::ScopeProcess::exec(
         if (!wait_for_state(lock, ScopeProcess::Stopped))
         {
             cerr << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
-                 << exec_data_.scope_id << "\" took too long to stop." << endl;
+                 << exec_data_.scope_id << "\" did not stop after " << exec_data_.timeout_ms << " ms." << endl;
             try
             {
                 kill(lock);
             }
             catch(std::exception const& e)
             {
-                cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+                cerr << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what() << endl;
             }
         }
     }
@@ -413,13 +422,26 @@ void RegistryObject::ScopeProcess::exec(
         argv.insert(argv.end(), {exec_data_.runtime_config, exec_data_.scope_config});
     }
 
-    std::map<std::string, std::string> env;
-    core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
     {
-        env.insert(std::make_pair(key, value));
-    });
+        // Copy current env vars into env.
+        std::map<std::string, std::string> env;
+        core::posix::this_process::env::for_each([&env](const std::string& key, const std::string& value)
+        {
+            env.insert(std::make_pair(key, value));
+        });
 
-    {
+        // Make sure we set LD_LIBRARY_PATH to include <lib_dir> and <lib_dir>/lib
+        // before exec'ing the scope.
+        auto scope_config_path = boost::filesystem::canonical(exec_data_.scope_config);
+        string lib_dir = scope_config_path.parent_path().native();
+        string scope_ld_lib_path = lib_dir + ":" + lib_dir + "/lib";
+        string ld_lib_path = core::posix::this_process::env::get("LD_LIBRARY_PATH", "");
+        if (!boost::algorithm::starts_with(ld_lib_path, lib_dir))
+        {
+            scope_ld_lib_path = scope_ld_lib_path + (ld_lib_path.empty() ? "" : (":" + ld_lib_path));
+        }
+        env["LD_LIBRARY_PATH"] = scope_ld_lib_path;  // Overwrite any LD_LIBRARY_PATH entry that may already be there.
+
         process_ = executor->exec(program, argv, env,
                                      core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
                                      exec_data_.confinement_profile);
@@ -443,10 +465,11 @@ void RegistryObject::ScopeProcess::exec(
         }
         catch(std::exception const& e)
         {
-            cerr << "RegistryObject::ScopeProcess::exec(): " << e.what() << endl;
+            cerr << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what() << endl;
         }
         throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
-                                       + exec_data_.scope_id + "\" took too long to start.");
+                                       + exec_data_.scope_id + "\" took longer than "
+                                       + std::to_string(exec_data_.timeout_ms) + " ms to start.");
     }
 
     cout << "RegistryObject::ScopeProcess::exec(): Process for scope: \"" << exec_data_.scope_id << "\" started" << endl;
@@ -469,7 +492,7 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     if (pid == process_.pid())
     {
         cout << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \"" << exec_data_.scope_id
-             << "\" terminated" << endl;
+             << "\" exited" << endl;
         clear_handle_unlocked();
         return true;
     }
@@ -483,13 +506,13 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
     update_state_unlocked(Stopped);
 }
 
-void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
+void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 {
-    if (state == state_)
+    if (new_state == state_)
     {
         return;
     }
-    else if (state == Running)
+    else if (new_state == Running)
     {
         if (reg_publisher_)
         {
@@ -502,11 +525,11 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
             cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
                  << "\" started manually" << endl;
 
-            // Don't update state, treat this scope as not running if a locate() is requested
+            // Don't update state_, treat this scope as not running if a locate() is requested
             return;
         }
     }
-    else if (state == Stopped)
+    else if (new_state == Stopped)
     {
         if (reg_publisher_)
         {
@@ -520,7 +543,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
                  << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
         }
     }
-    else if (state == Stopping && state_ != Running)
+    else if (new_state == Stopping && state_ != Running)
     {
         if (reg_publisher_)
         {
@@ -529,12 +552,12 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState state)
         }
 
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
-             << exec_data_.scope_id << "\" terminated" << endl;
+             << exec_data_.scope_id << "\" exited" << endl;
 
-        // Don't update state, treat this scope as not running if a locate() is requested
+        // Don't update state_, treat this scope as not running if a locate() is requested
         return;
     }
-    state_ = state;
+    state_ = new_state;
     state_change_cond_.notify_all();
 }
 
@@ -562,7 +585,7 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
             std::error_code ec;
 
             cerr << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
-                 << "\" is taking longer than expected to terminate gracefully. "
+                 << "\" took longer than " << exec_data_.timeout_ms << " ms to exit gracefully. "
                  << "Killing the process instead." << endl;
 
             // scope is taking too long to close, send kill signal

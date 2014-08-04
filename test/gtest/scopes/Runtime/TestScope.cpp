@@ -38,8 +38,9 @@ namespace
 class TestQuery : public SearchQueryBase
 {
 public:
-    TestQuery(CannedQuery const& query)
-        : query_(query)
+    TestQuery(CannedQuery const& query, SearchMetadata const& metadata)
+        : SearchQueryBase(query, metadata)
+        , query_(query)
     {
     }
 
@@ -64,6 +65,9 @@ public:
             EXPECT_THROW(reply->register_departments(parent), unity::LogicException);
         }
 
+        // send test info for no internet connection (mid run)
+        reply->info(OperationInfo{OperationInfo::NoInternet, "Partial results returned due to no internet connection."});
+
         Department::SPtr parent = Department::create("", query_, "All departments");
         Department::SPtr news_dep = Department::create("news", query_, "News");
         news_dep->set_subdepartments({Department::create("subdep1", query_, "Europe"), Department::create("subdep2", query_, "US")});
@@ -78,8 +82,11 @@ public:
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
 
+        // send test info for no internet connection (mid run)
+        reply->info(OperationInfo{OperationInfo::PoorInternet, "Partial results returned due to poor internet connection."});
+
         CannedQuery query("scope-A", "foo", "dep1");
-        Annotation annotation(Annotation::Type::Link);
+        experimental::Annotation annotation(experimental::Annotation::Type::Link);
         annotation.add_link("Link1", query);
         reply->push(annotation);
     }
@@ -93,38 +100,38 @@ private:
 class TestPreview : public PreviewQueryBase
 {
 public:
+    TestPreview(Result const& result, ActionMetadata const& metadata)
+        : PreviewQueryBase(result, metadata)
+    {
+    }
+
     virtual void cancelled() override
     {
     }
+
     virtual void run(PreviewReplyProxy const& reply) override
     {
+        // send test info for no location data (run start)
+        reply->info(OperationInfo{OperationInfo::NoLocationData});
+
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
         widgets.emplace_back(PreviewWidget(R"({"id": "id", "type": "image", "art": "screenshot-url"})"));
         reply->push(widgets);
         reply->push("author", Variant("Foo"));
         reply->push("rating", Variant("Bar"));
+
+        // send test info for no account data (run end)
+        reply->info(OperationInfo{OperationInfo::InaccurateLocationData, "Partial results returned due to inaccurate location data."});
     }
 };
 
-void TestScope::start(string const&, RegistryProxy const &)
+SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }
 
-void TestScope::stop()
+PreviewQueryBase::UPtr TestScope::preview(Result const& result, ActionMetadata const& metadata)
 {
-}
-
-void TestScope::run()
-{
-}
-
-SearchQueryBase::UPtr TestScope::search(CannedQuery const& query, SearchMetadata const &)
-{
-    return SearchQueryBase::UPtr(new TestQuery(query));
-}
-
-PreviewQueryBase::UPtr TestScope::preview(Result const&, ActionMetadata const &)
-{
-    return PreviewQueryBase::UPtr(new TestPreview());
+    return PreviewQueryBase::UPtr(new TestPreview(result, metadata));
 }

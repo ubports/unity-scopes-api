@@ -54,7 +54,7 @@ namespace
     const string location_data_needed_key = "LocationDataNeeded";
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
-    const string results_ttl_str = "ResultsTtlType";
+    const string results_ttl_key = "ResultsTtlType";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -62,6 +62,7 @@ namespace
     const string shape_images_key = "ShapeImages";
     const string category_header_bg_key = "CategoryHeaderBackground";
     const string preview_button_color_key = "PreviewButtonColor";
+    const string logo_overlay_color_key = "LogoOverlayColor";
     const string pageheader_logo_key = "PageHeader.Logo";
     const string pageheader_fg_color_key = "PageHeader.ForegroundColor";
     const string pageheader_background_key = "PageHeader.Background";
@@ -140,8 +141,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     // custom scope runner executable is optional
     try
     {
-        string key = parser()->get_string(scope_config_group, scoperunner_key);
-        scope_runner_.reset(new string(key));
+        string scope_runner = parser()->get_string(scope_config_group, scoperunner_key);
+        scope_runner_.reset(new string(scope_runner));
     }
     catch (LogicException const&)
     {
@@ -161,7 +162,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
     try
     {
-        string orig = parser()->get_string(scope_config_group, results_ttl_str);
+        string orig = parser()->get_string(scope_config_group, results_ttl_key);
         string ttl = orig;
         to_lower(ttl);
         if (ttl.empty() || ttl == "none")
@@ -181,7 +182,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         }
         else
         {
-            throw_ex("Illegal value (" + orig + ") for " + results_ttl_str);
+            throw_ex("Illegal value (\"" + orig + "\") for " + results_ttl_key);
         }
     }
     catch (LogicException const&)
@@ -200,7 +201,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
-    const KnownEntries known_entries = {
+    KnownEntries const known_entries = {
                                           {  scope_config_group,
                                              {
                                                 overrideable_key,
@@ -215,7 +216,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 location_data_needed_key,
                                                 scoperunner_key,
                                                 idle_timeout_key,
-                                                results_ttl_str
+                                                results_ttl_key
                                              }
                                           },
                                           {  scope_appearance_group,
@@ -225,6 +226,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                                                 shape_images_key,
                                                 category_header_bg_key,
                                                 preview_button_color_key,
+                                                logo_overlay_color_key,
                                                 pageheader_logo_key,
                                                 pageheader_fg_color_key,
                                                 pageheader_background_key,
