@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.0+14.10.20140804.1-0ubuntu1) utopic; urgency=medium
 
   [ Michi Henning ]
   * Added cache_directory() method and refactored scoperunner and RuntimeImpl.
@@ -12,7 +12,7 @@ unity-scopes-api (0.6.0-0ubuntu1) UNRELEASED; urgency=medium
   [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 28 Jul 2014 15:18:12 +0200
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 04 Aug 2014 20:27:02 +0000
 
 unity-scopes-api (0.5.3+14.10.20140728-0ubuntu1) utopic; urgency=medium
 
