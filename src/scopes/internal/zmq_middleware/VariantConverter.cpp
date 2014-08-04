@@ -138,7 +138,7 @@ void to_value_dict(VariantMap const& vm, capnproto::ValueDict::Builder& b)
 void to_value_array(VariantArray const& va, capnp::List<capnproto::Value>::Builder& b)
 {
     assert(va.size() == b.size());
-    uint i = 0;
+    unsigned int i = 0;
     for (auto const& el: va)
     {
         auto elm_bld = b[i];
