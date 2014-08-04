@@ -431,6 +431,16 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::Category::Category(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::CannedQuery const> const&, unity::scopes::CategoryRenderer const&)@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::Category::Category(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Category::~Category()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Location::has_altitude() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_area_code() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_region_code() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_region_name() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_country_code() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_country_name() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_zip_postal_code() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_vertical_accuracy() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_horizontal_accuracy() const@Base" 0replaceme
+ (c++)"unity::scopes::Location::has_city() const@Base" 0replaceme
  (c++)"unity::scopes::Location::set_altitude(double)@Base" 0replaceme
  (c++)"unity::scopes::Location::set_latitude(double)@Base" 0replaceme
  (c++)"unity::scopes::Location::set_area_code(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
@@ -690,6 +700,7 @@ libunity-scopes.so.2 libunity-scopes2 #MINVER#
  (c++)"unity::scopes::ActionMetadata::scope_data() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::cardinality() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::contains_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchMetadata::has_location() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::hints() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::location() const@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1

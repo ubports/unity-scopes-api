@@ -41,6 +41,18 @@ TEST_F(LocationTest, basic)
 TEST_F(LocationTest, optionals_throw_when_unset)
 {
     Location loc(1.0, 2.0);
+
+    EXPECT_FALSE(loc.has_altitude());
+    EXPECT_FALSE(loc.has_area_code());
+    EXPECT_FALSE(loc.has_city());
+    EXPECT_FALSE(loc.has_country_code());
+    EXPECT_FALSE(loc.has_country_name());
+    EXPECT_FALSE(loc.has_horizontal_accuracy());
+    EXPECT_FALSE(loc.has_region_code());
+    EXPECT_FALSE(loc.has_region_name());
+    EXPECT_FALSE(loc.has_vertical_accuracy());
+    EXPECT_FALSE(loc.has_zip_postal_code());
+
     EXPECT_THROW(loc.altitude(), NotFoundException);
     EXPECT_THROW(loc.area_code(), NotFoundException);
     EXPECT_THROW(loc.city(), NotFoundException);
@@ -57,22 +69,39 @@ TEST_F(LocationTest, setters_getters)
 {
     Location loc(1.0, 2.0);
 
+    EXPECT_FALSE(loc.has_altitude());
+    EXPECT_FALSE(loc.has_area_code());
+    EXPECT_FALSE(loc.has_city());
+    EXPECT_FALSE(loc.has_country_code());
+    EXPECT_FALSE(loc.has_country_name());
+    EXPECT_FALSE(loc.has_horizontal_accuracy());
+    EXPECT_FALSE(loc.has_region_code());
+    EXPECT_FALSE(loc.has_region_name());
+    EXPECT_FALSE(loc.has_vertical_accuracy());
+    EXPECT_FALSE(loc.has_zip_postal_code());
+
     loc.set_altitude(20.0);
+    EXPECT_TRUE(loc.has_altitude());
     EXPECT_DOUBLE_EQ(20.0, loc.altitude());
 
     loc.set_area_code("area code");
+    EXPECT_TRUE(loc.has_area_code());
     EXPECT_EQ("area code", loc.area_code());
 
     loc.set_city("city");
+    EXPECT_TRUE(loc.has_city());
     EXPECT_EQ("city", loc.city());
 
     loc.set_country_code("country code");
+    EXPECT_TRUE(loc.has_country_code());
     EXPECT_EQ("country code", loc.country_code());
 
     loc.set_country_name("country name");
+    EXPECT_TRUE(loc.has_country_name());
     EXPECT_EQ("country name", loc.country_name());
 
     loc.set_horizontal_accuracy(25.0);
+    EXPECT_TRUE(loc.has_horizontal_accuracy());
     EXPECT_DOUBLE_EQ(25.0, loc.horizontal_accuracy());
 
     loc.set_latitude(5.0);
@@ -82,15 +111,19 @@ TEST_F(LocationTest, setters_getters)
     EXPECT_DOUBLE_EQ(6.0, loc.longitude());
 
     loc.set_region_code("region code");
+    EXPECT_TRUE(loc.has_region_code());
     EXPECT_EQ("region code", loc.region_code());
 
     loc.set_region_name("region name");
+    EXPECT_TRUE(loc.has_region_name());
     EXPECT_EQ("region name", loc.region_name());
 
     loc.set_vertical_accuracy(4.0);
+    EXPECT_TRUE(loc.has_vertical_accuracy());
     EXPECT_DOUBLE_EQ(4.0, loc.vertical_accuracy());
 
     loc.set_zip_postal_code("zip postal code");
+    EXPECT_TRUE(loc.has_zip_postal_code());
     EXPECT_EQ("zip postal code", loc.zip_postal_code());
 }
 

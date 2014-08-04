@@ -81,7 +81,7 @@ LocationImpl& LocationImpl::operator=(LocationImpl const& rhs)
 
 double LocationImpl::altitude() const
 {
-    if (altitude_)
+    if (has_altitude())
     {
         return *altitude_;
     }
@@ -90,7 +90,7 @@ double LocationImpl::altitude() const
 
 std::string LocationImpl::area_code() const
 {
-    if (area_code_)
+    if (has_area_code())
     {
         return *area_code_;
     }
@@ -99,7 +99,7 @@ std::string LocationImpl::area_code() const
 
 std::string LocationImpl::city() const
 {
-    if (city_)
+    if (has_city())
     {
         return *city_;
     }
@@ -108,7 +108,7 @@ std::string LocationImpl::city() const
 
 std::string LocationImpl::country_code() const
 {
-    if (country_code_)
+    if (has_country_code())
     {
         return *country_code_;
     }
@@ -117,7 +117,7 @@ std::string LocationImpl::country_code() const
 
 std::string LocationImpl::country_name() const
 {
-    if (country_name_)
+    if (has_country_name())
     {
         return *country_name_;
     }
@@ -126,7 +126,7 @@ std::string LocationImpl::country_name() const
 
 double LocationImpl::horizontal_accuracy() const
 {
-    if (horizontal_accuracy_)
+    if (has_horizontal_accuracy())
     {
         return *horizontal_accuracy_;
     }
@@ -153,7 +153,7 @@ double LocationImpl::longitude() const
 
 std::string LocationImpl::region_code() const
 {
-    if (region_code_)
+    if (has_region_code())
     {
         return *region_code_;
     }
@@ -162,7 +162,7 @@ std::string LocationImpl::region_code() const
 
 std::string LocationImpl::region_name() const
 {
-    if (region_name_)
+    if (has_region_name())
     {
         return *region_name_;
     }
@@ -171,7 +171,7 @@ std::string LocationImpl::region_name() const
 
 double LocationImpl::vertical_accuracy() const
 {
-    if (vertical_accuracy_)
+    if (has_vertical_accuracy())
     {
         return *vertical_accuracy_;
     }
@@ -180,11 +180,61 @@ double LocationImpl::vertical_accuracy() const
 
 std::string LocationImpl::zip_postal_code() const
 {
-    if (zip_postal_code_)
+    if (has_zip_postal_code())
     {
         return *zip_postal_code_;
     }
     throw NotFoundException("attribute not set", "zip_postal_code");
+}
+
+bool LocationImpl::has_altitude() const
+{
+    return altitude_;
+}
+
+bool LocationImpl::has_area_code() const
+{
+    return area_code_;
+}
+
+bool LocationImpl::has_city() const
+{
+    return city_;
+}
+
+bool LocationImpl::has_country_code() const
+{
+    return country_code_;
+}
+
+bool LocationImpl::has_country_name() const
+{
+    return country_name_;
+}
+
+bool LocationImpl::has_horizontal_accuracy() const
+{
+    return horizontal_accuracy_;
+}
+
+bool LocationImpl::has_region_code() const
+{
+    return region_code_;
+}
+
+bool LocationImpl::has_region_name() const
+{
+    return region_name_;
+}
+
+bool LocationImpl::has_vertical_accuracy() const
+{
+    return vertical_accuracy_;
+}
+
+bool LocationImpl::has_zip_postal_code() const
+{
+    return zip_postal_code_;
 }
 
 void LocationImpl::set_altitude(double altitude)

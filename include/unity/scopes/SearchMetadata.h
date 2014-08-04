@@ -102,6 +102,12 @@ public:
     Location location() const;
 
     /**
+    \brief Does the SearchMetadata have a location.
+    \return True if there is a location property.
+    */
+    bool has_location() const;
+
+    /**
     \brief Sets a hint.
 
     \param key The name of the hint.
