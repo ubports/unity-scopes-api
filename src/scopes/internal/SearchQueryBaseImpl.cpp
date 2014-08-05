@@ -161,11 +161,13 @@ void SearchQueryBaseImpl::cancel()
 
 void SearchQueryBaseImpl::set_department_id(std::string const& department_id)
 {
+    lock_guard<mutex> lock(mutex_);
     department_id_ = department_id;
 }
 
 std::string SearchQueryBaseImpl::department_id() const
 {
+    lock_guard<mutex> lock(mutex_);
     return department_id_;
 }
 

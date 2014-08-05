@@ -48,8 +48,8 @@ TEST(RangeInputFilter, state)
     EXPECT_FALSE(filter1->has_start_value(fstate));
     EXPECT_FALSE(filter1->has_end_value(fstate));
 
-    EXPECT_THROW(filter1->start_value(fstate), unity::LogicException);
-    EXPECT_THROW(filter1->end_value(fstate), unity::LogicException);
+    EXPECT_THROW(filter1->start_value(fstate), unity::scopes::NotFoundException);
+    EXPECT_THROW(filter1->end_value(fstate), unity::scopes::NotFoundException);
 
     filter1->update_state(fstate, Variant(5), Variant::null());
     EXPECT_TRUE(fstate.has_filter("f1"));

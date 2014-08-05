@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/ValueSliderFilterImpl.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -126,9 +127,7 @@ double ValueSliderFilterImpl::value(FilterState const& filter_state) const
             // via a canned query from another scope, we shouldn't break this scope on it.
         }
     }
-    std::stringstream err;
-    err << "ValueSliderFilterImpl::get_value(): value is not set for filter '" << id() << "'";
-    throw LogicException(err.str());
+    throw NotFoundException("ValueSliderFilterImpl::get_value(): value is not set for filter", id());
 }
 
 void ValueSliderFilterImpl::update_state(FilterState& filter_state, double value) const

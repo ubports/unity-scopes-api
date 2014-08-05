@@ -95,16 +95,16 @@ public:
     /**
      \brief Get start value for this filter instance.
 
-     \return start value
-     \throws unity::LogicException if start value is not set
+     \return The start value.
+     \throws unity::scopes::NotFoundException if start value is not set.
      */
     double start_value(FilterState const& filter_state) const;
 
     /**
      \brief Get end value for this filter instance.
 
-     \return end value
-     \throws unity::LogicException if end value is not set
+     \return The end value.
+     \throws unity::scopes::NotFoundException if end value is not set.
      */
     double end_value(FilterState const& filter_state) const;
 
