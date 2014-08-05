@@ -16,6 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
@@ -174,6 +175,33 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("B", subdepts[1]->label);
     EXPECT_EQ("scope://foo?q=&dep=b", subdepts[1]->canned_query);
     EXPECT_FALSE(subdepts[1]->has_subdepartments);
+
+    // check filters
+    auto filters = std::get<1>(search_results);
+    auto filter_state = std::get<2>(search_results);
+
+    EXPECT_FALSE(filters.empty());
+    EXPECT_EQ(filters.size(), 1);
+    auto filter1 = filters.front();
+    auto option_filter = std::dynamic_pointer_cast<const OptionSelectorFilter>(filter1);
+    EXPECT_TRUE(option_filter != nullptr);
+    EXPECT_EQ(option_filter->label(), "Label");
+    EXPECT_EQ(option_filter->id(), "sorting_primary_filter");
+    EXPECT_EQ(option_filter->display_hints(), FilterBase::DisplayHints::Primary);
+    EXPECT_EQ(option_filter->multi_select(), false);
+
+    auto options = option_filter->options();
+    EXPECT_EQ(options.size(), 3);
+    EXPECT_EQ(options.front()->id(), "titlerank");
+    EXPECT_EQ(options.front()->label(), "Title rank");
+    EXPECT_EQ(options.back()->id(), "salesrank");
+    EXPECT_EQ(options.back()->label(), "Bestselling");
+
+    EXPECT_TRUE(option_filter->has_active_option(filter_state));
+    auto active_options = option_filter->active_options(filter_state);
+    EXPECT_FALSE(active_options.empty());
+    auto active_option = *(active_options.begin());
+    EXPECT_EQ(active_option->id(), "salesrank");
 }
 
 TEST_F(SmartScopesClientTest, preview)
