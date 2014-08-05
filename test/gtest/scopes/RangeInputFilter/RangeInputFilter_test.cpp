@@ -20,6 +20,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -92,11 +93,11 @@ TEST(RangeInputFilter, deserialize_exceptions)
 {
     VariantMap var;
     var["id"] = "f1";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["start_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["end_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["unit_label"] = "";
     EXPECT_NO_THROW(internal::RangeInputFilterImpl::create(var));
 }
