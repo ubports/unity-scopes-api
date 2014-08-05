@@ -119,7 +119,7 @@ TEST_F(SmartScopesClientTest, search)
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     auto search_results = search_handle->get_search_results();
-    std::vector<SearchResult> results = search_results.second;
+    std::vector<SearchResult> results = std::get<3>(search_results);
     ASSERT_EQ(3u, results.size());
 
     EXPECT_EQ("URI", results[0].uri);
@@ -150,7 +150,7 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ(nullptr, results[2].category);
 
     // check departments
-    auto dept = search_results.first;
+    auto dept = std::get<0>(search_results);
     EXPECT_TRUE(dept != nullptr);
     EXPECT_EQ("All", dept->label);
     EXPECT_EQ("Foo", dept->alternate_label);
@@ -229,23 +229,23 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     auto search_results = search_handle1->get_search_results();
-    std::vector<SearchResult> results = search_results.second;
+    std::vector<SearchResult> results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 
     search_results = search_handle2->get_search_results();
-    results = search_results.second;
+    results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 
     search_results = search_handle3->get_search_results();
-    results = search_results.second;
+    results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 
     search_results = search_handle4->get_search_results();
-    results = search_results.second;
+    results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 
     search_results = search_handle5->get_search_results();
-    results = search_results.second;
+    results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 }
 
@@ -261,7 +261,7 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
     auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
     auto search_results = search_handle->get_search_results();
-    std::vector<SearchResult> results = search_results.second;
+    std::vector<SearchResult> results = std::get<3>(search_results);
     EXPECT_EQ(3u, results.size());
 }
 

@@ -102,11 +102,11 @@ public:
         SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;
 
-        if (results.first) // are there any departments?
+        if (std::get<0>(results)) // are there any departments?
         {
             try
             {
-                auto const& deptinfo = results.first;
+                auto const& deptinfo = std::get<0>(results);
                 Department::SCPtr root = create_department(deptinfo);
                 reply->register_departments(root);
             }
@@ -117,7 +117,22 @@ public:
             }
         }
 
-        for (auto& result : results.second)
+        auto const& filters = std::get<1>(results);
+        if (!filters.empty())
+        {
+            auto const& filter_state = std::get<2>(results);
+            try
+            {
+                reply->push(filters, filter_state);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id_ << "': "
+                    << e.what() << std::endl;
+            }
+        }
+
+        for (auto& result : std::get<3>(results))
         {
             if (!result.category)
             {

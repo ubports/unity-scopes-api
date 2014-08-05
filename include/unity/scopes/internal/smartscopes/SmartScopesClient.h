@@ -19,6 +19,8 @@
 #ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
 #define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
 
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
 #include <unity/scopes/internal/UniqueID.h>
@@ -30,6 +32,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <tuple>
 
 namespace unity
 {
@@ -85,7 +88,7 @@ struct DepartmentInfo
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
 };
 
-using SearchRequestResults = std::pair<std::shared_ptr<DepartmentInfo>, std::vector<SearchResult>>;
+using SearchRequestResults = std::tuple<std::shared_ptr<DepartmentInfo>, Filters, FilterState, std::vector<SearchResult>>;
 
 class SearchHandle
 {
@@ -174,6 +177,8 @@ private:
     SearchRequestResults get_search_results(unsigned int search_id);
     std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
+    Filters parse_filters(JsonNodeInterface::SPtr node);
+    FilterState parse_filter_state(JsonNodeInterface::SPtr node, Filters const& filters);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
