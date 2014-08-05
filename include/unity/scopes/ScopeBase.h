@@ -70,6 +70,13 @@ class RuntimeImpl;
 
 }
 
+namespace testing
+{
+
+struct TypedScopeFixtureHelper;
+
+}
+
 /**
 \file ScopeBase.h
 \class ScopeBase
@@ -316,6 +323,7 @@ private:
 
     friend class internal::RuntimeImpl;
     friend class internal::ScopeObject;
+    friend struct testing::TypedScopeFixtureHelper;
     /// @endcond
 };
 

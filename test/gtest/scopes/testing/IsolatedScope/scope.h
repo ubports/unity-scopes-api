@@ -17,16 +17,16 @@
  *              Thomas Voß <thomas.voss@canonical.com>
  */
 
-#include <unity/scopes/AbstractScopeBase.h>
+#include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/testing/MockRegistry.h>
 
 namespace testing
 {
 
-class Scope : public unity::scopes::AbstractScopeBase
+class Scope : public unity::scopes::ScopeBase
 {
 public:
-    Scope(unity::scopes::RegistryProxy const&);
+    Scope();
     virtual ~Scope();
 
     void start(std::string const&) override;
@@ -52,18 +52,6 @@ public:
     unity::scopes::PreviewQueryBase::UPtr preview(
             unity::scopes::Result const&,
             unity::scopes::ActionMetadata const &) override;
-
-    std::string scope_directory() const override;
-
-    std::string cache_directory() const override;
-
-    std::string tmp_directory() const override;
-
-    unity::scopes::RegistryProxy registry() const override;
-
-    unity::scopes::VariantMap settings() const override;
-
-    unity::scopes::RegistryProxy registry_;
 };
 
 } // namespace testing
