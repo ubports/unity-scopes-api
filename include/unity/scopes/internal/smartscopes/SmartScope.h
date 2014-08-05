@@ -97,7 +97,7 @@ public:
         }
 
         ///! TODO: session_id, query_id, country (+location data)
-        search_handle_ = ss_client_->search(base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), hints_.locale(), "", hints_.cardinality());
+        search_handle_ = ss_client_->search(base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
 
         SearchRequestResults results = search_handle_->get_search_results();
         std::map<std::string, Category::SCPtr> categories;

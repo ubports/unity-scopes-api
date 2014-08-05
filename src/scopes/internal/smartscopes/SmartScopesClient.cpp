@@ -327,6 +327,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              uint query_id,
                                              std::string const& platform,
                                              VariantMap const& settings,
+                                             VariantMap const& filter_state,
                                              std::string const& locale,
                                              std::string const& country,
                                              uint limit)
@@ -365,6 +366,10 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     if (limit != 0)
     {
         search_uri << "&limit=" << std::to_string(limit);
+    }
+    if (!filter_state.empty())
+    {
+        search_uri << "&filters=" << http_client_->to_percent_encoding(Variant(filter_state).serialize_json());
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);

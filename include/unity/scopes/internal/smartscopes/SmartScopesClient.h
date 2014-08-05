@@ -157,6 +157,7 @@ public:
                               unsigned int query_id,
                               std::string const& platform,
                               VariantMap const& settings = VariantMap(),
+                              VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
                               const unsigned int limit = 0);
