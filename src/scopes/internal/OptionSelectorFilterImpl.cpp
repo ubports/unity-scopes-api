@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/FilterState.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unordered_set>
 #include <sstream>
@@ -83,7 +84,7 @@ void OptionSelectorFilterImpl::throw_on_missing(VariantMap::const_iterator const
 {
     if (it == endit)
     {
-        throw LogicException("OptionSelectorFilter: missing " + name);
+        throw NotFoundException("OptionSelectorFilter: missing ", name);
     }
 }
 

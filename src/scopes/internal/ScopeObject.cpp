@@ -80,14 +80,17 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         query_base = query_factory_fun();
         if (!query_base)
         {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()");
+            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()";
+            cerr << msg << endl;
+            throw ResourceException(msg);
         }
         query_base->p->set_settings_db(scope_base_->p->settings_db());
     }
     catch (...)
     {
-        throw ResourceException("Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()");
+        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()";
+        cerr << msg << endl;
+        throw ResourceException(msg);
     }
 
     MWQueryCtrlProxy ctrl_proxy;

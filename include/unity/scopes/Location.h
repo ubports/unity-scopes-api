@@ -74,6 +74,7 @@ public:
     /**
     \brief Get the altitude.
     \return The altitude.
+    \throws unity::scopes::NotFoundException if altitude is not set.
     */
     double altitude() const;            // optional
 
@@ -86,6 +87,7 @@ public:
     /**
     \brief Get the area code.
     \return The area code.
+    \throws unity::scopes::NotFoundException if area code is not set.
     */
     std::string area_code() const;            // optional
 
@@ -98,6 +100,7 @@ public:
     /**
     \brief Get the city name.
     \return The city name.
+    \throws unity::scopes::NotFoundException if city is not set.
     */
     std::string city() const;            // optional
 
@@ -110,6 +113,7 @@ public:
     /**
     \brief Get the country code.
     \return The country code.
+    \throws unity::scopes::NotFoundException if country code is not set.
     */
     std::string country_code() const;            // optional
 
@@ -122,6 +126,7 @@ public:
     /**
     \brief Get the country name.
     \return The country name.
+    \throws unity::scopes::NotFoundException if country name is not set.
     */
     std::string country_name() const;            // optional
 
@@ -134,6 +139,7 @@ public:
     /**
     \brief Get the horizontal accuracy.
     \return The horizontal accuracy.
+    \throws unity::scopes::NotFoundException if horizontal accuracy is not set.
     */
     double horizontal_accuracy() const;            // optional
 
@@ -164,6 +170,7 @@ public:
     /**
     \brief Get the region code.
     \return The region code.
+    \throws unity::scopes::NotFoundException if region code is not set.
     */
     std::string region_code() const;            // optional
 
@@ -176,6 +183,7 @@ public:
     /**
     \brief Get the region name.
     \return The region name.
+    \throws unity::scopes::NotFoundException if region name is not set.
     */
     std::string region_name() const;            // optional
 
@@ -188,6 +196,7 @@ public:
     /**
     \brief Get the vertical accuracy.
     \return The vertical accuracy.
+    \throws unity::scopes::NotFoundException if vertical accuracy is not set.
     */
     double vertical_accuracy() const;            // optional
 
@@ -200,6 +209,7 @@ public:
     /**
     \brief Get the zip or postal code.
     \return The zip or postal code.
+    \throws unity::scopes::NotFoundException if postal code is not set.
     */
     std::string zip_postal_code() const;            // optional
 

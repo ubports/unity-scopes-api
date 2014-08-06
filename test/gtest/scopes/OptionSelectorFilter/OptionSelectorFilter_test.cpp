@@ -20,6 +20,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -144,7 +145,7 @@ TEST(OptionSelectorFilter, deserialize)
             internal::OptionSelectorFilterImpl filter(var);
             FAIL();
         }
-        catch (unity::InvalidArgumentException const&) {}
+        catch (unity::scopes::NotFoundException const&) {}
     }
 
     {
@@ -155,7 +156,7 @@ TEST(OptionSelectorFilter, deserialize)
         {
             internal::OptionSelectorFilterImpl filter(var);
         }
-        catch (unity::LogicException const&) {}
+        catch (unity::scopes::NotFoundException const&) {}
     }
     {
         var["id"] = "f1";
