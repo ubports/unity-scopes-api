@@ -127,7 +127,7 @@ include_directories(
 set(cxx_version_required 4.9)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (NOT CMAKE_CXX_COMPILER_VERSION MATCHES "^${cxx_version_required}")
-        message(FATAL_ERROR "g++ version must be ${cxx_version_required}!")
+        message(FATAL_ERROR "g++ version must be ${cxx_version_required}, found ${CMAKE_CXX_COMPILER_VERSION}!")
     endif()
 endif()
 

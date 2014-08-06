@@ -75,7 +75,7 @@ public:
                 }
                 port_str[bytes_read] = '\0';
 
-                port_ = std::atoi(port_str);
+                port_ = std::stoi(port_str);
         }
     }
 

@@ -46,7 +46,6 @@ public:
     virtual ~ReplyImpl();
 
     virtual void finished() override;
-    void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
     virtual void info(OperationInfo const& op_info) override;
 

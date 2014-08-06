@@ -22,6 +22,8 @@
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 #include <unity/scopes/SearchMetadata.h>
 
+#include <boost/optional.hpp>
+
 namespace unity
 {
 
@@ -49,6 +51,10 @@ public:
     void set_cardinality(int cardinality);
     int cardinality() const;
 
+    void set_location(Location const& location);
+    Location location() const;
+    bool has_location() const;
+
     bool contains_hint(std::string const& key) const;
     void set_hint(std::string const& key, Variant const& value);
     VariantMap hints() const;
@@ -68,6 +74,7 @@ protected:
 private:
     int cardinality_;
     VariantMap hints_;
+    boost::optional<Location> location_;
 };
 
 } // namespace internal

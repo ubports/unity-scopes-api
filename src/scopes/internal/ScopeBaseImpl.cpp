@@ -82,6 +82,27 @@ std::string ScopeBaseImpl::cache_directory() const
     return cache_directory_;
 }
 
+void ScopeBaseImpl::set_tmp_directory(std::string const& path)
+{
+    lock_guard<mutex> lock(mutex_);
+    tmp_directory_ = path;
+    tmp_dir_initialized_ = true;
+}
+
+std::string ScopeBaseImpl::tmp_directory() const
+{
+    lock_guard<mutex> lock(mutex_);
+    if (!tmp_dir_initialized_)
+    {
+        throw LogicException("ScopeBase::tmp_directory() cannot be called from constructor");
+    }
+    if (tmp_directory_.empty())
+    {
+        throw ConfigException("ScopeBase::tmp_directory(): no tmp directory available");
+    }
+    return tmp_directory_;
+}
+
 void ScopeBaseImpl::set_registry(RegistryProxy const& registry)
 {
     lock_guard<mutex> lock(mutex_);

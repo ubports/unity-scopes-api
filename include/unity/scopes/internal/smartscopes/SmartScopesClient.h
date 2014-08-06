@@ -100,10 +100,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(uint search_id, std::shared_ptr<SmartScopesClient> ssc);
+    SearchHandle(unsigned int search_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    uint search_id_;
+    unsigned int search_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -123,10 +123,10 @@ public:
 
 private:
     friend class SmartScopesClient;
-    PreviewHandle(uint preview_id, std::shared_ptr<SmartScopesClient> ssc);
+    PreviewHandle(unsigned int preview_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    uint preview_id_;
+    unsigned int preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -151,18 +151,18 @@ public:
                               std::string const& query,
                               std::string const& department_id,
                               std::string const& session_id,
-                              uint query_id,
+                              unsigned int query_id,
                               std::string const& platform,
                               VariantMap const& settings = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
-                              const uint limit = 0);
+                              const unsigned int limit = 0);
 
     PreviewHandle::UPtr preview(std::string const& base_url,
                                 std::string const& result,
                                 std::string const& session_id,
                                 std::string const& platform,
-                                const uint widgets_api_version,
+                                const unsigned int widgets_api_version,
                                 VariantMap const& settings = VariantMap(),
                                 std::string const& locale = "",
                                 std::string const& country = "");
@@ -171,13 +171,13 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    SearchRequestResults get_search_results(uint search_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
+    SearchRequestResults get_search_results(unsigned int search_id);
+    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_query(uint query_id);
+    void cancel_query(unsigned int query_id);
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
@@ -190,7 +190,7 @@ private:
 
     std::string url_;
 
-    std::map<uint, HttpResponseHandle::SPtr> query_results_;
+    std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;
 
     std::mutex json_node_mutex_;
     std::mutex query_results_mutex_;
@@ -198,7 +198,7 @@ private:
     std::string cached_scopes_;
     bool have_latest_cache_;
 
-    uint query_counter_;
+    unsigned int query_counter_;
 };
 
 }  // namespace smartscopes

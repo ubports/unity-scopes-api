@@ -56,7 +56,7 @@ public:
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept override;
-    void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
+    void finished(CompletionDetails const& details) noexcept override;
     void info(OperationInfo const& op_info) noexcept override;
 
 private:
@@ -68,6 +68,7 @@ private:
     std::string origin_proxy_;
     int num_push_;
     std::atomic_bool info_occurred_;
+    std::vector<OperationInfo> info_list_;
 };
 
 } // namespace internal

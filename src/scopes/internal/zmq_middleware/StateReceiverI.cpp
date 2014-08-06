@@ -46,7 +46,7 @@ interface StateReceiver
 using namespace std::placeholders;
 
 StateReceiverI::StateReceiverI(StateReceiverObject::SPtr const& sro) :
-    ServantBase(sro, { { "push_state", bind(&StateReceiverI::push_state_, this, _1, _2, _3) } })
+    ServantBase(sro, { { "push_state", std::bind(&StateReceiverI::push_state_, this, _1, _2, _3) } })
 {
 }
 

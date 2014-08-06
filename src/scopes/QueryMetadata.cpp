@@ -19,6 +19,8 @@
 #include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 
+#include <stdlib.h>
+
 namespace unity
 {
 
@@ -32,9 +34,17 @@ QueryMetadata::QueryMetadata(internal::QueryMetadataImpl* impl)
 {
 }
 
-QueryMetadata::QueryMetadata(QueryMetadata const& other) = delete;
+QueryMetadata::QueryMetadata(QueryMetadata const&)
+{
+    abort();
+}
+
+QueryMetadata& QueryMetadata::operator=(QueryMetadata const&)
+{
+    abort();
+}
+
 QueryMetadata::QueryMetadata(QueryMetadata&&) = default;
-QueryMetadata& QueryMetadata::operator=(QueryMetadata const& other) = delete;
 QueryMetadata& QueryMetadata::operator=(QueryMetadata&&) = default;
 
 QueryMetadata::~QueryMetadata()

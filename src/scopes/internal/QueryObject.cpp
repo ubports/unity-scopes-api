@@ -122,14 +122,14 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
         // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }
@@ -150,8 +150,8 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
         {
             // Send finished() to up-stream client to tell him the query is done.
             // We send via the MWReplyProxy here because that allows passing
-            // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-            reply_->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
+            // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
+            reply_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
         }
     }  // Release lock
 

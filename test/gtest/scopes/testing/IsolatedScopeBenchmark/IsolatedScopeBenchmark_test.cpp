@@ -55,7 +55,7 @@ struct ScopeTraits<::testing::Scope>
         return "BenchmarkingScope";
     }
 
-    inline static std::shared_ptr<::testing::Scope> construct(unity::scopes::RegistryProxy const&)
+    inline static std::shared_ptr<::testing::Scope> construct()
     {
         return std::make_shared<::testing::Scope>(mean, variance);
     }

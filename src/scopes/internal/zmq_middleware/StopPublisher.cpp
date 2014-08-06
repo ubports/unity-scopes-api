@@ -41,6 +41,7 @@ StopPublisher::StopPublisher(zmqpp::context* context, string const& inproc_name)
     : context_(context)
     , endpoint_("inproc://" + inproc_name)
     , state_(Starting)
+    , stop_sent_(false)
 {
     assert(context);
     assert(!inproc_name.empty());
@@ -85,6 +86,13 @@ StopPublisher::~StopPublisher()
         // TODO: log this
     }
     // LCOV_EXCL_STOP
+
+    {
+        // The destructor may not be called from the same thread as
+        // the constructor, so we need a full fence here.
+        lock_guard<mutex> lock(m_);
+    }
+
     if (thread_.joinable())
     {
         thread_.join();
@@ -141,10 +149,13 @@ zmqpp::socket StopPublisher::subscribe()
 }
 
 // Tell the stopper thread to publish the stop message and terminate itself.
+// The stopper thread sends a stop message only once; subsequent calls
+// to stop() are no-ops.
 
 void StopPublisher::stop()
 {
     unique_lock<mutex> lock(m_);
+
     switch (state_)
     {
         case Stopping:
@@ -201,8 +212,12 @@ void StopPublisher::stopper_thread() noexcept
 
         // Write the stop message for the subscribers and close.
         // Sending an empty string is OK; the receiver will get a zero-length message.
-        pub_socket.send("");
-        pub_socket.close();
+        if (!stop_sent_)
+        {
+            stop_sent_ = true;
+            pub_socket.send("");
+            pub_socket.close();
+        }
         state_ = Stopped;
     }
     catch (...)

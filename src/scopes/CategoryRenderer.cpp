@@ -68,7 +68,7 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \subsection components1 components keys
 
 \arg \c title String specifying card's title
-\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0) and \c "fill-mode" (\c "crop" (default), or \c "fit")
+\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0)
 \arg \c subtitle String specifying subtitle of a card
 \arg \c mascot URI specifying card's mascot (secondary graphics)
 \arg \c emblem URI specifying card's emblem

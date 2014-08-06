@@ -26,7 +26,7 @@
 
     #include <QThread>
 
-    #define qHash(x,y) qHash(const QUrl &url, uint seed)
+    #define qHash(x,y) qHash(const QUrl &url, unsigned int seed)
     #include <QUrl>
     #undef qHash
 
@@ -62,7 +62,7 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread
 public:
     NONCOPYABLE(HttpClientQtThread);
 
-    HttpClientQtThread(const QUrl& url, uint timeout);
+    HttpClientQtThread(const QUrl& url, unsigned int timeout);
     ~HttpClientQtThread();
 
     bool get_reply(std::string& reply);
@@ -80,7 +80,7 @@ Q_SIGNALS:
 
 private:
     QUrl url_;
-    uint timeout_;
+    unsigned int timeout_;
     std::mutex reply_mutex_;
 
     bool success_;

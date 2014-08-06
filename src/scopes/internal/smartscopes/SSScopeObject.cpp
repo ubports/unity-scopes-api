@@ -166,7 +166,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     {
         try
         {
-            reply->finished(ListenerBase::Error, e.what());
+            reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         }
         catch (...)
         {
@@ -179,7 +179,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     {
         try
         {
-            reply->finished(ListenerBase::Error, "unknown exception");
+            reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         }
         catch (...)
         {

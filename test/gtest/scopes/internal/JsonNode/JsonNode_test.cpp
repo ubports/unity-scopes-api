@@ -52,8 +52,8 @@ TEST_F(JsonNodeTest, flat_values)
                           })";
 
     std::string value_str;
-    int value_int;
-    bool value_bool;
+    int value_int = 99;
+    bool value_bool = false;
 
     // parse json
 

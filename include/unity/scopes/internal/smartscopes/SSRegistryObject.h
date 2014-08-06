@@ -25,6 +25,7 @@
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/internal/smartscopes/SSConfig.h>
 
+#include <condition_variable>
 #include <mutex>
 
 namespace unity
@@ -90,9 +91,9 @@ private:
 
     MiddlewareBase::SPtr middleware_;
     std::string ss_scope_endpoint_;
-    uint const regular_refresh_timeout_;
-    uint next_refresh_timeout_;
-    uint const failed_refresh_timeout_;
+    unsigned int const regular_refresh_timeout_;
+    unsigned int next_refresh_timeout_;
+    unsigned int const failed_refresh_timeout_;
 
     bool caching_enabled_;
     std::string locale_;

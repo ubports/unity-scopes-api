@@ -125,7 +125,7 @@ To re-format all source and header files in the tree:
     $ make formatcode
 
 Thread and address sanitizer
-----------------
+----------------------------
 
 Set SANITIZER to "thread" or "address" to build with the
 corresponding sanitizer enabled.
@@ -224,8 +224,8 @@ are about to release a new Ubuntu version or there are major
 feature changes in the scopes run time or API, incrementing
 UNITY_SCOPES_MINOR is sufficient.
 
-The .so version for the library is <major><minor>. For example,
-version 0.6.3 has the name libunity-scopes.so.06.
+The .so version for the library is <major>.<minor>. For example,
+version 0.6.3 has the name libunity-scopes.so.0.6.
 This is defined in CMakeLists.txt as UNITY_SCOPES_SOVERSION.
 
 When incrementing the minor or major version number, follow these steps:
@@ -239,7 +239,7 @@ When incrementing the minor or major version number, follow these steps:
 3) Modify debian/control/unity-scopes-api and modify the
    Package name for the new version. For example, when
    changing from version 0.6.3 to 1.0.0, set the Package
-   to "libunity-scopes10".
+   to "libunity-scopes1.0".
 
    Add the previous version (such as libunity-scopes06) to
    the "Replaces" and "Conflicts" sections.

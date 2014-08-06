@@ -67,6 +67,7 @@ private:
 
     enum State { Starting, Started, Stopping, Stopped, Failed };
     State state_;
+    bool stop_sent_;
 
     mutable std::mutex m_;
     std::condition_variable cond_;

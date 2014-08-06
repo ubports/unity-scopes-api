@@ -51,7 +51,7 @@ public:
 
     std::string as_string() const override;
     int as_int() const override;
-    uint as_uint() const override;
+    unsigned int as_uint() const override;
     double as_double() const override;
     bool as_bool() const override;
 
@@ -59,7 +59,7 @@ public:
 
     JsonNodeInterface::SPtr get_node() const override;
     JsonNodeInterface::SPtr get_node(std::string const& node_name) const override;
-    JsonNodeInterface::SPtr get_node(uint node_index) const override;
+    JsonNodeInterface::SPtr get_node(unsigned int node_index) const override;
 
 private:
     static Json::Value from_variant(Variant const& var);

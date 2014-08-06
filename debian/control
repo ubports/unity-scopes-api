@@ -26,7 +26,7 @@ Build-Depends: g++-4.9,
                libjsoncpp-dev,
                libu1db-dev,
                python-u1db,
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
@@ -36,7 +36,7 @@ Homepage: https://launchpad.net/unity-scopes-api
 Vcs-Bzr: lp:unity-scopes-api
 Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 
-Package: libunity-scopes06
+Package: libunity-scopes0.6
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
@@ -56,7 +56,7 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes06 (= ${binary:Version}),
+Depends: libunity-scopes0.6 (= ${binary:Version}),
          libproperties-cpp-dev,
          libunity-api-dev,
          ${misc:Depends},
@@ -68,7 +68,7 @@ Section: devel
 Architecture: any
 Multi-Arch: foreign
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes06 (= ${binary:Version}),
+Depends: libunity-scopes0.6 (= ${binary:Version}),
          ${shlibs:Depends},
          ${misc:Depends},
 Description: Client utility for Unity scopes API

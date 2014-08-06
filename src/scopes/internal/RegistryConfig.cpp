@@ -22,6 +22,8 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <stdlib.h>
+
 using namespace std;
 
 namespace unity
