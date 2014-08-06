@@ -16,7 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/OptionSelectorFilter.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/scopes/ScopeExceptions.h>
@@ -539,7 +540,7 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
             }
             else if (root_node->has_node("filter_state"))
             {
-                filter_state = parse_filter_state(root_node->get_node("filter_state"), filters);
+                filter_state = parse_filter_state(root_node->get_node("filter_state"));
             }
         }
 
@@ -608,119 +609,22 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
 
 Filters SmartScopesClient::parse_filters(JsonNodeInterface::SPtr node)
 {
-    Filters result;
-
     if (node->type() != JsonNodeInterface::NodeType::Array)
     {
         throw LogicException("SmartScopesClient::parse_filters(): 'filters' attribute must be an array");
     }
 
-    for (int i = 0; i < node->size(); i++)
-    {
-        auto const& filter_node = node->get_node(i);
-        if (filter_node->type() != JsonNodeInterface::NodeType::Object || !filter_node->has_node("filter_type") || !filter_node->has_node("id"))
-        {
-            continue;
-        }
-        std::string filter_type = filter_node->get_node("filter_type")->as_string();
-        if (filter_type == "option_selector")
-        {
-            std::string filter_id = filter_node->get_node("id")->as_string();
-            std::string label;
-            if (filter_node->has_node("label"))
-            {
-                label = filter_node->get_node("label")->as_string();
-            }
-            bool multi_select = false;
-            if (filter_node->has_node("multi_select"))
-            {
-                multi_select = filter_node->get_node("multi_select")->as_bool();
-            }
-            FilterBase::DisplayHints hints = FilterBase::DisplayHints::Default;
-            if (filter_node->has_node("display_hints"))
-            {
-                std::string hints_str = filter_node->get_node("display_hints")->as_string();
-                if (hints_str == "primary")
-                {
-                    hints = FilterBase::DisplayHints::Primary;
-                }
-            }
-            if (!filter_node->has_node("options"))
-            {
-                continue;
-            }
-
-            JsonNodeInterface::SPtr options_node = filter_node->get_node("options");
-            if (options_node->type() != JsonNodeInterface::NodeType::Array || options_node->size() == 0)
-            {
-                continue;
-            }
-
-            auto filter = OptionSelectorFilter::create(filter_id, label, multi_select);
-            filter->set_display_hints(hints);
-
-            for (int j = 0; j < options_node->size(); j++)
-            {
-                auto option_node = options_node->get_node(j);
-                if (!option_node->has_node("id") || !option_node->has_node("label"))
-                {
-                    continue;
-                }
-                filter->add_option(option_node->get_node("id")->as_string(),
-                                   option_node->get_node("label")->as_string());
-            }
-
-            if (filter->options().empty())
-            {
-                // ignore a filter that has no options
-                continue;
-            }
-
-            result.push_back(std::move(filter));
-        }
-    }
-
-    return result;
+    return FilterBaseImpl::deserialize_filters(node->to_variant().get_array());
 }
 
-FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node, Filters const& known_filters)
+FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
 {
     if (node->type() != JsonNodeInterface::NodeType::Object)
     {
         throw LogicException("SmartScopesClient::parse_filter_state(): 'filter_state' attribute must be an object");
     }
 
-    std::set<std::string> known_ids;
-    for (auto it = known_filters.begin(); it != known_filters.end(); ++it)
-    {
-        known_ids.insert((*it)->id());
-    }
-
-    FilterState filter_state;
-
-    for (auto const& filter_id : node->member_names())
-    {
-        auto it = known_ids.find(filter_id);
-        if (it == known_ids.end())
-        {
-            // skip filters we know nothing about
-            continue;
-        }
-        auto state_node = node->get_node(filter_id);
-
-        // we only do OptionSelectorFilter for now, so this must be an array of active options
-        if (state_node->type() != JsonNodeInterface::NodeType::Array)
-        {
-            continue;
-        }
-        for (int i = 0; i < state_node->size(); i++)
-        {
-            auto option_node = state_node->get_node(i);
-            OptionSelectorFilter::update_state(filter_state, filter_id, option_node->as_string(), true);
-        }
-    }
-
-    return filter_state;
+    return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)

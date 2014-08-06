@@ -49,13 +49,25 @@ FilterBaseImpl::FilterBaseImpl(std::string const& id)
 }
 
 FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
+    : display_hints_(FilterBase::DisplayHints::Default)
 {
     auto it = find_or_throw("FilterBase()", var, "id");
     id_ = it->second.get_string();
     it = var.find("display_hints");
     if (it != var.end())
     {
-        set_display_hints(static_cast<FilterBase::DisplayHints>(it->second.get_int()));
+        switch (it->second.which())
+        {
+            case Variant::Type::Int:
+                set_display_hints(static_cast<FilterBase::DisplayHints>(it->second.get_int()));
+                break;
+            case Variant::Type::String:
+                set_display_hints(it->second.get_string() == "primary" ?
+                    FilterBase::DisplayHints::Primary : FilterBase::DisplayHints::Default);
+                break;
+            default:
+                break;
+        }
     }
 }
 

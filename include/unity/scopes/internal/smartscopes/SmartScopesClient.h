@@ -179,7 +179,7 @@ private:
     std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
-    FilterState parse_filter_state(JsonNodeInterface::SPtr node, Filters const& filters);
+    FilterState parse_filter_state(JsonNodeInterface::SPtr node);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
