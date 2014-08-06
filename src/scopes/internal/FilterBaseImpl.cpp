@@ -61,6 +61,7 @@ FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
             case Variant::Type::Int:
                 set_display_hints(static_cast<FilterBase::DisplayHints>(it->second.get_int()));
                 break;
+            // when receiving filter state from the server, strings are used
             case Variant::Type::String:
                 set_display_hints(it->second.get_string() == "primary" ?
                     FilterBase::DisplayHints::Primary : FilterBase::DisplayHints::Default);
