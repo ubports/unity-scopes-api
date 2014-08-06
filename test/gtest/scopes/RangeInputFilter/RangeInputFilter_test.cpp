@@ -20,6 +20,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -47,8 +48,8 @@ TEST(RangeInputFilter, state)
     EXPECT_FALSE(filter1->has_start_value(fstate));
     EXPECT_FALSE(filter1->has_end_value(fstate));
 
-    EXPECT_THROW(filter1->start_value(fstate), unity::LogicException);
-    EXPECT_THROW(filter1->end_value(fstate), unity::LogicException);
+    EXPECT_THROW(filter1->start_value(fstate), unity::scopes::NotFoundException);
+    EXPECT_THROW(filter1->end_value(fstate), unity::scopes::NotFoundException);
 
     filter1->update_state(fstate, Variant(5), Variant::null());
     EXPECT_TRUE(fstate.has_filter("f1"));
@@ -92,11 +93,11 @@ TEST(RangeInputFilter, deserialize_exceptions)
 {
     VariantMap var;
     var["id"] = "f1";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["start_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["end_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::InvalidArgumentException);
+    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
     var["unit_label"] = "";
     EXPECT_NO_THROW(internal::RangeInputFilterImpl::create(var));
 }

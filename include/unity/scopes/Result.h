@@ -146,8 +146,8 @@ public:
     /**
     \brief Get the proxy of a scope that handles activation and preview of this result.
 
-    The proxy is only available when receiving this result from a scope, otherwise
-    this method throws LogicException. Activation requests should only be sent to a scope
+    The proxy is available only when receiving this result from a scope, otherwise
+    this method throws LogicException. Activation requests should be sent to a scope
     returned by this method only if direct_activation() is false.
     \return The scope proxy.
     */

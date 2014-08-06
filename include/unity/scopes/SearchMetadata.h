@@ -98,6 +98,7 @@ public:
     /**
     \brief Get location.
     \return Location data representing the current location, including attributes such as city and country.
+    \throws unity::NotFoundException if no location data is available.
     */
     Location location() const;
 
@@ -119,6 +120,7 @@ public:
     \brief Get all hints.
 
     \return Hints dictionary.
+    \throws unity::NotFoundException if no hints are available.
     */
     VariantMap hints() const;
 
@@ -147,7 +149,7 @@ public:
     Referencing a non-existing hint throws unity::InvalidArgumentException.
     \param key The name of the hint.
     \return A const reference to the hint.
-    \throws unity::LogicException if no hint with the given name exists.
+    \throws unity::NotFoundException if no hint with the given name exists.
     */
     Variant const& operator[](std::string const& key) const;
 
