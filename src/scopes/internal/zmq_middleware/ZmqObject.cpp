@@ -281,7 +281,16 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
 
     zmqpp::poller p;
     p.add(s);
-    p.poll(timeout);
+
+    if (timeout == -1)
+    {
+        p.poll();
+    }
+    else
+    {
+        p.poll(timeout);
+    }
+
     if (!p.has_input(s))
     {
         // If a request times out, we must trash the corresponding socket, otherwise
