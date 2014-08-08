@@ -114,20 +114,17 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
     policy_(p),
     finish_(false)
 {
-    if (reap_interval != -1 && expiry_interval != -1)
+    if (reap_interval != -1 && reap_interval < 1)
     {
-        if (reap_interval < 1)
-        {
-            ostringstream s;
-            s << "Reaper: invalid reap_interval (" << reap_interval << "). Interval must be > 0.";
-            throw unity::InvalidArgumentException(s.str());
-        }
-        if (reap_interval > expiry_interval)
-        {
-            ostringstream s;
-            s << "Reaper: reap_interval (" << reap_interval << ") must be <= expiry_interval (" << expiry_interval << ").";
-            throw unity::LogicException(s.str());
-        }
+        ostringstream s;
+        s << "Reaper: invalid reap_interval (" << reap_interval << "). Interval must be > 0.";
+        throw unity::InvalidArgumentException(s.str());
+    }
+    if (expiry_interval != -1 && reap_interval > expiry_interval)
+    {
+        ostringstream s;
+        s << "Reaper: reap_interval (" << reap_interval << ") must be <= expiry_interval (" << expiry_interval << ").";
+        throw unity::LogicException(s.str());
     }
 }
 
