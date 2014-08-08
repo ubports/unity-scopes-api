@@ -330,12 +330,12 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
+    , manually_started_(false)
 {
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
-    : exec_data_(other.exec_data_)
-    , reg_publisher_(other.reg_publisher_)
+    : ScopeProcess(other.exec_data_, other.reg_publisher_)
 {
 }
 
@@ -443,8 +443,8 @@ void RegistryObject::ScopeProcess::exec(
         env["LD_LIBRARY_PATH"] = scope_ld_lib_path;  // Overwrite any LD_LIBRARY_PATH entry that may already be there.
 
         process_ = executor->exec(program, argv, env,
-                                     core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
-                                     exec_data_.confinement_profile);
+                                  core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
+                                  exec_data_.confinement_profile);
         if (process_.pid() <= 0)
         {
             clear_handle_unlocked();
@@ -525,8 +525,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
             cout << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
                  << "\" started manually" << endl;
 
-            // Don't update state_, treat this scope as not running if a locate() is requested
-            return;
+            manually_started_ = true;
         }
     }
     else if (new_state == Stopped)
@@ -543,7 +542,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
                  << "\" closed unexpectedly. Either the process crashed or was killed forcefully." << endl;
         }
     }
-    else if (new_state == Stopping && state_ != Running)
+    else if (new_state == Stopping && manually_started_)
     {
         if (reg_publisher_)
         {
@@ -554,8 +553,8 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" exited" << endl;
 
-        // Don't update state_, treat this scope as not running if a locate() is requested
-        return;
+        new_state = Stopped;
+        manually_started_ = false;
     }
     state_ = new_state;
     state_change_cond_.notify_all();
