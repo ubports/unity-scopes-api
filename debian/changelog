@@ -1,3 +1,11 @@
+unity-scopes-api (0.6.1-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Clear any signal masks inherited from the parent process when forking.
+  * Allow timeout value of -1 to disable the scope idle timeout, reaper timeouts, and two-way invocation timeout.
+
+ -- Pete Woods <pete.woods@canonical.com>  Fri, 08 Aug 2014 23:37:40 +0100
+
 unity-scopes-api (0.6.0+14.10.20140806-0ubuntu1) utopic; urgency=low
 
   [ Michal Hruby ]
