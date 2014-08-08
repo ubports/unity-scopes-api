@@ -328,7 +328,7 @@ The following keys are recognized in the ScopeConfig group:
   - %R - absolute path to the runtime .ini config file
   - %S - absolute path to the scope's .ini config file
 
-  E.g. "ScopeRunner = /usr/bin/gdbserver :1234 ~/MyScope/MyScope %R %S"
+  E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"
   
   If not set, the default scoperunner is used.
 
