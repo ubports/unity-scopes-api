@@ -35,6 +35,11 @@ core::posix::ChildProcess Executor::exec(const std::string& fn,
 {
     std::function<void()> child_setup = [confinement_profile]()
     {
+        // Clear any signal masks inherited from the parent process
+        ::sigset_t empty_mask;
+        ::sigemptyset(&empty_mask);
+        ::pthread_sigmask(SIG_SETMASK, &empty_mask, nullptr);
+
         if (!confinement_profile.empty())
         {
             if (aa_change_profile(confinement_profile.c_str()) < 0)
@@ -53,11 +58,6 @@ core::posix::ChildProcess Executor::exec(const std::string& fn,
                 }
             }
         }
-
-        // Clear any signal masks inherited from the parent process
-        ::sigset_t empty_mask;
-        ::sigemptyset(&empty_mask);
-        ::pthread_sigmask(SIG_SETMASK, &empty_mask, nullptr);
     };
     return core::posix::exec(fn, argv, env, flags, child_setup);
 }
