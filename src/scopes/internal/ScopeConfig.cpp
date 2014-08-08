@@ -155,7 +155,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     if (idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout)
     {
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
-                 ": value must be > 0 and <= " + std::to_string(max_idle_timeout));
+                 ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));
     }
 
 
