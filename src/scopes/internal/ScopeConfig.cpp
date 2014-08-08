@@ -152,7 +152,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     // Negative values and values greater than max int (once multiplied by 1000 (s to ms)) are illegal
     const int max_idle_timeout = std::numeric_limits<int>::max() / 1000;
-    if (idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout)
+    if ((idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout) && idle_timeout_ != -1)
     {
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
                  ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));

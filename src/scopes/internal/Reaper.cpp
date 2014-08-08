@@ -114,10 +114,10 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
     policy_(p),
     finish_(false)
 {
-    if (reap_interval < 0)
+    if (reap_interval < 1 && reap_interval != -1)
     {
         ostringstream s;
-        s << "Reaper: invalid reap_interval (" << reap_interval << "). Interval must be >= 0.";
+        s << "Reaper: invalid reap_interval (" << reap_interval << "). Interval must be > 0.";
         throw unity::InvalidArgumentException(s.str());
     }
     if (reap_interval > expiry_interval)
@@ -142,7 +142,7 @@ Reaper::SPtr Reaper::create(int reap_interval, int expiry_interval, DestroyPolic
 {
     SPtr reaper(new Reaper(reap_interval, expiry_interval, p));
     reaper->set_self();
-    if (reap_interval != 0 && expiry_interval != 0)
+    if (reap_interval != -1 && expiry_interval != -1)
     {
         reaper->start();
     }
@@ -171,7 +171,6 @@ void Reaper::destroy()
         finish_ = true;
         do_work_.notify_one();
     }
-
     if (reap_thread_.joinable())
     {
         reap_thread_.join();
