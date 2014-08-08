@@ -59,7 +59,7 @@ public:
                   std::string const& endpoint,
                   RequestMode m,
                   int pool_size,
-                  int64_t idle_timeout = 0);
+                  int64_t idle_timeout = -1);
     ~ObjectAdapter();
 
     ZmqMiddleware* mw() const;

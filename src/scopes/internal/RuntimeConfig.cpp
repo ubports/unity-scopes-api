@@ -83,12 +83,12 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                              default_middleware_ + default_middleware_configfile_key,
                                                              DFLT_MIDDLEWARE_INI);
         reap_expiry_ = get_optional_int(runtime_config_group, reap_expiry_key, DFLT_REAP_EXPIRY);
-        if (reap_expiry_ < 1)
+        if (reap_expiry_ < 1 && reap_expiry_ != -1)
         {
             throw_ex("Illegal value (" + to_string(reap_expiry_) + ") for " + reap_expiry_key + ": value must be > 0");
         }
         reap_interval_ = get_optional_int(runtime_config_group, reap_interval_key, DFLT_REAP_INTERVAL);
-        if (reap_interval_ < 1)
+        if (reap_interval_ < 1 && reap_interval_ != -1)
         {
             throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
         }
