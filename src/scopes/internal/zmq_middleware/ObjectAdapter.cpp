@@ -57,7 +57,7 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     endpoint_(endpoint),
     mode_(m),
     pool_size_(pool_size),
-    idle_timeout_(idle_timeout > 0 ? idle_timeout : zmqpp::poller::wait_forever),
+    idle_timeout_(idle_timeout != -1 ? idle_timeout : zmqpp::poller::wait_forever),
     state_(Inactive)
 {
     assert(!name.empty());

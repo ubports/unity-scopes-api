@@ -358,13 +358,16 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     // Create a servant for the scope and register the servant.
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    int idle_timeout_ms = 0;
     if (!scope_ini_file.empty())
     {
         ScopeConfig scope_config(scope_ini_file);
-        idle_timeout_ms = scope_config.idle_timeout() * 1000;
+        int idle_timeout_ms = scope_config.idle_timeout() * 1000;
+        mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
     }
-    mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+    else
+    {
+        mw->add_scope_object(scope_id_, move(scope));
+    }
 
     // Inform the registry that this scope is now ready to process requests
     reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);

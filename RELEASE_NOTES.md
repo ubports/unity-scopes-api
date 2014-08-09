@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Changes in version 0.6.1
+========================
+  - Clear any signal masks inherited from the parent process when forking.
+
+  - Allow timeout value of -1 to disable the scope idle timeout, reaper timeouts, and two-way invocation timeout.
+
 Changes in version 0.6.0
 ========================
   - Added tmp_directory() method to ScopeBase, so a scope can find out where it can write temporary files.
