@@ -49,6 +49,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(300, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, cfg.results_ttl_type());
         EXPECT_TRUE(cfg.location_data_needed());
+        EXPECT_TRUE(cfg.debug_mode());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
@@ -78,6 +79,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(DFLT_SCOPE_IDLE_TIMEOUT, cfg.idle_timeout());
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
         EXPECT_FALSE(cfg.location_data_needed());
+        EXPECT_FALSE(cfg.debug_mode());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
