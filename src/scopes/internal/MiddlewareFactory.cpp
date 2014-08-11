@@ -47,7 +47,8 @@ MiddlewareFactory::~MiddlewareFactory()
 
 MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
                                                string const& kind,
-                                               string const& configfile) const
+                                               string const& configfile,
+                                               bool debug_mode) const
 {
     lock_guard<decltype(mutex_)> lock(mutex_);
 
@@ -62,7 +63,7 @@ MiddlewareBase::SPtr MiddlewareFactory::create(string const& server_name,
     {
         case Kind_Zmq:
         {
-            mw = make_shared<zmq_middleware::ZmqMiddleware>(server_name, runtime_, configfile);
+            mw = make_shared<zmq_middleware::ZmqMiddleware>(server_name, runtime_, configfile, debug_mode);
             break;
         }
         case Kind_REST:

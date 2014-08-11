@@ -89,7 +89,7 @@ void create_dir(string const& dir, mode_t mode)
 
 } // namespace
 
-ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile) :
+ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile, bool debug_mode) :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Created),
@@ -101,9 +101,18 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
     {
         ZmqConfig config(configfile);
 
-        twoway_timeout_ = config.twoway_timeout();
-        locate_timeout_ = config.locate_timeout();
-        registry_timeout_ = config.registry_timeout();
+        if (debug_mode)
+        {
+            twoway_timeout_ = -1;
+            locate_timeout_ = 15000;
+            registry_timeout_ = 15000;
+        }
+        else
+        {
+            twoway_timeout_ = config.twoway_timeout();
+            locate_timeout_ = config.locate_timeout();
+            registry_timeout_ = config.registry_timeout();
+        }
         public_endpoint_dir_ = config.endpoint_dir();
         private_endpoint_dir_ = public_endpoint_dir_ + "/priv";
         registry_endpoint_dir_ = public_endpoint_dir_;
