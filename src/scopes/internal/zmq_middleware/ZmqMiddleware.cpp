@@ -102,19 +102,18 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
         ZmqConfig config(configfile);
 
         // Check if this scope has requested debug mode, if so, disable two-way timeout and set
-        // registry invocation timeouts to 15s
+        // locate timeout to 15s
         if (debug_mode)
         {
             twoway_timeout_ = -1;
             locate_timeout_ = 15000;
-            registry_timeout_ = 15000;
         }
         else
         {
             twoway_timeout_ = config.twoway_timeout();
             locate_timeout_ = config.locate_timeout();
-            registry_timeout_ = config.registry_timeout();
         }
+        registry_timeout_ = config.registry_timeout();
         public_endpoint_dir_ = config.endpoint_dir();
         private_endpoint_dir_ = public_endpoint_dir_ + "/priv";
         registry_endpoint_dir_ = public_endpoint_dir_;
