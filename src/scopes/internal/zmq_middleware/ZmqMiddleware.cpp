@@ -101,6 +101,8 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
     {
         ZmqConfig config(configfile);
 
+        // Check if this scope has requested debug mode, if so, disable two-way timeout and set
+        // registry invocation timeouts to 15s
         if (debug_mode)
         {
             twoway_timeout_ = -1;

@@ -362,6 +362,8 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     {
         ScopeConfig scope_config(scope_ini_file);
         int idle_timeout_ms;
+
+        // Check if this scope has requested debug mode, if so, disable reaper and idle timeouts
         if (scope_config.debug_mode())
         {
             reap_expiry_ = -1;
