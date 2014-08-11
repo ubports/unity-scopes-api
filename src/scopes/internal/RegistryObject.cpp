@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
@@ -331,11 +332,15 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher:
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
 {
+    // Check if this scope has requested debug mode, if so, set the process timeout to 15s
+    if (ScopeConfig(exec_data.scope_config).debug_mode())
+    {
+        exec_data.timeout_ms = 15000;
+    }
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
-    : exec_data_(other.exec_data_)
-    , reg_publisher_(other.reg_publisher_)
+    : ScopeProcess(other.exec_data_, other.reg_publisher_)
 {
 }
 
