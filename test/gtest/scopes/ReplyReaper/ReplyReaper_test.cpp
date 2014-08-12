@@ -106,6 +106,40 @@ TEST(ReplyReaper, reap)
     scope_t.join();
 }
 
+class NoReapReceiver : public SearchListenerBase
+{
+public:
+    NoReapReceiver()
+        : query_complete_(false)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+    }
+
+    virtual void finished(CompletionDetails const& details) override
+    {
+        // Check that finished() was called by the reaper.
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
+        lock_guard<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_all();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
 void scope_thread_debug_mode(Runtime::SPtr const& rt, string const& runtime_ini_file)
 {
     NoReplyScope scope;
@@ -127,7 +161,7 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
     auto proxy = mw->create_scope_proxy("NoReplyScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
 
-    auto receiver = make_shared<NullReceiver>();
+    auto receiver = make_shared<NoReapReceiver>();
     scope->search("test", SearchMetadata("en", "phone"), receiver);
     receiver->wait_until_finished();
 
