@@ -56,6 +56,7 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
+    bool debug_mode();
 };
 
 */
@@ -212,17 +213,20 @@ bool ZmqScope::debug_mode()
 {
     if (!debug_mode_)
     {
-        try
-        {
-            auto registry_proxy = mw_base()->registry_proxy();
-            ScopeMetadata metadata = registry_proxy->get_metadata(identity());
-            ///!debug_mode_.reset(new bool(metadata.debug_mode()));
-        }
-        catch (NotFoundException const&)
-        {
-            debug_mode_.reset(new bool(false));
-        }
+        capnp::MallocMessageBuilder request_builder;
+        make_request_(request_builder, "debug_mode");
+
+        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+        auto receiver = future.get();
+        auto segments = receiver.receive();
+        capnp::SegmentArrayMessageReader reader(segments);
+        auto response = reader.getRoot<capnproto::Response>();
+        throw_if_runtime_exception(response);
+
+        auto debug_mode_response = response.getPayload().getAs<capnproto::Scope::DebugModeResponse>();
+        debug_mode_.reset(new bool(debug_mode_response.getReturnValue()));
     }
+
     return *debug_mode_;
 }
 

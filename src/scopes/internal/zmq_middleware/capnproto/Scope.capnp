@@ -75,3 +75,8 @@ struct PreviewRequest
     hints @1      : ValueDict.ValueDict;
     replyProxy @2 : Proxy.Proxy;
 }
+
+struct DebugModeResponse
+{
+    returnValue @0 : Bool;
+}

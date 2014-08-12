@@ -74,6 +74,8 @@ public:
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 
+    bool debug_mode() const override;
+
 private:
     MWQueryCtrlProxy query(InvokeInfo const& info,
                            MWReplyProxy const& reply,
