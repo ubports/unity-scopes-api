@@ -209,6 +209,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
 
 bool ZmqScope::debug_mode()
 {
+    // We only need to retrieve the debug mode state once, so we cache it in debug_mode_
     if (!debug_mode_)
     {
         capnp::MallocMessageBuilder request_builder;
