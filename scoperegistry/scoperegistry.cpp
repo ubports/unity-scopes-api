@@ -293,10 +293,25 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_settings_definitions(VariantArray());
     try
     {
+        IniSettingsSchema::UPtr schema;
+
         // File is optional, so don't generate noise if it isn't there.
         if (filesystem::exists(settings_schema_path))
         {
-            auto schema = IniSettingsSchema::create(settings_schema_path.native());
+            schema = IniSettingsSchema::create(settings_schema_path.native());
+        }
+        // We always need to create a settings schema if the scope wants location data
+        else if (sc.location_data_needed())
+        {
+            schema = IniSettingsSchema::create_empty();
+        }
+
+        if (schema)
+        {
+            if (sc.location_data_needed())
+            {
+                schema->add_location_setting();
+            }
             mi->set_settings_definitions(schema->definitions());
         }
     }
