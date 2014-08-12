@@ -94,11 +94,15 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
     auto defs = meta.settings_definitions();
-    ASSERT_EQ(1, defs.size());
+    ASSERT_EQ(2, defs.size());
     EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
+    EXPECT_EQ("internal.location", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Enable location data", defs[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("boolean", defs[1].get_dict()["type"].get_string());
+    EXPECT_EQ(true, defs[1].get_dict()["defaultValue"].get_bool());
     EXPECT_TRUE(meta.location_data_needed());
 
     auto attrs = meta.appearance_attributes();
@@ -192,7 +196,7 @@ TEST(Registry, scope_state_notify)
 
     auto meta = r->get_metadata("testscopeA");
     auto defs = meta.settings_definitions();
-    EXPECT_EQ(1, defs.size());
+    EXPECT_EQ(2, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point

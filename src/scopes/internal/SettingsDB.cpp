@@ -55,8 +55,8 @@ SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string 
     // Parse schema
     try
     {
-        auto schema = IniSettingsSchema::create(ini_file_path);
-        return UPtr(new SettingsDB(db_path, move(schema)));
+        SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
+        return create_from_schema(db_path, *schema);
     }
     catch (std::exception const& e)
     {
@@ -70,7 +70,7 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, stri
     try
     {
         auto schema = JsonSettingsSchema::create(json_string);
-        return UPtr(new SettingsDB(db_path, move(schema)));
+        return create_from_schema(db_path, *schema);
     }
     catch (std::exception const& e)
     {
@@ -78,7 +78,12 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, stri
     }
 }
 
-SettingsDB::SettingsDB(string const& db_path, SettingsSchema::UPtr const& schema)
+SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsSchema const& schema)
+{
+    return UPtr(new SettingsDB(db_path, move(schema)));
+}
+
+SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     : state_changed_(false)
     , db_path_(db_path)
     , db_(nullptr, db_deleter)
@@ -86,7 +91,7 @@ SettingsDB::SettingsDB(string const& db_path, SettingsSchema::UPtr const& schema
 {
     // Initialize the def_map_ so we can look things
     // up quickly.
-    definitions_ = schema->definitions();
+    definitions_ = schema.definitions();
     for (auto const& d : definitions_)
     {
         def_map_.emplace(make_pair(d.get_dict()["id"].get_string(), d));
