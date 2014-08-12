@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
@@ -90,7 +91,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setCategory(reply_proxy->target_category().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -122,7 +123,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -157,7 +158,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
     future.wait();
 
     auto receiver = future.get();
@@ -190,7 +191,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -204,6 +205,23 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
+ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
+{
+    // Check if this scope has requested debug mode, if so, disable two-way timeout and set
+    // locate timeout to 15s.
+    if (!debug_mode_)
+    {
+        auto registry_proxy = mw_base()->registry_proxy();
+        ScopeMetadata metadata = registry_proxy->get_metadata(identity());
+        debug_mode_.reset(new bool(metadata.debug_mode()));
+    }
+    if (*debug_mode_)
+    {
+        return this->invoke_twoway_(out_params, -1, 15000);
+    }
+    return this->invoke_twoway_(out_params);
 }
 
 } // namespace zmq_middleware

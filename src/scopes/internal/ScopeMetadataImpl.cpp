@@ -116,6 +116,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         results_ttl_type_ = rhs.results_ttl_type_;
         settings_definitions_.reset(rhs.settings_definitions_ ? new VariantArray(*rhs.settings_definitions_) : nullptr);
         location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
+        debug_mode_.reset(rhs.debug_mode_ ? new bool(*rhs.debug_mode_) : nullptr);
     }
     return *this;
 }

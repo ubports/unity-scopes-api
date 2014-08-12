@@ -62,6 +62,10 @@ public:
     virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
+
+private:
+    ZmqReceiver invoke_scope_(capnp::MessageBuilder& out_params);
+    std::unique_ptr<bool> debug_mode_;
 };
 
 } // namespace zmq_middleware
