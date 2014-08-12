@@ -89,7 +89,7 @@ void create_dir(string const& dir, mode_t mode)
 
 } // namespace
 
-ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile, bool debug_mode) :
+ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile) :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Created),
@@ -101,18 +101,8 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
     {
         ZmqConfig config(configfile);
 
-        // Check if this scope has requested debug mode, if so, disable two-way timeout and set
-        // locate timeout to 15s
-        if (debug_mode)
-        {
-            twoway_timeout_ = -1;
-            locate_timeout_ = 15000;
-        }
-        else
-        {
-            twoway_timeout_ = config.twoway_timeout();
-            locate_timeout_ = config.locate_timeout();
-        }
+        twoway_timeout_ = config.twoway_timeout();
+        locate_timeout_ = config.locate_timeout();
         registry_timeout_ = config.registry_timeout();
         public_endpoint_dir_ = config.endpoint_dir();
         private_endpoint_dir_ = public_endpoint_dir_ + "/priv";

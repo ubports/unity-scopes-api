@@ -360,20 +360,9 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
     auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
     if (!scope_ini_file.empty())
     {
+        // Check if this scope has requested debug mode, if so, disable the idle timeout
         ScopeConfig scope_config(scope_ini_file);
-        int idle_timeout_ms;
-
-        // Check if this scope has requested debug mode, if so, disable reaper and idle timeouts
-        if (scope_config.debug_mode())
-        {
-            reap_expiry_ = -1;
-            reap_interval_ = -1;
-            idle_timeout_ms = -1;
-        }
-        else
-        {
-            idle_timeout_ms = scope_config.idle_timeout() * 1000;
-        }
+        int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
         mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
     }
     else

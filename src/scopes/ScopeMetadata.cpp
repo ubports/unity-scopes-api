@@ -147,6 +147,11 @@ bool ScopeMetadata::location_data_needed() const
     return p->location_data_needed();
 }
 
+bool ScopeMetadata::debug_mode() const
+{
+    return p->debug_mode();
+}
+
 //! @endcond
 
 } // namespace scopes

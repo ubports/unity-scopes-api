@@ -183,6 +183,12 @@ public:
     */
     bool location_data_needed() const;  // optional (default = false)
 
+    /**
+    \brief Check if this scope is in debug mode.
+    \return True if this scope is in debug mode.
+    */
+    bool debug_mode() const;  // optional (default = false)
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

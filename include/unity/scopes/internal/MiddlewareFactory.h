@@ -51,8 +51,7 @@ public:
     // it is created first.
     MiddlewareBase::SPtr create(std::string const& server_name,
                                 std::string const& kind,
-                                std::string const& configfile,
-                                bool debug_mode = false) const;
+                                std::string const& configfile) const;
 
     // Find the middleware with the given name and kind. Returns nullptr if that middleware doesn't exist.
     MiddlewareBase::SPtr find(std::string const& server_name, std::string const& kind) const;
