@@ -27,6 +27,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 using namespace std;
 
@@ -213,9 +214,16 @@ ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
     // locate timeout to 15s.
     if (!debug_mode_)
     {
-        auto registry_proxy = mw_base()->registry_proxy();
-        ScopeMetadata metadata = registry_proxy->get_metadata(identity());
-        debug_mode_.reset(new bool(metadata.debug_mode()));
+        try
+        {
+            auto registry_proxy = mw_base()->registry_proxy();
+            ScopeMetadata metadata = registry_proxy->get_metadata(identity());
+            debug_mode_.reset(new bool(metadata.debug_mode()));
+        }
+        catch (NotFoundException const&)
+        {
+            debug_mode_.reset(new bool(false));
+        }
     }
     if (*debug_mode_)
     {
