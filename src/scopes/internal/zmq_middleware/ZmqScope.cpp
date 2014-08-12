@@ -208,10 +208,8 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
-ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
+bool ZmqScope::debug_mode()
 {
-    // Check if this scope has requested debug mode, if so, disable two-way timeout and set
-    // locate timeout to 15s.
     if (!debug_mode_)
     {
         try
@@ -225,7 +223,14 @@ ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
             debug_mode_.reset(new bool(false));
         }
     }
-    if (*debug_mode_)
+    return *debug_mode_;
+}
+
+ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
+{
+    // Check if this scope has requested debug mode, if so, disable two-way timeout and set
+    // locate timeout to 15s.
+    if (debug_mode())
     {
         return this->invoke_twoway_(out_params, -1, 15000);
     }

@@ -95,7 +95,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
         throw unity::InvalidArgumentException("Scope::search(): invalid SearchListenerBase (nullptr)");
     }
 
-    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality()));
+    ReplyObject::SPtr ro(make_shared<ResultReplyObject>(reply, runtime_, to_string(), metadata.cardinality(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
@@ -149,7 +149,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
         throw unity::InvalidArgumentException("Scope::activate(): invalid ActivationListenerBase (nullptr)");
     }
 
-    ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
+    ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
@@ -197,7 +197,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
         throw unity::InvalidArgumentException("Scope::perform_action(): invalid ActivationListenerBase (nullptr)");
     }
 
-    ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string()));
+    ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
@@ -246,7 +246,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
         throw unity::InvalidArgumentException("Scope::preview(): invalid PreviewListenerBase (nullptr)");
     }
 
-    ReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string()));
+    ReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);

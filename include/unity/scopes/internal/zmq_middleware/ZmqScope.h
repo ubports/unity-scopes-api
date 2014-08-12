@@ -63,6 +63,8 @@ public:
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
 
+    virtual bool debug_mode() override;
+
 private:
     ZmqReceiver invoke_scope_(capnp::MessageBuilder& out_params);
     std::unique_ptr<bool> debug_mode_;
