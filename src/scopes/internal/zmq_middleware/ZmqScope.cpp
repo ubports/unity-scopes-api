@@ -23,11 +23,9 @@
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
-#include <unity/scopes/ScopeExceptions.h>
 
 using namespace std;
 

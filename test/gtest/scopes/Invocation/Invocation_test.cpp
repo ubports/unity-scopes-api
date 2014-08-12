@@ -154,6 +154,7 @@ public:
 
 TEST(Invocation, shutdown_with_outstanding_async)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("EmptyScope", "Zmq", "Zmq.ini");
     mw->start();
