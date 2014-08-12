@@ -20,7 +20,6 @@
 
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
