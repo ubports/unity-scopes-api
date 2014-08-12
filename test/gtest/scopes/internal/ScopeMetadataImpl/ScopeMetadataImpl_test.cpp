@@ -132,9 +132,6 @@ TEST(ScopeMetadataImpl, basic)
     // when "location_data_needed" is not set, false is returned
     EXPECT_FALSE(m.location_data_needed());
 
-    // when "debug_mode" is not set, false is returned
-    EXPECT_FALSE(m.debug_mode());
-
     // Check that the copy has the same values as the original
     EXPECT_EQ("scope_id", mi2->scope_id());
     EXPECT_EQ("identity", mi2->proxy()->identity());
@@ -161,7 +158,6 @@ TEST(ScopeMetadataImpl, basic)
     va.push_back(Variant("hello"));
     mi2->set_settings_definitions(va);
     mi2->set_location_data_needed(true);
-    mi2->set_debug_mode(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -174,7 +170,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
-    EXPECT_TRUE(m.debug_mode());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -196,7 +191,6 @@ TEST(ScopeMetadataImpl, basic)
     tmp_va.push_back(Variant("tmp hello"));
     ti->set_settings_definitions(tmp_va);
     ti->set_location_data_needed(true);
-    ti->set_debug_mode(true);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -217,7 +211,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, ci.results_ttl_type());
     EXPECT_EQ(tmp_va, ci.settings_definitions());
     EXPECT_TRUE(ci.location_data_needed());
-    EXPECT_TRUE(ci.debug_mode());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -238,7 +231,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(m.invisible());
     EXPECT_EQ(tmp_va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
-    EXPECT_TRUE(m.debug_mode());
 
     // Self-assignment
     tmp = tmp;
@@ -258,7 +250,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(tmp.invisible());
     EXPECT_EQ(tmp_va, tmp.settings_definitions());
     EXPECT_TRUE(tmp.location_data_needed());
-    EXPECT_TRUE(tmp.debug_mode());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -278,7 +269,6 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(tmp2.invisible());
     EXPECT_EQ(tmp_va, tmp2.settings_definitions());
     EXPECT_TRUE(tmp2.location_data_needed());
-    EXPECT_TRUE(tmp2.debug_mode());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -305,12 +295,11 @@ TEST(ScopeMetadataImpl, serialize)
     va.push_back(Variant("world"));
     mi->set_settings_definitions(va);
     mi->set_location_data_needed(false);
-    mi->set_debug_mode(false);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(15u, var.size());
+    EXPECT_EQ(14u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -326,7 +315,6 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(va, var["settings_definitions"].get_array());
     EXPECT_FALSE(var["location_data_needed"].get_bool());
-    EXPECT_FALSE(var["debug_mode"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -346,7 +334,6 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(va, c.settings_definitions());
     EXPECT_FALSE(c.location_data_needed());
-    EXPECT_FALSE(c.debug_mode());
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
@@ -547,7 +534,6 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     m["appearance_attributes"] = appearance;
     m["results_ttl_type"] = 0;
     m["location_data_needed"] = true;
-    m["debug_mode"] = true;
 
     ScopeMetadataImpl mi(m, &mw);
     mi.deserialize(m);
@@ -566,5 +552,4 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_EQ(appearance, mi.appearance_attributes());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, mi.results_ttl_type());
     EXPECT_TRUE(mi.location_data_needed());
-    EXPECT_TRUE(mi.debug_mode());
 }

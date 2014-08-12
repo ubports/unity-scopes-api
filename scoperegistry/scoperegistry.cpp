@@ -334,7 +334,6 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_scope_directory(scope_dir.native());
     mi->set_results_ttl_type(sc.results_ttl_type());
     mi->set_location_data_needed(sc.location_data_needed());
-    mi->set_debug_mode(sc.debug_mode());
 
     try
     {
@@ -391,7 +390,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     }
 
     // Check if this scope has requested debug mode, if so, set the process timeout to 15s
-    if (meta.debug_mode())
+    if (sc.debug_mode())
     {
         exec_data.timeout_ms = 15000;
     }

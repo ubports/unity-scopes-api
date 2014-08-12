@@ -58,7 +58,6 @@ public:
     ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
     VariantArray settings_definitions() const;                   // optional (default: empty array)
     bool location_data_needed() const;                           // optional (default: false)
-    bool debug_mode() const;                                     // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -75,7 +74,6 @@ public:
     void set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl);
     void set_settings_definitions(VariantArray const& settings_definitions);
     void set_location_data_needed(bool location_data_needed);
-    void set_debug_mode(bool debug_mode);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -100,7 +98,6 @@ private:
     ScopeMetadata::ResultsTtlType results_ttl_type_;
     std::unique_ptr<VariantArray> settings_definitions_;  // Optional, hence a pointer
     std::unique_ptr<bool> location_data_needed_;          // Optional, hence a pointer
-    std::unique_ptr<bool> debug_mode_;                    // Optional, hence a pointer
 };
 
 } // namespace internal

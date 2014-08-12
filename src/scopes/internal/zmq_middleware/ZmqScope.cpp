@@ -216,7 +216,7 @@ bool ZmqScope::debug_mode()
         {
             auto registry_proxy = mw_base()->registry_proxy();
             ScopeMetadata metadata = registry_proxy->get_metadata(identity());
-            debug_mode_.reset(new bool(metadata.debug_mode()));
+            ///!debug_mode_.reset(new bool(metadata.debug_mode()));
         }
         catch (NotFoundException const&)
         {

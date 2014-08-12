@@ -90,10 +90,6 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
     {
         location_data_needed_.reset(new bool(*other.location_data_needed_));
     }
-    if (other.debug_mode_)
-    {
-        debug_mode_.reset(new bool(*other.debug_mode_));
-    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -116,7 +112,6 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         results_ttl_type_ = rhs.results_ttl_type_;
         settings_definitions_.reset(rhs.settings_definitions_ ? new VariantArray(*rhs.settings_definitions_) : nullptr);
         location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
-        debug_mode_.reset(rhs.debug_mode_ ? new bool(*rhs.debug_mode_) : nullptr);
     }
     return *this;
 }
@@ -228,15 +223,6 @@ bool ScopeMetadataImpl::location_data_needed() const
     return false;
 }
 
-bool ScopeMetadataImpl::debug_mode() const
-{
-    if (debug_mode_)
-    {
-        return *debug_mode_;
-    }
-    return false;
-}
-
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -310,11 +296,6 @@ void ScopeMetadataImpl::set_settings_definitions(VariantArray const& settings_de
 void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
 {
     location_data_needed_.reset(new bool(location_data_needed));
-}
-
-void ScopeMetadataImpl::set_debug_mode(bool debug_mode)
-{
-    debug_mode_.reset(new bool(debug_mode));
 }
 
 namespace
@@ -391,10 +372,6 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (location_data_needed_)
     {
         var["location_data_needed"] = *location_data_needed_;
-    }
-    if (debug_mode_)
-    {
-        var["debug_mode"] = *debug_mode_;
     }
 
     return var;
@@ -516,12 +493,6 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         location_data_needed_.reset(new bool(it->second.get_bool()));
-    }
-
-    it = var.find("debug_mode");
-    if (it != var.end())
-    {
-        debug_mode_.reset(new bool(it->second.get_bool()));
     }
 }
 
