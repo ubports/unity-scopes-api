@@ -38,6 +38,8 @@ public:
 
     static UPtr create(std::string const& json_string);
 
+    static UPtr create_empty();
+
     ~JsonSettingsSchema();
 
     JsonSettingsSchema(JsonSettingsSchema&&) = default;
@@ -45,8 +47,12 @@ public:
 
     virtual VariantArray definitions() const;
 
+    virtual void add_location_setting();
+
 private:
     JsonSettingsSchema(std::string const& ini_file);
+
+    JsonSettingsSchema();
 
     VariantArray definitions_;
 };

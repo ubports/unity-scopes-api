@@ -129,7 +129,6 @@ Setting::Setting(string const& id,
     type_ = it->first;
 }
 
-
 Variant Setting::to_schema_definition()
 {
     VariantMap schema;

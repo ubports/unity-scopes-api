@@ -257,11 +257,34 @@ void SSRegistryObject::get_remote_scopes()
                 metadata->set_appearance_attributes(*scope.appearance);
             }
 
+            JsonSettingsSchema::UPtr schema;
+
             if (scope.settings)
             {
                 try
                 {
-                    auto schema = JsonSettingsSchema::create(*scope.settings);
+                    schema = JsonSettingsSchema::create(*scope.settings);
+                }
+                catch (ResourceException const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                    std::cerr << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\"" << std::endl;
+                }
+            }
+            else if (scope.needs_location_data)
+            {
+                schema = JsonSettingsSchema::create_empty();
+            }
+
+            if (schema)
+            {
+                if (scope.needs_location_data)
+                {
+                    schema->add_location_setting();
+                }
+
+                try
+                {
                     metadata->set_settings_definitions(schema->definitions());
 
                     // Get the previous JSON definition for this scope (if any)
