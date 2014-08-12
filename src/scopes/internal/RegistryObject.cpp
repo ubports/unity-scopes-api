@@ -332,11 +332,6 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher:
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
 {
-    // Check if this scope has requested debug mode, if so, set the process timeout to 15s
-    if (ScopeConfig(exec_data.scope_config).debug_mode())
-    {
-        exec_data.timeout_ms = 15000;
-    }
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
