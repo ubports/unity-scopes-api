@@ -177,7 +177,7 @@ TEST(IniSettingsSchema, exceptions)
     catch (ResourceException const& e)
     {
         boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
-                       "    unity::ResourceException: IniSettingsSchema\\(\\): invalid key \"internal:foo\" prefixed with \"internal:\"");
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): invalid key \"internal.foo\" prefixed with \"internal.\"");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 }
@@ -238,7 +238,7 @@ TEST(IniSettingsSchema, empty_then_with_location)
         auto defs = s->definitions();
         ASSERT_EQ(1, defs.size());
 
-        EXPECT_EQ("internal:location", defs[0].get_dict()["id"].get_string());
+        EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
         EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());
         EXPECT_EQ("boolean", defs[0].get_dict()["type"].get_string());
         EXPECT_TRUE(defs[0].get_dict()["displayValues"].is_null());

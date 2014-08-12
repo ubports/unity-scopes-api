@@ -266,8 +266,8 @@ IniSettingsSchema::IniSettingsSchema(string const& ini_file)
         auto settings = p->get_groups();
         for (auto const& id: settings)
         {
-            if(starts_with(id, "internal:")) {
-                throw ResourceException(string("IniSettingsSchema(): invalid key \"") + id + "\" prefixed with \"internal:\"");
+            if(starts_with(id, "internal.")) {
+                throw ResourceException(string("IniSettingsSchema(): invalid key \"") + id + "\" prefixed with \"internal.\"");
             }
             Setting s(p, id);
             definitions_.push_back(s.to_schema_definition());
@@ -288,7 +288,7 @@ VariantArray IniSettingsSchema::definitions() const
 
 void IniSettingsSchema::add_location_setting()
 {
-    Setting s("internal:location", "boolean", "Enable location data", VariantArray(), Variant(true));
+    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
     definitions_.push_back(s.to_schema_definition());
 }
 
