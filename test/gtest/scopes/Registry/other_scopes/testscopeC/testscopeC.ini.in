@@ -6,3 +6,5 @@ Author = Canonical Ltd.
 Icon = /foo/scope-C.Icon
 SearchHint = scope-C.SearchHint
 HotKey = scope-C.HotKey
+IdleTimeout = 2
+DebugMode = true

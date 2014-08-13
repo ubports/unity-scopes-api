@@ -261,7 +261,16 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    unique_lock<decltype(mutex_)> lock(mutex_);
+
+    auto proc_it = scope_processes_.find(scope_id);
+    if (proc_it != scope_processes_.end())
+    {
+        // Kill process after unlocking, so we can handle on_process_death
+        lock.unlock();
+        proc_it->second.kill();
+        lock.lock();
+    }
 
     scope_processes_.erase(scope_id);
 
@@ -335,8 +344,7 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher:
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
-    : exec_data_(other.exec_data_)
-    , reg_publisher_(other.reg_publisher_)
+    : ScopeProcess(other.exec_data_, other.reg_publisher_)
 {
 }
 

@@ -16,6 +16,7 @@ IdleTimeout = 300
 ResultsTtlType = large
 LocationDataNeeded = true
 ConfinementType = unconfined
+DebugMode = true
 
 [Appearance]
 arbitrary_key = true
