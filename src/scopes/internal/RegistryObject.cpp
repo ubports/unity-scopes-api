@@ -260,21 +260,16 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    ProcessMap::iterator proc_it;
+    unique_lock<decltype(mutex_)> lock(mutex_);
+
+    auto proc_it = scope_processes_.find(scope_id);
+    if (proc_it != scope_processes_.end())
     {
-        lock_guard<decltype(mutex_)> lock(mutex_);
-
-        proc_it = scope_processes_.find(scope_id);
-        if (proc_it == scope_processes_.end())
-        {
-            throw NotFoundException("RegistryObject::remove_local_scope(): Tried to remove unknown local scope", scope_id);
-        }
+        // Kill process after unlocking, so we can handle on_process_death
+        lock.unlock();
+        proc_it->second.kill();
+        lock.lock();
     }
-
-    // Kill process after unlocking, so we can handle on_process_death
-    proc_it->second.kill();
-
-    lock_guard<decltype(mutex_)> lock(mutex_);
 
     scope_processes_.erase(scope_id);
 
