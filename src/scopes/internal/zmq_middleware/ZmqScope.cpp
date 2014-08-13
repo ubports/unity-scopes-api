@@ -209,6 +209,8 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
 
 bool ZmqScope::debug_mode()
 {
+    lock_guard<std::mutex> lock(debug_mode_mutex_);
+
     // We only need to retrieve the debug mode state once, so we cache it in debug_mode_
     if (!debug_mode_)
     {

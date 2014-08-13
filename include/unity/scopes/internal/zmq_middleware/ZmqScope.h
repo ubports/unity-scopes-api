@@ -67,6 +67,7 @@ public:
 
 private:
     ZmqReceiver invoke_scope_(capnp::MessageBuilder& out_params);
+    std::mutex debug_mode_mutex_;
     std::unique_ptr<bool> debug_mode_;
 };
 
