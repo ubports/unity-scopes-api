@@ -506,6 +506,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::smartscopes::SSRegistryObject::~SSRegistryObject()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSConfig::SSConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::smartscopes::SSConfig::~SSConfig()@Base" 0.4.4+14.10.20140508
+ (c++)"unity::scopes::internal::RuntimeConfig::default_config_directory()@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::default_data_directory()@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::RuntimeConfig::RuntimeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::~RuntimeConfig()@Base" 0.4.2+14.04.20140404.2
@@ -845,6 +846,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::reap_expiry() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RuntimeConfig::reap_interval() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RuntimeConfig::ss_configfile() const@Base" 0.4.4+14.10.20140508
+ (c++)"unity::scopes::internal::RuntimeConfig::config_directory() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::data_directory() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::RuntimeConfig::registry_identity() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0.4.2+14.04.20140404.2

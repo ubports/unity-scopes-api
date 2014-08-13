@@ -105,6 +105,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
+        config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -307,15 +308,18 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     {
         // Try to open the scope settings database, if any.
-        string settings_dir = data_dir_ + "/" + scope_id_;
+        string config_dir = config_dir_ + "/" + scope_id_;
+        string settings_db = config_dir + "/settings.db";
+
+        string data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
-        string settings_db = settings_dir + "/settings.db";
+
         string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
         if (boost::filesystem::exists(settings_schema))
         {
-            // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+            // Make sure the data directories exist. (No permission for group and others; data might be sensitive.)
             ::mkdir(data_dir_.c_str(), 0700);
-            ::mkdir(settings_dir.c_str(), 0700);
+            ::mkdir(data_dir.c_str(), 0700);
 
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
