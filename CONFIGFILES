@@ -95,15 +95,23 @@ The following keys are recognized:
 - DataDir
 
   The parent directory under which the run time writes scope-specific data files
-  (such as settings).
+  (such as caches).
 
   The default value is $HOME/.local/share/unity-scopes.
 
   Note that the actual files are written into subdirectories of
   this directory, for example:
 
-  $HOME/.local/share/unity-scopes/<scope_id>/settings.db
+  $HOME/.local/share/unity-scopes/<scope_id>/cache.db
 
+- ConfigDir
+
+  The parent directory under which the runtime writes the scope configration files.
+
+  Note that the actual configuration is written into subdirectories of this
+  directory. Specically:
+
+  $HOME/.config/unity-scopes/<scope_id>/settings.db
 
 Zmq.ini
 -------
