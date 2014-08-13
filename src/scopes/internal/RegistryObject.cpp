@@ -260,24 +260,32 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    unique_lock<decltype(mutex_)> lock(mutex_);
-    if (scopes_.find(scope_id) != scopes_.end())
+    ProcessMap::iterator proc_it;
     {
-        // Unlock here so that we can handle on_process_death
-        lock.unlock();
-        scope_processes_.at(scope_id).kill();
-        lock.lock();
-        scope_processes_.erase(scope_id);
+        lock_guard<decltype(mutex_)> lock(mutex_);
 
-        if (scopes_.erase(scope_id) == 1)
+        proc_it = scope_processes_.find(scope_id);
+        if (proc_it == scope_processes_.end())
         {
-            if (publisher_)
-            {
-                // Send a blank message to subscribers to inform them that the registry has been updated
-                publisher_->send_message("");
-            }
-            return true;
+            throw NotFoundException("RegistryObject::remove_local_scope(): Tried to remove unknown local scope", scope_id);
         }
+    }
+
+    // Kill process after unlocking, so we can handle on_process_death
+    proc_it->second.kill();
+
+    lock_guard<decltype(mutex_)> lock(mutex_);
+
+    scope_processes_.erase(scope_id);
+
+    if (scopes_.erase(scope_id) == 1)
+    {
+        if (publisher_)
+        {
+            // Send a blank message to subscribers to inform them that the registry has been updated
+            publisher_->send_message("");
+        }
+        return true;
     }
 
     return false;
