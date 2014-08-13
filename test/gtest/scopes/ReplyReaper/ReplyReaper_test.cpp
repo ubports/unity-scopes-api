@@ -103,7 +103,10 @@ TEST(ReplyReaper, reap)
     receiver->wait_until_finished();
 
     no_reply_rt->destroy();
-    scope_t.join();
+    if (scope_t.joinable())
+    {
+        scope_t.join();
+    }
 }
 
 class NoReapReceiver : public SearchListenerBase
@@ -166,5 +169,8 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
     receiver->wait_until_finished();
 
     no_reply_rt->destroy();
-    scope_t.join();
+    if (scope_t.joinable())
+    {
+        scope_t.join();
+    }
 }
