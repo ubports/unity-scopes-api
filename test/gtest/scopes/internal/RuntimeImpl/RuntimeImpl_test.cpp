@@ -72,15 +72,15 @@ TEST(RuntimeImpl, basic)
     }
 }
 
-class ScopeReady
+class Waiter
 {
 public:
-    ScopeReady()
+    Waiter()
         : ready_(false)
     {
     };
 
-    void operator()() noexcept
+    void set_ready() noexcept
     {
         lock_guard<mutex> lock(m_);
         ready_ = true;
@@ -139,8 +139,8 @@ TEST(RuntimeImpl, exceptions)
     }
 
     {
-        ScopeReady ready;
-        auto cb = [&ready]{ ready(); };
+        Waiter waiter;
+        auto cb = [&waiter]{ waiter.set_ready(); };
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope(TestScope::ThrowFromRun);
@@ -150,7 +150,7 @@ TEST(RuntimeImpl, exceptions)
         };
         auto fut = std::async(launch::async, thread_func);
 
-        ready.wait_until_ready();
+        waiter.wait_until_ready();
         rt->destroy();
 
         try
@@ -167,8 +167,8 @@ TEST(RuntimeImpl, exceptions)
     }
 
     {
-        ScopeReady ready;
-        auto cb = [&ready]{ ready(); };
+        Waiter waiter;
+        auto cb = [&waiter]{ waiter.set_ready(); };
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope(TestScope::ThrowFromStop);
@@ -179,7 +179,7 @@ TEST(RuntimeImpl, exceptions)
         auto fut = std::async(launch::async, thread_func);
 
         // Don't destroy the run time until after the scope has finished initializing.
-        ready.wait_until_ready();
+        waiter.wait_until_ready();
         rt->destroy();
 
         try
@@ -205,8 +205,8 @@ TEST(RuntimeImpl, directories)
         boost::filesystem::remove_all(TEST_DIR "/cache_dir/unconfined");
         boost::filesystem::remove_all(TEST_DIR "/cache_dir/leaf-net");
 
-        ScopeReady ready;
-        auto cb = [&ready]{ ready(); };
+        Waiter waiter;
+        auto cb = [&waiter]{ waiter.set_ready(); };
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope;
@@ -227,7 +227,7 @@ TEST(RuntimeImpl, directories)
         EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
 
         // Don't shut down the run time until after the scope has initialized.
-        ready.wait_until_ready();
+        waiter.wait_until_ready();
         rt->destroy();
 
         fut.wait();
@@ -244,8 +244,8 @@ TEST(RuntimeImpl, directories)
         util::ResourcePtr<char const*, decltype(restore_perms)> permission_guard(dir_path, restore_perms);
         ::chmod(dir_path, 0000);
 
-        ScopeReady ready;
-        auto cb = [&ready]{ ready(); };
+        Waiter waiter;
+        auto cb = [&waiter]{ waiter.set_ready(); };
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope;
@@ -266,7 +266,7 @@ TEST(RuntimeImpl, directories)
         EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
 
         // Don't shut down the run time until after the scope has initialized.
-        ready.wait_until_ready();
+        waiter.wait_until_ready();
         rt->destroy();
 
         fut.wait();
