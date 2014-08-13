@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/ResourcePtr.h>
 
 #include "TestScope.h"
 
@@ -71,7 +72,34 @@ TEST(RuntimeImpl, basic)
     }
 }
 
-TEST(RuntimeImpl, error)
+class ScopeReady
+{
+public:
+    ScopeReady()
+        : ready_(false)
+    {
+    };
+
+    void operator()() noexcept
+    {
+        lock_guard<mutex> lock(m_);
+        ready_ = true;
+        cond_.notify_all();
+    }
+
+    void wait_until_ready()
+    {
+        unique_lock<mutex> lock(m_);
+        cond_.wait(lock, [this]{ return ready_; });
+    }
+
+private:
+    mutex m_;
+    condition_variable cond_;
+    bool ready_;
+};
+
+TEST(RuntimeImpl, exceptions)
 {
     try
     {
@@ -84,23 +112,112 @@ TEST(RuntimeImpl, error)
                      "    unity::FileException: Could not load ini file NoSuchFile.ini: No such file or directory (errno = 4)",
                      e.what());
     }
-}
 
-void testscope_thread(Runtime::SPtr const& rt, TestScope* testscope, string const& runtime_ini_file)
-{
-    rt->run_scope(testscope, runtime_ini_file, TEST_DIR "/TestScope.ini");
+    string const rt_ini_file = TEST_DIR "/Runtime.ini";
+    string const scope_ini_file = TEST_DIR "/TestScope.ini";
+
+    {
+        auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
+        TestScope testscope(TestScope::ThrowFromStart);
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file]
+        {
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file);
+        };
+        auto fut = std::async(launch::async, thread_func);
+
+        try
+        {
+            fut.get();
+            FAIL();
+        }
+        catch (std::exception const& e)
+        {
+            EXPECT_STREQ("unity::ResourceException: Scope TestScope: exception from start():\n"
+                         "    unity::ResourceException: Can't start",
+                         e.what());
+        }
+    }
+
+    {
+        ScopeReady ready;
+        auto cb = [&ready]{ ready(); };
+
+        auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
+        TestScope testscope(TestScope::ThrowFromRun);
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        {
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+        };
+        auto fut = std::async(launch::async, thread_func);
+
+        ready.wait_until_ready();
+        rt->destroy();
+
+        try
+        {
+            fut.get();
+            FAIL();
+        }
+        catch (std::exception const& e)
+        {
+            EXPECT_STREQ("unity::ResourceException: Scope TestScope: exception from run():\n"
+                         "    unity::ResourceException: Can't run",
+                         e.what());
+        }
+    }
+
+    {
+        ScopeReady ready;
+        auto cb = [&ready]{ ready(); };
+
+        auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
+        TestScope testscope(TestScope::ThrowFromStop);
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        {
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+        };
+        auto fut = std::async(launch::async, thread_func);
+
+        // Don't destroy the run time until after the scope has finished initializing.
+        ready.wait_until_ready();
+        rt->destroy();
+
+        try
+        {
+            fut.get();
+            FAIL();
+        }
+        catch (std::exception const& e)
+        {
+            EXPECT_STREQ("unity::ResourceException: Scope TestScope: exception from stop():\n"
+                         "    unity::ResourceException: Can't stop",
+                         e.what());
+        }
+    }
 }
 
 TEST(RuntimeImpl, directories)
 {
+    string const rt_ini_file = TEST_DIR "/Runtime.ini";
+    string const scope_ini_file = TEST_DIR "/TestScope.ini";
 
     {
-        Runtime::SPtr rt = move(Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini"));
-        TestScope testscope;
-        std::thread testscope_t(testscope_thread, rt, &testscope, TEST_DIR "/Runtime.ini");
+        boost::filesystem::remove_all(TEST_DIR "/cache_dir/unconfined");
+        boost::filesystem::remove_all(TEST_DIR "/cache_dir/leaf-net");
 
-        // Give thread some time to start up.
-        this_thread::sleep_for(chrono::milliseconds(200));
+        ScopeReady ready;
+        auto cb = [&ready]{ ready(); };
+
+        auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
+        TestScope testscope;
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        {
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+        };
+        auto fut = std::async(launch::async, thread_func);
+
+        // Directories are not available before start() is called on the scope.
+        testscope.wait_until_started();
 
         EXPECT_EQ(TEST_DIR, testscope.scope_directory());
 
@@ -109,7 +226,49 @@ TEST(RuntimeImpl, directories)
 
         EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
 
+        // Don't shut down the run time until after the scope has initialized.
+        ready.wait_until_ready();
         rt->destroy();
-        testscope_t.join();
+
+        fut.wait();
+    }
+
+    {
+        // Same test again, but, this time, we remove write permission from the
+        // scope's directory. This cons the run time into thinking that the scope is confined.
+
+        char const* dir_path = TEST_DIR "/cache_dir/unconfined";
+
+        // Make sure we restore previous permissions if something throws.
+        auto restore_perms = [](char const* path){ ::chmod(path, 0700); };
+        util::ResourcePtr<char const*, decltype(restore_perms)> permission_guard(dir_path, restore_perms);
+        ::chmod(dir_path, 0000);
+
+        ScopeReady ready;
+        auto cb = [&ready]{ ready(); };
+
+        auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
+        TestScope testscope;
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        {
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+        };
+        auto fut = std::async(launch::async, thread_func);
+
+        // Directories are not available before start() is called on the scope.
+        testscope.wait_until_started();
+
+        EXPECT_EQ(TEST_DIR, testscope.scope_directory());
+
+        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/leaf-net/TestScope";
+        EXPECT_EQ(tmpdir, testscope.tmp_directory());
+
+        EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
+
+        // Don't shut down the run time until after the scope has initialized.
+        ready.wait_until_ready();
+        rt->destroy();
+
+        fut.wait();
     }
 }

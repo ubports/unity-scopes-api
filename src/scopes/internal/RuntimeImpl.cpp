@@ -280,12 +280,17 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& scope_ini_file,
+                            std::function<void()> ready_cb)
 {
-    run_scope(scope_base, "", scope_ini_file);
+    run_scope(scope_base, "", scope_ini_file, ready_cb);
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_file, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& runtime_ini_file,
+                            string const& scope_ini_file,
+                            std::function<void()> ready_cb)
 {
     if (!scope_base)
     {
@@ -346,39 +351,93 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
         scope_base->p->set_tmp_directory(path);
     }
 
-    scope_base->start(scope_id_);
+    try
+    {
+        scope_base->start(scope_id_);
+    }
+    catch (...)
+    {
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from start()");
+    }
+
+    exception_ptr ep;  // Stores any exceptions that happen from now on.
 
     // Ensure the scope gets stopped.
-    unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
+    auto call_stop = [this, &ep](ScopeBase *scope_base)
+    {
+        try
+        {
+            scope_base->stop();
+        }
+        catch (...)
+        {
+            unity::ResourceException ex("Scope " + scope_id_ +": exception from stop()");
+            ep = make_exception_ptr(ex);
+        }
+    };
+    unity::util::ResourcePtr<ScopeBase*, decltype(call_stop)> cleanup_scope(scope_base, call_stop);
 
     // Give a thread to the scope to do with as it likes. If the scope
     // doesn't want to use it and immediately returns from run(),
     // that's fine.
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
+    this_thread::yield();
 
-    // Create a servant for the scope and register the servant.
-    auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    if (!scope_ini_file.empty())
+    try
     {
-        ScopeConfig scope_config(scope_ini_file);
-        int idle_timeout_ms = scope_config.idle_timeout() * 1000;
-        mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+        // Create a servant for the scope and register the servant.
+        auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+        if (!scope_ini_file.empty())
+        {
+            ScopeConfig scope_config(scope_ini_file);
+            int idle_timeout_ms = scope_config.idle_timeout() * 1000;
+            mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+        }
+        else
+        {
+            mw->add_scope_object(scope_id_, move(scope));
+        }
+
+        // Inform the registry that this scope is now ready to process requests
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+
+        if (ready_cb)
+        {
+            try
+            {
+                ready_cb();
+            }
+            catch (...)
+            {
+            }
+        }
+        mw->wait_for_shutdown();
+        cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
     }
-    else
+    catch (...)
     {
-        mw->add_scope_object(scope_id_, move(scope));
+        unity::ResourceException ex("Scope " + scope_id_ +": failure during initialization");
+        ex.remember(ep);  // ep will still be nullptr if something other than stop() threw.
+        ep = make_exception_ptr(ex);
     }
 
-    // Inform the registry that this scope is now ready to process requests
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+    try
+    {
+        run_future.get();
+    }
+    catch (...)
+    {
+        unity::ResourceException ex("Scope " + scope_id_ +": exception from run()");
+        ep = ex.remember(ep);
+    }
 
-    mw->wait_for_shutdown();
-    cleanup_scope.reset();   // Causes ScopeBase::run() to terminate if the scope is properly written
-
-    // Inform the registry that this scope is shutting down
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
-
-    run_future.get();
+    if (ep)
+    {
+        rethrow_exception(ep);
+    }
 }
 
 ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const
