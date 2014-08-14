@@ -205,7 +205,6 @@ void SettingsDB::process_all_docs()
 {
     if (db_.get() == nullptr)
     {
-        cerr << "attempting to open database: " << db_path_ << endl;
         boost::filesystem::path p(db_path_);
         if (boost::filesystem::exists(p))
         {
