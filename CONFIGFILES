@@ -109,7 +109,7 @@ The following keys are recognized:
   The parent directory under which the runtime writes the scope configration files.
 
   Note that the actual configuration is written into subdirectories of this
-  directory. Specically:
+  directory. Specifically:
 
   $HOME/.config/unity-scopes/<scope_id>/settings.ini
 
