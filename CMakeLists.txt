@@ -234,9 +234,6 @@ set(OTHER_LIBS
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
-    curl
-    oauth
-    json-c
     pthread
     smartscopes
 )
