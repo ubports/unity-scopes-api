@@ -72,33 +72,6 @@ TEST(RuntimeImpl, basic)
     }
 }
 
-class Waiter
-{
-public:
-    Waiter()
-        : ready_(false)
-    {
-    };
-
-    void set_ready() noexcept
-    {
-        lock_guard<mutex> lock(m_);
-        ready_ = true;
-        cond_.notify_all();
-    }
-
-    void wait_until_ready()
-    {
-        unique_lock<mutex> lock(m_);
-        cond_.wait(lock, [this]{ return ready_; });
-    }
-
-private:
-    mutex m_;
-    condition_variable cond_;
-    bool ready_;
-};
-
 TEST(RuntimeImpl, exceptions)
 {
     try
@@ -123,11 +96,11 @@ TEST(RuntimeImpl, exceptions)
         {
             rt->run_scope(&testscope, rt_ini_file, scope_ini_file);
         };
-        auto fut = std::async(launch::async, thread_func);
+        auto thread_done = std::async(launch::async, thread_func);
 
         try
         {
-            fut.get();
+            thread_done.get();
             FAIL();
         }
         catch (std::exception const& e)
@@ -139,23 +112,24 @@ TEST(RuntimeImpl, exceptions)
     }
 
     {
-        Waiter waiter;
-        auto cb = [&waiter]{ waiter.set_ready(); };
+        std::promise<void> promise;
+        auto initialized = promise.get_future();
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope(TestScope::ThrowFromRun);
-        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
         };
-        auto fut = std::async(launch::async, thread_func);
+        auto thread_done = std::async(launch::async, thread_func);
 
-        waiter.wait_until_ready();
+        // Don't destroy the run time until after the scope has finished initializing.
+        initialized.wait();
         rt->destroy();
 
         try
         {
-            fut.get();
+            thread_done.get();
             FAIL();
         }
         catch (std::exception const& e)
@@ -167,24 +141,24 @@ TEST(RuntimeImpl, exceptions)
     }
 
     {
-        Waiter waiter;
-        auto cb = [&waiter]{ waiter.set_ready(); };
+        std::promise<void> promise;
+        auto initialized = promise.get_future();
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope(TestScope::ThrowFromStop);
-        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
         };
-        auto fut = std::async(launch::async, thread_func);
+        auto thread_done = std::async(launch::async, thread_func);
 
         // Don't destroy the run time until after the scope has finished initializing.
-        waiter.wait_until_ready();
+        initialized.wait();
         rt->destroy();
 
         try
         {
-            fut.get();
+            thread_done.get();
             FAIL();
         }
         catch (std::exception const& e)
@@ -205,16 +179,16 @@ TEST(RuntimeImpl, directories)
         boost::filesystem::remove_all(TEST_DIR "/cache_dir/unconfined");
         boost::filesystem::remove_all(TEST_DIR "/cache_dir/leaf-net");
 
-        Waiter waiter;
-        auto cb = [&waiter]{ waiter.set_ready(); };
+        std::promise<void> promise;
+        auto initialized = promise.get_future();
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope;
-        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
         };
-        auto fut = std::async(launch::async, thread_func);
+        auto thread_done = std::async(launch::async, thread_func);
 
         // Directories are not available before start() is called on the scope.
         testscope.wait_until_started();
@@ -226,11 +200,11 @@ TEST(RuntimeImpl, directories)
 
         EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
 
-        // Don't shut down the run time until after the scope has initialized.
-        waiter.wait_until_ready();
+        // Don't destroy the run time until after the scope has finished initializing.
+        initialized.wait();
         rt->destroy();
 
-        fut.wait();
+        thread_done.wait();
     }
 
     {
@@ -244,16 +218,16 @@ TEST(RuntimeImpl, directories)
         util::ResourcePtr<char const*, decltype(restore_perms)> permission_guard(dir_path, restore_perms);
         ::chmod(dir_path, 0000);
 
-        Waiter waiter;
-        auto cb = [&waiter]{ waiter.set_ready(); };
+        std::promise<void> promise;
+        auto initialized = promise.get_future();
 
         auto rt = move(RuntimeImpl::create("TestScope", rt_ini_file));
         TestScope testscope;
-        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, cb]
+        auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, cb);
+            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
         };
-        auto fut = std::async(launch::async, thread_func);
+        auto thread_done = std::async(launch::async, thread_func);
 
         // Directories are not available before start() is called on the scope.
         testscope.wait_until_started();
@@ -266,9 +240,9 @@ TEST(RuntimeImpl, directories)
         EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
 
         // Don't shut down the run time until after the scope has initialized.
-        waiter.wait_until_ready();
+        initialized.wait();
         rt->destroy();
 
-        fut.wait();
+        thread_done.wait();
     }
 }

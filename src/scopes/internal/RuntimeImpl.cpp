@@ -178,8 +178,6 @@ void RuntimeImpl::destroy()
     {
         middleware_->stop();
         middleware_->wait_for_shutdown();
-        middleware_ = nullptr;
-        middleware_factory_.reset(nullptr);
     }
 }
 
@@ -280,17 +278,50 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
+namespace
+{
+
+class PromiseWrapper final
+{
+public:
+    PromiseWrapper(std::promise<void> p)
+        : p_(move(p))
+    {
+    }
+
+    ~PromiseWrapper()
+    {
+        try
+        {
+            p_.set_value();
+        }
+        catch (std::future_error const&)
+        {
+        }
+    }
+
+    void set_value()
+    {
+        p_.set_value();
+    }
+
+private:
+    std::promise<void> p_;
+};
+
+}
+
 void RuntimeImpl::run_scope(ScopeBase* scope_base,
                             string const& scope_ini_file,
-                            std::function<void()> ready_cb)
+                            std::promise<void> ready_promise)
 {
-    run_scope(scope_base, "", scope_ini_file, ready_cb);
+    run_scope(scope_base, "", scope_ini_file, move(ready_promise));
 }
 
 void RuntimeImpl::run_scope(ScopeBase* scope_base,
                             string const& runtime_ini_file,
                             string const& scope_ini_file,
-                            std::function<void()> ready_cb)
+                            std::promise<void> ready_promise)
 {
     if (!scope_base)
     {
@@ -377,6 +408,9 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     };
     unity::util::ResourcePtr<ScopeBase*, decltype(call_stop)> cleanup_scope(scope_base, call_stop);
 
+    // Make sure we satisfy the promise even if something goes wrong.
+    PromiseWrapper promise(move(ready_promise));
+
     // Give a thread to the scope to do with as it likes. If the scope
     // doesn't want to use it and immediately returns from run(),
     // that's fine.
@@ -401,16 +435,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         // Inform the registry that this scope is now ready to process requests
         reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
 
-        if (ready_cb)
-        {
-            try
-            {
-                ready_cb();
-            }
-            catch (...)
-            {
-            }
-        }
+        promise.set_value();
         mw->wait_for_shutdown();
         cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
 

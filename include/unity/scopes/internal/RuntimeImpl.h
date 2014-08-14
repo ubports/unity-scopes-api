@@ -55,11 +55,11 @@ public:
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
     void run_scope(ScopeBase* scope_base,
                    std::string const& scope_ini_file,
-                   std::function<void()> ready_cb = nullptr);
+                   std::promise<void> ready_promise = std::promise<void>());
     void run_scope(ScopeBase* scope_base,
                    std::string const& runtime_ini_file,
                    std::string const& scope_ini_file,
-                   std::function<void()> ready_cb = nullptr);
+                   std::promise<void> = std::promise<void>());
 
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
