@@ -44,6 +44,7 @@ public:
 
     static UPtr create_from_ini_file(std::string const& db_path, std::string const& ini_file_path);
     static UPtr create_from_json_string(std::string const& db_path, std::string const& json_string);
+    static UPtr create_from_schema(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
 
     ~SettingsDB();
 
@@ -60,7 +61,7 @@ public:
     bool state_changed_;
 
 private:
-    SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema::UPtr const& schema);
+    SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
 
     void process_all_docs();
     void set_defaults();

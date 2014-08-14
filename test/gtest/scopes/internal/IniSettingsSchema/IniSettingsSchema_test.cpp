@@ -32,9 +32,10 @@ using namespace std;
 TEST(IniSettingsSchema, basic)
 {
     auto s = IniSettingsSchema::create(TEST_SRC_DIR "/schema.ini");
+    s->add_location_setting();
 
     auto defs = s->definitions();
-    ASSERT_EQ(8, defs.size());
+    ASSERT_EQ(9, defs.size());
 
     EXPECT_EQ("location", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
@@ -60,6 +61,7 @@ TEST(IniSettingsSchema, basic)
     EXPECT_TRUE(defs[3].get_dict()["defaultValue"].get_bool());
 
     EXPECT_EQ(Variant(), defs[4].get_dict()["defaultValue"]);
+
     EXPECT_EQ(Variant(), defs[5].get_dict()["defaultValue"]);
     EXPECT_EQ(Variant(), defs[6].get_dict()["defaultValue"]);
     EXPECT_EQ(Variant(), defs[7].get_dict()["defaultValue"]);
@@ -166,6 +168,18 @@ TEST(IniSettingsSchema, exceptions)
                        "        unity::LogicException:.*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
+
+    try
+    {
+        IniSettingsSchema::create(TEST_SRC_DIR "/internal_name.ini");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        boost::regex r("unity::ResourceException: IniSettingsSchema\\(\\): cannot parse settings file \".*\":\n"
+                       "    unity::ResourceException: IniSettingsSchema\\(\\): invalid key \"internal.foo\" prefixed with \"internal.\"");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
 }
 
 class SetLanguage: public ::testing::Test
@@ -209,5 +223,25 @@ TEST_F(SetLanguage, localization)
         ASSERT_EQ(2, defs[0].get_dict()["displayValues"].get_array().size());
         EXPECT_EQ("Celsius", defs[0].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("Fahrenheit", defs[0].get_dict()["displayValues"].get_array()[1].get_string());
+    }
+}
+
+TEST(IniSettingsSchema, empty_then_with_location)
+{
+    auto s = IniSettingsSchema::create_empty();
+    {
+        auto defs = s->definitions();
+        ASSERT_TRUE(defs.empty());
+    }
+    s->add_location_setting();
+    {
+        auto defs = s->definitions();
+        ASSERT_EQ(1, defs.size());
+
+        EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
+        EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());
+        EXPECT_EQ("boolean", defs[0].get_dict()["type"].get_string());
+        EXPECT_TRUE(defs[0].get_dict()["displayValues"].is_null());
+        EXPECT_TRUE(defs[0].get_dict()["defaultValue"].get_bool());
     }
 }
