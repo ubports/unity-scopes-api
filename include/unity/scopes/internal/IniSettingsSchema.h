@@ -45,12 +45,14 @@ public:
     IniSettingsSchema(IniSettingsSchema&&) = default;
     IniSettingsSchema& operator=(IniSettingsSchema&&) = default;
 
-    virtual VariantArray definitions() const;
+    virtual VariantArray definitions() const override;
 
-    virtual void add_location_setting();
+    void add_location_setting() override;
 
 private:
-    IniSettingsSchema(std::string const& ini_file = std::string());
+    IniSettingsSchema(std::string const& ini_file);
+
+    IniSettingsSchema();
 
     std::string const ini_file_;
     VariantArray definitions_;

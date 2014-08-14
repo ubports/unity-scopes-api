@@ -253,11 +253,6 @@ IniSettingsSchema::UPtr IniSettingsSchema::create_empty()
 IniSettingsSchema::IniSettingsSchema(string const& ini_file)
     : ini_file_(ini_file)
 {
-    if (ini_file.empty())
-    {
-        return;
-    }
-
     try
     {
         auto p = make_shared<IniParser>(ini_file.c_str());
@@ -276,6 +271,10 @@ IniSettingsSchema::IniSettingsSchema(string const& ini_file)
     {
         throw ResourceException("IniSettingsSchema(): cannot parse settings file \"" + ini_file + "\"");
     }
+}
+
+IniSettingsSchema::IniSettingsSchema()
+{
 }
 
 IniSettingsSchema::~IniSettingsSchema() = default;

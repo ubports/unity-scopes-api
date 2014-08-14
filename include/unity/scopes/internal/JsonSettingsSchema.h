@@ -45,9 +45,9 @@ public:
     JsonSettingsSchema(JsonSettingsSchema&&) = default;
     JsonSettingsSchema& operator=(JsonSettingsSchema&&) = default;
 
-    virtual VariantArray definitions() const;
+    virtual VariantArray definitions() const override;
 
-    virtual void add_location_setting();
+    void add_location_setting() override;
 
 private:
     JsonSettingsSchema(std::string const& ini_file);
