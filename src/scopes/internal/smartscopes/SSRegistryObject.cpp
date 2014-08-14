@@ -307,7 +307,7 @@ void SSRegistryObject::get_remote_scopes()
                     {
                         // Store both JSON (for internal comparison) and DB (for external use)
                         changed = true;
-                        std::string settings_db = RuntimeConfig::default_config_directory() + "/" + scope.id + "/settings.db";
+                        std::string settings_db = RuntimeConfig::default_config_directory() + "/" + scope.id + "/settings.ini";
                         SettingsDB::SPtr db(SettingsDB::create_from_schema(settings_db, *schema));
                         settings_defs_[scope.id] = SSSettingsDef{settings, db, needs_location_data};
                     }

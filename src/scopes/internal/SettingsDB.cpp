@@ -13,7 +13,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by Michi Henning <michi.henning@canonical.com>
+ * Authored by:
+ *   Michi Henning <michi.henning@canonical.com>
+ *   Pete Woods <pete.woods@canonical.com>
  */
 
 #include <unity/scopes/internal/SettingsDB.h>
@@ -25,7 +27,6 @@
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
-#include <jsoncpp/json/json.h>
 
 using namespace unity::util;
 using namespace std;
@@ -42,11 +43,15 @@ namespace internal
 namespace
 {
 
-// Custom deleters for ResourcePtr because the u1db API requires
-// a pointer to a pointer to release things.
+void watch_deleter(int fd, int watch)
+{
+    if (fd >= 0 && watch >= 0)
+    {
+        inotify_rm_watch(fd, watch);
+    }
+}
 
-auto db_deleter = [](u1database* p){ u1db_free(&p); };
-auto doc_deleter = [](u1db_document* p){ u1db_free_doc(&p); };
+static const char* GROUP_NAME = "General";
 
 }  // namespace
 
@@ -86,9 +91,17 @@ SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsS
 SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     : state_changed_(false)
     , db_path_(db_path)
-    , db_(nullptr, db_deleter)
-    , generation_(-1)
+    , fd_(inotify_init(), std::bind(&close, std::placeholders::_1))
+    , watch_(-1, std::bind(&watch_deleter, fd_.get(), std::placeholders::_1))
+    , thread_state_(Idle)
 {
+    // Validate the file descriptor
+    if (fd_.get() < 0)
+    {
+        throw SyscallException("SettingsDB(): inotify_init() failed on inotify fd (fd = " +
+                               to_string(fd_.get()) + ")", errno);
+    }
+
     // Initialize the def_map_ so we can look things
     // up quickly.
     definitions_ = schema.definitions();
@@ -100,158 +113,216 @@ SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     process_all_docs();
 }
 
-SettingsDB::~SettingsDB() = default;
+SettingsDB::~SettingsDB()
+{
+    // Tell the thread to stop politely
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = ThreadState::Stopping;
+        // Important to stop the watch, as this unblocks the select() call
+        watch_.dealloc();
+    }
 
-// Called once by u1db for each setting. We are lenient when parsing
+    // Wait for thread to terminate
+    if (thread_.joinable())
+    {
+        thread_.join();
+    }
+}
+
+void SettingsDB::watch_thread()
+{
+    try
+    {
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(fd_.get(), &fds);
+
+        int bytes_avail = 0;
+        std::string buffer;
+
+        // Poll for notifications until stop is requested
+        while (true)
+        {
+            // Wait for a payload to arrive
+            int ret = select(fd_.get() + 1, &fds, nullptr, nullptr, nullptr);
+            if (ret < 0)
+            {
+                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
+                                       "select() failed on inotify fd (fd = " +
+                                       std::to_string(fd_.get()) + ")", errno);
+            }
+            // Get number of bytes available
+            ret = ioctl(fd_.get(), FIONREAD, &bytes_avail);
+            if (ret < 0)
+            {
+                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
+                                       "ioctl() failed on inotify fd (fd = " +
+                                       std::to_string(fd_.get()) + ")", errno);
+            }
+            // Read available bytes
+            buffer.resize(bytes_avail);
+            int bytes_read = read(fd_.get(), &buffer[0], buffer.size());
+            if (bytes_read < 0)
+            {
+                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
+                                       "read() failed on inotify fd (fd = " +
+                                       std::to_string(fd_.get()) + ")", errno);
+            }
+
+            // Process event(s) received
+            int i = 0;
+            while (i < bytes_read)
+            {
+                struct inotify_event* event = (inotify_event*)&buffer[i];
+
+                if (event->mask & IN_DELETE_SELF)
+                {
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    state_changed_ = false;
+                    watch_.dealloc();
+                    watch_.reset(-1);
+                }
+                else if (event->mask & IN_CLOSE_WRITE)
+                {
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    state_changed_ = true;
+                }
+                i += sizeof(inotify_event) + event->len;
+            }
+
+
+            // Break from the loop if we are stopping
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (thread_state_ == Stopping)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << e.what() << std::endl;
+        thread_state_ = Failed;
+    }
+    catch (...)
+    {
+        std::cerr << "SettingsDB::watch_thread(): Thread aborted: unknown exception" << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_state_ = Failed;
+    }
+}
+
+// Called once for each setting. We are lenient when parsing
 // the setting value. If it doesn't match the schema, or something goes
 // wrong otherwise, we use the default value rather than complaining.
 // It is up to the writer of the DB to ensure that the DB contents
 // match the schema.
 
-void SettingsDB::process_doc_(string const& id, string const& json)
+void SettingsDB::process_doc_(string const& id, IniParser const& p)
 {
-    // The shell writes the IDs with a prefix, so we need to strip that before
-    // looking for the ID in the schema.
-    static string const ID_PREFIX = "default-";
-    if (!boost::starts_with(id, ID_PREFIX))
-    {
-        return;  // We ignore anything that doesn't match the prefix.
-    }
+    auto def = def_map_.find(id);
 
-    string real_id = id.substr(ID_PREFIX.size());  // Discard prefix
-
-    if (def_map_.find(real_id) == def_map_.end())
+    if (def == def_map_.end())
     {
         return;  // We ignore anything for which we don't have a schema.
     }
 
-    // Parse the value definition
-    Json::Reader reader;
-    Json::Value root;
-    Json::Value val;
-    if (!reader.parse(json, root) || !root.isObject() || (val = root["value"]).isNull())
-    {
-        // Broken database (syntax error or unexpected JSON objects).
-        return;
-    }
 
-    // Convert the JSON value to a Variant of the correct type according to the schema.
-    switch (val.type())
+    string type = def->second.get_dict()["type"].get_string();
+    try
     {
-        case Json::ValueType::stringValue:
+        if (type == "boolean")
         {
-            if (val.isString())
-            {
-                values_[real_id] = Variant(val.asString());
-            }
-            break;
+            values_[id] = Variant(p.get_boolean(GROUP_NAME, id));
         }
-        case Json::ValueType::booleanValue:
+        else if (type == "list")
         {
-            if (val.isBool())
-            {
-                values_[real_id] = Variant(val.asBool());
-            }
-            break;
+            values_[id] = Variant(p.get_int(GROUP_NAME, id));
         }
-        case Json::ValueType::intValue:
+        else if (type == "number")
         {
-            if (val.isInt())
+            string value = p.get_string(GROUP_NAME, id);
+            try
             {
-                values_[real_id] = Variant(val.asInt());
+                values_[id] = Variant(stod(value));
             }
-            break;
+            catch (invalid_argument & e)
+            {
+            }
         }
-        default:
+        else if (type == "string")
         {
-            // Ignore all other value types, because they don't make sense.
-            break;
+            values_[id] = Variant(p.get_string(GROUP_NAME, id));
         }
     }
+    catch (LogicException & e)
+    {
+    }
 }
-
-namespace
-{
-
-extern "C"
-{
-
-int check_for_changes(void* instance, char const* /* doc_id */, int /* gen*/, char const* /* trans_id */)
-{
-    SettingsDB* thisp = static_cast<SettingsDB*>(instance);
-    assert(thisp);
-
-    thisp->state_changed_ = true;
-    return 0;
-}
-
-int process_doc(void* instance, u1db_document *docp)
-{
-    ResourcePtr<u1db_document*, decltype(doc_deleter)> doc(docp, doc_deleter);
-
-    SettingsDB* thisp = static_cast<SettingsDB*>(instance);
-    assert(thisp);
-
-    thisp->process_doc_(doc.get()->doc_id, doc.get()->json);
-
-    return 0;
-}
-
-}  // extern "C"
-
-}  // namespace
 
 void SettingsDB::process_all_docs()
 {
-    if (db_.get() == nullptr)
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (!watch_ || watch_.get() < 0)
     {
         boost::filesystem::path p(db_path_);
         if (boost::filesystem::exists(p))
         {
-            // Open the db. (It is possible that no DB existed when the constructor ran,
-            // but the DB was created later, when the user first changed a setting.)
-            db_.reset(u1db_open(db_path_.c_str()));
-            if (db_.get() == nullptr)
+            watch_.reset(inotify_add_watch(fd_.get(),
+                                           db_path_.c_str(),
+                                           IN_CLOSE_WRITE
+                                           | IN_DELETE_SELF));
+            if (watch_.get() < 0)
             {
-                // We don't get any more detailed info from the u1db API.
-                throw ResourceException("SettingsDB: u1db_open() failed, db = " + db_path_);
+                throw ResourceException("SettingsDB::add_watch(): failed to add watch for path: \"" +
+                                        db_path_ + "\". inotify_add_watch() failed. (fd = " +
+                                        std::to_string(fd_.get()) + ", path = " + db_path_ + ")");
+            }
+
+            state_changed_ = true;
+
+            if (thread_state_ == Idle)
+            {
+                thread_state_ = Running;
+                thread_ = std::thread(&SettingsDB::watch_thread, this);
             }
         }
         else
         {
+            state_changed_ = false;
+
             set_defaults();
             return;
         }
     }
-    assert(db_.get());
-
-    // Look for changed documents.
-    // If there was an update, state_changed_ is set to true.
-    state_changed_ = false;
-    char* trans_id = nullptr;
-    int new_generation = generation_;
-    int status = u1db_whats_changed(db_.get(), &new_generation, &trans_id, this, check_for_changes);
-    free(trans_id);  // We don't need it.
-    if (status != U1DB_OK)
-    {
-        throw ResourceException("SettingsDB(): u1db_whats_changed() failed, status = "
-                                + to_string(status) + ", db = " + db_path_);
-    }
 
     if (state_changed_)
     {
+        state_changed_ = false;
         // We re-establish the defaults and re-read everything. We need to put the defaults back because
         // settings may have been deleted from the database.
         set_defaults();
 
-        int new_generation = generation_;
-        status = u1db_get_all_docs(db_.get(), 0, &new_generation, this, process_doc);
-        if (status != U1DB_OK)
+        try
         {
-            throw ResourceException("SettingsDB(): u1db_get_all_docs() failed, status = "
-                                    + to_string(status) + ", db = " + db_path_);               // LCOV_EXCL_LINE
+            IniParser p(db_path_.c_str());
+
+            if (p.has_group(GROUP_NAME))
+            {
+                auto keys = p.get_keys(GROUP_NAME);
+                for (auto const& key : keys) {
+                    process_doc_(key, p);
+                }
+            }
         }
-        generation_ = new_generation;
+        catch (FileException & e)
+        {
+            throw ResourceException(e.what());
+        }
     }
 }
 

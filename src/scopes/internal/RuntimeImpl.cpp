@@ -345,7 +345,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     {
         // Try to open the scope settings database, if any.
         string config_dir = config_dir_ + "/" + scope_id_;
-        string settings_db = config_dir + "/settings.db";
+        string settings_db = config_dir + "/settings.ini";
 
         string data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
