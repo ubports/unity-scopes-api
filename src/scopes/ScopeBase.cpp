@@ -94,6 +94,7 @@ RegistryProxy ScopeBase::registry() const
 
 unity::scopes::VariantMap ScopeBase::settings() const
 {
+    std::cerr << "settings: " << Variant(p->settings()).serialize_json() << std::endl;
     return p->settings();
 }
 

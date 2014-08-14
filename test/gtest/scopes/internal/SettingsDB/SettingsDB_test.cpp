@@ -48,7 +48,7 @@ void write_db(const string& src)
   time(&start_time); \
   time_t current_time; \
   time(&current_time); \
-  while (difftime(current_time, start_time) < 2) \
+  while (difftime(current_time, start_time) < 10) \
   { \
     if(expected == actual) \
     { \
