@@ -38,6 +38,7 @@
 
 #include "EmptyScope.h"
 #include "TestScope.h"
+#include "DebugTestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -136,6 +137,26 @@ TEST(Invocation, timeout)
     EXPECT_EQ("", receiver->error_message());
 }
 
+TEST(Invocation, no_timeout_in_debug_mode)
+{
+    auto reg_rt = run_test_registry();
+    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
+    auto mw = rt->factory()->create("DebugTestScope", "Zmq", "Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("DebugTestScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+
+    auto receiver = make_shared<TestReceiver>();
+
+    // This call sleeps for 2s then returns
+    scope->search("test", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Check that the two-way invocation timeout did not kick in due to "DebugMode = true"
+    EXPECT_EQ(CompletionDetails::OK, receiver->status());
+    EXPECT_EQ("", receiver->error_message());
+}
+
 class NullReceiver : public SearchListenerBase
 {
 public:
@@ -154,6 +175,7 @@ public:
 
 TEST(Invocation, shutdown_with_outstanding_async)
 {
+    auto reg_rt = run_test_registry();
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("EmptyScope", "Zmq", "Zmq.ini");
     mw->start();
@@ -183,6 +205,12 @@ void nullscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
     rt->run_scope(&scope, runtime_ini_file, "");
 }
 
+void debugtestscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+{
+    DebugTestScope scope;
+    rt->run_scope(&scope, runtime_ini_file, "DebugTestScope.ini");
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -192,6 +220,9 @@ int main(int argc, char **argv)
 
     Runtime::SPtr esrt = move(Runtime::create_scope_runtime("EmptyScope", "Runtime.ini"));
     std::thread emptyscope_t(nullscope_thread, esrt, "Runtime.ini");
+
+    Runtime::SPtr dsrt = move(Runtime::create_scope_runtime("DebugTestScope", "Runtime.ini"));
+    std::thread debugtestscope_t(debugtestscope_thread, dsrt, "Runtime.ini");
 
     // Give threads some time to bind to endpoints, to avoid getting ObjectNotExistException
     // from a synchronous remote call.
@@ -204,6 +235,9 @@ int main(int argc, char **argv)
 
     esrt->destroy();
     emptyscope_t.join();
+
+    dsrt->destroy();
+    debugtestscope_t.join();
 
     return rc;
 }

@@ -13,21 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/SearchQueryBase.h>
-#include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/PreviewWidget.h>
-#include <unity/scopes/SearchReply.h>
-
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
-#include <boost/algorithm/string.hpp>
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
-using namespace std;
 using namespace unity::scopes;
 
 class MyQuery : public SearchQueryBase
@@ -67,13 +59,8 @@ public:
 class MyScope : public ScopeBase
 {
 public:
-    virtual void start(string const&) override
+    virtual void start(std::string const&) override
     {
-        string ld_lib_path = getenv("LD_LIBRARY_PATH");
-        string expected_path_prefix = string(SCOPE_CONFIG_PATH) + ":" + SCOPE_CONFIG_PATH + "/lib";
-        // We don't use gtest here because then the scope would have to link against it,
-        // but libgtest.a isn't compiled with -fPIC.
-        assert(boost::algorithm::starts_with(ld_lib_path, expected_path_prefix));
     }
 
     virtual void stop() override {}

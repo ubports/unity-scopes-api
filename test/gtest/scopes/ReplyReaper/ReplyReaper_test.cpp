@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 
@@ -103,5 +104,74 @@ TEST(ReplyReaper, reap)
     receiver->wait_until_finished();
 
     no_reply_rt->destroy();
-    scope_t.join();
+    if (scope_t.joinable())
+    {
+        scope_t.join();
+    }
+}
+
+class NoReapReceiver : public SearchListenerBase
+{
+public:
+    NoReapReceiver()
+        : query_complete_(false)
+    {
+    }
+
+    virtual void push(CategorisedResult /* result */) override
+    {
+    }
+
+    virtual void finished(CompletionDetails const& details) override
+    {
+        // Check that finished() was called by the reaper.
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
+        lock_guard<mutex> lock(mutex_);
+        query_complete_ = true;
+        cond_.notify_all();
+    }
+
+    void wait_until_finished()
+    {
+        unique_lock<mutex> lock(mutex_);
+        cond_.wait(lock, [this] { return this->query_complete_; });
+    }
+
+private:
+    bool query_complete_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
+void scope_thread_debug_mode(Runtime::SPtr const& rt, string const& runtime_ini_file)
+{
+    NoReplyScope scope;
+    rt->run_scope(&scope, runtime_ini_file, TEST_DIR "/DebugScope.ini");
+}
+
+TEST(ReplyReaper, no_reap_in_debug_mode)
+{
+    auto reg_rt = run_test_registry();
+
+    Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
+    std::thread scope_t(scope_thread_debug_mode, no_reply_rt, TEST_DIR "/Runtime.ini");
+
+    // Run a query in the scope. The query will do nothing for 3 seconds,
+    // but the reaper will reap after at most 2 seconds.
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("NoReplyScope");
+    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
+
+    auto receiver = make_shared<NoReapReceiver>();
+    scope->search("test", SearchMetadata("en", "phone"), receiver);
+    receiver->wait_until_finished();
+
+    no_reply_rt->destroy();
+    if (scope_t.joinable())
+    {
+        scope_t.join();
+    }
 }

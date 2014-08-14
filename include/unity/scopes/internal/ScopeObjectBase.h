@@ -69,6 +69,8 @@ public:
                                      ActionMetadata const& hints,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) = 0;
+
+    virtual bool debug_mode() const = 0;
 };
 
 } // namespace internal

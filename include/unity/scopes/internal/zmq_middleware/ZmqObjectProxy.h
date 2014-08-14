@@ -77,7 +77,7 @@ protected:
     void invoke_oneway_(capnp::MessageBuilder& out_params);
 
     ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout);
+    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params, int64_t twoway_timeout, int64_t locate_timeout = -1);
 
 private:
     ZmqReceiver invoke_twoway__(capnp::MessageBuilder& out_params, int64_t timeout);
