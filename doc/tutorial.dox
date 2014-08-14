@@ -491,7 +491,7 @@ The following types are supported for settings:
 
 <ul>
 <li>`string` - a string value
-<li>`number` - an integer value
+<li>`number` - an numeric value
 <li>`boolean` - `true` or `false`
 <li>`list` - a list of alternatives to choose from (single-choice)
 </ul>

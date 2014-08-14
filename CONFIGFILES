@@ -111,7 +111,7 @@ The following keys are recognized:
   Note that the actual configuration is written into subdirectories of this
   directory. Specically:
 
-  $HOME/.config/unity-scopes/<scope_id>/settings.db
+  $HOME/.config/unity-scopes/<scope_id>/settings.ini
 
 Zmq.ini
 -------
