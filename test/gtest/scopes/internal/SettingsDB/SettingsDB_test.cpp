@@ -18,17 +18,20 @@
  *   Pete Woods <pete.woods@canonical.com>
  */
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS // Apparently we need this to successfully link against Boost
-
 #include <unity/scopes/internal/SettingsDB.h>
 
 #include <unity/UnityExceptions.h>
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS // We need this to successfully link against Boost when calling
+                                    // copy_file. See https://svn.boost.org/trac/boost/ticket/6779
+#include <boost/filesystem/operations.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
-#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
 #include <ctime>
+
 
 using namespace unity;
 using namespace unity::scopes::internal;
@@ -44,18 +47,16 @@ void write_db(const string& src)
 
 #define TRY_EXPECT_EQ(expected, actual) \
 { \
-  time_t start_time; \
-  time(&start_time); \
-  time_t current_time; \
-  time(&current_time); \
-  while (difftime(current_time, start_time) < 10) \
+  auto now = chrono::system_clock::now(); \
+  auto later = now + chrono::seconds(10); \
+  while (now < later) \
   { \
-    if(expected == actual) \
+    if (expected == actual) \
     { \
         break; \
     } \
-    usleep(100000); \
-    time(&current_time); \
+    this_thread::sleep_for(chrono::milliseconds(10)); \
+    now = chrono::system_clock::now(); \
   } \
   EXPECT_EQ(expected, actual); \
 }
@@ -184,6 +185,43 @@ TEST(SettingsDB, basic)
         EXPECT_EQ(4, db->settings().size());
         TRY_EXPECT_EQ("Paris", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
+        EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
+        EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
+    }
+}
+
+TEST(SettingsDB, delete_db)
+{
+    auto schema = TEST_SRC_DIR "/schema.ini";
+
+    {
+        unlink(db_name.c_str());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
+
+        // If db doesn't exist, default values are returned.
+        EXPECT_EQ(4, db->settings().size());
+        EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
+        EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
+        EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
+
+        // Create the DB now, with a bunch of settings.
+        write_db("db_loctempageenabled.ini");
+
+        // Settings should be updated.
+        EXPECT_EQ(4, db->settings().size());
+        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
+        EXPECT_EQ(42, db->settings()["ageSetting"].get_double());
+        EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
+
+        // Now remove the database.
+        unlink(db_name.c_str());
+
+        // Default values should come back.
+        EXPECT_EQ(4, db->settings().size());
+        TRY_EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
     }

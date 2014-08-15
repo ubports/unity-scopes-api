@@ -28,6 +28,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 
+#include <fcntl.h>
+
 using namespace unity::util;
 using namespace std;
 
@@ -43,7 +45,38 @@ namespace internal
 namespace
 {
 
-void watch_deleter(int fd, int watch)
+typedef ResourcePtr<int, function<void(int)>> FileLock;
+
+static FileLock unix_lock(string const& path)
+{
+    FileLock file_lock(::open(path.c_str(), O_RDONLY), [](int fd)
+    {
+        if (fd != -1)
+        {
+            close(fd);
+        }
+    });
+
+    if (file_lock.get() == -1)
+    {
+        throw FileException("Couldn't open file " + path, errno);
+    }
+
+    struct flock fl;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    fl.l_type = F_RDLCK;
+
+    if (::fcntl(file_lock.get(), F_SETLKW, &fl) != 0)
+    {
+        throw FileException("Couldn't get file lock for " + path, errno);
+    }
+
+    return file_lock;
+}
+
+static void watch_deleter(int fd, int watch)
 {
     if (fd >= 0 && watch >= 0)
     {
@@ -63,7 +96,7 @@ SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string 
         SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
         return create_from_schema(db_path, *schema);
     }
-    catch (std::exception const& e)
+    catch (exception const& e)
     {
         throw ResourceException("SettingsDB::create_from_ini_file(): schema = " + ini_file_path + ", db = " + db_path);
     }
@@ -77,7 +110,7 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, stri
         auto schema = JsonSettingsSchema::create(json_string);
         return create_from_schema(db_path, *schema);
     }
-    catch (std::exception const& e)
+    catch (exception const& e)
     {
         throw ResourceException("SettingsDB::create_from_json_string(): cannot parse schema, db = " + db_path);
     }
@@ -91,8 +124,8 @@ SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsS
 SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     : state_changed_(false)
     , db_path_(db_path)
-    , fd_(inotify_init(), std::bind(&close, std::placeholders::_1))
-    , watch_(-1, std::bind(&watch_deleter, fd_.get(), std::placeholders::_1))
+    , fd_(inotify_init(), bind(&close, placeholders::_1))
+    , watch_(-1, bind(&watch_deleter, fd_.get(), placeholders::_1))
     , thread_state_(Idle)
 {
     // Validate the file descriptor
@@ -113,19 +146,19 @@ SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     process_all_docs();
 }
 
+
 SettingsDB::~SettingsDB()
 {
     // Tell the thread to stop politely
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        thread_state_ = ThreadState::Stopping;
+        lock_guard<mutex> lock(mutex_);
         // Important to stop the watch, as this unblocks the select() call
         watch_.dealloc();
+        thread_state_ = ThreadState::Stopping;
     }
 
     // Wait for thread to terminate
-    if (thread_.joinable())
-    {
+    if (thread_.joinable()) {
         thread_.join();
     }
 }
@@ -139,7 +172,7 @@ void SettingsDB::watch_thread()
         FD_SET(fd_.get(), &fds);
 
         int bytes_avail = 0;
-        std::string buffer;
+        string buffer;
 
         // Poll for notifications until stop is requested
         while (true)
@@ -150,16 +183,18 @@ void SettingsDB::watch_thread()
             {
                 throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
                                        "select() failed on inotify fd (fd = " +
-                                       std::to_string(fd_.get()) + ")", errno);
+                                       to_string(fd_.get()) + ")", errno);
             }
+
             // Get number of bytes available
             ret = ioctl(fd_.get(), FIONREAD, &bytes_avail);
             if (ret < 0)
             {
                 throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
                                        "ioctl() failed on inotify fd (fd = " +
-                                       std::to_string(fd_.get()) + ")", errno);
+                                       to_string(fd_.get()) + ")", errno);
             }
+
             // Read available bytes
             buffer.resize(bytes_avail);
             int bytes_read = read(fd_.get(), &buffer[0], buffer.size());
@@ -167,7 +202,7 @@ void SettingsDB::watch_thread()
             {
                 throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
                                        "read() failed on inotify fd (fd = " +
-                                       std::to_string(fd_.get()) + ")", errno);
+                                       to_string(fd_.get()) + ")", errno);
             }
 
             // Process event(s) received
@@ -178,14 +213,15 @@ void SettingsDB::watch_thread()
 
                 if (event->mask & IN_DELETE_SELF)
                 {
-                    std::lock_guard<std::mutex> lock(mutex_);
+                    lock_guard<mutex> lock(mutex_);
                     state_changed_ = false;
                     watch_.dealloc();
                     watch_.reset(-1);
+                    thread_state_ = Stopping;
                 }
                 else if (event->mask & IN_CLOSE_WRITE)
                 {
-                    std::lock_guard<std::mutex> lock(mutex_);
+                    lock_guard<mutex> lock(mutex_);
                     state_changed_ = true;
                 }
                 i += sizeof(inotify_event) + event->len;
@@ -194,23 +230,25 @@ void SettingsDB::watch_thread()
 
             // Break from the loop if we are stopping
             {
-                std::lock_guard<std::mutex> lock(mutex_);
+                lock_guard<mutex> lock(mutex_);
                 if (thread_state_ == Stopping)
                 {
+                    thread_state_ = Idle;
                     break;
                 }
             }
         }
     }
-    catch (std::exception const& e)
+    catch (exception const& e)
     {
-        std::cerr << e.what() << std::endl;
+        cerr << "SettingsDB::watch_thread(): Thread aborted: " << e.what() << endl;
+        lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
     catch (...)
     {
-        std::cerr << "SettingsDB::watch_thread(): Thread aborted: unknown exception" << std::endl;
-        std::lock_guard<std::mutex> lock(mutex_);
+        cerr << "SettingsDB::watch_thread(): Thread aborted: unknown exception" << endl;
+        lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
 }
@@ -265,7 +303,7 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
 
 void SettingsDB::process_all_docs()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    lock_guard<mutex> lock(mutex_);
 
     if (!watch_ || watch_.get() < 0)
     {
@@ -280,7 +318,7 @@ void SettingsDB::process_all_docs()
             {
                 throw ResourceException("SettingsDB::add_watch(): failed to add watch for path: \"" +
                                         db_path_ + "\". inotify_add_watch() failed. (fd = " +
-                                        std::to_string(fd_.get()) + ", path = " + db_path_ + ")");
+                                        to_string(fd_.get()) + ", path = " + db_path_ + ")");
             }
 
             state_changed_ = true;
@@ -288,7 +326,7 @@ void SettingsDB::process_all_docs()
             if (thread_state_ == Idle)
             {
                 thread_state_ = Running;
-                thread_ = std::thread(&SettingsDB::watch_thread, this);
+                thread_ = thread(&SettingsDB::watch_thread, this);
             }
         }
         else
@@ -309,6 +347,8 @@ void SettingsDB::process_all_docs()
 
         try
         {
+            FileLock lock = unix_lock(db_path_);
+
             IniParser p(db_path_.c_str());
 
             if (p.has_group(GROUP_NAME))

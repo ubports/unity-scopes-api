@@ -108,6 +108,8 @@ The following keys are recognized:
 
   The parent directory under which the runtime writes the scope configration files.
 
+  The default value is $HOME/.config/unity-scopes.
+
   Note that the actual configuration is written into subdirectories of this
   directory. Specifically:
 
