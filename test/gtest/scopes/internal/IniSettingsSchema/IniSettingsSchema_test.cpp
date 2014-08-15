@@ -53,7 +53,7 @@ TEST(IniSettingsSchema, basic)
     EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
     EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());
     EXPECT_EQ("Age", defs[2].get_dict()["displayName"].get_string());
-    EXPECT_EQ(23, defs[2].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(23, defs[2].get_dict()["defaultValue"].get_double());
 
     EXPECT_EQ("enabled", defs[3].get_dict()["id"].get_string());
     EXPECT_EQ("boolean", defs[3].get_dict()["type"].get_string());

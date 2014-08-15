@@ -819,6 +819,10 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
             setting_str << "\"" << setting.second.get_string() << "\"";
             setting_valid = true;
             break;
+        case Variant::Double:
+            setting_str << setting.second.get_double();
+            setting_valid = true;
+            break;
         default:
             std::cerr << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for settings value: \"" << setting.first << "\"" << std::endl;
         }

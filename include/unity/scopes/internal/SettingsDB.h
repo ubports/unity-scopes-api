@@ -25,10 +25,19 @@
 #include <unity/util/NonCopyable.h>
 #include <unity/util/ResourcePtr.h>
 
-#include <u1db/u1db.h>
+#include <sys/inotify.h>
+#include <sys/ioctl.h>
+
+#include <atomic>
+#include <thread>
 
 namespace unity
 {
+
+namespace util
+{
+class IniParser;
+}
 
 namespace scopes
 {
@@ -53,25 +62,32 @@ public:
 
     VariantMap settings();  // Returns the current settings (checking the DB each time).
 
-    // These should be private, but we can't make them private because an extern "C"
-    // callback cannot access private members.
-
-    void process_doc_(std::string const& id, std::string const& json);
-
-    bool state_changed_;
-
 private:
+    enum ThreadState
+    {
+        Idle,
+        Running,
+        Stopping,
+        Failed
+    };
+
     SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
 
+    void process_doc_(std::string const& id, unity::util::IniParser const& parer);
     void process_all_docs();
     void set_defaults();
+    void watch_thread();
 
+    bool state_changed_;
     std::string db_path_;
-    unity::util::ResourcePtr<u1database*, std::function<void(u1database*)>> db_;
-    int generation_;
+    unity::util::ResourcePtr<int, std::function<void(int)>> fd_;
+    unity::util::ResourcePtr<int, std::function<void(int)>> watch_;
     VariantArray definitions_;                       // Returned by SettingsSchema
-    std::map<std::string, Variant const&> def_map_;  // Allows fast access to the Variants in definitions_
+    std::map<std::string, Variant> def_map_;  // Allows fast access to the Variants in definitions_
     unity::scopes::VariantMap values_;
+    std::thread thread_;
+    std::mutex mutex_;
+    ThreadState thread_state_;
 };
 
 }  // namespace internal

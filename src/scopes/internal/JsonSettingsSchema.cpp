@@ -72,7 +72,7 @@ private:
     void set_default_value(Json::Value const& v, Type expected_type);
     Variant get_bool_default(Json::Value const& v) const;
     Variant get_enum_default(Json::Value const& v);
-    Variant get_int_default(Json::Value const& v) const;
+    Variant get_double_default(Json::Value const& v) const;
     Variant get_string_default(Json::Value const& v) const;
     void set_enumerators(Json::Value const& v);
 
@@ -200,7 +200,7 @@ void Setting::set_default_value(Json::Value const& v, Type expected_type)
         }
         case Type::NumberT:
         {
-            default_value_ = get_int_default(v_param);
+            default_value_ = get_double_default(v_param);
             break;
         }
         case Type::StringT:
@@ -236,7 +236,7 @@ Variant Setting::get_bool_default(Json::Value const& v) const
     return Variant(v_dflt.asBool());
 }
 
-Variant Setting::get_int_default(Json::Value const& v) const
+Variant Setting::get_double_default(Json::Value const& v) const
 {
     if (v.isNull())  // No "parameters" key
     {
@@ -247,12 +247,12 @@ Variant Setting::get_int_default(Json::Value const& v) const
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isInt())
+    if (!v_dflt.isNumeric())
     {
         throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
                                        + "\" definition, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asInt());
+    return Variant(v_dflt.asDouble());
 }
 
 Variant Setting::get_enum_default(Json::Value const& v)
