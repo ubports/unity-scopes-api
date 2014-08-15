@@ -149,6 +149,7 @@ ZmqMiddleware::~ZmqMiddleware()
         stop();
         wait_for_shutdown();
 
+        // TODO:
         // We terminate explicitly here instead of relying
         // on the destructor so we can measure how long it
         // takes. There is an intermittent problem with
@@ -162,8 +163,10 @@ ZmqMiddleware::~ZmqMiddleware()
         auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
         if (millisecs > 100)
         {
-            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-                 << " ms to complete for " << server_name_ << endl;
+            ostringstream s;
+            s << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+              << " ms to complete for " << server_name_ << endl;
+            cerr << s.str();
         }
     }
     catch (std::exception const& e)
@@ -197,10 +200,21 @@ void ZmqMiddleware::start()
         {
             {
                 lock_guard<mutex> lock(data_mutex_);
-                oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
-                // N.B. We absolutely MUST have AT LEAST 2 two-way invoke threads
-                // as rebinding is invoked within two-way invocations.
-                twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
+                try
+                {
+                    oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
+                    // N.B. We absolutely MUST have AT LEAST 2 two-way invoke threads
+                    // as rebinding is invoked within two-way invocations.
+                    twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
+                }
+                catch (std::exception const& e)
+                {
+                    throw MiddlewareException(string("Cannot create outgoing invocation pools: ") + e.what());
+                }
+                catch (...)
+                {
+                    throw MiddlewareException("Cannot create outgoing invocation pools: unknown exception");
+                }
             }
             shutdown_flag = false;
             state_ = Started;
@@ -230,8 +244,12 @@ void ZmqMiddleware::stop()
             lock_guard<mutex> lock(data_mutex_);
 
             // No more outgoing invocations
-            twoway_invokers_.reset();
-            oneway_invoker_.reset();
+            assert((oneway_invoker_ && twoway_invokers_) || (!oneway_invoker_ && !twoway_invokers_));
+            if (oneway_invoker_)
+            {
+                twoway_invokers_->destroy();            // Destroy immediately, because invocations can take time.
+                oneway_invoker_->destroy_once_empty();  // Wait for queued oneways to go out first.
+            }
 
             // Initiate shutdown of all adapters
             for (auto& pair : am_)

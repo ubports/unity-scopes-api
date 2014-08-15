@@ -423,14 +423,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     try
     {
-
         // Create a servant for the scope and register the servant.
         if (!scope_ini_file.empty())
         {
             // Check if this scope has requested debug mode, if so, disable the idle timeout
             ScopeConfig scope_config(scope_ini_file);
             int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
-
             auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
                                                                                      scope_base,
                                                                                      scope_config.debug_mode()));
@@ -509,8 +507,8 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
 {
     // TODO: HACK: Until we get a fancier Apparmor query API, we try
     //             to create the scope cache dir and figure out whether
-    //             whether we are confined or unconfined. We first try to
-    //             create <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
+    //             we are confined or unconfined. We first try to create
+    //             <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
     //             in case they don't exist. Then we try to create a file in
     //             <data_dir>unconfined/<scope_id_>. If that works, we unlink
     //             the file again and can conclude that the scope is unconfined.

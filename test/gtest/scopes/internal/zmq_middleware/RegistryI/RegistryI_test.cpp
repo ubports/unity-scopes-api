@@ -436,12 +436,13 @@ public:
 
     int first_child_pid()
     {
-        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers | egrep -v 'ps|egrep'"));
+        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers --sort=+pid | egrep -v 'ps|egrep'"));
     }
 
     int process_count()
     {
-        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | egrep -v 'ps|egrep|wc' | wc -l"));
+        int current_process_count =
+            stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers | egrep -v 'ps|egrep|wc' | wc -l"));
         return current_process_count - start_process_count;
     }
 
@@ -563,20 +564,26 @@ TEST_F(RegistryITest, locate_all)
 class Receiver : public SearchListenerBase
 {
 public:
+    Receiver()
+        : query_complete_(false)
+    {
+    }
+
     void push(CategorisedResult) override {}
 
     void finished(CompletionDetails const&) override
     {
         // Signal that the query is complete
-        unique_lock<std::mutex> lock(mutex_);
+        lock_guard<std::mutex> lock(mutex_);
         query_complete_ = true;
-        cond_.notify_one();
+        cond_.notify_all();
     }
 
     void wait_until_finished()
     {
         unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        EXPECT_TRUE(cond_.wait_for(lock, chrono::seconds(5), [this] { return this->query_complete_; }))
+            << "Receiver: finished message did not arrive";
     }
 
 private:
@@ -710,6 +717,6 @@ TEST_F(RegistryITest, locate_idle_timeout)
     // check now that the scope has shutdown automatically (timed out after 2s)
     EXPECT_FALSE(reg->is_scope_running("testscopeB"));
 
-    // check that 1 new process was started
+    // check that the process is gone
     EXPECT_EQ(0, process_count());
 }
