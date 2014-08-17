@@ -347,15 +347,16 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         string config_dir = config_dir_ + "/" + scope_id_;
         string settings_db = config_dir + "/settings.ini";
 
-        string data_dir = data_dir_ + "/" + scope_id_;
+        string scope_data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
 
         string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
-        if (boost::filesystem::exists(settings_schema))
+        boost::system::error_code ec;
+        if (boost::filesystem::exists(settings_schema, ec))
         {
             // Make sure the data directories exist. (No permission for group and others; data might be sensitive.)
-            ::mkdir(data_dir_.c_str(), 0700);
-            ::mkdir(data_dir.c_str(), 0700);
+            !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
+            !boost::filesystem::exists(scope_data_dir, ec) && ::mkdir(scope_data_dir.c_str(), 0700);
 
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
@@ -377,11 +378,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         // exist. (/run/user/<uid> gets cleaned out periodically.)
         string path = string("/run/user/") + std::to_string(geteuid());
         path += "/scopes";
-        ::mkdir(path.c_str(), 0700);
+        boost::system::error_code ec;
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
         path += "/" + confinement_type;
-        ::mkdir(path.c_str(), 0700);
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
         path += "/" + scope_id_;
-        ::mkdir(path.c_str(), 0700);
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
 
         scope_base->p->set_tmp_directory(path);
     }
@@ -516,8 +518,11 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
     //             the file again and can conclude that the scope is unconfined.
     //             Otherwise, the scope must be confined, in which case
     //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
+    //             We try and create a directory only if it doesn't exist, to avoid
+    //             noise in Apparmor logs if permission is denied.
 
-    ::mkdir(data_dir_.c_str(), 0700); // We don't care if this fails.
+    boost::system::error_code ec;
+    !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700); // We don't care if this fails.
 
     // Assume we are unconfined initially.
     confinement_type = "unconfined";
@@ -525,9 +530,9 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
 
     // The following two mkdir() calls will fail if the scope is confined or
     // the directories exist already.
-    ::mkdir(dir.c_str(), 0700);
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     dir += "/" + scope_id_;
-    ::mkdir(dir.c_str(), 0700);
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     string tmp = dir + "/.scope_tmp_XXXXXX";
     int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
     if (fd != -1)
@@ -541,9 +546,9 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
         // mkstemp() failed, the scope must be confined.
         confinement_type = "leaf-net";
         dir = data_dir_ + "/" + confinement_type;
-        ::mkdir(dir.c_str(), 0700);
+        !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
         dir += "/" + scope_id_;
-        ::mkdir(dir.c_str(), 0700);
+        !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     }
     return dir;
 }
