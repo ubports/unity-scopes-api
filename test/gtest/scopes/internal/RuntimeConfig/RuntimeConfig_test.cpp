@@ -66,6 +66,22 @@ TEST(RuntimeConfig, overridden_data_dir_with_home_dir)
     EXPECT_EQ("Foo", c.data_directory());
 }
 
+TEST(RuntimeConfig, overridden_config_dir)
+{
+    unsetenv("HOME");
+
+    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    EXPECT_EQ("Foo", c.config_directory());
+}
+
+TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
+{
+    setenv("HOME", TEST_SRC_DIR, 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    EXPECT_EQ("Foo", c.config_directory());
+}
+
 TEST(RuntimeConfig, exceptions)
 {
     try
@@ -116,6 +132,22 @@ TEST(RuntimeConfig, exceptions)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoDataDir.ini\": No DataDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_data_directory(): "
+                     "$HOME not set",
+                     e.what());
+    }
+
+    try
+    {
+        unsetenv("HOME");
+
+        RuntimeConfig c(TEST_SRC_DIR "/NoConfigDir.ini");
+        FAIL();
+        EXPECT_EQ("Foo", c.data_directory());
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoConfigDir.ini\": No ConfigDir configured and "
+                     "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_config_directory(): "
                      "$HOME not set",
                      e.what());
     }

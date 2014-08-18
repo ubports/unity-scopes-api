@@ -94,11 +94,15 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
     auto defs = meta.settings_definitions();
-    ASSERT_EQ(1, defs.size());
+    ASSERT_EQ(2, defs.size());
     EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
+    EXPECT_EQ("internal.location", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("Enable location data", defs[1].get_dict()["displayName"].get_string());
+    EXPECT_EQ("boolean", defs[1].get_dict()["type"].get_string());
+    EXPECT_EQ(true, defs[1].get_dict()["defaultValue"].get_bool());
     EXPECT_TRUE(meta.location_data_needed());
 
     auto attrs = meta.appearance_attributes();
@@ -192,7 +196,7 @@ TEST(Registry, scope_state_notify)
 
     auto meta = r->get_metadata("testscopeA");
     auto defs = meta.settings_definitions();
-    EXPECT_EQ(1, defs.size());
+    EXPECT_EQ(2, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point
@@ -238,6 +242,128 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(wait_for_stateB_update());
     EXPECT_FALSE(get_stateB());
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
+}
+
+TEST(Registry, no_idle_timeout_in_debug_mode)
+{
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure testscopeC scope_state_callback
+    auto conn = r->set_scope_state_callback("testscopeC", [&update_received, &mutex, &cond](bool)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
+    });
+
+    auto wait_for_state_update = [&update_received, &mutex, &cond]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; });
+        update_received = false;
+        return success;
+    };
+
+    // Move testscopeC into the scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    auto meta = r->get_metadata("testscopeC");
+    auto sp = meta.proxy();
+
+    // testscopeC should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+    EXPECT_FALSE(wait_for_state_update());
+
+    // search would fail if testscopeC can't be executed
+    auto receiver = std::make_shared<Receiver>();
+    SearchListenerBase::SPtr reply(receiver);
+    auto ctrl = sp->search("foo", SearchMetadata("C", "desktop"), reply);
+    EXPECT_TRUE(receiver->wait_until_finished());
+
+    // testscopeC should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(r->is_scope_running("testscopeC"));
+
+    // check that the scope is still running after 4s
+    // (due to "DebugMode = true" and despite "IdleTimeout = 2")
+    std::this_thread::sleep_for(std::chrono::seconds{4});
+    EXPECT_FALSE(wait_for_state_update());
+    EXPECT_TRUE(r->is_scope_running("testscopeC"));
+
+    // Move testscopeC back into the other_scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
+TEST(Registry, manually_started_scope)
+{
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure testscopeC scope_state_callback
+    auto conn = r->set_scope_state_callback("testscopeC", [&update_received, &mutex, &cond](bool)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
+    });
+
+    auto wait_for_state_update = [&update_received, &mutex, &cond]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::seconds(5), [&update_received] { return update_received; });
+        update_received = false;
+        return success;
+    };
+
+    // Move testscopeC into the scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    // testscopeC should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+
+    // start testscopeC manually
+    auto scope_pid = fork();
+    if (scope_pid == 0)
+    {
+        const char* const args[] = {"scoperunner [Registry test]", TEST_RUNTIME_FILE, TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", nullptr};
+
+        if (execv(TEST_SCOPERUNNER_PATH "/scoperunner", const_cast<char* const*>(args)) < 0)
+        {
+            perror("Error starting scoperunner:");
+        }
+        exit(0);
+    }
+
+    // testscopeC should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(r->is_scope_running("testscopeC"));
+
+    // stop testscopeC manually
+    kill(scope_pid, SIGTERM);
+    int status;
+    waitpid(scope_pid, &status, 0);
+
+    // testscopeC should now be stopped
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+
+    // Move testscopeC back into the other_scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 TEST(Registry, list_update_notify_before_click_folder_exists)
@@ -489,9 +615,6 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
-        // Allow the registry process some time to start up,
-        // so we don't get an ObjectNotExistException.
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         auto rc = RUN_ALL_TESTS();
         kill(rpid, SIGTERM);
         waitpid(rpid, nullptr, 0);

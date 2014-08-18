@@ -222,7 +222,7 @@ TEST(ScopeLoader, throw_unity_exception_from_start)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from start():\n"
                          "    unity::LogicException: start failure",
                          e.what());
         }
@@ -246,7 +246,7 @@ TEST(ScopeLoader, throw_unity_exception_from_start_no_unload)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from start():\n"
                          "    unity::LogicException: start failure",
                          e.what());
         }
@@ -272,7 +272,7 @@ TEST(ScopeLoader, throw_unknown_exception_from_start)
         }
         catch (unity::Exception const& e)
         {
-            EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in start():\n"
+            EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from start():\n"
                          "    unknown exception",
                          e.what());
         }
@@ -302,7 +302,7 @@ TEST(ScopeLoader, throw_unity_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from stop():\n"
                      "    unity::LogicException: stop failure",
                      e.what());
     }
@@ -328,7 +328,7 @@ TEST(ScopeLoader, throw_std_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from stop():\n"
                      "    stop failure",
                      e.what());
     }
@@ -353,7 +353,7 @@ TEST(ScopeLoader, throw_unknown_exception_from_stop)
     }
     catch (unity::ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from stop():\n"
                      "    unknown exception",
                      e.what());
     }
@@ -392,7 +392,7 @@ TEST(ScopeLoader, unload_stop_exception)
     }
     catch (unity::Exception const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: Scope testScope: terminated due to exception in stop():\n"
+        EXPECT_STREQ("unity::ResourceException: Scope testScope: exception from stop():\n"
                      "    unity::LogicException: stop failure",
                      e.what());
     }

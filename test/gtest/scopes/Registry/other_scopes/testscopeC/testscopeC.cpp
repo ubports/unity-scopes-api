@@ -1,0 +1,99 @@
+/*
+ * Copyright (C) 2014 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ */
+
+#include <unity/scopes/ScopeBase.h>
+
+#define EXPORT __attribute__ ((visibility ("default")))
+
+using namespace unity::scopes;
+
+class MyQuery : public SearchQueryBase
+{
+public:
+    MyQuery(CannedQuery const& query, SearchMetadata const& metadata) :
+        SearchQueryBase(query, metadata)
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(SearchReplyProxy const&) override
+    {
+    }
+};
+
+class MyPreview : public PreviewQueryBase
+{
+public:
+    MyPreview(Result const& result, ActionMetadata const& metadata)
+        : PreviewQueryBase(result, metadata)
+    {
+    }
+
+    virtual void cancelled() override
+    {
+    }
+
+    virtual void run(PreviewReplyProxy const&) override
+    {
+    }
+};
+
+class MyScope : public ScopeBase
+{
+public:
+    virtual void start(std::string const&) override
+    {
+    }
+
+    virtual void stop() override {}
+
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
+    {
+        SearchQueryBase::UPtr query(new MyQuery(q, metadata));
+        return query;
+    }
+
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
+    {
+        PreviewQueryBase::UPtr preview(new MyPreview(result, metadata));
+        return preview;
+    }
+};
+
+extern "C"
+{
+
+    EXPORT
+    unity::scopes::ScopeBase*
+    // cppcheck-suppress unusedFunction
+    UNITY_SCOPE_CREATE_FUNCTION()
+    {
+        return new MyScope;
+    }
+
+    EXPORT
+    void
+    // cppcheck-suppress unusedFunction
+    UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
+    {
+        delete scope_base;
+    }
+}

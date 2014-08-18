@@ -293,10 +293,25 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_settings_definitions(VariantArray());
     try
     {
+        IniSettingsSchema::UPtr schema;
+
         // File is optional, so don't generate noise if it isn't there.
         if (filesystem::exists(settings_schema_path))
         {
-            auto schema = IniSettingsSchema::create(settings_schema_path.native());
+            schema = IniSettingsSchema::create(settings_schema_path.native());
+        }
+        // We always need to create a settings schema if the scope wants location data
+        else if (sc.location_data_needed())
+        {
+            schema = IniSettingsSchema::create_empty();
+        }
+
+        if (schema)
+        {
+            if (sc.location_data_needed())
+            {
+                schema->add_location_setting();
+            }
             mi->set_settings_definitions(schema->definitions());
         }
     }
@@ -389,7 +404,15 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                 scope_dir.filename().native();
     }
 
-    exec_data.timeout_ms = timeout_ms;
+    // Check if this scope has requested debug mode, if so, set the process timeout to 15s
+    if (sc.debug_mode())
+    {
+        exec_data.timeout_ms = 15000;
+    }
+    else
+    {
+        exec_data.timeout_ms = timeout_ms;
+    }
 
     try
     {
@@ -474,9 +497,11 @@ int main(int argc, char* argv[])
             // TODO: HACK: We create the root of the data directory for confined scopes,
             //       in case the scope is confined and the dir doesn't exist
             //       yet. This really should be done by the click-installation but,
-            //       prior to RTM, we don't rely on that.
+            //       prior to RTM, we don't rely on that. We check whether the
+            //       directory exists first to avoid getting noise in the Apparmor log.
             string data_root = rt_config.data_directory() + "/leaf-net";
-            ::mkdir(data_root.c_str(), 0700);
+            boost::system::error_code ec;
+            !boost::filesystem::exists(data_root, ec) && ::mkdir(data_root.c_str(), 0700);
         } // Release memory for config parser
 
         // Collect the registry config data.

@@ -38,15 +38,21 @@ public:
 
     static UPtr create(std::string const& ini_file);
 
+    static UPtr create_empty();
+
     ~IniSettingsSchema();
 
     IniSettingsSchema(IniSettingsSchema&&) = default;
     IniSettingsSchema& operator=(IniSettingsSchema&&) = default;
 
-    virtual VariantArray definitions() const;
+    virtual VariantArray definitions() const override;
+
+    void add_location_setting() override;
 
 private:
     IniSettingsSchema(std::string const& ini_file);
+
+    IniSettingsSchema();
 
     std::string const ini_file_;
     VariantArray definitions_;

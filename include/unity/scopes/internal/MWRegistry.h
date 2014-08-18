@@ -39,6 +39,7 @@ public:
     // Remote operations
     virtual ScopeMetadata get_metadata(std::string const& scope_id) = 0;
     virtual MetadataMap list() = 0;
+    virtual ObjectProxy locate(std::string const& identity, int64_t timeout) = 0;
     virtual ObjectProxy locate(std::string const& identity) = 0;
     virtual bool is_scope_running(std::string const& scope_id) = 0;
 
