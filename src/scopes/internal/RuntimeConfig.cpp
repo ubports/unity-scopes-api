@@ -47,6 +47,7 @@ const string default_middleware_configfile_key = ".ConfigFile";
 const string reap_expiry_key = "Reap.Expiry";
 const string reap_interval_key = "Reap.Interval";
 const string data_dir_key = "DataDir";
+const string config_dir_key = "ConfigDir";
 
 }  // namespace
 
@@ -66,6 +67,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         try
         {
             data_directory_ = default_data_directory();
+            config_directory_ = default_config_directory();
         }
         catch (ResourceException const& e)
         {
@@ -83,12 +85,12 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                              default_middleware_ + default_middleware_configfile_key,
                                                              DFLT_MIDDLEWARE_INI);
         reap_expiry_ = get_optional_int(runtime_config_group, reap_expiry_key, DFLT_REAP_EXPIRY);
-        if (reap_expiry_ < 1)
+        if (reap_expiry_ < 1 && reap_expiry_ != -1)
         {
             throw_ex("Illegal value (" + to_string(reap_expiry_) + ") for " + reap_expiry_key + ": value must be > 0");
         }
         reap_interval_ = get_optional_int(runtime_config_group, reap_interval_key, DFLT_REAP_INTERVAL);
-        if (reap_interval_ < 1)
+        if (reap_interval_ < 1 && reap_interval_ != -1)
         {
             throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
         }
@@ -104,6 +106,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No DataDir configured and failed to get default");
             }
         }
+        config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
+        if (config_directory_.empty())
+        {
+            try
+            {
+                config_directory_ = default_config_directory();
+            }
+            catch (ResourceException const& e)
+            {
+                throw_ex("No ConfigDir configured and failed to get default");
+            }
+        }
     }
 
     KnownEntries const known_entries = {
@@ -117,7 +131,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 default_middleware_ + default_middleware_configfile_key,
                                                 reap_expiry_key,
                                                 reap_interval_key,
-                                                data_dir_key
+                                                data_dir_key,
+                                                config_dir_key
                                              }
                                           }
                                        };
@@ -171,6 +186,21 @@ int RuntimeConfig::reap_interval() const
 string RuntimeConfig::data_directory() const
 {
     return data_directory_;
+}
+
+string RuntimeConfig::config_directory() const
+{
+    return config_directory_;
+}
+
+string RuntimeConfig::default_config_directory()
+{
+    char const* home = getenv("HOME");
+    if (!home || *home == '\0')
+    {
+        throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
+    }
+    return string(home) + "/.config/unity-scopes";
 }
 
 string RuntimeConfig::default_data_directory()

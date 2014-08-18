@@ -47,7 +47,8 @@ class ReplyObject : public ReplyObjectBase
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy);
+    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
+                std::string const& scope_proxy, bool dont_reap);
     virtual ~ReplyObject();
 
     virtual bool process_data(VariantMap const& data) = 0;

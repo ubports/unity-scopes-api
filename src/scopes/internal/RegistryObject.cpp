@@ -24,6 +24,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <core/posix/child_process.h>
@@ -260,7 +261,16 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    lock_guard<decltype(mutex_)> lock(mutex_);
+    unique_lock<decltype(mutex_)> lock(mutex_);
+
+    auto proc_it = scope_processes_.find(scope_id);
+    if (proc_it != scope_processes_.end())
+    {
+        // Kill process after unlocking, so we can handle on_process_death
+        lock.unlock();
+        proc_it->second.kill();
+        lock.lock();
+    }
 
     scope_processes_.erase(scope_id);
 

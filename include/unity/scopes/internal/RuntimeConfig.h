@@ -46,6 +46,8 @@ public:
     int reap_expiry() const;
     int reap_interval() const;
     std::string data_directory() const;
+    std::string config_directory() const;
+    static std::string default_config_directory();
     static std::string default_data_directory();
 
 private:
@@ -58,6 +60,7 @@ private:
     int reap_expiry_;
     int reap_interval_;
     std::string data_directory_;
+    std::string config_directory_;
 };
 
 } // namespace internal

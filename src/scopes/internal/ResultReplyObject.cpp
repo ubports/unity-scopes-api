@@ -43,11 +43,9 @@ namespace scopes
 namespace internal
 {
 
-ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver,
-                                     RuntimeImpl const* runtime,
-                                     std::string const& scope_id,
-                                     int cardinality) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id),
+ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                                     std::string const& scope_id, int cardinality, bool dont_reap) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id, dont_reap),
     receiver_(receiver),
     cat_registry_(new CategoryRegistry()),
     runtime_(runtime),

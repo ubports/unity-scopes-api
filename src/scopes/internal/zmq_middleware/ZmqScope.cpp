@@ -54,6 +54,7 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
+    bool debug_mode();
 };
 
 */
@@ -90,7 +91,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setCategory(reply_proxy->target_category().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -122,7 +123,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -157,7 +158,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
     future.wait();
 
     auto receiver = future.get();
@@ -190,7 +191,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
         p.setIdentity(reply_proxy->identity().c_str());
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -204,6 +205,41 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
+bool ZmqScope::debug_mode()
+{
+    lock_guard<std::mutex> lock(debug_mode_mutex_);
+
+    // We only need to retrieve the debug mode state once, so we cache it in debug_mode_
+    if (!debug_mode_)
+    {
+        capnp::MallocMessageBuilder request_builder;
+        make_request_(request_builder, "debug_mode");
+
+        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+        auto receiver = future.get();
+        auto segments = receiver.receive();
+        capnp::SegmentArrayMessageReader reader(segments);
+        auto response = reader.getRoot<capnproto::Response>();
+        throw_if_runtime_exception(response);
+
+        auto debug_mode_response = response.getPayload().getAs<capnproto::Scope::DebugModeResponse>();
+        debug_mode_.reset(new bool(debug_mode_response.getReturnValue()));
+    }
+
+    return *debug_mode_;
+}
+
+ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
+{
+    // Check if this scope has requested debug mode, if so, disable two-way timeout and set
+    // locate timeout to 15s.
+    if (debug_mode())
+    {
+        return this->invoke_twoway_(out_params, -1, 15000);
+    }
+    return this->invoke_twoway_(out_params);
 }
 
 } // namespace zmq_middleware

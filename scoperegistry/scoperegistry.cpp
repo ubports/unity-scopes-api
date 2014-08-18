@@ -293,10 +293,25 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_settings_definitions(VariantArray());
     try
     {
+        IniSettingsSchema::UPtr schema;
+
         // File is optional, so don't generate noise if it isn't there.
         if (filesystem::exists(settings_schema_path))
         {
-            auto schema = IniSettingsSchema::create(settings_schema_path.native());
+            schema = IniSettingsSchema::create(settings_schema_path.native());
+        }
+        // We always need to create a settings schema if the scope wants location data
+        else if (sc.location_data_needed())
+        {
+            schema = IniSettingsSchema::create_empty();
+        }
+
+        if (schema)
+        {
+            if (sc.location_data_needed())
+            {
+                schema->add_location_setting();
+            }
             mi->set_settings_definitions(schema->definitions());
         }
     }
@@ -389,7 +404,15 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                 scope_dir.filename().native();
     }
 
-    exec_data.timeout_ms = timeout_ms;
+    // Check if this scope has requested debug mode, if so, set the process timeout to 15s
+    if (sc.debug_mode())
+    {
+        exec_data.timeout_ms = 15000;
+    }
+    else
+    {
+        exec_data.timeout_ms = timeout_ms;
+    }
 
     try
     {

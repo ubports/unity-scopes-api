@@ -18,11 +18,49 @@
 
 #include "TestScope.h"
 
+#include <unity/UnityExceptions.h>
+
 using namespace std;
 using namespace unity::scopes;
 
+TestScope::TestScope(Behavior b)
+    : behavior_(b)
+    , started_(false)
+{
+}
+
 void TestScope::start(string const&)
 {
+    lock_guard<mutex> lock(m_);
+    started_ = true;
+    cond_.notify_all();
+
+    if (behavior_ == ThrowFromStart)
+    {
+        throw unity::ResourceException("Can't start");
+    }
+}
+
+void TestScope::stop()
+{
+    if (behavior_ == ThrowFromStop)
+    {
+        throw unity::ResourceException("Can't stop");
+    }
+}
+
+void TestScope::run()
+{
+    if (behavior_ == ThrowFromRun)
+    {
+        throw unity::ResourceException("Can't run");
+    }
+}
+
+void TestScope::wait_until_started()
+{
+    unique_lock<mutex> lock(m_);
+    cond_.wait(lock, [this]{ return started_; });
 }
 
 SearchQueryBase::UPtr TestScope::search(CannedQuery const&, SearchMetadata const&)

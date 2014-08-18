@@ -105,6 +105,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
+        config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -178,8 +179,6 @@ void RuntimeImpl::destroy()
     {
         middleware_->stop();
         middleware_->wait_for_shutdown();
-        middleware_ = nullptr;
-        middleware_factory_.reset(nullptr);
     }
 }
 
@@ -280,12 +279,50 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& scope_ini_file)
+namespace
 {
-    run_scope(scope_base, "", scope_ini_file);
+
+class PromiseWrapper final
+{
+public:
+    PromiseWrapper(std::promise<void> p)
+        : p_(move(p))
+    {
+    }
+
+    ~PromiseWrapper()
+    {
+        try
+        {
+            p_.set_value();
+        }
+        catch (std::future_error const&)
+        {
+        }
+    }
+
+    void set_value()
+    {
+        p_.set_value();
+    }
+
+private:
+    std::promise<void> p_;
+};
+
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_file, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& scope_ini_file,
+                            std::promise<void> ready_promise)
+{
+    run_scope(scope_base, "", scope_ini_file, move(ready_promise));
+}
+
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& runtime_ini_file,
+                            string const& scope_ini_file,
+                            std::promise<void> ready_promise)
 {
     if (!scope_base)
     {
@@ -307,15 +344,18 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     {
         // Try to open the scope settings database, if any.
-        string settings_dir = data_dir_ + "/" + scope_id_;
+        string config_dir = config_dir_ + "/" + scope_id_;
+        string settings_db = config_dir + "/settings.ini";
+
+        string data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
-        string settings_db = settings_dir + "/settings.db";
+
         string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
         if (boost::filesystem::exists(settings_schema))
         {
-            // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
+            // Make sure the data directories exist. (No permission for group and others; data might be sensitive.)
             ::mkdir(data_dir_.c_str(), 0700);
-            ::mkdir(settings_dir.c_str(), 0700);
+            ::mkdir(data_dir.c_str(), 0700);
 
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
@@ -346,36 +386,93 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
         scope_base->p->set_tmp_directory(path);
     }
 
-    scope_base->start(scope_id_);
+    try
+    {
+        scope_base->start(scope_id_);
+    }
+    catch (...)
+    {
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from start()");
+    }
+
+    exception_ptr ep;  // Stores any exceptions that happen from now on.
 
     // Ensure the scope gets stopped.
-    unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
+    auto call_stop = [this, &ep](ScopeBase *scope_base)
+    {
+        try
+        {
+            scope_base->stop();
+        }
+        catch (...)
+        {
+            unity::ResourceException ex("Scope " + scope_id_ +": exception from stop()");
+            ep = make_exception_ptr(ex);
+        }
+    };
+    unity::util::ResourcePtr<ScopeBase*, decltype(call_stop)> cleanup_scope(scope_base, call_stop);
+
+    // Make sure we satisfy the promise even if something goes wrong.
+    PromiseWrapper promise(move(ready_promise));
 
     // Give a thread to the scope to do with as it likes. If the scope
     // doesn't want to use it and immediately returns from run(),
     // that's fine.
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
+    this_thread::yield();
 
-    // Create a servant for the scope and register the servant.
-    auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    int idle_timeout_ms = 0;
-    if (!scope_ini_file.empty())
+    try
     {
-        ScopeConfig scope_config(scope_ini_file);
-        idle_timeout_ms = scope_config.idle_timeout() * 1000;
+
+        // Create a servant for the scope and register the servant.
+        if (!scope_ini_file.empty())
+        {
+            // Check if this scope has requested debug mode, if so, disable the idle timeout
+            ScopeConfig scope_config(scope_ini_file);
+            int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
+
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
+                                                                                     scope_base,
+                                                                                     scope_config.debug_mode()));
+            mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+        }
+        else
+        {
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+            mw->add_scope_object(scope_id_, move(scope));
+        }
+
+        // Inform the registry that this scope is now ready to process requests
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+
+        promise.set_value();
+        mw->wait_for_shutdown();
+        cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
     }
-    mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+    catch (...)
+    {
+        unity::ResourceException ex("Scope " + scope_id_ +": failure during initialization");
+        ex.remember(ep);  // ep will still be nullptr if something other than stop() threw.
+        ep = make_exception_ptr(ex);
+    }
 
-    // Inform the registry that this scope is now ready to process requests
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+    try
+    {
+        run_future.get();
+    }
+    catch (...)
+    {
+        unity::ResourceException ex("Scope " + scope_id_ +": exception from run()");
+        ep = ex.remember(ep);
+    }
 
-    mw->wait_for_shutdown();
-    cleanup_scope.reset();   // Causes ScopeBase::run() to terminate if the scope is properly written
-
-    // Inform the registry that this scope is shutting down
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
-
-    run_future.get();
+    if (ep)
+    {
+        rethrow_exception(ep);
+    }
 }
 
 ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const

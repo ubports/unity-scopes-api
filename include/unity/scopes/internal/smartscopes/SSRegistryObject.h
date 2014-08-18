@@ -75,6 +75,7 @@ private:
     {
         std::string json;
         SettingsDB::SPtr db;
+        bool needs_location_data;
     };
 
     SmartScopesClient::SPtr ssclient_;
