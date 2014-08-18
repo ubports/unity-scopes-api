@@ -52,14 +52,14 @@ void write_db(const string& src)
   auto later = now + chrono::seconds(10); \
   while (now < later) \
   { \
-    if (expected == actual) \
+    if ((expected) == (actual)) \
     { \
         break; \
     } \
     this_thread::sleep_for(chrono::milliseconds(10)); \
     now = chrono::system_clock::now(); \
   } \
-  EXPECT_EQ(expected, actual); \
+  EXPECT_EQ((expected), (actual)); \
 }
 
 #define TRY_EXPECT_TRUE(expr) \
@@ -80,7 +80,7 @@ void write_db(const string& src)
 
 #define TRY_EXPECT_FALSE(expr) \
 { \
-  TRY_EXPECT_TRUE(!expr); \
+  TRY_EXPECT_TRUE(!(expr)); \
 }
 
 TEST(SettingsDB, basic)
