@@ -33,10 +33,16 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/filesystem.hpp>
+
 #include <gtest/gtest.h>
 
 #include <array>
 #include <cassert>
+#include <fstream>
 #include <set>
 
 using namespace std;
@@ -434,15 +440,16 @@ public:
         }
     }
 
-    int first_child_pid()
+    pid_t only_child_pid()
     {
-        return stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " --no-headers | egrep -v 'ps|egrep'"));
+        auto pids = child_pids();
+        EXPECT_EQ(1, pids.size()) << "Expected to find a single child process";
+        return pids[0];
     }
 
     int process_count()
     {
-        int current_process_count = stoi(exec_cmd("ps --ppid " + std::to_string(getpid()) + " | egrep -v 'ps|egrep|wc' | wc -l"));
-        return current_process_count - start_process_count;
+        return count_child_procs() - start_process_count;
     }
 
     ScopeProxy start_testscopeB()
@@ -474,26 +481,52 @@ public:
     }
 
 protected:
-    std::string exec_cmd(std::string const& cmd)
+    struct IsNumeric
     {
-        FILE* pipe = popen(cmd.c_str(), "r");
-        if (!pipe)
+        bool operator()(boost::filesystem::directory_entry const& e)
         {
-            return "";
+            static char const* digits = "0123456789";
+            return e.path().filename().native().find_first_not_of(digits) == string::npos;
         }
+    };
 
-        char buffer[128];
-        std::string result;
-        while (!feof(pipe))
+    vector<pid_t> child_pids()
+    {
+        vector<pid_t> pids;
+
+        // Run through /proc and pick up all numeric directories in there.
+        boost::filesystem::path proc_dir("/proc");
+        vector<boost::filesystem::directory_entry> entries;
+        boost::copy(boost::make_iterator_range(boost::filesystem::directory_iterator(proc_dir), {})
+                        | boost::adaptors::filtered(IsNumeric()),
+                    back_inserter(entries));
+
+        // For each process, check if we are the parent. If so, add that process's
+        // pid to pids.
+        auto const my_pid = getpid();
+        for (auto&& e : entries)
         {
-            if (fgets(buffer, 128, pipe) != NULL)
+            ifstream child(e.path().native() + "/stat");
+            if (!child)
             {
-                result += buffer;
+                continue;
+            }
+            pid_t pid;
+            string fname;
+            char state;
+            pid_t ppid;
+            child >> pid >> fname >> state >> ppid;
+            if (ppid == my_pid)
+            {
+                pids.push_back(pid);
             }
         }
-        pclose(pipe);
+        return pids;
+    }
 
-        return result;
+    int count_child_procs()
+    {
+        return child_pids().size();
     }
 
     int start_process_count = 0;
@@ -598,7 +631,7 @@ TEST_F(RegistryITest, locate_rebinding)
     EXPECT_EQ(1, process_count());
 
     // kill first scope
-    int scope1_pid = first_child_pid();
+    pid_t scope1_pid = only_child_pid();
     kill(scope1_pid, SIGKILL);
 
     // wait for the SIGCHLD signal to reach the registry
@@ -667,7 +700,7 @@ TEST_F(RegistryITest, locate_custom_exec)
     EXPECT_EQ(1, process_count());
 
     // kill scope
-    int scope1_pid = first_child_pid();
+    pid_t scope1_pid = only_child_pid();
     kill(scope1_pid, SIGKILL);
 
     // wait for the SIGCHLD signal to reach the registry

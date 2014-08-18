@@ -21,16 +21,33 @@
 
 #include <unity/scopes/ScopeBase.h>
 
+#include <condition_variable>
+
 class TestScope : public unity::scopes::ScopeBase
 {
 public:
-    virtual void start(std::string const&);
+    enum Behavior { Normal, ThrowFromStart, ThrowFromRun, ThrowFromStop };
+
+    TestScope(Behavior = Normal);
+    virtual ~TestScope() = default;
+
+    virtual void start(std::string const&) override;
+    virtual void stop() override;
+    virtual void run() override;
+
+    void wait_until_started();
 
     virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
                                                         unity::scopes::SearchMetadata const&) override;
 
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const&) override;
+
+private:
+    Behavior behavior_;
+    std::mutex m_;
+    std::condition_variable cond_;
+    bool started_;
 };
 
 #endif

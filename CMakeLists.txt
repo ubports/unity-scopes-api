@@ -191,7 +191,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)   # Major official release number.
 set(UNITY_SCOPES_MINOR 6)   # Must be changed for ABI incompatible changes
-set(UNITY_SCOPES_MICRO 0)   # For ABI compatible changes
+set(UNITY_SCOPES_MICRO 2)   # For ABI compatible changes
 set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
 
 # Version for testing, with all symbols visible
@@ -222,11 +222,6 @@ if(NOT DLLIB)
   message(FATAL_ERROR "Dl lib not found.")
 endif()
 
-find_library(U1DBLIB u1db)
-if(NOT U1DBLIB)
-  message(FATAL_ERROR "U1DB lib not found.")
-endif()
-
 
 # Other libraries we depend on
 set(OTHER_LIBS
@@ -239,10 +234,6 @@ set(OTHER_LIBS
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
-    ${U1DBLIB}
-    curl
-    oauth
-    json-c
     pthread
     smartscopes
 )

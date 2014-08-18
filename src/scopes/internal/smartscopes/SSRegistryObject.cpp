@@ -257,30 +257,59 @@ void SSRegistryObject::get_remote_scopes()
                 metadata->set_appearance_attributes(*scope.appearance);
             }
 
+            bool needs_location_data = scope.needs_location_data && *scope.needs_location_data;
+
+            JsonSettingsSchema::UPtr schema;
             if (scope.settings)
             {
                 try
                 {
-                    auto schema = JsonSettingsSchema::create(*scope.settings);
+                    schema = JsonSettingsSchema::create(*scope.settings);
+                }
+                catch (ResourceException const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                    std::cerr << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\"" << std::endl;
+                }
+            }
+            else if (needs_location_data)
+            {
+                schema = JsonSettingsSchema::create_empty();
+            }
+
+            if (schema)
+            {
+                if (needs_location_data)
+                {
+                    schema->add_location_setting();
+                }
+
+                try
+                {
                     metadata->set_settings_definitions(schema->definitions());
+
+                    std::string settings = scope.settings? *scope.settings : "";
 
                     // Get the previous JSON definition for this scope (if any)
                     std::lock_guard<std::mutex> lock(scopes_mutex_);
                     std::string prev_json = "";
+                    bool prev_needs_location_data = false;
                     auto it = settings_defs_.find(scope.id);
                     if (it != settings_defs_.end())
                     {
                         prev_json = it->second.json;
+                        prev_needs_location_data = it->second.needs_location_data;
                     }
 
                     // Check if the settings definitions have changed
-                    if (*scope.settings != prev_json)
+                    if (needs_location_data != prev_needs_location_data
+                            || (scope.settings && settings != prev_json))
                     {
                         // Store both JSON (for internal comparison) and DB (for external use)
                         changed = true;
-                        std::string settings_db = RuntimeConfig::default_data_directory() + "/" + scope.id + "/settings.db";
-                        SettingsDB::SPtr db(SettingsDB::create_from_json_string(settings_db, *scope.settings));
-                        settings_defs_[scope.id] = SSSettingsDef{*scope.settings, db};
+                        std::string settings_db = RuntimeConfig::default_config_directory() + "/" + scope.id + "/settings.ini";
+                        SettingsDB::SPtr db(SettingsDB::create_from_schema(settings_db, *schema));
+                        settings_defs_[scope.id] = SSSettingsDef{settings, db, needs_location_data};
                     }
                 }
                 catch (ResourceException const& e)
@@ -290,10 +319,7 @@ void SSRegistryObject::get_remote_scopes()
                 }
             }
 
-            if (scope.needs_location_data)
-            {
-                metadata->set_location_data_needed(*scope.needs_location_data);
-            }
+            metadata->set_location_data_needed(needs_location_data);
 
             metadata->set_invisible(scope.invisible);
 

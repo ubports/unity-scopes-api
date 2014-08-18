@@ -20,6 +20,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/internal/ValueSliderFilterImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
@@ -55,7 +56,7 @@ TEST(ValueSliderFilter, state)
         FilterState fstate;
         auto filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
         EXPECT_FALSE(filter1->has_value(fstate));
-        EXPECT_THROW(filter1->value(fstate), unity::LogicException);
+        EXPECT_THROW(filter1->value(fstate), unity::scopes::NotFoundException);
     }
 
     {

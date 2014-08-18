@@ -17,8 +17,8 @@
 */
 
 #include <unity/scopes/internal/Utils.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-#include <sstream>
 #include <iomanip>
 #include <locale>
 
@@ -36,9 +36,7 @@ VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap 
     auto it = var.find(key);
     if (it == var.end())
     {
-        std::stringstream str;
-        str << context << ": missing '"  << key << "' element";
-        throw unity::InvalidArgumentException(str.str());
+        throw unity::scopes::NotFoundException(context + ": missing element", key);
     }
     return it;
 }

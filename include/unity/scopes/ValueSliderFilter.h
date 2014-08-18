@@ -152,7 +152,7 @@ public:
      \brief Get value of this filter from filter state object.
 
      \return value of this filter
-     \throws unity::LogicException if value is not present in state object.
+     \throws unity::scopes::NotFoundException if value is not present in state object.
     */
     double value(FilterState const& filter_state) const;
 

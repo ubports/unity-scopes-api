@@ -47,9 +47,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
+ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode) :
     runtime_(runtime),
-    scope_base_(scope_base)
+    scope_base_(scope_base),
+    debug_mode_(debug_mode)
 {
     assert(runtime);
     assert(scope_base);
@@ -80,14 +81,17 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         query_base = query_factory_fun();
         if (!query_base)
         {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()");
+            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()";
+            cerr << msg << endl;
+            throw ResourceException(msg);
         }
         query_base->p->set_settings_db(scope_base_->p->settings_db());
     }
     catch (...)
     {
-        throw ResourceException("Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()");
+        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()";
+        cerr << msg << endl;
+        throw ResourceException(msg);
     }
 
     MWQueryCtrlProxy ctrl_proxy;
@@ -212,6 +216,11 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                 return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }
     );
+}
+
+bool ScopeObject::debug_mode() const
+{
+    return debug_mode_;
 }
 
 } // namespace internal

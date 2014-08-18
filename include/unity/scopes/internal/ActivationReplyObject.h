@@ -34,7 +34,8 @@ namespace internal
 class ActivationReplyObject : public ReplyObject
 {
 public:
-    ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id);
+    ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                          std::string const& scope_id, bool dont_reap = false);
     virtual bool process_data(VariantMap const& data) override;
 
 private:

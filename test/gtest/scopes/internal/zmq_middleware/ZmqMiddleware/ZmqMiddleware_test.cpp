@@ -452,6 +452,11 @@ public:
     {
         return nullptr;
     }
+
+    virtual bool debug_mode() const override
+    {
+        return false;
+    }
 };
 
 // Make sure that multiple threads calling wait_for_shutdown() complete

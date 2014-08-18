@@ -30,8 +30,9 @@ namespace scopes
 namespace internal
 {
 
-ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id),
+ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                                             std::string const& scope_id, bool dont_reap) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id, dont_reap),
     receiver_(receiver)
 {
     assert(receiver_);

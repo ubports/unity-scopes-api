@@ -55,6 +55,7 @@ namespace
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
+    const string debug_mode_key = "DebugMode";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -152,10 +153,10 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     // Negative values and values greater than max int (once multiplied by 1000 (s to ms)) are illegal
     const int max_idle_timeout = std::numeric_limits<int>::max() / 1000;
-    if (idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout)
+    if ((idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout) && idle_timeout_ != -1)
     {
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
-                 ": value must be > 0 and <= " + std::to_string(max_idle_timeout));
+                 ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));
     }
 
 
@@ -189,6 +190,15 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     {
     }
 
+    try
+    {
+        debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
+    }
+    catch (LogicException const&)
+    {
+        debug_mode_ = false;
+    }
+
     // read all display attributes from scope_appearance_group
     try
     {
@@ -202,39 +212,40 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
 
     KnownEntries const known_entries = {
-                                          {  scope_config_group,
-                                             {
-                                                overrideable_key,
-                                                scope_name_key,
-                                                description_key,
-                                                author_key,
-                                                art_key,
-                                                icon_key,
-                                                search_hint_key,
-                                                hot_key_key,
-                                                invisible_key,
-                                                location_data_needed_key,
-                                                scoperunner_key,
-                                                idle_timeout_key,
-                                                results_ttl_key
-                                             }
-                                          },
-                                          {  scope_appearance_group,
-                                             {
-                                                fg_color_key,
-                                                bg_color_key,
-                                                shape_images_key,
-                                                category_header_bg_key,
-                                                preview_button_color_key,
-                                                logo_overlay_color_key,
-                                                pageheader_logo_key,
-                                                pageheader_fg_color_key,
-                                                pageheader_background_key,
-                                                pageheader_div_color_key,
-                                                pageheader_nav_bg_key
-                                             }
-                                          }
-                                       };
+        {  scope_config_group,
+           {
+               overrideable_key,
+               scope_name_key,
+               description_key,
+               author_key,
+               art_key,
+               icon_key,
+               search_hint_key,
+               hot_key_key,
+               invisible_key,
+               location_data_needed_key,
+               scoperunner_key,
+               idle_timeout_key,
+               results_ttl_key,
+               debug_mode_key
+           }
+        },
+        {  scope_appearance_group,
+           {
+               fg_color_key,
+               bg_color_key,
+               shape_images_key,
+               category_header_bg_key,
+               preview_button_color_key,
+               logo_overlay_color_key,
+               pageheader_logo_key,
+               pageheader_fg_color_key,
+               pageheader_background_key,
+               pageheader_div_color_key,
+               pageheader_nav_bg_key
+           }
+        }
+    };
     check_unknown_entries(known_entries);
 }
 
@@ -378,6 +389,11 @@ int ScopeConfig::idle_timeout() const
 ScopeMetadata::ResultsTtlType ScopeConfig::results_ttl_type() const
 {
     return results_ttl_type_;
+}
+
+bool ScopeConfig::debug_mode() const
+{
+    return debug_mode_;
 }
 
 VariantMap ScopeConfig::appearance_attributes() const

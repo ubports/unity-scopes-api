@@ -20,6 +20,8 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
+#include <iostream>
+
 using namespace std;
 
 namespace unity
@@ -41,7 +43,20 @@ QueryBase::~QueryBase()
 void QueryBase::cancel()
 {
     p->cancel();    // Forward cancel to subqueries
-    cancelled();    // Inform this query that it was cancelled
+    try
+    {
+        cancelled();    // Inform this query that it was cancelled
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "QueryBase::cancel(): exception from cancelled(): " << e.what() << endl;
+        // TODO: log error
+    }
+    catch (...)
+    {
+        cerr << "QueryBase::cancel(): unknown exception from cancelled()" << endl;
+        // TODO: log error
+    }
 }
 /// @endcond
 

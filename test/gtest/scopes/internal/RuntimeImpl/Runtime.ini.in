@@ -4,3 +4,4 @@ Registry.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Registry.ini
 Default.Middleware = Zmq
 Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 DataDir = @CMAKE_CURRENT_BINARY_DIR@/cache_dir
+ConfigDir = @CMAKE_CURRENT_BINARY_DIR@/cache_dir

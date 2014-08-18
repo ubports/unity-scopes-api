@@ -16,6 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/scopes/ScopeExceptions.h>
@@ -326,6 +328,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
                                              uint query_id,
                                              std::string const& platform,
                                              VariantMap const& settings,
+                                             VariantMap const& filter_state,
                                              std::string const& locale,
                                              std::string const& country,
                                              uint limit)
@@ -364,6 +367,10 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     if (limit != 0)
     {
         search_uri << "&limit=" << std::to_string(limit);
+    }
+    if (!filter_state.empty())
+    {
+        search_uri << "&filters=" << http_client_->to_percent_encoding(Variant(filter_state).serialize_json());
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
@@ -454,6 +461,8 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
         std::vector<SearchResult> results;
         std::map<std::string, std::shared_ptr<SearchCategory>> categories;
         std::shared_ptr<DepartmentInfo> departments;
+        Filters filters;
+        FilterState filter_state;
 
         std::vector<std::string> jsons = extract_json_stream(response_str);
 
@@ -525,11 +534,19 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
             {
                 departments = parse_departments(root_node->get_node("departments"));
             }
+            else if (root_node->has_node("filters"))
+            {
+                filters = parse_filters(root_node->get_node("filters"));
+            }
+            else if (root_node->has_node("filter_state"))
+            {
+                filter_state = parse_filter_state(root_node->get_node("filter_state"));
+            }
         }
 
         std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
 
-        return std::make_pair(departments, results);
+        return std::tie(departments, filters, filter_state, results);
     }
     catch (std::exception const& e)
     {
@@ -588,6 +605,26 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
         }
     }
     return dep;
+}
+
+Filters SmartScopesClient::parse_filters(JsonNodeInterface::SPtr node)
+{
+    if (node->type() != JsonNodeInterface::NodeType::Array)
+    {
+        throw LogicException("SmartScopesClient::parse_filters(): 'filters' attribute must be an array");
+    }
+
+    return FilterBaseImpl::deserialize_filters(node->to_variant().get_array());
+}
+
+FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
+{
+    if (node->type() != JsonNodeInterface::NodeType::Object)
+    {
+        throw LogicException("SmartScopesClient::parse_filter_state(): 'filter_state' attribute must be an object");
+    }
+
+    return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
 std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)
@@ -780,6 +817,10 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
             break;
         case Variant::String:
             setting_str << "\"" << setting.second.get_string() << "\"";
+            setting_valid = true;
+            break;
+        case Variant::Double:
+            setting_str << setting.second.get_double();
             setting_valid = true;
             break;
         default:

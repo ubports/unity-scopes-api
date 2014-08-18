@@ -206,7 +206,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params)
     return invoke_twoway_(out_params, timeout_);
 }
 
-ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t timeout)
+ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, int64_t twoway_timeout, int64_t locate_timeout)
 {
     auto registry_proxy = mw_base()->registry_proxy();
     auto ss_registry_proxy = mw_base()->ss_registry_proxy();
@@ -221,7 +221,15 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     {
         try
         {
-            ObjectProxy new_proxy = registry_proxy->locate(identity());
+            ObjectProxy new_proxy;
+            if (locate_timeout != -1)
+            {
+                new_proxy = registry_proxy->locate(identity(), locate_timeout);
+            }
+            else
+            {
+                new_proxy = registry_proxy->locate(identity());
+            }
             // update our proxy with the newly received data
             // (we need to first store values in local variables outside of the mutex,
             // otherwise we will deadlock on the following ZmqObjectProxy methods)
@@ -244,7 +252,7 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& out_params, in
     }
 
     // Try the invocation
-    return invoke_twoway__(out_params, timeout);
+    return invoke_twoway__(out_params, twoway_timeout);
 }
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
@@ -281,7 +289,16 @@ ZmqReceiver ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& out_params, i
 
     zmqpp::poller p;
     p.add(s);
-    p.poll(timeout);
+
+    if (timeout == -1)
+    {
+        p.poll();
+    }
+    else
+    {
+        p.poll(timeout);
+    }
+
     if (!p.has_input(s))
     {
         // If a request times out, we must trash the corresponding socket, otherwise

@@ -52,6 +52,7 @@ public:
     std::string scope_runner() const;      // Optional, throws NotFoundException if not present
     int idle_timeout() const;              // Optional, returns default value if not present
     ScopeMetadata::ResultsTtlType results_ttl_type() const;  // Optional, returns none if not present
+    bool debug_mode() const;               // Optional, returns false if not present
 
     VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
 
@@ -71,6 +72,7 @@ private:
     std::unique_ptr<std::string> scope_runner_;
     int idle_timeout_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
+    bool debug_mode_;
 
     VariantMap appearance_attributes_;
 };

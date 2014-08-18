@@ -146,11 +146,14 @@ public:
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result: uri=" << result.uri()
-             << " title=" << result.title()
-             << " category id: "
-             << result.category()->id()
-             << endl;
+        VariantMap result_dict(result.serialize());
+        result_dict = result_dict["attrs"].get_dict();
+        cout << "received result: category id=" << result.category()->id() << endl << "{" << endl;
+        for (auto attr_it = result_dict.begin(); attr_it != result_dict.end(); ++attr_it)
+        {
+            cout << "\t\"" << attr_it->first << "\": " << attr_it->second.serialize_json();
+        }
+        cout << "}" << endl;
         ++push_result_count_;
         if (index_to_save_ > 0 && push_result_count_ == index_to_save_)
         {

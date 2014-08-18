@@ -24,8 +24,6 @@ Build-Depends: g++-4.9,
                lttng-tools,
                qtbase5-dev,
                libjsoncpp-dev,
-               libu1db-dev,
-               python-u1db,
 Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
 Section: libs
