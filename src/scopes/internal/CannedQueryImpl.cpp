@@ -137,7 +137,7 @@ VariantMap CannedQueryImpl::serialize() const
 std::string CannedQueryImpl::to_uri() const
 {
     std::ostringstream s;
-    s << scopes_schema << to_percent_encoding(scope_id_);
+    s << scopes_schema << scope_id_;
     s << "?q=" << to_percent_encoding(query_string_);
 
     if (!department_id_.empty())
