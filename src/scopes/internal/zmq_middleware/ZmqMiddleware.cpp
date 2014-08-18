@@ -198,9 +198,9 @@ void ZmqMiddleware::start()
             {
                 lock_guard<mutex> lock(data_mutex_);
                 oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
-                // N.B. We absolutely MUST have AT LEAST 2 two-way invoke threads
-                // as rebinding is invoked within two-way invocations.
-                twoway_invokers_.reset(new ThreadPool(2));  // TODO: get pool size from config
+                // N.B. We absolutely MUST have AT LEAST 3 two-way invoke threads as both rebinding
+                // and debug_mode requests could be invoked within a single two-way invocation.
+                twoway_invokers_.reset(new ThreadPool(3));  // TODO: get pool size from config
             }
             shutdown_flag = false;
             state_ = Started;
