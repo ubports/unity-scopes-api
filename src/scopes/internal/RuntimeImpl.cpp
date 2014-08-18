@@ -179,6 +179,8 @@ void RuntimeImpl::destroy()
     {
         middleware_->stop();
         middleware_->wait_for_shutdown();
+        middleware_ = nullptr;
+        middleware_factory_ = nullptr;
     }
 }
 
