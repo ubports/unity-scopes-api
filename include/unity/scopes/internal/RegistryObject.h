@@ -119,6 +119,7 @@ private:
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         MWPublisher::SPtr reg_publisher_;
+        bool manually_started_;
     };
 
 private:
