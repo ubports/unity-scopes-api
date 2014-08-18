@@ -340,7 +340,11 @@ TEST(Registry, manually_started_scope)
     if (scope_pid == 0)
     {
         const char* const args[] = {"scoperunner [Registry test]", TEST_RUNTIME_FILE, TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", nullptr};
-        execv(TEST_SCOPERUNNER_PATH "/scoperunner", const_cast<char* const*>(args));
+
+        if (execv(TEST_SCOPERUNNER_PATH "/scoperunner", const_cast<char* const*>(args)) < 0)
+        {
+            perror("Error starting scoperunner:");
+        }
         exit(0);
     }
 
