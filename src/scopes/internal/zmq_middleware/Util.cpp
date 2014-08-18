@@ -88,7 +88,7 @@ void safe_bind(zmqpp::socket& s, string const& endpoint)
             // LCOV_EXCL_STOP
         }
         util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);
-        if (::connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == 0)
+        if (::connect(fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) == 0)
         {
             // Connect succeeded, so another server is using the socket already.
             throw MiddlewareException("safe_bind(): address in use: " + endpoint);

@@ -41,6 +41,8 @@ class AbstractScopeBase
 {
 public:
 /// @cond
+    virtual ~AbstractScopeBase() = default;
+
     virtual void start(std::string const& scope_id) = 0;
     virtual void stop() = 0;
     virtual void run() = 0;
