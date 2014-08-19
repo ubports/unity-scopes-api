@@ -531,7 +531,7 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
     string dir = data_dir_ + "/" + confinement_type;
 
     // For scopes that are in a click package together with an app,
-    // such as Youtube, the cache directory is shared between the app and
+    // such as YouTube, the cache directory is shared between the app and
     // the scope. The cache directory name is the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
