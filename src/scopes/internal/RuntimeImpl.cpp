@@ -36,13 +36,12 @@
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 
-#include <boost/filesystem.hpp>
-
 #include <cassert>
 #include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
+#include <sys/apparmor.h>
 #include <sys/stat.h>
 
 using namespace std;
@@ -511,47 +510,37 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 
 string RuntimeImpl::find_cache_dir(string& confinement_type) const
 {
-    // TODO: HACK: Until we get a fancier Apparmor query API, we try
-    //             to create the scope cache dir and figure out whether
-    //             whether we are confined or unconfined. We first try to
-    //             create <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
-    //             in case they don't exist. Then we try to create a file in
-    //             <data_dir>unconfined/<scope_id_>. If that works, we unlink
-    //             the file again and can conclude that the scope is unconfined.
-    //             Otherwise, the scope must be confined, in which case
-    //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
-    //             We try and create a directory only if it doesn't exist, to avoid
-    //             noise in Apparmor logs if permission is denied.
+    // Find out whether we are confined. aa_getcon() returns -1 in that case.
+    char* con = nullptr;
+    char* mode;
+    int rc = aa_getcon(&con, &mode);
+    // Only con (not mode) must be deallocated
+    free(con);
+    confinement_type = rc == -1 ? "leaf-net" : "unconfined";
 
+    // For scopes that are in a click package together with an app,
+    // such as YouTube, the cache directory is shared between the app and
+    // the scope. The cache directory name is the scope ID up to the first
+    // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
+    // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
+    auto id = scope_id_;
+    if (confinement_type == "leaf-net")
+    {
+        auto pos = id.find('_');
+        if (pos != string::npos)
+        {
+            id = id.substr(0, pos);
+        }
+    }
+
+    // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
     boost::system::error_code ec;
-    !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700); // We don't care if this fails.
-
-    // Assume we are unconfined initially.
-    confinement_type = "unconfined";
+    !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
     string dir = data_dir_ + "/" + confinement_type;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+    dir += "/" + id;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
-    // The following two mkdir() calls will fail if the scope is confined or
-    // the directories exist already.
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    dir += "/" + scope_id_;
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    string tmp = dir + "/.scope_tmp_XXXXXX";
-    int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
-    if (fd != -1)
-    {
-        // If mkstemp succeeded, the scope is unconfined.
-        assert(::unlink(tmp.c_str()) == 0);
-        ::close(fd);
-    }
-    else
-    {
-        // mkstemp() failed, the scope must be confined.
-        confinement_type = "leaf-net";
-        dir = data_dir_ + "/" + confinement_type;
-        !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-        dir += "/" + scope_id_;
-        !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    }
     return dir;
 }
 
