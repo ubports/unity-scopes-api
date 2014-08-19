@@ -6,6 +6,8 @@ Changes in version 0.6.2
   - Move scope configuration to ~/.config/unity-scopes/
 
   - New setting to enable/disable of location data being fed to scopes.
+
+  - New DebugMode scope configuration option.
  
 Changes in version 0.6.1
 ========================
