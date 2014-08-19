@@ -530,10 +530,22 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
     confinement_type = "unconfined";
     string dir = data_dir_ + "/" + confinement_type;
 
+    // For scopes that are in a click package together with an app,
+    // such as Youtube, the cache directory is shared between the app and
+    // the scope. The cache directory name is the scope ID up to the first
+    // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
+    // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
+    auto id = scope_id_;
+    auto pos = id.find('_');
+    if (pos != string::npos)
+    {
+        id = id.substr(0, pos);
+    }
+
     // The following two mkdir() calls will fail if the scope is confined or
     // the directories exist already.
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    dir += "/" + scope_id_;
+    dir += "/" + id;
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     string tmp = dir + "/.scope_tmp_XXXXXX";
     int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
@@ -549,7 +561,7 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
         confinement_type = "leaf-net";
         dir = data_dir_ + "/" + confinement_type;
         !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-        dir += "/" + scope_id_;
+        dir += "/" + id;
         !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     }
     return dir;
