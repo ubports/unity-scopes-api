@@ -1,7 +1,7 @@
 {
 global:
-        unity_scope_create_v@UNITY_SCOPES_MAJOR@_@UNITY_SCOPES_MINOR@;
-        unity_scope_destroy;
+        "unity_scope_create_v@UNITY_SCOPES_SOVERSION@";
+        "unity_scope_destroy";
 local:
     extern "C++" {
         *;

@@ -189,10 +189,10 @@ endif()
 set(UNITY_SCOPES_LIB unity-scopes)
 
 # API version
-set(UNITY_SCOPES_MAJOR 0)   # Major official release number.
-set(UNITY_SCOPES_MINOR 6)   # Must be changed for ABI incompatible changes
-set(UNITY_SCOPES_MICRO 2)   # For ABI compatible changes
-set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
+set(UNITY_SCOPES_MAJOR 0)
+set(UNITY_SCOPES_MINOR 6)
+set(UNITY_SCOPES_MICRO 2)
+set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
