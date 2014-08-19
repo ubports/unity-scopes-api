@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.3
+========================
+  - Fix scope cache path for confined scopes.
+
 Changes in version 0.6.2
 ========================
   - Move scope configuration to ~/.config/unity-scopes/

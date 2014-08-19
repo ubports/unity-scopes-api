@@ -1,3 +1,13 @@
+unity-scopes-api (0.6.3-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pete Woods ]
+  * Sync with RTM (see last release for dependency drops).
+
+  [ Michi Henning ]
+  * Fix cache directory paths for confined scopes.
+
+ -- Pete Woods <pete.woods@canonical.com>  Tue, 19 Aug 2014 13:13:49 +0100
+
 unity-scopes-api (0.6.2+rtm+rtm+rtm+14.09.20140818-0ubuntu1) 14.09; urgency=medium
 
   [ Pete Woods ]
