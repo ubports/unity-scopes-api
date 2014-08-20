@@ -36,7 +36,7 @@ SmartQuery::SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, 
 {
 }
 
-SmartQuery::~SmartQuery() noexcept
+SmartQuery::~SmartQuery()
 {
 }
 

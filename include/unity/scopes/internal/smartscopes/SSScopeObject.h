@@ -49,7 +49,7 @@ public:
     UNITY_DEFINES_PTRS(SSScopeObject);
 
     SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr ss_registry);
-    virtual ~SSScopeObject() noexcept;
+    virtual ~SSScopeObject();
 
     // Remote operation implementations
     MWQueryCtrlProxy search(CannedQuery const& q,

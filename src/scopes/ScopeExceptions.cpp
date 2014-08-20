@@ -63,7 +63,7 @@ ObjectNotExistException::ObjectNotExistException(ObjectNotExistException const&)
 ObjectNotExistException& ObjectNotExistException::operator=(ObjectNotExistException const&) = default;
 
 
-ObjectNotExistException::~ObjectNotExistException() noexcept = default;
+ObjectNotExistException::~ObjectNotExistException() = default;
 
 //! @endcond
 
@@ -90,7 +90,7 @@ TimeoutException::TimeoutException(TimeoutException const&) = default;
 TimeoutException& TimeoutException::operator=(TimeoutException const&) = default;
 
 
-TimeoutException::~TimeoutException() noexcept = default;
+TimeoutException::~TimeoutException() = default;
 
 //! @endcond
 

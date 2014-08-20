@@ -35,7 +35,7 @@ class SmartQuery : public SearchQueryBase
 {
 public:
     SmartQuery(std::string const& scope_id, SSRegistryObject::SPtr reg, CannedQuery const& query, SearchMetadata const& hints);
-    ~SmartQuery() noexcept;
+    ~SmartQuery();
 
     virtual void cancelled() override;
     virtual void run(SearchReplyProxy const& reply) override;

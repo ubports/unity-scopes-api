@@ -69,7 +69,7 @@ public:
     UNITY_DEFINES_PTRS(SSQueryObject);
 
     SSQueryObject();
-    virtual ~SSQueryObject() noexcept;
+    virtual ~SSQueryObject();
 
     // Remote operation implementations
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
