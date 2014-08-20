@@ -95,7 +95,7 @@ void HttpClientQtThread::timeout()
     success_ = false;
     reply_ = "Request timed out: " + url_.url().toStdString();
 
-    emit this->abort();
+    emit HttpClientQtThread::abort();
     quit();
 }
 
