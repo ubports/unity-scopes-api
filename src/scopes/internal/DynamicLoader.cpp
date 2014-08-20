@@ -92,7 +92,7 @@ DynamicLoader::VoidFunc DynamicLoader::find_function(string const& symbol)
 {
     // The ugly cast is needed because a void* (returned by dlsym()) is not compatible with a function pointer.
     VoidFunc func;
-    *(void**)&func = find_variable(symbol);
+    *reinterpret_cast<void**>(&func) = find_variable(symbol);
     return func;
 }
 

@@ -193,6 +193,8 @@ JsonNodeInterface::NodeType JsonCppNode::type() const
             return Real;
         case Json::booleanValue:
             return Bool;
+        default:
+            break;
     }
 
     return Null;

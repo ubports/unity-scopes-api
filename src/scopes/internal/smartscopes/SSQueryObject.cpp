@@ -52,7 +52,7 @@ SSQueryObject::SSQueryObject()
 {
 }
 
-SSQueryObject::~SSQueryObject() noexcept
+SSQueryObject::~SSQueryObject()
 {
 }
 
