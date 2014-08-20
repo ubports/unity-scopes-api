@@ -246,6 +246,16 @@ std::string PreviewWidgetImpl::data() const
     VariantMap var;
     var["id"] = id_;
     var["type"] = type_;
+    if (widgets_.size())
+    {
+        VariantArray va;
+        for (auto w: widgets_)
+        {
+            va.push_back(Variant(w.serialize()));
+        }
+        var["widgets"] = Variant(va);
+    }
+
     var["components"] = Variant(cm);
     for (auto const& kv: attributes_)
     {

@@ -92,6 +92,7 @@ TEST(PreviewWidget, to_json)
 
         PreviewWidget subwidget1("w2", "image");
         subwidget1.add_attribute_value("source", Variant("bar"));
+        subwidget1.add_attribute_mapping("foo", "booze");
 
         PreviewWidget subwidget2("w3", "image");
         subwidget2.add_attribute_value("source", Variant("baz"));
@@ -100,9 +101,10 @@ TEST(PreviewWidget, to_json)
         w.add_widget(subwidget2);
 
         internal::JsonCppNode node(w.data());
-        EXPECT_EQ("i1", node.get_node("id")->as_string());
+        EXPECT_EQ("w1", node.get_node("id")->as_string());
         EXPECT_EQ("expandable", node.get_node("type")->as_string());
         EXPECT_EQ("w2", node.get_node("widgets")->get_node(0)->get_node("id")->as_string());
+        EXPECT_EQ("booze", node.get_node("widgets")->get_node(0)->get_node("components")->get_node("foo")->as_string());
         EXPECT_EQ("w3", node.get_node("widgets")->get_node(1)->get_node("id")->as_string());
     }
 }
