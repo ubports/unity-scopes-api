@@ -337,7 +337,7 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
-RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher)
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
     , manually_started_(false)
@@ -518,16 +518,17 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
 
 void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 {
+    auto reg_publisher = reg_publisher_.lock();
     if (new_state == state_)
     {
         return;
     }
     else if (new_state == Running)
     {
-        if (reg_publisher_)
+        if (reg_publisher)
         {
             // Send a "started" message to subscribers to inform them that this scope (topic) has started
-            reg_publisher_->send_message("started", exec_data_.scope_id);
+            reg_publisher->send_message("started", exec_data_.scope_id);
         }
 
         if (state_ != Starting)
@@ -540,10 +541,10 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopped)
     {
-        if (reg_publisher_)
+        if (reg_publisher)
         {
             // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
-            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+            reg_publisher->send_message("stopped", exec_data_.scope_id);
         }
 
         if (state_ != Stopping)
@@ -554,10 +555,10 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopping && manually_started_)
     {
-        if (reg_publisher_)
+        if (reg_publisher)
         {
             // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
-            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+            reg_publisher->send_message("stopped", exec_data_.scope_id);
         }
 
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""

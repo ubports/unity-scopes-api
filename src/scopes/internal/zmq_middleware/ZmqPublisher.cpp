@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <iostream> // TODO: remove this
 
 namespace unity
 {
@@ -139,8 +140,17 @@ void ZmqPublisher::publisher_thread()
         // Clean up
         pub_socket.close();
     }
+    catch (std::exception const& e)
+    {
+        std::cerr << "ZmqPublisher: exception: " << e.what() << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_exception_ = std::current_exception();
+        thread_state_ = Failed;
+        cond_.notify_all();
+    }
     catch (...)
     {
+        std::cerr << "ZmqPublisher: unknown exception" << std::endl;
         std::lock_guard<std::mutex> lock(mutex_);
         thread_exception_ = std::current_exception();
         thread_state_ = Failed;

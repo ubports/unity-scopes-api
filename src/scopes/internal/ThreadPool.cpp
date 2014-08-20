@@ -33,68 +33,114 @@ namespace scopes
 namespace internal
 {
 
-ThreadPool::ThreadPool(int size)
-    : num_threads_(size)
+ThreadPool::ThreadPool(int num_threads)
+    : queue_(new TaskQueue)
+    , state_(Created)
 {
-    if (size < 1)
+    if (num_threads < 1)
     {
-        throw InvalidArgumentException("ThreadPool(): invalid pool size: " + std::to_string(size));
+        throw InvalidArgumentException("ThreadPool(): invalid pool size: " + std::to_string(num_threads));
     }
-
-    queue_.reset(new TaskQueue);
 
     try
     {
-        {
-            lock_guard<mutex> lock(mutex_);
-            threads_ready_ = std::promise<void>();
-        }
-        for (int i = 0; i < size; ++i)
+        for (int i = 0; i < num_threads; ++i)
         {
             threads_.push_back(std::thread(&ThreadPool::run, this));
         }
-        auto future = threads_ready_.get_future();
-        future.get();
     }
-    catch (std::exception const&)   // LCOV_EXCL_LINE
+    catch (...)
     {
-        throw ResourceException("ThreadPool(): exception during pool creation");  // LCOV_EXCL_LINE
+        queue_->destroy();          // Causes any threads that were created to exit.
+        for (auto&& t : threads_)
+        {
+            t.join();
+        }
+        throw ResourceException("ThreadPool(): exception during pool creation");
     }
 }
 
 ThreadPool::~ThreadPool()
 {
-    queue_->destroy();
+    destroy();
+}
 
+void ThreadPool::destroy() noexcept
+{
     vector<thread> threads;
-    {
-        lock_guard<mutex> lock(mutex_);
-        threads.swap(threads_);
-    }
 
-    try
     {
-        for (size_t i = 0; i < threads.size(); ++i)
+        unique_lock<mutex> lock(mutex_);
+        switch (state_)
         {
-            threads[i].join();
+            case Destroyed:
+            {
+                return;  // Already destroyed, no-op.
+            }
+            case Destroying:
+            {
+                // Block until some other thread has finished destruction.
+                cond_.wait(lock, [this]{ return state_ == Destroyed; });
+                return;
+            }
+            default:
+            {
+                assert(state_ == Created || state_ == Waiting);
+                state_ = Destroying;
+                // No notify here because no-one waits for Destroying.
+
+                queue_->destroy();
+                threads.swap(threads_);
+            }
         }
     }
-    catch (...) // LCOV_EXCL_LINE
+
+    // Join with threads with the lock released.
+    for (size_t i = 0; i < threads.size(); ++i)
     {
-        assert(false);  // LCOV_EXCL_LINE
+        threads[i].join();
     }
+
+    lock_guard<mutex> lock(mutex_);
+    state_ = Destroyed;
+    cond_.notify_all();              // Wake up everyone else waiting for destruction to complete.
+}
+
+void ThreadPool::destroy_once_empty() noexcept
+{
+    unique_lock<mutex> lock(mutex_);
+    switch (state_)
+    {
+        case Destroyed:
+        {
+            return;  // Nothing to do.
+        }
+        case Created:
+        {
+            state_ = Waiting;
+            lock.unlock();               // Release lock while waiting for queue to drain.
+            queue_->wait_until_empty();
+            destroy();
+            return;
+        }
+        default:
+        {
+            assert(state_ == Waiting || state_ == Destroying);
+            cond_.wait(lock, [this]{ return state_ == Destroyed; });
+            return;
+        }
+    }
+    // NOTREACHED
+}
+
+void ThreadPool::wait_for_destroy() noexcept
+{
+    unique_lock<mutex> lock(mutex_);
+    cond_.wait(lock, [this]{ return state_ == Destroyed; });
 }
 
 void ThreadPool::run()
 {
-    {
-        lock_guard<mutex> lock(mutex_);
-        if (--num_threads_ == 0)
-        {
-            threads_ready_.set_value();
-        }
-    }
-
     for (;;)
     {
         TaskQueue::value_type task;  // Task must go out of scope in each iteration, in case it stores shared_ptrs.

@@ -148,23 +148,6 @@ ZmqMiddleware::~ZmqMiddleware()
     {
         stop();
         wait_for_shutdown();
-
-        // We terminate explicitly here instead of relying
-        // on the destructor so we can measure how long it
-        // takes. There is an intermittent problem with
-        // zmq taking several seconds to terminate the context.
-        // Until we figure out what's going on here, we measure
-        // how long it takes and print a warning if it takes
-        // longer than 100 ms.
-        auto start_time = chrono::system_clock::now();
-        context_.terminate();
-        auto end_time = chrono::system_clock::now();
-        auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
-        if (millisecs > 100)
-        {
-            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-                 << " ms to complete for " << server_name_ << endl;
-        }
     }
     catch (std::exception const& e)
     {
@@ -175,6 +158,23 @@ ZmqMiddleware::~ZmqMiddleware()
     {
         cerr << "~ZmqMiddleware(): unknown exception" << endl;
         // TODO: log exception
+    }
+
+    // We terminate explicitly here instead of relying
+    // on the destructor so we can measure how long it
+    // takes. There is an intermittent problem with
+    // zmq taking several seconds to terminate the context.
+    // Until we figure out what's going on here, we measure
+    // how long it takes and print a warning if it takes
+    // longer than 100 ms.
+    auto start_time = chrono::system_clock::now();
+    context_.terminate();
+    auto end_time = chrono::system_clock::now();
+    auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
+    if (millisecs > 100)
+    {
+        cerr << "warning: ZmqMiddleware::wait_for_shutdown(): context_.terminate() for "
+             << server_name_ << " took " << millisecs << " ms to complete for " << server_name_ << endl;
     }
 }
 
@@ -197,10 +197,21 @@ void ZmqMiddleware::start()
         {
             {
                 lock_guard<mutex> lock(data_mutex_);
-                oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
-                // N.B. We absolutely MUST have AT LEAST 3 two-way invoke threads as both rebinding
-                // and debug_mode requests could be invoked within a single two-way invocation.
-                twoway_invokers_.reset(new ThreadPool(3));  // TODO: get pool size from config
+                try
+                {
+                    oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
+                    // N.B. We absolutely MUST have AT LEAST 3 two-way invoke threads as both rebinding
+                    // and debug_mode requests could be invoked within a single two-way invocation.
+                    twoway_invokers_.reset(new ThreadPool(3));  // TODO: get pool size from config
+                }
+                catch (std::exception const& e)
+                {
+                    throw MiddlewareException(string("Cannot create outgoing invocation pools: ") + e.what());
+                }
+                catch (...)
+                {
+                    throw MiddlewareException("Cannot create outgoing invocation pools: unknown exception");
+                }
             }
             shutdown_flag = false;
             state_ = Started;
@@ -230,8 +241,12 @@ void ZmqMiddleware::stop()
             lock_guard<mutex> lock(data_mutex_);
 
             // No more outgoing invocations
-            twoway_invokers_.reset();
-            oneway_invoker_.reset();
+            assert((oneway_invoker_ && twoway_invokers_) || (!oneway_invoker_ && !twoway_invokers_));
+            if (oneway_invoker_)
+            {
+                twoway_invokers_->destroy();            // Destroy immediately, because invocations can take time.
+                oneway_invoker_->destroy_once_empty();  // Wait for queued oneways to go out first.
+            }
 
             // Initiate shutdown of all adapters
             for (auto& pair : am_)

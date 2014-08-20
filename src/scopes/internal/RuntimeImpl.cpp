@@ -158,7 +158,10 @@ void RuntimeImpl::destroy()
     }
 
     // No more outgoing invocations.
-    async_pool_ = nullptr;
+    if (async_pool_)
+    {
+        async_pool_->destroy_once_empty();
+    }
 
     // Wait for any twoway operations that were invoked asynchronously to complete.
     if (future_queue_)
@@ -178,8 +181,6 @@ void RuntimeImpl::destroy()
     {
         middleware_->stop();
         middleware_->wait_for_shutdown();
-        middleware_ = nullptr;
-        middleware_factory_ = nullptr;
     }
 }
 
@@ -426,14 +427,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     try
     {
-
         // Create a servant for the scope and register the servant.
         if (!scope_ini_file.empty())
         {
             // Check if this scope has requested debug mode, if so, disable the idle timeout
             ScopeConfig scope_config(scope_ini_file);
             int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
-
             auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
                                                                                      scope_base,
                                                                                      scope_config.debug_mode()));

@@ -57,7 +57,8 @@ public:
 
     std::string endpoint() const;
     zmqpp::socket subscribe();
-    void stop();
+    void stop() noexcept;
+    void wait_until_stopped() noexcept;
 
 private:
     zmqpp::context* context_;

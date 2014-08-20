@@ -88,7 +88,7 @@ private:
             Stopped, Starting, Running, Stopping
         };
 
-        ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher);
+        ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher);
         ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
@@ -118,7 +118,7 @@ private:
         mutable std::mutex process_mutex_;
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
-        MWPublisher::SPtr reg_publisher_;
+        std::weak_ptr<MWPublisher> reg_publisher_; // weak_ptr, so processes don't hold publisher alive
         bool manually_started_;
     };
 
