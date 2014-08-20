@@ -38,6 +38,13 @@ namespace internal
     class PreviewWidgetImpl;
 }
 
+class PreviewWidget;
+
+/*! \typedef PreviewWidgetList
+\brief List of preview widgets (see unity::scopes::PreviewWidget)
+*/
+typedef std::list<PreviewWidget> PreviewWidgetList;
+
 class PreviewWidget
 {
 public:
@@ -109,6 +116,16 @@ public:
     void add_attribute_mapping(std::string const& key, std::string const& field_name);
 
     /**
+      \brief Adds a widget into expandable widget.
+
+      Adds a widget into this widget, which needs to be of 'expandable' type. This method throws
+      if adding a widget into any other widget type.
+
+      \throws unity::LogicException if type of this widget is other than 'expandable'
+    */
+    void add_widget(PreviewWidget const& widget);
+
+    /**
     \brief Get the identifier of this widget.
     \return The widget identifier.
     */
@@ -137,6 +154,12 @@ public:
     VariantMap attribute_values() const;
 
     /**
+    \brief
+    TODO
+    */
+    PreviewWidgetList widgets() const;
+
+    /**
     \brief Get a JSON representation of this widget.
     \return The JSON string.
     */
@@ -151,11 +174,6 @@ private:
     PreviewWidget(internal::PreviewWidgetImpl *impl);
     friend class internal::PreviewWidgetImpl;
 };
-
-/*! \typedef PreviewWidgetList
-\brief List of preview widgets (see unity::scopes::PreviewWidget)
-*/
-typedef std::list<PreviewWidget> PreviewWidgetList;
 
 } // namespace scopes
 

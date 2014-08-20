@@ -344,7 +344,7 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
 //! @cond
 
 PreviewWidget::PreviewWidget(std::string const& definition)
-    : p(new internal::PreviewWidgetImpl(definition))
+    : p(new internal::PreviewWidgetImpl(internal::PreviewWidgetImpl::from_json(definition)))
 {
 }
 
@@ -391,6 +391,11 @@ void PreviewWidget::add_attribute_mapping(std::string const& key, std::string co
     p->add_attribute_mapping(key, field_name);
 }
 
+void PreviewWidget::add_widget(PreviewWidget const& widget)
+{
+    p->add_widget(widget);
+}
+
 std::string PreviewWidget::id() const
 {
     return p->id();
@@ -409,6 +414,11 @@ std::map<std::string, std::string> PreviewWidget::attribute_mappings() const
 VariantMap PreviewWidget::attribute_values() const
 {
     return p->attribute_values();
+}
+
+PreviewWidgetList PreviewWidget::widgets() const
+{
+    return p->widgets();
 }
 
 std::string PreviewWidget::data() const
