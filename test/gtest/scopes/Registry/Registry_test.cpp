@@ -302,6 +302,70 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
+TEST(Registry, manually_started_scope)
+{
+    bool update_received = false;
+    std::mutex mutex;
+    std::condition_variable cond;
+
+    Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
+    RegistryProxy r = rt->registry();
+
+    // Configure testscopeC scope_state_callback
+    auto conn = r->set_scope_state_callback("testscopeC", [&update_received, &mutex, &cond](bool)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = true;
+        cond.notify_one();
+    });
+
+    auto wait_for_state_update = [&update_received, &mutex, &cond]
+    {
+        // Wait for an update notification
+        std::unique_lock<std::mutex> lock(mutex);
+        bool success = cond.wait_for(lock, std::chrono::seconds(5), [&update_received] { return update_received; });
+        update_received = false;
+        return success;
+    };
+
+    // Move testscopeC into the scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    // testscopeC should not be running at this point
+    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+
+    // start testscopeC manually
+    auto scope_pid = fork();
+    if (scope_pid == 0)
+    {
+        const char* const args[] = {"scoperunner [Registry test]", TEST_RUNTIME_FILE, TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", nullptr};
+
+        if (execv(TEST_SCOPERUNNER_PATH "/scoperunner", const_cast<char* const*>(args)) < 0)
+        {
+            perror("Error starting scoperunner:");
+        }
+        exit(0);
+    }
+
+    // testscopeC should now be running
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_TRUE(r->is_scope_running("testscopeC"));
+
+    // stop testscopeC manually
+    kill(scope_pid, SIGTERM);
+    int status;
+    waitpid(scope_pid, &status, 0);
+
+    // testscopeC should now be stopped
+    EXPECT_TRUE(wait_for_state_update());
+    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+
+    // Move testscopeC back into the other_scopes folder
+    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
 TEST(Registry, list_update_notify_before_click_folder_exists)
 {
     bool update_received = false;

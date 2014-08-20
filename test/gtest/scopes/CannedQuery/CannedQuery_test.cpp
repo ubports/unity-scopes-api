@@ -82,22 +82,22 @@ TEST(CannedQuery, to_uri)
         CannedQuery q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
-        EXPECT_EQ("scope://scope%2DA?q=foo&dep=dep1", q.to_uri());
+        EXPECT_EQ("scope://scope-A?q=foo&dep=dep1", q.to_uri());
     }
     {
         CannedQuery q("scope-A");
-        EXPECT_EQ("scope://scope%2DA?q=", q.to_uri());
+        EXPECT_EQ("scope://scope-A?q=", q.to_uri());
     }
     {
         CannedQuery q("scope-A");
         q.set_query_string("foo bar Baz");
         q.set_department_id("dep 1");
-        EXPECT_EQ("scope://scope%2DA?q=foo%20bar%20Baz&dep=dep%201", q.to_uri());
+        EXPECT_EQ("scope://scope-A?q=foo%20bar%20Baz&dep=dep%201", q.to_uri());
     }
     {
         CannedQuery q("com.canonical.scope.foo");
         q.set_query_string("ß"); // utf8 character
-        EXPECT_EQ("scope://com%2Ecanonical%2Escope%2Efoo?q=%C3%9F", q.to_uri());
+        EXPECT_EQ("scope://com.canonical.scope.foo?q=%C3%9F", q.to_uri());
     }
     {
         {
@@ -208,6 +208,7 @@ TEST(CannedQuery, from_uri)
         EXPECT_EQ("Foo bar", q.query_string());
         EXPECT_EQ("a bc", q.department_id());
     }
+    // percent-encoded host supported for backwards compatibility
     {
         auto q = CannedQuery::from_uri("scope://com%2Ecanonical%2Escope%2Efoo?q=Foo&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D");
         EXPECT_EQ("com.canonical.scope.foo", q.scope_id());
@@ -219,6 +220,11 @@ TEST(CannedQuery, from_uri)
         auto actopts = filter->active_options(fstate);
         EXPECT_EQ(1, actopts.size());
         EXPECT_EQ("o1", (*(actopts.begin()))->id());
+    }
+    {
+        auto q = CannedQuery::from_uri("scope://com.canonical.scope.foo?q=Foo");
+        EXPECT_EQ("com.canonical.scope.foo", q.scope_id());
+        EXPECT_EQ("Foo", q.query_string());
     }
     // no "q=" argument
     {
