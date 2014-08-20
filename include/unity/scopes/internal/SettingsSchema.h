@@ -46,6 +46,8 @@ public:
     SettingsSchema& operator=(SettingsSchema&&) = default;
 
     virtual VariantArray definitions() const = 0;
+
+    virtual void add_location_setting() = 0;
 };
 
 } // namespace internal

@@ -37,7 +37,8 @@ class RuntimeImpl;
 class PreviewReplyObject : public ReplyObject
 {
 public:
-    PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id);
+    PreviewReplyObject(PreviewListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                       std::string const& scope_id, bool dont_reap = false);
     virtual ~PreviewReplyObject();
 
     virtual bool process_data(VariantMap const& data) override;

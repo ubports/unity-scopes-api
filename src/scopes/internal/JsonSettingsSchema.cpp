@@ -21,6 +21,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <jsoncpp/json/json.h>
 
@@ -38,6 +39,7 @@ namespace internal
 using namespace unity;
 using namespace unity::scopes;
 using namespace boost;
+using namespace boost::algorithm;
 using namespace std;
 
 namespace
@@ -51,6 +53,11 @@ public:
     NONCOPYABLE(Setting);
 
     Setting(Json::Value const& v);
+    Setting(string const& id,
+                string const& type,
+                string const& display_name,
+                VariantArray const& enumerators,
+                Variant const& default_value);
     ~Setting() = default;
 
     string id() const;
@@ -65,7 +72,7 @@ private:
     void set_default_value(Json::Value const& v, Type expected_type);
     Variant get_bool_default(Json::Value const& v) const;
     Variant get_enum_default(Json::Value const& v);
-    Variant get_int_default(Json::Value const& v) const;
+    Variant get_double_default(Json::Value const& v) const;
     Variant get_string_default(Json::Value const& v) const;
     void set_enumerators(Json::Value const& v);
 
@@ -109,6 +116,27 @@ Setting::Setting(Json::Value const& v)
     set_default_value(v, it->second);
 
     display_name_ = get_mandatory(v, display_name_key, Json::stringValue).asString();
+}
+
+Setting::Setting(string const& id,
+                 string const& type,
+                 string const& display_name,
+                 VariantArray const& enumerators,
+                 Variant const& default_value)
+    : id_(id)
+    , display_name_(display_name)
+    , default_value_(default_value)
+    , enumerators_(enumerators)
+{
+    assert(!id.empty());
+
+    auto const it = VALID_TYPES.find(type);
+    if (it == VALID_TYPES.end())
+    {
+        throw ResourceException(string("JsonSettingsSchema(): invalid \"type\" definition: \"")
+                                + type + "\", setting = \"" + id_ + "\"");
+    }
+    type_ = it->first;
 }
 
 string Setting::id() const
@@ -172,7 +200,7 @@ void Setting::set_default_value(Json::Value const& v, Type expected_type)
         }
         case Type::NumberT:
         {
-            default_value_ = get_int_default(v_param);
+            default_value_ = get_double_default(v_param);
             break;
         }
         case Type::StringT:
@@ -208,7 +236,7 @@ Variant Setting::get_bool_default(Json::Value const& v) const
     return Variant(v_dflt.asBool());
 }
 
-Variant Setting::get_int_default(Json::Value const& v) const
+Variant Setting::get_double_default(Json::Value const& v) const
 {
     if (v.isNull())  // No "parameters" key
     {
@@ -219,12 +247,12 @@ Variant Setting::get_int_default(Json::Value const& v) const
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isInt())
+    if (!v_dflt.isNumeric())
     {
         throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
                                        + "\" definition, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asInt());
+    return Variant(v_dflt.asDouble());
 }
 
 Variant Setting::get_enum_default(Json::Value const& v)
@@ -326,6 +354,11 @@ JsonSettingsSchema::UPtr JsonSettingsSchema::create(string const& json_string)
     return UPtr(new JsonSettingsSchema(json_string));
 }
 
+JsonSettingsSchema::UPtr JsonSettingsSchema::create_empty()
+{
+    return UPtr(new JsonSettingsSchema());
+}
+
 JsonSettingsSchema::JsonSettingsSchema(string const& json_string)
 {
     try
@@ -353,6 +386,10 @@ JsonSettingsSchema::JsonSettingsSchema(string const& json_string)
         for (unsigned i = 0; i < root.size(); ++i)
         {
             Setting s(root[i]);
+            if (starts_with(s.id(), "internal."))
+            {
+                throw ResourceException(string("JsonSettingsSchema(): invalid key \"") + s.id() + "\" prefixed with \"internal.\"");
+            }
             if (seen_settings.find(s.id()) != seen_settings.end())
             {
                 throw ResourceException("JsonSettingsSchema(): duplicate definition, id = \"" + s.id() + "\"");
@@ -371,6 +408,16 @@ JsonSettingsSchema::JsonSettingsSchema(string const& json_string)
         throw ResourceException(string("JsonSettingsSchema(): unexpected error: ") + e.what());
     }
     // LCOV_EXCL_STOP
+}
+
+JsonSettingsSchema::JsonSettingsSchema()
+{
+}
+
+void JsonSettingsSchema::add_location_setting()
+{
+    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
+    definitions_.push_back(s.to_schema_definition());
 }
 
 JsonSettingsSchema::~JsonSettingsSchema() = default;

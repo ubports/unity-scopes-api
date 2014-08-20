@@ -1,6 +1,18 @@
 Release notes
 =============
 
+Changes in version 0.6.3
+========================
+  - Fix scope cache path for confined scopes.
+
+Changes in version 0.6.2
+========================
+  - Move scope configuration to ~/.config/unity-scopes/
+
+  - New setting to enable/disable of location data being fed to scopes.
+
+  - New DebugMode scope configuration option.
+ 
 Changes in version 0.6.1
 ========================
   - Clear any signal masks inherited from the parent process when forking.

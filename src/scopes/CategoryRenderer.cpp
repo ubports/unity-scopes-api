@@ -57,11 +57,11 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 
 \subsection template1 template keys
 
-\arg \c category-layout Specifies renderer type; possible values: \c "grid" (default), \c "carousel", \c "organic-grid", \c "journal", \c "vertical-journal"
+\arg \c category-layout Specifies renderer type; possible values: \c "grid" (default), \c "carousel", \c "vertical-journal", \c "horizontal-list"
 \arg \c card-layout Specifies layout of the individual result cards; possible values: \c "vertical" (default), \c "horizontal"
 \arg \c card-size Size of the result cards; possible values: \c "small", \c "medium" (default), \c "large"; when using <tt>"category-layout": "vertical-journal"</tt> any integer between 12 and 38
 \arg \c overlay Overlay text data on top of the art; boolean, default false
-\arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: any non-negative integer, where 0 fully expands the category (only affects grid and journal)
+\arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: any non-negative integer, where 0 fully expands the category (only affects grid and vertical journal)
 \arg \c card-background Background color for the cards; string; URI in the format \verbatim color:///#rrggbb \endverbatim or \verbatim color:///color_name
 \endverbatim or \verbatim gradient:///#rrggbb/#rrggbb \endverbatim or an image URI (will be stretched)
 

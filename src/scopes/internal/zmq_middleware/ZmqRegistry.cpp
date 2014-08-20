@@ -144,7 +144,7 @@ MetadataMap ZmqRegistry::list()
     return sm;
 }
 
-ObjectProxy ZmqRegistry::locate(std::string const& identity)
+ObjectProxy ZmqRegistry::locate(std::string const& identity, int64_t timeout)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "locate");
@@ -152,7 +152,6 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
     in_params.setIdentity(identity.c_str());
 
     // locate uses a custom timeout because it needs to potentially fork/exec a scope.
-    int64_t timeout = mw_base()->locate_timeout();
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
     auto receiver = future.get();
     auto segments = receiver.receive();
@@ -190,6 +189,11 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
             throw MiddlewareException("Registry::locate(): unknown user exception");
         }
     }
+}
+
+ObjectProxy ZmqRegistry::locate(std::string const& identity)
+{
+    return locate(identity, mw_base()->locate_timeout());
 }
 
 bool ZmqRegistry::is_scope_running(std::string const& scope_id)

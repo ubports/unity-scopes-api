@@ -36,13 +36,12 @@
 #include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 
-#include <boost/filesystem.hpp>
-
 #include <cassert>
 #include <cstring>
 #include <future>
 #include <iostream> // TODO: remove this once logging is added
 
+#include <sys/apparmor.h>
 #include <sys/stat.h>
 
 using namespace std;
@@ -105,6 +104,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         data_dir_ = config.data_directory();
+        config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
     {
@@ -179,7 +179,7 @@ void RuntimeImpl::destroy()
         middleware_->stop();
         middleware_->wait_for_shutdown();
         middleware_ = nullptr;
-        middleware_factory_.reset(nullptr);
+        middleware_factory_ = nullptr;
     }
 }
 
@@ -280,12 +280,50 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& scope_ini_file)
+namespace
 {
-    run_scope(scope_base, "", scope_ini_file);
+
+class PromiseWrapper final
+{
+public:
+    PromiseWrapper(std::promise<void> p)
+        : p_(move(p))
+    {
+    }
+
+    ~PromiseWrapper()
+    {
+        try
+        {
+            p_.set_value();
+        }
+        catch (std::future_error const&)
+        {
+        }
+    }
+
+    void set_value()
+    {
+        p_.set_value();
+    }
+
+private:
+    std::promise<void> p_;
+};
+
 }
 
-void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_file, string const& scope_ini_file)
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& scope_ini_file,
+                            std::promise<void> ready_promise)
+{
+    run_scope(scope_base, "", scope_ini_file, move(ready_promise));
+}
+
+void RuntimeImpl::run_scope(ScopeBase* scope_base,
+                            string const& runtime_ini_file,
+                            string const& scope_ini_file,
+                            std::promise<void> ready_promise)
 {
     if (!scope_base)
     {
@@ -307,15 +345,19 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
 
     {
         // Try to open the scope settings database, if any.
-        string settings_dir = data_dir_ + "/" + scope_id_;
+        string config_dir = config_dir_ + "/" + scope_id_;
+        string settings_db = config_dir + "/settings.ini";
+
+        string scope_data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
-        string settings_db = settings_dir + "/settings.db";
+
         string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
-        if (boost::filesystem::exists(settings_schema))
+        boost::system::error_code ec;
+        if (boost::filesystem::exists(settings_schema, ec))
         {
-            // Make sure the settings directories exist. (No permission for group and others; data might be sensitive.)
-            ::mkdir(data_dir_.c_str(), 0700);
-            ::mkdir(settings_dir.c_str(), 0700);
+            // Make sure the data directories exist. (No permission for group and others; data might be sensitive.)
+            !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
+            !boost::filesystem::exists(scope_data_dir, ec) && ::mkdir(scope_data_dir.c_str(), 0700);
 
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
@@ -337,48 +379,103 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base, string const& runtime_ini_fil
         // exist. (/run/user/<uid> gets cleaned out periodically.)
         string path = string("/run/user/") + std::to_string(geteuid());
         path += "/scopes";
-        ::mkdir(path.c_str(), 0700);
+        boost::system::error_code ec;
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
         path += "/" + confinement_type;
-        ::mkdir(path.c_str(), 0700);
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
         path += "/" + scope_id_;
-        ::mkdir(path.c_str(), 0700);
+        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
 
         scope_base->p->set_tmp_directory(path);
     }
 
-    scope_base->start(scope_id_);
+    try
+    {
+        scope_base->start(scope_id_);
+    }
+    catch (...)
+    {
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from start()");
+    }
+
+    exception_ptr ep;  // Stores any exceptions that happen from now on.
 
     // Ensure the scope gets stopped.
-    unique_ptr<ScopeBase, void(*)(ScopeBase*)> cleanup_scope(scope_base, [](ScopeBase *scope_base) { scope_base->stop(); });
+    auto call_stop = [this, &ep](ScopeBase *scope_base)
+    {
+        try
+        {
+            scope_base->stop();
+        }
+        catch (...)
+        {
+            unity::ResourceException ex("Scope " + scope_id_ +": exception from stop()");
+            ep = make_exception_ptr(ex);
+        }
+    };
+    unity::util::ResourcePtr<ScopeBase*, decltype(call_stop)> cleanup_scope(scope_base, call_stop);
+
+    // Make sure we satisfy the promise even if something goes wrong.
+    PromiseWrapper promise(move(ready_promise));
 
     // Give a thread to the scope to do with as it likes. If the scope
     // doesn't want to use it and immediately returns from run(),
     // that's fine.
     auto run_future = std::async(launch::async, [scope_base] { scope_base->run(); });
+    this_thread::yield();
 
-    // Create a servant for the scope and register the servant.
-    auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
-    if (!scope_ini_file.empty())
+    try
     {
-        ScopeConfig scope_config(scope_ini_file);
-        int idle_timeout_ms = scope_config.idle_timeout() * 1000;
-        mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+
+        // Create a servant for the scope and register the servant.
+        if (!scope_ini_file.empty())
+        {
+            // Check if this scope has requested debug mode, if so, disable the idle timeout
+            ScopeConfig scope_config(scope_ini_file);
+            int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
+
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
+                                                                                     scope_base,
+                                                                                     scope_config.debug_mode()));
+            mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
+        }
+        else
+        {
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+            mw->add_scope_object(scope_id_, move(scope));
+        }
+
+        // Inform the registry that this scope is now ready to process requests
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+
+        promise.set_value();
+        mw->wait_for_shutdown();
+        cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
+
+        // Inform the registry that this scope is shutting down
+        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
     }
-    else
+    catch (...)
     {
-        mw->add_scope_object(scope_id_, move(scope));
+        unity::ResourceException ex("Scope " + scope_id_ +": failure during initialization");
+        ex.remember(ep);  // ep will still be nullptr if something other than stop() threw.
+        ep = make_exception_ptr(ex);
     }
 
-    // Inform the registry that this scope is now ready to process requests
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+    try
+    {
+        run_future.get();
+    }
+    catch (...)
+    {
+        unity::ResourceException ex("Scope " + scope_id_ +": exception from run()");
+        ep = ex.remember(ep);
+    }
 
-    mw->wait_for_shutdown();
-    cleanup_scope.reset();   // Causes ScopeBase::run() to terminate if the scope is properly written
-
-    // Inform the registry that this scope is shutting down
-    reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
-
-    run_future.get();
+    if (ep)
+    {
+        rethrow_exception(ep);
+    }
 }
 
 ObjectProxy RuntimeImpl::string_to_proxy(string const& s) const
@@ -413,44 +510,37 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 
 string RuntimeImpl::find_cache_dir(string& confinement_type) const
 {
-    // TODO: HACK: Until we get a fancier Apparmor query API, we try
-    //             to create the scope cache dir and figure out whether
-    //             whether we are confined or unconfined. We first try to
-    //             create <data_dir>/unconfined and <data_dir>/unconfined/<scope_id_>,
-    //             in case they don't exist. Then we try to create a file in
-    //             <data_dir>unconfined/<scope_id_>. If that works, we unlink
-    //             the file again and can conclude that the scope is unconfined.
-    //             Otherwise, the scope must be confined, in which case
-    //             we create <data_dir>/leaf-net and <data_dir>/leaf-net/<scope_id_>.
+    // Find out whether we are confined. aa_getcon() returns -1 in that case.
+    char* con = nullptr;
+    char* mode;
+    int rc = aa_getcon(&con, &mode);
+    // Only con (not mode) must be deallocated
+    free(con);
+    confinement_type = rc == -1 ? "leaf-net" : "unconfined";
 
-    ::mkdir(data_dir_.c_str(), 0700); // We don't care if this fails.
+    // For scopes that are in a click package together with an app,
+    // such as YouTube, the cache directory is shared between the app and
+    // the scope. The cache directory name is the scope ID up to the first
+    // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
+    // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
+    auto id = scope_id_;
+    if (confinement_type == "leaf-net")
+    {
+        auto pos = id.find('_');
+        if (pos != string::npos)
+        {
+            id = id.substr(0, pos);
+        }
+    }
 
-    // Assume we are unconfined initially.
-    confinement_type = "unconfined";
+    // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
+    boost::system::error_code ec;
+    !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
     string dir = data_dir_ + "/" + confinement_type;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+    dir += "/" + id;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
-    // The following two mkdir() calls will fail if the scope is confined or
-    // the directories exist already.
-    ::mkdir(dir.c_str(), 0700);
-    dir += "/" + scope_id_;
-    ::mkdir(dir.c_str(), 0700);
-    string tmp = dir + "/.scope_tmp_XXXXXX";
-    int fd = mkstemp(const_cast<char*>(tmp.c_str()));  // mkstemp() modifies its argument
-    if (fd != -1)
-    {
-        // If mkstemp succeeded, the scope is unconfined.
-        assert(::unlink(tmp.c_str()) == 0);
-        ::close(fd);
-    }
-    else
-    {
-        // mkstemp() failed, the scope must be confined.
-        confinement_type = "leaf-net";
-        dir = data_dir_ + "/" + confinement_type;
-        ::mkdir(dir.c_str(), 0700);
-        dir += "/" + scope_id_;
-        ::mkdir(dir.c_str(), 0700);
-    }
     return dir;
 }
 

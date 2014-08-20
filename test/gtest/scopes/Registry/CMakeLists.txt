@@ -8,6 +8,7 @@ add_definitions(-DTEST_SRC_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 add_definitions(-DTEST_RUNTIME_PATH="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DTEST_RUNTIME_FILE="${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini")
 add_definitions(-DTEST_REGISTRY_PATH="${PROJECT_BINARY_DIR}/scoperegistry")
+add_definitions(-DTEST_SCOPERUNNER_PATH="${PROJECT_BINARY_DIR}/scoperunner")
 add_definitions(-DTEST_SCOPE_A_PATH="${CMAKE_CURRENT_BINARY_DIR}/scopes/testscopeA")
 
 add_executable(Registry_test Registry_test.cpp)

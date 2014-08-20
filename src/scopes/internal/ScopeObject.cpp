@@ -47,9 +47,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
+ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode) :
     runtime_(runtime),
-    scope_base_(scope_base)
+    scope_base_(scope_base),
+    debug_mode_(debug_mode)
 {
     assert(runtime);
     assert(scope_base);
@@ -215,6 +216,11 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                 return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }
     );
+}
+
+bool ScopeObject::debug_mode() const
+{
+    return debug_mode_;
 }
 
 } // namespace internal

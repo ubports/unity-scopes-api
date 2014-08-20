@@ -1,0 +1,5 @@
+[ScopeConfig]
+DisplayName = Debug Test Scope
+Description = Debug Test Scope description
+Author = Canonical
+DebugMode = true

@@ -41,7 +41,8 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy) :
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
+                         std::string const& scope_proxy, bool dont_reap) :
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
@@ -50,10 +51,14 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
 {
     assert(receiver_base);
     assert(runtime);
-    reap_item_ = runtime->reply_reaper()->add([this] {
-        string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
-        this->finished(CompletionDetails(CompletionDetails::Error, msg));
-    });
+
+    if (dont_reap == false)
+    {
+        reap_item_ = runtime->reply_reaper()->add([this] {
+            string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
+            this->finished(CompletionDetails(CompletionDetails::Error, msg));
+        });
+    }
 }
 
 ReplyObject::~ReplyObject()
@@ -89,7 +94,10 @@ void ReplyObject::push(VariantMap const& result) noexcept
         return; // Ignore replies that arrive after finished().
     }
 
-    reap_item_->refresh();
+    if (reap_item_)
+    {
+        reap_item_->refresh();
+    }
 
     {
         unique_lock<mutex> lock(mutex_);
@@ -148,7 +156,10 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
 
     // Only one thread can reach this point, any others were thrown out above.
 
-    reap_item_->destroy();
+    if (reap_item_)
+    {
+        reap_item_->destroy();
+    }
 
     // Wait until all currently executing calls to push() have completed.
     unique_lock<mutex> lock(mutex_);
@@ -189,7 +200,10 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
         return; // Ignore info messages that arrive after finished().
     }
 
-    reap_item_->refresh();
+    if (reap_item_)
+    {
+        reap_item_->refresh();
+    }
     info_occurred_.exchange(true);
 
     try

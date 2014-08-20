@@ -20,6 +20,9 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <cassert>
 
 namespace unity
@@ -35,6 +38,7 @@ using namespace unity;
 using namespace unity::scopes;
 using namespace unity::util;
 using namespace std;
+using namespace boost::algorithm;
 
 namespace
 {
@@ -44,7 +48,12 @@ class Setting final
 public:
     NONCOPYABLE(Setting);
 
-    Setting(IniParser const& p, string const& id);
+    Setting(shared_ptr<IniParser> const& p, string const& id);
+    Setting(string const& id,
+            string const& type,
+            string const& display_name,
+            VariantArray const& display_values,
+            Variant const& default_value);
     ~Setting() = default;
 
     string id() const;
@@ -65,8 +74,8 @@ private:
     vector<string> get_mandatory_localized_string_array(string const& key);
     void set_value(Type expected_type);
 
-    IniParser const& p_;
-    string const& id_;
+    shared_ptr<IniParser> p_;
+    string id_;
     string type_;
     string display_name_;
     VariantArray display_values_;
@@ -80,7 +89,7 @@ static const map<string, Setting::Type> VALID_TYPES {
                                                       { "string",  Setting::StringT },
                                                     };
 
-Setting::Setting(IniParser const& p, string const& id)
+Setting::Setting(shared_ptr<IniParser> const& p, string const& id)
     : p_(p)
     , id_(id)
 {
@@ -100,6 +109,26 @@ Setting::Setting(IniParser const& p, string const& id)
     display_name_ = get_mandatory_localized_string(d_name_key);
 }
 
+Setting::Setting(string const& id,
+                 string const& type,
+                 string const& display_name,
+                 VariantArray const& display_values,
+                 Variant const& default_value)
+    : id_(id)
+    , display_name_(display_name)
+    , display_values_(display_values)
+    , default_value_(default_value)
+{
+    assert(!id.empty());
+
+    auto const it = VALID_TYPES.find(type);
+    if (it == VALID_TYPES.end())
+    {
+        throw ResourceException(string("IniSettingsSchema(): invalid \"") + type_key + "\" definition: \""
+                                + type + "\", setting = \"" + id_ + "\"");
+    }
+    type_ = it->first;
+}
 
 Variant Setting::to_schema_definition()
 {
@@ -119,7 +148,7 @@ string Setting::get_mandatory_string(string const& key)
 {
     try
     {
-        return p_.get_string(id_, key);
+        return p_->get_string(id_, key);
     }
     catch (LogicException const&)
     {
@@ -131,7 +160,7 @@ string Setting::get_mandatory_localized_string(string const& key)
 {
     try
     {
-        return p_.get_locale_string(id_, key);
+        return p_->get_locale_string(id_, key);
     }
     catch (LogicException const&)
     {
@@ -143,7 +172,7 @@ vector<string> Setting::get_mandatory_localized_string_array(string const& key)
 {
     try
     {
-        return p_.get_locale_string_array(id_, key);
+        return p_->get_locale_string_array(id_, key);
     }
     catch (LogicException const&)
     {
@@ -153,7 +182,7 @@ vector<string> Setting::get_mandatory_localized_string_array(string const& key)
 
 void Setting::set_value(Type expected_type)
 {
-    if (!p_.has_key(id_, dflt_val_key))
+    if (!p_->has_key(id_, dflt_val_key))
     {
         return;  // No default value set.
     }
@@ -164,12 +193,12 @@ void Setting::set_value(Type expected_type)
         {
             case Setting::BooleanT:
             {
-                default_value_ = Variant(p_.get_boolean(id_, dflt_val_key));
+                default_value_ = Variant(p_->get_boolean(id_, dflt_val_key));
                 break;
             }
             case Setting::ListT:
             {
-                default_value_ = Variant(p_.get_int(id_, dflt_val_key));
+                default_value_ = Variant(p_->get_int(id_, dflt_val_key));
                 auto values = get_mandatory_localized_string_array(d_values_key);
                 if (values.size() < 2)
                 {
@@ -189,12 +218,20 @@ void Setting::set_value(Type expected_type)
             }
             case Setting::NumberT:
             {
-                default_value_ = Variant(p_.get_int(id_, dflt_val_key));
+                string value = p_->get_string(id_, dflt_val_key);
+                try
+                {
+                    default_value_ = Variant(stod(value));
+                }
+                catch (invalid_argument & e)
+                {
+                    throw LogicException(e.what());
+                }
                 break;
             }
             case Setting::StringT:
             {
-                default_value_ = Variant(p_.get_string(id_, dflt_val_key));
+                default_value_ = Variant(p_->get_string(id_, dflt_val_key));
                 break;
             }
             default:
@@ -217,16 +254,24 @@ IniSettingsSchema::UPtr IniSettingsSchema::create(string const& ini_file)
     return UPtr(new IniSettingsSchema(ini_file));
 }
 
+IniSettingsSchema::UPtr IniSettingsSchema::create_empty()
+{
+    return UPtr(new IniSettingsSchema());
+}
+
 IniSettingsSchema::IniSettingsSchema(string const& ini_file)
     : ini_file_(ini_file)
 {
     try
     {
-        IniParser p(ini_file.c_str());
+        auto p = make_shared<IniParser>(ini_file.c_str());
 
-        auto settings = p.get_groups();
+        auto settings = p->get_groups();
         for (auto const& id: settings)
         {
+            if(starts_with(id, "internal.")) {
+                throw ResourceException(string("IniSettingsSchema(): invalid key \"") + id + "\" prefixed with \"internal.\"");
+            }
             Setting s(p, id);
             definitions_.push_back(s.to_schema_definition());
         }
@@ -237,11 +282,21 @@ IniSettingsSchema::IniSettingsSchema(string const& ini_file)
     }
 }
 
+IniSettingsSchema::IniSettingsSchema()
+{
+}
+
 IniSettingsSchema::~IniSettingsSchema() = default;
 
 VariantArray IniSettingsSchema::definitions() const
 {
     return definitions_;
+}
+
+void IniSettingsSchema::add_location_setting()
+{
+    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
+    definitions_.push_back(s.to_schema_definition());
 }
 
 } // namespace internal

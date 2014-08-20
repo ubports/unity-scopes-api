@@ -148,10 +148,10 @@ present in the library .so. If you add new public symbols to the library,
 it's necessary to refresh the symbols file, otherwise the package will
 fail to build. The easiest way to do that is using bzr-builddeb:
 
-    $ bzr bd
+    $ bzr bd -- -us -uc -j8  # Don't sign source package or changes file, 8 compiles in parallel
     $ # this will exit with an error if symbols file isn't up-to-date
     $ cd ../build-area/unity-scopes-api-[version]
-    $ cat ./debian/libunity-scopes2/DEBIAN/symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes2.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
+    $ cat ./debian/libunity-scopes3/DEBIAN/symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes3.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
     $ cd -
     $ # review the symbol differences and if everything is ok, apply the diff
     $ patch -p0 < /tmp/symbols.diff

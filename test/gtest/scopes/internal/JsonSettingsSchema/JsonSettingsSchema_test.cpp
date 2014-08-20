@@ -137,7 +137,7 @@ TEST(JsonSettingsSchema, basic)
     EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
     EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());
     EXPECT_EQ("Age", defs[2].get_dict()["displayName"].get_string());
-    EXPECT_EQ(23, defs[2].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ(23, defs[2].get_dict()["defaultValue"].get_double());
 
     EXPECT_EQ("enabled", defs[3].get_dict()["id"].get_string());
     EXPECT_EQ("boolean", defs[3].get_dict()["type"].get_string());
@@ -397,8 +397,9 @@ TEST(JsonSettingsSchema, exceptions)
                     {
                         "id": "x",
                         "type": "number",
+                         "displayName": "X",
                         "parameters": {
-                            "defaultValue": true
+                            "defaultValue": "banana"
                         }
                     }
                 ]
@@ -634,5 +635,50 @@ TEST(JsonSettingsSchema, exceptions)
         EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): invalid value type "
                      "for \"defaultValue\" definition, id = \"x\"",
                      e.what());
+    }
+
+    try
+    {
+        JsonSettingsSchema::create(R"(
+            {
+                "settings":
+                [
+                    {
+                        "id": "internal.x",
+                        "type": "boolean",
+                        "displayName": "Foo",
+                        "parameters": {
+                            "defaultValue": true
+                        }
+                    }
+                ]
+            }
+        )");
+        FAIL();
+    }
+    catch (ResourceException const& e)
+    {
+        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): invalid key \"internal.x\" prefixed with \"internal.\"",
+                     e.what());
+    }
+}
+
+TEST(JsonSettingsSchema, empty_then_with_location)
+{
+    auto s = JsonSettingsSchema::create_empty();
+    {
+        auto defs = s->definitions();
+        ASSERT_TRUE(defs.empty());
+    }
+    s->add_location_setting();
+    {
+        auto defs = s->definitions();
+        ASSERT_EQ(1, defs.size());
+
+        EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
+        EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());
+        EXPECT_EQ("boolean", defs[0].get_dict()["type"].get_string());
+        EXPECT_TRUE(defs[0].get_dict()["displayValues"].is_null());
+        EXPECT_TRUE(defs[0].get_dict()["defaultValue"].get_bool());
     }
 }

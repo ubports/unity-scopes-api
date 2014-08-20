@@ -43,8 +43,8 @@ public:
 
 private:
     virtual void search_(Current const& current,
-                               capnp::AnyPointer::Reader& in_params,
-                               capnproto::Response::Builder& r);
+                         capnp::AnyPointer::Reader& in_params,
+                         capnproto::Response::Builder& r);
     virtual void activate_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r);
@@ -54,6 +54,9 @@ private:
     virtual void preview_(Current const& current,
                           capnp::AnyPointer::Reader& in_params,
                           capnproto::Response::Builder& r);
+    virtual void debug_mode_(Current const& current,
+                             capnp::AnyPointer::Reader& in_params,
+                             capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware

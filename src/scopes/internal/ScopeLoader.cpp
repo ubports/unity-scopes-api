@@ -116,7 +116,7 @@ void ScopeLoader::start()
     catch (...)
     {
         scope_state_ = ScopeState::Failed;
-        throw unity::ResourceException("Scope " + scope_id_ +": terminated due to exception in start()");
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from start()");
     }
     scope_state_ = ScopeState::Started;
 }
@@ -148,7 +148,7 @@ void ScopeLoader::stop()
     catch (...)
     {
         scope_state_ = ScopeState::Failed;
-        throw unity::ResourceException("Scope " + scope_id_ +": terminated due to exception in stop()");
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from stop()");
     }
 }
 
