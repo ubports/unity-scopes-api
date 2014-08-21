@@ -168,7 +168,7 @@ void StopPublisher::stopper_thread() noexcept
         assert(state_ == Starting);
 
         // Create the publishing socket.
-        zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
+        zmqpp::socket pub_socket(*context_, zmqpp::socket_type::publish);
         // Allow time for stop message to be buffered, so close() won't discard it.
         pub_socket.set(zmqpp::socket_option::linger, 200);
         pub_socket.bind(endpoint_);
