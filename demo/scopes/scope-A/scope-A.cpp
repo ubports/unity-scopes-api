@@ -121,7 +121,7 @@ public:
 
         PreviewWidget expandable("exp", "expandable");
         expandable.add_attribute_value("title", Variant("foo"));
-        expandable.add_attribute_value("collapsed-widgets", Variant(2));
+        expandable.add_attribute_value("collapsed-widgets", Variant(0));
 
         PreviewWidget w1("t1", "text");
         w1.add_attribute_value("title", Variant("widget1"));

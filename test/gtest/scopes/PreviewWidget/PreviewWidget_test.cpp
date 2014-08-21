@@ -73,6 +73,33 @@ TEST(PreviewWidget, expandable_widget)
     }
 }
 
+TEST(PreviewWidget, expandable_widget_exceptions)
+{
+    // cannot have duplicate widget ids
+    {
+        PreviewWidget w("w1", "expandable");
+        PreviewWidget subwidget1("w2", "image");
+        PreviewWidget subwidget2("w2", "text");
+
+        w.add_widget(subwidget1);
+        EXPECT_THROW(w.add_widget(subwidget2), unity::LogicException);
+    }
+    // cannot have same id for expandable and sub-widget
+    {
+        PreviewWidget w("w1", "expandable");
+        PreviewWidget subwidget1("w1", "image");
+
+        EXPECT_THROW(w.add_widget(subwidget1), unity::LogicException);
+    }
+    // cannot add expandable into expandable
+    {
+        PreviewWidget w("w1", "expandable");
+        PreviewWidget subwidget1("w2", "expandable");
+
+        EXPECT_THROW(w.add_widget(subwidget1), unity::LogicException);
+    }
+}
+
 TEST(PreviewWidget, to_json)
 {
     {
@@ -86,6 +113,7 @@ TEST(PreviewWidget, to_json)
         EXPECT_EQ(10, node.get_node("foo")->as_int());
         EXPECT_EQ("bar", node.get_node("components")->get_node("boo")->as_string());
     }
+    // json with expandable widget
     {
         PreviewWidget w("w1", "expandable");
         w.add_attribute_value("title", Variant("foo"));
@@ -102,6 +130,7 @@ TEST(PreviewWidget, to_json)
 
         internal::JsonCppNode node(w.data());
         EXPECT_EQ("w1", node.get_node("id")->as_string());
+        EXPECT_EQ("foo", node.get_node("title")->as_string());
         EXPECT_EQ("expandable", node.get_node("type")->as_string());
         EXPECT_EQ("w2", node.get_node("widgets")->get_node(0)->get_node("id")->as_string());
         EXPECT_EQ("booze", node.get_node("widgets")->get_node(0)->get_node("components")->get_node("foo")->as_string());
@@ -118,7 +147,7 @@ TEST(PreviewWidget, from_json)
         EXPECT_EQ("foo", w.attribute_values()["title"].get_string());
         EXPECT_EQ("boo", w.attribute_mappings()["rating"]);
     }
-
+    // json with expandable widget
     {
         PreviewWidget w(R"({"id": "i1", "type": "expandable", "title": "foo", "components": {"rating": "boo"}, "widgets": [{"id": "w2", "type": "text", "title": "bar"}]})");
         EXPECT_EQ("i1", w.id());

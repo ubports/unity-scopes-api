@@ -119,9 +119,11 @@ public:
       \brief Adds a widget into expandable widget.
 
       Adds a widget into this widget, which needs to be of 'expandable' type. This method throws
-      if adding a widget into any other widget type.
+      if adding a widget into any other widget type. Also, adding an 'expandable' widget into
+      another 'expandable' is not allowed.
 
-      \throws unity::LogicException if type of this widget is other than 'expandable'
+      \throws unity::LogicException if type of this widget is other than 'expandable', or when
+      adding 'expandable' to 'expandable'.
     */
     void add_widget(PreviewWidget const& widget);
 
@@ -154,8 +156,10 @@ public:
     VariantMap attribute_values() const;
 
     /**
-    \brief
-    TODO
+    \brief Get widgets of 'expandable' widget.
+
+    Returns the list of widget attached to this widget, which must be of 'expandable' type. This list is
+    always empty for other widget types.
     */
     PreviewWidgetList widgets() const;
 

@@ -187,7 +187,22 @@ void PreviewWidgetImpl::add_widget(PreviewWidget const& widget)
     {
         throw LogicException("PreviewWidget::add_widget(): widgets can only be added to widget of type 'expandable'");
     }
-    // TODO check for duplicates
+    if (widget.widget_type() == "expandable")
+    {
+        throw LogicException("PreviewWidget::add_widget(): can't add 'expandable' widget '" + widget.id() + "' into another 'expandable'");
+    }
+    if (widget.id() == id_)
+    {
+        throw LogicException("PreviewWidget::add_widget(): can't add widget '" + widget.id() + "' with same id as the 'expandable' widget");
+    }
+
+    for (auto const& w: widgets_)
+    {
+        if (w.id() == widget.id())
+        {
+            throw unity::LogicException("PreviewWidget::add_widget(): widget '" + widget.id() + "' already added to widget '" + id_);
+        }
+    }
     widgets_.push_back(widget);
 }
 
