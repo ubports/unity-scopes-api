@@ -125,8 +125,10 @@ public:
 
         PreviewWidget w1("t1", "text");
         w1.add_attribute_value("title", Variant("widget1"));
+        w1.add_attribute_value("text", Variant("fooooaosdoasdoa"));
         PreviewWidget w2("t2", "text");
         w2.add_attribute_value("title", Variant("widget2"));
+        w2.add_attribute_value("text", Variant("fooooaosdoasdoa"));
         expandable.add_widget(w1);
         expandable.add_widget(w2);
 
