@@ -50,7 +50,7 @@ TEST(PreviewWidget, expandable_widget)
 
         {
             PreviewWidget subwidget1("w2", "image");
-            subwidget1.add_attribute_value("source", Variant("bar"));
+            subwidget1.add_attribute_mapping("source", "src");
 
             PreviewWidget subwidget2("w3", "image");
             subwidget2.add_attribute_value("source", Variant("baz"));
@@ -68,8 +68,10 @@ TEST(PreviewWidget, expandable_widget)
         EXPECT_EQ(2u, widgets.size());
         auto it = widgets.begin();
         EXPECT_EQ("w2", it->id());
+        EXPECT_EQ("src", it->attribute_mappings()["source"]);
         ++it;
         EXPECT_EQ("w3", it->id());
+        EXPECT_EQ("baz", it->attribute_values()["source"].get_string());
     }
 }
 
