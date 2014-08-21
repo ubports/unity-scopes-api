@@ -1,10 +1,11 @@
-unity-scopes-api (0.6.2+rtm+rtm+rtm+14.09.20140818-0ubuntu1) 14.09; urgency=medium
+unity-scopes-api (0.6.3+14.10.20140820-0ubuntu1) utopic; urgency=medium
 
   [ Pete Woods ]
   * Move scope configuration to ~/.config/unity-scopes/
   * New setting to enable/disable location data being fed to scopes.
   * Switch from u1db to QSettings and drop u1db and related dependencies.
   * There are internal symbols changes that do not break the public ABI.
+    - Apologies for the symbol sorting. The previous release caused this.
 
   [ Marcus Tomlinson ]
   * Add scope debug mode parameter.
@@ -12,12 +13,14 @@ unity-scopes-api (0.6.2+rtm+rtm+rtm+14.09.20140818-0ubuntu1) 14.09; urgency=medi
   [ Michi Henning ]
   * Fix several race conditions.
   * Make tests more robust.
+  * Fix cache directory paths for confined scopes.
 
   [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
   * New rebuild forced
+  * New rebuild forced
 
- -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 18 Aug 2014 17:57:51 +0000
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 20 Aug 2014 14:25:35 +0000
 
 unity-scopes-api (0.6.1+14.10.20140809-0ubuntu1) utopic; urgency=medium
 
