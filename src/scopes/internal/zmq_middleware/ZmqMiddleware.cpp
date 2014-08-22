@@ -198,9 +198,17 @@ void ZmqMiddleware::start()
             {
                 lock_guard<mutex> lock(data_mutex_);
                 oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
-                // N.B. We absolutely MUST have AT LEAST 3 two-way invoke threads as both rebinding
-                // and debug_mode requests could be invoked within a single two-way invocation.
-                twoway_invokers_.reset(new ThreadPool(3));  // TODO: get pool size from config
+                // N.B. We absolutely MUST have AT LEAST 5 two-way invoke threads:
+                // * 3 threads are required to execute a standard scope invocation as both
+                //   rebinding and debug_mode requests could be invoked within a single two-way
+                //   invocation.
+                // * We then need an extra thread available per layer of hierarchy under an
+                //   aggregating scope as an aggregator may invoke a nested scope while running in
+                //   a thread of its own.
+                // * 5 threads therefore, at least allows for an aggregating scope to invoke nested
+                //   aggregators.
+                // (NOTE: To be safe, we should keep some headroom above this 5 thread minimum)
+                twoway_invokers_.reset(new ThreadPool(8));  // TODO: get pool size from config
             }
             shutdown_flag = false;
             state_ = Started;
