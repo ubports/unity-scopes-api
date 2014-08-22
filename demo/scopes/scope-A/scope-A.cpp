@@ -128,7 +128,7 @@ public:
         w1.add_attribute_value("text", Variant("fooooaosdoasdoa"));
         PreviewWidget w2("t2", "text");
         w2.add_attribute_value("title", Variant("widget2"));
-        w2.add_attribute_value("text", Variant("fooooaosdoasdoa"));
+        w2.add_attribute_mapping("text", "txt");
         expandable.add_widget(w1);
         expandable.add_widget(w2);
 
@@ -155,6 +155,10 @@ public:
         if (!reply->push(widgets))
         {
             return;  // Query was cancelled
+        }
+        if (!reply->push("txt", Variant("This is a text")))
+        {
+            return;
         }
         if (!reply->push("author", Variant("Foo")))
         {
