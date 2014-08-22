@@ -363,7 +363,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     }
     if (results_ttl_type_ != ScopeMetadata::ResultsTtlType::None)
     {
-        var["results_ttl_type"] = (int) results_ttl_type_;
+        var["results_ttl_type"] = static_cast<int>(results_ttl_type_);
     }
     if (settings_definitions_)
     {

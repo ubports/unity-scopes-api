@@ -58,7 +58,7 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
     co_->set_query(qo_);
 }
 
-SSScopeObject::~SSScopeObject() noexcept
+SSScopeObject::~SSScopeObject()
 {
 }
 

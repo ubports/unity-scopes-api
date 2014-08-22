@@ -83,7 +83,7 @@ public:
     //@}
 
     /// @cond
-    virtual ~ObjectNotExistException() noexcept;
+    virtual ~ObjectNotExistException();
     /// @endcond
 
     /**
@@ -124,7 +124,7 @@ public:
     //@}
 
     /// @cond
-    virtual ~TimeoutException() noexcept;
+    virtual ~TimeoutException();
     /// @endcond
 
     /**
