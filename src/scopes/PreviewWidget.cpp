@@ -91,6 +91,7 @@ The following widget types are recognized by Unity:
 \arg \c text
 \arg \c rating-input
 \arg \c reviews
+\arg \c expandable
 
 \subsection audio audio widget
 
@@ -338,6 +339,30 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
     w1.add_attribute_value("reviews", builder.end());
     ...
 }
+\endcode
+
+\subsection expandable expandable widget
+
+The expandable widget is used to group several widgets into an expandable pane.
+
+List of attributes:
+\arg \c title A string specifying the title
+\arg \c collapsed-widgets Optional number of collapsed widgets (0 makes all of them visible)
+
+\code
+    PreviewWidget expandable("exp", "expandable");
+    expandable.add_attribute_value("title", Variant("This is an expandable widget"));
+    expandable.add_attribute_value("collapsed-widgets", Variant(0));
+
+    PreviewWidget w1("w1", "text");
+    w1.add_attribute_value("title", Variant("Subwidget 1"));
+    w1.add_attribute_value("text", Variant("A text"));
+    PreviewWidget w2("w2", "text");
+    w2.add_attribute_value("title", Variant("Subwidget 2"));
+    w2.add_attribute_value("text", Variant("A text"));
+    expandable.add_widget(w1);
+    expandable.add_widget(w2);
+    ...
 \endcode
 */
 
