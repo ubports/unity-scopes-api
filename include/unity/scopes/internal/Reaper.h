@@ -39,10 +39,12 @@ namespace internal
 
 typedef std::function<void()> ReaperCallback;
 
+class ReapItem;
+
 namespace reaper_private
 {
 
-struct Item
+struct Item final
 {
     Item(ReaperCallback cb) :
         cb(cb),
@@ -55,7 +57,7 @@ struct Item
 
     ReaperCallback cb;                               // Called if timeout expires (application-supplied callback)
     std::chrono::steady_clock::time_point timestamp; // Last add() or refresh()
-    std::function<void()> disable_reap_item;         // Disables corresponding ReapItem if timeout expires
+    std::weak_ptr<ReapItem> reap_item;               // Points back at owning ReapItem
 };
 
 typedef std::list<Item> Reaplist;

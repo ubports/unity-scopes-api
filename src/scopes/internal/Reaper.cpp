@@ -210,8 +210,8 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
     // Make a new ReapItem.
     assert(self_.lock());
     ReapItem::SPtr reap_item(new ReapItem(self_, ri));
-    // Now that the ReapItem is created, we can set the disable callback
-    ri->disable_reap_item = [reap_item] { reap_item->destroy(); };
+    // Now that the ReapItem is created, we can set the back-pointer.
+    ri->reap_item = reap_item;
     return reap_item;
 }
 
@@ -246,8 +246,7 @@ void Reaper::reap_func()
             auto const oldest_item_age = chrono::duration_cast<chrono::milliseconds>(now - list_.back().timestamp);
             auto const reap_interval = chrono::duration_cast<chrono::milliseconds>(reap_interval_);
             auto const sleep_interval = max(expiry_interval_ - oldest_item_age, reap_interval);
-            auto const wakeup_time = now + sleep_interval;
-            do_work_.wait_until(lock, wakeup_time, [this]{ return finish_; });
+            do_work_.wait_for(lock, sleep_interval, [this]{ return finish_; });
         }
 
         if (finish_ && policy_ == NoCallbackOnDestroy)
@@ -268,10 +267,7 @@ void Reaper::reap_func()
         }
         else
         {
-            // finish_ may or may not be set here. If it is set, we still do one final
-            // reaping pass before returning below so, if the reaper is destroyed
-            // while there are still entries on it, expired entries have their callbacks
-            // invoked at destruction time.
+            // Find any entries that have expired.
             auto const now = chrono::steady_clock::now();
             for (auto it = list_.rbegin(); it != list_.rend(); ++it)
             {
@@ -300,8 +296,11 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 {
     for (auto& item : zombies)
     {
-        assert(item.disable_reap_item);
-        item.disable_reap_item();           // Calls destroy() on the ReapItem, so it removes itself from list_
+        auto ri = item.reap_item.lock();
+        if (ri)
+        {
+            ri->destroy();  // ReapItem removes itself from list_
+        }
 
         assert(item.cb);
         try
