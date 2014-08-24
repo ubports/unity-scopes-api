@@ -114,7 +114,7 @@ void ReapItem::destroy() noexcept
         it_ = reaper->list_.end();
     }
 
-    lock_guard<mutex> lock(mutex);
+    lock_guard<mutex> lock(mutex_);
     destruction_in_progress_ = false;
     cond_.notify_all();
 }
