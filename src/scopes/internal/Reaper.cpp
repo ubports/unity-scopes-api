@@ -35,77 +35,88 @@ namespace scopes
 namespace internal
 {
 
-mutex ReapItem::mutex_;
-
 ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::iterator it) :
     reaper_(reaper),
     it_(it),
-    destroyed_(false)
+    destroyed_(false),
+    destruction_in_progress_(false)
 {
 }
 
 ReapItem::~ReapItem()
 {
     // If we go out of scope, we remove ourselves from the reaper list. This
-    // ensures that no more callbacks will be sent.
+    // ensures that no callback will be made.
     destroy();
 }
 
 void ReapItem::refresh() noexcept
 {
-    if (destroyed_.load())
-    {
-        return; // Calling refresh() after destroy() has no effect.
-    }
-
     // If the reaper is still around, remove the entry from the list
     // and put it back on the front, updating the time stamp.
     weak_ptr<Reaper> wp_reaper;
     {
         lock_guard<mutex> lock(mutex_);
+        if (destroyed_)
+        {
+            return; // Calling refresh() after destroy() has no effect.
+        }
         wp_reaper = reaper_;
     }
-    auto const reaper = wp_reaper.lock();
+    auto const reaper = wp_reaper.lock();  // Reaper may no longer be around
     if (reaper)
     {
         lock_guard<mutex> reaper_lock(reaper->mutex_);
-        assert(it_ != reaper->list_.end());
-        reaper_private::Item item(*it_);
-        item.timestamp = chrono::steady_clock::now();
-        reaper->list_.erase(it_);
-        reaper->list_.push_front(item);
-        it_ = reaper->list_.begin();
+        if (it_ != reaper->list_.end())
+        {
+            reaper_private::Item item(*it_);
+            item.timestamp = chrono::steady_clock::now();
+            reaper->list_.erase(it_);
+            reaper->list_.push_front(item);
+            it_ = reaper->list_.begin();
+        }
     }
     else
     {
         // The reaper has gone away, so we disable ourself.
-        destroyed_.store(true);
+        lock_guard<mutex> lock(mutex_);
+        destroyed_ = true;
     }
 }
 
 void ReapItem::destroy() noexcept
 {
-    if (destroyed_.exchange(true))  // Only the first call to destroy has any effect.
-    {
-        return;
-    }
-
+    // We need to make sure that a call to destroy() cannot
+    // complete until after the corresponding callback
+    // was made. Otherwise, remove_zombies() could invoke
+    // the callback on an instance after destroy() returns,
+    // but the instance may already have been decallocated
+    // by the application.
     weak_ptr<Reaper> wp_reaper;
     {
-        lock_guard<mutex> lock(mutex_);
+        unique_lock<mutex> lock(mutex_);
         wp_reaper = reaper_;
+        cond_.wait(lock, [this]{ return !this->destruction_in_progress_; });
+        if (destroyed_)
+        {
+            return;  // remove_zombies() is going to complete destruction.
+        }
+        destruction_in_progress_ = true;
+        destroyed_ = true;
     }
-    auto const reaper = wp_reaper.lock();
+    auto const reaper = wp_reaper.lock();  // Reaper may no longer be around
     if (reaper)
     {
+        // Remove our Item from the reaper's list.
         lock_guard<mutex> reaper_lock(reaper->mutex_);
-        assert(it_ != reaper->list_.end());
-        reaper->list_.erase(it_);
+        if (it_ != reaper->list_.end())
+        {
+            reaper->list_.erase(it_);
+            it_ = reaper->list_.end();
+        }
     }
-
-#ifndef NDEBUG
-    it_ = reaper->list_.end();
-#endif
+    destruction_in_progress_ = false;
+    cond_.notify_all();
 }
 
 Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
@@ -297,20 +308,47 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
     for (auto& item : zombies)
     {
         auto ri = item.reap_item.lock();
-        if (ri)
+        if (!ri)
         {
-            ri->destroy();  // ReapItem removes itself from list_
+            // destroy() was called on the ReapItem after this reaping pass started,
+            // but before we got around to dealing with this ReapItem.
+            continue;
         }
 
-        assert(item.cb);
+        {
+            unique_lock<mutex> lock(ri->mutex_);
+            ri->cond_.wait(lock, [&ri]{ return !ri->destruction_in_progress_; });
+            if (ri->destroyed_)
+            {
+                continue;  // destroy() was called during this pass; it will complete destruction.
+            }
+            ri->destruction_in_progress_ = true;
+            ri->destroyed_ = true;
+        }
+
+        {
+            lock_guard<mutex> reaper_lock(mutex_);
+            if (ri->it_ != list_.end())
+            {
+                list_.erase(ri->it_);
+                ri->it_ = list_.end();
+            }
+        }
+
         try
         {
+            assert(item.cb);
             item.cb();                      // Informs the caller that the item timed out.
         }
         catch (...)
         {
             // Ignore exceptions raised by the application's callback function.
         }
+
+        // Allow any threads sleeping in destroy() to return.
+        lock_guard<mutex> lock(ri->mutex_);
+        ri->destruction_in_progress_ = false;
+        ri->cond_.notify_all();
     }
 }
 

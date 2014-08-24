@@ -93,10 +93,13 @@ private:
              reaper_private::Reaplist::iterator it);    // Only Reaper can instantiate
 
     std::weak_ptr<Reaper> reaper_;                      // The reaper this item belongs with
-    static std::mutex mutex_;                           // Protects weak_ptr
     reaper_private::Reaplist::iterator it_;             // Position in reap list
-    std::atomic_bool destroyed_;
+    bool destroyed_;
+    bool destruction_in_progress_;
+    std::mutex mutex_;
+    std::condition_variable cond_;
 
+    friend struct Item;
     friend class Reaper;
 };
 
