@@ -67,14 +67,12 @@ void ReapItem::refresh() noexcept
     if (reaper)
     {
         lock_guard<mutex> reaper_lock(reaper->mutex_);
-        if (it_ != reaper->list_.end())
-        {
-            reaper_private::Item item(*it_);
-            item.timestamp = chrono::steady_clock::now();
-            reaper->list_.erase(it_);
-            reaper->list_.push_front(item);
-            it_ = reaper->list_.begin();
-        }
+        assert(it_ != reaper->list_.end());
+        reaper_private::Item item(*it_);
+        item.timestamp = chrono::steady_clock::now();
+        reaper->list_.erase(it_);
+        reaper->list_.push_front(item);
+        it_ = reaper->list_.begin();
     }
     else
     {
@@ -96,11 +94,13 @@ void ReapItem::destroy() noexcept
     {
         unique_lock<mutex> lock(mutex_);
         wp_reaper = reaper_;
-        cond_.wait(lock, [this]{ return !this->destruction_in_progress_; });
         if (destroyed_)
         {
-            return;  // remove_zombies() is going to complete destruction.
+            // remove_zombies() is going to complete
+            // destruction, or item was destroyed previously.
+            return;
         }
+        cond_.wait(lock, [this]{ return !this->destruction_in_progress_; });
         destruction_in_progress_ = true;
         destroyed_ = true;
     }
@@ -109,12 +109,12 @@ void ReapItem::destroy() noexcept
     {
         // Remove our Item from the reaper's list.
         lock_guard<mutex> reaper_lock(reaper->mutex_);
-        if (it_ != reaper->list_.end())
-        {
-            reaper->list_.erase(it_);
-            it_ = reaper->list_.end();
-        }
+        assert(it_ != reaper->list_.end());
+        reaper->list_.erase(it_);
+        it_ = reaper->list_.end();
     }
+
+    lock_guard<mutex> lock(mutex);
     destruction_in_progress_ = false;
     cond_.notify_all();
 }
@@ -328,11 +328,9 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 
         {
             lock_guard<mutex> reaper_lock(mutex_);
-            if (ri->it_ != list_.end())
-            {
-                list_.erase(ri->it_);
-                ri->it_ = list_.end();
-            }
+            assert(ri->it_ != list_.end());
+            list_.erase(ri->it_);
+            ri->it_ = list_.end();
         }
 
         try
