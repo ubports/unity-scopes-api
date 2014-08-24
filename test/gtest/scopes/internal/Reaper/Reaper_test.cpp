@@ -314,7 +314,7 @@ TEST(Reaper, expiry)
         EXPECT_EQ(2, r->size());
 
         // t == 2.5
-        // We destroy null out e2 and destroy e3 while the reaping pass is still stuck in the callback for e1.
+        // We null out e2 and destroy e3 while the reaping pass is still stuck in the callback for e1.
         e2 = nullptr;
         e3->destroy();
         EXPECT_EQ(0, c2.get());
