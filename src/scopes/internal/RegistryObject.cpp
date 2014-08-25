@@ -667,7 +667,7 @@ void RegistryObject::ScopeProcess::publish_state_change(bool scope_started)
             std::string started_message = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch "
                                          "/ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded "
                                          "string:" + exec_data_.scope_id + " "
-                                         "uint64c:" + std::to_string(process_.pid());
+                                         "uint64:" + std::to_string(process_.pid());
             if (std::system(started_message.c_str()) != 0)
             {
                 std::cerr << "RegistryObject::ScopeProcess::publish_state_change(): Failed to execute SDK DBus callback" << endl;
@@ -686,7 +686,7 @@ void RegistryObject::ScopeProcess::publish_state_change(bool scope_started)
             // If we're in debug mode, callback to the SDK via dbus (used to monitor scope lifecycle)
             std::string stopped_message = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch "
                                          "/ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped "
-                                         "stringc:" + exec_data_.scope_id;
+                                         "string:" + exec_data_.scope_id;
             if (std::system(stopped_message.c_str()) != 0)
             {
                 std::cerr << "RegistryObject::ScopeProcess::publish_state_change(): Failed to execute SDK DBus callback" << endl;
