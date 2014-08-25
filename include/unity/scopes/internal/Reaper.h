@@ -76,6 +76,12 @@ class Reaper;
 //
 // Letting a ReapItem go out of scope automatically calls destroy(), meaning that the item's callback
 // is *not* invoked when a ReapItem is destroyed.
+//
+// If a ReapItem is destroyed (by calling its destroy() method or implicitly, by letting it go out of scope),
+// it is possible for the reaper to concurrently invoke the callback for the ReapItem (if the ReapItem
+// happens to expire at just the right time). The implementation guarantees that, by the time destroy()
+// returns, the expire callback either has completed already, or will not happen at all. That is,
+// a callback never arrives after a call to destroy() has returned.
 
 class ReapItem final
 {
