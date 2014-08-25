@@ -524,11 +524,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Running)
     {
-        if (reg_publisher_)
-        {
-            // Send a "started" message to subscribers to inform them that this scope (topic) has started
-            reg_publisher_->send_message("started", exec_data_.scope_id);
-        }
+        publish_state_change(true);
 
         if (state_ != Starting)
         {
@@ -540,11 +536,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopped)
     {
-        if (reg_publisher_)
-        {
-            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
-            reg_publisher_->send_message("stopped", exec_data_.scope_id);
-        }
+        publish_state_change(false);
 
         if (state_ != Stopping)
         {
@@ -554,11 +546,7 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopping && manually_started_)
     {
-        if (reg_publisher_)
-        {
-            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
-            reg_publisher_->send_message("stopped", exec_data_.scope_id);
-        }
+        publish_state_change(false);
 
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" exited" << endl;
@@ -662,6 +650,49 @@ std::vector<std::string> RegistryObject::ScopeProcess::expand_custom_exec()
     }
 
     return command_args;
+}
+
+void RegistryObject::ScopeProcess::publish_state_change(bool scope_started)
+{
+    if (scope_started)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "started" message to subscribers to inform them that this scope (topic) has started
+            reg_publisher_->send_message("started", exec_data_.scope_id);
+        }
+        if (exec_data_.debug_mode)
+        {
+            // If we're in debug mode, callback to the SDK via dbus (used to monitor scope lifecycle)
+            std::string started_message = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch "
+                                         "/ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded "
+                                         "string:" + exec_data_.scope_id + " "
+                                         "uint64c:" + std::to_string(process_.pid());
+            if (std::system(started_message.c_str()) != 0)
+            {
+                std::cerr << "RegistryObject::ScopeProcess::publish_state_change(): Failed to execute SDK DBus callback" << endl;
+            }
+        }
+    }
+    else if (scope_started == false)
+    {
+        if (reg_publisher_)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+        }
+        if (exec_data_.debug_mode)
+        {
+            // If we're in debug mode, callback to the SDK via dbus (used to monitor scope lifecycle)
+            std::string stopped_message = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch "
+                                         "/ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped "
+                                         "stringc:" + exec_data_.scope_id;
+            if (std::system(stopped_message.c_str()) != 0)
+            {
+                std::cerr << "RegistryObject::ScopeProcess::publish_state_change(): Failed to execute SDK DBus callback" << endl;
+            }
+        }
+    }
 }
 
 } // namespace internal

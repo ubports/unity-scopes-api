@@ -428,6 +428,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     }
     exec_data.runtime_config = config_file;
     exec_data.scope_config = scope.second;
+    exec_data.debug_mode = sc.debug_mode();
 
     registry->add_local_scope(scope.first, move(meta), exec_data);
 }
