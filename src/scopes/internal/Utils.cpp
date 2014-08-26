@@ -143,9 +143,9 @@ bool convert_to<bool>(std::string const& val, Variant& out)
     return false;
 }
 
-static std::mutex system_mutex;
 int safe_system_call(std::string const& command)
 {
+    static std::mutex system_mutex;
     std::lock_guard<std::mutex> lock(system_mutex);
     return std::system(command.c_str());
 }
