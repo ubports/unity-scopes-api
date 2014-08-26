@@ -112,7 +112,7 @@ private:
         void kill(std::unique_lock<std::mutex>& lock);
 
         std::vector<std::string> expand_custom_exec();
-        void publish_state_change(bool scope_started);
+        void publish_state_change(ProcessState scope_state);
 
     private:
         const ScopeExecData exec_data_;
