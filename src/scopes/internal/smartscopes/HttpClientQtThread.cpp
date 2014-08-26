@@ -84,7 +84,7 @@ void HttpClientQtThread::cancel()
     success_ = false;
     reply_ = "Request cancelled: " + url_.url().toStdString();
 
-    emit abort();
+    emit HttpClientQtThread::abort();
     quit();
 }
 
@@ -95,7 +95,7 @@ void HttpClientQtThread::timeout()
     success_ = false;
     reply_ = "Request timed out: " + url_.url().toStdString();
 
-    emit abort();
+    emit HttpClientQtThread::abort();
     quit();
 }
 

@@ -87,7 +87,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
 }
 
-SSRegistryObject::~SSRegistryObject() noexcept
+SSRegistryObject::~SSRegistryObject()
 {
     // stop the refresh thread
     {

@@ -50,7 +50,7 @@ public:
                      std::string const& ss_scope_endpoint,
                      std::string const& sss_url = "",
                      bool caching_enabled = true);
-    virtual ~SSRegistryObject() noexcept;
+    virtual ~SSRegistryObject();
 
     ScopeMetadata get_metadata(std::string const& scope_id) const override;
     MetadataMap list() const override;
