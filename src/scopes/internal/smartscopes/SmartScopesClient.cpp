@@ -427,8 +427,9 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     uint preview_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [](std::string const&) {
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [](std::string const& line) {
             //TODO
+            std::cout << "Line: " << line;
             });
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));

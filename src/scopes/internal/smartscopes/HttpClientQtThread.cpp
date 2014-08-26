@@ -69,17 +69,17 @@ void HttpClientQtThread::run()
 
     QNetworkReply* reply = manager->get(request);
     reply->setReadBufferSize(0); // unlimited buffer
-    connect(reply, SIGNAL(readyRead()), this, SLOT(dataReady()));
 
-    connect(manager, &QNetworkAccessManager::finished, this, &HttpClientQtThread::got_reply, Qt::DirectConnection);
+    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(got_reply(QNetworkReply *)));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(dataReady()));
     connect(this, &HttpClientQtThread::abort, reply, &QNetworkReply::abort);
 
     QTimer timeout;
     timeout.singleShot(timeout_, this, SLOT(timeout()));
     QThread::exec();  // enter event loop
 
-    delete reply;
-    delete manager;
+    reply->deleteLater();
+    manager->deleteLater();
 }
 
 void HttpClientQtThread::cancel()
@@ -106,16 +106,20 @@ void HttpClientQtThread::timeout()
 
 void HttpClientQtThread::dataReady()
 {
-    //TODO
-    std::cout << "Data ready\n";
-    QNetworkReply *net_reply = qobject_cast<QNetworkReply*>(sender());
-    assert(net_reply);
-    while (net_reply->canReadLine())
+    QNetworkReply* net_reply = qobject_cast<QNetworkReply*>(sender());
+    if (net_reply)
     {
-        std::cout << "Can readline\n";
-        QByteArray data = net_reply->readLine();
-        const std::string replyLine(data.constData(), data.size());
-        lineDataCallback_(replyLine);
+        if (net_reply->canReadLine())
+        {
+            std::cout << "Can readline\n";
+            QByteArray data = net_reply->readLine();
+            const std::string replyLine(data.constData(), data.size());
+            lineDataCallback_(replyLine);
+            {
+                std::lock_guard<std::mutex> lock(reply_mutex_);
+                reply_ += replyLine;
+            }
+        }
     }
 }
 
@@ -123,10 +127,10 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
 {
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
-    if (!reply_.empty())
+    /*if (!reply_.empty())
     {
         return;
-    }
+    }*/
 
     if (!reply)
     {
@@ -150,7 +154,7 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     {
         success_ = true;
         QByteArray byte_array = reply->readAll();
-        reply_ = std::string(byte_array.constData(), byte_array.size());
+        reply_ = reply_ + std::string(byte_array.constData(), byte_array.size());
     }
 
     quit();
