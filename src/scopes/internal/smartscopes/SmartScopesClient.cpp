@@ -166,7 +166,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str());
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [](std::string const&) {//TODO
+                });
         response->wait();
 
         response_str = response->get();
@@ -377,7 +378,9 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str());
+    query_results_[search_id] = http_client_->get(search_uri.str(), [](std::string const&) {
+            //TODO
+            });
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -424,7 +427,9 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     uint preview_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    query_results_[preview_id] = http_client_->get(preview_uri.str());
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [](std::string const&) {
+            //TODO
+            });
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }

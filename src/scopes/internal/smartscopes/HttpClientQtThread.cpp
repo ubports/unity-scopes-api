@@ -22,6 +22,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTimer>
+#include <cassert>
+#include <iostream>
 
 namespace unity
 {
@@ -35,9 +37,10 @@ namespace internal
 namespace smartscopes
 {
 
-HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout, std::function<void(std::string const&)> const& lineData)
     : QThread()
     , url_(url)
+    , lineDataCallback_(lineData)
     , timeout_(timeout)
     , success_(false)
 {
@@ -65,6 +68,8 @@ void HttpClientQtThread::run()
     QNetworkRequest request(url_);
 
     QNetworkReply* reply = manager->get(request);
+    reply->setReadBufferSize(0); // unlimited buffer
+    connect(reply, SIGNAL(readyRead()), this, SLOT(dataReady()));
 
     connect(manager, &QNetworkAccessManager::finished, this, &HttpClientQtThread::got_reply, Qt::DirectConnection);
     connect(this, &HttpClientQtThread::abort, reply, &QNetworkReply::abort);
@@ -97,6 +102,21 @@ void HttpClientQtThread::timeout()
 
     emit HttpClientQtThread::abort();
     quit();
+}
+
+void HttpClientQtThread::dataReady()
+{
+    //TODO
+    std::cout << "Data ready\n";
+    QNetworkReply *net_reply = qobject_cast<QNetworkReply*>(sender());
+    assert(net_reply);
+    while (net_reply->canReadLine())
+    {
+        std::cout << "Can readline\n";
+        QByteArray data = net_reply->readLine();
+        const std::string replyLine(data.constData(), data.size());
+        lineDataCallback_(replyLine);
+    }
 }
 
 void HttpClientQtThread::got_reply(QNetworkReply* reply)

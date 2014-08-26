@@ -24,6 +24,7 @@
 
 #include <future>
 #include <string>
+#include <functional>
 
 namespace unity
 {
@@ -48,7 +49,8 @@ public:
     HttpClientInterface() = default;
     virtual ~HttpClientInterface() = default;
 
-    virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url) = 0;
+    virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url,
+            std::function<void(std::string const&)> const& lineData = [](std::string const&) {}) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;
 
