@@ -1,3 +1,11 @@
+unity-scopes-api (0.6.3+14.10.20140826-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Fix two-way invoke thread pool - fixes lp:1359582.
+  * Fix ABI break caused by introduction of explicit destructor.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 26 Aug 2014 13:44:05 +0000
+
 unity-scopes-api (0.6.3+14.10.20140820.is.0.6.1+14.10.20140809-0ubuntu1) utopic; urgency=medium
 
   * Do a quick emergency revert of the last landing as it is causing a
