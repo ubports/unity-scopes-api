@@ -1,3 +1,9 @@
+unity-scopes-api (0.6.4-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Added support for expandable widgets.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 27 Aug 2014 13:30:09 +0200
+
 unity-scopes-api (0.6.3+14.10.20140826-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]
@@ -36,12 +42,6 @@ unity-scopes-api (0.6.3+14.10.20140820-0ubuntu1) utopic; urgency=medium
   * New rebuild forced
 
  -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 20 Aug 2014 14:25:35 +0000
-
-unity-scopes-api (0.6.3-0ubuntu1) UNRELEASED; urgency=medium
-
-  * Added support for expandable widgets.
-
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 22 Aug 2014 13:13:26 +0200
 
 unity-scopes-api (0.6.1+14.10.20140809-0ubuntu1) utopic; urgency=medium
 

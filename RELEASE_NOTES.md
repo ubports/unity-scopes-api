@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.4
+========================
+  - Implemented support for expandable preview widgets. See the documentation of PreviewWidget
+    for details of the new widget type.
+
 Changes in version 0.6.3
 ========================
   - Fix scope cache path for confined scopes.
