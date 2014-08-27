@@ -38,8 +38,7 @@ namespace internal
 ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::iterator it) :
     reaper_(reaper),
     it_(it),
-    destroyed_(false),
-    destruction_in_progress_(false)
+    destroyed_(false)
 {
 }
 
@@ -54,19 +53,18 @@ void ReapItem::refresh() noexcept
 {
     // If the reaper is still around, remove the entry from the list
     // and put it back on the front, updating the time stamp.
-    weak_ptr<Reaper> wp_reaper;
-    {
-        lock_guard<mutex> lock(mutex_);
-        if (destroyed_)
-        {
-            return; // Calling refresh() after destroy() has no effect.
-        }
-        wp_reaper = reaper_;
-    }
-    auto const reaper = wp_reaper.lock();  // Reaper may no longer be around
+    auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
-        lock_guard<mutex> reaper_lock(reaper->mutex_);
+        std::lock(mutex_, reaper->mutex_);
+        lock_guard<mutex> reaper_lock(reaper->mutex_, adopt_lock);
+        lock_guard<mutex> item_lock(mutex_, adopt_lock);
+
+        if (destroyed_)
+        {
+            return;  // A reaping pass may have destroyed this ReapItem already.
+        }
+
         assert(it_ != reaper->list_.end());
         reaper_private::Item item(*it_);
         item.timestamp = chrono::steady_clock::now();
@@ -77,7 +75,7 @@ void ReapItem::refresh() noexcept
     else
     {
         // The reaper has gone away, so we disable ourself.
-        lock_guard<mutex> lock(mutex_);
+        lock_guard<mutex> item_lock(mutex_);
         destroyed_ = true;
     }
 }
@@ -85,45 +83,56 @@ void ReapItem::refresh() noexcept
 void ReapItem::destroy() noexcept
 {
     // We need to make sure that a call to destroy() cannot
-    // complete until after the corresponding callback
-    // was made. Otherwise, remove_zombies() could invoke
+    // complete until after the the callback from a concurrent
+    // reaping pass was made. Otherwise, remove_zombies() could invoke
     // the callback on an instance after destroy() returns,
     // but the instance may already have been decallocated
     // by the application.
-    weak_ptr<Reaper> wp_reaper;
-    {
-        unique_lock<mutex> lock(mutex_);
-        wp_reaper = reaper_;
-        if (destroyed_)
-        {
-            // remove_zombies() is going to complete
-            // destruction, or item was destroyed previously.
-            return;
-        }
-        cond_.wait(lock, [this]{ return !this->destruction_in_progress_; });
-        destruction_in_progress_ = true;
-        destroyed_ = true;
-    }
-    auto const reaper = wp_reaper.lock();  // Reaper may no longer be around
+
+    auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
+        {
+            // Wait for a concurrent reaping pass to complete only
+            // if destroy() is not called by the reaper. This ensures
+            // that destroy() does not return until after the callback
+            // function for this reap item has completed, and avoids
+            // deadlock if the callback function tries to destroy its
+            // own reap item.
+            unique_lock<mutex> reap_lock(reaper->reap_mutex_);
+            if (reaper->reap_thread_id_ != this_thread::get_id())
+            {
+                reaper->reap_done_.wait(reap_lock, [&reaper]{ return !reaper->reap_in_progress_; });
+            }
+
+            lock_guard<mutex> item_lock(mutex_);
+            if (destroyed_)
+            {
+                return;  // A reaping pass may have destroyed this ReapItem already.
+            }
+            destroyed_ = true;
+        }
+
         // Remove our Item from the reaper's list.
-        lock_guard<mutex> reaper_lock(reaper->mutex_);
+        lock_guard<mutex> lock(reaper->mutex_);
         assert(it_ != reaper->list_.end());
         reaper->list_.erase(it_);
         it_ = reaper->list_.end();
     }
-
-    lock_guard<mutex> lock(mutex_);
-    destruction_in_progress_ = false;
-    cond_.notify_all();
+    else
+    {
+        // The reaper has gone away, so we disable ourself.
+        lock_guard<mutex> item_lock(mutex_);
+        destroyed_ = true;
+    }
 }
 
 Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
     reap_interval_(chrono::seconds(reap_interval)),
     expiry_interval_(chrono::seconds(expiry_interval)),
     policy_(p),
-    finish_(false)
+    finish_(false),
+    reap_in_progress_(false)
 {
     if (reap_interval != -1 && expiry_interval != -1)
     {
@@ -144,7 +153,7 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
 
 Reaper::~Reaper()
 {
-    destroy();
+    destroy();  // noexcept
 }
 
 // Instantiate a new reaper. We call set_self() after instantiation so the reaper
@@ -171,6 +180,8 @@ void Reaper::set_self() noexcept
 void Reaper::start()
 {
     reap_thread_ = thread(&Reaper::reap_func, this);
+    lock_guard<mutex> reap_lock(reap_mutex_);
+    reap_thread_id_ = reap_thread_.get_id();
 }
 
 void Reaper::destroy()
@@ -201,7 +212,7 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
         throw unity::InvalidArgumentException("Reaper: invalid null callback passed to add().");
     }
 
-    lock_guard<mutex> lock(mutex_);
+    unique_lock<mutex> lock(mutex_);
 
     if (finish_)
     {
@@ -305,29 +316,34 @@ void Reaper::reap_func()
 
 void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 {
+    // reap_in_progress prevents ReapItem::destroy() from returning
+    // before its callback has completed.
+    {
+        lock_guard<mutex> reap_lock(reap_mutex_);
+        reap_in_progress_ = true;
+    }
+
     for (auto& item : zombies)
     {
         auto ri = item.reap_item.lock();
         if (!ri)
         {
-            // destroy() was called on the ReapItem after this reaping pass started,
+            // ReapItem was deallocated after this reaping pass started,
             // but before we got around to dealing with this ReapItem.
             continue;
         }
 
         {
-            unique_lock<mutex> lock(ri->mutex_);
-            ri->cond_.wait(lock, [&ri]{ return !ri->destruction_in_progress_; });
+            lock_guard<mutex> item_lock(ri->mutex_);
             if (ri->destroyed_)
             {
-                continue;  // destroy() was called during this pass; it will complete destruction.
+                continue;  // destroy() was called during this pass, it has already completed destruction.
             }
-            ri->destruction_in_progress_ = true;
             ri->destroyed_ = true;
         }
 
         {
-            lock_guard<mutex> reaper_lock(mutex_);
+            lock_guard<mutex> lock(mutex_);
             assert(ri->it_ != list_.end());
             list_.erase(ri->it_);
             ri->it_ = list_.end();
@@ -342,11 +358,12 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
         {
             // Ignore exceptions raised by the application's callback function.
         }
+    }
 
-        // Allow any threads sleeping in destroy() to return.
-        lock_guard<mutex> lock(ri->mutex_);
-        ri->destruction_in_progress_ = false;
-        ri->cond_.notify_all();
+    {
+        lock_guard<mutex> reap_lock(reap_mutex_);
+        reap_in_progress_ = false;
+        reap_done_.notify_all();
     }
 }
 

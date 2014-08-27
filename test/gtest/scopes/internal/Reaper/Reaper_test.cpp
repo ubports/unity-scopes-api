@@ -26,18 +26,42 @@ using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
+class Timer
+{
+public:
+    Timer()
+        : start_(chrono::system_clock::now())
+    {
+    }
+
+    int operator()()
+    {
+        auto now = chrono::system_clock::now();
+        auto ms_elapsed = chrono::duration_cast<chrono::milliseconds>(now - start_).count();
+        return ms_elapsed;
+    }
+
+private:
+    chrono::time_point<std::chrono::system_clock> start_;
+};
+
 class Counter
 {
 public:
-    Counter(int delay = 0) : c(0), d(chrono::milliseconds(delay)) {}
+    Counter(int delay = 0, function<void()> cb = nullptr)
+        : c(0), d(chrono::milliseconds(delay)), cb_(cb)
+    {
+    }
+    virtual ~Counter() = default;
     void reset() { c = 0; }
     int get() { return c; }
-    void increment() { ++c; this_thread::sleep_for(d); }
-    void increment_throw() { ++c; throw 42; }
+    virtual void increment() { if (cb_) cb_(); ++c; this_thread::sleep_for(d); }
+    void increment_throw() { if (cb_) cb_(); ++c; throw 42; }
 
 private:
     atomic_int c;
     chrono::milliseconds d;
+    function<void()> cb_;
 };
 
 // Basic tests.
@@ -203,8 +227,12 @@ TEST(Reaper, expiry)
         EXPECT_EQ(0u, r->size());
         EXPECT_EQ(2, c.get());
     }
+}
 
+TEST(Reaper, destroy_during_expiry)
+{
     {
+        Counter c1;
         auto r = Reaper::create(2, 3, Reaper::CallbackOnDestroy);
 
         // Sleep for 0.5 seconds, so the reaper is blocked,
@@ -215,7 +243,6 @@ TEST(Reaper, expiry)
         // which schedules the next reaping pass 3 seconds
         // from now.
         // t == 0
-        Counter c1;
         auto e1 = r->add(bind(&Counter::increment, &c1));
         Counter c2;
         auto e2 = r->add(bind(&Counter::increment, &c2));
@@ -287,48 +314,102 @@ TEST(Reaper, expiry)
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(1, c3.get());
     }
+}
 
+TEST(Reaper, wait_during_expiry)
+{
     {
+        // Make sure that calls to destroy() wait if a reaping pass is
+        // is in progress so the expiry callback is guaranteed to have
+        // completed by the time destroy() returns.
+
+        // t == 0
+        Timer t;
+
+        // Create the counters before the reaper, so the memory is visible
+        // in the lambdas passed to the reaper.
+
+        // Callback for c1 must arrive no sooner than 2 seconds from now, and no later
+        // than 2.5 seconds from now.
+        Counter c1(1000, [&t]{ int now = t(); if (now < 2000) FAIL(); if (now > 2500) FAIL(); });
+
+        // Callback for c2 must arrive no sooner than 3 seconds from now.
+        Counter c2(0, [&t] { if (t() < 3000) FAIL(); });
+
+        Counter c3;
+
         auto r = Reaper::create(1, 2, Reaper::CallbackOnDestroy);
 
         // Add three entries. This wakes up the reaper thread,
         // which schedules the next reaping pass 2 seconds
         // from now. The callback for e1 delays the reaping pass for a second,
         // so e2 and e3 will be looked at 1 second after reaping e1.
-
-        // t == 0
-        Counter c1(1000);
         auto e1 = r->add(bind(&Counter::increment, &c1));
-        Counter c2;
         auto e2 = r->add(bind(&Counter::increment, &c2));
-        Counter c3;
         auto e3 = r->add(bind(&Counter::increment, &c3));
+
         EXPECT_EQ(3, r->size());
 
         this_thread::sleep_for(chrono::milliseconds(2500));  // At t == 2.0, reaper kicks in.
 
         // t == 2.5
-        EXPECT_EQ(1, c1.get());             // Was reaped at t == 2.0
+        EXPECT_GE(t(), 2500);
+        EXPECT_EQ(1, c1.get());             // Was reaped at t == 2.0 (tested by lambda on c1)
         EXPECT_EQ(0, c2.get());             // Expires at t == 3.0, Due to be reaped at t == 4.0
         EXPECT_EQ(0, c3.get());             // Expires at t == 3.0, Due to be reaped at t == 4.0
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2, r->size());            // Both entries must still be there
 
-        // t == 2.5
         // We null out e2 and destroy e3 while the reaping pass is still stuck in the callback for e1.
-        e2 = nullptr;
-        e3->destroy();
-        EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(0, c3.get());
-
-        this_thread::sleep_for(chrono::seconds(1));
-
-        // t == 3.5
-        // Callbacks for e2 and e3 are not invoked because they were destroyed during the reaping pass.
-        EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(0, c3.get());
+        EXPECT_LT(t(), 3000);
+        e2 = nullptr;                       // Blocks until e1's callback completes at t == 3.0 (tested by lambda on c2)
+        EXPECT_GE(t(), 3000);
         EXPECT_EQ(0, r->size());
 
-        r->destroy();
+        // t == 3.0
+        e3->destroy();                      // Does nothing because e3 was destroyed by reaper at t == 3.0
+        EXPECT_EQ(0, c2.get());
+        EXPECT_EQ(1, c3.get());
+    }
+}
+
+TEST(Reaper, self_destroy)
+{
+    {
+        auto r = Reaper::create(1, 1, Reaper::CallbackOnDestroy);
+
+        struct SelfDestroy
+        {
+            SelfDestroy(Reaper::SPtr const& r)
+                : cb_called(false)
+            {
+                lock_guard<mutex> lock(m);
+                ri = r->add([this]{ this->expired(); });
+            }
+
+            void expired()
+            {
+                lock_guard<mutex> lock(m);
+                ri->destroy();
+                cb_called = true;
+            }
+
+            bool called()
+            {
+                lock_guard<mutex> lock(m);
+                return cb_called;
+            }
+
+        private:
+            ReapItem::SPtr ri;
+            bool cb_called;
+            mutex m;
+        };
+
+        // Make sure that a callback that calls destroy() on its own
+        // reap item doesn't deadlock.
+        SelfDestroy sd(r);
+        this_thread::sleep_for(chrono::milliseconds(1500));
+        EXPECT_TRUE(sd.called());
         EXPECT_EQ(0, r->size());
     }
 }

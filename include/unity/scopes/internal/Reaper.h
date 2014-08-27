@@ -57,7 +57,7 @@ struct Item final
 
     ReaperCallback cb;                               // Called if timeout expires (application-supplied callback)
     std::chrono::steady_clock::time_point timestamp; // Last add() or refresh()
-    std::weak_ptr<ReapItem> reap_item;               // Points back at owning ReapItem
+    std::weak_ptr<ReapItem> reap_item;               // Points back at corresponding ReapItem
 };
 
 typedef std::list<Item> Reaplist;
@@ -82,6 +82,11 @@ class Reaper;
 // happens to expire at just the right time). The implementation guarantees that, by the time destroy()
 // returns, the expire callback either has completed already, or will not happen at all. That is,
 // a callback never arrives after a call to destroy() has returned.
+//
+// It is safe to call methods on a ReapItem or the Reaper from within the callback function that
+// is passed to Reaper::add(). However, the callback function must make such calls on the thread
+// that called it; it cannot delegate such calls to a different thread. This allows the callback
+// function for a ReapItem to call destroy() on itself without deadlock.
 
 class ReapItem final
 {
@@ -99,11 +104,9 @@ private:
              reaper_private::Reaplist::iterator it);    // Only Reaper can instantiate
 
     std::weak_ptr<Reaper> reaper_;                      // The reaper this item belongs with
-    reaper_private::Reaplist::iterator it_;             // Position in reap list
+    reaper_private::Reaplist::iterator it_;             // Position of self in reap list
     bool destroyed_;
-    bool destruction_in_progress_;
     std::mutex mutex_;
-    std::condition_variable cond_;
 
     friend struct Item;
     friend class Reaper;
@@ -175,14 +178,19 @@ private:
     std::weak_ptr<Reaper> self_;            // We keep a weak reference to ourselves, to pass to each ReapItem.
     std::chrono::seconds reap_interval_;    // How frequently we look for entries to reap
     std::chrono::seconds expiry_interval_;  // How long before an entry times out
-    DestroyPolicy policy_;                  // Whether to invoke callback on entries still present when reaper is destroyed
+    DestroyPolicy policy_;                  // Whether to invoke cb on entries still present when reaper is destroyed
     reaper_private::Reaplist list_;         // Items in LRU order, most recently refreshed one at the front.
 
     mutable std::mutex mutex_;              // Protects list_. Also used by ReapItem to serialize updates to list_.
 
     std::thread reap_thread_;               // Reaper thread scans list_ and issues callbacks for timed-out entries
+    std::thread::id reap_thread_id_;        // ID of reaper thread (used to prevent deadlock in callbacks)
     std::condition_variable do_work_;       // Reaper thread waits on this
     bool finish_;                           // Set when reaper thread needs to terminate
+
+    bool reap_in_progress_;                      // True while a reaping pass is happening
+    mutable std::mutex reap_mutex_;              // Used with reap_done_
+    mutable std::condition_variable reap_done_;  // Signalled when reaping pass completes
 
     friend class ReapItem;
 };
