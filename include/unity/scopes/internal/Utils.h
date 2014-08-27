@@ -54,6 +54,8 @@ bool convert_to(std::string const& val, Variant& out)
 template<>
 bool convert_to<bool>(std::string const& val, Variant& out);
 
+int safe_system_call(std::string const& command);
+
 } // namespace internal
 
 } // namespace scopes
