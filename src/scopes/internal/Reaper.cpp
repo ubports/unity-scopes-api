@@ -262,7 +262,7 @@ void Reaper::reap_func()
             // There is at least one item on the list, we wait with a timeout.
             // The first-to-expire item is at the tail of the list. We sleep at least long enough
             // for that item to get a chance to expire. (There is no point in waking up earlier.)
-            // But, if have just done a scan, we sleep for at least reap_interval_, so there is
+            // But, if we have just done a scan, we sleep for at least reap_interval_, so there is
             // at most one pass every reap_interval_.
             auto const now = chrono::steady_clock::now();
             auto const oldest_item_age = chrono::duration_cast<chrono::milliseconds>(now - list_.back().timestamp);
