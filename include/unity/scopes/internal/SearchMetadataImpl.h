@@ -22,7 +22,6 @@
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 #include <unity/scopes/SearchMetadata.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/optional.hpp>
 
 namespace unity
