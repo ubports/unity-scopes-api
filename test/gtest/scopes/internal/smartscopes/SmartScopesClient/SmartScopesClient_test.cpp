@@ -141,7 +141,7 @@ TEST_F(SmartScopesClientTest, search)
     };
 
     auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
-    search_handle->get_search_results();
+    search_handle->wait();
 
     ASSERT_EQ(3u, results.size());
     ASSERT_EQ(1u, categories.size());
@@ -170,7 +170,6 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ("Category Fail", results[2].other_params["title"]->as_string());
     EXPECT_EQ(nullptr, results[2].other_params["icon"]);
     EXPECT_EQ("https://dash.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
-    //EXPECT_EQ("", results[2].category_id);
 
     // check departments
     EXPECT_TRUE(dept != nullptr);
@@ -235,7 +234,7 @@ TEST_F(SmartScopesClientTest, preview)
     };
 
     auto preview_handle = ssc_->preview(handler, sss_url_ + "/demo", "result", "session_id", "platform", 0);
-    preview_handle->get_preview_results();
+    preview_handle->wait();
 
     ASSERT_EQ(3u, columns.size());
 
@@ -297,19 +296,19 @@ TEST_F(SmartScopesClientTest, consecutive_searches)
     auto search_handle4 = ssc_->search(handler4, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
     auto search_handle5 = ssc_->search(handler5, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    search_handle1->get_search_results();
+    search_handle1->wait();
     EXPECT_EQ(3u, results1.size());
 
-    search_handle2->get_search_results();
+    search_handle2->wait();
     EXPECT_EQ(3u, results2.size());
 
-    search_handle3->get_search_results();
+    search_handle3->wait();
     EXPECT_EQ(3u, results3.size());
 
-    search_handle4->get_search_results();
+    search_handle4->wait();
     EXPECT_EQ(3u, results4.size());
 
-    search_handle5->get_search_results();
+    search_handle5->wait();
     EXPECT_EQ(3u, results5.size());
 }
 
@@ -326,7 +325,7 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
     {
         auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
         search_handle->cancel_search();
-        EXPECT_THROW(search_handle->get_search_results(), std::exception);
+        EXPECT_THROW(search_handle->wait(), std::exception);
     }
 
     SearchReplyHandler handler2;
@@ -339,7 +338,7 @@ TEST_F(SmartScopesClientTest, consecutive_cancels)
 
     auto search_handle = ssc_->search(handler2, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    search_handle->get_search_results();
+    search_handle->wait();
     EXPECT_EQ(3u, results.size());
 }
 

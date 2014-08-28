@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
@@ -68,9 +69,9 @@ SearchHandle::~SearchHandle()
     cancel_search();
 }
 
-void SearchHandle::get_search_results()
+void SearchHandle::wait()
 {
-    ssc_->get_search_results(search_id_);
+    ssc_->wait_for_search(search_id_);
 }
 
 void SearchHandle::cancel_search()
@@ -91,9 +92,9 @@ PreviewHandle::~PreviewHandle()
     cancel_preview();
 }
 
-void PreviewHandle::get_preview_results()
+void PreviewHandle::wait()
 {
-    ssc_->get_preview_results(preview_id_);
+    ssc_->wait_for_preview(preview_id_);
 }
 
 void PreviewHandle::cancel_preview()
@@ -168,8 +169,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
 
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
-            //TODO
-            response_str += replyLine; // accumulate all reply lines
+                response_str += replyLine; // accumulate all reply lines
         });
         response->wait();
 
@@ -581,7 +581,7 @@ void SmartScopesClient::parse_line(std::string const& json, SearchReplyHandler c
     }
 }
 
-void SmartScopesClient::get_search_results(uint search_id)
+void SmartScopesClient::wait_for_search(uint search_id)
 {
     try
     {
@@ -601,18 +601,16 @@ void SmartScopesClient::get_search_results(uint search_id)
         }
 
         query_result->wait();
-        query_result->get(); //FIXME get rid of
-
-        {
-            std::lock_guard<std::mutex> lock(query_results_mutex_);
-            query_results_.erase(search_id);
-        }
+        query_result->get(); // may throw on error
     }
     catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << ": " << e.what() << std::endl;
         throw;
     }
+
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    query_results_.erase(search_id);
 }
 
 std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInterface::SPtr node)
@@ -687,7 +685,7 @@ FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
     return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
-void SmartScopesClient::get_preview_results(uint preview_id)
+void SmartScopesClient::wait_for_preview(uint preview_id)
 {
     try
     {
@@ -707,18 +705,16 @@ void SmartScopesClient::get_preview_results(uint preview_id)
         }
 
         query_result->wait();
-        query_result->get(); // FIXME get rid of it
-
-        {
-            std::lock_guard<std::mutex> lock(query_results_mutex_);
-            query_results_.erase(preview_id);
-        }
+        query_result->get(); // may throw on error
     }
     catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query " << preview_id << std::endl;
         throw;
     }
+
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    query_results_.erase(preview_id);
 }
 
 std::vector<std::string> SmartScopesClient::extract_json_stream(std::string const& json_stream)

@@ -96,7 +96,7 @@ public:
 
     ~SearchHandle();
 
-    void get_search_results();
+    void wait();
     void cancel_search();
 
 private:
@@ -119,7 +119,7 @@ public:
     using Columns = std::vector<std::vector<std::vector<std::string>>>;
     using Widgets = std::vector<std::string>;
 
-    void get_preview_results();
+    void wait();
     void cancel_preview();
 
 private:
@@ -190,8 +190,8 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    void get_search_results(unsigned int search_id);
-    void get_preview_results(unsigned int preview_id);
+    void wait_for_search(unsigned int search_id);
+    void wait_for_preview(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
     FilterState parse_filter_state(JsonNodeInterface::SPtr node);

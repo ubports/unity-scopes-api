@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include <unity/scopes/internal/smartscopes/SmartScope.h>
@@ -161,9 +162,8 @@ void SmartQuery::run(SearchReplyProxy const& reply)
 
     ///! TODO: session_id, query_id, country (+location data)
     search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
-    search_handle_->get_search_results();
+    search_handle_->wait();
 
-    // TODO wait for query to complete
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
 }
 
@@ -233,7 +233,7 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
     ///! TODO: session_id, widgets_api_version, country (+location data)
     preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
 
-    preview_handle_->get_preview_results();
+    preview_handle_->wait();
     reply->push(widgets);
 
     std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;

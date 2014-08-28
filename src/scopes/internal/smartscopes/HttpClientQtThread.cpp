@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include "unity/scopes/internal/smartscopes/HttpClientQtThread.h"
@@ -113,7 +114,6 @@ void HttpClientQtThread::dataReady()
         {
             QByteArray data = net_reply->readLine();
             const std::string replyLine(data.constData(), data.size());
-            //std::cout << "Can readline: " << replyLine << std::endl;
             lineDataCallback_(replyLine);
         }
     }
@@ -123,10 +123,10 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
 {
     std::lock_guard<std::mutex> lock(reply_mutex_);
 
-    /*if (!reply_.empty())
+    if (!reply_.empty())
     {
         return;
-    }*/
+    }
 
     if (!reply)
     {
