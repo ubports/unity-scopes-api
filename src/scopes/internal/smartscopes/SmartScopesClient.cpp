@@ -68,9 +68,9 @@ SearchHandle::~SearchHandle()
     cancel_search();
 }
 
-SearchRequestResults SearchHandle::get_search_results()
+void SearchHandle::get_search_results()
 {
-    return ssc_->get_search_results(search_id_);
+    ssc_->get_search_results(search_id_);
 }
 
 void SearchHandle::cancel_search()
@@ -382,10 +382,16 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str(), [handler](std::string const& lineData) {
-            //TODO
-
-            });
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& lineData) {
+            try
+            {
+                parse_search_line(lineData, handler);
+            }
+            catch (std::exception const &e)
+            {
+                std::cerr << "Failed to parse: " << e.what() << std::endl;
+            }
+    });
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -494,7 +500,7 @@ void SmartScopesClient::parse_search_line(std::string const& json, SearchReplyHa
             else if (member == "cat_id")
             {
                 std::string category = child_node->get_node(member)->as_string();
-                result.category_id = category; //categories.find(category) != categories.end() ? categories[category] : nullptr;
+                result.category_id = category;
             }
             else
             {
@@ -520,7 +526,7 @@ void SmartScopesClient::parse_search_line(std::string const& json, SearchReplyHa
     }
 }
 
-SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
+void SmartScopesClient::get_search_results(uint search_id)
 {
     try
     {
@@ -548,96 +554,6 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
             std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
             query_results_.erase(search_id);
         }
-
-        std::vector<SearchResult> results;
-        std::map<std::string, std::shared_ptr<SearchCategory>> categories;
-        std::shared_ptr<DepartmentInfo> departments;
-        Filters filters;
-        FilterState filter_state;
-
-        std::vector<std::string> jsons = extract_json_stream(response_str);
-
-        for (std::string& json : jsons)
-        {
-            JsonNodeInterface::SPtr root_node;
-            JsonNodeInterface::SPtr child_node;
-
-            {
-                std::lock_guard<std::mutex> lock(json_node_mutex_);
-                json_node_->read_json(json);
-                root_node = json_node_->get_node();
-            }
-
-            if (root_node->has_node("category"))
-            {
-                child_node = root_node->get_node("category");
-                auto category = std::make_shared<SearchCategory>();
-
-                std::vector<std::string> members = child_node->member_names();
-                for (auto& member : members)
-                {
-                    if (member == "icon")
-                    {
-                        category->icon = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "id")
-                    {
-                        category->id = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "render_template")
-                    {
-                        category->renderer_template = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "title")
-                    {
-                        category->title = child_node->get_node(member)->as_string();
-                    }
-                }
-
-                categories[category->id] = category;
-            }
-            else if (root_node->has_node("result"))
-            {
-                child_node = root_node->get_node("result");
-                SearchResult result;
-                result.json = child_node->to_json_string();
-
-                std::vector<std::string> members = child_node->member_names();
-                for (auto& member : members)
-                {
-                    if (member == "uri")
-                    {
-                        result.uri = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "cat_id")
-                    {
-                        std::string category = child_node->get_node(member)->as_string();
-                        //result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
-                    }
-                    else
-                    {
-                        result.other_params[member] = child_node->get_node(member);
-                    }
-                }
-                results.push_back(result);
-            }
-            else if (root_node->has_node("departments"))
-            {
-                departments = parse_departments(root_node->get_node("departments"));
-            }
-            else if (root_node->has_node("filters"))
-            {
-                filters = parse_filters(root_node->get_node("filters"));
-            }
-            else if (root_node->has_node("filter_state"))
-            {
-                filter_state = parse_filter_state(root_node->get_node("filter_state"));
-            }
-        }
-
-        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
-
-        return std::tie(departments, filters, filter_state, results);
     }
     catch (std::exception const& e)
     {

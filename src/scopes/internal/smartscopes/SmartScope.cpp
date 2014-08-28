@@ -161,6 +161,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
 
     ///! TODO: session_id, query_id, country (+location data)
     search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
+    search_handle_->get_search_results();
 
     // TODO wait for query to complete
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;

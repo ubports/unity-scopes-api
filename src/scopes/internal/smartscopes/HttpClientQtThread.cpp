@@ -111,14 +111,10 @@ void HttpClientQtThread::dataReady()
     {
         if (net_reply->canReadLine())
         {
-            std::cout << "Can readline\n";
             QByteArray data = net_reply->readLine();
             const std::string replyLine(data.constData(), data.size());
+            //std::cout << "Can readline: " << replyLine << std::endl;
             lineDataCallback_(replyLine);
-            {
-                //std::lock_guard<std::mutex> lock(reply_mutex_);
-                //reply_ += replyLine;
-            }
         }
     }
 }
@@ -153,9 +149,18 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     else
     {
         success_ = true;
-        QByteArray byte_array = reply->readAll();
-        //reply_ = reply_ + std::string(byte_array.constData(), byte_array.size());
-        lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
+        // read any remaining lines
+        while (reply->canReadLine())
+        {
+            const QByteArray byte_array = reply->readLine();
+            lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
+        }
+        // there may be data left which is not "\n" terminated
+        if (reply->bytesAvailable())
+        {
+            const QByteArray byte_array = reply->readAll();
+            lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
+        }
     }
 
     quit();

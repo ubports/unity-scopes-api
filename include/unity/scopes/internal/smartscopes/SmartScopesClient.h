@@ -76,7 +76,6 @@ struct SearchResult
     std::string json;
     std::string uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
-    //std::shared_ptr<SearchCategory> category;
     std::string category_id;
 };
 
@@ -89,8 +88,6 @@ struct DepartmentInfo
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
 };
 
-using SearchRequestResults = std::tuple<std::shared_ptr<DepartmentInfo>, Filters, FilterState, std::vector<SearchResult>>;
-
 class SearchHandle
 {
 public:
@@ -99,7 +96,7 @@ public:
 
     ~SearchHandle();
 
-    SearchRequestResults get_search_results();
+    void get_search_results();
     void cancel_search();
 
 private:
@@ -186,7 +183,7 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    SearchRequestResults get_search_results(unsigned int search_id);
+    void get_search_results(unsigned int search_id);
     std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
