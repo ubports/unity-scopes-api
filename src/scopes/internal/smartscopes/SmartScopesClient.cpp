@@ -166,11 +166,14 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [](std::string const&) {//TODO
-                });
+
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
+            //TODO
+            response_str += replyLine; // accumulate all reply lines
+        });
         response->wait();
 
-        response_str = response->get();
+        //response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
     }
     catch (std::exception const& e)
@@ -322,7 +325,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     return !using_cache;
 }
 
-SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
+SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
+                                             std::string const& base_url,
                                              std::string const& query,
                                              std::string const& department_id,
                                              std::string const& session_id,
@@ -378,8 +382,9 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str(), [](std::string const&) {
+    query_results_[search_id] = http_client_->get(search_uri.str(), [handler](std::string const& lineData) {
             //TODO
+
             });
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
@@ -433,6 +438,86 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
             });
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
+}
+
+void SmartScopesClient::parse_search_line(std::string const& json, SearchReplyHandler const& handler)
+{
+    JsonNodeInterface::SPtr root_node;
+    JsonNodeInterface::SPtr child_node;
+
+    {
+        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        json_node_->read_json(json);
+        root_node = json_node_->get_node();
+    }
+
+    if (root_node->has_node("category"))
+    {
+        child_node = root_node->get_node("category");
+        auto category = std::make_shared<SearchCategory>();
+
+        std::vector<std::string> members = child_node->member_names();
+        for (auto& member : members)
+        {
+            if (member == "icon")
+            {
+                category->icon = child_node->get_node(member)->as_string();
+            }
+            else if (member == "id")
+            {
+                category->id = child_node->get_node(member)->as_string();
+            }
+            else if (member == "render_template")
+            {
+                category->renderer_template = child_node->get_node(member)->as_string();
+            }
+            else if (member == "title")
+            {
+                category->title = child_node->get_node(member)->as_string();
+            }
+        }
+        handler.category_handler(category);
+    }
+    else if (root_node->has_node("result"))
+    {
+        child_node = root_node->get_node("result");
+        SearchResult result;
+        result.json = child_node->to_json_string();
+
+        std::vector<std::string> members = child_node->member_names();
+        for (auto& member : members)
+        {
+            if (member == "uri")
+            {
+                result.uri = child_node->get_node(member)->as_string();
+            }
+            else if (member == "cat_id")
+            {
+                std::string category = child_node->get_node(member)->as_string();
+                result.category_id = category; //categories.find(category) != categories.end() ? categories[category] : nullptr;
+            }
+            else
+            {
+                result.other_params[member] = child_node->get_node(member);
+            }
+        }
+        handler.result_handler(result);
+    }
+    else if (root_node->has_node("departments"))
+    {
+        auto departments = parse_departments(root_node->get_node("departments"));
+        handler.departments_handler(departments);
+    }
+    else if (root_node->has_node("filters"))
+    {
+        auto filters = parse_filters(root_node->get_node("filters"));
+        handler.filters_handler(filters);
+    }
+    else if (root_node->has_node("filter_state"))
+    {
+        auto filter_state = parse_filter_state(root_node->get_node("filter_state"));
+        handler.filter_state_handler(filter_state);
+    }
 }
 
 SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
@@ -527,7 +612,7 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
                     else if (member == "cat_id")
                     {
                         std::string category = child_node->get_node(member)->as_string();
-                        result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
+                        //result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
                     }
                     else
                     {

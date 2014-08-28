@@ -61,17 +61,94 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
     }
 
-    ///! TODO: session_id, query_id, country (+location data)
-    search_handle_ = ss_client_->search(base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
-
-    SearchRequestResults results = search_handle_->get_search_results();
-    std::map<std::string, Category::SCPtr> categories;
-
-    if (std::get<0>(results)) // are there any departments?
+    struct FiltersHandler
     {
+        FiltersHandler(SearchReplyProxy reply, std::string const& scope_id):
+            reply(reply),
+            scope_id(scope_id),
+            has_filters(false),
+            has_state(false)
+        {}
+
+        void push() {
+            if (has_filters && has_state) {
+                try
+                {
+                    reply->push(filters, state);
+                }
+                catch (std::exception const& e)
+                {
+                    std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id << "': "
+                        << e.what() << std::endl;
+                }
+            }
+        }
+
+        void set(Filters const& f) {
+            filters = f;
+            has_filters = true;
+            push();
+        }
+
+        void set(FilterState const& s) {
+            state = s;
+            has_state = true;
+            push();
+        }
+
+        SearchReplyProxy reply;
+        std::string scope_id;
+        bool has_filters;
+        bool has_state;
+        Filters filters;
+        FilterState state;
+    } filters_data(reply, scope_id_);
+
+    SearchReplyHandler handler;
+    handler.filters_handler = [&filters_data](Filters const &filters) {
+        filters_data.set(filters);
+    };
+    handler.filter_state_handler = [&filters_data](FilterState const& state) {
+        filters_data.set(state);
+    };
+    handler.category_handler = [this, reply](std::shared_ptr<SearchCategory> const& category) {
+        const CategoryRenderer rdr(category->renderer_template);
         try
         {
-            auto const& deptinfo = std::get<0>(results);
+            reply->register_category(category->id, category->title, category->icon, rdr);
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "SmartScope: failed to register category: \"" << category->id
+                << "\" for scope \"" << scope_id_ << "\" and query: \""
+                << query_.query_string() << std::endl;
+        }
+    };
+    handler.result_handler = [this, reply](SearchResult const& result) {
+        auto cat = reply->lookup_category(result.category_id);
+        if (cat)
+        {
+            CategorisedResult res(cat);
+            res.set_uri(result.uri);
+            res["result_json"] = result.json;
+
+            auto other_params = result.other_params;
+            for (auto& param : other_params)
+            {
+                res[param.first] = param.second->to_variant();
+            }
+
+            reply->push(res);
+        }
+        else
+        {
+            std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
+                      << "\" returned an invalid cat_id. Skipping result." << std::endl;
+        }
+    };
+    handler.departments_handler = [this, reply](std::shared_ptr<DepartmentInfo> const& deptinfo) {
+        try
+        {
             Department::SCPtr root = create_department(deptinfo);
             reply->register_departments(root);
         }
@@ -80,59 +157,12 @@ void SmartQuery::run(SearchReplyProxy const& reply)
             std::cerr << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': "
                       << e.what() << std::endl;
         }
-    }
+    };
 
-    auto const& filters = std::get<1>(results);
-    if (!filters.empty())
-    {
-        auto const& filter_state = std::get<2>(results);
-        try
-        {
-            reply->push(filters, filter_state);
-        }
-        catch (std::exception const& e)
-        {
-            std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id_ << "': "
-                      << e.what() << std::endl;
-        }
-    }
+    ///! TODO: session_id, query_id, country (+location data)
+    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
 
-    for (auto& result : std::get<3>(results))
-    {
-        if (!result.category)
-        {
-            std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
-                      << "\" returned an invalid cat_id. Skipping result." << std::endl;
-            continue;
-        }
-
-        Category::SCPtr cat;
-
-        auto cat_it = categories.find(result.category->id);
-        if (cat_it == end(categories))
-        {
-            CategoryRenderer rdr(result.category->renderer_template);
-            cat = reply->register_category(result.category->id, result.category->title, result.category->icon, rdr);
-            categories[result.category->id] = cat;
-        }
-        else
-        {
-            cat = cat_it->second;
-        }
-
-        CategorisedResult res(cat);
-        res.set_uri(result.uri);
-        res["result_json"] = result.json;
-
-        auto other_params = result.other_params;
-        for (auto& param : other_params)
-        {
-            res[param.first] = param.second->to_variant();
-        }
-
-        reply->push(res);
-    }
-
+    // TODO wait for query to complete
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
 }
 

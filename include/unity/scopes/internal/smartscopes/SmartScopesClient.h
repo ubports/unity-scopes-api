@@ -76,7 +76,8 @@ struct SearchResult
     std::string json;
     std::string uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
-    std::shared_ptr<SearchCategory> category;
+    //std::shared_ptr<SearchCategory> category;
+    std::string category_id;
 };
 
 struct DepartmentInfo
@@ -133,6 +134,15 @@ private:
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
+struct SearchReplyHandler
+{
+    std::function<void(SearchResult const&)> result_handler;
+    std::function<void(std::shared_ptr<SearchCategory> const&)> category_handler;
+    std::function<void(std::shared_ptr<DepartmentInfo> const&)> departments_handler;
+    std::function<void(Filters const&)> filters_handler;
+    std::function<void(FilterState const&)> filter_state_handler;
+};
+
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
 {
 public:
@@ -150,7 +160,8 @@ public:
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
-    SearchHandle::UPtr search(std::string const& base_url,
+    SearchHandle::UPtr search(SearchReplyHandler const& handler,
+                              std::string const& base_url,
                               std::string const& query,
                               std::string const& department_id,
                               std::string const& session_id,
@@ -180,6 +191,8 @@ private:
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
     FilterState parse_filter_state(JsonNodeInterface::SPtr node);
+    void parse_search_line(std::string const& json,
+            SearchReplyHandler const& handler);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 

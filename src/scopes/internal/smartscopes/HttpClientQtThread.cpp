@@ -116,8 +116,8 @@ void HttpClientQtThread::dataReady()
             const std::string replyLine(data.constData(), data.size());
             lineDataCallback_(replyLine);
             {
-                std::lock_guard<std::mutex> lock(reply_mutex_);
-                reply_ += replyLine;
+                //std::lock_guard<std::mutex> lock(reply_mutex_);
+                //reply_ += replyLine;
             }
         }
     }
@@ -154,7 +154,8 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     {
         success_ = true;
         QByteArray byte_array = reply->readAll();
-        reply_ = reply_ + std::string(byte_array.constData(), byte_array.size());
+        //reply_ = reply_ + std::string(byte_array.constData(), byte_array.size());
+        lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
     }
 
     quit();
