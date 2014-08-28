@@ -83,7 +83,7 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint time
     : promise_(nullptr)
     , qt_thread_(nullptr)
 {
-    promise_ = std::make_shared<std::promise<std::string>>();
+    promise_ = std::make_shared<std::promise<void>>();
 
     get_thread_ =
         std::thread([this, request_url, timeout, lineData]()
@@ -112,7 +112,7 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint time
                 }
                 else
                 {
-                    promise_->set_value(reply);
+                    promise_->set_value();
                 }
             });
 
@@ -124,7 +124,7 @@ HttpClientQt::HttpSession::~HttpSession()
     cancel_session();
 }
 
-std::future<std::string> HttpClientQt::HttpSession::get_future()
+std::future<void> HttpClientQt::HttpSession::get_future()
 {
     return promise_->get_future();
 }

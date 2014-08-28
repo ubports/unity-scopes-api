@@ -58,13 +58,13 @@ private:
         HttpSession(std::string const& request_url, unsigned int timeout, std::function<void(std::string const&)> const& lineData);
         ~HttpSession();
 
-        std::future<std::string> get_future();
+        std::future<void> get_future();
 
         void cancel_session();
         void wait_for_session();
 
     private:
-        std::shared_ptr<std::promise<std::string>> promise_;
+        std::shared_ptr<std::promise<void>> promise_;
         std::thread get_thread_;
         std::unique_ptr<HttpClientQtThread> qt_thread_;
         std::mutex qt_thread_mutex_;

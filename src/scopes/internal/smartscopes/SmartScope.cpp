@@ -204,41 +204,37 @@ void SmartPreview::cancelled()
 
 void SmartPreview::run(PreviewReplyProxy const& reply)
 {
-    ///! TODO: session_id, widgets_api_version, country (+location data)
-    preview_handle_ = ss_client_->preview(base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
-
-    auto results = preview_handle_->get_preview_results();
-    PreviewHandle::Columns columns = results.first;
-    PreviewHandle::Widgets widgets = results.second;
-
-    // register layout
-    if (columns.size() > 0)
-    {
-        ColumnLayoutList layout_list;
-
-        for (auto& column : columns)
+    PreviewReplyHandler handler;
+    PreviewWidgetList widgets;
+    handler.widget_handler = [&widgets](std::string const& widget_json) {
+        widgets.push_back(PreviewWidget(widget_json));
+    };
+    handler.columns_handler = [reply](PreviewHandle::Columns const &columns) {
+        if (columns.size() > 0)
         {
-            ColumnLayout layout(column.size());
-            for (auto& widget_lo : column)
+            // register layout
+            ColumnLayoutList layout_list;
+
+            for (auto& column : columns)
             {
-                layout.add_column(widget_lo);
+                ColumnLayout layout(column.size());
+                for (auto& widget_lo : column)
+                {
+                    layout.add_column(widget_lo);
+                }
+
+                layout_list.emplace_back(layout);
             }
 
-            layout_list.emplace_back(layout);
+            reply->register_layout(layout_list);
         }
+    };
 
-        reply->register_layout(layout_list);
-    }
+    ///! TODO: session_id, widgets_api_version, country (+location data)
+    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
 
-    // push wigdets
-    PreviewWidgetList widget_list;
-
-    for (auto& widget_json : widgets)
-    {
-        widget_list.emplace_back(PreviewWidget(widget_json));
-    }
-
-    reply->push(widget_list);
+    preview_handle_->get_preview_results();
+    reply->push(widgets);
 
     std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
 }
