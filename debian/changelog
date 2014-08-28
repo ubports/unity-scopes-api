@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.4-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.4+14.10.20140828.1-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]
   * Execute SDK DBus callback on scope start and stop in debug mode.
@@ -6,7 +6,7 @@ unity-scopes-api (0.6.4-0ubuntu1) UNRELEASED; urgency=medium
   [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 27 Aug 2014 13:46:29 +0200
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 28 Aug 2014 14:01:50 +0000
 
 unity-scopes-api (0.6.3+14.10.20140826-0ubuntu1) utopic; urgency=medium
 
