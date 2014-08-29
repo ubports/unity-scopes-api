@@ -206,6 +206,45 @@ TEST(PreviewWidget, serialize)
         EXPECT_EQ(10, var["attributes"].get_dict()["foo"].get_int());
         EXPECT_EQ("bar", var["components"].get_dict()["boo"].get_string());
     }
+    // expandable widget
+    {
+        PreviewWidget w("w1", "expandable");
+        w.add_attribute_value("title", Variant("foo"));
+
+        PreviewWidget subwidget1("w2", "image");
+        subwidget1.add_attribute_value("source", Variant("bar"));
+        subwidget1.add_attribute_mapping("source", "src");
+
+        PreviewWidget subwidget2("w3", "image");
+        subwidget2.add_attribute_value("source", Variant("baz"));
+
+        w.add_widget(subwidget1);
+        w.add_widget(subwidget2);
+
+        auto var = w.serialize();
+        {
+            EXPECT_EQ("w1", var["id"].get_string());
+            EXPECT_EQ("expandable", var["type"].get_string());
+            EXPECT_EQ("w2", var["widgets"].get_array()[0].get_dict()["id"].get_string());
+            EXPECT_EQ("w3", var["widgets"].get_array()[1].get_dict()["id"].get_string());
+        }
+        // deserialize it back
+        {
+            PreviewWidget deserialized = internal::PreviewWidgetImpl::create(var);
+            EXPECT_EQ("w1", deserialized.id());
+            EXPECT_EQ("expandable", deserialized.widget_type());
+            EXPECT_EQ("foo", w.attribute_values()["title"].get_string());
+
+            auto const widgets = deserialized.widgets();
+            EXPECT_EQ(2u, widgets.size());
+            auto it = widgets.begin();
+            EXPECT_EQ("w2", it->id());
+            EXPECT_EQ("src", it->attribute_mappings()["source"]);
+            ++it;
+            EXPECT_EQ("w3", it->id());
+            EXPECT_EQ("baz", it->attribute_values()["source"].get_string());
+        }
+    }
 }
 
 TEST(PreviewWidget, deserialize)
