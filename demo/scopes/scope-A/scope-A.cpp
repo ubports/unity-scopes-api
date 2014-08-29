@@ -118,7 +118,21 @@ public:
     {
         PreviewWidgetList widgets;
         widgets.emplace_back(PreviewWidget(R"({"id": "header", "type": "header", "title": "title", "subtitle": "author", "rating": "rating"})"));
-        widgets.emplace_back(PreviewWidget(R"({"id": "img", "type": "image", "art": "screenshot-url"})"));
+
+        PreviewWidget expandable("exp", "expandable");
+        expandable.add_attribute_value("title", Variant("foo"));
+        expandable.add_attribute_value("collapsed-widgets", Variant(0));
+
+        PreviewWidget w1("t1", "text");
+        w1.add_attribute_value("title", Variant("widget1"));
+        w1.add_attribute_value("text", Variant("fooooaosdoasdoa"));
+        PreviewWidget w2("t2", "text");
+        w2.add_attribute_value("title", Variant("widget2"));
+        w2.add_attribute_mapping("text", "txt");
+        expandable.add_widget(w1);
+        expandable.add_widget(w2);
+
+        widgets.emplace_back(expandable);
 
         PreviewWidget w("img2", "image");
         w.add_attribute_value("zoomable", Variant(false));
@@ -126,14 +140,14 @@ public:
         widgets.emplace_back(w);
 
         ColumnLayout layout1col(1);
-        layout1col.add_column({"header", "title"});
+        layout1col.add_column({"header", "exp"});
 
         ColumnLayout layout2col(2);
-        layout2col.add_column({"header", "title"});
-        layout2col.add_column({"author", "rating"});
+        layout2col.add_column({"header", "exp"});
+        layout2col.add_column({"author", "exp"});
 
         ColumnLayout layout3col(3);
-        layout3col.add_column({"header", "title"});
+        layout3col.add_column({"header", "exp"});
         layout3col.add_column({"author"});
         layout3col.add_column({"rating"});
 
@@ -141,6 +155,10 @@ public:
         if (!reply->push(widgets))
         {
             return;  // Query was cancelled
+        }
+        if (!reply->push("txt", Variant("This is a text")))
+        {
+            return;
         }
         if (!reply->push("author", Variant("Foo")))
         {

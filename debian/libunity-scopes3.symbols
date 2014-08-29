@@ -119,6 +119,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::OperationInfo::~OperationInfo()@Base" 0.6.0+14.10.20140804.1
  (c++)"unity::scopes::OperationInfo::operator=(unity::scopes::OperationInfo&&)@Base" 0.6.0+14.10.20140804.1
  (c++)"unity::scopes::OperationInfo::operator=(unity::scopes::OperationInfo const&)@Base" 0.6.0+14.10.20140804.1
+ (c++)"unity::scopes::PreviewWidget::add_widget(unity::scopes::PreviewWidget const&)@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::add_attribute_value(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::add_attribute_mapping(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::PreviewWidget(unity::scopes::PreviewWidget&&)@Base" 0.4.0+14.04.20140312.1
@@ -673,6 +674,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::PreviewWidget::attribute_mappings() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::PreviewWidget::data() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::PreviewWidget::widgets() const@Base" 0replaceme
  (c++)"unity::scopes::PreviewWidget::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::QueryMetadata::form_factor() const@Base" 0.6.0+14.10.20140804.1
  (c++)"unity::scopes::QueryMetadata::internet_connectivity() const@Base" 0.6.0+14.10.20140804.1
