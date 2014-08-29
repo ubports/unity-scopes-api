@@ -205,9 +205,8 @@ void SmartPreview::cancelled()
 void SmartPreview::run(PreviewReplyProxy const& reply)
 {
     PreviewReplyHandler handler;
-    PreviewWidgetList widgets;
-    handler.widget_handler = [&widgets](std::string const& widget_json) {
-        widgets.push_back(PreviewWidget(widget_json));
+    handler.widget_handler = [reply](std::string const& widget_json) {
+        reply->push({PreviewWidget(widget_json)});
     };
     handler.columns_handler = [reply](PreviewHandle::Columns const &columns) {
         if (columns.size() > 0)
@@ -234,7 +233,6 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
     preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
 
     preview_handle_->wait();
-    reply->push(widgets);
 
     std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
 }

@@ -326,29 +326,7 @@ class PreviewerWithCols : public PreviewListenerBase
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(3u, widget_list.size());
-
-        // widget 1
-        auto it = widget_list.begin();
-        EXPECT_EQ("widget_id_A", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
-
-        // widget 2
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_B", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
-
-        // widget 3
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_C", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
-
+        widget_list_.insert(widget_list_.end(), widget_list.begin(), widget_list.end());
         widget_pushes_++;
     }
 
@@ -396,9 +374,33 @@ public:
 
     virtual void finished(CompletionDetails const& details) override
     {
+        EXPECT_EQ(3u, widget_list_.size());
+
+        // widget 1
+        auto it = widget_list_.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
+
+        // widget 3
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_C", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
+
+
         EXPECT_EQ(CompletionDetails::OK, details.status());
         EXPECT_EQ("", details.message());
-        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(3, widget_pushes_);
         EXPECT_EQ(1, col_pushes_);
 
         // Signal wait_until_finished
@@ -417,6 +419,7 @@ private:
     int widget_pushes_ = 0;
     int col_pushes_ = 0;
     bool query_complete_ = false;
+    PreviewWidgetList widget_list_;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -426,22 +429,7 @@ class PreviewerNoCols : public PreviewListenerBase
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(2u, widget_list.size());
-
-        // widget 1
-        auto it = widget_list.begin();
-        EXPECT_EQ("widget_id_A", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
-
-        // widget 2
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_B", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
-
+        widget_list_.insert(widget_list_.end(), widget_list.begin(), widget_list.end());
         widget_pushes_++;
     }
 
@@ -459,8 +447,24 @@ public:
     {
         EXPECT_EQ(CompletionDetails::OK, details.status());
         EXPECT_EQ("", details.message());
-        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(2, widget_pushes_);
         EXPECT_EQ(0, col_pushes_);
+
+        EXPECT_EQ(2u, widget_list_.size());
+
+        // widget 1
+        auto it = widget_list_.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         // Signal wait_until_finished
         std::unique_lock<std::mutex> lock(mutex_);
@@ -480,6 +484,7 @@ private:
     bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
+    PreviewWidgetList widget_list_;
 };
 
 TEST_F(smartscopesproxytest, preview)
