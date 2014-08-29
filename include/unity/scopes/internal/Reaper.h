@@ -127,6 +127,11 @@ public:
     NONCOPYABLE(Reaper);
     UNITY_DEFINES_PTRS(Reaper);
 
+    // Destroys the reaper.
+    // Complexity: O(n), where n is the total number of items. This is the cost of
+    //             calling the callback of any items still on the reaper list (depending
+    //             on the destroy policy), plus the cost of calling the destructor
+    //             for any remaining list items.
     ~Reaper();
 
     enum DestroyPolicy { NoCallbackOnDestroy, CallbackOnDestroy };
@@ -146,12 +151,19 @@ public:
     // entries to not be refreshed for longer than their expiry interval, then be refreshed again, and
     // not be reaped on the next pass.
     //
+    // If both reap_interval and expiry_interval are set to -1, entries have infinite expiry time.
+    // Reaper::add(), ReapItem::refresh(), and ReapItem::destroy() can still be called.
+    // Callbacks are invoked in this case only if the reaper is destroyed while it still holds
+    // entries and CallbackOnDestroy is set.
+    //
     // Reaping passes are O(m) complexity, where m is the number of expired items (not
     // the total number of items).
     static SPtr create(int reap_interval, int expiry_interval, DestroyPolicy p = NoCallbackOnDestroy);
 
     // Destroys the reaper and returns once any remaining items have been reaped (depending on the
     // destroy policy). The destructor implicitly calls destroy().
+    // Complexity: O(n) if CallbackOnDestroy is set, where n is the total number of items in the reaper.
+    //             O(m) if NoCallbackOnDestroy is set, where m is the numer of expired items.
     void destroy();
 
     // Adds a new item to the reaper. The reaper calls cb once the item has not been refreshed for at

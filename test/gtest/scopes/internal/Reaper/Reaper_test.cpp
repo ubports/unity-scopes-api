@@ -192,6 +192,26 @@ TEST(Reaper, basic)
         }
         EXPECT_EQ(0, c.get());
     }
+
+    {
+        // Make sure that destroying a reap item after explicitly destroying
+        // the reaper still works and correctly removes the item from the list.
+        auto r = Reaper::create(5, 5);
+        auto e1 = r->add([]{});
+        auto e2 = r->add([]{});
+        auto e3 = r->add([]{});
+        EXPECT_EQ(3, r->size());
+        e2->destroy();
+        EXPECT_EQ(2, r->size());
+
+        r->destroy();
+
+        EXPECT_EQ(2, r->size());
+        e3->destroy();
+        EXPECT_EQ(1, r->size());
+        e1->destroy();
+        EXPECT_EQ(0, r->size());
+    }
 }
 
 TEST(Reaper, expiry)
@@ -411,6 +431,69 @@ TEST(Reaper, self_destroy)
         this_thread::sleep_for(chrono::milliseconds(1500));
         EXPECT_TRUE(sd.called());
         EXPECT_EQ(0, r->size());
+    }
+}
+
+TEST(Reaper, no_reap_thread)
+{
+    // Check that, with disabled reaper thread, we can still add,
+    // refresh, and destroy entries, and that the callbacks for
+    // entries that are still around at distruction time are
+    // invoked (because CallbackOnDestroy is set).
+    try
+    {
+    {
+        Counter c1;
+        Counter c2;
+        Counter c3;
+
+        auto r = Reaper::create(-1, -1, Reaper::CallbackOnDestroy);
+        auto e1 = r->add(bind(&Counter::increment, &c1));
+        auto e2 = r->add(bind(&Counter::increment, &c2));
+        auto e3 = r->add(bind(&Counter::increment, &c3));
+
+        e1->refresh();
+        e2->destroy();
+        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(0, c1.get());
+        EXPECT_EQ(0, c2.get());
+        EXPECT_EQ(0, c3.get());
+
+        r->destroy();
+        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(1, c1.get());
+        EXPECT_EQ(0, c2.get());
+        EXPECT_EQ(1, c3.get());
+    }
+
+    // Same again, but with NoCallbackOnDestroy.
+    {
+        Counter c1;
+        Counter c2;
+        Counter c3;
+
+        auto r = Reaper::create(-1, -1, Reaper::NoCallbackOnDestroy);
+        auto e1 = r->add(bind(&Counter::increment, &c1));
+        auto e2 = r->add(bind(&Counter::increment, &c2));
+        auto e3 = r->add(bind(&Counter::increment, &c3));
+
+        e1->refresh();
+        e2->destroy();
+        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(0, c1.get());
+        EXPECT_EQ(0, c2.get());
+        EXPECT_EQ(0, c3.get());
+
+        r->destroy();
+        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(0, c1.get());
+        EXPECT_EQ(0, c2.get());
+        EXPECT_EQ(0, c3.get());
+    }
+    }
+    catch (std::exception const& e)
+    {
+        cerr << e.what() << endl;
     }
 }
 

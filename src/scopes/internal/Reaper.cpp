@@ -51,8 +51,6 @@ ReapItem::~ReapItem()
 
 void ReapItem::refresh() noexcept
 {
-    // If the reaper is still around, remove the entry from the list
-    // and put it back on the front, updating the time stamp.
     auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
@@ -65,6 +63,7 @@ void ReapItem::refresh() noexcept
             return;  // A reaping pass may have destroyed this ReapItem already.
         }
 
+        // Move our Item to the head of the list after updating the time stamp.
         assert(it_ != reaper->list_.end());
         reaper_private::Item item(*it_);
         item.timestamp = chrono::steady_clock::now();
@@ -82,13 +81,6 @@ void ReapItem::refresh() noexcept
 
 void ReapItem::destroy() noexcept
 {
-    // We need to make sure that a call to destroy() cannot
-    // complete until after the the callback from a concurrent
-    // reaping pass was made. Otherwise, remove_zombies() could invoke
-    // the callback on an instance after destroy() returns,
-    // but the instance may already have been decallocated
-    // by the application.
-
     auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
@@ -193,6 +185,13 @@ void Reaper::destroy()
         {
             return;
         }
+        // If the reaper thread was never started, but there
+        // are entries to be reaped, start the thread, so it
+        // will invoke the callbacks for any remaining entries.
+        if (reap_interval_.count() == -1 && list_.size() != 0 && policy_ == CallbackOnDestroy)
+        {
+            start();
+        }
         finish_ = true;
         do_work_.notify_one();
     }
@@ -220,10 +219,10 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
     }
 
     // Put new Item at the head of the list.
-    reaper_private::Reaplist::iterator ri;
+    reaper_private::Reaplist::iterator li;
     Item item(cb);
     list_.push_front(item); // LRU order
-    ri = list_.begin();
+    li = list_.begin();
     if (list_.size() == 1)
     {
         do_work_.notify_one();  // Wake up reaper thread
@@ -231,9 +230,9 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
 
     // Make a new ReapItem.
     assert(self_.lock());
-    ReapItem::SPtr reap_item(new ReapItem(self_, ri));
+    ReapItem::SPtr reap_item(new ReapItem(self_, li));
     // Now that the ReapItem is created, we can set the back-pointer.
-    ri->reap_item = reap_item;
+    li->reap_item = reap_item;
     return reap_item;
 }
 
@@ -287,7 +286,7 @@ void Reaper::reap_func()
             // Final pass for CallbackOnDestroy. We simply call back on everything.
             zombies.assign(list_.begin(), list_.end());
         }
-        else
+        else if (reap_interval_.count() != -1)  // Look only if we have non-infinite expiry time.
         {
             // Find any entries that have expired.
             auto const now = chrono::steady_clock::now();
@@ -337,7 +336,8 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
             lock_guard<mutex> item_lock(ri->mutex_);
             if (ri->destroyed_)
             {
-                continue;  // destroy() was called during this pass, it has already completed destruction.
+                // ReapItem::destroy() was called during this pass, it has already completed destruction.
+                continue;
             }
             ri->destroyed_ = true;
         }
