@@ -289,10 +289,9 @@ void Reaper::reap_func()
         else if (reap_interval_.count() != -1)  // Look only if we have non-infinite expiry time.
         {
             // Find any entries that have expired.
-            auto const now = chrono::steady_clock::now();
             for (auto it = list_.rbegin(); it != list_.rend(); ++it)
             {
-                if (now < it->timestamp + expiry_interval_)
+                if (chrono::steady_clock::now() < it->timestamp + expiry_interval_)
                 {
                     break;  // LRU order. Once we find an entry that's not expired, we can stop looking.
                 }

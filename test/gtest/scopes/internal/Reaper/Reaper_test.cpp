@@ -253,31 +253,27 @@ TEST(Reaper, destroy_during_expiry)
 {
     {
         Counter c1;
+        Counter c2;
+        Counter c3;
+
         auto r = Reaper::create(2, 3, Reaper::CallbackOnDestroy);
 
-        // Sleep for 0.5 seconds, so the reaper is blocked,
-        // waiting for something to be added to the queue.
-        this_thread::sleep_for(chrono::milliseconds(500));
-
         // Add three entries. This wakes up the reaper thread,
-        // which schedules the next reaping pass 3 seconds
-        // from now.
+        // which schedules the next reaping pass 3 seconds from now.
         // t == 0
         auto e1 = r->add(bind(&Counter::increment, &c1));
-        Counter c2;
         auto e2 = r->add(bind(&Counter::increment, &c2));
-        Counter c3;
         auto e3 = r->add(bind(&Counter::increment, &c3));
 
-        // Wait 1.5 seconds and refresh e1.
+        // Wait 1.5 seconds and refresh e3.
         this_thread::sleep_for(chrono::milliseconds(1500));
-        e1->refresh();
+        e3->refresh();
 
         // t == 1.5
         // Remaining life times:
-        // e1: 3.0
+        // e1: 1.5
         // e2: 1.5
-        // e3: 1.5
+        // e3: 3.0
 
         // Wait for 1 second and refresh e2.
         this_thread::sleep_for(chrono::seconds(1));
@@ -285,49 +281,49 @@ TEST(Reaper, destroy_during_expiry)
 
         // t == 2.5
         // Remaining life times:
-        // e1: 2.0
+        // e1: 0.5
         // e2: 3.0
-        // e3: 0.5
+        // e3: 2.0
         //
         // Wait for 1 second. While we are asleep, the first
         // Reaping pass happens.
-        this_thread::sleep_for(chrono::seconds(1));  // t == 3.0, first reaping pass, next pass at t == 5.0
+        this_thread::sleep_for(chrono::seconds(1));  // At t == 3.0, first reaping pass, next pass at t == 5.0
 
         // t == 3.5
-        // While we were asleep, the first pass must have reaped e3.
+        // While we were asleep, the first pass must have reaped e1.
         EXPECT_EQ(2u, r->size());
-        EXPECT_EQ(0, c1.get());
+        EXPECT_EQ(1, c1.get());
         EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(1, c3.get());
+        EXPECT_EQ(0, c3.get());
 
         // t == 3.5
         // Remaining life times:
-        // e1: 1.0
         // e2: 2.0
+        // e3: 1.0
 
         // The first reaping pass happened 0.5 seconds ago, and the next
         // pass won't happen for another 1.5 seconds, because we reap
         // at most once every 2 seconds.
-        // We sleep another 1.25 seconds, which expires e1.
+        // We sleep another 1.25 seconds, which expires e3.
         this_thread::sleep_for(chrono::milliseconds(1250));
 
         // Remaining life times:
-        // e1: -0.25 (expired)
         // e2: 0.75
-        EXPECT_EQ(2u, r->size());  // e1 is still there because it is expired, but not reaped.
-        EXPECT_EQ(0, c1.get());
+        // e3: -0.25 (expired)
+        EXPECT_EQ(2u, r->size());  // e3 is still there because it is expired, but not reaped.
+        EXPECT_EQ(1, c1.get());
         EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(1, c3.get());
+        EXPECT_EQ(0, c3.get());
 
         // We destroy e2, which cancels the callback for it.
         e2 = nullptr;
-        EXPECT_EQ(1u, r->size());  // e1 is still there because it is expired, but not reaped.
-        EXPECT_EQ(0, c1.get());
+        EXPECT_EQ(1u, r->size());  // e3 is still there because it is expired, but not reaped.
+        EXPECT_EQ(1, c1.get());
         EXPECT_EQ(0, c2.get());    // Callback for e2 must not have been invoked.
-        EXPECT_EQ(1, c3.get());
+        EXPECT_EQ(0, c3.get());
 
         // Now we destroy the reaper, *before* the pass at t == 5.0.
-        // Because CallbackOnDestroy is set, e1 is reaped.
+        // Because CallbackOnDestroy is set, e3 is reaped.
         r->destroy();
         EXPECT_EQ(0, r->size());
         EXPECT_EQ(1, c1.get());    // Callback for e1 must have been invoked.
@@ -346,9 +342,6 @@ TEST(Reaper, wait_during_expiry)
         // t == 0
         Timer t;
 
-        // Create the counters before the reaper, so the memory is visible
-        // in the lambdas passed to the reaper.
-
         // Callback for c1 must arrive no sooner than 2 seconds from now, and no later
         // than 2.5 seconds from now.
         Counter c1(1000, [&t]{ int now = t(); if (now < 2000) FAIL(); if (now > 2500) FAIL(); });
@@ -356,39 +349,34 @@ TEST(Reaper, wait_during_expiry)
         // Callback for c2 must arrive no sooner than 3 seconds from now.
         Counter c2(0, [&t] { if (t() < 3000) FAIL(); });
 
-        Counter c3;
-
         auto r = Reaper::create(1, 2, Reaper::CallbackOnDestroy);
 
         // Add three entries. This wakes up the reaper thread,
         // which schedules the next reaping pass 2 seconds
         // from now. The callback for e1 delays the reaping pass for a second,
-        // so e2 and e3 will be looked at 1 second after reaping e1.
+        // so e2 will be looked at 1 second after reaping e1.
         auto e1 = r->add(bind(&Counter::increment, &c1));
         auto e2 = r->add(bind(&Counter::increment, &c2));
-        auto e3 = r->add(bind(&Counter::increment, &c3));
 
-        EXPECT_EQ(3, r->size());
+        // e1 is oldest, so at the tail of the reap list.
+
+        EXPECT_EQ(2, r->size());
+        EXPECT_LT(t(), 2000);
 
         this_thread::sleep_for(chrono::milliseconds(2500));  // At t == 2.0, reaper kicks in.
 
         // t == 2.5
         EXPECT_GE(t(), 2500);
-        EXPECT_EQ(1, c1.get());             // Was reaped at t == 2.0 (tested by lambda on c1)
-        EXPECT_EQ(0, c2.get());             // Expires at t == 3.0, Due to be reaped at t == 4.0
-        EXPECT_EQ(0, c3.get());             // Expires at t == 3.0, Due to be reaped at t == 4.0
-        EXPECT_EQ(2, r->size());            // Both entries must still be there
+        EXPECT_EQ(1, c1.get());             // Was reaped at t ~ 2.0 (tested by lambda on c1)
+        EXPECT_EQ(0, c2.get());             // Expires at t ~ 2.0, but not reaped yet, because c1 has not completed
+        EXPECT_EQ(1, r->size());            // Both entries must still be there
 
-        // We null out e2 and destroy e3 while the reaping pass is still stuck in the callback for e1.
+        // We null out e2 while the reaping pass is still stuck in the callback for e1.
         EXPECT_LT(t(), 3000);
-        e2 = nullptr;                       // Blocks until e1's callback completes at t == 3.0 (tested by lambda on c2)
+        e2 = nullptr;                       // Blocks until e1's callback completes at t ~ 3.0 (tested by lambda on c2)
         EXPECT_GE(t(), 3000);
-        EXPECT_EQ(0, r->size());
-
-        // t == 3.0
-        e3->destroy();                      // Does nothing because e3 was destroyed by reaper at t == 3.0
         EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(1, c3.get());
+        EXPECT_EQ(0, r->size());
     }
 }
 
