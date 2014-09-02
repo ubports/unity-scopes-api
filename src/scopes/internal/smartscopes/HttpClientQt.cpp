@@ -80,11 +80,8 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 //-- HttpClientQt::HttpSession
 
 HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout, std::function<void(std::string const&)> const& lineData)
-    : promise_(nullptr)
-    , qt_thread_(nullptr)
+    : qt_thread_(nullptr)
 {
-    promise_ = std::make_shared<std::promise<void>>();
-
     get_thread_ =
         std::thread([this, request_url, timeout, lineData]()
             {
@@ -108,11 +105,11 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint time
                 if (!success)
                 {
                     unity::ResourceException e(reply);
-                    promise_->set_exception(e.self());
+                    promise_.set_exception(e.self());
                 }
                 else
                 {
-                    promise_->set_value();
+                    promise_.set_value();
                 }
             });
 
@@ -126,7 +123,7 @@ HttpClientQt::HttpSession::~HttpSession()
 
 std::future<void> HttpClientQt::HttpSession::get_future()
 {
-    return promise_->get_future();
+    return promise_.get_future();
 }
 
 void HttpClientQt::HttpSession::cancel_session()

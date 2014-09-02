@@ -64,7 +64,7 @@ private:
         void wait_for_session();
 
     private:
-        std::shared_ptr<std::promise<void>> promise_;
+        std::promise<void> promise_;
         std::thread get_thread_;
         std::unique_ptr<HttpClientQtThread> qt_thread_;
         std::mutex qt_thread_mutex_;
