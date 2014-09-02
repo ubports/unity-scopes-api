@@ -240,8 +240,20 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
         }
     };
 
-    ///! TODO: session_id, widgets_api_version, country (+location data)
-    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
+    ///! TODO: widgets_api_version, country (+location data)
+    std::string session_id;
+    auto const metadata = action_metadata();
+    if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
+    {
+        session_id = metadata["session-id"].get_string();
+    }
+    else
+    {
+        session_id = "session_id_missing";
+        std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\" preview: \"" << result().uri() << "\"" << std::endl;
+    }
+
+    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), session_id, hints_.form_factor(), 0, settings(), hints_.locale(), "");
 
     preview_handle_->wait();
 

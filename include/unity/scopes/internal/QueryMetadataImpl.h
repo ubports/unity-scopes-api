@@ -52,6 +52,12 @@ public:
     void set_internet_connectivity(QueryMetadata::ConnectivityStatus connectivity_status);
     QueryMetadata::ConnectivityStatus internet_connectivity() const;
 
+    bool contains_hint(std::string const& key) const;
+    void set_hint(std::string const& key, Variant const& value);
+    VariantMap hints() const;
+    Variant& hint(std::string const& key);
+    Variant const& hint(std::string const& key) const;
+
     virtual VariantMap serialize() const = 0;
 
 protected:
@@ -61,6 +67,7 @@ protected:
 private:
     std::string locale_;
     std::string form_factor_;
+    VariantMap hints_;
     QueryMetadata::ConnectivityStatus internet_connectivity_;
 };
 
