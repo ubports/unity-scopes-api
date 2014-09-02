@@ -426,10 +426,8 @@ TEST(Reaper, no_reap_thread)
 {
     // Check that, with disabled reaper thread, we can still add,
     // refresh, and destroy entries, and that the callbacks for
-    // entries that are still around at distruction time are
+    // entries that are still around at destruction time are
     // invoked (because CallbackOnDestroy is set).
-    try
-    {
     {
         Counter c1;
         Counter c2;
@@ -477,11 +475,6 @@ TEST(Reaper, no_reap_thread)
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(0, c3.get());
-    }
-    }
-    catch (std::exception const& e)
-    {
-        cerr << e.what() << endl;
     }
 }
 
