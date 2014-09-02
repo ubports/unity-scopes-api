@@ -209,15 +209,11 @@ TEST(RuntimeImpl, directories)
     }
 
     {
-        // Same test again, but, this time, we remove write permission from the
-        // scope's directory. This cons the run time into thinking that the scope is confined.
+        // Check that scopes that share a cache dir with an app (because
+        // the scope is packaged with the app in a single click package)
+        // share the app's cache directory.
 
-        char const* dir_path = TEST_DIR "/cache_dir/unconfined";
-
-        // Make sure we restore previous permissions if something throws.
-        auto restore_perms = [](char const* path){ ::chmod(path, 0700); };
-        util::ResourcePtr<char const*, decltype(restore_perms)> permission_guard(dir_path, restore_perms);
-        ::chmod(dir_path, 0000);
+        string const scope_ini_file = TEST_DIR "/TestScope_TestScope.ini";
 
         std::promise<void> promise;
         auto initialized = promise.get_future();
@@ -235,12 +231,12 @@ TEST(RuntimeImpl, directories)
 
         EXPECT_EQ(TEST_DIR, testscope.scope_directory());
 
-        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/leaf-net/TestScope";
+        string tmpdir = "/run/user/" + to_string(geteuid()) + "/scopes/unconfined/TestScope";
         EXPECT_EQ(tmpdir, testscope.tmp_directory());
 
-        EXPECT_EQ(TEST_DIR "/cache_dir/leaf-net/TestScope", testscope.cache_directory());
+        EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
 
-        // Don't shut down the run time until after the scope has initialized.
+        // Don't destroy the run time until after the scope has finished initializing.
         initialized.wait();
         rt->destroy();
 

@@ -20,6 +20,7 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <cassert>
@@ -217,7 +218,15 @@ void Setting::set_value(Type expected_type)
             }
             case Setting::NumberT:
             {
-                default_value_ = Variant(p_->get_int(id_, dflt_val_key));
+                string value = p_->get_string(id_, dflt_val_key);
+                try
+                {
+                    default_value_ = Variant(stod(value));
+                }
+                catch (invalid_argument & e)
+                {
+                    throw LogicException(e.what());
+                }
                 break;
             }
             case Setting::StringT:

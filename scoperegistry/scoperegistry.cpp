@@ -428,6 +428,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     }
     exec_data.runtime_config = config_file;
     exec_data.scope_config = scope.second;
+    exec_data.debug_mode = sc.debug_mode();
 
     registry->add_local_scope(scope.first, move(meta), exec_data);
 }
@@ -497,9 +498,11 @@ int main(int argc, char* argv[])
             // TODO: HACK: We create the root of the data directory for confined scopes,
             //       in case the scope is confined and the dir doesn't exist
             //       yet. This really should be done by the click-installation but,
-            //       prior to RTM, we don't rely on that.
+            //       prior to RTM, we don't rely on that. We check whether the
+            //       directory exists first to avoid getting noise in the Apparmor log.
             string data_root = rt_config.data_directory() + "/leaf-net";
-            ::mkdir(data_root.c_str(), 0700);
+            boost::system::error_code ec;
+            !boost::filesystem::exists(data_root, ec) && ::mkdir(data_root.c_str(), 0700);
         } // Release memory for config parser
 
         // Collect the registry config data.

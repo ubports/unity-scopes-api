@@ -123,6 +123,8 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
         {
             throw MiddlewareException(payload.getUnknown().cStr());
         }
+        default:
+            break;
     }
 }
 

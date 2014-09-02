@@ -53,6 +53,7 @@ public:
         std::string scope_config;
         std::string confinement_profile;
         int timeout_ms;
+        bool debug_mode;
     };
 
 public:
@@ -111,6 +112,7 @@ private:
         void kill(std::unique_lock<std::mutex>& lock);
 
         std::vector<std::string> expand_custom_exec();
+        void publish_state_change(ProcessState scope_state);
 
     private:
         const ScopeExecData exec_data_;
@@ -119,6 +121,7 @@ private:
         mutable std::condition_variable state_change_cond_;
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         MWPublisher::SPtr reg_publisher_;
+        bool manually_started_;
     };
 
 private:
