@@ -173,7 +173,6 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         });
         response->wait();
 
-        //response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
     }
     catch (std::exception const& e)
@@ -586,8 +585,6 @@ void SmartScopesClient::wait_for_search(uint search_id)
     try
     {
         HttpResponseHandle::SPtr query_result;
-        std::string response_str;
-
         {
             std::lock_guard<std::mutex> lock(query_results_mutex_);
 
@@ -690,8 +687,6 @@ void SmartScopesClient::wait_for_preview(uint preview_id)
     try
     {
         HttpResponseHandle::SPtr query_result;
-        std::string response_str;
-
         {
             std::lock_guard<std::mutex> lock(query_results_mutex_);
 
