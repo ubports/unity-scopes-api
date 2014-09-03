@@ -48,12 +48,12 @@ HttpClientQt::~HttpClientQt()
 {
 }
 
-HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url)
+HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, std::function<void(std::string const&)> const& lineData)
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
     // start new session
-    auto session = std::make_shared<HttpSession>(request_url, no_reply_timeout_);
+    auto session = std::make_shared<HttpSession>(request_url, no_reply_timeout_, lineData);
     sessions_[session_index_] = session;
 
     return std::make_shared<HttpResponseHandle>(shared_from_this(), session_index_++, session->get_future());
@@ -79,20 +79,17 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 //-- HttpClientQt::HttpSession
 
-HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout)
-    : promise_(nullptr)
-    , qt_thread_(nullptr)
+HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout, std::function<void(std::string const&)> const& lineData)
+    : qt_thread_(nullptr)
 {
-    promise_ = std::make_shared<std::promise<std::string>>();
-
     get_thread_ =
-        std::thread([this, request_url, timeout]()
+        std::thread([this, request_url, timeout, lineData]()
             {
                 QUrl url(request_url.c_str());
 
                 {
                     std::lock_guard<std::mutex> lock(qt_thread_mutex_);
-                    qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout));
+                    qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout, lineData));
                 }
 
                 QEventLoop loop;
@@ -108,11 +105,11 @@ HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint time
                 if (!success)
                 {
                     unity::ResourceException e(reply);
-                    promise_->set_exception(e.self());
+                    promise_.set_exception(e.self());
                 }
                 else
                 {
-                    promise_->set_value(reply);
+                    promise_.set_value();
                 }
             });
 
@@ -124,9 +121,9 @@ HttpClientQt::HttpSession::~HttpSession()
     cancel_session();
 }
 
-std::future<std::string> HttpClientQt::HttpSession::get_future()
+std::future<void> HttpClientQt::HttpSession::get_future()
 {
-    return promise_->get_future();
+    return promise_.get_future();
 }
 
 void HttpClientQt::HttpSession::cancel_session()
