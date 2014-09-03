@@ -344,7 +344,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     // mandatory parameters
     search_uri << "q=" << http_client_->to_percent_encoding(query);
 
-    search_uri << "&session_id=" << session_id;
+    search_uri << "&session_id=" << http_client_->to_percent_encoding(session_id);
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=" << platform;
 
@@ -412,7 +412,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     // mandatory parameters
 
     preview_uri << "result=" << http_client_->to_percent_encoding(result);
-    preview_uri << "&session_id=" << session_id;
+    preview_uri << "&session_id=" << http_client_->to_percent_encoding(session_id);
     preview_uri << "&platform=" << platform;
     preview_uri << "&widgets_api_version=" << std::to_string(widgets_api_version);
 
