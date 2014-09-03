@@ -161,7 +161,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     };
 
     ///! TODO: country (+location data)
-    uint query_id = 0;
+    int query_id = 0;
     std::string session_id;
     auto const metadata = search_metadata();
     if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
@@ -175,7 +175,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     }
     if (metadata.contains_hint("query-id") && metadata["query-id"].which() == Variant::Int)
     {
-        query_id = static_cast<uint>(metadata["query-id"].get_int());
+        query_id = metadata["query-id"].get_int();
     }
     else
     {
