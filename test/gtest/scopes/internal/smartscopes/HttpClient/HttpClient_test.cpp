@@ -101,7 +101,6 @@ TEST_F(HttpClientTestQuick, ok_server)
     HttpResponseHandle::SPtr response = http_client_->get(test_url_ + "?1", [&response_str](std::string const& s) { response_str += s; });
     response->wait();
 
-    //EXPECT_NO_THROW(response_str = response->get());
     EXPECT_EQ("Hello there", response_str);
 }
 

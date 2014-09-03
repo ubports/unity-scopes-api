@@ -33,11 +33,18 @@ namespace internal
 
 //! @cond
 
-PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
+PreviewWidgetImpl PreviewWidgetImpl::from_json(std::string const& json_text)
 {
     //TODO: json validation
     const internal::JsonCppNode node(json_text);
     auto var = node.to_variant().get_dict();
+
+    return from_json_node(var);
+}
+
+PreviewWidgetImpl PreviewWidgetImpl::from_json_node(VariantMap const& var)
+{
+    PreviewWidgetImpl pimpl;
 
     //
     // the JSON representation of preview widget keeps all the attributes at the top level of the dict,
@@ -49,9 +56,11 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
         // convert VariantMap to map<string,string>
         for (auto const& kv: it->second.get_dict())
         {
-            add_attribute_mapping(kv.first, kv.second.get_string());
+            pimpl.add_attribute_mapping(kv.first, kv.second.get_string());
         }
     }
+
+    PreviewWidgetList widgets;
 
     // iterate over top-level attributes, skip 'components' key
     for (auto const& kv: var)
@@ -60,18 +69,33 @@ PreviewWidgetImpl::PreviewWidgetImpl(std::string const& json_text)
         {
             if (kv.first == "id")
             {
-                set_id(kv.second.get_string());
+                pimpl.set_id(kv.second.get_string());
             }
             else if (kv.first == "type")
             {
-                set_widget_type(kv.second.get_string());
+                pimpl.set_widget_type(kv.second.get_string());
+            }
+            else if (kv.first == "widgets")
+            {
+                auto const va = kv.second.get_array();
+                for (auto const w: va)
+                {
+                    widgets.push_back(PreviewWidget(new PreviewWidgetImpl(PreviewWidgetImpl::from_json_node(w.get_dict()))));
+                }
             }
             else
             {
-                add_attribute_value(kv.first, kv.second);
+                pimpl.add_attribute_value(kv.first, kv.second);
             }
         }
     }
+
+    if (pimpl.type_ == "expandable")
+    {
+        pimpl.widgets_ = widgets;
+    }
+
+    return pimpl;
 }
 
 PreviewWidgetImpl::PreviewWidgetImpl(std::string const& id, std::string const &widget_type)
@@ -117,6 +141,18 @@ PreviewWidgetImpl::PreviewWidgetImpl(VariantMap const& var)
     {
         add_attribute_mapping(kv.first, kv.second.get_string());
     }
+
+    if (type_ == "expandable")
+    {
+        it = var.find("widgets");
+        if (it != var.end())
+        {
+            for (auto const& w: it->second.get_array())
+            {
+                widgets_.push_back(PreviewWidget(new PreviewWidgetImpl(w.get_dict())));
+            }
+        }
+    }
 }
 
 PreviewWidget PreviewWidgetImpl::create(VariantMap const& var)
@@ -138,11 +174,36 @@ void PreviewWidgetImpl::set_widget_type(std::string const& widget_type)
 
 void PreviewWidgetImpl::add_attribute_value(std::string const& key, Variant const& value)
 {
-    if (key == "id" || key == "type" || key == "components")
+    if (key == "id" || key == "type" || key == "components" || key == "widgets")
     {
         throw InvalidArgumentException("PreviewWidget::add_attribute_value(): Can't override '" + key + "'");
     }
     attributes_[key] = value;
+}
+
+void PreviewWidgetImpl::add_widget(PreviewWidget const& widget)
+{
+    if (type_ != "expandable")
+    {
+        throw LogicException("PreviewWidget::add_widget(): widgets can only be added to widget of type 'expandable'");
+    }
+    if (widget.widget_type() == "expandable")
+    {
+        throw LogicException("PreviewWidget::add_widget(): can't add 'expandable' widget '" + widget.id() + "' into another 'expandable'");
+    }
+    if (widget.id() == id_)
+    {
+        throw LogicException("PreviewWidget::add_widget(): can't add widget '" + widget.id() + "' with same id as the 'expandable' widget");
+    }
+
+    for (auto const& w: widgets_)
+    {
+        if (w.id() == widget.id())
+        {
+            throw unity::LogicException("PreviewWidget::add_widget(): widget '" + widget.id() + "' already added to widget '" + id_);
+        }
+    }
+    widgets_.push_back(widget);
 }
 
 void PreviewWidgetImpl::add_attribute_mapping(std::string const& key, std::string const& field_name)
@@ -183,6 +244,11 @@ VariantMap PreviewWidgetImpl::attribute_values() const
     return attributes_;
 }
 
+PreviewWidgetList PreviewWidgetImpl::widgets() const
+{
+    return widgets_;
+}
+
 std::string PreviewWidgetImpl::data() const
 {
     // convert from map<string,string> to VariantMap
@@ -195,6 +261,16 @@ std::string PreviewWidgetImpl::data() const
     VariantMap var;
     var["id"] = id_;
     var["type"] = type_;
+    if (widgets_.size())
+    {
+        VariantArray va;
+        for (auto w: widgets_)
+        {
+            va.push_back(Variant(w.serialize()));
+        }
+        var["widgets"] = Variant(va);
+    }
+
     var["components"] = Variant(cm);
     for (auto const& kv: attributes_)
     {
@@ -229,6 +305,15 @@ VariantMap PreviewWidgetImpl::serialize() const
     vm["type"] = type_;
     vm["attributes"] = attributes_;
     vm["components"] = Variant(cm);
+    if (widgets_.size())
+    {
+        VariantArray va;
+        for (auto w: widgets_)
+        {
+            va.push_back(Variant(w.serialize()));
+        }
+        vm["widgets"] = Variant(va);
+    }
     return vm;
 }
 
