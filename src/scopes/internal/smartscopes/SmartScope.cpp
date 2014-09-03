@@ -161,6 +161,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     };
 
     ///! TODO: country (+location data)
+    uint query_id = 0;
     std::string session_id;
     auto const metadata = search_metadata();
     if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
@@ -172,7 +173,16 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         session_id = "session_id_missing";
         std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
     }
-    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
+    if (metadata.contains_hint("query-id") && metadata["query-id"].which() == Variant::Int)
+    {
+        query_id = static_cast<uint>(metadata["query-id"].get_int());
+    }
+    else
+    {
+        std::cout << "SmartScope: missing or invalid query id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
+    }
+
+    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
     search_handle_->wait();
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
