@@ -168,7 +168,7 @@ public:
                               std::string const& query,
                               std::string const& department_id,
                               std::string const& session_id,
-                              unsigned int query_id,
+                              int query_id,
                               std::string const& platform,
                               VariantMap const& settings = VariantMap(),
                               VariantMap const& filter_state = VariantMap(),

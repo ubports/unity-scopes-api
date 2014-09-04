@@ -56,12 +56,6 @@ public:
     Location location() const;
     bool has_location() const;
 
-    bool contains_hint(std::string const& key) const;
-    void set_hint(std::string const& key, Variant const& value);
-    VariantMap hints() const;
-    Variant& hint(std::string const& key);
-    Variant const& hint(std::string const& key) const;
-
     virtual VariantMap serialize() const override;
 
     static SearchMetadata create(VariantMap const& var);
@@ -74,7 +68,6 @@ protected:
 
 private:
     int cardinality_;
-    VariantMap hints_;
     boost::optional<Location> location_;
 };
 
