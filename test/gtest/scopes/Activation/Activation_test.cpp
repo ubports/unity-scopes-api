@@ -547,7 +547,7 @@ TEST(Activation, scope)
     auto reg_rt = run_test_registry();
 
     auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
-    RaiiScopeThread<TestScope> scope_thread(move(scope_rt), "Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt), TEST_DIR "/Runtime.ini");
 
     // parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");

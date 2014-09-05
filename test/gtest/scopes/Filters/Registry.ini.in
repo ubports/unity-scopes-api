@@ -1,6 +1,6 @@
 [Registry]
 Middleware = Zmq
-Zmq.ConfigFile = Zmq.ini
+Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Scope.InstallDir = /unused
 Click.InstallDir = /unused
 Scoperunner.Path = /unused
