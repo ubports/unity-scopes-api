@@ -78,7 +78,7 @@ SearchQueryBase::UPtr SlowCreateScope::search(CannedQuery const& query, SearchMe
     // invocation. When this method returns, the client-side run time calls
     // the real cancel, which triggers the cancelled() callback above, which, in turn,
     // causes TestQuery::run() to complete.
-    this_thread::sleep_for(chrono::milliseconds(200));
+    this_thread::sleep_for(chrono::milliseconds(250));
 
     return SearchQueryBase::UPtr(new TestQuery(query, metadata));
 }

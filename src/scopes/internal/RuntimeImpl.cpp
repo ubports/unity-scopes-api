@@ -425,14 +425,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     try
     {
-
         // Create a servant for the scope and register the servant.
         if (!scope_ini_file.empty())
         {
             // Check if this scope has requested debug mode, if so, disable the idle timeout
             ScopeConfig scope_config(scope_ini_file);
             int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
-
             auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
                                                                                      scope_base,
                                                                                      scope_config.debug_mode()));

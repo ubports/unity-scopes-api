@@ -150,8 +150,6 @@ TEST(Registry, scope_state_notify)
     // Configure testscopeA scope_state_callback
     auto connA = r->set_scope_state_callback("testscopeA", [&updateA_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
-        std::cerr << "scopeA updated, running: " << is_running << std::endl;
-        //std::cerr << ts() << " scopeA updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
         updateA_received = true;
         testscopeA_state = is_running;
@@ -161,7 +159,6 @@ TEST(Registry, scope_state_notify)
     // Configure testscopeB scope_state_callback
     auto connB = r->set_scope_state_callback("testscopeB", [&updateB_received, &testscopeB_state, &mutex, &cond](bool is_running)
     {
-        std::cerr << "scopeB updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
         updateB_received = true;
         testscopeB_state = is_running;
@@ -619,6 +616,8 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
+    int rc = 0;
+
     // Clean up in case we left something behind from an earlier interrupted run.
     system::error_code ec;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
@@ -639,14 +638,18 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
-        auto rc = RUN_ALL_TESTS();
+        rc = ::system("echo -n \"load average: \"; cat /proc/loadavg; vmstat --wide");
+        if (rc == 0)
+        {
+            rc = RUN_ALL_TESTS();
+        }
         kill(rpid, SIGTERM);
         waitpid(rpid, nullptr, 0);
-        return rc;
     }
     else
     {
         perror("Failed to fork:");
     }
-    return 1;
+
+    return rc;
 }

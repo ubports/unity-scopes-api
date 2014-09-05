@@ -86,7 +86,18 @@ TEST(ThreadSafeQueue, exception)
 
         try
         {
-            q->push("fred");
+            q->push("fred");    // Move push
+            FAIL();
+        }
+        catch (std::runtime_error const& e)
+        {
+            EXPECT_STREQ("ThreadSafeQueue: cannot push onto destroyed queue", e.what());
+        }
+
+        try
+        {
+            string s = "fred";
+            q->push(s);         // Copy push
             FAIL();
         }
         catch (std::runtime_error const& e)
@@ -210,6 +221,7 @@ TEST(ThreadSafeQueue, move_only)
     EXPECT_EQ("again", m.val());
 
     q.destroy();
+
     try
     {
         q.push(move(MoveOnly("no_push")));
@@ -219,4 +231,16 @@ TEST(ThreadSafeQueue, move_only)
     {
         EXPECT_STREQ("ThreadSafeQueue: cannot push onto destroyed queue", e.what());
     }
+}
+
+TEST(ThreadSafeQueue, wait_until_empty)
+{
+    ThreadSafeQueue<int> q;
+    q.push(99);
+    auto fut = std::async(launch::async, [&q] {
+        this_thread::sleep_for(chrono::milliseconds(300)); q.wait_and_pop(); q.destroy();
+    });
+    q.wait_until_empty();
+    EXPECT_TRUE(q.empty());
+    fut.wait();
 }

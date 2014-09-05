@@ -228,7 +228,11 @@ int main(int argc, char **argv)
     // from a synchronous remote call.
     this_thread::sleep_for(chrono::milliseconds(500));
 
-    auto rc = RUN_ALL_TESTS();
+    int rc = ::system("echo -n \"load average: \"; cat /proc/loadavg; vmstat --wide");
+    if (rc == 0)
+    {
+        rc = RUN_ALL_TESTS();
+    }
 
     tsrt->destroy();
     testscope_t.join();

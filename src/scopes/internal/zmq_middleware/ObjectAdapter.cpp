@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
+#include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 #include <zmqpp/message.hpp>
 #include <zmqpp/poller.hpp>
