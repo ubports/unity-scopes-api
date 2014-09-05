@@ -23,7 +23,6 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem/operations.hpp>
 
 #include <condition_variable>

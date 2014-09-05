@@ -18,7 +18,6 @@
 
 #include <unity/scopes/testing/Statistics.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/math/distributions/normal.hpp>
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/special_functions/pow.hpp>

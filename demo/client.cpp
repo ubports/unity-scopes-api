@@ -19,7 +19,6 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>

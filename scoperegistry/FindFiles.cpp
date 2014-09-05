@@ -21,7 +21,6 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem/path.hpp>
 
 #include <map>
