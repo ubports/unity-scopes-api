@@ -25,6 +25,8 @@
 
 #include "SlowSearchScope.h"
 
+#include <fstream>
+
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -138,8 +140,6 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
         slowsearchscope_t.join();
     }
 
-    // Check that the run time doesn't shut down until
-    // the search in the scope has completed, which takes 4 seconds.
     // We allow 4 - 8 seconds for things to shut down.
     // If no finished message has arrived by then, something is broken.
     auto duration = chrono::steady_clock::now() - start_time;
@@ -151,11 +151,10 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    auto rc = ::system("echo -n \"load average: \"; cat /proc/loadavg; vmstat --wide");
-    if (rc == 0)
-    {
-        rc = RUN_ALL_TESTS();
-    }
+    std::ifstream la("/proc/loadavg");
+    std::string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
 
-    return rc;
+    return RUN_ALL_TESTS();
 }

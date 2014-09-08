@@ -151,7 +151,7 @@ ZmqMiddleware::~ZmqMiddleware()
 
         // TODO:
         // We terminate explicitly here instead of relying
-        // on the destructor so we can measure how long it
+        // on the context_ destructor so we can measure how long it
         // takes. There is an intermittent problem with
         // zmq taking several seconds to terminate the context.
         // Until we figure out what's going on here, we measure

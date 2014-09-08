@@ -26,6 +26,7 @@
 #include <boost/filesystem/operations.hpp>
 
 #include <condition_variable>
+#include <fstream>
 #include <functional>
 #include <mutex>
 #include <signal.h>
@@ -376,6 +377,8 @@ TEST(Registry, manually_started_scope)
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    rt->destroy();
 }
 
 TEST(Registry, list_update_notify_before_click_folder_exists)
@@ -618,7 +621,7 @@ int main(int argc, char **argv)
 
     int rc = 0;
 
-    // Clean up in case we left something behind from an earlier interrupted run.
+    // Unlink in case we left the link behind from an earlier interrupted run.
     system::error_code ec;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     filesystem::remove_all(TEST_RUNTIME_PATH "/click",ec);
@@ -638,11 +641,13 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
-        rc = ::system("echo -n \"load average: \"; cat /proc/loadavg; vmstat --wide");
-        if (rc == 0)
-        {
-            rc = RUN_ALL_TESTS();
-        }
+        std::ifstream la("/proc/loadavg");
+        std::string avg[3];
+        la >> avg[0] >> avg[1] >> avg[2];
+        std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
+
+        rc = RUN_ALL_TESTS();
+
         kill(rpid, SIGTERM);
         waitpid(rpid, nullptr, 0);
     }

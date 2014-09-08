@@ -16,12 +16,6 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <mutex>
-
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
@@ -39,6 +33,13 @@
 #include "PusherScope.h"
 #include "SlowCreateScope.h"
 #include "TestScope.h"
+
+#include <fstream>
+#include <mutex>
+
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -112,7 +113,7 @@ public:
         EXPECT_EQ(1, annotation_count_);
         EXPECT_EQ(2, info_count_);
 
-        EXPECT_EQ(2, details.info_list().size()); // If this assertion fails, the test hangs until Jenkins times out
+        EXPECT_EQ(2, details.info_list().size());
         if (details.info_list().size() == 2)
         {
             EXPECT_EQ(OperationInfo::NoInternet, details.info_list()[0].code());
@@ -515,11 +516,12 @@ int main(int argc, char **argv)
     // from a synchronous remote call.
     this_thread::sleep_for(chrono::milliseconds(500));
 
-    rc = ::system("echo -n \"load average: \"; cat /proc/loadavg; vmstat --wide");
-    if (rc == 0)
-    {
-        rc = RUN_ALL_TESTS();
-    }
+    std::ifstream la("/proc/loadavg");
+    std::string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
+
+    rc = RUN_ALL_TESTS();
 
     srt->destroy();
     scope_t.join();

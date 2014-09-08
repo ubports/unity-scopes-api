@@ -157,7 +157,10 @@ void RuntimeImpl::destroy()
     }
 
     // No more outgoing invocations.
-    async_pool_ = nullptr;
+    if (async_pool_)
+    {
+        async_pool_->destroy_once_empty();
+    }
 
     // Wait for any twoway operations that were invoked asynchronously to complete.
     if (future_queue_)
