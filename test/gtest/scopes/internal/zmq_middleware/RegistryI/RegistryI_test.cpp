@@ -751,3 +751,15 @@ TEST_F(RegistryITest, locate_idle_timeout)
     // check that the process is gone
     EXPECT_EQ(0, process_count());
 }
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+
+    ifstream la("/proc/loadavg");
+    string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << endl;
+
+    return RUN_ALL_TESTS();
+}

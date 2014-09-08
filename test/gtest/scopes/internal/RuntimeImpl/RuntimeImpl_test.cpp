@@ -27,6 +27,8 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 #include <fcntl.h>
 
 using namespace std;
@@ -241,4 +243,16 @@ TEST(RuntimeImpl, directories)
 
         thread_done.wait();
     }
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+
+    ifstream la("/proc/loadavg");
+    string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << endl;
+
+    return RUN_ALL_TESTS();
 }
